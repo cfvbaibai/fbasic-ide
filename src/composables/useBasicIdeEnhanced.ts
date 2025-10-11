@@ -21,11 +21,29 @@
  * 
  * @returns Object containing reactive state and methods for IDE functionality
  */
+
+/* global setInterval, clearInterval */
 import { ref, computed } from 'vue'
 import { FBasicParser } from '../core/parser/FBasicParser'
 import { BasicInterpreter } from '../core/BasicInterpreter'
-import type { ExecutionResult, ParserInfo, HighlighterInfo, BasicVariable } from '../core/interfaces'
+import type { ExecutionResult, ParserInfo, HighlighterInfo, BasicVariable, DeviceAdapterInterface } from '../core/interfaces'
 import { isEmpty } from 'lodash-es'
+
+// Import device abstraction
+import { 
+  BasicDeviceManager, 
+  BasicDeviceFactory, 
+  DeviceAdapter,
+  DeviceType,
+  WebJoystickDevice
+} from '../core/devices/index'
+
+/**
+ * Extended BasicInterpreter interface with joystick polling
+ */
+interface InterpreterWithJoystickPolling extends BasicInterpreter {
+  joystickPollInterval?: ReturnType<typeof setInterval>
+}
 
 /**
  * Enhanced composable function for BASIC IDE functionality with AST-based parsing
@@ -50,7 +68,62 @@ export function useBasicIde() {
 
   // Parser and interpreter instances
   const parser = new FBasicParser()
-  const interpreter = new BasicInterpreter()
+  const interpreter = new BasicInterpreter() as InterpreterWithJoystickPolling
+
+  // Device abstraction setup
+  const deviceManager = new BasicDeviceManager()
+  const _deviceFactory = new BasicDeviceFactory()
+  const deviceAdapter = new DeviceAdapter({
+    deviceManager,
+    enableDeviceIntegration: true
+  }) as DeviceAdapterInterface
+
+  // Initialize joystick device
+  const initializeJoystickDevice = async () => {
+    try {
+      const joystickDevice = new WebJoystickDevice('web-joystick', 'Web Joystick', {
+        enableGamepadAPI: true,
+        crossButtonThreshold: 0.5,
+        deadzone: 0.1
+      })
+      
+      await deviceManager.registerDevice(joystickDevice)
+      deviceManager.setPrimaryDevice(DeviceType.JOYSTICK, 'web-joystick')
+      
+      // Update interpreter with device adapter
+      interpreter.updateConfig({ deviceAdapter })
+    } catch (error) {
+      console.warn('Failed to initialize joystick device:', error)
+    }
+  }
+
+  // Initialize device system
+  initializeJoystickDevice()
+
+  // Start joystick state polling
+  const startJoystickPolling = () => {
+    const pollInterval = setInterval(async () => {
+      if (interpreter) {
+        await interpreter.updateJoystickStates()
+      }
+    }, 100) // Poll every 100ms
+    
+    // Store interval ID for cleanup
+    interpreter.joystickPollInterval = pollInterval
+  }
+
+  // Start polling when device adapter is ready
+  setTimeout(() => {
+    startJoystickPolling()
+  }, 1000) // Start after 1 second to allow device initialization
+
+  // Cleanup function for joystick polling
+  const cleanupJoystickPolling = () => {
+    if (interpreter.joystickPollInterval) {
+      clearInterval(interpreter.joystickPollInterval)
+      interpreter.joystickPollInterval = undefined
+    }
+  }
 
   // Computed properties
   const hasErrors = computed(() => !isEmpty(errors.value))
@@ -343,7 +416,13 @@ export function useBasicIde() {
     validateCode,
     getParserCapabilities,
     getHighlighterCapabilities,
-    toggleDebugMode
+    toggleDebugMode,
+    
+    // Device integration
+    deviceAdapter,
+    
+    // Cleanup
+    cleanupJoystickPolling
   }
 }
 

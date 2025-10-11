@@ -385,6 +385,8 @@ FunctionName =
   "SGN"i { return 'SGN'; } /
   "SIN"i { return 'SIN'; } /
   "SQR"i { return 'SQR'; } /
+  "STICK"i { return 'STICK'; } /
+  "STRIG"i { return 'STRIG'; } /
   "TAN"i { return 'TAN'; }
 
 // Variable

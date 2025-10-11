@@ -182,14 +182,14 @@ describe('Integration Tests', () => {
     }
 
     it('should parse all sample codes without syntax errors', async () => {
-      for (const [name, code] of Object.entries(sampleCodes)) {
+      for (const [_name, code] of Object.entries(sampleCodes)) {
         const result = await parser.parse(code)
         expect(result.success).toBe(true)
       }
     })
 
     it('should execute all sample codes successfully', async () => {
-      for (const [name, code] of Object.entries(sampleCodes)) {
+      for (const [_name, code] of Object.entries(sampleCodes)) {
         const result = await interpreter.execute(code)
         expect(result.success).toBe(true)
         expect(result.errors).toHaveLength(0)
@@ -273,7 +273,7 @@ describe('Integration Tests', () => {
     it('should have consistent debug message format', async () => {
       interpreter.updateConfig({ enableDebugMode: true })
       const result = await interpreter.execute('10 PRINT "Test"\n20 LET X = 5\n30 END')
-      const debugLines = result.debugOutput.split('\n').filter(line => line.trim() !== '')
+      const debugLines = result.debugOutput?.split('\n').filter(line => line.trim() !== '') || []
       expect(debugLines.length).toBeGreaterThan(0)
       // All debug messages should follow a consistent format
       debugLines.forEach(line => {
@@ -434,19 +434,13 @@ describe('Integration Tests', () => {
     it('should handle invalid syntax gracefully', async () => {
       const result = await interpreter.execute('10 INVALID STATEMENT\n20 END')
       expect(result.success).toBe(false)
-      expect(result.errors[0].type).toBe('SYNTAX')
+      expect(result.errors?.[0]?.type).toBe('SYNTAX')
     })
 
     it('should handle runtime errors gracefully', async () => {
       const result = await interpreter.execute('10 GOTO 999\n20 END')
       expect(result.success).toBe(false)
-      expect(result.errors[0].type).toBe('RUNTIME')
-    })
-
-    it('should handle runtime errors gracefully', async () => {
-      const result = await interpreter.execute('10 GOTO 999\n20 END')
-      expect(result.success).toBe(false)
-      expect(result.errors[0].type).toBe('RUNTIME')
+      expect(result.errors?.[0]?.type).toBe('RUNTIME')
     })
   })
 })

@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import CodeEditor from './components/CodeEditor.vue'
 import RuntimeOutput from './components/RuntimeOutput.vue'
 import IdeControls from './components/IdeControls.vue'
+import JoystickControl from './components/JoystickControl.vue'
 import { useBasicIde as useBasicIdeEnhanced } from './composables/useBasicIdeEnhanced'
 import type { ParserInfo, HighlighterInfo } from './core/interfaces'
 
@@ -26,7 +27,8 @@ const {
   validateCode,
   getParserCapabilities,
   getHighlighterCapabilities,
-  toggleDebugMode
+  toggleDebugMode,
+  deviceAdapter
 } = useBasicIdeEnhanced()
 
 // Computed properties for backward compatibility
@@ -119,6 +121,9 @@ onMounted(() => {
         />
       </div>
     </div>
+
+    <!-- Joystick Control Panel -->
+    <JoystickControl :device-adapter="deviceAdapter" />
   </div>
 </template>
 

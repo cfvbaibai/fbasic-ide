@@ -44,6 +44,15 @@ export interface LoopState {
 }
 
 /**
+ * Device Adapter interface for joystick integration
+ * This avoids circular imports by defining the minimal interface needed
+ */
+export interface DeviceAdapterInterface {
+  getStickState(joystickId: number): Promise<number>
+  getTriggerState(joystickId: number): Promise<number>
+}
+
+/**
  * Configuration for the BASIC interpreter
  */
 export interface InterpreterConfig {
@@ -51,6 +60,7 @@ export interface InterpreterConfig {
   maxOutputLines: number
   enableDebugMode: boolean
   strictMode: boolean
+  deviceAdapter?: DeviceAdapterInterface
 }
 
 /**

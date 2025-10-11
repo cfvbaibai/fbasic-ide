@@ -16,7 +16,8 @@ import type {
   BasicVariable, 
   BasicError, 
   InterpreterConfig, 
-  ExecutionResult
+  ExecutionResult,
+  DeviceAdapterInterface
 } from './interfaces'
 
 // Import the FBasicParser
@@ -78,6 +79,9 @@ export class BasicInterpreter {
   private dataIndex = 0 // Current position in DATA
   private arrays: Map<string, (number | string)[]> = new Map() // Array storage
   private debugOutput: string[] = [] // Debug output buffer
+  private deviceAdapter?: DeviceAdapterInterface // DeviceAdapter for joystick support
+  private joystickStates: number[] = [0, 0, 0, 0] // Cached STICK states for joysticks 0-3
+  private triggerStates: number[] = [0, 0, 0, 0] // Cached STRIG states for joysticks 0-3
 
   constructor(config?: Partial<InterpreterConfig>) {
     this.config = {
@@ -87,6 +91,7 @@ export class BasicInterpreter {
       strictMode: false,
       ...config
     }
+    this.deviceAdapter = config?.deviceAdapter
     this.parser = new FBasicParser()
   }
 
@@ -931,6 +936,16 @@ export class BasicInterpreter {
         return str.substring(startIndex, startIndex + count)
       }
       
+      // Joystick functions (Family BASIC v3)
+      case 'STICK': {
+        const joystickId = this.toNumber(args[0] || 0)
+        return this.getJoystickState(joystickId)
+      }
+      case 'STRIG': {
+        const joystickId = this.toNumber(args[0] || 0)
+        return this.getTriggerState(joystickId)
+      }
+      
       default: return 0
     }
   }
@@ -1123,6 +1138,42 @@ export class BasicInterpreter {
       ...this.config,
       ...newConfig
     }
+    if (newConfig.deviceAdapter !== undefined) {
+      this.deviceAdapter = newConfig.deviceAdapter
+    }
+  }
+
+  /**
+   * Update joystick states from device adapter
+   * This should be called periodically to keep joystick states current
+   */
+  async updateJoystickStates(): Promise<void> {
+    if (!this.deviceAdapter) return
+    
+    try {
+      for (let i = 0; i < 4; i++) {
+        this.joystickStates[i] = await this.deviceAdapter.getStickState(i)
+        this.triggerStates[i] = await this.deviceAdapter.getTriggerState(i)
+      }
+    } catch (error) {
+      this.debugLog(`Error updating joystick states: ${error}`)
+    }
+  }
+
+  /**
+   * Get current joystick state (STICK function)
+   */
+  getJoystickState(joystickId: number): number {
+    if (joystickId < 0 || joystickId > 3) return 0
+    return this.joystickStates[joystickId] || 0
+  }
+
+  /**
+   * Get current trigger state (STRIG function)
+   */
+  getTriggerState(joystickId: number): number {
+    if (joystickId < 0 || joystickId > 3) return 0
+    return this.triggerStates[joystickId] || 0
   }
 
 }
