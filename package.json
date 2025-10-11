@@ -1,0 +1,52 @@
+{
+    "name": "fbasic-emu",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "npm run build-parser && vite",
+        "build": "npm run build-parser && vue-tsc && vite build",
+        "preview": "vite preview",
+        "lint": "eslint . --fix",
+        "type-check": "npm run build-parser && vue-tsc --noEmit",
+        "test": "npm run build-parser && vitest",
+        "test:ui": "npm run build-parser && vitest --ui",
+        "test:run": "npm run build-parser && vitest run",
+        "test:run:parallel": "npm run build-parser && vitest run --pool=forks --poolOptions.forks.maxForks=4",
+        "test:run:threads": "npm run build-parser && vitest run --pool=threads --poolOptions.threads.maxThreads=4",
+        "test:run:single": "npm run build-parser && vitest run --pool=forks --poolOptions.forks.singleFork=true",
+        "test:coverage": "npm run build-parser && vitest run --coverage",
+        "build-parser": "tsx src/core/parser/build-parser.ts",
+        "clean": "del src\\core\\parser\\fbasic-parser.js 2>nul || echo Parser file not found",
+        "prebuild": "npm run build-parser"
+    },
+    "dependencies": {
+        "@element-plus/icons-vue": "^2.3.2",
+        "element-plus": "^2.11.4",
+        "lodash-es": "^4.17.21",
+        "peggy": "^3.0.2",
+        "vue": "^3.5.22"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.37.0",
+        "@types/lodash-es": "^4.17.12",
+        "@types/node": "^24.7.1",
+        "@typescript-eslint/eslint-plugin": "^8.46.0",
+        "@typescript-eslint/parser": "^8.46.0",
+        "@vitejs/plugin-vue": "^6.0.1",
+        "@vitest/ui": "^3.2.4",
+        "@vue/eslint-config-prettier": "^10.2.0",
+        "@vue/eslint-config-typescript": "^14.6.0",
+        "@vue/test-utils": "^2.4.6",
+        "@vue/tsconfig": "^0.8.1",
+        "eslint": "^9.37.0",
+        "eslint-plugin-vue": "^10.5.0",
+        "jsdom": "^27.0.0",
+        "prettier": "^3.6.2",
+        "tsx": "^4.19.2",
+        "typescript": "^5.9.3",
+        "vite": "^7.1.7",
+        "vitest": "^3.2.4",
+        "vue-tsc": "^3.1.1"
+    }
+}
