@@ -51,6 +51,7 @@ export type CommandNode =
   | CircleStatementNode
   | PaintStatementNode
   | StatementBlockNode
+  | StatementBlockExecutorNode
   | InvalidCommandNode;
 
 // PRINT Statement
@@ -79,6 +80,12 @@ export interface IfStatementNode extends ASTNode {
 // Statement Block (for multi-statement THEN clauses)
 export interface StatementBlockNode extends ASTNode {
   type: 'StatementBlock';
+  statements: CommandNode[];
+}
+
+// Statement Block Executor (for processed nested StatementBlocks)
+export interface StatementBlockExecutorNode extends ASTNode {
+  type: 'StatementBlockExecutor';
   statements: CommandNode[];
 }
 

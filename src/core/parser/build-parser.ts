@@ -30,13 +30,16 @@ export function buildParser(): void {
     
     // Generate the parser
     console.log('Generating parser...');
-    const parserCode = peggy.generate(grammar, {
-      output: 'source',
-      format: 'es',
-      optimize: 'speed',
+    // Define the options with proper typing
+    const options = {
+      output: 'source' as const,
+      format: 'es' as const,
+      optimize: 'speed' as const,
       trace: false,
-      plugins: []
-    } as unknown as Parameters<typeof peggy.generate>[1]);
+      plugins: [] as never[]
+    };
+    
+    const parserCode = peggy.generate(grammar, options);
     
     // Write the generated parser
     const outputPath = join(currentDir, 'fbasic-parser.js');

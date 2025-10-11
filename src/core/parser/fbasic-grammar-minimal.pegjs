@@ -111,7 +111,7 @@ printStatement = "PRINT"i WS printList:PrintList? {
   };
 }
 
-PrintList = head:PrintItem tail:(_ ("," / ";") _ item:PrintItem { return item; })* {
+PrintList = head:PrintItem tail:(_ separator:("," / ";") _ item:PrintItem { return { item, separator }; })* {
   return [head, ...tail];
 }
 
@@ -214,16 +214,16 @@ readStatement = "READ"i _ variables:VariableList {
 
 // RESTORE Statement
 restoreStatement = 
+  "RESTORE"i WS lineNumber:Expression {
+    return {
+      type: 'RestoreStatement',
+      lineNumber: lineNumber
+    };
+  } /
   "RESTORE"i {
     return {
       type: 'RestoreStatement',
       lineNumber: null
-    };
-  } /
-  "RESTORE"i _ lineNumber:Expression {
-    return {
-      type: 'RestoreStatement',
-      lineNumber: lineNumber
     };
   }
 
