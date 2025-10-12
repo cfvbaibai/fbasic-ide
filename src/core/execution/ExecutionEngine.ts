@@ -4,7 +4,7 @@
  * Main execution engine that orchestrates BASIC program execution.
  */
 
-import type { ExecutionResult } from '../interfaces'
+import type { ExecutionResult, BasicDeviceAdapter } from '../interfaces'
 import type { StatementNode, CommandNode } from '../parser/ast-types'
 import { ERROR_TYPES } from '../constants'
 import { ExecutionContext } from '../state/ExecutionContext'
@@ -22,13 +22,16 @@ export class ExecutionEngine {
   private dataService: DataService
   private statementRouter: StatementRouter
 
-  constructor(context: ExecutionContext) {
+  constructor(
+    context: ExecutionContext,
+    deviceAdapter?: BasicDeviceAdapter
+  ) {
     this.context = context
     
     // Initialize services
     this.evaluator = new ExpressionEvaluator(this.context)
     this.variableService = new VariableService(this.context, this.evaluator)
-    this.ioService = new IoService(this.context, this.evaluator)
+    this.ioService = new IoService(this.context, this.evaluator, deviceAdapter)
     this.dataService = new DataService(this.context, this.evaluator)
     this.statementRouter = new StatementRouter(
       this.context,
@@ -167,11 +170,8 @@ export class ExecutionEngine {
       }
       
       return {
-        success: this.context.errors.length === 0,
-        output: this.ioService.getOutput(),
-        debugOutput: this.context.config.enableDebugMode ? 
-          this.context.debugOutput.join('\n') : undefined,
-        errors: this.context.errors,
+        success: this.context.getErrors().length === 0,
+        errors: this.context.getErrors(),
         variables: this.context.variables,
         executionTime: Date.now() - startTime
       }
@@ -186,10 +186,7 @@ export class ExecutionEngine {
       
       return {
         success: false,
-        output: this.ioService.getOutput(),
-        debugOutput: this.context.config.enableDebugMode ? 
-          this.context.debugOutput.join('\n') : undefined,
-        errors: this.context.errors,
+        errors: this.context.getErrors(),
         variables: this.context.variables,
         executionTime: Date.now() - startTime
       }
@@ -209,38 +206,6 @@ export class ExecutionEngine {
    */
   reset(): void {
     this.context.reset()
-  }
-
-  /**
-   * Update joystick states
-   */
-  async updateJoystickStates(): Promise<void> {
-    if (!this.context.deviceAdapter) return
-    
-    try {
-      for (let i = 0; i < 4; i++) {
-        this.context.joystickStates[i] = await this.context.deviceAdapter.getStickState(i)
-        this.context.triggerStates[i] = await this.context.deviceAdapter.getTriggerState(i)
-      }
-    } catch (error) {
-      this.context.addDebugOutput(`Error updating joystick states: ${error}`)
-    }
-  }
-
-  /**
-   * Get current joystick state
-   */
-  getJoystickState(joystickId: number): number {
-    if (joystickId < 0 || joystickId > 3) return 0
-    return this.context.joystickStates[joystickId] || 0
-  }
-
-  /**
-   * Get current trigger state
-   */
-  getTriggerState(joystickId: number): number {
-    if (joystickId < 0 || joystickId > 3) return 0
-    return this.context.triggerStates[joystickId] || 0
   }
 
   /**

@@ -22,27 +22,24 @@
  * @returns Object containing reactive state and methods for IDE functionality
  */
 
-/* global setInterval, clearInterval */
-import { ref, computed } from 'vue'
+/* global Worker, NodeJS, clearTimeout */
+import { ref, onUnmounted } from 'vue'
 import { FBasicParser } from '../core/parser/FBasicParser'
-import { BasicInterpreter } from '../core/BasicInterpreter'
-import type { ExecutionResult, ParserInfo, HighlighterInfo, BasicVariable, DeviceAdapterInterface } from '../core/interfaces'
-import { isEmpty } from 'lodash-es'
-
-// Import device abstraction
-import { 
-  BasicDeviceManager, 
-  BasicDeviceFactory, 
-  DeviceAdapter,
-  DeviceType,
-  WebJoystickDevice
-} from '../core/devices/index'
+import { getSampleCode } from '../core/samples/sampleCodes'
+import type { ExecutionResult, ParserInfo, HighlighterInfo, BasicVariable, AnyServiceWorkerMessage } from '../core/interfaces'
+import { EXECUTION_LIMITS } from '../core/constants'
 
 /**
- * Extended BasicInterpreter interface with joystick polling
+ * Service Worker Manager for direct communication
  */
-interface InterpreterWithJoystickPolling extends BasicInterpreter {
-  joystickPollInterval?: ReturnType<typeof setInterval>
+interface ServiceWorkerManager {
+  worker: Worker | null
+  messageId: number
+  pendingMessages: Map<string, {
+    resolve: (result: ExecutionResult) => void
+    reject: (error: Error) => void
+    timeout: NodeJS.Timeout
+  }>
 }
 
 /**
@@ -66,69 +63,242 @@ export function useBasicIde() {
   const debugOutput = ref<string>('')
   const debugMode = ref(false)
 
-  // Parser and interpreter instances
+  // Parser instance
   const parser = new FBasicParser()
-  const interpreter = new BasicInterpreter() as InterpreterWithJoystickPolling
+  
+  // Service Worker Manager
+  const serviceWorkerManager: ServiceWorkerManager = {
+    worker: null,
+    messageId: 0,
+    pendingMessages: new Map()
+  }
 
-  // Device abstraction setup
-  const deviceManager = new BasicDeviceManager()
-  const _deviceFactory = new BasicDeviceFactory()
-  const deviceAdapter = new DeviceAdapter({
-    deviceManager,
-    enableDeviceIntegration: true
-  }) as DeviceAdapterInterface
+  // Functions to send joystick events directly to service worker
+  const sendStickEvent = (joystickId: number, state: number) => {
+    if (serviceWorkerManager.worker) {
+      serviceWorkerManager.worker.postMessage({
+        type: 'STICK_EVENT',
+        id: `stick-${Date.now()}`,
+        timestamp: Date.now(),
+        data: { joystickId, state }
+      })
+    }
+  }
 
-  // Initialize joystick device
-  const initializeJoystickDevice = async () => {
+  const sendStrigEvent = (joystickId: number, state: number) => {
+    if (serviceWorkerManager.worker) {
+      serviceWorkerManager.worker.postMessage({
+        type: 'STRIG_EVENT',
+        id: `strig-${Date.now()}`,
+        timestamp: Date.now(),
+        data: { joystickId, state }
+      })
+    }
+  }
+
+  // Helper function to check if code contains joystick functions
+  const _hasJoystickFunctions = (code: string): boolean => {
+    const joystickKeywords = ['STICK(', 'STRIG(']
+    return joystickKeywords.some(keyword => code.includes(keyword))
+  }
+
+  // Service Worker Management Functions
+  const initializeServiceWorker = async (): Promise<void> => {
+    if (serviceWorkerManager.worker) {
+      console.log('✅ [COMPOSABLE] Service worker already initialized')
+      return
+    }
+
     try {
-      const joystickDevice = new WebJoystickDevice('web-joystick', 'Web Joystick', {
-        enableGamepadAPI: true,
-        crossButtonThreshold: 0.5,
-        deadzone: 0.1
+      console.log('🔧 [COMPOSABLE] Initializing service worker...')
+      serviceWorkerManager.worker = new Worker('/basic-interpreter-worker.js')
+      
+      // Set up message handling
+      serviceWorkerManager.worker.onmessage = (event) => {
+        handleWorkerMessage(event.data)
+      }
+      
+      serviceWorkerManager.worker.onerror = (error) => {
+        console.error('❌ [COMPOSABLE] Service worker error:', error)
+        rejectAllPendingMessages('Service worker error: ' + error.message)
+        // Restart service worker on error
+        restartServiceWorker()
+      }
+      
+      serviceWorkerManager.worker.onmessageerror = (error) => {
+        console.error('❌ [COMPOSABLE] Service worker message error:', error)
+        rejectAllPendingMessages('Service worker message error')
+        // Restart service worker on message error
+        restartServiceWorker()
+      }
+      
+      console.log('✅ [COMPOSABLE] Service worker initialized successfully')
+    } catch (error) {
+      console.error('❌ [COMPOSABLE] Failed to initialize service worker:', error)
+      throw error
+    }
+  }
+
+  const restartServiceWorker = async (): Promise<void> => {
+    console.log('🔄 [COMPOSABLE] Restarting service worker...')
+    
+    // Terminate existing worker
+    if (serviceWorkerManager.worker) {
+      serviceWorkerManager.worker.terminate()
+      serviceWorkerManager.worker = null
+    }
+    
+    // Clear pending messages
+    rejectAllPendingMessages('Service worker restarted')
+    
+    // Wait a bit before restarting
+    await new Promise(resolve => setTimeout(resolve, 100))
+    
+    // Reinitialize
+    await initializeServiceWorker()
+  }
+
+  const checkServiceWorkerHealth = async (): Promise<boolean> => {
+    if (!serviceWorkerManager.worker) {
+      return false
+    }
+
+    try {
+      // Send a ping message to check if worker is responsive
+      const _pingResult = await sendMessageToWorker({
+        type: 'EXECUTE',
+        id: `ping-${Date.now()}`,
+        timestamp: Date.now(),
+        data: {
+          code: '10 PRINT "PING"',
+          config: {
+            maxIterations: 100,
+            maxOutputLines: 10,
+            enableDebugMode: false,
+            strictMode: false,
+            deviceAdapter: undefined
+          },
+          options: {
+            timeout: 5000
+          }
+        }
       })
       
-      await deviceManager.registerDevice(joystickDevice)
-      deviceManager.setPrimaryDevice(DeviceType.JOYSTICK, 'web-joystick')
-      
-      // Update interpreter with device adapter
-      interpreter.updateConfig({ deviceAdapter })
+      return true
     } catch (error) {
-      console.warn('Failed to initialize joystick device:', error)
+      console.warn('⚠️ [COMPOSABLE] Service worker health check failed:', error)
+      return false
     }
   }
 
-  // Initialize device system
-  initializeJoystickDevice()
-
-  // Start joystick state polling
-  const startJoystickPolling = () => {
-    const pollInterval = setInterval(async () => {
-      if (interpreter) {
-        await interpreter.updateJoystickStates()
-      }
-    }, 100) // Poll every 100ms
+  const handleWorkerMessage = (message: AnyServiceWorkerMessage): void => {
+    console.log('📨 [COMPOSABLE] Received message from worker:', message.type)
     
-    // Store interval ID for cleanup
-    interpreter.joystickPollInterval = pollInterval
-  }
-
-  // Start polling when device adapter is ready
-  setTimeout(() => {
-    startJoystickPolling()
-  }, 1000) // Start after 1 second to allow device initialization
-
-  // Cleanup function for joystick polling
-  const cleanupJoystickPolling = () => {
-    if (interpreter.joystickPollInterval) {
-      clearInterval(interpreter.joystickPollInterval)
-      interpreter.joystickPollInterval = undefined
+    switch (message.type) {
+      case 'OUTPUT':
+        handleOutputMessage(message)
+        break
+      case 'RESULT':
+        handleResultMessage(message)
+        break
+      case 'ERROR':
+        handleErrorMessage(message)
+        break
+      case 'PROGRESS':
+        handleProgressMessage(message)
+        break
+      default:
+        console.warn('⚠️ [COMPOSABLE] Unknown message type:', message.type)
     }
   }
 
-  // Computed properties
-  const hasErrors = computed(() => !isEmpty(errors.value))
-  const hasOutput = computed(() => !isEmpty(output.value))
-  const isReady = computed(() => !isRunning.value)
+  const handleOutputMessage = (message: AnyServiceWorkerMessage): void => {
+    const { output: outputText, outputType } = (message as any).data
+    console.log('📤 [COMPOSABLE] Handling output:', outputType, outputText)
+    
+    if (outputType === 'print') {
+      output.value.push(outputText)
+    } else if (outputType === 'debug') {
+      debugOutput.value += outputText + '\n'
+    } else if (outputType === 'error') {
+      errors.value.push({
+        line: 0,
+        message: outputText,
+        type: 'runtime'
+      })
+    }
+  }
+
+  const handleResultMessage = (message: AnyServiceWorkerMessage): void => {
+    const { executionId, result } = (message as any).data
+    console.log('✅ [COMPOSABLE] Execution completed:', executionId, 'result:', result)
+    
+    const pending = serviceWorkerManager.pendingMessages.get(executionId)
+    if (pending) {
+      clearTimeout(pending.timeout)
+      serviceWorkerManager.pendingMessages.delete(executionId)
+      pending.resolve(result)
+    } else {
+      console.warn('⚠️ [COMPOSABLE] No pending message found for executionId:', executionId)
+    }
+  }
+
+  const handleErrorMessage = (message: AnyServiceWorkerMessage): void => {
+    const { executionId, error } = (message as any).data
+    console.error('❌ [COMPOSABLE] Execution error:', executionId, error)
+    
+    const pending = serviceWorkerManager.pendingMessages.get(executionId)
+    if (pending) {
+      clearTimeout(pending.timeout)
+      serviceWorkerManager.pendingMessages.delete(executionId)
+      pending.reject(new Error(error))
+    }
+  }
+
+  const handleProgressMessage = (message: AnyServiceWorkerMessage): void => {
+    const { iterationCount, currentStatement } = (message as any).data
+    console.log('🔄 [COMPOSABLE] Progress:', iterationCount, currentStatement)
+    // Could emit progress events here if needed
+  }
+
+  const rejectAllPendingMessages = (reason: string): void => {
+    console.log('🚫 [COMPOSABLE] Rejecting all pending messages:', reason)
+    for (const [_messageId, pending] of serviceWorkerManager.pendingMessages) {
+      clearTimeout(pending.timeout)
+      pending.reject(new Error(reason))
+    }
+    serviceWorkerManager.pendingMessages.clear()
+  }
+
+  const sendMessageToWorker = (message: AnyServiceWorkerMessage): Promise<ExecutionResult> => {
+    return new Promise((resolve, reject) => {
+      if (!serviceWorkerManager.worker) {
+        reject(new Error('Service worker not initialized'))
+        return
+      }
+
+      const _messageId = (++serviceWorkerManager.messageId).toString()
+      const messageWithId = { ...message, id: _messageId }
+      
+      // Set up timeout
+      const timeout = setTimeout(() => {
+        console.log('⏰ [COMPOSABLE] Message timeout:', _messageId)
+        serviceWorkerManager.pendingMessages.delete(_messageId)
+        reject(new Error('Service worker message timeout'))
+      }, 30000) // 30 second timeout
+      
+      // Store pending message
+      serviceWorkerManager.pendingMessages.set(_messageId, {
+        resolve,
+        reject,
+        timeout
+      })
+      
+      console.log('📤 [COMPOSABLE] Sending message to worker:', messageWithId.type, _messageId)
+      console.log('📤 [COMPOSABLE] Pending messages count:', serviceWorkerManager.pendingMessages.size)
+      serviceWorkerManager.worker.postMessage(messageWithId)
+    })
+  }
 
   /**
    * Parse and highlight the current code
@@ -181,8 +351,15 @@ export function useBasicIde() {
     debugOutput.value = ''
 
     try {
-      // Configure interpreter with debug mode
-      interpreter.updateConfig({ enableDebugMode: debugMode.value })
+      // Initialize service worker if not already done
+      await initializeServiceWorker()
+
+      // Check service worker health before execution
+      const isHealthy = await checkServiceWorkerHealth()
+      if (!isHealthy) {
+        console.log('🔄 [COMPOSABLE] Service worker unhealthy, restarting...')
+        await restartServiceWorker()
+      }
 
       // Parse the code
       const ast = await parseCode()
@@ -191,19 +368,33 @@ export function useBasicIde() {
         return
       }
 
-      // Execute using AST-based interpreter
-      const result: ExecutionResult = await interpreter.execute(code.value)
+      // Clear previous output
+      output.value = []
+      errors.value = []
+      debugOutput.value = ''
+
+      // Send execution message to service worker
+      const result = await sendMessageToWorker({
+        type: 'EXECUTE',
+        id: `execute-${Date.now()}`,
+        timestamp: Date.now(),
+        data: {
+          code: code.value,
+          config: {
+            maxIterations: EXECUTION_LIMITS.MAX_ITERATIONS_PRODUCTION,
+            maxOutputLines: EXECUTION_LIMITS.MAX_OUTPUT_LINES_PRODUCTION,
+            enableDebugMode: debugMode.value,
+            strictMode: true,
+          }
+        }
+      })
+
+      if (result && result.errors && result.errors.length > 0) {
+        errors.value = result.errors
+      }
       
-      output.value = Array.isArray(result.output) ? result.output : [result.output]
-      variables.value = result.variables instanceof Map ? Object.fromEntries(result.variables) : result.variables
-      debugOutput.value = result.debugOutput || ''
-      
-      if (result.errors && result.errors.length > 0) {
-        errors.value = result.errors.map(error => ({
-          line: error.line,
-          message: error.message,
-          type: error.type
-        }))
+      if (result && result.variables) {
+        variables.value = result.variables instanceof Map ? Object.fromEntries(result.variables) : result.variables
       }
 
     } catch (error) {
@@ -223,8 +414,15 @@ export function useBasicIde() {
    */
   const stopCode = () => {
     isRunning.value = false
-    // Note: The AST-based interpreter doesn't have a direct stop method yet
-    // This would need to be implemented in the interpreter
+    // Send stop message to service worker
+    if (serviceWorkerManager.worker) {
+      serviceWorkerManager.worker.postMessage({
+        type: 'STOP',
+        id: `stop-${Date.now()}`,
+        timestamp: Date.now(),
+        data: {}
+      })
+    }
   }
 
   /**
@@ -256,109 +454,12 @@ export function useBasicIde() {
   /**
    * Load sample code
    */
-  const loadSampleCode = (sampleType: 'basic' | 'gaming' | 'complex' | 'comprehensive' = 'basic') => {
-    const samples = {
-      basic: `10 PRINT "Basic F-Basic Program"
-20 LET A = 10
-30 LET B = 20
-40 LET C = A + B
-50 PRINT "A + B = "; C
-60 END`,
-
-      gaming: `10 REM F-Basic Gaming Demo
-20 CLS
-30 SPRITE 0, 100, 100
-40 SPRITEON 0
-50 SPRITEPUT 0, 1, 2
-60 CGSET 65, 255
-70 CGPUT 65, 1, 3
-80 MOVE 0, 1
-90 ANIMATE 0, 1, 2
-100 VIEW 0, 0, 320, 240
-110 SOUND 440, 1000
-120 JOY 0, 1
-130 TILE 0, 0, 0
-140 HIT 0, 1
-150 PRINT "Gaming demo completed!"
-160 END`,
-
-      complex: `10 REM Complex F-Basic Program
-20 PRINT "Complex F-Basic Demo"
-30 PRINT
-40 FOR I = 1 TO 10
-50   IF I MOD 2 = 0 THEN PRINT "Even: "; I
-60   IF I MOD 2 = 1 THEN PRINT "Odd: "; I
-70 NEXT I
-80 PRINT
-90 LET SUM = 0
-100 FOR J = 1 TO 100
-110   SUM = SUM + J
-120 NEXT J
-130 PRINT "Sum of 1 to 100 = "; SUM
-140 PRINT
-150 PRINT "String functions demo:"
-160 LET TEXT$ = "Hello World"
-170 PRINT "Length of '"; TEXT$; "' = "; LEN(TEXT$)
-180 PRINT "Left 5 chars: "; LEFT(TEXT$, 5)
-190 PRINT "Right 5 chars: "; RIGHT(TEXT$, 5)
-200 PRINT "Middle chars: "; MID(TEXT$, 3, 5)
-210 END`,
-
-      comprehensive: `10 REM F-Basic Comprehensive Gaming Demo
-20 CLS
-30 REM Initialize sprites
-40 SPRITE 0, 50, 50
-50 SPRITE 1, 150, 50
-60 SPRITEON 0
-70 SPRITEON 1
-80 REM Set sprite properties
-90 SPRITECOLOR 0, 1
-100 SPRITECOLOR 1, 2
-110 SPRITEPRIORITY 0, 1
-120 SPRITEPRIORITY 1, 2
-130 REM Character generator
-140 CGSET 65, 255
-150 CGPUT 65, 1, 3
-160 CGMOVE 65, 1, 3
-170 REM Movement and animation
-180 MOVE 0, 1
-190 MOVEX 0, 5
-200 MOVEY 0, 3
-210 ANIMATE 0, 1, 2
-220 ANIMSPEED 2
-230 ANIMLOOP 1
-240 REM View and scrolling
-250 VIEW 0, 0, 320, 240
-260 SCROLL 0, 0
-270 SCROLLSPEED 1
-280 REM Sound and music
-290 SOUND 440, 1000
-300 MUSIC 1
-310 VOLUME 50
-320 PITCH 440
-330 REM Input handling
-340 JOY 0, 1
-350 JOYPAD 0, 1
-360 BUTTON 1, 1
-370 KEY 65, 1
-380 REM Tile graphics
-390 TILE 0, 0, 0
-400 TILEMAP 0, 0, 0
-410 BACKGROUND 0, 1
-420 LAYER 0, 1
-430 PRIORITY 1, 1
-440 REM Collision detection
-450 HIT 0, 1
-460 COLLISION 0, 1
-470 HITBOX 0, 0, 0, 16
-480 REM System commands
-490 CLEAR
-500 RUN
-510 END`
+  const loadSampleCode = (sampleType: 'basic' | 'gaming' | 'complex' | 'comprehensive' | 'pause' = 'basic') => {
+    const sample = getSampleCode(sampleType)
+    if (sample) {
+      code.value = sample.code
+      updateHighlighting()
     }
-
-    code.value = samples[sampleType]
-    updateHighlighting()
   }
 
   /**
@@ -390,6 +491,16 @@ export function useBasicIde() {
   // Initialize highlighting
   updateHighlighting()
 
+  // Cleanup service worker on component unmount
+  onUnmounted(() => {
+    console.log('🧹 [COMPOSABLE] Cleaning up service worker...')
+    if (serviceWorkerManager.worker) {
+      serviceWorkerManager.worker.terminate()
+      serviceWorkerManager.worker = null
+    }
+    rejectAllPendingMessages('Component unmounted')
+  })
+
   return {
     // State
     code,
@@ -400,12 +511,7 @@ export function useBasicIde() {
     highlightedCode,
     debugOutput,
     debugMode,
-    
-    // Computed
-    hasErrors,
-    hasOutput,
-    isReady,
-    
+
     // Methods
     runCode,
     stopCode,
@@ -418,11 +524,9 @@ export function useBasicIde() {
     getHighlighterCapabilities,
     toggleDebugMode,
     
-    // Device integration
-    deviceAdapter,
-    
-    // Cleanup
-    cleanupJoystickPolling
+    // Service worker communication
+    sendStickEvent,
+    sendStrigEvent,
   }
 }
 

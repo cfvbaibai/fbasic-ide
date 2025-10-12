@@ -15,8 +15,6 @@ const {
   errors,
   variables,
   highlightedCode,
-  hasErrors,
-  hasOutput,
   isReady,
   debugOutput,
   debugMode,
@@ -24,11 +22,11 @@ const {
   stopCode,
   clearOutput,
   loadSampleCode,
-  validateCode,
   getParserCapabilities,
   getHighlighterCapabilities,
   toggleDebugMode,
-  deviceAdapter
+  sendStickEvent,
+  sendStrigEvent,
 } = useBasicIdeEnhanced()
 
 // Computed properties for backward compatibility
@@ -64,8 +62,11 @@ onMounted(() => {
             <el-button @click="loadSampleCode('basic')" size="small">
               Basic
             </el-button>
+            <el-button @click="loadSampleCode('pause')" size="small">
+              Pause Demo
+            </el-button>
             <el-button @click="loadSampleCode('gaming')" size="small">
-              Gaming
+              Joystick Test
             </el-button>
             <el-button @click="loadSampleCode('complex')" size="small">
               Complex
@@ -112,7 +113,7 @@ onMounted(() => {
           </el-tag>
         </div>
         <RuntimeOutput 
-          :output="output.join('\n')" 
+          :output="output" 
           :is-running="isRunning" 
           :errors="errors"
           :variables="variables"
@@ -123,19 +124,25 @@ onMounted(() => {
     </div>
 
     <!-- Joystick Control Panel -->
-    <JoystickControl :device-adapter="deviceAdapter" />
+    <JoystickControl 
+      :send-stick-event="sendStickEvent"
+      :send-strig-event="sendStrigEvent"
+    />
   </div>
 </template>
 
 <style scoped>
 .ide-container {
   height: 100vh;
+  width: 100vw;
   display: flex;
   flex-direction: column;
   background: #f5f5f5;
+  overflow: hidden; /* Prevent outer scrollbar */
 }
 
 .ide-header {
+  flex: 0 0 auto; /* Fixed height header */
   background: #fff;
   border-bottom: 1px solid #e4e7ed;
   padding: 1rem 1.5rem;
@@ -143,6 +150,7 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-height: 80px; /* Ensure minimum header height */
 }
 
 .header-left {
@@ -171,27 +179,33 @@ onMounted(() => {
 }
 
 .ide-content {
-  flex: 1;
+  flex: 1 1 0; /* Take remaining space */
   display: flex;
-  height: calc(100vh - 80px);
+  min-height: 0; /* Allow flex items to shrink below content size */
+  overflow: hidden; /* Prevent content overflow */
 }
 
 .editor-panel {
-  flex: 1;
+  flex: 1 1 0; /* Equal width with output panel */
   background: #fff;
   border-right: 1px solid #e4e7ed;
   display: flex;
   flex-direction: column;
+  min-width: 0; /* Allow panel to shrink */
+  overflow: hidden; /* Prevent panel overflow */
 }
 
 .output-panel {
-  flex: 1;
+  flex: 1 1 0; /* Equal width with editor panel */
   background: #fff;
   display: flex;
   flex-direction: column;
+  min-width: 0; /* Allow panel to shrink */
+  overflow: hidden; /* Prevent panel overflow */
 }
 
 .panel-header {
+  flex: 0 0 auto; /* Fixed height header */
   background: #f8f9fa;
   border-bottom: 1px solid #e4e7ed;
   padding: 0.75rem 1rem;
@@ -200,5 +214,19 @@ onMounted(() => {
   gap: 0.5rem;
   font-weight: 500;
   color: #606266;
+  min-height: 48px; /* Ensure minimum header height */
+}
+
+/* Ensure the main content areas are scrollable */
+.editor-panel > :not(.panel-header) {
+  flex: 1 1 0;
+  overflow: auto;
+  min-height: 0;
+}
+
+.output-panel > :not(.panel-header) {
+  flex: 1 1 0;
+  overflow: auto;
+  min-height: 0;
 }
 </style>

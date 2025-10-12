@@ -1,11 +1,14 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { BasicInterpreter } from '../core/BasicInterpreter'
+import { TestDeviceAdapter } from '@/core/devices'
 
 describe('Debug Execution', () => {
   let interpreter: BasicInterpreter
+  let deviceAdapter: TestDeviceAdapter
 
   beforeEach(() => {
-    interpreter = new BasicInterpreter()
+    deviceAdapter = new TestDeviceAdapter()
+    interpreter = new BasicInterpreter({ deviceAdapter })
   })
 
   it('should debug string literals', async () => {
@@ -15,9 +18,9 @@ describe('Debug Execution', () => {
     const result = await interpreter.execute('10 PRINT "Factorial of"; 5; "is"; 120\n20 END')
     
     console.log('Success:', result.success)
-    console.log('Output:', result.output)
+    console.log('Output:', deviceAdapter.printOutputs)
     console.log('Errors:', result.errors)
-    console.log('Debug output:', result.debugOutput)
+    console.log('Debug output:', deviceAdapter.debugOutputs)
     
     expect(result.success).toBe(true)
   })
@@ -26,9 +29,9 @@ describe('Debug Execution', () => {
     const result = await interpreter.execute('10 LET START = 1\n20 LET FINISH = 3\n30 FOR I = START TO FINISH\n40 PRINT I\n50 NEXT I\n60 END')
     
     console.log('Success:', result.success)
-    console.log('Output:', result.output)
+    console.log('Output:', deviceAdapter.printOutputs)
     console.log('Errors:', result.errors)
-    console.log('Debug output:', result.debugOutput)
+    console.log('Debug output:', deviceAdapter.debugOutputs)
     
     expect(result.success).toBe(true)
   })
@@ -37,9 +40,9 @@ describe('Debug Execution', () => {
     const result = await interpreter.execute('10 LET LINE = 30\n20 PRINT "Before"\n25 GOTO LINE\n30 PRINT "Target"\n40 END')
     
     console.log('Success:', result.success)
-    console.log('Output:', result.output)
+    console.log('Output:', deviceAdapter.printOutputs)
     console.log('Errors:', result.errors)
-    console.log('Debug output:', result.debugOutput)
+    console.log('Debug output:', deviceAdapter.debugOutputs)
     
     expect(result.success).toBe(true)
   })
@@ -48,9 +51,9 @@ describe('Debug Execution', () => {
     const result = await interpreter.execute('10 FOR I = 1 TO 2\n20   FOR J = 1 TO 2\n30     PRINT I, J\n40   NEXT J\n50 NEXT I\n60 END')
     
     console.log('Success:', result.success)
-    console.log('Output:', result.output)
+    console.log('Output:', deviceAdapter.printOutputs)
     console.log('Errors:', result.errors)
-    console.log('Debug output:', result.debugOutput)
+    console.log('Debug output:', deviceAdapter.debugOutputs)
     
     expect(result.success).toBe(true)
   })

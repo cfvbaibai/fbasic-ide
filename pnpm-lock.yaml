@@ -57,6 +57,9 @@ importers:
       '@vue/tsconfig':
         specifier: ^0.8.1
         version: 0.8.1(typescript@5.9.3)(vue@3.5.22(typescript@5.9.3))
+      esbuild:
+        specifier: ^0.25.10
+        version: 0.25.10
       eslint:
         specifier: ^9.37.0
         version: 9.37.0

@@ -6,12 +6,15 @@
 
 import { describe, it, expect, beforeEach } from 'vitest'
 import { BasicInterpreter } from '../core/BasicInterpreter'
+import { TestDeviceAdapter } from '@/core/devices'
 
 describe('STICK and STRIG Function Tests', () => {
   let interpreter: BasicInterpreter
+  let deviceAdapter: TestDeviceAdapter
 
   beforeEach(() => {
-    interpreter = new BasicInterpreter()
+    deviceAdapter = new TestDeviceAdapter()
+    interpreter = new BasicInterpreter({ deviceAdapter })
   })
 
   describe('STICK Function', () => {
@@ -57,8 +60,7 @@ describe('STICK and STRIG Function Tests', () => {
       const result = await interpreter.execute(code)
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      expect(result.output).toContain('STICK(0) = 0')
-      expect(result.output).toContain('STICK(1) = 0')
+      expect(deviceAdapter.printOutputs).toEqual(['STICK(0) = 0', 'STICK(1) = 0'])
     })
 
     it('should handle STICK with variables', async () => {
@@ -127,8 +129,7 @@ describe('STICK and STRIG Function Tests', () => {
       const result = await interpreter.execute(code)
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      expect(result.output).toContain('STRIG(0) = 0')
-      expect(result.output).toContain('STRIG(1) = 0')
+      expect(deviceAdapter.printOutputs).toEqual(['STRIG(0) = 0', 'STRIG(1) = 0'])
     })
 
     it('should handle STRIG with variables', async () => {
@@ -165,8 +166,7 @@ describe('STICK and STRIG Function Tests', () => {
       const result = await interpreter.execute(code)
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      expect(result.output).toContain('STICK(0) = 0')
-      expect(result.output).toContain('STRIG(0) = 0')
+      expect(deviceAdapter.printOutputs).toEqual(['STICK(0) = 0', 'STRIG(0) = 0'])
     })
 
     it('should handle STICK and STRIG in conditional statements', async () => {
@@ -189,14 +189,8 @@ describe('STICK and STRIG Function Tests', () => {
       const result = await interpreter.execute(code)
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      expect(result.output).toContain('STICK(0) = 0')
-      expect(result.output).toContain('STICK(1) = 0')
-      expect(result.output).toContain('STICK(2) = 0')
-      expect(result.output).toContain('STICK(3) = 0')
-      expect(result.output).toContain('STRIG(0) = 0')
-      expect(result.output).toContain('STRIG(1) = 0')
-      expect(result.output).toContain('STRIG(2) = 0')
-      expect(result.output).toContain('STRIG(3) = 0')
+      expect(deviceAdapter.printOutputs).toEqual([
+        'STICK(0) = 0', 'STRIG(0) = 0', 'STICK(1) = 0', 'STRIG(1) = 0', 'STICK(2) = 0', 'STRIG(2) = 0', 'STICK(3) = 0', 'STRIG(3) = 0'])
     })
   })
 
@@ -210,7 +204,7 @@ describe('STICK and STRIG Function Tests', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       // Should return 0 when no device adapter is available
-      expect(result.output).toContain('0')
+      expect(deviceAdapter.printOutputs).toEqual(['0'])
     })
 
     it('should handle STRIG without device adapter gracefully', async () => {
@@ -222,7 +216,7 @@ describe('STICK and STRIG Function Tests', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       // Should return 0 when no device adapter is available
-      expect(result.output).toContain('0')
+      expect(deviceAdapter.printOutputs).toEqual(['0'])
     })
 
     it('should handle invalid joystick IDs', async () => {
@@ -234,8 +228,7 @@ describe('STICK and STRIG Function Tests', () => {
       const result = await interpreter.execute(code)
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      // Should return 0 for invalid joystick IDs
-      expect(result.output).toContain('0')
+      expect(deviceAdapter.printOutputs).toEqual(['00'])
     })
   })
 
@@ -278,11 +271,7 @@ describe('STICK and STRIG Function Tests', () => {
       const result = await interpreter.execute(code)
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      expect(result.output).toContain('Move stick and press buttons!')
-      expect(result.output).toContain('STICK(0) = 0')
-      expect(result.output).toContain('STRIG(0) = 0')
-      expect(result.output).toContain('STICK(1) = 0')
-      expect(result.output).toContain('STRIG(1) = 0')
+      expect(deviceAdapter.printOutputs).toEqual(['Move stick and press buttons!', 'STICK(0) = 0', 'STRIG(0) = 0', 'STICK(1) = 0', 'STRIG(1) = 0'])
     })
   })
 })

@@ -11,20 +11,16 @@ import type {
   StatementNode
 } from '../parser/ast-types'
 import type { BasicError, InterpreterConfig } from '../interfaces'
-import type { BasicVariable, DeviceAdapterInterface } from '../interfaces'
+import type { BasicVariable, BasicDeviceAdapter } from '../interfaces'
 import type { LoopState } from '../state/ExecutionContext'
 import type { BasicScalarValue, BasicArrayValue } from '../types/BasicTypes'
 
 export interface EvaluationContext {
   variables: Map<string, BasicVariable>
   arrays: Map<string, BasicArrayValue>
-  deviceAdapter?: DeviceAdapterInterface
-  getJoystickState: (joystickId: number) => number
-  getTriggerState: (joystickId: number) => number
+  deviceAdapter?: BasicDeviceAdapter
   
   // Additional properties needed for execution
-  output: string[]
-  errors: BasicError[]
   isRunning: boolean
   shouldStop: boolean
   currentStatementIndex: number
@@ -35,12 +31,14 @@ export interface EvaluationContext {
   gosubStack: number[]
   dataValues: BasicScalarValue[]
   dataIndex: number
-  debugOutput: string[]
   
   // Methods
   addOutput: (text: string) => void
   addError: (error: BasicError) => void
   addDebugOutput: (message: string) => void
+  getErrors: () => BasicError[]
+  getStickState: (joystickId: number) => number
+  consumeStrigState: (joystickId: number) => number
   findStatementIndexByLine: (lineNumber: number) => number
   nextStatement: () => void
   shouldContinue: () => boolean
@@ -199,11 +197,11 @@ export class ExpressionEvaluator {
       // Joystick functions (Family BASIC v3)
       case 'STICK': {
         const joystickId = this.toNumber(args[0] || 0)
-        return this.context.getJoystickState(joystickId)
+        return this.context.deviceAdapter?.getStickState(joystickId) || 0
       }
       case 'STRIG': {
         const joystickId = this.toNumber(args[0] || 0)
-        return this.context.getTriggerState(joystickId)
+        return this.context.deviceAdapter?.consumeStrigState(joystickId) || 0
       }
       
       default: return 0

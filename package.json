@@ -4,8 +4,8 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
-        "dev": "npm run build-parser && vite",
-        "build": "npm run build-parser && vue-tsc && vite build",
+        "dev": "npm run build-parser && npm run build-service-worker && vite",
+        "build": "npm run build-parser && npm run build-service-worker && vue-tsc && vite build",
         "preview": "vite preview",
         "lint": "eslint . --fix",
         "type-check": "npm run build-parser && vue-tsc --noEmit",
@@ -17,6 +17,8 @@
         "test:run:single": "npm run build-parser && vitest run --pool=forks --poolOptions.forks.singleFork=true",
         "test:coverage": "npm run build-parser && vitest run --coverage",
         "build-parser": "tsx src/core/parser/build-parser.ts",
+        "build-service-worker": "tsx scripts/build-service-worker.ts",
+        "test-service-worker": "tsx scripts/test-service-worker.ts",
         "clean": "del src\\core\\parser\\fbasic-parser.js 2>nul || echo Parser file not found",
         "prebuild": "npm run build-parser"
     },
@@ -39,6 +41,7 @@
         "@vue/eslint-config-typescript": "^14.6.0",
         "@vue/test-utils": "^2.4.6",
         "@vue/tsconfig": "^0.8.1",
+        "esbuild": "^0.25.10",
         "eslint": "^9.37.0",
         "eslint-plugin-vue": "^10.5.0",
         "jsdom": "^27.0.0",

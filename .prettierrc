@@ -2,8 +2,16 @@
     "semi": false,
     "singleQuote": true,
     "tabWidth": 2,
+    "useTabs": false,
     "trailingComma": "es5",
     "printWidth": 80,
     "endOfLine": "lf",
-    "arrowParens": "avoid"
+    "arrowParens": "avoid",
+    "overrides": [{
+        "files": "*.js",
+        "options": {
+            "tabWidth": 2,
+            "useTabs": false
+        }
+    }]
 }

@@ -18,7 +18,8 @@ import type {
   RestoreStatementNode, 
   DimStatementNode, 
   ColorStatementNode,
-  NumberLiteralNode
+  NumberLiteralNode,
+  PauseStatementNode
 } from '../parser/ast-types'
 import { ERROR_TYPES } from '../constants'
 import { PrintExecutor } from './executors/PrintExecutor'
@@ -112,6 +113,11 @@ export class StatementRouter {
       case 'EndStatement':
         // END statement - stop execution
         this.context.shouldStop = true
+        break
+
+      case 'PauseStatement':
+        // PAUSE statement - pause execution for specified duration
+        await this.executePauseStatement(statement.command)
         break
 
       case 'RemStatement':
@@ -412,6 +418,24 @@ export class StatementRouter {
     
     // Placeholder - actual color implementation would go here
     this.context.addDebugOutput(`COLOR: foreground=${foreground}, background=${background}`)
+  }
+
+  private async executePauseStatement(pauseStmt: PauseStatementNode): Promise<void> {
+    // Evaluate the duration expression
+    const durationValue = this.evaluator.evaluateExpression(pauseStmt.duration)
+    const durationMs = this.toNumber(durationValue)
+    
+    // Ensure duration is non-negative
+    const pauseDuration = Math.max(0, durationMs)
+    
+    if (this.context.config.enableDebugMode) {
+      this.context.addDebugOutput(`PAUSE: ${pauseDuration}ms`)
+    }
+    
+    // Pause execution for the specified duration
+    if (pauseDuration > 0) {
+      await new Promise(resolve => setTimeout(resolve, pauseDuration))
+    }
   }
 
   private toNumber(value: number | string | boolean | undefined): number {

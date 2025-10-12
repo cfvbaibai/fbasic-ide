@@ -10,11 +10,10 @@
 
 import { 
   EXECUTION_LIMITS, 
-  ERROR_TYPES
+  ERROR_TYPES,
 } from './constants'
 import type { 
   BasicVariable, 
-  BasicError, 
   InterpreterConfig, 
   ExecutionResult
 } from './interfaces'
@@ -41,13 +40,29 @@ export class BasicInterpreter {
   private context?: ExecutionContext
 
   constructor(config?: Partial<InterpreterConfig>) {
+    console.log('🔧 [MAIN] BasicInterpreter constructor called with config:', {
+      hasDeviceAdapter: !!config?.deviceAdapter,
+      maxIterations: config?.maxIterations,
+      maxOutputLines: config?.maxOutputLines,
+      enableDebugMode: config?.enableDebugMode,
+      strictMode: config?.strictMode
+    })
+    
     this.config = {
-      maxIterations: EXECUTION_LIMITS.MAX_ITERATIONS,
-      maxOutputLines: EXECUTION_LIMITS.MAX_OUTPUT_LINES,
+      maxIterations: EXECUTION_LIMITS.MAX_ITERATIONS_TEST,
+      maxOutputLines: EXECUTION_LIMITS.MAX_OUTPUT_LINES_TEST,
       enableDebugMode: false,
       strictMode: false,
-      ...config
+      ...config,
     }
+    
+    console.log('🔧 [MAIN] Final config after merge:', {
+      maxIterations: this.config.maxIterations,
+      maxOutputLines: this.config.maxOutputLines,
+      enableDebugMode: this.config.enableDebugMode,
+      strictMode: this.config.strictMode
+    })
+    
     this.parser = new FBasicParser()
   }
 
@@ -55,15 +70,13 @@ export class BasicInterpreter {
    * Execute BASIC code
    */
   async execute(code: string): Promise<ExecutionResult> {
+    console.log('🚀 [MAIN] BasicInterpreter.execute called with code length:', code.length)
     try {
       // Parse the code
       const parseResult = await this.parser.parse(code)
       if (!parseResult.success) {
-      return {
-        success: false,
-          output: '',
-          debugOutput: this.config.enableDebugMode ? 
-            parseResult.errors?.map((e) => `Parse error: ${e.message}`).join('\n') : undefined,
+        return {
+          success: false,
           errors: parseResult.errors?.map((error) => ({
             line: error.location?.start?.line || 0,
             message: error.message,
@@ -81,20 +94,19 @@ export class BasicInterpreter {
         if (this.config.deviceAdapter) {
           this.context.deviceAdapter = this.config.deviceAdapter
         }
-        this.executionEngine = new ExecutionEngine(this.context)
+        this.executionEngine = new ExecutionEngine(this.context, this.config.deviceAdapter)
+      } else {
+        // Update existing ExecutionEngine with current output callback
+        this.executionEngine = new ExecutionEngine(this.context, this.config.deviceAdapter)
       }
       
       // Reset context for new execution but preserve device adapter and cached states
-      const preservedJoystickStates = this.context.joystickStates
-      const preservedTriggerStates = this.context.triggerStates
       const preservedDeviceAdapter = this.context.deviceAdapter
       
       this.context.reset()
       this.context.statements = parseResult.ast?.statements || []
       
       // Restore preserved values
-      this.context.joystickStates = preservedJoystickStates
-      this.context.triggerStates = preservedTriggerStates
       this.context.deviceAdapter = preservedDeviceAdapter
 
       // Execute the program
@@ -105,26 +117,14 @@ export class BasicInterpreter {
     } catch (error) {
       return {
         success: false,
-        output: '',
-        debugOutput: this.config.enableDebugMode ? 
-          `Execution error: ${error}` : undefined,
         errors: [{
-        line: 0,
-        message: `Execution error: ${error}`,
-        type: ERROR_TYPES.RUNTIME
+          line: 0,
+          message: `Execution error: ${error}`,
+          type: ERROR_TYPES.RUNTIME
         }],
         variables: new Map(),
         executionTime: 0
       }
-    }
-  }
-
-  /**
-   * Stop execution
-   */
-  stop(): void {
-    if (this.executionEngine) {
-      this.executionEngine.stop()
     }
   }
 
@@ -143,56 +143,21 @@ export class BasicInterpreter {
   updateConfig(newConfig: Partial<InterpreterConfig>): void {
     this.config = {
       ...this.config,
-      ...newConfig
+      ...newConfig,
     }
     
     if (this.executionEngine) {
-      this.executionEngine.updateConfig(newConfig)
-    }
-    
-    // Update device adapter if provided
-    if (newConfig.deviceAdapter && this.context) {
-      this.context.deviceAdapter = newConfig.deviceAdapter
+      this.executionEngine.updateConfig(this.config)
     }
   }
 
   /**
-   * Update joystick states (for STICK/STRIG functions)
+   * Stop execution and cleanup resources
    */
-  async updateJoystickStates(): Promise<void> {
-    // Ensure execution context exists
-    if (!this.context) {
-      this.context = new ExecutionContext(this.config)
-      // Set device adapter if provided
-      if (this.config.deviceAdapter) {
-        this.context.deviceAdapter = this.config.deviceAdapter
-      }
-      this.executionEngine = new ExecutionEngine(this.context)
-    }
-    
+  stop(): void {
     if (this.executionEngine) {
-      await this.executionEngine.updateJoystickStates()
+      this.executionEngine.stop()
     }
-  }
-
-  /**
-   * Get current joystick state
-   */
-  getJoystickState(joystickId: number): number {
-    if (this.executionEngine) {
-      return this.executionEngine.getJoystickState(joystickId)
-    }
-    return 0
-  }
-
-  /**
-   * Get current trigger state
-   */
-  getTriggerState(joystickId: number): number {
-    if (this.executionEngine) {
-      return this.executionEngine.getTriggerState(joystickId)
-    }
-    return 0
   }
 
   /**
@@ -214,26 +179,5 @@ export class BasicInterpreter {
    */
   getVariables(): Map<string, BasicVariable> {
     return this.context?.variables || new Map()
-  }
-
-  /**
-   * Get current output
-   */
-  getOutput(): string[] {
-    return this.context?.output || []
-  }
-
-  /**
-   * Get current errors
-   */
-  getErrors(): BasicError[] {
-    return this.context?.errors || []
-  }
-
-  /**
-   * Get debug output
-   */
-  getDebugOutput(): string[] {
-    return this.context?.debugOutput || []
   }
 }

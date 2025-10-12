@@ -6,11 +6,13 @@
 
 import type { ExpressionNode } from '../parser/ast-types'
 import { ExpressionEvaluator, type EvaluationContext } from '../evaluation/ExpressionEvaluator'
+import type { BasicDeviceAdapter } from '../interfaces'
 
 export class IoService {
   constructor(
     private context: EvaluationContext,
-    private evaluator: ExpressionEvaluator
+    private evaluator: ExpressionEvaluator,
+    private deviceAdapter?: BasicDeviceAdapter
   ) {}
 
   /**
@@ -89,7 +91,7 @@ export class IoService {
    * Clear the screen (output)
    */
   clearScreen(): void {
-    this.context.output = []
+    this.context.deviceAdapter?.clearScreen()
     
     if (this.context.config.enableDebugMode) {
       this.context.addDebugOutput('CLS: Screen cleared')
@@ -128,27 +130,6 @@ export class IoService {
       }
     }
     return '0'
-  }
-
-  /**
-   * Get current output as string
-   */
-  getOutput(): string {
-    return this.context.output.join('\n')
-  }
-
-  /**
-   * Get current output as array
-   */
-  getOutputArray(): string[] {
-    return [...this.context.output]
-  }
-
-  /**
-   * Clear output
-   */
-  clearOutput(): void {
-    this.context.output = []
   }
 
   /**

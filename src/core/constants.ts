@@ -11,8 +11,19 @@
 
 // Execution limits
 export const EXECUTION_LIMITS = {
+  // Test environment limits (strict to prevent infinite loops in tests)
+  MAX_ITERATIONS_TEST: 10000,
+  MAX_OUTPUT_LINES_TEST: 1000,
+  
+  // Production environment limits (more permissive for real user interaction)
+  MAX_ITERATIONS_PRODUCTION: 1000000, // Much higher limit for production
+  MAX_OUTPUT_LINES_PRODUCTION: 10000,
+  
+  // Legacy limits (for backward compatibility)
   MAX_ITERATIONS: 10000,
   MAX_OUTPUT_LINES: 1000,
+  
+  // Other limits (same for both environments)
   MAX_LINE_NUMBER: 99999,
   MAX_VARIABLE_NAME_LENGTH: 255,
   MAX_STRING_LENGTH: 32767,
@@ -26,6 +37,18 @@ export const DEFAULTS = {
   FOR_LOOP_STEP: 1,
   TAB_SIZE: 2,
   MAX_OUTPUT_LINES: 1000,
+  ASYNC_EXECUTION: {
+    ENABLED_PRODUCTION: true,
+    ENABLED_TEST: false,
+    YIELD_INTERVAL: 100, // Yield every 100 iterations in production
+    YIELD_DURATION: 1, // Yield for 1ms to allow browser to process events
+  },
+  SERVICE_WORKER: {
+    ENABLED_PRODUCTION: true,
+    ENABLED_TEST: false,
+    WORKER_SCRIPT: '/basic-interpreter-worker.js',
+    MESSAGE_TIMEOUT: 30000, // 30 seconds timeout for service worker messages
+  }
 } as const
 
 // Error types

@@ -1,0 +1,232 @@
+/**
+ * Service Worker Entry Point for BASIC Interpreter
+ * 
+ * This is the main entry point for the service worker that will be bundled
+ * with the interpreter code.
+ */
+
+import { BasicInterpreter } from '../BasicInterpreter'
+import { ServiceWorkerDeviceAdapter } from '../devices/ServiceWorkerDeviceAdapter'
+import type { 
+  AnyServiceWorkerMessage,
+  ExecuteMessage,
+  ResultMessage,
+  ErrorMessage,
+  StopMessage,
+  OutputMessage,
+  StrigEventMessage,
+  StickEventMessage
+} from '../interfaces'
+
+/* global self */
+
+// Service Worker Interpreter Implementation
+class ServiceWorkerInterpreter {
+  private interpreter: BasicInterpreter | null = null
+  private isRunning: boolean = false
+  private currentExecutionId: string | null = null
+  private serviceWorkerDeviceAdapter: ServiceWorkerDeviceAdapter | null = null
+
+  constructor() {
+    this.interpreter = null
+    this.isRunning = false
+    this.currentExecutionId = null
+    this.serviceWorkerDeviceAdapter = new ServiceWorkerDeviceAdapter()
+
+    this.setupMessageListener()
+  }
+
+  setupMessageListener() {
+    if (typeof self === 'undefined') return
+
+    self.addEventListener('message', (event) => {
+      console.log('📨 [WORKER] Service worker received message from main thread:', {
+        type: event.data.type,
+        id: event.data.id,
+        timestamp: event.data.timestamp,
+        dataSize: JSON.stringify(event.data).length
+      })
+      this.handleMessage(event.data)
+    })
+  }
+
+  async handleMessage(message: AnyServiceWorkerMessage) {
+    console.log('🔍 [WORKER] Processing message:', {
+      type: message.type,
+      id: message.id,
+      timestamp: message.timestamp
+    })
+    
+    try {
+      switch (message.type) {
+        case 'EXECUTE':
+          console.log('▶️ [WORKER] Handling EXECUTE message')
+          await this.handleExecute(message as ExecuteMessage)
+          break
+        case 'STOP':
+          console.log('⏹️ [WORKER] Handling STOP message')
+          this.handleStop(message as StopMessage)
+          break
+        case 'STRIG_EVENT':
+          console.log('🎮 [WORKER] Handling STRIG_EVENT message')
+          this.handleStrigEvent(message as StrigEventMessage)
+          break
+        case 'STICK_EVENT':
+          console.log('🎮 [WORKER] Handling STICK_EVENT message')
+          this.handleStickEvent(message as StickEventMessage)
+          break
+      }
+    } catch (error) {
+      console.log('❌ [WORKER] Error processing message:', error)
+      this.sendError(message.id, error instanceof Error ? error : new Error(String(error)))
+    }
+  }
+
+  async handleExecute(message: ExecuteMessage) {
+    try {
+      const { code, config } = message.data
+      this.currentExecutionId = message.id
+      
+      console.log('▶️ [WORKER] Starting execution:', {
+        executionId: message.id,
+        codeLength: code.length,
+      })
+      
+      // Create a new interpreter for each execution to ensure correct configuration
+      console.log('🔧 [WORKER] Creating interpreter with ServiceWorkerDeviceAdapter:', {
+        hasOriginalDeviceAdapter: !!config.deviceAdapter,
+        maxIterations: config.maxIterations,
+        maxOutputLines: config.maxOutputLines
+      })
+      this.interpreter = new BasicInterpreter({
+        ...config,
+        deviceAdapter: this.serviceWorkerDeviceAdapter!, // Use ServiceWorkerDeviceAdapter (non-null assertion)
+      })
+      console.log('✅ [WORKER] Interpreter created with ServiceWorkerDeviceAdapter')
+
+      // Execute the BASIC code
+      console.log('🚀 [WORKER] Executing BASIC code')
+      this.isRunning = true
+      const result = await this.interpreter.execute(code)
+      this.isRunning = false
+
+      console.log('✅ [WORKER] Execution completed:', {
+        success: result.success,
+        outputLines: this.serviceWorkerDeviceAdapter?.printOutput.length || 0,
+        executionTime: result.executionTime
+      })
+
+      // Create enhanced result with execution metadata
+      const enhancedResult: ResultMessage['data'] = {
+        ...result,
+        executionId: message.id,
+        workerId: 'service-worker-1'
+      }
+
+      this.sendResult(message.id, enhancedResult)
+    } catch (error) {
+      this.isRunning = false
+      this.sendError(message.id, error instanceof Error ? error : new Error(String(error)))
+    }
+  }
+
+  handleStop(_message: StopMessage) {
+    console.log('⏹️ [WORKER] Stopping execution:', {
+      wasRunning: this.isRunning,
+      currentExecutionId: this.currentExecutionId
+    })
+    this.isRunning = false
+    if (this.interpreter) {
+      console.log('🛑 [WORKER] Calling interpreter.stop()')
+      this.interpreter.stop()
+    }
+  }
+
+  handleStrigEvent(message: StrigEventMessage) {
+    const { joystickId, state } = message.data
+    console.log('🎮 [WORKER] Processing STRIG event:', { joystickId, state })
+    
+    // Update the ServiceWorkerDeviceAdapter directly
+    if (this.serviceWorkerDeviceAdapter) {
+      console.log('🎮 [WORKER] Updating ServiceWorkerDeviceAdapter STRIG buffer')
+      this.serviceWorkerDeviceAdapter.pushStrigState(joystickId, state)
+    } else {
+      console.log('🎮 [WORKER] No ServiceWorkerDeviceAdapter available for STRIG event')
+    }
+  }
+
+  handleStickEvent(message: StickEventMessage) {
+    const { joystickId, state } = message.data
+    console.log('🎮 [WORKER] Processing STICK event:', { joystickId, state })
+    
+    // Update the ServiceWorkerDeviceAdapter directly
+    if (this.serviceWorkerDeviceAdapter) {
+      console.log('🎮 [WORKER] Updating ServiceWorkerDeviceAdapter STICK state')
+      this.serviceWorkerDeviceAdapter.setStickState(joystickId, state)
+    } else {
+      console.log('🎮 [WORKER] No ServiceWorkerDeviceAdapter available for STICK event')
+    }
+  }
+
+  sendOutput(output: string, outputType: 'print' | 'debug' | 'error') {
+    if (!this.currentExecutionId) return
+
+    const message: OutputMessage = {
+      type: 'OUTPUT',
+      id: `output-${Date.now()}`,
+      timestamp: Date.now(),
+      data: {
+        executionId: this.currentExecutionId,
+        output,
+        outputType,
+        timestamp: Date.now()
+      }
+    }
+    console.log('📤 [WORKER→MAIN] Sending OUTPUT message:', {
+      outputType,
+      outputLength: output.length,
+      executionId: this.currentExecutionId
+    })
+    self.postMessage(message)
+  }
+
+  sendResult(messageId: string, result: ResultMessage['data']) {
+    const message: ResultMessage = {
+      type: 'RESULT',
+      id: messageId,
+      timestamp: Date.now(),
+      data: result
+    }
+    console.log('📊 [WORKER→MAIN] Sending RESULT message:', {
+      messageId,
+      success: result.success,
+      executionTime: result.executionTime
+    })
+    self.postMessage(message)
+  }
+
+  sendError(messageId: string, error: Error) {
+    const message: ErrorMessage = {
+      type: 'ERROR',
+      id: messageId,
+      timestamp: Date.now(),
+      data: {
+        executionId: messageId,
+        message: error.message,
+        stack: error.stack,
+        errorType: 'execution',
+        recoverable: true
+      }
+    }
+    console.log('❌ [WORKER→MAIN] Sending ERROR message:', {
+      messageId,
+      errorMessage: error.message,
+      errorType: 'execution',
+      recoverable: true
+    })
+    self.postMessage(message)
+  }
+}
+
+// Initialize service worker interpreter
+new ServiceWorkerInterpreter()

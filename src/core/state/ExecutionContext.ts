@@ -9,7 +9,7 @@ import type {
   BasicVariable, 
   BasicError, 
   InterpreterConfig,
-  DeviceAdapterInterface 
+  BasicDeviceAdapter 
 } from '../interfaces'
 import type { StatementNode } from '../parser/ast-types'
 import type { EvaluationContext } from '../evaluation/ExpressionEvaluator'
@@ -28,8 +28,6 @@ export interface LoopState {
 export class ExecutionContext implements EvaluationContext {
   // Core state
   public variables: Map<string, BasicVariable> = new Map()
-  public output: string[] = []
-  public errors: BasicError[] = []
   public isRunning = false
   public shouldStop = false
   public currentStatementIndex = 0
@@ -48,13 +46,10 @@ export class ExecutionContext implements EvaluationContext {
   public dataIndex = 0 // Current position in DATA
   public arrays: Map<string, BasicArrayValue> = new Map() // Array storage
   
-  // Debug
-  public debugOutput: string[] = [] // Debug output buffer
-  
   // Device integration
-  public deviceAdapter?: DeviceAdapterInterface
-  public joystickStates: number[] = [0, 0, 0, 0] // Cached STICK states for joysticks 0-3
-  public triggerStates: number[] = [0, 0, 0, 0] // Cached STRIG states for joysticks 0-3
+  public deviceAdapter?: BasicDeviceAdapter
+
+  private errors: BasicError[] = []
 
   constructor(config: InterpreterConfig) {
     this.config = config
@@ -65,8 +60,6 @@ export class ExecutionContext implements EvaluationContext {
    */
   reset(): void {
     this.variables.clear()
-    this.output = []
-    this.errors = []
     this.isRunning = false
     this.shouldStop = false
     this.currentStatementIndex = 0
@@ -77,26 +70,28 @@ export class ExecutionContext implements EvaluationContext {
     this.dataValues = []
     this.dataIndex = 0
     this.arrays.clear()
-    this.debugOutput = []
-    this.joystickStates = [0, 0, 0, 0]
-    this.triggerStates = [0, 0, 0, 0]
   }
 
   /**
    * Add output to the context
    */
   addOutput(value: string): void {
-    if (this.output.length >= this.config.maxOutputLines) {
-      this.output.shift() // Remove oldest line
-    }
-    this.output.push(value)
+    this.deviceAdapter?.printOutput(value)
   }
 
   /**
    * Add error to the context
    */
   addError(error: BasicError): void {
+    this.deviceAdapter?.errorOutput(error.message)
     this.errors.push(error)
+  }
+
+  /**
+   * Get errors
+   */
+  getErrors(): BasicError[] {
+    return this.errors
   }
 
   /**
@@ -104,7 +99,7 @@ export class ExecutionContext implements EvaluationContext {
    */
   addDebugOutput(message: string): void {
     if (this.config.enableDebugMode) {
-      this.debugOutput.push(`[DEBUG] ${message}`)
+      this.deviceAdapter?.debugOutput(message)
     }
   }
 
@@ -164,16 +159,27 @@ export class ExecutionContext implements EvaluationContext {
   /**
    * Get joystick state (cross buttons)
    */
-  getJoystickState(joystickId: number): number {
-    // Use cached synchronous state
-    return this.joystickStates[joystickId] || 0
+  getStickState(joystickId: number): number {
+    // Use device adapter if available, otherwise fall back to cached state
+    if (this.deviceAdapter) {
+      return this.deviceAdapter.getStickState(joystickId)
+    }
+    return 0
   }
 
   /**
    * Get trigger state (action buttons)
    */
-  getTriggerState(joystickId: number): number {
-    // Use cached synchronous state
-    return this.triggerStates[joystickId] || 0
+  consumeStrigState(joystickId: number): number {
+    // Use consumeTriggerState if available
+    if (this.deviceAdapter) {
+      const consumedValue = this.deviceAdapter.consumeStrigState(joystickId)
+      
+      if (consumedValue > 0) {
+        console.log(`🎮 [EXECUTION] STRIG event consumed: joystickId=${joystickId}, value=${consumedValue}`)
+        return consumedValue
+      }
+    }
+    return 0
   }
 }

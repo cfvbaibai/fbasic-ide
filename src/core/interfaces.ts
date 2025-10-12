@@ -3,6 +3,7 @@
  */
 
 import { VARIABLE_TYPES, ERROR_TYPES } from './constants'
+import type { EvaluationContext } from './execution'
 
 /**
  * Represents a BASIC variable with its value and type
@@ -44,12 +45,23 @@ export interface LoopState {
 }
 
 /**
- * Device Adapter interface for joystick integration
- * This avoids circular imports by defining the minimal interface needed
+ * Basic Device Adapter interface for Family BASIC interpreter
+ * 
+ * Handles all input/output/debugging/audio features needed for Family BASIC
  */
-export interface DeviceAdapterInterface {
-  getStickState(joystickId: number): Promise<number>
-  getTriggerState(joystickId: number): Promise<number>
+export interface BasicDeviceAdapter {
+  // === JOYSTICK INPUT ===
+  getJoystickCount(): number
+  getStickState(joystickId: number): number
+  setStickState(joystickId: number, state: number): void
+  pushStrigState(joystickId: number, state: number): void
+  consumeStrigState(joystickId: number): number
+  
+  // === TEXT OUTPUT ===
+  printOutput(output: string): void
+  debugOutput(output: string): void
+  errorOutput(output: string): void
+  clearScreen(): void
 }
 
 /**
@@ -60,7 +72,7 @@ export interface InterpreterConfig {
   maxOutputLines: number
   enableDebugMode: boolean
   strictMode: boolean
-  deviceAdapter?: DeviceAdapterInterface
+  deviceAdapter?: BasicDeviceAdapter
 }
 
 /**
@@ -68,8 +80,6 @@ export interface InterpreterConfig {
  */
 export interface ExecutionResult {
   success: boolean
-  output: string
-  debugOutput?: string
   errors: BasicError[]
   variables: Map<string, BasicVariable>
   executionTime: number
@@ -79,30 +89,15 @@ export interface ExecutionResult {
  * Interface for command handlers
  */
 export interface CommandHandler {
-  execute(_statement: BasicStatement, _context: ExecutionContext): Promise<void>
+  execute(_statement: BasicStatement, _context: EvaluationContext): Promise<void>
   validate(_statement: BasicStatement): BasicError[]
-}
-
-/**
- * Execution context passed to command handlers
- */
-export interface ExecutionContext {
-  variables: Map<string, BasicVariable>
-  output: string[]
-  errors: BasicError[]
-  loopStack: LoopState[]
-  currentStatementIndex: number
-  statements: BasicStatement[]
-  shouldStop: boolean
-  evaluateExpression(_expr: string): number | string
-  jumpToLine(_lineNumber: number): void
 }
 
 /**
  * Interface for expression evaluators
  */
 export interface ExpressionEvaluator {
-  evaluate(_expression: string, _context: ExecutionContext): number | string
+  evaluate(_expression: string, _context: EvaluationContext): number | string
   validate(_expression: string): BasicError[]
 }
 
@@ -161,4 +156,162 @@ export interface OutputManager {
   writeln(_text?: string): void
   getOutput(): string
   clear(): void
+}
+
+/**
+ * Service Worker message types for BASIC interpreter
+ */
+
+// Base message interface for all service worker communication
+export interface ServiceWorkerMessage {
+  type: ServiceWorkerMessageType
+  id: string
+  timestamp: number
+}
+
+// Message types enum for better type safety
+export type ServiceWorkerMessageType = 
+  | 'EXECUTE'
+  | 'RESULT'
+  | 'ERROR'
+  | 'PROGRESS'
+  | 'OUTPUT'
+  | 'STOP'
+  | 'INIT'
+  | 'READY'
+  | 'STRIG_EVENT'
+  | 'STICK_EVENT'
+
+// Execute message - sent from UI to service worker
+export interface ExecuteMessage extends ServiceWorkerMessage {
+  type: 'EXECUTE'
+  data: {
+    code: string
+    config: InterpreterConfig
+    options?: {
+      timeout?: number
+      enableProgress?: boolean
+    }
+  }
+}
+
+// Result message - sent from service worker to UI
+export interface ResultMessage extends ServiceWorkerMessage {
+  type: 'RESULT'
+  data: ExecutionResult & {
+    executionId: string
+    workerId?: string
+  }
+}
+
+// Progress message - sent from service worker to UI during execution
+export interface ProgressMessage extends ServiceWorkerMessage {
+  type: 'PROGRESS'
+  data: {
+    executionId: string
+    iterationCount: number
+    currentStatement?: string
+    progress: {
+      completed: number
+      total: number
+      percentage: number
+    }
+    estimatedTimeRemaining?: number
+  }
+}
+
+// Output message - sent from service worker to UI for real-time output
+export interface OutputMessage extends ServiceWorkerMessage {
+  type: 'OUTPUT'
+  data: {
+    executionId: string
+    output: string
+    outputType: 'print' | 'debug' | 'error'
+    timestamp: number
+  }
+}
+
+// Stop message - sent from UI to service worker
+export interface StopMessage extends ServiceWorkerMessage {
+  type: 'STOP'
+  data: {
+    executionId: string
+    reason?: 'user_request' | 'timeout' | 'error'
+  }
+}
+
+// STRIG event message - sent from main thread to service worker
+export interface StrigEventMessage extends ServiceWorkerMessage {
+  type: 'STRIG_EVENT'
+  data: {
+    joystickId: number
+    state: number
+    timestamp: number
+  }
+}
+
+// STICK event message - sent from main thread to service worker
+export interface StickEventMessage extends ServiceWorkerMessage {
+  type: 'STICK_EVENT'
+  data: {
+    joystickId: number
+    state: number
+    timestamp: number
+  }
+}
+
+// Error message - sent from service worker to UI
+export interface ErrorMessage extends ServiceWorkerMessage {
+  type: 'ERROR'
+  data: {
+    executionId: string
+    message: string
+    stack?: string
+    errorType: 'execution' | 'timeout' | 'initialization' | 'communication'
+    recoverable: boolean
+  }
+}
+
+// Init message - sent from service worker to UI on startup
+export interface InitMessage extends ServiceWorkerMessage {
+  type: 'INIT'
+  data: {
+    workerId: string
+    capabilities: string[]
+    version: string
+  }
+}
+
+// Ready message - sent from service worker to UI when ready
+export interface ReadyMessage extends ServiceWorkerMessage {
+  type: 'READY'
+  data: {
+    workerId: string
+    status: 'ready' | 'busy' | 'error'
+  }
+}
+
+// Union type for all possible messages
+export type AnyServiceWorkerMessage = 
+  | ExecuteMessage
+  | ResultMessage
+  | ProgressMessage
+  | OutputMessage
+  | StopMessage
+  | StrigEventMessage
+  | StickEventMessage
+  | ErrorMessage
+  | InitMessage
+  | ReadyMessage
+
+// Message handler interface for type-safe message handling
+export interface ServiceWorkerMessageHandler {
+  handleExecute(message: ExecuteMessage): Promise<void>
+  handleResult(message: ResultMessage): void
+  handleProgress(message: ProgressMessage): void
+  handleOutput(message: OutputMessage): void
+  handleStop(message: StopMessage): void
+  handleError(message: ErrorMessage): void
+  handleInit(message: InitMessage): void
+  handleReady(message: ReadyMessage): void
 }

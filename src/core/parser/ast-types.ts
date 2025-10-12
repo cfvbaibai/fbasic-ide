@@ -37,6 +37,7 @@ export type CommandNode =
   | GosubStatementNode
   | ReturnStatementNode
   | EndStatementNode
+  | PauseStatementNode
   | InputStatementNode
   | DataStatementNode
   | ReadStatementNode
@@ -124,6 +125,12 @@ export interface ReturnStatementNode extends ASTNode {
 // END Statement
 export interface EndStatementNode extends ASTNode {
   type: 'EndStatement';
+}
+
+// PAUSE Statement
+export interface PauseStatementNode extends ASTNode {
+  type: 'PauseStatement';
+  duration: ExpressionNode;
 }
 
 // INPUT Statement

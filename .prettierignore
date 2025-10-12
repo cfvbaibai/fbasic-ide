@@ -1,0 +1,11 @@
+# Generated files
+public/basic-interpreter-worker.js
+src/core/parser/fbasic-parser.js
+
+# Dependencies
+node_modules/
+dist/
+
+# Build outputs
+*.min.js
+*.bundle.js

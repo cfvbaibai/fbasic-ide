@@ -9,7 +9,7 @@
     IF: 'IF', THEN: 'THEN', ELSE: 'ELSE',
     FOR: 'FOR', NEXT: 'NEXT', TO: 'TO', STEP: 'STEP',
     GOTO: 'GOTO', GOSUB: 'GOSUB', RETURN: 'RETURN',
-    END: 'END', STOP: 'STOP',
+    END: 'END', STOP: 'STOP', PAUSE: 'PAUSE',
     
     // Data and Variables
     LET: 'LET', DIM: 'DIM', DATA: 'DATA', READ: 'READ', RESTORE: 'RESTORE',
@@ -93,6 +93,7 @@ SingleCommand =
   gosubStatement /
   returnStatement /
   endStatement /
+  pauseStatement /
   inputStatement /
   dataStatement /
   restoreStatement /
@@ -181,6 +182,14 @@ returnStatement = "RETURN"i {
 // END Statement
 endStatement = "END"i {
   return { type: 'EndStatement' };
+}
+
+// PAUSE Statement
+pauseStatement = "PAUSE"i _ duration:Expression {
+  return {
+    type: 'PauseStatement',
+    duration: duration
+  };
 }
 
 // INPUT Statement

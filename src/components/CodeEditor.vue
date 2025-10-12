@@ -90,18 +90,21 @@ onMounted(() => {
 
 <style scoped>
 .code-editor {
-  flex: 1;
+  flex: 1 1 0;
   display: flex;
   flex-direction: column;
   font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
   background: #fff;
+  min-height: 0; /* Allow component to shrink */
+  overflow: hidden; /* Prevent overflow */
 }
 
 .editor-container {
-  flex: 1;
+  flex: 1 1 0;
   display: flex;
   position: relative;
   overflow: hidden;
+  min-height: 0; /* Allow container to shrink */
 }
 
 .line-numbers {
