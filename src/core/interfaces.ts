@@ -4,6 +4,7 @@
 
 import { VARIABLE_TYPES, ERROR_TYPES } from './constants'
 import type { EvaluationContext } from './execution'
+import type { BasicArrayValue } from './types/BasicTypes'
 
 /**
  * Represents a BASIC variable with its value and type
@@ -82,6 +83,7 @@ export interface ExecutionResult {
   success: boolean
   errors: BasicError[]
   variables: Map<string, BasicVariable>
+  arrays?: Map<string, BasicArrayValue> // Arrays declared/used during execution
   executionTime: number
 }
 

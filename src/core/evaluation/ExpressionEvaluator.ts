@@ -423,9 +423,15 @@ export class ExpressionEvaluator {
   }
 
   /**
-   * Evaluate primary expression: NumberLiteral | StringLiteral | Identifier | FunctionCall | (LParen Expression RParen)
+   * Evaluate primary expression: NumberLiteral | StringLiteral | ArrayAccess | FunctionCall | Identifier | (LParen Expression RParen)
    */
   private evaluatePrimary(cst: CstNode): number | string {
+    // Check for array access
+    const arrayAccessCst = getFirstCstNode(cst.children.arrayAccess)
+    if (arrayAccessCst) {
+      return this.evaluateArrayAccess(arrayAccessCst)
+    }
+
     // Check for function call
     const functionCallCst = getFirstCstNode(cst.children.functionCall)
     if (functionCallCst) {
@@ -433,7 +439,7 @@ export class ExpressionEvaluator {
     }
 
     // Check for parenthesized expression
-    if (cst.children.LParen && !functionCallCst) {
+    if (cst.children.LParen && !functionCallCst && !arrayAccessCst) {
       const exprCst = getFirstCstNode(cst.children.expression)
       if (exprCst) {
         return this.evaluateExpression(exprCst)
@@ -467,6 +473,65 @@ export class ExpressionEvaluator {
     }
 
     throw new Error('Invalid primary expression')
+  }
+
+  /**
+   * Evaluate array access: Identifier LParen ExpressionList RParen
+   * Examples: A(I), A$(I, J)
+   */
+  private evaluateArrayAccess(cst: CstNode): number | string {
+    const identifierToken = getFirstToken(cst.children.Identifier)
+    if (!identifierToken) {
+      throw new Error('Invalid array access: missing array name')
+    }
+
+    const arrayName = identifierToken.image.toUpperCase()
+    const expressionListCst = getFirstCstNode(cst.children.expressionList)
+    
+    if (!expressionListCst) {
+      throw new Error('Invalid array access: missing indices')
+    }
+
+    // Evaluate indices
+    const expressions = getCstNodes(expressionListCst.children.expression)
+    const indices: number[] = []
+    
+    for (const exprCst of expressions) {
+      const indexValue = this.evaluateExpression(exprCst)
+      if (typeof indexValue !== 'number') {
+        throw new Error(`Invalid array index: expected number, got ${typeof indexValue}`)
+      }
+      indices.push(Math.floor(indexValue))
+    }
+
+    // Get array value
+    const array = this.context.arrays.get(arrayName)
+    if (!array) {
+      // Array not found - return default value
+      return arrayName.endsWith('$') ? '' : 0
+    }
+
+    // Navigate through array dimensions
+    let value: BasicScalarValue | BasicArrayValue = array
+    for (let i = 0; i < indices.length; i++) {
+      const index = indices[i]
+      if (index === undefined) {
+        throw new Error(`Invalid array index at dimension ${i}`)
+      }
+      if (typeof value !== 'object' || !Array.isArray(value)) {
+        throw new Error(`Array access error: dimension ${i} is not an array`)
+      }
+      if (index < 0 || index >= value.length) {
+        // Out of bounds - return default value
+        return arrayName.endsWith('$') ? '' : 0
+      }
+      value = value[index] as BasicScalarValue | BasicArrayValue
+    }
+
+    // Return the scalar value
+    return (typeof value === 'object' && Array.isArray(value)) 
+      ? (arrayName.endsWith('$') ? '' : 0) // Still an array (too few indices)
+      : value as BasicScalarValue
   }
 
   /**

@@ -121,6 +121,7 @@ export class ExecutionEngine {
         success: this.context.getErrors().length === 0,
         errors: this.context.getErrors(),
         variables: this.context.variables,
+        arrays: this.context.arrays,
         executionTime: Date.now() - startTime
       }
       
@@ -136,6 +137,7 @@ export class ExecutionEngine {
         success: false,
         errors: this.context.getErrors(),
         variables: this.context.variables,
+        arrays: this.context.arrays,
         executionTime: Date.now() - startTime
       }
     }

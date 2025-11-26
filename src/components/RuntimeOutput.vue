@@ -128,12 +128,12 @@ watch(() => props.output.length, scrollToBottom)
           <div class="variables-content">
             <div class="variable-list">
               <div 
-                v-for="(value, name) in variables" 
+                v-for="(variable, name) in variables" 
                 :key="name" 
                 class="variable-item"
               >
                 <span class="variable-name">{{ name }}</span>
-                <span class="variable-value">{{ value }}</span>
+                <span class="variable-value">{{ variable.value }}</span>
               </div>
             </div>
           </div>
@@ -211,44 +211,6 @@ watch(() => props.output.length, scrollToBottom)
   word-wrap: break-word;
 }
 
-.variables-content {
-  flex: 1 1 0;
-  padding: 1rem;
-  overflow-y: auto;
-  background: #f8f9fa;
-  min-height: 0;
-}
-
-.variable-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 0.5rem;
-}
-
-.variable-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem;
-  background: #fff;
-  border: 1px solid #e4e7ed;
-  border-radius: 4px;
-  font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
-  font-size: 14px;
-}
-
-.variable-name {
-  font-weight: bold;
-  color: #409eff;
-}
-
-.variable-value {
-  color: #333;
-  background: #f0f0f0;
-  padding: 0.25rem 0.5rem;
-  border-radius: 3px;
-  font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
-}
 
 .empty-output {
   display: flex;

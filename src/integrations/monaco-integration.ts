@@ -43,27 +43,36 @@ const monarchLanguage: monaco.languages.IMonarchLanguage = {
   // Tokenizer rules (order matters - more specific patterns first)
   tokenizer: {
     root: [
+      // REM lines (entire line as comment) - must come before line-number rule
+      // Matches: <lineNumber> REM <comment text>
+      [/^\d+\s+REM.*$/i, 'comment'],
+
       // Line numbers at start of line
       [/^\d+/, 'line-number'],
 
       // String literals (before operators to avoid matching quotes)
       [/"[^"]*"/, 'string'],
 
-      // String functions with $ suffix (must come before regular functions)
+      // String functions with $ suffix (must come before identifiers)
+      // Match function name followed by $ and then ( for function call
+      // Pattern: LEFT$(, RIGHT$(, MID$(, STR$(, HEX$(
       [
-        /\b(LEFT\$|RIGHT\$|MID\$|STR\$|HEX\$)\b/i,
+        /\b(LEFT\$|RIGHT\$|MID\$|STR\$|HEX\$)(?=\s*\()/i,
         'function'
       ],
 
       // Numeric functions (Family BASIC supported)
+      // Match function name followed by ( for function call
+      // Pattern: ABS(, SGN(, RND(, VAL(, LEN(, STICK(, STRIG(
       [
-        /\b(ABS|SGN|RND|VAL|LEN|STICK|STRIG)\b/i,
+        /\b(ABS|SGN|RND|VAL|LEN|STICK|STRIG)(?=\s*\()/i,
         'function'
       ],
 
       // Keywords (case-insensitive)
+      // Note: REM is excluded here since REM lines are handled above as comments
       [
-        /\b(PRINT|LET|IF|THEN|FOR|NEXT|TO|STEP|GOTO|END|PAUSE|REM)\b/i,
+        /\b(PRINT|LET|IF|THEN|FOR|NEXT|TO|STEP|GOTO|END|PAUSE|DIM|DATA|READ|RESTORE)\b/i,
         'keyword'
       ],
 
@@ -79,7 +88,8 @@ const monarchLanguage: monaco.languages.IMonarchLanguage = {
       // Number literals (integers only in Family BASIC)
       [/\d+/, 'number'],
 
-      // Comments (REM statement) - must come after REM keyword check
+      // REM comments (for REM after colon - though not valid in Family BASIC, handle gracefully)
+      // Note: REM lines starting with line number are handled above
       [/REM.*$/i, 'comment'],
 
       // Identifiers (variables)

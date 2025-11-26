@@ -8,7 +8,7 @@ import type { CstNode } from 'chevrotain'
 import { ExpressionEvaluator, type EvaluationContext } from '../evaluation/ExpressionEvaluator'
 import { ERROR_TYPES } from '../constants'
 import type { BasicScalarValue } from '../types/BasicTypes'
-import { getLineNumberFromStatement } from '../parser/cst-helpers'
+import { getFirstCstNode, getCstNodes, getFirstToken } from '../parser/cst-helpers'
 
 export class DataService {
   constructor(
@@ -18,22 +18,55 @@ export class DataService {
 
   /**
    * Add data values from a DATA statement (CST version)
+   * DATA statements only contain constants:
+   * - NumberLiteral: numeric constants
+   * - StringLiteral: quoted strings (may contain commas/colons)
+   * - Identifier: unquoted strings (treated as string constants, not variables)
    */
-  addDataValuesCst(expressionCsts: CstNode[]): void {
-    for (const exprCst of expressionCsts) {
-      const value = this.evaluator.evaluateExpression(exprCst)
+  addDataValuesCst(constantCsts: CstNode[]): void {
+    for (const constantCst of constantCsts) {
+      const value = this.evaluateDataConstant(constantCst)
       this.context.dataValues.push(value)
     }
     
     if (this.context.config.enableDebugMode) {
-      this.context.addDebugOutput(`DATA: Added ${expressionCsts.length} values`)
+      this.context.addDebugOutput(`DATA: Added ${constantCsts.length} values`)
     }
+  }
+
+  /**
+   * Evaluate a DATA constant (NumberLiteral, StringLiteral, or Identifier)
+   * Identifiers in DATA are treated as string constants, not variable references
+   */
+  private evaluateDataConstant(constantCst: CstNode): BasicScalarValue {
+    // Check for number literal
+    const numberToken = getFirstToken(constantCst.children.NumberLiteral)
+    if (numberToken) {
+      return parseInt(numberToken.image, 10)
+    }
+
+    // Check for string literal (quoted string)
+    const stringToken = getFirstToken(constantCst.children.StringLiteral)
+    if (stringToken) {
+      // Remove quotes and return the string value
+      return stringToken.image.slice(1, -1)
+    }
+
+    // Check for identifier (unquoted string constant)
+    const identifierToken = getFirstToken(constantCst.children.Identifier)
+    if (identifierToken) {
+      // In DATA statements, identifiers are treated as string constants, not variables
+      return identifierToken.image
+    }
+
+    // Should not reach here if parser is correct
+    throw new Error('Invalid DATA constant: must be NumberLiteral, StringLiteral, or Identifier')
   }
 
   /**
    * Add data values from a DATA statement (AST version - deprecated)
    */
-  addDataValues(expressions: any[]): void {
+  addDataValues(_expressions: unknown[]): void {
     // This method is kept for compatibility but should not be used
     // Use addDataValuesCst instead
     console.warn('addDataValues called with AST - use addDataValuesCst instead')
@@ -46,7 +79,7 @@ export class DataService {
     if (this.context.dataIndex >= this.context.dataValues.length) {
       this.context.addError({
         line: 0,
-        message: 'Out of data',
+        message: 'OD ERROR',
         type: ERROR_TYPES.RUNTIME
       })
       return 0
@@ -128,18 +161,56 @@ export class DataService {
    * Find the index of the first DATA statement at or after the specified line
    */
   private findDataStatementIndex(lineNumber: number): number {
-    // For now, DATA statements are not yet implemented in CST parser
-    // This will be implemented when DATA statement parsing is added
-    return -1
+    // Find the first DATA statement at or after the specified line
+    // We need to search through expanded statements to find DATA statements
+    let dataIndex = 0
+    
+    for (const statement of this.context.statements) {
+      const commandCst = statement.command
+      const singleCommandCst = getFirstCstNode(commandCst.children.singleCommand)
+      
+      if (singleCommandCst?.children.dataStatement) {
+        // Found a DATA statement
+        if (statement.lineNumber >= lineNumber) {
+          return dataIndex
+        }
+        // Count data values in this DATA statement
+        const dataStmtCst = getFirstCstNode(singleCommandCst.children.dataStatement)
+        if (dataStmtCst) {
+          const dataConstantListCst = getFirstCstNode(dataStmtCst.children.dataConstantList)
+          if (dataConstantListCst) {
+            const constants = getCstNodes(dataConstantListCst.children.dataConstant)
+            dataIndex += constants.length
+          }
+        }
+      }
+    }
+    
+    return -1 // Not found
   }
 
   /**
    * Preprocess all DATA statements to build the data array
    */
   preprocessDataStatements(): void {
-    // For now, DATA statements are not yet implemented in CST parser
-    // This will be implemented when DATA statement parsing is added
     this.context.dataValues = []
+    
+    // Process all DATA statements in order
+    for (const statement of this.context.statements) {
+      const commandCst = statement.command
+      const singleCommandCst = getFirstCstNode(commandCst.children.singleCommand)
+      
+      if (singleCommandCst?.children.dataStatement) {
+        const dataStmtCst = getFirstCstNode(singleCommandCst.children.dataStatement)
+        if (dataStmtCst) {
+          const dataConstantListCst = getFirstCstNode(dataStmtCst.children.dataConstantList)
+          if (dataConstantListCst) {
+            const constants = getCstNodes(dataConstantListCst.children.dataConstant)
+            this.addDataValuesCst(constants)
+          }
+        }
+      }
+    }
     
     if (this.context.config.enableDebugMode) {
       this.context.addDebugOutput(`Preprocessed ${this.context.dataValues.length} data values`)

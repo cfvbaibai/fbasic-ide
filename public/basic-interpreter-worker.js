@@ -9278,6 +9278,10 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
   var If = createToken({ name: "If", pattern: /\bIF\b/i });
   var Then = createToken({ name: "Then", pattern: /\bTHEN\b/i });
   var Goto = createToken({ name: "Goto", pattern: /\bGOTO\b/i });
+  var Dim = createToken({ name: "Dim", pattern: /\bDIM\b/i });
+  var Data = createToken({ name: "Data", pattern: /\bDATA\b/i });
+  var Read = createToken({ name: "Read", pattern: /\bREAD\b/i });
+  var Restore = createToken({ name: "Restore", pattern: /\bRESTORE\b/i });
   var Len = createToken({ name: "Len", pattern: /\bLEN\b/i });
   var Left = createToken({ name: "Left", pattern: /\bLEFT\$/i });
   var Right = createToken({ name: "Right", pattern: /\bRIGHT\$/i });
@@ -9358,6 +9362,10 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     If,
     Then,
     Goto,
+    Dim,
+    Data,
+    Read,
+    Restore,
     // String functions (must come before Identifier)
     Len,
     Left,
@@ -9461,6 +9469,12 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         });
         this.CONSUME(RParen);
       });
+      this.arrayAccess = this.RULE("arrayAccess", () => {
+        this.CONSUME(Identifier);
+        this.CONSUME(LParen);
+        this.SUBRULE(this.expressionList);
+        this.CONSUME(RParen);
+      });
       this.primary = this.RULE("primary", () => {
         this.OR([
           {
@@ -9474,6 +9488,12 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
             // String functions: LEN, LEFT$, RIGHT$, MID$, STR$, HEX$
             GATE: () => this.LA(1).tokenType === Len || this.LA(1).tokenType === Left || this.LA(1).tokenType === Right || this.LA(1).tokenType === Mid || this.LA(1).tokenType === Str || this.LA(1).tokenType === Hex || this.LA(1).tokenType === Abs || this.LA(1).tokenType === Sgn || this.LA(1).tokenType === Rnd || this.LA(1).tokenType === Val || this.LA(1).tokenType === Stick || this.LA(1).tokenType === Strig,
             ALT: () => this.SUBRULE(this.functionCall)
+          },
+          {
+            // Array access: Identifier LParen ExpressionList RParen
+            // Must check before plain Identifier to avoid ambiguity
+            GATE: () => this.LA(1).tokenType === Identifier && this.LA(2).tokenType === LParen,
+            ALT: () => this.SUBRULE(this.arrayAccess)
           },
           { ALT: () => this.CONSUME(Identifier) },
           {
@@ -9581,7 +9601,9 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
             { ALT: () => this.CONSUME(Comma) },
             { ALT: () => this.CONSUME(Semicolon) }
           ]);
-          this.SUBRULE2(this.printItem);
+          this.OPTION(() => {
+            this.SUBRULE2(this.printItem);
+          });
         });
       });
       this.printStatement = this.RULE("printStatement", () => {
@@ -9594,7 +9616,14 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         this.OPTION(() => {
           this.CONSUME(Let);
         });
-        this.CONSUME(Identifier);
+        this.OR([
+          {
+            // Array access: Identifier LParen ExpressionList RParen
+            GATE: () => this.LA(1).tokenType === Identifier && this.LA(2).tokenType === LParen,
+            ALT: () => this.SUBRULE(this.arrayAccess)
+          },
+          { ALT: () => this.CONSUME(Identifier) }
+        ]);
         this.CONSUME(Equal);
         this.SUBRULE(this.expression);
       });
@@ -9623,6 +9652,79 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       this.gotoStatement = this.RULE("gotoStatement", () => {
         this.CONSUME(Goto);
         this.CONSUME(NumberLiteral);
+      });
+      this.dimensionList = this.RULE("dimensionList", () => {
+        this.SUBRULE(this.expression);
+        this.OPTION(() => {
+          this.CONSUME(Comma);
+          this.SUBRULE2(this.expression);
+        });
+      });
+      this.arrayDeclaration = this.RULE("arrayDeclaration", () => {
+        this.CONSUME(Identifier);
+        this.CONSUME(LParen);
+        this.SUBRULE(this.dimensionList);
+        this.CONSUME(RParen);
+      });
+      this.dimStatement = this.RULE("dimStatement", () => {
+        this.CONSUME(Dim);
+        this.SUBRULE(this.arrayDeclaration);
+        this.MANY(() => {
+          this.CONSUME(Comma);
+          this.SUBRULE2(this.arrayDeclaration);
+        });
+      });
+      this.dataConstant = this.RULE("dataConstant", () => {
+        this.OR([
+          { ALT: () => this.CONSUME(NumberLiteral) },
+          {
+            GATE: () => this.LA(1).tokenType === StringLiteral,
+            ALT: () => this.CONSUME(StringLiteral)
+          },
+          { ALT: () => this.CONSUME(Identifier) }
+          // Unquoted string constant
+        ]);
+      });
+      this.dataConstantList = this.RULE("dataConstantList", () => {
+        this.OPTION(() => {
+          this.SUBRULE(this.dataConstant);
+          this.MANY(() => {
+            this.CONSUME(Comma);
+            this.SUBRULE2(this.dataConstant);
+          });
+        });
+      });
+      this.dataStatement = this.RULE("dataStatement", () => {
+        this.CONSUME(Data);
+        this.SUBRULE(this.dataConstantList);
+      });
+      this.readStatement = this.RULE("readStatement", () => {
+        this.CONSUME(Read);
+        this.OR([
+          {
+            // Array access: Identifier LParen ExpressionList RParen
+            GATE: () => this.LA(1).tokenType === Identifier && this.LA(2).tokenType === LParen,
+            ALT: () => this.SUBRULE(this.arrayAccess)
+          },
+          { ALT: () => this.CONSUME(Identifier) }
+        ]);
+        this.MANY(() => {
+          this.CONSUME(Comma);
+          this.OR2([
+            {
+              // Array access: Identifier LParen ExpressionList RParen
+              GATE: () => this.LA(1).tokenType === Identifier && this.LA(2).tokenType === LParen,
+              ALT: () => this.SUBRULE2(this.arrayAccess)
+            },
+            { ALT: () => this.CONSUME2(Identifier) }
+          ]);
+        });
+      });
+      this.restoreStatement = this.RULE("restoreStatement", () => {
+        this.CONSUME(Restore);
+        this.OPTION(() => {
+          this.CONSUME(NumberLiteral);
+        });
       });
       this.ifThenStatement = this.RULE("ifThenStatement", () => {
         this.CONSUME(If);
@@ -9653,81 +9755,6 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           }
         ]);
       });
-      this.remStatement = this.RULE("remStatement", () => {
-        this.CONSUME(Rem);
-        this.MANY(() => {
-          this.OR([
-            // Match tokens that could appear in comments, using suffixes to avoid conflicts
-            { ALT: () => this.CONSUME(StringLiteral) },
-            { ALT: () => this.CONSUME(NumberLiteral) },
-            { ALT: () => this.CONSUME(Identifier) },
-            { ALT: () => this.CONSUME(Let) },
-            { ALT: () => this.CONSUME(Print) },
-            { ALT: () => this.CONSUME(For) },
-            { ALT: () => this.CONSUME(To) },
-            { ALT: () => this.CONSUME(Step) },
-            { ALT: () => this.CONSUME(Next) },
-            { ALT: () => this.CONSUME(End) },
-            { ALT: () => this.CONSUME2(Rem) },
-            // Use CONSUME2 for second occurrence
-            { ALT: () => this.CONSUME(If) },
-            { ALT: () => this.CONSUME(Then) },
-            { ALT: () => this.CONSUME(Goto) },
-            { ALT: () => this.CONSUME(Pause) },
-            { ALT: () => this.CONSUME(Equal) },
-            { ALT: () => this.CONSUME(NotEqual) },
-            { ALT: () => this.CONSUME(LessThan) },
-            { ALT: () => this.CONSUME(GreaterThan) },
-            { ALT: () => this.CONSUME(LessThanOrEqual) },
-            { ALT: () => this.CONSUME(GreaterThanOrEqual) },
-            { ALT: () => this.CONSUME(Plus) },
-            { ALT: () => this.CONSUME(Minus) },
-            { ALT: () => this.CONSUME(Multiply) },
-            { ALT: () => this.CONSUME(Divide) },
-            { ALT: () => this.CONSUME(Mod) },
-            { ALT: () => this.CONSUME(And) },
-            { ALT: () => this.CONSUME(Or) },
-            { ALT: () => this.CONSUME(Xor) },
-            { ALT: () => this.CONSUME(Not) },
-            // Function tokens (must be consumed in REM)
-            { ALT: () => this.CONSUME(Len) },
-            { ALT: () => this.CONSUME(Left) },
-            { ALT: () => this.CONSUME(Right) },
-            { ALT: () => this.CONSUME(Mid) },
-            { ALT: () => this.CONSUME(Str) },
-            { ALT: () => this.CONSUME(Hex) },
-            { ALT: () => this.CONSUME(Abs) },
-            { ALT: () => this.CONSUME(Sgn) },
-            { ALT: () => this.CONSUME(Rnd) },
-            { ALT: () => this.CONSUME(Val) },
-            { ALT: () => this.CONSUME(Stick) },
-            { ALT: () => this.CONSUME(Strig) },
-            { ALT: () => this.CONSUME(Comma) },
-            { ALT: () => this.CONSUME(Semicolon) },
-            { ALT: () => this.CONSUME(Colon) },
-            // Colon ends REM and starts next command
-            { ALT: () => this.CONSUME(LParen) },
-            { ALT: () => this.CONSUME(RParen) },
-            // Additional punctuation and special characters
-            { ALT: () => this.CONSUME(Period) },
-            { ALT: () => this.CONSUME(Hash2) },
-            { ALT: () => this.CONSUME(Dollar) },
-            { ALT: () => this.CONSUME(LBracket) },
-            { ALT: () => this.CONSUME(RBracket) },
-            { ALT: () => this.CONSUME(Exclamation) },
-            { ALT: () => this.CONSUME(Question) },
-            { ALT: () => this.CONSUME(AtSign) },
-            { ALT: () => this.CONSUME(Percent) },
-            { ALT: () => this.CONSUME(LBrace) },
-            { ALT: () => this.CONSUME(RBrace) },
-            { ALT: () => this.CONSUME(Pipe) },
-            { ALT: () => this.CONSUME(Tilde) },
-            { ALT: () => this.CONSUME(Underscore) },
-            { ALT: () => this.CONSUME(Backslash) },
-            { ALT: () => this.CONSUME(Apostrophe) }
-          ]);
-        });
-      });
       this.singleCommand = this.RULE("singleCommand", () => {
         this.OR([
           {
@@ -9754,13 +9781,27 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
             GATE: () => this.LA(1).tokenType === End,
             ALT: () => this.SUBRULE(this.endStatement)
           },
-          {
-            GATE: () => this.LA(1).tokenType === Rem,
-            ALT: () => this.SUBRULE(this.remStatement)
-          },
+          // REM statement removed - REM lines are handled at line level before parsing
+          // In Family BASIC, REM cannot appear after colons
           {
             GATE: () => this.LA(1).tokenType === Pause,
             ALT: () => this.SUBRULE(this.pauseStatement)
+          },
+          {
+            GATE: () => this.LA(1).tokenType === Dim,
+            ALT: () => this.SUBRULE(this.dimStatement)
+          },
+          {
+            GATE: () => this.LA(1).tokenType === Data,
+            ALT: () => this.SUBRULE(this.dataStatement)
+          },
+          {
+            GATE: () => this.LA(1).tokenType === Read,
+            ALT: () => this.SUBRULE(this.readStatement)
+          },
+          {
+            GATE: () => this.LA(1).tokenType === Restore,
+            ALT: () => this.SUBRULE(this.restoreStatement)
           },
           { ALT: () => this.SUBRULE(this.letStatement) }
           // Must be last since it can start with Identifier
@@ -9791,6 +9832,10 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
       const line = lines[lineIndex]?.trim();
       if (!line) {
+        continue;
+      }
+      const remMatch = line.match(/^\s*(\d+)\s+REM\b/i);
+      if (remMatch) {
         continue;
       }
       const lexResult = lexer.tokenize(line);
@@ -12925,14 +12970,18 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       return primaryValue;
     }
     /**
-     * Evaluate primary expression: NumberLiteral | StringLiteral | Identifier | FunctionCall | (LParen Expression RParen)
+     * Evaluate primary expression: NumberLiteral | StringLiteral | ArrayAccess | FunctionCall | Identifier | (LParen Expression RParen)
      */
     evaluatePrimary(cst) {
+      const arrayAccessCst = getFirstCstNode(cst.children.arrayAccess);
+      if (arrayAccessCst) {
+        return this.evaluateArrayAccess(arrayAccessCst);
+      }
       const functionCallCst = getFirstCstNode(cst.children.functionCall);
       if (functionCallCst) {
         return this.evaluateFunctionCall(functionCallCst);
       }
-      if (cst.children.LParen && !functionCallCst) {
+      if (cst.children.LParen && !functionCallCst && !arrayAccessCst) {
         const exprCst = getFirstCstNode(cst.children.expression);
         if (exprCst) {
           return this.evaluateExpression(exprCst);
@@ -12957,6 +13006,49 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         return varName.endsWith("$") ? "" : 0;
       }
       throw new Error("Invalid primary expression");
+    }
+    /**
+     * Evaluate array access: Identifier LParen ExpressionList RParen
+     * Examples: A(I), A$(I, J)
+     */
+    evaluateArrayAccess(cst) {
+      const identifierToken = getFirstToken(cst.children.Identifier);
+      if (!identifierToken) {
+        throw new Error("Invalid array access: missing array name");
+      }
+      const arrayName = identifierToken.image.toUpperCase();
+      const expressionListCst = getFirstCstNode(cst.children.expressionList);
+      if (!expressionListCst) {
+        throw new Error("Invalid array access: missing indices");
+      }
+      const expressions = getCstNodes(expressionListCst.children.expression);
+      const indices = [];
+      for (const exprCst of expressions) {
+        const indexValue = this.evaluateExpression(exprCst);
+        if (typeof indexValue !== "number") {
+          throw new Error(`Invalid array index: expected number, got ${typeof indexValue}`);
+        }
+        indices.push(Math.floor(indexValue));
+      }
+      const array = this.context.arrays.get(arrayName);
+      if (!array) {
+        return arrayName.endsWith("$") ? "" : 0;
+      }
+      let value = array;
+      for (let i = 0; i < indices.length; i++) {
+        const index = indices[i];
+        if (index === void 0) {
+          throw new Error(`Invalid array index at dimension ${i}`);
+        }
+        if (typeof value !== "object" || !Array.isArray(value)) {
+          throw new Error(`Array access error: dimension ${i} is not an array`);
+        }
+        if (index < 0 || index >= value.length) {
+          return arrayName.endsWith("$") ? "" : 0;
+        }
+        value = value[index];
+      }
+      return typeof value === "object" && Array.isArray(value) ? arrayName.endsWith("$") ? "" : 0 : value;
     }
     /**
      * Evaluate function call: Delegates to FunctionEvaluator
@@ -13192,25 +13284,34 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     }
     /**
      * Create an array with specified dimensions
+     * According to Family BASIC spec:
+     * - Numerical arrays are initialized to 0
+     * - String arrays (name ends with $) are initialized to empty strings
      */
     createArray(name, dimensions) {
-      const array = this.createArrayRecursive(dimensions, 0);
+      const isStringArray = name.endsWith("$");
+      const defaultValue = isStringArray ? "" : 0;
+      const array = this.createArrayRecursive(dimensions, 0, defaultValue);
       this.context.arrays.set(name, array);
     }
     /**
      * Recursively create array structure
+     * @param dimensions Array of dimension sizes (highest index + 1)
+     * @param currentDim Current dimension index
+     * @param defaultValue Default value for leaf elements (0 for numeric, '' for string)
      */
-    createArrayRecursive(dimensions, currentDim) {
+    createArrayRecursive(dimensions, currentDim, defaultValue) {
       if (currentDim >= dimensions.length) {
         return [];
       }
-      const size = Math.floor(dimensions[currentDim] ?? 0);
+      const highestIndex = Math.floor(dimensions[currentDim] ?? 0);
+      const size = highestIndex + 1;
       const array = [];
       for (let i = 0; i < size; i++) {
         if (currentDim === dimensions.length - 1) {
-          array[i] = 0;
+          array[i] = defaultValue;
         } else {
-          array[i] = this.createArrayRecursive(dimensions, currentDim + 1);
+          array[i] = this.createArrayRecursive(dimensions, currentDim + 1, defaultValue);
         }
       }
       return array;
@@ -13276,18 +13377,46 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     }
     /**
      * Execute a LET statement from CST
+     * Supports: LET X = 5, LET A(0) = 10, LET A$(I, J) = "Hello"
      */
     execute(letStmtCst) {
-      const identifierToken = getFirstToken(letStmtCst.children.Identifier);
       const expressionCst = getFirstCstNode(letStmtCst.children.expression);
-      if (!identifierToken || !expressionCst) {
-        throw new Error("Invalid LET statement: missing identifier or expression");
+      if (!expressionCst) {
+        throw new Error("Invalid LET statement: missing expression");
       }
-      const varName = identifierToken.image.toUpperCase();
-      this.variableService.setVariableFromExpressionCst(varName, expressionCst);
-      if (this.variableService.context.config.enableDebugMode) {
+      const arrayAccessCst = getFirstCstNode(letStmtCst.children.arrayAccess);
+      if (arrayAccessCst) {
+        const identifierToken = getFirstToken(arrayAccessCst.children.Identifier);
+        const expressionListCst = getFirstCstNode(arrayAccessCst.children.expressionList);
+        if (!identifierToken || !expressionListCst) {
+          throw new Error("Invalid LET statement: invalid array access");
+        }
+        const arrayName = identifierToken.image.toUpperCase();
+        const indexExpressions = getCstNodes(expressionListCst.children.expression);
+        const indices = indexExpressions.map((exprCst) => {
+          const indexValue = this.variableService.evaluator.evaluateExpression(exprCst);
+          if (typeof indexValue !== "number") {
+            throw new Error(`Invalid array index: expected number, got ${typeof indexValue}`);
+          }
+          return Math.floor(indexValue);
+        });
         const value = this.variableService.evaluator.evaluateExpression(expressionCst);
-        this.variableService.context.addDebugOutput(`LET: ${varName} = ${value}`);
+        const basicValue = typeof value === "string" ? value : Math.floor(value);
+        this.variableService.setArrayElement(arrayName, indices, basicValue);
+        if (this.variableService.context.config.enableDebugMode) {
+          this.variableService.context.addDebugOutput(`LET: ${arrayName}(${indices.join(", ")}) = ${basicValue}`);
+        }
+      } else {
+        const identifierToken = getFirstToken(letStmtCst.children.Identifier);
+        if (!identifierToken) {
+          throw new Error("Invalid LET statement: missing identifier");
+        }
+        const varName = identifierToken.image.toUpperCase();
+        this.variableService.setVariableFromExpressionCst(varName, expressionCst);
+        if (this.variableService.context.config.enableDebugMode) {
+          const value = this.variableService.evaluator.evaluateExpression(expressionCst);
+          this.variableService.context.addDebugOutput(`LET: ${varName} = ${value}`);
+        }
       }
     }
   };
@@ -13601,6 +13730,85 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     }
   };
 
+  // src/core/execution/executors/DimExecutor.ts
+  var DimExecutor = class {
+    constructor(context, evaluator, variableService) {
+      this.context = context;
+      this.evaluator = evaluator;
+      this.variableService = variableService;
+    }
+    /**
+     * Execute DIM statement
+     * DIM ArrayDeclaration (Comma ArrayDeclaration)*
+     */
+    execute(cst, lineNumber) {
+      const arrayDeclarations = getCstNodes(cst.children.arrayDeclaration);
+      for (const arrayDeclCst of arrayDeclarations) {
+        const identifierToken = getFirstToken(arrayDeclCst.children.Identifier);
+        if (!identifierToken) {
+          this.context.addError({
+            line: lineNumber,
+            message: "DIM: Missing array name",
+            type: ERROR_TYPES.RUNTIME
+          });
+          continue;
+        }
+        const arrayName = identifierToken.image;
+        const dimensionListCst = getFirstCstNode(arrayDeclCst.children.dimensionList);
+        if (!dimensionListCst) {
+          this.context.addError({
+            line: lineNumber,
+            message: `DIM: Missing dimensions for array ${arrayName}`,
+            type: ERROR_TYPES.RUNTIME
+          });
+          continue;
+        }
+        const dimensionExpressions = getCstNodes(dimensionListCst.children.expression);
+        const dimensions = [];
+        for (const exprCst of dimensionExpressions) {
+          const value = this.evaluator.evaluateExpression(exprCst);
+          const numValue = this.toNumber(value);
+          if (numValue < 0) {
+            this.context.addError({
+              line: lineNumber,
+              message: `DIM: Array dimension must be >= 0 for ${arrayName}`,
+              type: ERROR_TYPES.RUNTIME
+            });
+            return;
+          }
+          dimensions.push(numValue);
+        }
+        if (dimensions.length < 1 || dimensions.length > 2) {
+          this.context.addError({
+            line: lineNumber,
+            message: `DIM: Arrays can have 1 or 2 dimensions only for ${arrayName}`,
+            type: ERROR_TYPES.RUNTIME
+          });
+          continue;
+        }
+        this.variableService.createArray(arrayName, dimensions);
+        if (this.context.config.enableDebugMode) {
+          const dimStr = dimensions.join(",");
+          this.context.addDebugOutput(`DIM: Created array ${arrayName}(${dimStr})`);
+        }
+      }
+    }
+    /**
+     * Convert a value to an integer
+     */
+    toNumber(value) {
+      if (typeof value === "number") {
+        return Math.floor(value);
+      }
+      if (typeof value === "boolean") return value ? 1 : 0;
+      if (typeof value === "string") {
+        const parsed = parseInt(value, 10);
+        return isNaN(parsed) ? 0 : parsed;
+      }
+      return 0;
+    }
+  };
+
   // src/core/services/DataService.ts
   var DataService = class {
     constructor(context, evaluator) {
@@ -13609,20 +13817,43 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     }
     /**
      * Add data values from a DATA statement (CST version)
+     * DATA statements only contain constants:
+     * - NumberLiteral: numeric constants
+     * - StringLiteral: quoted strings (may contain commas/colons)
+     * - Identifier: unquoted strings (treated as string constants, not variables)
      */
-    addDataValuesCst(expressionCsts) {
-      for (const exprCst of expressionCsts) {
-        const value = this.evaluator.evaluateExpression(exprCst);
+    addDataValuesCst(constantCsts) {
+      for (const constantCst of constantCsts) {
+        const value = this.evaluateDataConstant(constantCst);
         this.context.dataValues.push(value);
       }
       if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(`DATA: Added ${expressionCsts.length} values`);
+        this.context.addDebugOutput(`DATA: Added ${constantCsts.length} values`);
       }
+    }
+    /**
+     * Evaluate a DATA constant (NumberLiteral, StringLiteral, or Identifier)
+     * Identifiers in DATA are treated as string constants, not variable references
+     */
+    evaluateDataConstant(constantCst) {
+      const numberToken = getFirstToken(constantCst.children.NumberLiteral);
+      if (numberToken) {
+        return parseInt(numberToken.image, 10);
+      }
+      const stringToken = getFirstToken(constantCst.children.StringLiteral);
+      if (stringToken) {
+        return stringToken.image.slice(1, -1);
+      }
+      const identifierToken = getFirstToken(constantCst.children.Identifier);
+      if (identifierToken) {
+        return identifierToken.image;
+      }
+      throw new Error("Invalid DATA constant: must be NumberLiteral, StringLiteral, or Identifier");
     }
     /**
      * Add data values from a DATA statement (AST version - deprecated)
      */
-    addDataValues(expressions) {
+    addDataValues(_expressions) {
       console.warn("addDataValues called with AST - use addDataValuesCst instead");
     }
     /**
@@ -13632,7 +13863,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       if (this.context.dataIndex >= this.context.dataValues.length) {
         this.context.addError({
           line: 0,
-          message: "Out of data",
+          message: "OD ERROR",
           type: ERROR_TYPES.RUNTIME
         });
         return 0;
@@ -13701,6 +13932,24 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
      * Find the index of the first DATA statement at or after the specified line
      */
     findDataStatementIndex(lineNumber) {
+      let dataIndex = 0;
+      for (const statement of this.context.statements) {
+        const commandCst = statement.command;
+        const singleCommandCst = getFirstCstNode(commandCst.children.singleCommand);
+        if (singleCommandCst?.children.dataStatement) {
+          if (statement.lineNumber >= lineNumber) {
+            return dataIndex;
+          }
+          const dataStmtCst = getFirstCstNode(singleCommandCst.children.dataStatement);
+          if (dataStmtCst) {
+            const dataConstantListCst = getFirstCstNode(dataStmtCst.children.dataConstantList);
+            if (dataConstantListCst) {
+              const constants = getCstNodes(dataConstantListCst.children.dataConstant);
+              dataIndex += constants.length;
+            }
+          }
+        }
+      }
       return -1;
     }
     /**
@@ -13708,8 +13957,105 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
      */
     preprocessDataStatements() {
       this.context.dataValues = [];
+      for (const statement of this.context.statements) {
+        const commandCst = statement.command;
+        const singleCommandCst = getFirstCstNode(commandCst.children.singleCommand);
+        if (singleCommandCst?.children.dataStatement) {
+          const dataStmtCst = getFirstCstNode(singleCommandCst.children.dataStatement);
+          if (dataStmtCst) {
+            const dataConstantListCst = getFirstCstNode(dataStmtCst.children.dataConstantList);
+            if (dataConstantListCst) {
+              const constants = getCstNodes(dataConstantListCst.children.dataConstant);
+              this.addDataValuesCst(constants);
+            }
+          }
+        }
+      }
       if (this.context.config.enableDebugMode) {
         this.context.addDebugOutput(`Preprocessed ${this.context.dataValues.length} data values`);
+      }
+    }
+  };
+
+  // src/core/execution/executors/DataExecutor.ts
+  var DataExecutor = class {
+    constructor(dataService) {
+      this.dataService = dataService;
+    }
+    /**
+     * Execute DATA statement (preprocessing phase)
+     * DATA DataConstantList
+     */
+    execute(cst) {
+      const dataConstantListCst = getFirstCstNode(cst.children.dataConstantList);
+      if (!dataConstantListCst) {
+        return;
+      }
+      const constants = getCstNodes(dataConstantListCst.children.dataConstant);
+      this.dataService.addDataValuesCst(constants);
+    }
+  };
+
+  // src/core/execution/executors/ReadExecutor.ts
+  var ReadExecutor = class {
+    constructor(dataService, variableService, evaluator) {
+      this.dataService = dataService;
+      this.variableService = variableService;
+      this.evaluator = evaluator;
+    }
+    /**
+     * Execute READ statement
+     * READ (Identifier | ArrayAccess) (Comma (Identifier | ArrayAccess))*
+     */
+    execute(cst, _lineNumber) {
+      const identifierTokens = getTokens(cst.children.Identifier);
+      for (const identifierToken of identifierTokens) {
+        const variableName = identifierToken.image;
+        const dataValue = this.dataService.readNextDataValue();
+        this.variableService.setVariable(variableName, dataValue);
+      }
+      const arrayAccessNodes = getCstNodes(cst.children.arrayAccess);
+      for (const arrayAccessCst of arrayAccessNodes) {
+        const identifierToken = getFirstToken(arrayAccessCst.children.Identifier);
+        if (!identifierToken) {
+          continue;
+        }
+        const arrayName = identifierToken.image.toUpperCase();
+        const expressionListCst = getFirstCstNode(arrayAccessCst.children.expressionList);
+        if (!expressionListCst) {
+          continue;
+        }
+        const expressions = getCstNodes(expressionListCst.children.expression);
+        const indices = [];
+        for (const exprCst of expressions) {
+          const indexValue = this.evaluator.evaluateExpression(exprCst);
+          if (typeof indexValue !== "number") {
+            continue;
+          }
+          indices.push(Math.floor(indexValue));
+        }
+        const dataValue = this.dataService.readNextDataValue();
+        this.variableService.setArrayElement(arrayName, indices, dataValue);
+      }
+    }
+  };
+
+  // src/core/execution/executors/RestoreExecutor.ts
+  var RestoreExecutor = class {
+    constructor(dataService) {
+      this.dataService = dataService;
+    }
+    /**
+     * Execute RESTORE statement
+     * RESTORE (NumberLiteral)?
+     */
+    execute(cst) {
+      const numberLiteralToken = getFirstToken(cst.children.NumberLiteral);
+      if (numberLiteralToken) {
+        const lineNumber = parseInt(numberLiteralToken.image, 10);
+        this.dataService.restoreData(lineNumber);
+      } else {
+        this.dataService.restoreData();
       }
     }
   };
@@ -13730,6 +14076,10 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       __publicField(this, "pauseExecutor");
       __publicField(this, "ifThenExecutor");
       __publicField(this, "gotoExecutor");
+      __publicField(this, "dimExecutor");
+      __publicField(this, "dataExecutor");
+      __publicField(this, "readExecutor");
+      __publicField(this, "restoreExecutor");
       this.printExecutor = new PrintExecutor(ioService, evaluator);
       this.letExecutor = new LetExecutor(variableService);
       this.forExecutor = new ForExecutor(context, evaluator, variableService);
@@ -13738,6 +14088,10 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       this.pauseExecutor = new PauseExecutor(context, evaluator);
       this.ifThenExecutor = new IfThenExecutor(context, evaluator);
       this.gotoExecutor = new GotoExecutor(context);
+      this.dimExecutor = new DimExecutor(context, evaluator, variableService);
+      this.dataExecutor = new DataExecutor(dataService);
+      this.readExecutor = new ReadExecutor(dataService, variableService, evaluator);
+      this.restoreExecutor = new RestoreExecutor(dataService);
     }
     /**
      * Route an expanded statement to its appropriate executor
@@ -13867,17 +14221,34 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           this.endExecutor.execute(endStmtCst);
           return;
         }
-      } else if (singleCommandCst.children.remStatement) {
-        if (this.context.config.enableDebugMode) {
-          this.context.addDebugOutput("REM: Comment ignored");
-        }
-        return;
       } else if (singleCommandCst.children.pauseStatement) {
         const pauseStmtCst = getFirstCstNode(singleCommandCst.children.pauseStatement);
         if (pauseStmtCst) {
           await this.pauseExecutor.execute(pauseStmtCst);
         }
         return;
+      } else if (singleCommandCst.children.dimStatement) {
+        const dimStmtCst = getFirstCstNode(singleCommandCst.children.dimStatement);
+        if (dimStmtCst) {
+          this.dimExecutor.execute(dimStmtCst, expandedStatement.lineNumber);
+        }
+      } else if (singleCommandCst.children.dataStatement) {
+        const dataStmtCst = getFirstCstNode(singleCommandCst.children.dataStatement);
+        if (dataStmtCst) {
+          if (this.context.config.enableDebugMode) {
+            this.context.addDebugOutput("DATA: Statement already processed during preprocessing");
+          }
+        }
+      } else if (singleCommandCst.children.readStatement) {
+        const readStmtCst = getFirstCstNode(singleCommandCst.children.readStatement);
+        if (readStmtCst) {
+          this.readExecutor.execute(readStmtCst, expandedStatement.lineNumber);
+        }
+      } else if (singleCommandCst.children.restoreStatement) {
+        const restoreStmtCst = getFirstCstNode(singleCommandCst.children.restoreStatement);
+        if (restoreStmtCst) {
+          this.restoreExecutor.execute(restoreStmtCst);
+        }
       } else {
         this.context.addError({
           line: expandedStatement.lineNumber,
@@ -13967,6 +14338,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           success: this.context.getErrors().length === 0,
           errors: this.context.getErrors(),
           variables: this.context.variables,
+          arrays: this.context.arrays,
           executionTime: Date.now() - startTime
         };
       } catch (error) {
@@ -13980,6 +14352,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           success: false,
           errors: this.context.getErrors(),
           variables: this.context.variables,
+          arrays: this.context.arrays,
           executionTime: Date.now() - startTime
         };
       }
@@ -14125,6 +14498,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
             type: ERROR_TYPES.RUNTIME
           }],
           variables: /* @__PURE__ */ new Map(),
+          arrays: /* @__PURE__ */ new Map(),
           executionTime: 0
         };
       }

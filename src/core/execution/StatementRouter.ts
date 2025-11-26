@@ -13,6 +13,10 @@ import { EndExecutor } from './executors/EndExecutor'
 import { PauseExecutor } from './executors/PauseExecutor'
 import { IfThenExecutor } from './executors/IfThenExecutor'
 import { GotoExecutor } from './executors/GotoExecutor'
+import { DimExecutor } from './executors/DimExecutor'
+import { DataExecutor } from './executors/DataExecutor'
+import { ReadExecutor } from './executors/ReadExecutor'
+import { RestoreExecutor } from './executors/RestoreExecutor'
 import { IoService } from '../services/IoService'
 import { VariableService } from '../services/VariableService'
 import { DataService } from '../services/DataService'
@@ -29,6 +33,10 @@ export class StatementRouter {
   private pauseExecutor: PauseExecutor
   private ifThenExecutor: IfThenExecutor
   private gotoExecutor: GotoExecutor
+  private dimExecutor: DimExecutor
+  private dataExecutor: DataExecutor
+  private readExecutor: ReadExecutor
+  private restoreExecutor: RestoreExecutor
 
   constructor(
     private context: EvaluationContext,
@@ -45,6 +53,10 @@ export class StatementRouter {
     this.pauseExecutor = new PauseExecutor(context, evaluator)
     this.ifThenExecutor = new IfThenExecutor(context, evaluator)
     this.gotoExecutor = new GotoExecutor(context)
+    this.dimExecutor = new DimExecutor(context, evaluator, variableService)
+    this.dataExecutor = new DataExecutor(dataService)
+    this.readExecutor = new ReadExecutor(dataService, variableService, evaluator)
+    this.restoreExecutor = new RestoreExecutor(dataService)
   }
 
   /**
@@ -208,18 +220,38 @@ export class StatementRouter {
         this.endExecutor.execute(endStmtCst)
         return // Don't continue executing
       }
-    } else if (singleCommandCst.children.remStatement) {
-      // REM statements are comments - do nothing (no-op)
-      if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput('REM: Comment ignored')
-      }
-      return
     } else if (singleCommandCst.children.pauseStatement) {
       const pauseStmtCst = getFirstCstNode(singleCommandCst.children.pauseStatement)
       if (pauseStmtCst) {
         await this.pauseExecutor.execute(pauseStmtCst)
       }
       return
+    } else if (singleCommandCst.children.dimStatement) {
+      const dimStmtCst = getFirstCstNode(singleCommandCst.children.dimStatement)
+      if (dimStmtCst) {
+        this.dimExecutor.execute(dimStmtCst, expandedStatement.lineNumber)
+      }
+    } else if (singleCommandCst.children.dataStatement) {
+      // DATA statements are preprocessed, but we still need to handle them during execution
+      // (they're no-ops during execution, but we process them during preprocessing)
+      const dataStmtCst = getFirstCstNode(singleCommandCst.children.dataStatement)
+      if (dataStmtCst) {
+        // DATA statements are already processed during preprocessing
+        // During execution, they are no-ops
+        if (this.context.config.enableDebugMode) {
+          this.context.addDebugOutput('DATA: Statement already processed during preprocessing')
+        }
+      }
+    } else if (singleCommandCst.children.readStatement) {
+      const readStmtCst = getFirstCstNode(singleCommandCst.children.readStatement)
+      if (readStmtCst) {
+        this.readExecutor.execute(readStmtCst, expandedStatement.lineNumber)
+      }
+    } else if (singleCommandCst.children.restoreStatement) {
+      const restoreStmtCst = getFirstCstNode(singleCommandCst.children.restoreStatement)
+      if (restoreStmtCst) {
+        this.restoreExecutor.execute(restoreStmtCst)
+      }
     } else {
       // Other statement types not yet implemented
       this.context.addError({

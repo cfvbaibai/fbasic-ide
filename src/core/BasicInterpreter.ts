@@ -140,6 +140,7 @@ export class BasicInterpreter {
           type: ERROR_TYPES.RUNTIME
         }],
         variables: new Map(),
+        arrays: new Map(),
         executionTime: 0
       }
     }

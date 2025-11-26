@@ -236,14 +236,16 @@ describe('REM Statement', () => {
       expect(result.variables.get('X')?.value).toBe(10)
     })
 
-    it('should handle REM on same line as other statements', async () => {
+    it('should NOT allow REM on same line as other statements (Family BASIC spec)', async () => {
+      // In Family BASIC, REM cannot appear after colons
+      // Lines like "10 LET X = 5: REM comment" are invalid
       const code = `10 LET X = 5: REM Set X to 5
 20 PRINT X: REM Print X`
       const result = await interpreter.execute(code)
       
-      expect(result.success).toBe(true)
-      expect(result.errors).toHaveLength(0)
-      expect(result.variables.get('X')?.value).toBe(5)
+      // This should fail because REM cannot appear after colon
+      expect(result.success).toBe(false)
+      expect(result.errors.length).toBeGreaterThan(0)
     })
 
     it('should handle REM with keywords in comment', async () => {

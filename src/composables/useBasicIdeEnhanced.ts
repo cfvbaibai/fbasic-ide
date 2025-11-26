@@ -22,7 +22,7 @@
  * @returns Object containing reactive state and methods for IDE functionality
  */
 
-/* global Worker, NodeJS, clearTimeout */
+/* global NodeJS */
 import { ref, onUnmounted } from 'vue'
 import { FBasicParser } from '../core/parser/FBasicParser'
 import { getSampleCode } from '../core/samples/sampleCodes'
@@ -52,7 +52,7 @@ export function useBasicIde() {
   const code = ref(`10 PRINT "Hello World!"
 20 PRINT "Family Basic IDE Demo"
 30 PRINT "Program completed!"
-40 FOR I=1 TO 3: PRINT "I="; I: NEXT I
+40 FOR I=1 TO 3: PRINT "I="; I: NEXT
 50 END`)
 
   const isRunning = ref(false)
@@ -399,7 +399,24 @@ export function useBasicIde() {
       }
       
       if (result && result.variables) {
-        variables.value = result.variables instanceof Map ? Object.fromEntries(result.variables) : result.variables
+        const vars: Record<string, BasicVariable> = result.variables instanceof Map 
+          ? Object.fromEntries(result.variables) 
+          : result.variables
+        
+        // Add arrays as variables for display (show actual array values)
+        if (result.arrays) {
+          const arrays = result.arrays instanceof Map ? result.arrays : new Map(Object.entries(result.arrays))
+          for (const [arrayName, arrayValue] of arrays.entries()) {
+            // Format array to show actual values
+            const formatted = formatArrayForDisplay(arrayValue)
+            vars[arrayName] = {
+              value: formatted,
+              type: arrayName.endsWith('$') ? 'string' : 'number'
+            }
+          }
+        }
+        
+        variables.value = vars
       }
 
     } catch (error) {
@@ -491,6 +508,51 @@ export function useBasicIde() {
   const validateCode = async () => {
     const cst = await parseCode()
     return cst !== null
+  }
+
+  /**
+   * Format a single value for display
+   */
+  function formatValue(value: unknown): string {
+    if (typeof value === 'string') {
+      return `"${value}"`
+    }
+    if (typeof value === 'number') {
+      return String(value)
+    }
+    if (value === undefined || value === null) {
+      return '0'
+    }
+    return String(value)
+  }
+
+  /**
+   * Format array for display in Variables panel
+   * Shows actual array values in a readable format
+   */
+  function formatArrayForDisplay(array: unknown): string {
+    if (!Array.isArray(array)) {
+      return 'Array'
+    }
+    
+    // Check if it's a 2D array (nested arrays)
+    const is2D = array.length > 0 && Array.isArray(array[0])
+    
+    if (is2D) {
+      // 2D array: show matrix representation
+      const rows: string[] = []
+      for (let i = 0; i < array.length; i++) {
+        const row = array[i]
+        if (Array.isArray(row)) {
+          rows.push(`[${row.map(v => formatValue(v)).join(', ')}]`)
+        }
+      }
+      return `[${rows.join(', ')}]`
+    } else {
+      // 1D array: show all values
+      const values = array.map(v => formatValue(v))
+      return `[${values.join(', ')}]`
+    }
   }
 
   // Initialize highlighting

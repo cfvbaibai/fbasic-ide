@@ -21,7 +21,7 @@ import type {
 } from 'chevrotain';
 import {
   // Keywords
-  Let, Print, For, To, Step, Next, End, Rem, Pause, If, Then, Goto,
+  Let, Print, For, To, Step, Next, End, Pause, If, Then, Goto, Dim, Data, Read, Restore,
   // String functions
   Len, Left, Right, Mid, Str, Hex,
   // Arithmetic functions
@@ -36,9 +36,6 @@ import {
   Equal, Plus, Minus, Multiply, Divide, Mod,
   // Punctuation
   Comma, Semicolon, Colon, LParen, RParen,
-  // Additional punctuation for REM statements
-  Period, Hash, Dollar, LBracket, RBracket, Exclamation, Question, AtSign, Percent,
-  LBrace, RBrace, Pipe, Tilde, Underscore, Backslash, Apostrophe,
   // Literals
   StringLiteral, NumberLiteral, Identifier,
   // Lexer
@@ -65,7 +62,6 @@ class FBasicChevrotainParser extends CstParser {
   declare forStatement: () => CstNode;
   declare nextStatement: () => CstNode;
   declare endStatement: () => CstNode;
-  declare remStatement: () => CstNode;
   declare pauseStatement: () => CstNode;
   declare comparisonExpression: () => CstNode;
   declare logicalNotExpression: () => CstNode;
@@ -74,8 +70,17 @@ class FBasicChevrotainParser extends CstParser {
   declare logicalExpression: () => CstNode;
   declare ifThenStatement: () => CstNode;
   declare gotoStatement: () => CstNode;
+  declare dimStatement: () => CstNode;
+  declare dataStatement: () => CstNode;
+  declare readStatement: () => CstNode;
+  declare restoreStatement: () => CstNode;
+  declare arrayDeclaration: () => CstNode;
+  declare dimensionList: () => CstNode;
   declare expressionList: () => CstNode;
+  declare dataConstant: () => CstNode;
+  declare dataConstantList: () => CstNode;
   declare functionCall: () => CstNode;
+  declare arrayAccess: () => CstNode;
   declare singleCommand: () => CstNode;
   declare command: () => CstNode;
   declare commandList: () => CstNode;
@@ -125,7 +130,16 @@ class FBasicChevrotainParser extends CstParser {
       this.CONSUME(RParen);
     });
 
-    // Primary = NumberLiteral | StringLiteral | Identifier | FunctionCall | (LParen Expression RParen)
+    // ArrayAccess = Identifier LParen ExpressionList RParen
+    // Handles array element access like A(I) or A$(I, J)
+    this.arrayAccess = this.RULE('arrayAccess', () => {
+      this.CONSUME(Identifier);
+      this.CONSUME(LParen);
+      this.SUBRULE(this.expressionList);
+      this.CONSUME(RParen);
+    });
+
+    // Primary = NumberLiteral | StringLiteral | ArrayAccess | FunctionCall | Identifier | (LParen Expression RParen)
     this.primary = this.RULE('primary', () => {
       this.OR([
         {
@@ -151,6 +165,14 @@ class FBasicChevrotainParser extends CstParser {
             this.LA(1).tokenType === Stick ||
             this.LA(1).tokenType === Strig,
           ALT: () => this.SUBRULE(this.functionCall)
+        },
+        {
+          // Array access: Identifier LParen ExpressionList RParen
+          // Must check before plain Identifier to avoid ambiguity
+          GATE: () => 
+            this.LA(1).tokenType === Identifier && 
+            this.LA(2).tokenType === LParen,
+          ALT: () => this.SUBRULE(this.arrayAccess)
         },
         { ALT: () => this.CONSUME(Identifier) },
         {
@@ -286,7 +308,9 @@ class FBasicChevrotainParser extends CstParser {
       ]);
     });
 
-    // PrintList = PrintItem (Comma|Semicolon PrintItem)*
+    // PrintList = PrintItem (Comma|Semicolon PrintItem?)*
+    // Allows trailing comma or semicolon (e.g., PRINT X; or PRINT A, B,)
+    // Trailing separator is consumed but PrintItem is optional
     this.printList = this.RULE('printList', () => {
       this.SUBRULE(this.printItem);
       this.MANY(() => {
@@ -294,7 +318,10 @@ class FBasicChevrotainParser extends CstParser {
           { ALT: () => this.CONSUME(Comma) },
           { ALT: () => this.CONSUME(Semicolon) }
         ]);
-        this.SUBRULE2(this.printItem);
+        // PrintItem is optional - allows trailing separator
+        this.OPTION(() => {
+          this.SUBRULE2(this.printItem);
+        });
       });
     });
 
@@ -307,11 +334,24 @@ class FBasicChevrotainParser extends CstParser {
     });
 
     // LET? Identifier = Expression
+    // LET (Identifier | ArrayAccess) = Expression
+    // Supports both simple variable assignment and array element assignment
+    // Examples: LET X = 5, LET A(0) = 10, LET A$(I, J) = "Hello"
     this.letStatement = this.RULE('letStatement', () => {
       this.OPTION(() => {
         this.CONSUME(Let);
       });
-      this.CONSUME(Identifier);
+      // Variable or array element (must check ArrayAccess before Identifier)
+      this.OR([
+        {
+          // Array access: Identifier LParen ExpressionList RParen
+          GATE: () => 
+            this.LA(1).tokenType === Identifier && 
+            this.LA(2).tokenType === LParen,
+          ALT: () => this.SUBRULE(this.arrayAccess)
+        },
+        { ALT: () => this.CONSUME(Identifier) }
+      ]);
       this.CONSUME(Equal);
       this.SUBRULE(this.expression);
     });
@@ -356,6 +396,117 @@ class FBasicChevrotainParser extends CstParser {
       this.CONSUME(NumberLiteral); // Line number to jump to
     });
 
+    // DimensionList = Expression (Comma Expression)?
+    // For 1D array: (m1)
+    // For 2D array: (m1, m2)
+    this.dimensionList = this.RULE('dimensionList', () => {
+      this.SUBRULE(this.expression); // First dimension
+      this.OPTION(() => {
+        this.CONSUME(Comma);
+        this.SUBRULE2(this.expression); // Second dimension (optional)
+      });
+    });
+
+    // ArrayDeclaration = Identifier LParen DimensionList RParen
+    // Examples: A(3), B(3,3), A$(3), B$(3,3)
+    this.arrayDeclaration = this.RULE('arrayDeclaration', () => {
+      this.CONSUME(Identifier); // Array name (can include $ for string arrays)
+      this.CONSUME(LParen);
+      this.SUBRULE(this.dimensionList);
+      this.CONSUME(RParen);
+    });
+
+    // DIM ArrayDeclaration (Comma ArrayDeclaration)*
+    // Declares one or more arrays
+    // Example: DIM A(3), B(3,3), A$(3), B$(3,3)
+    this.dimStatement = this.RULE('dimStatement', () => {
+      this.CONSUME(Dim);
+      this.SUBRULE(this.arrayDeclaration);
+      this.MANY(() => {
+        this.CONSUME(Comma);
+        this.SUBRULE2(this.arrayDeclaration);
+      });
+    });
+
+    // DataConstant = NumberLiteral | StringLiteral | Identifier
+    // DATA statements only accept constants (not expressions/variables)
+    // Identifiers in DATA are treated as string constants (unquoted strings)
+    // Example: DATA 10, GOOD, "Hello, World"
+    this.dataConstant = this.RULE('dataConstant', () => {
+      this.OR([
+        { ALT: () => this.CONSUME(NumberLiteral) },
+        {
+          GATE: () => this.LA(1).tokenType === StringLiteral,
+          ALT: () => this.CONSUME(StringLiteral)
+        },
+        { ALT: () => this.CONSUME(Identifier) } // Unquoted string constant
+      ]);
+    });
+
+    // DataConstantList = DataConstant (Comma DataConstant)*
+    // List of constants for DATA statement (optional - empty DATA is allowed)
+    this.dataConstantList = this.RULE('dataConstantList', () => {
+      this.OPTION(() => {
+        this.SUBRULE(this.dataConstant);
+        this.MANY(() => {
+          this.CONSUME(Comma);
+          this.SUBRULE2(this.dataConstant);
+        });
+      });
+    });
+
+    // DATA DataConstantList
+    // Stores data values that can be read by READ
+    // Only accepts constants: NumberLiteral, StringLiteral (quoted), Identifier (unquoted string)
+    // Example: DATA 10, 20, GOOD, MORNING, "Hello, World"
+    // Empty DATA statement is allowed: DATA
+    this.dataStatement = this.RULE('dataStatement', () => {
+      this.CONSUME(Data);
+      this.SUBRULE(this.dataConstantList);
+    });
+
+    // READ (Identifier | ArrayAccess) (Comma (Identifier | ArrayAccess))*
+    // Reads data values from DATA statements into variables or array elements
+    // Example: READ A, B, C$, D$, A(I), B$(I, J)
+    this.readStatement = this.RULE('readStatement', () => {
+      this.CONSUME(Read);
+      // First variable: Identifier or ArrayAccess
+      this.OR([
+        {
+          // Array access: Identifier LParen ExpressionList RParen
+          GATE: () => 
+            this.LA(1).tokenType === Identifier && 
+            this.LA(2).tokenType === LParen,
+          ALT: () => this.SUBRULE(this.arrayAccess)
+        },
+        { ALT: () => this.CONSUME(Identifier) }
+      ]);
+      // Additional variables
+      this.MANY(() => {
+        this.CONSUME(Comma);
+        this.OR2([
+          {
+            // Array access: Identifier LParen ExpressionList RParen
+            GATE: () => 
+              this.LA(1).tokenType === Identifier && 
+              this.LA(2).tokenType === LParen,
+            ALT: () => this.SUBRULE2(this.arrayAccess)
+          },
+          { ALT: () => this.CONSUME2(Identifier) }
+        ]);
+      });
+    });
+
+    // RESTORE (NumberLiteral)?
+    // Restores data pointer to beginning or specific line
+    // Example: RESTORE or RESTORE 100
+    this.restoreStatement = this.RULE('restoreStatement', () => {
+      this.CONSUME(Restore);
+      this.OPTION(() => {
+        this.CONSUME(NumberLiteral); // Optional line number
+      });
+    });
+
     // IF LogicalExpression THEN (CommandList | NumberLiteral)
     // IF LogicalExpression GOTO NumberLiteral
     // Executes the commands after THEN or jumps to line number if condition is true
@@ -393,88 +544,7 @@ class FBasicChevrotainParser extends CstParser {
       ]);
     });
 
-    // REM (any remaining tokens)*
-    // REM is followed by optional comment text (everything after REM is ignored)
-    // We consume all remaining tokens as comment text
-    // Note: In BASIC, REM consumes everything after it until colon or end of line
-    this.remStatement = this.RULE('remStatement', () => {
-      this.CONSUME(Rem);
-      // Consume all remaining tokens as comment (they're ignored)
-      // Use MANY to consume tokens until colon (which starts next command) or end of input
-      // We need to use numerical suffixes for tokens that appear multiple times
-      this.MANY(() => {
-        this.OR([
-          // Match tokens that could appear in comments, using suffixes to avoid conflicts
-          { ALT: () => this.CONSUME(StringLiteral) },
-          { ALT: () => this.CONSUME(NumberLiteral) },
-          { ALT: () => this.CONSUME(Identifier) },
-          { ALT: () => this.CONSUME(Let) },
-          { ALT: () => this.CONSUME(Print) },
-          { ALT: () => this.CONSUME(For) },
-          { ALT: () => this.CONSUME(To) },
-          { ALT: () => this.CONSUME(Step) },
-          { ALT: () => this.CONSUME(Next) },
-          { ALT: () => this.CONSUME(End) },
-          { ALT: () => this.CONSUME2(Rem) }, // Use CONSUME2 for second occurrence
-          { ALT: () => this.CONSUME(If) },
-          { ALT: () => this.CONSUME(Then) },
-          { ALT: () => this.CONSUME(Goto) },
-          { ALT: () => this.CONSUME(Pause) },
-          { ALT: () => this.CONSUME(Equal) },
-          { ALT: () => this.CONSUME(NotEqual) },
-          { ALT: () => this.CONSUME(LessThan) },
-          { ALT: () => this.CONSUME(GreaterThan) },
-          { ALT: () => this.CONSUME(LessThanOrEqual) },
-          { ALT: () => this.CONSUME(GreaterThanOrEqual) },
-          { ALT: () => this.CONSUME(Plus) },
-          { ALT: () => this.CONSUME(Minus) },
-          { ALT: () => this.CONSUME(Multiply) },
-          { ALT: () => this.CONSUME(Divide) },
-          { ALT: () => this.CONSUME(Mod) },
-          { ALT: () => this.CONSUME(And) },
-          { ALT: () => this.CONSUME(Or) },
-          { ALT: () => this.CONSUME(Xor) },
-          { ALT: () => this.CONSUME(Not) },
-          // Function tokens (must be consumed in REM)
-          { ALT: () => this.CONSUME(Len) },
-          { ALT: () => this.CONSUME(Left) },
-          { ALT: () => this.CONSUME(Right) },
-          { ALT: () => this.CONSUME(Mid) },
-          { ALT: () => this.CONSUME(Str) },
-          { ALT: () => this.CONSUME(Hex) },
-          { ALT: () => this.CONSUME(Abs) },
-          { ALT: () => this.CONSUME(Sgn) },
-          { ALT: () => this.CONSUME(Rnd) },
-          { ALT: () => this.CONSUME(Val) },
-          { ALT: () => this.CONSUME(Stick) },
-          { ALT: () => this.CONSUME(Strig) },
-          { ALT: () => this.CONSUME(Comma) },
-          { ALT: () => this.CONSUME(Semicolon) },
-          { ALT: () => this.CONSUME(Colon) }, // Colon ends REM and starts next command
-          { ALT: () => this.CONSUME(LParen) },
-          { ALT: () => this.CONSUME(RParen) },
-          // Additional punctuation and special characters
-          { ALT: () => this.CONSUME(Period) },
-          { ALT: () => this.CONSUME(Hash) },
-          { ALT: () => this.CONSUME(Dollar) },
-          { ALT: () => this.CONSUME(LBracket) },
-          { ALT: () => this.CONSUME(RBracket) },
-          { ALT: () => this.CONSUME(Exclamation) },
-          { ALT: () => this.CONSUME(Question) },
-          { ALT: () => this.CONSUME(AtSign) },
-          { ALT: () => this.CONSUME(Percent) },
-          { ALT: () => this.CONSUME(LBrace) },
-          { ALT: () => this.CONSUME(RBrace) },
-          { ALT: () => this.CONSUME(Pipe) },
-          { ALT: () => this.CONSUME(Tilde) },
-          { ALT: () => this.CONSUME(Underscore) },
-          { ALT: () => this.CONSUME(Backslash) },
-          { ALT: () => this.CONSUME(Apostrophe) }
-        ]);
-      });
-    });
-
-    // SingleCommand = IfThenStatement | GotoStatement | LetStatement | PrintStatement | ForStatement | NextStatement | EndStatement | RemStatement | PauseStatement
+    // SingleCommand = IfThenStatement | GotoStatement | LetStatement | PrintStatement | ForStatement | NextStatement | EndStatement | PauseStatement
     // Order matters: keyword-based statements (that start with a keyword) should come before letStatement
     // because letStatement can start with just an Identifier (LET is optional)
     // Use GATE conditions to ensure keywords are matched correctly before trying letStatement
@@ -504,13 +574,27 @@ class FBasicChevrotainParser extends CstParser {
           GATE: () => this.LA(1).tokenType === End,
           ALT: () => this.SUBRULE(this.endStatement)
         },
-        {
-          GATE: () => this.LA(1).tokenType === Rem,
-          ALT: () => this.SUBRULE(this.remStatement)
-        },
+        // REM statement removed - REM lines are handled at line level before parsing
+        // In Family BASIC, REM cannot appear after colons
         {
           GATE: () => this.LA(1).tokenType === Pause,
           ALT: () => this.SUBRULE(this.pauseStatement)
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Dim,
+          ALT: () => this.SUBRULE(this.dimStatement)
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Data,
+          ALT: () => this.SUBRULE(this.dataStatement)
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Read,
+          ALT: () => this.SUBRULE(this.readStatement)
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Restore,
+          ALT: () => this.SUBRULE(this.restoreStatement)
         },
         { ALT: () => this.SUBRULE(this.letStatement) } // Must be last since it can start with Identifier
       ]);
@@ -577,6 +661,16 @@ export function parseWithChevrotain(source: string): {
   for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
     const line = lines[lineIndex]?.trim();
     if (!line) {
+      continue;
+    }
+
+    // Check if line is a REM statement (comment line)
+    // Format: <lineNumber> REM <comment text>
+    // After trimming, check if line starts with a number followed by REM
+    const remMatch = line.match(/^\s*(\d+)\s+REM\b/i);
+    if (remMatch) {
+      // This is a REM line - skip it entirely (don't tokenize or parse)
+      // REM lines are treated as comments and ignored
       continue;
     }
 

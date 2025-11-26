@@ -114,28 +114,38 @@ export class VariableService {
 
   /**
    * Create an array with specified dimensions
+   * According to Family BASIC spec:
+   * - Numerical arrays are initialized to 0
+   * - String arrays (name ends with $) are initialized to empty strings
    */
   createArray(name: string, dimensions: number[]): void {
-    const array = this.createArrayRecursive(dimensions, 0)
+    const isStringArray = name.endsWith('$')
+    const defaultValue = isStringArray ? '' : 0
+    const array = this.createArrayRecursive(dimensions, 0, defaultValue)
     this.context.arrays.set(name, array)
   }
 
   /**
    * Recursively create array structure
+   * @param dimensions Array of dimension sizes (highest index + 1)
+   * @param currentDim Current dimension index
+   * @param defaultValue Default value for leaf elements (0 for numeric, '' for string)
    */
-  private createArrayRecursive(dimensions: number[], currentDim: number): BasicArrayValue {
+  private createArrayRecursive(dimensions: number[], currentDim: number, defaultValue: BasicScalarValue): BasicArrayValue {
     if (currentDim >= dimensions.length) {
       return []
     }
 
-    const size = Math.floor(dimensions[currentDim] ?? 0)
+    // Size is highest index + 1 (e.g., DIM A(3) means indices 0,1,2,3 = 4 elements)
+    const highestIndex = Math.floor(dimensions[currentDim] ?? 0)
+    const size = highestIndex + 1
     const array: BasicArrayValue[] = []
     
     for (let i = 0; i < size; i++) {
       if (currentDim === dimensions.length - 1) {
-        array[i] = 0 // Initialize with default value
+        array[i] = defaultValue // Initialize with default value (0 for numeric, '' for string)
       } else {
-        array[i] = this.createArrayRecursive(dimensions, currentDim + 1)
+        array[i] = this.createArrayRecursive(dimensions, currentDim + 1, defaultValue)
       }
     }
     
