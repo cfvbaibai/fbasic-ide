@@ -5,7 +5,6 @@
  */
 
 import type { ExecutionResult, BasicDeviceAdapter } from '../interfaces'
-import type { StatementNode, CommandNode } from '../parser/ast-types'
 import { ERROR_TYPES } from '../constants'
 import { ExecutionContext } from '../state/ExecutionContext'
 import { ExpressionEvaluator } from '../evaluation/ExpressionEvaluator'
@@ -43,69 +42,18 @@ export class ExecutionEngine {
   }
 
   /**
-   * Preprocess statement blocks by flattening colon-separated statements
+   * Preprocess statements (statements are already expanded)
    */
-  private preprocessStatementBlocks(): void {
-    const flattenedStatements: StatementNode[] = []
-    
-    for (const statement of this.context.statements) {
-      if (statement.command.type === 'StatementBlock') {
-        // Flatten the statement block into individual statements
-        const block = statement.command
-        for (const cmd of block.statements) {
-          // Recursively process nested StatementBlocks
-          const processedCmd = this.processNestedStatementBlocks(cmd)
-          flattenedStatements.push({
-            type: 'Statement',
-            lineNumber: statement.lineNumber,
-            command: processedCmd
-          })
-        }
-      } else {
-        // Process non-block statements for nested StatementBlocks
-        const processedStatement = {
-          ...statement,
-          command: this.processNestedStatementBlocks(statement.command)
-        }
-        flattenedStatements.push(processedStatement)
-      }
-    }
-    
-    // Update the context with flattened statements
-    this.context.statements = flattenedStatements
-    
+  private preprocessStatements(): void {
     if (this.context.config.enableDebugMode) {
-      this.context.addDebugOutput(`Preprocessed ${flattenedStatements.length} statements (flattened statement blocks)`)
-      // Debug: show statement indices and line numbers
-      for (let i = 0; i < flattenedStatements.length; i++) {
-        const stmt = flattenedStatements[i]
+      this.context.addDebugOutput(`Preprocessed ${this.context.statements.length} expanded statements`)
+      for (let i = 0; i < this.context.statements.length; i++) {
+        const stmt = this.context.statements[i]
         if (stmt) {
-          this.context.addDebugOutput(`Statement ${i}: Line ${stmt.lineNumber}, Type: ${stmt.command.type}`)
+          this.context.addDebugOutput(`Statement ${i}: Line ${stmt.lineNumber}`)
         }
       }
-    }
-  }
-
-  /**
-   * Recursively process nested StatementBlocks in commands
-   */
-  private processNestedStatementBlocks(command: CommandNode): CommandNode {
-    if (command.type === 'StatementBlock') {
-      // Flatten the StatementBlock by executing each statement in sequence
-      // For now, we'll handle this by creating a special executor
-      return {
-        type: 'StatementBlockExecutor',
-        statements: command.statements
-      } as CommandNode
-    } else if (command.type === 'IfStatement') {
-      // Process the thenStatement for nested StatementBlocks
-      return {
-        ...command,
-        thenStatement: this.processNestedStatementBlocks(command.thenStatement)
-      } as CommandNode
-    } else {
-      // No nested StatementBlocks to process
-      return command
+      this.context.addDebugOutput(`Label map: ${this.context.labelMap.size} line numbers`)
     }
   }
 
@@ -119,8 +67,8 @@ export class ExecutionEngine {
       // Preprocess DATA statements
       this.dataService.preprocessDataStatements()
       
-      // Preprocess statement blocks (flatten colon-separated statements)
-      this.preprocessStatementBlocks()
+      // Preprocess statements
+      this.preprocessStatements()
       
       // Start execution
       this.context.isRunning = true
@@ -128,18 +76,18 @@ export class ExecutionEngine {
       
       // Main execution loop
       while (this.context.shouldContinue()) {
-        const statement = this.context.getCurrentStatement()
-        if (!statement) break
+        const expandedStatement = this.context.getCurrentStatement()
+        if (!expandedStatement) break
         
         // Track the statement index before execution
         const statementIndexBefore = this.context.currentStatementIndex
         
         if (this.context.config.enableDebugMode) {
-          this.context.addDebugOutput(`Executing statement ${statementIndexBefore}: ${statement.command.type}`)
+          this.context.addDebugOutput(`Executing statement ${statementIndexBefore}: Line ${expandedStatement.lineNumber}`)
         }
         
         // Execute the statement
-        await this.statementRouter.executeStatement(statement)
+        await this.statementRouter.executeStatement(expandedStatement)
         
         // Only move to next statement if the index wasn't modified by the statement
         if (this.context.currentStatementIndex === statementIndexBefore) {

@@ -26,13 +26,13 @@
 import { ref, onUnmounted } from 'vue'
 import { FBasicParser } from '../core/parser/FBasicParser'
 import { getSampleCode } from '../core/samples/sampleCodes'
-import type { ExecutionResult, ParserInfo, HighlighterInfo, BasicVariable, AnyServiceWorkerMessage } from '../core/interfaces'
+import type { ExecutionResult, ParserInfo, HighlighterInfo, BasicVariable, AnyServiceWorkerMessage, ResultMessage, ErrorMessage } from '../core/interfaces'
 import { EXECUTION_LIMITS } from '../core/constants'
 
 /**
- * Service Worker Manager for direct communication
+ * Web Worker Manager for direct communication
  */
-interface ServiceWorkerManager {
+interface WebWorkerManager {
   worker: Worker | null
   messageId: number
   pendingMessages: Map<string, {
@@ -66,17 +66,17 @@ export function useBasicIde() {
   // Parser instance
   const parser = new FBasicParser()
   
-  // Service Worker Manager
-  const serviceWorkerManager: ServiceWorkerManager = {
+  // Web Worker Manager
+  const webWorkerManager: WebWorkerManager = {
     worker: null,
     messageId: 0,
     pendingMessages: new Map()
   }
 
-  // Functions to send joystick events directly to service worker
+  // Functions to send joystick events directly to web worker
   const sendStickEvent = (joystickId: number, state: number) => {
-    if (serviceWorkerManager.worker) {
-      serviceWorkerManager.worker.postMessage({
+    if (webWorkerManager.worker) {
+      webWorkerManager.worker.postMessage({
         type: 'STICK_EVENT',
         id: `stick-${Date.now()}`,
         timestamp: Date.now(),
@@ -86,8 +86,8 @@ export function useBasicIde() {
   }
 
   const sendStrigEvent = (joystickId: number, state: number) => {
-    if (serviceWorkerManager.worker) {
-      serviceWorkerManager.worker.postMessage({
+    if (webWorkerManager.worker) {
+      webWorkerManager.worker.postMessage({
         type: 'STRIG_EVENT',
         id: `strig-${Date.now()}`,
         timestamp: Date.now(),
@@ -102,64 +102,64 @@ export function useBasicIde() {
     return joystickKeywords.some(keyword => code.includes(keyword))
   }
 
-  // Service Worker Management Functions
-  const initializeServiceWorker = async (): Promise<void> => {
-    if (serviceWorkerManager.worker) {
-      console.log('✅ [COMPOSABLE] Service worker already initialized')
+  // Web Worker Management Functions
+  const initializeWebWorker = async (): Promise<void> => {
+    if (webWorkerManager.worker) {
+      console.log('✅ [COMPOSABLE] Web worker already initialized')
       return
     }
 
     try {
-      console.log('🔧 [COMPOSABLE] Initializing service worker...')
-      serviceWorkerManager.worker = new Worker('/basic-interpreter-worker.js')
+      console.log('🔧 [COMPOSABLE] Initializing web worker...')
+      webWorkerManager.worker = new Worker('/basic-interpreter-worker.js')
       
       // Set up message handling
-      serviceWorkerManager.worker.onmessage = (event) => {
+      webWorkerManager.worker.onmessage = (event) => {
         handleWorkerMessage(event.data)
       }
       
-      serviceWorkerManager.worker.onerror = (error) => {
-        console.error('❌ [COMPOSABLE] Service worker error:', error)
-        rejectAllPendingMessages('Service worker error: ' + error.message)
-        // Restart service worker on error
-        restartServiceWorker()
+      webWorkerManager.worker.onerror = (error) => {
+        console.error('❌ [COMPOSABLE] Web worker error:', error)
+        rejectAllPendingMessages('Web worker error: ' + error.message)
+        // Restart web worker on error
+        restartWebWorker()
       }
       
-      serviceWorkerManager.worker.onmessageerror = (error) => {
-        console.error('❌ [COMPOSABLE] Service worker message error:', error)
-        rejectAllPendingMessages('Service worker message error')
-        // Restart service worker on message error
-        restartServiceWorker()
+      webWorkerManager.worker.onmessageerror = (error) => {
+        console.error('❌ [COMPOSABLE] Web worker message error:', error)
+        rejectAllPendingMessages('Web worker message error')
+        // Restart web worker on message error
+        restartWebWorker()
       }
       
-      console.log('✅ [COMPOSABLE] Service worker initialized successfully')
+      console.log('✅ [COMPOSABLE] Web worker initialized successfully')
     } catch (error) {
-      console.error('❌ [COMPOSABLE] Failed to initialize service worker:', error)
+      console.error('❌ [COMPOSABLE] Failed to initialize web worker:', error)
       throw error
     }
   }
 
-  const restartServiceWorker = async (): Promise<void> => {
-    console.log('🔄 [COMPOSABLE] Restarting service worker...')
+  const restartWebWorker = async (): Promise<void> => {
+    console.log('🔄 [COMPOSABLE] Restarting web worker...')
     
     // Terminate existing worker
-    if (serviceWorkerManager.worker) {
-      serviceWorkerManager.worker.terminate()
-      serviceWorkerManager.worker = null
+    if (webWorkerManager.worker) {
+      webWorkerManager.worker.terminate()
+      webWorkerManager.worker = null
     }
     
     // Clear pending messages
-    rejectAllPendingMessages('Service worker restarted')
+    rejectAllPendingMessages('Web worker restarted')
     
     // Wait a bit before restarting
     await new Promise(resolve => setTimeout(resolve, 100))
     
     // Reinitialize
-    await initializeServiceWorker()
+    await initializeWebWorker()
   }
 
-  const checkServiceWorkerHealth = async (): Promise<boolean> => {
-    if (!serviceWorkerManager.worker) {
+  const checkWebWorkerHealth = async (): Promise<boolean> => {
+    if (!webWorkerManager.worker) {
       return false
     }
 
@@ -186,7 +186,7 @@ export function useBasicIde() {
       
       return true
     } catch (error) {
-      console.warn('⚠️ [COMPOSABLE] Service worker health check failed:', error)
+      console.warn('⚠️ [COMPOSABLE] Web worker health check failed:', error)
       return false
     }
   }
@@ -230,28 +230,33 @@ export function useBasicIde() {
   }
 
   const handleResultMessage = (message: AnyServiceWorkerMessage): void => {
-    const { executionId, result } = (message as any).data
-    console.log('✅ [COMPOSABLE] Execution completed:', executionId, 'result:', result)
+    const resultMessage = message as ResultMessage
+    const result = resultMessage.data // message.data IS the ExecutionResult
+    console.log('✅ [COMPOSABLE] Execution completed:', result.executionId, 'result:', result)
     
-    const pending = serviceWorkerManager.pendingMessages.get(executionId)
+    // Use message.id to look up the pending message (not executionId from data)
+    const pending = webWorkerManager.pendingMessages.get(message.id)
     if (pending) {
       clearTimeout(pending.timeout)
-      serviceWorkerManager.pendingMessages.delete(executionId)
+      webWorkerManager.pendingMessages.delete(message.id)
       pending.resolve(result)
     } else {
-      console.warn('⚠️ [COMPOSABLE] No pending message found for executionId:', executionId)
+      console.warn('⚠️ [COMPOSABLE] No pending message found for messageId:', message.id)
     }
   }
 
   const handleErrorMessage = (message: AnyServiceWorkerMessage): void => {
-    const { executionId, error } = (message as any).data
-    console.error('❌ [COMPOSABLE] Execution error:', executionId, error)
+    const errorMessage = message as ErrorMessage
+    console.error('❌ [COMPOSABLE] Execution error:', errorMessage.data.executionId, errorMessage.data.message)
     
-    const pending = serviceWorkerManager.pendingMessages.get(executionId)
+    // Use message.id to look up the pending message (not executionId from data)
+    const pending = webWorkerManager.pendingMessages.get(message.id)
     if (pending) {
       clearTimeout(pending.timeout)
-      serviceWorkerManager.pendingMessages.delete(executionId)
-      pending.reject(new Error(error))
+      webWorkerManager.pendingMessages.delete(message.id)
+      pending.reject(new Error(errorMessage.data.message))
+    } else {
+      console.warn('⚠️ [COMPOSABLE] No pending message found for error messageId:', message.id)
     }
   }
 
@@ -263,40 +268,40 @@ export function useBasicIde() {
 
   const rejectAllPendingMessages = (reason: string): void => {
     console.log('🚫 [COMPOSABLE] Rejecting all pending messages:', reason)
-    for (const [_messageId, pending] of serviceWorkerManager.pendingMessages) {
+    for (const [_messageId, pending] of webWorkerManager.pendingMessages) {
       clearTimeout(pending.timeout)
       pending.reject(new Error(reason))
     }
-    serviceWorkerManager.pendingMessages.clear()
+    webWorkerManager.pendingMessages.clear()
   }
 
   const sendMessageToWorker = (message: AnyServiceWorkerMessage): Promise<ExecutionResult> => {
     return new Promise((resolve, reject) => {
-      if (!serviceWorkerManager.worker) {
-        reject(new Error('Service worker not initialized'))
+      if (!webWorkerManager.worker) {
+        reject(new Error('Web worker not initialized'))
         return
       }
 
-      const _messageId = (++serviceWorkerManager.messageId).toString()
+      const _messageId = (++webWorkerManager.messageId).toString()
       const messageWithId = { ...message, id: _messageId }
       
       // Set up timeout
       const timeout = setTimeout(() => {
         console.log('⏰ [COMPOSABLE] Message timeout:', _messageId)
-        serviceWorkerManager.pendingMessages.delete(_messageId)
-        reject(new Error('Service worker message timeout'))
+        webWorkerManager.pendingMessages.delete(_messageId)
+        reject(new Error('Web worker message timeout'))
       }, 30000) // 30 second timeout
       
       // Store pending message
-      serviceWorkerManager.pendingMessages.set(_messageId, {
+      webWorkerManager.pendingMessages.set(_messageId, {
         resolve,
         reject,
         timeout
       })
       
       console.log('📤 [COMPOSABLE] Sending message to worker:', messageWithId.type, _messageId)
-      console.log('📤 [COMPOSABLE] Pending messages count:', serviceWorkerManager.pendingMessages.size)
-      serviceWorkerManager.worker.postMessage(messageWithId)
+      console.log('📤 [COMPOSABLE] Pending messages count:', webWorkerManager.pendingMessages.size)
+      webWorkerManager.worker.postMessage(messageWithId)
     })
   }
 
@@ -309,13 +314,13 @@ export function useBasicIde() {
   }
 
   /**
-   * Parse the current code into AST
+   * Parse the current code into CST
    */
   const parseCode = async () => {
     try {
       const result = await parser.parse(code.value)
-      if (result.success && result.ast) {
-        return result.ast
+      if (result.success && result.cst) {
+        return result.cst
       } else {
         // Update errors from parser
         if (result.errors) {
@@ -351,19 +356,19 @@ export function useBasicIde() {
     debugOutput.value = ''
 
     try {
-      // Initialize service worker if not already done
-      await initializeServiceWorker()
+      // Initialize web worker if not already done
+      await initializeWebWorker()
 
-      // Check service worker health before execution
-      const isHealthy = await checkServiceWorkerHealth()
+      // Check web worker health before execution
+      const isHealthy = await checkWebWorkerHealth()
       if (!isHealthy) {
-        console.log('🔄 [COMPOSABLE] Service worker unhealthy, restarting...')
-        await restartServiceWorker()
+        console.log('🔄 [COMPOSABLE] Web worker unhealthy, restarting...')
+        await restartWebWorker()
       }
 
       // Parse the code
-      const ast = await parseCode()
-      if (!ast) {
+      const cst = await parseCode()
+      if (!cst) {
         isRunning.value = false
         return
       }
@@ -373,7 +378,7 @@ export function useBasicIde() {
       errors.value = []
       debugOutput.value = ''
 
-      // Send execution message to service worker
+      // Send execution message to web worker
       const result = await sendMessageToWorker({
         type: 'EXECUTE',
         id: `execute-${Date.now()}`,
@@ -414,9 +419,9 @@ export function useBasicIde() {
    */
   const stopCode = () => {
     isRunning.value = false
-    // Send stop message to service worker
-    if (serviceWorkerManager.worker) {
-      serviceWorkerManager.worker.postMessage({
+    // Send stop message to web worker
+    if (webWorkerManager.worker) {
+      webWorkerManager.worker.postMessage({
         type: 'STOP',
         id: `stop-${Date.now()}`,
         timestamp: Date.now(),
@@ -484,19 +489,19 @@ export function useBasicIde() {
    * Validate code syntax
    */
   const validateCode = async () => {
-    const ast = await parseCode()
-    return ast !== null
+    const cst = await parseCode()
+    return cst !== null
   }
 
   // Initialize highlighting
   updateHighlighting()
 
-  // Cleanup service worker on component unmount
+  // Cleanup web worker on component unmount
   onUnmounted(() => {
-    console.log('🧹 [COMPOSABLE] Cleaning up service worker...')
-    if (serviceWorkerManager.worker) {
-      serviceWorkerManager.worker.terminate()
-      serviceWorkerManager.worker = null
+    console.log('🧹 [COMPOSABLE] Cleaning up web worker...')
+    if (webWorkerManager.worker) {
+      webWorkerManager.worker.terminate()
+      webWorkerManager.worker = null
     }
     rejectAllPendingMessages('Component unmounted')
   })
@@ -524,7 +529,7 @@ export function useBasicIde() {
     getHighlighterCapabilities,
     toggleDebugMode,
     
-    // Service worker communication
+    // Web worker communication
     sendStickEvent,
     sendStrigEvent,
   }

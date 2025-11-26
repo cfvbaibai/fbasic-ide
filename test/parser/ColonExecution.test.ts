@@ -1,0 +1,152 @@
+/**
+ * Integration tests for colon-separated statement execution
+ */
+
+import { describe, it, expect, beforeEach, vi, type MockedFunction } from 'vitest'
+import { BasicInterpreter } from '@/core/BasicInterpreter'
+import type { BasicDeviceAdapter } from '@/core/interfaces'
+
+describe('Colon-Separated Statement Execution', () => {
+  let interpreter: BasicInterpreter
+  let mockDeviceAdapter: BasicDeviceAdapter
+  let printOutputMock: MockedFunction<(output: string) => void>
+
+  beforeEach(() => {
+    printOutputMock = vi.fn()
+    mockDeviceAdapter = {
+      getJoystickCount: vi.fn(() => 0),
+      getStickState: vi.fn(() => 0),
+      setStickState: vi.fn(),
+      pushStrigState: vi.fn(),
+      consumeStrigState: vi.fn(() => 0),
+      printOutput: printOutputMock,
+      debugOutput: vi.fn(),
+      errorOutput: vi.fn(),
+      clearScreen: vi.fn()
+    }
+
+    interpreter = new BasicInterpreter({
+      maxIterations: 1000,
+      maxOutputLines: 100,
+      enableDebugMode: false,
+      strictMode: false,
+      deviceAdapter: mockDeviceAdapter
+    })
+  })
+
+  describe('Multiple LET statements on one line', () => {
+    it('should execute multiple LET statements sequentially', async () => {
+      const code = '10 LET A=5: LET B=10: LET C=15'
+      const result = await interpreter.execute(code)
+      
+      expect(result.success).toBe(true)
+      expect(result.errors).toHaveLength(0)
+      expect(result.variables.get('A')?.value).toBe(5)
+      expect(result.variables.get('B')?.value).toBe(10)
+      expect(result.variables.get('C')?.value).toBe(15)
+    })
+
+    it('should execute LET statements without keyword', async () => {
+      const code = '10 A=5: B=10: C=15'
+      const result = await interpreter.execute(code)
+      
+      expect(result.success).toBe(true)
+      expect(result.errors).toHaveLength(0)
+      expect(result.variables.get('A')?.value).toBe(5)
+      expect(result.variables.get('B')?.value).toBe(10)
+      expect(result.variables.get('C')?.value).toBe(15)
+    })
+  })
+
+  describe('Multiple PRINT statements on one line', () => {
+    it('should execute multiple PRINT statements sequentially', async () => {
+      const code = '10 PRINT "Hello": PRINT "World"'
+      const result = await interpreter.execute(code)
+      
+      expect(result.success).toBe(true)
+      expect(result.errors).toHaveLength(0)
+      expect(printOutputMock).toHaveBeenCalledTimes(2)
+      expect(printOutputMock).toHaveBeenNthCalledWith(1, 'Hello')
+      expect(printOutputMock).toHaveBeenNthCalledWith(2, 'World')
+    })
+
+    it('should execute PRINT with empty statements', async () => {
+      const code = '10 PRINT: PRINT "Hello": PRINT'
+      const result = await interpreter.execute(code)
+      
+      expect(result.success).toBe(true)
+      expect(result.errors).toHaveLength(0)
+      expect(printOutputMock).toHaveBeenCalledTimes(3)
+      expect(printOutputMock).toHaveBeenNthCalledWith(1, '')
+      expect(printOutputMock).toHaveBeenNthCalledWith(2, 'Hello')
+      expect(printOutputMock).toHaveBeenNthCalledWith(3, '')
+    })
+  })
+
+  describe('Mixed LET and PRINT statements', () => {
+    it('should execute LET then PRINT on the same line', async () => {
+      const code = '10 LET A=5: PRINT A'
+      const result = await interpreter.execute(code)
+      
+      expect(result.success).toBe(true)
+      expect(result.errors).toHaveLength(0)
+      expect(result.variables.get('A')?.value).toBe(5)
+      expect(printOutputMock).toHaveBeenCalledTimes(1)
+      expect(printOutputMock).toHaveBeenCalledWith('5')
+    })
+
+    it('should execute multiple mixed statements', async () => {
+      const code = '10 LET A=5: PRINT A: LET B=10: PRINT B'
+      const result = await interpreter.execute(code)
+      
+      expect(result.success).toBe(true)
+      expect(result.errors).toHaveLength(0)
+      expect(result.variables.get('A')?.value).toBe(5)
+      expect(result.variables.get('B')?.value).toBe(10)
+      expect(printOutputMock).toHaveBeenCalledTimes(2)
+      expect(printOutputMock).toHaveBeenNthCalledWith(1, '5')
+      expect(printOutputMock).toHaveBeenNthCalledWith(2, '10')
+    })
+
+    it('should use variables set earlier in the same line', async () => {
+      const code = '10 LET X=10: LET Y=X+5: PRINT Y'
+      const result = await interpreter.execute(code)
+      
+      expect(result.success).toBe(true)
+      expect(result.errors).toHaveLength(0)
+      expect(result.variables.get('X')?.value).toBe(10)
+      expect(result.variables.get('Y')?.value).toBe(15)
+      expect(printOutputMock).toHaveBeenCalledTimes(1)
+      expect(printOutputMock).toHaveBeenCalledWith('15')
+    })
+  })
+
+  describe('Multi-line programs with colons', () => {
+    it('should execute multiple lines with colon-separated statements', async () => {
+      const code = `10 LET A=5: PRINT A
+20 LET B=10: PRINT B`
+      const result = await interpreter.execute(code)
+      
+      expect(result.success).toBe(true)
+      expect(result.errors).toHaveLength(0)
+      expect(result.variables.get('A')?.value).toBe(5)
+      expect(result.variables.get('B')?.value).toBe(10)
+      expect(printOutputMock).toHaveBeenCalledTimes(2)
+    })
+
+    it('should handle mixed lines with and without colons', async () => {
+      const code = `10 LET A=5: PRINT A
+20 PRINT "Single statement"
+30 LET B=10: PRINT B: LET C=15`
+      const result = await interpreter.execute(code)
+      
+      expect(result.success).toBe(true)
+      expect(result.errors).toHaveLength(0)
+      expect(result.variables.get('A')?.value).toBe(5)
+      expect(result.variables.get('B')?.value).toBe(10)
+      expect(result.variables.get('C')?.value).toBe(15)
+      expect(printOutputMock).toHaveBeenCalledTimes(3) // Line 10: 1 PRINT, Line 20: 1 PRINT, Line 30: 1 PRINT
+    })
+  })
+})
+

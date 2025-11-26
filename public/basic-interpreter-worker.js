@@ -1,4328 +1,8 @@
 "use strict";
 (() => {
   var __defProp = Object.defineProperty;
-  var __getOwnPropNames = Object.getOwnPropertyNames;
   var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-  var __esm = (fn, res) => function __init() {
-    return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
-  };
-  var __export = (target, all) => {
-    for (var name in all)
-      __defProp(target, name, { get: all[name], enumerable: true });
-  };
   var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-
-  // src/core/parser/fbasic-parser.js
-  var fbasic_parser_exports = {};
-  __export(fbasic_parser_exports, {
-    SyntaxError: () => peg$SyntaxError,
-    parse: () => peg$parse
-  });
-  function peg$subclass(child, parent) {
-    function C() {
-      this.constructor = child;
-    }
-    C.prototype = parent.prototype;
-    child.prototype = new C();
-  }
-  function peg$SyntaxError(message, expected, found, location) {
-    var self2 = Error.call(this, message);
-    if (Object.setPrototypeOf) {
-      Object.setPrototypeOf(self2, peg$SyntaxError.prototype);
-    }
-    self2.expected = expected;
-    self2.found = found;
-    self2.location = location;
-    self2.name = "SyntaxError";
-    return self2;
-  }
-  function peg$padEnd(str, targetLength, padString) {
-    padString = padString || " ";
-    if (str.length > targetLength) {
-      return str;
-    }
-    targetLength -= str.length;
-    padString += padString.repeat(targetLength);
-    return str + padString.slice(0, targetLength);
-  }
-  function peg$parse(input, options) {
-    options = options !== void 0 ? options : {};
-    var peg$FAILED = {};
-    var peg$source = options.grammarSource;
-    var peg$startRuleFunctions = { Program: peg$parseProgram };
-    var peg$startRuleFunction = peg$parseProgram;
-    var peg$c0 = "\n";
-    var peg$c1 = "\r\n";
-    var peg$c2 = "\r";
-    var peg$c3 = ":";
-    var peg$c4 = "print";
-    var peg$c5 = ",";
-    var peg$c6 = ";";
-    var peg$c7 = "let";
-    var peg$c8 = "=";
-    var peg$c9 = "if";
-    var peg$c10 = "then";
-    var peg$c11 = "for";
-    var peg$c12 = "to";
-    var peg$c13 = " ";
-    var peg$c14 = "step";
-    var peg$c15 = "next";
-    var peg$c16 = "goto";
-    var peg$c17 = "gosub";
-    var peg$c18 = "return";
-    var peg$c19 = "end";
-    var peg$c20 = "pause";
-    var peg$c21 = "input";
-    var peg$c22 = "data";
-    var peg$c23 = "read";
-    var peg$c24 = "restore";
-    var peg$c25 = "dim";
-    var peg$c26 = "(";
-    var peg$c27 = ")";
-    var peg$c28 = "rem";
-    var peg$c29 = "cls";
-    var peg$c30 = "color";
-    var peg$c31 = "or";
-    var peg$c32 = "and";
-    var peg$c33 = "<>";
-    var peg$c34 = "<=";
-    var peg$c35 = ">=";
-    var peg$c36 = "<";
-    var peg$c37 = ">";
-    var peg$c38 = "+";
-    var peg$c39 = "-";
-    var peg$c40 = "*";
-    var peg$c41 = "/";
-    var peg$c42 = "mod";
-    var peg$c43 = "^";
-    var peg$c44 = "not";
-    var peg$c45 = "abs";
-    var peg$c46 = "atn";
-    var peg$c47 = "cos";
-    var peg$c48 = "exp";
-    var peg$c49 = "fix";
-    var peg$c50 = "int";
-    var peg$c51 = "left";
-    var peg$c52 = "len";
-    var peg$c53 = "log";
-    var peg$c54 = "mid";
-    var peg$c55 = "right";
-    var peg$c56 = "rnd";
-    var peg$c57 = "sgn";
-    var peg$c58 = "sin";
-    var peg$c59 = "sqr";
-    var peg$c60 = "stick";
-    var peg$c61 = "strig";
-    var peg$c62 = "tan";
-    var peg$c63 = ".";
-    var peg$c64 = '"';
-    var peg$r0 = /^[ \t]/;
-    var peg$r1 = /^[0-9]/;
-    var peg$r2 = /^[\r\n]/;
-    var peg$r3 = /^[A-Za-z]/;
-    var peg$r4 = /^[A-Za-z0-9$_]/;
-    var peg$r5 = /^[eE]/;
-    var peg$r6 = /^[+\-]/;
-    var peg$r7 = /^[^"]/;
-    var peg$r8 = /^[ \t\r\n]/;
-    var peg$e0 = peg$literalExpectation("\n", false);
-    var peg$e1 = peg$literalExpectation("\r\n", false);
-    var peg$e2 = peg$literalExpectation("\r", false);
-    var peg$e3 = peg$classExpectation([" ", "	"], false, false);
-    var peg$e4 = peg$classExpectation([["0", "9"]], false, false);
-    var peg$e5 = peg$literalExpectation(":", false);
-    var peg$e6 = peg$literalExpectation("PRINT", true);
-    var peg$e7 = peg$literalExpectation(",", false);
-    var peg$e8 = peg$literalExpectation(";", false);
-    var peg$e9 = peg$literalExpectation("LET", true);
-    var peg$e10 = peg$literalExpectation("=", false);
-    var peg$e11 = peg$literalExpectation("IF", true);
-    var peg$e12 = peg$literalExpectation("THEN", true);
-    var peg$e13 = peg$literalExpectation("FOR", true);
-    var peg$e14 = peg$literalExpectation("TO", true);
-    var peg$e15 = peg$literalExpectation(" ", false);
-    var peg$e16 = peg$literalExpectation("STEP", true);
-    var peg$e17 = peg$literalExpectation("NEXT", true);
-    var peg$e18 = peg$literalExpectation("GOTO", true);
-    var peg$e19 = peg$literalExpectation("GOSUB", true);
-    var peg$e20 = peg$literalExpectation("RETURN", true);
-    var peg$e21 = peg$literalExpectation("END", true);
-    var peg$e22 = peg$literalExpectation("PAUSE", true);
-    var peg$e23 = peg$literalExpectation("INPUT", true);
-    var peg$e24 = peg$literalExpectation("DATA", true);
-    var peg$e25 = peg$literalExpectation("READ", true);
-    var peg$e26 = peg$literalExpectation("RESTORE", true);
-    var peg$e27 = peg$literalExpectation("DIM", true);
-    var peg$e28 = peg$literalExpectation("(", false);
-    var peg$e29 = peg$literalExpectation(")", false);
-    var peg$e30 = peg$literalExpectation("REM", true);
-    var peg$e31 = peg$classExpectation(["\r", "\n"], false, false);
-    var peg$e32 = peg$anyExpectation();
-    var peg$e33 = peg$literalExpectation("CLS", true);
-    var peg$e34 = peg$literalExpectation("COLOR", true);
-    var peg$e35 = peg$literalExpectation("OR", true);
-    var peg$e36 = peg$literalExpectation("AND", true);
-    var peg$e37 = peg$literalExpectation("<>", false);
-    var peg$e38 = peg$literalExpectation("<=", false);
-    var peg$e39 = peg$literalExpectation(">=", false);
-    var peg$e40 = peg$literalExpectation("<", false);
-    var peg$e41 = peg$literalExpectation(">", false);
-    var peg$e42 = peg$literalExpectation("+", false);
-    var peg$e43 = peg$literalExpectation("-", false);
-    var peg$e44 = peg$literalExpectation("*", false);
-    var peg$e45 = peg$literalExpectation("/", false);
-    var peg$e46 = peg$literalExpectation("MOD", true);
-    var peg$e47 = peg$literalExpectation("^", false);
-    var peg$e48 = peg$literalExpectation("NOT", true);
-    var peg$e49 = peg$literalExpectation("ABS", true);
-    var peg$e50 = peg$literalExpectation("ATN", true);
-    var peg$e51 = peg$literalExpectation("COS", true);
-    var peg$e52 = peg$literalExpectation("EXP", true);
-    var peg$e53 = peg$literalExpectation("FIX", true);
-    var peg$e54 = peg$literalExpectation("INT", true);
-    var peg$e55 = peg$literalExpectation("LEFT", true);
-    var peg$e56 = peg$literalExpectation("LEN", true);
-    var peg$e57 = peg$literalExpectation("LOG", true);
-    var peg$e58 = peg$literalExpectation("MID", true);
-    var peg$e59 = peg$literalExpectation("RIGHT", true);
-    var peg$e60 = peg$literalExpectation("RND", true);
-    var peg$e61 = peg$literalExpectation("SGN", true);
-    var peg$e62 = peg$literalExpectation("SIN", true);
-    var peg$e63 = peg$literalExpectation("SQR", true);
-    var peg$e64 = peg$literalExpectation("STICK", true);
-    var peg$e65 = peg$literalExpectation("STRIG", true);
-    var peg$e66 = peg$literalExpectation("TAN", true);
-    var peg$e67 = peg$classExpectation([["A", "Z"], ["a", "z"]], false, false);
-    var peg$e68 = peg$classExpectation([["A", "Z"], ["a", "z"], ["0", "9"], "$", "_"], false, false);
-    var peg$e69 = peg$literalExpectation(".", false);
-    var peg$e70 = peg$classExpectation(["e", "E"], false, false);
-    var peg$e71 = peg$classExpectation(["+", "-"], false, false);
-    var peg$e72 = peg$literalExpectation('"', false);
-    var peg$e73 = peg$classExpectation(['"'], true, false);
-    var peg$e74 = peg$classExpectation([" ", "	", "\r", "\n"], false, false);
-    var peg$f0 = function(statements) {
-      return {
-        type: "Program",
-        statements
-      };
-    };
-    var peg$f1 = function(lineNumber, command) {
-      return {
-        type: "Statement",
-        lineNumber,
-        command
-      };
-    };
-    var peg$f2 = function(lineNumber, command) {
-      return {
-        type: "Statement",
-        lineNumber,
-        command
-      };
-    };
-    var peg$f3 = function(digits) {
-      return parseInt(digits.join(""), 10);
-    };
-    var peg$f4 = function(command, nextCommand) {
-      return nextCommand;
-    };
-    var peg$f5 = function(command, tail) {
-      if (tail.length === 0) {
-        return command;
-      } else {
-        return {
-          type: "StatementBlock",
-          statements: [command, ...tail]
-        };
-      }
-    };
-    var peg$f6 = function(printList) {
-      return {
-        type: "PrintStatement",
-        printList: printList || []
-      };
-    };
-    var peg$f7 = function(head, separator, item) {
-      return { item, separator };
-    };
-    var peg$f8 = function(head, tail) {
-      return [head, ...tail];
-    };
-    var peg$f9 = function(expression) {
-      return { type: "Expression", expression };
-    };
-    var peg$f10 = function(string) {
-      return { type: "StringLiteral", value: string };
-    };
-    var peg$f11 = function(variable, expression) {
-      return {
-        type: "LetStatement",
-        variable,
-        expression,
-        hasLetKeyword: true
-      };
-    };
-    var peg$f12 = function(condition, thenCommand) {
-      return {
-        type: "IfStatement",
-        condition,
-        thenStatement: thenCommand
-      };
-    };
-    var peg$f13 = function(variable, start, end, stepValue) {
-      return stepValue;
-    };
-    var peg$f14 = function(variable, start, end, step) {
-      return {
-        type: "ForStatement",
-        variable,
-        start,
-        end,
-        step: step || { type: "NumberLiteral", value: 1 }
-      };
-    };
-    var peg$f15 = function(variable) {
-      return {
-        type: "NextStatement",
-        variable
-      };
-    };
-    var peg$f16 = function(target) {
-      return {
-        type: "GotoStatement",
-        target
-      };
-    };
-    var peg$f17 = function(target) {
-      return {
-        type: "GosubStatement",
-        target
-      };
-    };
-    var peg$f18 = function() {
-      return { type: "ReturnStatement" };
-    };
-    var peg$f19 = function() {
-      return { type: "EndStatement" };
-    };
-    var peg$f20 = function(duration) {
-      return {
-        type: "PauseStatement",
-        duration
-      };
-    };
-    var peg$f21 = function(str) {
-      return str;
-    };
-    var peg$f22 = function(prompt, variable, varName) {
-      return varName;
-    };
-    var peg$f23 = function(prompt, variable, variables) {
-      return {
-        type: "InputStatement",
-        prompt,
-        variables: [variable, ...variables]
-      };
-    };
-    var peg$f24 = function(constants) {
-      return {
-        type: "DataStatement",
-        constants
-      };
-    };
-    var peg$f25 = function(head, constant) {
-      return constant;
-    };
-    var peg$f26 = function(head, tail) {
-      return [head, ...tail];
-    };
-    var peg$f27 = function(variables) {
-      return {
-        type: "ReadStatement",
-        variables
-      };
-    };
-    var peg$f28 = function(lineNumber) {
-      return {
-        type: "RestoreStatement",
-        lineNumber
-      };
-    };
-    var peg$f29 = function() {
-      return {
-        type: "RestoreStatement",
-        lineNumber: null
-      };
-    };
-    var peg$f30 = function(head, arr) {
-      return arr;
-    };
-    var peg$f31 = function(head, tail) {
-      return {
-        type: "DimStatement",
-        arrays: [head, ...tail]
-      };
-    };
-    var peg$f32 = function(name, dimensions) {
-      return {
-        variable: {
-          type: "Variable",
-          name,
-          subscript: null
-        },
-        dimensions
-      };
-    };
-    var peg$f33 = function(comment) {
-      return {
-        type: "RemStatement",
-        comment: comment.join("")
-      };
-    };
-    var peg$f34 = function() {
-      return { type: "ClsStatement" };
-    };
-    var peg$f35 = function(foreground, bg) {
-      return bg;
-    };
-    var peg$f36 = function(foreground, background) {
-      return {
-        type: "ColorStatement",
-        foreground,
-        background
-      };
-    };
-    var peg$f37 = function(left, right) {
-      return right;
-    };
-    var peg$f38 = function(left, tail) {
-      return tail.reduce((left2, right) => ({
-        type: "BinaryExpression",
-        operator: "OR",
-        left: left2,
-        right
-      }), left);
-    };
-    var peg$f39 = function(left, right) {
-      return right;
-    };
-    var peg$f40 = function(left, tail) {
-      return tail.reduce((left2, right) => ({
-        type: "BinaryExpression",
-        operator: "AND",
-        left: left2,
-        right
-      }), left);
-    };
-    var peg$f41 = function(left, op, right) {
-      return { op, right };
-    };
-    var peg$f42 = function(left, tail) {
-      return tail.reduce((left2, { op, right }) => ({
-        type: "BinaryExpression",
-        operator: op,
-        left: left2,
-        right
-      }), left);
-    };
-    var peg$f43 = function(left, op, right) {
-      return { op, right };
-    };
-    var peg$f44 = function(left, tail) {
-      return tail.reduce((left2, { op, right }) => ({
-        type: "BinaryExpression",
-        operator: op,
-        left: left2,
-        right
-      }), left);
-    };
-    var peg$f45 = function(left, op, right) {
-      return { op, right };
-    };
-    var peg$f46 = function(left, tail) {
-      return tail.reduce((left2, { op, right }) => ({
-        type: "BinaryExpression",
-        operator: op,
-        left: left2,
-        right
-      }), left);
-    };
-    var peg$f47 = function(left, op, right) {
-      return { op, right };
-    };
-    var peg$f48 = function(left, tail) {
-      return tail.reduce((left2, { op, right }) => ({
-        type: "BinaryExpression",
-        operator: op,
-        left: left2,
-        right
-      }), left);
-    };
-    var peg$f49 = function(left, op, right) {
-      return { op, right };
-    };
-    var peg$f50 = function(left, tail) {
-      return tail.reduce((left2, { op, right }) => ({
-        type: "BinaryExpression",
-        operator: op,
-        left: left2,
-        right
-      }), left);
-    };
-    var peg$f51 = function(operand) {
-      return {
-        type: "UnaryExpression",
-        operator: "NOT",
-        operand
-      };
-    };
-    var peg$f52 = function(operand) {
-      return {
-        type: "UnaryExpression",
-        operator: "-",
-        operand
-      };
-    };
-    var peg$f53 = function(expression) {
-      return expression;
-    };
-    var peg$f54 = function(name, args) {
-      return {
-        type: "FunctionCall",
-        name,
-        arguments: args || []
-      };
-    };
-    var peg$f55 = function() {
-      return "ABS";
-    };
-    var peg$f56 = function() {
-      return "ATN";
-    };
-    var peg$f57 = function() {
-      return "COS";
-    };
-    var peg$f58 = function() {
-      return "EXP";
-    };
-    var peg$f59 = function() {
-      return "FIX";
-    };
-    var peg$f60 = function() {
-      return "INT";
-    };
-    var peg$f61 = function() {
-      return "LEFT";
-    };
-    var peg$f62 = function() {
-      return "LEN";
-    };
-    var peg$f63 = function() {
-      return "LOG";
-    };
-    var peg$f64 = function() {
-      return "MID";
-    };
-    var peg$f65 = function() {
-      return "RIGHT";
-    };
-    var peg$f66 = function() {
-      return "RND";
-    };
-    var peg$f67 = function() {
-      return "SGN";
-    };
-    var peg$f68 = function() {
-      return "SIN";
-    };
-    var peg$f69 = function() {
-      return "SQR";
-    };
-    var peg$f70 = function() {
-      return "STICK";
-    };
-    var peg$f71 = function() {
-      return "STRIG";
-    };
-    var peg$f72 = function() {
-      return "TAN";
-    };
-    var peg$f73 = function(name, indices) {
-      return {
-        type: "Variable",
-        name,
-        subscript: indices
-      };
-    };
-    var peg$f74 = function(name) {
-      return {
-        type: "Variable",
-        name,
-        subscript: null
-      };
-    };
-    var peg$f75 = function(first, rest) {
-      return (first + rest.join("")).toUpperCase();
-    };
-    var peg$f76 = function(number) {
-      return {
-        type: "NumberLiteral",
-        value: number
-      };
-    };
-    var peg$f77 = function(integer, fraction, exponent) {
-      let value = integer;
-      if (fraction) value += fraction;
-      if (exponent) value *= Math.pow(10, exponent);
-      return parseFloat(value.toString());
-    };
-    var peg$f78 = function(digits) {
-      return parseInt(digits.join(""), 10);
-    };
-    var peg$f79 = function(digits) {
-      return parseFloat("0." + digits.join(""));
-    };
-    var peg$f80 = function(sign, digits) {
-      return parseInt((sign || "") + digits.join(""), 10);
-    };
-    var peg$f81 = function(chars) {
-      return {
-        type: "StringLiteral",
-        value: chars.join("")
-      };
-    };
-    var peg$f82 = function(command) {
-      return {
-        type: "InvalidCommand",
-        command: command.join("")
-      };
-    };
-    var peg$f83 = function(head, expr) {
-      return expr;
-    };
-    var peg$f84 = function(head, tail) {
-      return [head, ...tail];
-    };
-    var peg$f85 = function(head, varName) {
-      return varName;
-    };
-    var peg$f86 = function(head, tail) {
-      return [head, ...tail];
-    };
-    var peg$currPos = 0;
-    var peg$savedPos = 0;
-    var peg$posDetailsCache = [{ line: 1, column: 1 }];
-    var peg$maxFailPos = 0;
-    var peg$maxFailExpected = [];
-    var peg$silentFails = 0;
-    var peg$result;
-    if ("startRule" in options) {
-      if (!(options.startRule in peg$startRuleFunctions)) {
-        throw new Error(`Can't start parsing from rule "` + options.startRule + '".');
-      }
-      peg$startRuleFunction = peg$startRuleFunctions[options.startRule];
-    }
-    function text() {
-      return input.substring(peg$savedPos, peg$currPos);
-    }
-    function offset() {
-      return peg$savedPos;
-    }
-    function range() {
-      return {
-        source: peg$source,
-        start: peg$savedPos,
-        end: peg$currPos
-      };
-    }
-    function location() {
-      return peg$computeLocation(peg$savedPos, peg$currPos);
-    }
-    function expected(description, location2) {
-      location2 = location2 !== void 0 ? location2 : peg$computeLocation(peg$savedPos, peg$currPos);
-      throw peg$buildStructuredError(
-        [peg$otherExpectation(description)],
-        input.substring(peg$savedPos, peg$currPos),
-        location2
-      );
-    }
-    function error(message, location2) {
-      location2 = location2 !== void 0 ? location2 : peg$computeLocation(peg$savedPos, peg$currPos);
-      throw peg$buildSimpleError(message, location2);
-    }
-    function peg$literalExpectation(text2, ignoreCase) {
-      return { type: "literal", text: text2, ignoreCase };
-    }
-    function peg$classExpectation(parts, inverted, ignoreCase) {
-      return { type: "class", parts, inverted, ignoreCase };
-    }
-    function peg$anyExpectation() {
-      return { type: "any" };
-    }
-    function peg$endExpectation() {
-      return { type: "end" };
-    }
-    function peg$otherExpectation(description) {
-      return { type: "other", description };
-    }
-    function peg$computePosDetails(pos) {
-      var details = peg$posDetailsCache[pos];
-      var p;
-      if (details) {
-        return details;
-      } else {
-        p = pos - 1;
-        while (!peg$posDetailsCache[p]) {
-          p--;
-        }
-        details = peg$posDetailsCache[p];
-        details = {
-          line: details.line,
-          column: details.column
-        };
-        while (p < pos) {
-          if (input.charCodeAt(p) === 10) {
-            details.line++;
-            details.column = 1;
-          } else {
-            details.column++;
-          }
-          p++;
-        }
-        peg$posDetailsCache[pos] = details;
-        return details;
-      }
-    }
-    function peg$computeLocation(startPos, endPos, offset2) {
-      var startPosDetails = peg$computePosDetails(startPos);
-      var endPosDetails = peg$computePosDetails(endPos);
-      var res = {
-        source: peg$source,
-        start: {
-          offset: startPos,
-          line: startPosDetails.line,
-          column: startPosDetails.column
-        },
-        end: {
-          offset: endPos,
-          line: endPosDetails.line,
-          column: endPosDetails.column
-        }
-      };
-      if (offset2 && peg$source && typeof peg$source.offset === "function") {
-        res.start = peg$source.offset(res.start);
-        res.end = peg$source.offset(res.end);
-      }
-      return res;
-    }
-    function peg$fail(expected2) {
-      if (peg$currPos < peg$maxFailPos) {
-        return;
-      }
-      if (peg$currPos > peg$maxFailPos) {
-        peg$maxFailPos = peg$currPos;
-        peg$maxFailExpected = [];
-      }
-      peg$maxFailExpected.push(expected2);
-    }
-    function peg$buildSimpleError(message, location2) {
-      return new peg$SyntaxError(message, null, null, location2);
-    }
-    function peg$buildStructuredError(expected2, found, location2) {
-      return new peg$SyntaxError(
-        peg$SyntaxError.buildMessage(expected2, found),
-        expected2,
-        found,
-        location2
-      );
-    }
-    function peg$parseProgram() {
-      var s0, s1, s2, s3;
-      s0 = peg$currPos;
-      s1 = peg$parse_();
-      s2 = [];
-      s3 = peg$parseStatement();
-      while (s3 !== peg$FAILED) {
-        s2.push(s3);
-        s3 = peg$parseStatement();
-      }
-      s3 = peg$parse_();
-      peg$savedPos = s0;
-      s0 = peg$f0(s2);
-      return s0;
-    }
-    function peg$parseEOL() {
-      var s0;
-      if (input.charCodeAt(peg$currPos) === 10) {
-        s0 = peg$c0;
-        peg$currPos++;
-      } else {
-        s0 = peg$FAILED;
-        if (peg$silentFails === 0) {
-          peg$fail(peg$e0);
-        }
-      }
-      if (s0 === peg$FAILED) {
-        if (input.substr(peg$currPos, 2) === peg$c1) {
-          s0 = peg$c1;
-          peg$currPos += 2;
-        } else {
-          s0 = peg$FAILED;
-          if (peg$silentFails === 0) {
-            peg$fail(peg$e1);
-          }
-        }
-        if (s0 === peg$FAILED) {
-          if (input.charCodeAt(peg$currPos) === 13) {
-            s0 = peg$c2;
-            peg$currPos++;
-          } else {
-            s0 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e2);
-            }
-          }
-        }
-      }
-      return s0;
-    }
-    function peg$parseWS() {
-      var s0, s1;
-      s0 = [];
-      if (peg$r0.test(input.charAt(peg$currPos))) {
-        s1 = input.charAt(peg$currPos);
-        peg$currPos++;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) {
-          peg$fail(peg$e3);
-        }
-      }
-      while (s1 !== peg$FAILED) {
-        s0.push(s1);
-        if (peg$r0.test(input.charAt(peg$currPos))) {
-          s1 = input.charAt(peg$currPos);
-          peg$currPos++;
-        } else {
-          s1 = peg$FAILED;
-          if (peg$silentFails === 0) {
-            peg$fail(peg$e3);
-          }
-        }
-      }
-      return s0;
-    }
-    function peg$parseLine() {
-      var s0, s1, s2, s3, s4;
-      s0 = peg$currPos;
-      s1 = peg$parseLineNumber();
-      if (s1 !== peg$FAILED) {
-        s2 = peg$parse_();
-        s3 = peg$parseCommand();
-        if (s3 !== peg$FAILED) {
-          s4 = peg$parse_();
-          peg$savedPos = s0;
-          s0 = peg$f1(s1, s3);
-        } else {
-          peg$currPos = s0;
-          s0 = peg$FAILED;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parseStatement() {
-      var s0, s1, s2, s3, s4;
-      s0 = peg$currPos;
-      s1 = peg$parseLineNumber();
-      if (s1 !== peg$FAILED) {
-        s2 = peg$parse_();
-        s3 = peg$parseCommand();
-        if (s3 !== peg$FAILED) {
-          s4 = peg$parse_();
-          peg$savedPos = s0;
-          s0 = peg$f2(s1, s3);
-        } else {
-          peg$currPos = s0;
-          s0 = peg$FAILED;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parseLineNumber() {
-      var s0, s1, s2;
-      s0 = peg$currPos;
-      s1 = [];
-      if (peg$r1.test(input.charAt(peg$currPos))) {
-        s2 = input.charAt(peg$currPos);
-        peg$currPos++;
-      } else {
-        s2 = peg$FAILED;
-        if (peg$silentFails === 0) {
-          peg$fail(peg$e4);
-        }
-      }
-      if (s2 !== peg$FAILED) {
-        while (s2 !== peg$FAILED) {
-          s1.push(s2);
-          if (peg$r1.test(input.charAt(peg$currPos))) {
-            s2 = input.charAt(peg$currPos);
-            peg$currPos++;
-          } else {
-            s2 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e4);
-            }
-          }
-        }
-      } else {
-        s1 = peg$FAILED;
-      }
-      if (s1 !== peg$FAILED) {
-        peg$savedPos = s0;
-        s1 = peg$f3(s1);
-      }
-      s0 = s1;
-      return s0;
-    }
-    function peg$parseCommand() {
-      var s0, s1, s2, s3, s4, s5, s6, s7;
-      s0 = peg$currPos;
-      s1 = peg$parseSingleCommand();
-      if (s1 !== peg$FAILED) {
-        s2 = [];
-        s3 = peg$currPos;
-        s4 = peg$parse_();
-        if (input.charCodeAt(peg$currPos) === 58) {
-          s5 = peg$c3;
-          peg$currPos++;
-        } else {
-          s5 = peg$FAILED;
-          if (peg$silentFails === 0) {
-            peg$fail(peg$e5);
-          }
-        }
-        if (s5 !== peg$FAILED) {
-          s6 = peg$parse_();
-          s7 = peg$parseSingleCommand();
-          if (s7 !== peg$FAILED) {
-            peg$savedPos = s3;
-            s3 = peg$f4(s1, s7);
-          } else {
-            peg$currPos = s3;
-            s3 = peg$FAILED;
-          }
-        } else {
-          peg$currPos = s3;
-          s3 = peg$FAILED;
-        }
-        while (s3 !== peg$FAILED) {
-          s2.push(s3);
-          s3 = peg$currPos;
-          s4 = peg$parse_();
-          if (input.charCodeAt(peg$currPos) === 58) {
-            s5 = peg$c3;
-            peg$currPos++;
-          } else {
-            s5 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e5);
-            }
-          }
-          if (s5 !== peg$FAILED) {
-            s6 = peg$parse_();
-            s7 = peg$parseSingleCommand();
-            if (s7 !== peg$FAILED) {
-              peg$savedPos = s3;
-              s3 = peg$f4(s1, s7);
-            } else {
-              peg$currPos = s3;
-              s3 = peg$FAILED;
-            }
-          } else {
-            peg$currPos = s3;
-            s3 = peg$FAILED;
-          }
-        }
-        peg$savedPos = s0;
-        s0 = peg$f5(s1, s2);
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parseSingleCommand() {
-      var s0;
-      s0 = peg$parseprintStatement();
-      if (s0 === peg$FAILED) {
-        s0 = peg$parseletStatement();
-        if (s0 === peg$FAILED) {
-          s0 = peg$parseifStatement();
-          if (s0 === peg$FAILED) {
-            s0 = peg$parseforStatement();
-            if (s0 === peg$FAILED) {
-              s0 = peg$parsenextStatement();
-              if (s0 === peg$FAILED) {
-                s0 = peg$parsegotoStatement();
-                if (s0 === peg$FAILED) {
-                  s0 = peg$parsegosubStatement();
-                  if (s0 === peg$FAILED) {
-                    s0 = peg$parsereturnStatement();
-                    if (s0 === peg$FAILED) {
-                      s0 = peg$parseendStatement();
-                      if (s0 === peg$FAILED) {
-                        s0 = peg$parsepauseStatement();
-                        if (s0 === peg$FAILED) {
-                          s0 = peg$parseinputStatement();
-                          if (s0 === peg$FAILED) {
-                            s0 = peg$parsedataStatement();
-                            if (s0 === peg$FAILED) {
-                              s0 = peg$parserestoreStatement();
-                              if (s0 === peg$FAILED) {
-                                s0 = peg$parsereadStatement();
-                                if (s0 === peg$FAILED) {
-                                  s0 = peg$parsedimStatement();
-                                  if (s0 === peg$FAILED) {
-                                    s0 = peg$parseremStatement();
-                                    if (s0 === peg$FAILED) {
-                                      s0 = peg$parseclsStatement();
-                                      if (s0 === peg$FAILED) {
-                                        s0 = peg$parsecolorStatement();
-                                        if (s0 === peg$FAILED) {
-                                          s0 = peg$parseinvalidCommand();
-                                        }
-                                      }
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-      return s0;
-    }
-    function peg$parseprintStatement() {
-      var s0, s1, s2, s3;
-      s0 = peg$currPos;
-      if (input.substr(peg$currPos, 5).toLowerCase() === peg$c4) {
-        s1 = input.substr(peg$currPos, 5);
-        peg$currPos += 5;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) {
-          peg$fail(peg$e6);
-        }
-      }
-      if (s1 !== peg$FAILED) {
-        s2 = peg$parseWS();
-        s3 = peg$parsePrintList();
-        if (s3 === peg$FAILED) {
-          s3 = null;
-        }
-        peg$savedPos = s0;
-        s0 = peg$f6(s3);
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parsePrintList() {
-      var s0, s1, s2, s3, s4, s5, s6, s7;
-      s0 = peg$currPos;
-      s1 = peg$parsePrintItem();
-      if (s1 !== peg$FAILED) {
-        s2 = [];
-        s3 = peg$currPos;
-        s4 = peg$parse_();
-        if (input.charCodeAt(peg$currPos) === 44) {
-          s5 = peg$c5;
-          peg$currPos++;
-        } else {
-          s5 = peg$FAILED;
-          if (peg$silentFails === 0) {
-            peg$fail(peg$e7);
-          }
-        }
-        if (s5 === peg$FAILED) {
-          if (input.charCodeAt(peg$currPos) === 59) {
-            s5 = peg$c6;
-            peg$currPos++;
-          } else {
-            s5 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e8);
-            }
-          }
-        }
-        if (s5 !== peg$FAILED) {
-          s6 = peg$parse_();
-          s7 = peg$parsePrintItem();
-          if (s7 !== peg$FAILED) {
-            peg$savedPos = s3;
-            s3 = peg$f7(s1, s5, s7);
-          } else {
-            peg$currPos = s3;
-            s3 = peg$FAILED;
-          }
-        } else {
-          peg$currPos = s3;
-          s3 = peg$FAILED;
-        }
-        while (s3 !== peg$FAILED) {
-          s2.push(s3);
-          s3 = peg$currPos;
-          s4 = peg$parse_();
-          if (input.charCodeAt(peg$currPos) === 44) {
-            s5 = peg$c5;
-            peg$currPos++;
-          } else {
-            s5 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e7);
-            }
-          }
-          if (s5 === peg$FAILED) {
-            if (input.charCodeAt(peg$currPos) === 59) {
-              s5 = peg$c6;
-              peg$currPos++;
-            } else {
-              s5 = peg$FAILED;
-              if (peg$silentFails === 0) {
-                peg$fail(peg$e8);
-              }
-            }
-          }
-          if (s5 !== peg$FAILED) {
-            s6 = peg$parse_();
-            s7 = peg$parsePrintItem();
-            if (s7 !== peg$FAILED) {
-              peg$savedPos = s3;
-              s3 = peg$f7(s1, s5, s7);
-            } else {
-              peg$currPos = s3;
-              s3 = peg$FAILED;
-            }
-          } else {
-            peg$currPos = s3;
-            s3 = peg$FAILED;
-          }
-        }
-        peg$savedPos = s0;
-        s0 = peg$f8(s1, s2);
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parsePrintItem() {
-      var s0, s1;
-      s0 = peg$currPos;
-      s1 = peg$parselogicalOr();
-      if (s1 !== peg$FAILED) {
-        peg$savedPos = s0;
-        s1 = peg$f9(s1);
-      }
-      s0 = s1;
-      if (s0 === peg$FAILED) {
-        s0 = peg$currPos;
-        s1 = peg$parseStringLiteral();
-        if (s1 !== peg$FAILED) {
-          peg$savedPos = s0;
-          s1 = peg$f10(s1);
-        }
-        s0 = s1;
-      }
-      return s0;
-    }
-    function peg$parseletStatement() {
-      var s0, s1, s2, s3, s4, s5, s6, s7;
-      s0 = peg$currPos;
-      if (input.substr(peg$currPos, 3).toLowerCase() === peg$c7) {
-        s1 = input.substr(peg$currPos, 3);
-        peg$currPos += 3;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) {
-          peg$fail(peg$e9);
-        }
-      }
-      if (s1 === peg$FAILED) {
-        s1 = null;
-      }
-      s2 = peg$parse_();
-      s3 = peg$parseVariable();
-      if (s3 !== peg$FAILED) {
-        s4 = peg$parse_();
-        if (input.charCodeAt(peg$currPos) === 61) {
-          s5 = peg$c8;
-          peg$currPos++;
-        } else {
-          s5 = peg$FAILED;
-          if (peg$silentFails === 0) {
-            peg$fail(peg$e10);
-          }
-        }
-        if (s5 !== peg$FAILED) {
-          s6 = peg$parse_();
-          s7 = peg$parselogicalOr();
-          if (s7 !== peg$FAILED) {
-            peg$savedPos = s0;
-            s0 = peg$f11(s3, s7);
-          } else {
-            peg$currPos = s0;
-            s0 = peg$FAILED;
-          }
-        } else {
-          peg$currPos = s0;
-          s0 = peg$FAILED;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parseifStatement() {
-      var s0, s1, s2, s3, s4, s5, s6, s7;
-      s0 = peg$currPos;
-      if (input.substr(peg$currPos, 2).toLowerCase() === peg$c9) {
-        s1 = input.substr(peg$currPos, 2);
-        peg$currPos += 2;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) {
-          peg$fail(peg$e11);
-        }
-      }
-      if (s1 !== peg$FAILED) {
-        s2 = peg$parse_();
-        s3 = peg$parselogicalOr();
-        if (s3 !== peg$FAILED) {
-          s4 = peg$parse_();
-          if (input.substr(peg$currPos, 4).toLowerCase() === peg$c10) {
-            s5 = input.substr(peg$currPos, 4);
-            peg$currPos += 4;
-          } else {
-            s5 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e12);
-            }
-          }
-          if (s5 !== peg$FAILED) {
-            s6 = peg$parse_();
-            s7 = peg$parseCommand();
-            if (s7 !== peg$FAILED) {
-              peg$savedPos = s0;
-              s0 = peg$f12(s3, s7);
-            } else {
-              peg$currPos = s0;
-              s0 = peg$FAILED;
-            }
-          } else {
-            peg$currPos = s0;
-            s0 = peg$FAILED;
-          }
-        } else {
-          peg$currPos = s0;
-          s0 = peg$FAILED;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parseforStatement() {
-      var s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15, s16;
-      s0 = peg$currPos;
-      if (input.substr(peg$currPos, 3).toLowerCase() === peg$c11) {
-        s1 = input.substr(peg$currPos, 3);
-        peg$currPos += 3;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) {
-          peg$fail(peg$e13);
-        }
-      }
-      if (s1 !== peg$FAILED) {
-        s2 = peg$parse_();
-        s3 = peg$parseVariable();
-        if (s3 !== peg$FAILED) {
-          s4 = peg$parse_();
-          if (input.charCodeAt(peg$currPos) === 61) {
-            s5 = peg$c8;
-            peg$currPos++;
-          } else {
-            s5 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e10);
-            }
-          }
-          if (s5 !== peg$FAILED) {
-            s6 = peg$parse_();
-            s7 = peg$parselogicalOr();
-            if (s7 !== peg$FAILED) {
-              s8 = peg$parse_();
-              if (input.substr(peg$currPos, 2).toLowerCase() === peg$c12) {
-                s9 = input.substr(peg$currPos, 2);
-                peg$currPos += 2;
-              } else {
-                s9 = peg$FAILED;
-                if (peg$silentFails === 0) {
-                  peg$fail(peg$e14);
-                }
-              }
-              if (s9 !== peg$FAILED) {
-                s10 = peg$parse_();
-                s11 = peg$parselogicalOr();
-                if (s11 !== peg$FAILED) {
-                  s12 = peg$currPos;
-                  if (input.charCodeAt(peg$currPos) === 32) {
-                    s13 = peg$c13;
-                    peg$currPos++;
-                  } else {
-                    s13 = peg$FAILED;
-                    if (peg$silentFails === 0) {
-                      peg$fail(peg$e15);
-                    }
-                  }
-                  if (s13 !== peg$FAILED) {
-                    if (input.substr(peg$currPos, 4).toLowerCase() === peg$c14) {
-                      s14 = input.substr(peg$currPos, 4);
-                      peg$currPos += 4;
-                    } else {
-                      s14 = peg$FAILED;
-                      if (peg$silentFails === 0) {
-                        peg$fail(peg$e16);
-                      }
-                    }
-                    if (s14 !== peg$FAILED) {
-                      s15 = peg$parse_();
-                      s16 = peg$parselogicalOr();
-                      if (s16 !== peg$FAILED) {
-                        peg$savedPos = s12;
-                        s12 = peg$f13(s3, s7, s11, s16);
-                      } else {
-                        peg$currPos = s12;
-                        s12 = peg$FAILED;
-                      }
-                    } else {
-                      peg$currPos = s12;
-                      s12 = peg$FAILED;
-                    }
-                  } else {
-                    peg$currPos = s12;
-                    s12 = peg$FAILED;
-                  }
-                  if (s12 === peg$FAILED) {
-                    s12 = null;
-                  }
-                  peg$savedPos = s0;
-                  s0 = peg$f14(s3, s7, s11, s12);
-                } else {
-                  peg$currPos = s0;
-                  s0 = peg$FAILED;
-                }
-              } else {
-                peg$currPos = s0;
-                s0 = peg$FAILED;
-              }
-            } else {
-              peg$currPos = s0;
-              s0 = peg$FAILED;
-            }
-          } else {
-            peg$currPos = s0;
-            s0 = peg$FAILED;
-          }
-        } else {
-          peg$currPos = s0;
-          s0 = peg$FAILED;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parsenextStatement() {
-      var s0, s1, s2, s3;
-      s0 = peg$currPos;
-      if (input.substr(peg$currPos, 4).toLowerCase() === peg$c15) {
-        s1 = input.substr(peg$currPos, 4);
-        peg$currPos += 4;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) {
-          peg$fail(peg$e17);
-        }
-      }
-      if (s1 !== peg$FAILED) {
-        s2 = peg$parse_();
-        s3 = peg$parseVariable();
-        if (s3 === peg$FAILED) {
-          s3 = null;
-        }
-        peg$savedPos = s0;
-        s0 = peg$f15(s3);
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parsegotoStatement() {
-      var s0, s1, s2, s3;
-      s0 = peg$currPos;
-      if (input.substr(peg$currPos, 4).toLowerCase() === peg$c16) {
-        s1 = input.substr(peg$currPos, 4);
-        peg$currPos += 4;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) {
-          peg$fail(peg$e18);
-        }
-      }
-      if (s1 !== peg$FAILED) {
-        s2 = peg$parse_();
-        s3 = peg$parselogicalOr();
-        if (s3 !== peg$FAILED) {
-          peg$savedPos = s0;
-          s0 = peg$f16(s3);
-        } else {
-          peg$currPos = s0;
-          s0 = peg$FAILED;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parsegosubStatement() {
-      var s0, s1, s2, s3;
-      s0 = peg$currPos;
-      if (input.substr(peg$currPos, 5).toLowerCase() === peg$c17) {
-        s1 = input.substr(peg$currPos, 5);
-        peg$currPos += 5;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) {
-          peg$fail(peg$e19);
-        }
-      }
-      if (s1 !== peg$FAILED) {
-        s2 = peg$parse_();
-        s3 = peg$parselogicalOr();
-        if (s3 !== peg$FAILED) {
-          peg$savedPos = s0;
-          s0 = peg$f17(s3);
-        } else {
-          peg$currPos = s0;
-          s0 = peg$FAILED;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parsereturnStatement() {
-      var s0, s1;
-      s0 = peg$currPos;
-      if (input.substr(peg$currPos, 6).toLowerCase() === peg$c18) {
-        s1 = input.substr(peg$currPos, 6);
-        peg$currPos += 6;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) {
-          peg$fail(peg$e20);
-        }
-      }
-      if (s1 !== peg$FAILED) {
-        peg$savedPos = s0;
-        s1 = peg$f18();
-      }
-      s0 = s1;
-      return s0;
-    }
-    function peg$parseendStatement() {
-      var s0, s1;
-      s0 = peg$currPos;
-      if (input.substr(peg$currPos, 3).toLowerCase() === peg$c19) {
-        s1 = input.substr(peg$currPos, 3);
-        peg$currPos += 3;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) {
-          peg$fail(peg$e21);
-        }
-      }
-      if (s1 !== peg$FAILED) {
-        peg$savedPos = s0;
-        s1 = peg$f19();
-      }
-      s0 = s1;
-      return s0;
-    }
-    function peg$parsepauseStatement() {
-      var s0, s1, s2, s3;
-      s0 = peg$currPos;
-      if (input.substr(peg$currPos, 5).toLowerCase() === peg$c20) {
-        s1 = input.substr(peg$currPos, 5);
-        peg$currPos += 5;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) {
-          peg$fail(peg$e22);
-        }
-      }
-      if (s1 !== peg$FAILED) {
-        s2 = peg$parse_();
-        s3 = peg$parselogicalOr();
-        if (s3 !== peg$FAILED) {
-          peg$savedPos = s0;
-          s0 = peg$f20(s3);
-        } else {
-          peg$currPos = s0;
-          s0 = peg$FAILED;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parseinputStatement() {
-      var s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10;
-      s0 = peg$currPos;
-      if (input.substr(peg$currPos, 5).toLowerCase() === peg$c21) {
-        s1 = input.substr(peg$currPos, 5);
-        peg$currPos += 5;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) {
-          peg$fail(peg$e23);
-        }
-      }
-      if (s1 !== peg$FAILED) {
-        s2 = peg$parse_();
-        s3 = peg$currPos;
-        s4 = peg$parseStringLiteral();
-        if (s4 !== peg$FAILED) {
-          s5 = peg$parse_();
-          if (input.charCodeAt(peg$currPos) === 44) {
-            s6 = peg$c5;
-            peg$currPos++;
-          } else {
-            s6 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e7);
-            }
-          }
-          if (s6 !== peg$FAILED) {
-            s7 = peg$parse_();
-            peg$savedPos = s3;
-            s3 = peg$f21(s4);
-          } else {
-            peg$currPos = s3;
-            s3 = peg$FAILED;
-          }
-        } else {
-          peg$currPos = s3;
-          s3 = peg$FAILED;
-        }
-        if (s3 === peg$FAILED) {
-          s3 = null;
-        }
-        s4 = peg$parseVariable();
-        if (s4 !== peg$FAILED) {
-          s5 = [];
-          s6 = peg$currPos;
-          s7 = peg$parse_();
-          if (input.charCodeAt(peg$currPos) === 44) {
-            s8 = peg$c5;
-            peg$currPos++;
-          } else {
-            s8 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e7);
-            }
-          }
-          if (s8 !== peg$FAILED) {
-            s9 = peg$parse_();
-            s10 = peg$parseVariable();
-            if (s10 !== peg$FAILED) {
-              peg$savedPos = s6;
-              s6 = peg$f22(s3, s4, s10);
-            } else {
-              peg$currPos = s6;
-              s6 = peg$FAILED;
-            }
-          } else {
-            peg$currPos = s6;
-            s6 = peg$FAILED;
-          }
-          while (s6 !== peg$FAILED) {
-            s5.push(s6);
-            s6 = peg$currPos;
-            s7 = peg$parse_();
-            if (input.charCodeAt(peg$currPos) === 44) {
-              s8 = peg$c5;
-              peg$currPos++;
-            } else {
-              s8 = peg$FAILED;
-              if (peg$silentFails === 0) {
-                peg$fail(peg$e7);
-              }
-            }
-            if (s8 !== peg$FAILED) {
-              s9 = peg$parse_();
-              s10 = peg$parseVariable();
-              if (s10 !== peg$FAILED) {
-                peg$savedPos = s6;
-                s6 = peg$f22(s3, s4, s10);
-              } else {
-                peg$currPos = s6;
-                s6 = peg$FAILED;
-              }
-            } else {
-              peg$currPos = s6;
-              s6 = peg$FAILED;
-            }
-          }
-          peg$savedPos = s0;
-          s0 = peg$f23(s3, s4, s5);
-        } else {
-          peg$currPos = s0;
-          s0 = peg$FAILED;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parsedataStatement() {
-      var s0, s1, s2, s3;
-      s0 = peg$currPos;
-      if (input.substr(peg$currPos, 4).toLowerCase() === peg$c22) {
-        s1 = input.substr(peg$currPos, 4);
-        peg$currPos += 4;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) {
-          peg$fail(peg$e24);
-        }
-      }
-      if (s1 !== peg$FAILED) {
-        s2 = peg$parse_();
-        s3 = peg$parseConstantList();
-        if (s3 !== peg$FAILED) {
-          peg$savedPos = s0;
-          s0 = peg$f24(s3);
-        } else {
-          peg$currPos = s0;
-          s0 = peg$FAILED;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parseConstantList() {
-      var s0, s1, s2, s3, s4, s5, s6, s7;
-      s0 = peg$currPos;
-      s1 = peg$parseConstant();
-      if (s1 !== peg$FAILED) {
-        s2 = [];
-        s3 = peg$currPos;
-        s4 = peg$parse_();
-        if (input.charCodeAt(peg$currPos) === 44) {
-          s5 = peg$c5;
-          peg$currPos++;
-        } else {
-          s5 = peg$FAILED;
-          if (peg$silentFails === 0) {
-            peg$fail(peg$e7);
-          }
-        }
-        if (s5 !== peg$FAILED) {
-          s6 = peg$parse_();
-          s7 = peg$parseConstant();
-          if (s7 !== peg$FAILED) {
-            peg$savedPos = s3;
-            s3 = peg$f25(s1, s7);
-          } else {
-            peg$currPos = s3;
-            s3 = peg$FAILED;
-          }
-        } else {
-          peg$currPos = s3;
-          s3 = peg$FAILED;
-        }
-        while (s3 !== peg$FAILED) {
-          s2.push(s3);
-          s3 = peg$currPos;
-          s4 = peg$parse_();
-          if (input.charCodeAt(peg$currPos) === 44) {
-            s5 = peg$c5;
-            peg$currPos++;
-          } else {
-            s5 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e7);
-            }
-          }
-          if (s5 !== peg$FAILED) {
-            s6 = peg$parse_();
-            s7 = peg$parseConstant();
-            if (s7 !== peg$FAILED) {
-              peg$savedPos = s3;
-              s3 = peg$f25(s1, s7);
-            } else {
-              peg$currPos = s3;
-              s3 = peg$FAILED;
-            }
-          } else {
-            peg$currPos = s3;
-            s3 = peg$FAILED;
-          }
-        }
-        peg$savedPos = s0;
-        s0 = peg$f26(s1, s2);
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parsereadStatement() {
-      var s0, s1, s2, s3;
-      s0 = peg$currPos;
-      if (input.substr(peg$currPos, 4).toLowerCase() === peg$c23) {
-        s1 = input.substr(peg$currPos, 4);
-        peg$currPos += 4;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) {
-          peg$fail(peg$e25);
-        }
-      }
-      if (s1 !== peg$FAILED) {
-        s2 = peg$parse_();
-        s3 = peg$parseVariableList();
-        if (s3 !== peg$FAILED) {
-          peg$savedPos = s0;
-          s0 = peg$f27(s3);
-        } else {
-          peg$currPos = s0;
-          s0 = peg$FAILED;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parserestoreStatement() {
-      var s0, s1, s2, s3;
-      s0 = peg$currPos;
-      if (input.substr(peg$currPos, 7).toLowerCase() === peg$c24) {
-        s1 = input.substr(peg$currPos, 7);
-        peg$currPos += 7;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) {
-          peg$fail(peg$e26);
-        }
-      }
-      if (s1 !== peg$FAILED) {
-        s2 = peg$parseWS();
-        s3 = peg$parselogicalOr();
-        if (s3 !== peg$FAILED) {
-          peg$savedPos = s0;
-          s0 = peg$f28(s3);
-        } else {
-          peg$currPos = s0;
-          s0 = peg$FAILED;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      if (s0 === peg$FAILED) {
-        s0 = peg$currPos;
-        if (input.substr(peg$currPos, 7).toLowerCase() === peg$c24) {
-          s1 = input.substr(peg$currPos, 7);
-          peg$currPos += 7;
-        } else {
-          s1 = peg$FAILED;
-          if (peg$silentFails === 0) {
-            peg$fail(peg$e26);
-          }
-        }
-        if (s1 !== peg$FAILED) {
-          peg$savedPos = s0;
-          s1 = peg$f29();
-        }
-        s0 = s1;
-      }
-      return s0;
-    }
-    function peg$parsedimStatement() {
-      var s0, s1, s2, s3, s4, s5, s6, s7, s8, s9;
-      s0 = peg$currPos;
-      if (input.substr(peg$currPos, 3).toLowerCase() === peg$c25) {
-        s1 = input.substr(peg$currPos, 3);
-        peg$currPos += 3;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) {
-          peg$fail(peg$e27);
-        }
-      }
-      if (s1 !== peg$FAILED) {
-        s2 = peg$parse_();
-        s3 = peg$parseArrayDeclaration();
-        if (s3 !== peg$FAILED) {
-          s4 = [];
-          s5 = peg$currPos;
-          s6 = peg$parse_();
-          if (input.charCodeAt(peg$currPos) === 44) {
-            s7 = peg$c5;
-            peg$currPos++;
-          } else {
-            s7 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e7);
-            }
-          }
-          if (s7 !== peg$FAILED) {
-            s8 = peg$parse_();
-            s9 = peg$parseArrayDeclaration();
-            if (s9 !== peg$FAILED) {
-              peg$savedPos = s5;
-              s5 = peg$f30(s3, s9);
-            } else {
-              peg$currPos = s5;
-              s5 = peg$FAILED;
-            }
-          } else {
-            peg$currPos = s5;
-            s5 = peg$FAILED;
-          }
-          while (s5 !== peg$FAILED) {
-            s4.push(s5);
-            s5 = peg$currPos;
-            s6 = peg$parse_();
-            if (input.charCodeAt(peg$currPos) === 44) {
-              s7 = peg$c5;
-              peg$currPos++;
-            } else {
-              s7 = peg$FAILED;
-              if (peg$silentFails === 0) {
-                peg$fail(peg$e7);
-              }
-            }
-            if (s7 !== peg$FAILED) {
-              s8 = peg$parse_();
-              s9 = peg$parseArrayDeclaration();
-              if (s9 !== peg$FAILED) {
-                peg$savedPos = s5;
-                s5 = peg$f30(s3, s9);
-              } else {
-                peg$currPos = s5;
-                s5 = peg$FAILED;
-              }
-            } else {
-              peg$currPos = s5;
-              s5 = peg$FAILED;
-            }
-          }
-          peg$savedPos = s0;
-          s0 = peg$f31(s3, s4);
-        } else {
-          peg$currPos = s0;
-          s0 = peg$FAILED;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parseArrayDeclaration() {
-      var s0, s1, s2, s3, s4, s5, s6, s7;
-      s0 = peg$currPos;
-      s1 = peg$parseIdentifier();
-      if (s1 !== peg$FAILED) {
-        s2 = peg$parse_();
-        if (input.charCodeAt(peg$currPos) === 40) {
-          s3 = peg$c26;
-          peg$currPos++;
-        } else {
-          s3 = peg$FAILED;
-          if (peg$silentFails === 0) {
-            peg$fail(peg$e28);
-          }
-        }
-        if (s3 !== peg$FAILED) {
-          s4 = peg$parse_();
-          s5 = peg$parseExpressionList();
-          if (s5 !== peg$FAILED) {
-            s6 = peg$parse_();
-            if (input.charCodeAt(peg$currPos) === 41) {
-              s7 = peg$c27;
-              peg$currPos++;
-            } else {
-              s7 = peg$FAILED;
-              if (peg$silentFails === 0) {
-                peg$fail(peg$e29);
-              }
-            }
-            if (s7 !== peg$FAILED) {
-              peg$savedPos = s0;
-              s0 = peg$f32(s1, s5);
-            } else {
-              peg$currPos = s0;
-              s0 = peg$FAILED;
-            }
-          } else {
-            peg$currPos = s0;
-            s0 = peg$FAILED;
-          }
-        } else {
-          peg$currPos = s0;
-          s0 = peg$FAILED;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parseremStatement() {
-      var s0, s1, s2, s3, s4, s5, s6;
-      s0 = peg$currPos;
-      if (input.substr(peg$currPos, 3).toLowerCase() === peg$c28) {
-        s1 = input.substr(peg$currPos, 3);
-        peg$currPos += 3;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) {
-          peg$fail(peg$e30);
-        }
-      }
-      if (s1 !== peg$FAILED) {
-        s2 = peg$parse_();
-        s3 = [];
-        s4 = peg$currPos;
-        s5 = peg$currPos;
-        peg$silentFails++;
-        if (peg$r2.test(input.charAt(peg$currPos))) {
-          s6 = input.charAt(peg$currPos);
-          peg$currPos++;
-        } else {
-          s6 = peg$FAILED;
-          if (peg$silentFails === 0) {
-            peg$fail(peg$e31);
-          }
-        }
-        peg$silentFails--;
-        if (s6 === peg$FAILED) {
-          s5 = void 0;
-        } else {
-          peg$currPos = s5;
-          s5 = peg$FAILED;
-        }
-        if (s5 !== peg$FAILED) {
-          if (input.length > peg$currPos) {
-            s6 = input.charAt(peg$currPos);
-            peg$currPos++;
-          } else {
-            s6 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e32);
-            }
-          }
-          if (s6 !== peg$FAILED) {
-            s5 = [s5, s6];
-            s4 = s5;
-          } else {
-            peg$currPos = s4;
-            s4 = peg$FAILED;
-          }
-        } else {
-          peg$currPos = s4;
-          s4 = peg$FAILED;
-        }
-        while (s4 !== peg$FAILED) {
-          s3.push(s4);
-          s4 = peg$currPos;
-          s5 = peg$currPos;
-          peg$silentFails++;
-          if (peg$r2.test(input.charAt(peg$currPos))) {
-            s6 = input.charAt(peg$currPos);
-            peg$currPos++;
-          } else {
-            s6 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e31);
-            }
-          }
-          peg$silentFails--;
-          if (s6 === peg$FAILED) {
-            s5 = void 0;
-          } else {
-            peg$currPos = s5;
-            s5 = peg$FAILED;
-          }
-          if (s5 !== peg$FAILED) {
-            if (input.length > peg$currPos) {
-              s6 = input.charAt(peg$currPos);
-              peg$currPos++;
-            } else {
-              s6 = peg$FAILED;
-              if (peg$silentFails === 0) {
-                peg$fail(peg$e32);
-              }
-            }
-            if (s6 !== peg$FAILED) {
-              s5 = [s5, s6];
-              s4 = s5;
-            } else {
-              peg$currPos = s4;
-              s4 = peg$FAILED;
-            }
-          } else {
-            peg$currPos = s4;
-            s4 = peg$FAILED;
-          }
-        }
-        peg$savedPos = s0;
-        s0 = peg$f33(s3);
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parseclsStatement() {
-      var s0, s1;
-      s0 = peg$currPos;
-      if (input.substr(peg$currPos, 3).toLowerCase() === peg$c29) {
-        s1 = input.substr(peg$currPos, 3);
-        peg$currPos += 3;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) {
-          peg$fail(peg$e33);
-        }
-      }
-      if (s1 !== peg$FAILED) {
-        peg$savedPos = s0;
-        s1 = peg$f34();
-      }
-      s0 = s1;
-      return s0;
-    }
-    function peg$parsecolorStatement() {
-      var s0, s1, s2, s3, s4, s5, s6, s7, s8;
-      s0 = peg$currPos;
-      if (input.substr(peg$currPos, 5).toLowerCase() === peg$c30) {
-        s1 = input.substr(peg$currPos, 5);
-        peg$currPos += 5;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) {
-          peg$fail(peg$e34);
-        }
-      }
-      if (s1 !== peg$FAILED) {
-        s2 = peg$parse_();
-        s3 = peg$parselogicalOr();
-        if (s3 !== peg$FAILED) {
-          s4 = peg$currPos;
-          s5 = peg$parse_();
-          if (input.charCodeAt(peg$currPos) === 44) {
-            s6 = peg$c5;
-            peg$currPos++;
-          } else {
-            s6 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e7);
-            }
-          }
-          if (s6 !== peg$FAILED) {
-            s7 = peg$parse_();
-            s8 = peg$parselogicalOr();
-            if (s8 !== peg$FAILED) {
-              peg$savedPos = s4;
-              s4 = peg$f35(s3, s8);
-            } else {
-              peg$currPos = s4;
-              s4 = peg$FAILED;
-            }
-          } else {
-            peg$currPos = s4;
-            s4 = peg$FAILED;
-          }
-          if (s4 === peg$FAILED) {
-            s4 = null;
-          }
-          peg$savedPos = s0;
-          s0 = peg$f36(s3, s4);
-        } else {
-          peg$currPos = s0;
-          s0 = peg$FAILED;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parselogicalOr() {
-      var s0, s1, s2, s3, s4, s5, s6, s7;
-      s0 = peg$currPos;
-      s1 = peg$parselogicalAnd();
-      if (s1 !== peg$FAILED) {
-        s2 = [];
-        s3 = peg$currPos;
-        s4 = peg$parse_();
-        if (input.substr(peg$currPos, 2).toLowerCase() === peg$c31) {
-          s5 = input.substr(peg$currPos, 2);
-          peg$currPos += 2;
-        } else {
-          s5 = peg$FAILED;
-          if (peg$silentFails === 0) {
-            peg$fail(peg$e35);
-          }
-        }
-        if (s5 !== peg$FAILED) {
-          s6 = peg$parse_();
-          s7 = peg$parselogicalAnd();
-          if (s7 !== peg$FAILED) {
-            peg$savedPos = s3;
-            s3 = peg$f37(s1, s7);
-          } else {
-            peg$currPos = s3;
-            s3 = peg$FAILED;
-          }
-        } else {
-          peg$currPos = s3;
-          s3 = peg$FAILED;
-        }
-        while (s3 !== peg$FAILED) {
-          s2.push(s3);
-          s3 = peg$currPos;
-          s4 = peg$parse_();
-          if (input.substr(peg$currPos, 2).toLowerCase() === peg$c31) {
-            s5 = input.substr(peg$currPos, 2);
-            peg$currPos += 2;
-          } else {
-            s5 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e35);
-            }
-          }
-          if (s5 !== peg$FAILED) {
-            s6 = peg$parse_();
-            s7 = peg$parselogicalAnd();
-            if (s7 !== peg$FAILED) {
-              peg$savedPos = s3;
-              s3 = peg$f37(s1, s7);
-            } else {
-              peg$currPos = s3;
-              s3 = peg$FAILED;
-            }
-          } else {
-            peg$currPos = s3;
-            s3 = peg$FAILED;
-          }
-        }
-        peg$savedPos = s0;
-        s0 = peg$f38(s1, s2);
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parselogicalAnd() {
-      var s0, s1, s2, s3, s4, s5, s6, s7;
-      s0 = peg$currPos;
-      s1 = peg$parseequality();
-      if (s1 !== peg$FAILED) {
-        s2 = [];
-        s3 = peg$currPos;
-        s4 = peg$parse_();
-        if (input.substr(peg$currPos, 3).toLowerCase() === peg$c32) {
-          s5 = input.substr(peg$currPos, 3);
-          peg$currPos += 3;
-        } else {
-          s5 = peg$FAILED;
-          if (peg$silentFails === 0) {
-            peg$fail(peg$e36);
-          }
-        }
-        if (s5 !== peg$FAILED) {
-          s6 = peg$parse_();
-          s7 = peg$parseequality();
-          if (s7 !== peg$FAILED) {
-            peg$savedPos = s3;
-            s3 = peg$f39(s1, s7);
-          } else {
-            peg$currPos = s3;
-            s3 = peg$FAILED;
-          }
-        } else {
-          peg$currPos = s3;
-          s3 = peg$FAILED;
-        }
-        while (s3 !== peg$FAILED) {
-          s2.push(s3);
-          s3 = peg$currPos;
-          s4 = peg$parse_();
-          if (input.substr(peg$currPos, 3).toLowerCase() === peg$c32) {
-            s5 = input.substr(peg$currPos, 3);
-            peg$currPos += 3;
-          } else {
-            s5 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e36);
-            }
-          }
-          if (s5 !== peg$FAILED) {
-            s6 = peg$parse_();
-            s7 = peg$parseequality();
-            if (s7 !== peg$FAILED) {
-              peg$savedPos = s3;
-              s3 = peg$f39(s1, s7);
-            } else {
-              peg$currPos = s3;
-              s3 = peg$FAILED;
-            }
-          } else {
-            peg$currPos = s3;
-            s3 = peg$FAILED;
-          }
-        }
-        peg$savedPos = s0;
-        s0 = peg$f40(s1, s2);
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parseequality() {
-      var s0, s1, s2, s3, s4, s5, s6, s7;
-      s0 = peg$currPos;
-      s1 = peg$parserelational();
-      if (s1 !== peg$FAILED) {
-        s2 = [];
-        s3 = peg$currPos;
-        s4 = peg$parse_();
-        if (input.charCodeAt(peg$currPos) === 61) {
-          s5 = peg$c8;
-          peg$currPos++;
-        } else {
-          s5 = peg$FAILED;
-          if (peg$silentFails === 0) {
-            peg$fail(peg$e10);
-          }
-        }
-        if (s5 === peg$FAILED) {
-          if (input.substr(peg$currPos, 2) === peg$c33) {
-            s5 = peg$c33;
-            peg$currPos += 2;
-          } else {
-            s5 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e37);
-            }
-          }
-        }
-        if (s5 !== peg$FAILED) {
-          s6 = peg$parse_();
-          s7 = peg$parserelational();
-          if (s7 !== peg$FAILED) {
-            peg$savedPos = s3;
-            s3 = peg$f41(s1, s5, s7);
-          } else {
-            peg$currPos = s3;
-            s3 = peg$FAILED;
-          }
-        } else {
-          peg$currPos = s3;
-          s3 = peg$FAILED;
-        }
-        while (s3 !== peg$FAILED) {
-          s2.push(s3);
-          s3 = peg$currPos;
-          s4 = peg$parse_();
-          if (input.charCodeAt(peg$currPos) === 61) {
-            s5 = peg$c8;
-            peg$currPos++;
-          } else {
-            s5 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e10);
-            }
-          }
-          if (s5 === peg$FAILED) {
-            if (input.substr(peg$currPos, 2) === peg$c33) {
-              s5 = peg$c33;
-              peg$currPos += 2;
-            } else {
-              s5 = peg$FAILED;
-              if (peg$silentFails === 0) {
-                peg$fail(peg$e37);
-              }
-            }
-          }
-          if (s5 !== peg$FAILED) {
-            s6 = peg$parse_();
-            s7 = peg$parserelational();
-            if (s7 !== peg$FAILED) {
-              peg$savedPos = s3;
-              s3 = peg$f41(s1, s5, s7);
-            } else {
-              peg$currPos = s3;
-              s3 = peg$FAILED;
-            }
-          } else {
-            peg$currPos = s3;
-            s3 = peg$FAILED;
-          }
-        }
-        peg$savedPos = s0;
-        s0 = peg$f42(s1, s2);
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parserelational() {
-      var s0, s1, s2, s3, s4, s5, s6, s7;
-      s0 = peg$currPos;
-      s1 = peg$parseadditive();
-      if (s1 !== peg$FAILED) {
-        s2 = [];
-        s3 = peg$currPos;
-        s4 = peg$parse_();
-        if (input.substr(peg$currPos, 2) === peg$c34) {
-          s5 = peg$c34;
-          peg$currPos += 2;
-        } else {
-          s5 = peg$FAILED;
-          if (peg$silentFails === 0) {
-            peg$fail(peg$e38);
-          }
-        }
-        if (s5 === peg$FAILED) {
-          if (input.substr(peg$currPos, 2) === peg$c35) {
-            s5 = peg$c35;
-            peg$currPos += 2;
-          } else {
-            s5 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e39);
-            }
-          }
-          if (s5 === peg$FAILED) {
-            if (input.charCodeAt(peg$currPos) === 60) {
-              s5 = peg$c36;
-              peg$currPos++;
-            } else {
-              s5 = peg$FAILED;
-              if (peg$silentFails === 0) {
-                peg$fail(peg$e40);
-              }
-            }
-            if (s5 === peg$FAILED) {
-              if (input.charCodeAt(peg$currPos) === 62) {
-                s5 = peg$c37;
-                peg$currPos++;
-              } else {
-                s5 = peg$FAILED;
-                if (peg$silentFails === 0) {
-                  peg$fail(peg$e41);
-                }
-              }
-            }
-          }
-        }
-        if (s5 !== peg$FAILED) {
-          s6 = peg$parse_();
-          s7 = peg$parseadditive();
-          if (s7 !== peg$FAILED) {
-            peg$savedPos = s3;
-            s3 = peg$f43(s1, s5, s7);
-          } else {
-            peg$currPos = s3;
-            s3 = peg$FAILED;
-          }
-        } else {
-          peg$currPos = s3;
-          s3 = peg$FAILED;
-        }
-        while (s3 !== peg$FAILED) {
-          s2.push(s3);
-          s3 = peg$currPos;
-          s4 = peg$parse_();
-          if (input.substr(peg$currPos, 2) === peg$c34) {
-            s5 = peg$c34;
-            peg$currPos += 2;
-          } else {
-            s5 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e38);
-            }
-          }
-          if (s5 === peg$FAILED) {
-            if (input.substr(peg$currPos, 2) === peg$c35) {
-              s5 = peg$c35;
-              peg$currPos += 2;
-            } else {
-              s5 = peg$FAILED;
-              if (peg$silentFails === 0) {
-                peg$fail(peg$e39);
-              }
-            }
-            if (s5 === peg$FAILED) {
-              if (input.charCodeAt(peg$currPos) === 60) {
-                s5 = peg$c36;
-                peg$currPos++;
-              } else {
-                s5 = peg$FAILED;
-                if (peg$silentFails === 0) {
-                  peg$fail(peg$e40);
-                }
-              }
-              if (s5 === peg$FAILED) {
-                if (input.charCodeAt(peg$currPos) === 62) {
-                  s5 = peg$c37;
-                  peg$currPos++;
-                } else {
-                  s5 = peg$FAILED;
-                  if (peg$silentFails === 0) {
-                    peg$fail(peg$e41);
-                  }
-                }
-              }
-            }
-          }
-          if (s5 !== peg$FAILED) {
-            s6 = peg$parse_();
-            s7 = peg$parseadditive();
-            if (s7 !== peg$FAILED) {
-              peg$savedPos = s3;
-              s3 = peg$f43(s1, s5, s7);
-            } else {
-              peg$currPos = s3;
-              s3 = peg$FAILED;
-            }
-          } else {
-            peg$currPos = s3;
-            s3 = peg$FAILED;
-          }
-        }
-        peg$savedPos = s0;
-        s0 = peg$f44(s1, s2);
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parseadditive() {
-      var s0, s1, s2, s3, s4, s5, s6, s7;
-      s0 = peg$currPos;
-      s1 = peg$parsemultiplicative();
-      if (s1 !== peg$FAILED) {
-        s2 = [];
-        s3 = peg$currPos;
-        s4 = peg$parse_();
-        if (input.charCodeAt(peg$currPos) === 43) {
-          s5 = peg$c38;
-          peg$currPos++;
-        } else {
-          s5 = peg$FAILED;
-          if (peg$silentFails === 0) {
-            peg$fail(peg$e42);
-          }
-        }
-        if (s5 === peg$FAILED) {
-          if (input.charCodeAt(peg$currPos) === 45) {
-            s5 = peg$c39;
-            peg$currPos++;
-          } else {
-            s5 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e43);
-            }
-          }
-        }
-        if (s5 !== peg$FAILED) {
-          s6 = peg$parse_();
-          s7 = peg$parsemultiplicative();
-          if (s7 !== peg$FAILED) {
-            peg$savedPos = s3;
-            s3 = peg$f45(s1, s5, s7);
-          } else {
-            peg$currPos = s3;
-            s3 = peg$FAILED;
-          }
-        } else {
-          peg$currPos = s3;
-          s3 = peg$FAILED;
-        }
-        while (s3 !== peg$FAILED) {
-          s2.push(s3);
-          s3 = peg$currPos;
-          s4 = peg$parse_();
-          if (input.charCodeAt(peg$currPos) === 43) {
-            s5 = peg$c38;
-            peg$currPos++;
-          } else {
-            s5 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e42);
-            }
-          }
-          if (s5 === peg$FAILED) {
-            if (input.charCodeAt(peg$currPos) === 45) {
-              s5 = peg$c39;
-              peg$currPos++;
-            } else {
-              s5 = peg$FAILED;
-              if (peg$silentFails === 0) {
-                peg$fail(peg$e43);
-              }
-            }
-          }
-          if (s5 !== peg$FAILED) {
-            s6 = peg$parse_();
-            s7 = peg$parsemultiplicative();
-            if (s7 !== peg$FAILED) {
-              peg$savedPos = s3;
-              s3 = peg$f45(s1, s5, s7);
-            } else {
-              peg$currPos = s3;
-              s3 = peg$FAILED;
-            }
-          } else {
-            peg$currPos = s3;
-            s3 = peg$FAILED;
-          }
-        }
-        peg$savedPos = s0;
-        s0 = peg$f46(s1, s2);
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parsemultiplicative() {
-      var s0, s1, s2, s3, s4, s5, s6, s7;
-      s0 = peg$currPos;
-      s1 = peg$parseexponentiation();
-      if (s1 !== peg$FAILED) {
-        s2 = [];
-        s3 = peg$currPos;
-        s4 = peg$parse_();
-        if (input.charCodeAt(peg$currPos) === 42) {
-          s5 = peg$c40;
-          peg$currPos++;
-        } else {
-          s5 = peg$FAILED;
-          if (peg$silentFails === 0) {
-            peg$fail(peg$e44);
-          }
-        }
-        if (s5 === peg$FAILED) {
-          if (input.charCodeAt(peg$currPos) === 47) {
-            s5 = peg$c41;
-            peg$currPos++;
-          } else {
-            s5 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e45);
-            }
-          }
-          if (s5 === peg$FAILED) {
-            if (input.substr(peg$currPos, 3).toLowerCase() === peg$c42) {
-              s5 = input.substr(peg$currPos, 3);
-              peg$currPos += 3;
-            } else {
-              s5 = peg$FAILED;
-              if (peg$silentFails === 0) {
-                peg$fail(peg$e46);
-              }
-            }
-          }
-        }
-        if (s5 !== peg$FAILED) {
-          s6 = peg$parse_();
-          s7 = peg$parseexponentiation();
-          if (s7 !== peg$FAILED) {
-            peg$savedPos = s3;
-            s3 = peg$f47(s1, s5, s7);
-          } else {
-            peg$currPos = s3;
-            s3 = peg$FAILED;
-          }
-        } else {
-          peg$currPos = s3;
-          s3 = peg$FAILED;
-        }
-        while (s3 !== peg$FAILED) {
-          s2.push(s3);
-          s3 = peg$currPos;
-          s4 = peg$parse_();
-          if (input.charCodeAt(peg$currPos) === 42) {
-            s5 = peg$c40;
-            peg$currPos++;
-          } else {
-            s5 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e44);
-            }
-          }
-          if (s5 === peg$FAILED) {
-            if (input.charCodeAt(peg$currPos) === 47) {
-              s5 = peg$c41;
-              peg$currPos++;
-            } else {
-              s5 = peg$FAILED;
-              if (peg$silentFails === 0) {
-                peg$fail(peg$e45);
-              }
-            }
-            if (s5 === peg$FAILED) {
-              if (input.substr(peg$currPos, 3).toLowerCase() === peg$c42) {
-                s5 = input.substr(peg$currPos, 3);
-                peg$currPos += 3;
-              } else {
-                s5 = peg$FAILED;
-                if (peg$silentFails === 0) {
-                  peg$fail(peg$e46);
-                }
-              }
-            }
-          }
-          if (s5 !== peg$FAILED) {
-            s6 = peg$parse_();
-            s7 = peg$parseexponentiation();
-            if (s7 !== peg$FAILED) {
-              peg$savedPos = s3;
-              s3 = peg$f47(s1, s5, s7);
-            } else {
-              peg$currPos = s3;
-              s3 = peg$FAILED;
-            }
-          } else {
-            peg$currPos = s3;
-            s3 = peg$FAILED;
-          }
-        }
-        peg$savedPos = s0;
-        s0 = peg$f48(s1, s2);
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parseexponentiation() {
-      var s0, s1, s2, s3, s4, s5, s6, s7;
-      s0 = peg$currPos;
-      s1 = peg$parseunary();
-      if (s1 !== peg$FAILED) {
-        s2 = [];
-        s3 = peg$currPos;
-        s4 = peg$parse_();
-        if (input.charCodeAt(peg$currPos) === 94) {
-          s5 = peg$c43;
-          peg$currPos++;
-        } else {
-          s5 = peg$FAILED;
-          if (peg$silentFails === 0) {
-            peg$fail(peg$e47);
-          }
-        }
-        if (s5 !== peg$FAILED) {
-          s6 = peg$parse_();
-          s7 = peg$parseunary();
-          if (s7 !== peg$FAILED) {
-            peg$savedPos = s3;
-            s3 = peg$f49(s1, s5, s7);
-          } else {
-            peg$currPos = s3;
-            s3 = peg$FAILED;
-          }
-        } else {
-          peg$currPos = s3;
-          s3 = peg$FAILED;
-        }
-        while (s3 !== peg$FAILED) {
-          s2.push(s3);
-          s3 = peg$currPos;
-          s4 = peg$parse_();
-          if (input.charCodeAt(peg$currPos) === 94) {
-            s5 = peg$c43;
-            peg$currPos++;
-          } else {
-            s5 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e47);
-            }
-          }
-          if (s5 !== peg$FAILED) {
-            s6 = peg$parse_();
-            s7 = peg$parseunary();
-            if (s7 !== peg$FAILED) {
-              peg$savedPos = s3;
-              s3 = peg$f49(s1, s5, s7);
-            } else {
-              peg$currPos = s3;
-              s3 = peg$FAILED;
-            }
-          } else {
-            peg$currPos = s3;
-            s3 = peg$FAILED;
-          }
-        }
-        peg$savedPos = s0;
-        s0 = peg$f50(s1, s2);
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parseunary() {
-      var s0, s1, s2, s3;
-      s0 = peg$currPos;
-      if (input.substr(peg$currPos, 3).toLowerCase() === peg$c44) {
-        s1 = input.substr(peg$currPos, 3);
-        peg$currPos += 3;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) {
-          peg$fail(peg$e48);
-        }
-      }
-      if (s1 !== peg$FAILED) {
-        s2 = peg$parse_();
-        s3 = peg$parseunary();
-        if (s3 !== peg$FAILED) {
-          peg$savedPos = s0;
-          s0 = peg$f51(s3);
-        } else {
-          peg$currPos = s0;
-          s0 = peg$FAILED;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      if (s0 === peg$FAILED) {
-        s0 = peg$currPos;
-        if (input.charCodeAt(peg$currPos) === 45) {
-          s1 = peg$c39;
-          peg$currPos++;
-        } else {
-          s1 = peg$FAILED;
-          if (peg$silentFails === 0) {
-            peg$fail(peg$e43);
-          }
-        }
-        if (s1 !== peg$FAILED) {
-          s2 = peg$parse_();
-          s3 = peg$parseunary();
-          if (s3 !== peg$FAILED) {
-            peg$savedPos = s0;
-            s0 = peg$f52(s3);
-          } else {
-            peg$currPos = s0;
-            s0 = peg$FAILED;
-          }
-        } else {
-          peg$currPos = s0;
-          s0 = peg$FAILED;
-        }
-        if (s0 === peg$FAILED) {
-          s0 = peg$parseprimary();
-        }
-      }
-      return s0;
-    }
-    function peg$parseprimary() {
-      var s0, s1, s2, s3, s4, s5;
-      s0 = peg$currPos;
-      if (input.charCodeAt(peg$currPos) === 40) {
-        s1 = peg$c26;
-        peg$currPos++;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) {
-          peg$fail(peg$e28);
-        }
-      }
-      if (s1 !== peg$FAILED) {
-        s2 = peg$parse_();
-        s3 = peg$parselogicalOr();
-        if (s3 !== peg$FAILED) {
-          s4 = peg$parse_();
-          if (input.charCodeAt(peg$currPos) === 41) {
-            s5 = peg$c27;
-            peg$currPos++;
-          } else {
-            s5 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e29);
-            }
-          }
-          if (s5 !== peg$FAILED) {
-            peg$savedPos = s0;
-            s0 = peg$f53(s3);
-          } else {
-            peg$currPos = s0;
-            s0 = peg$FAILED;
-          }
-        } else {
-          peg$currPos = s0;
-          s0 = peg$FAILED;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      if (s0 === peg$FAILED) {
-        s0 = peg$parsefunctionCall();
-        if (s0 === peg$FAILED) {
-          s0 = peg$parseVariable();
-          if (s0 === peg$FAILED) {
-            s0 = peg$parseNumberLiteral();
-            if (s0 === peg$FAILED) {
-              s0 = peg$parseStringLiteral();
-            }
-          }
-        }
-      }
-      return s0;
-    }
-    function peg$parsefunctionCall() {
-      var s0, s1, s2, s3, s4, s5, s6, s7;
-      s0 = peg$currPos;
-      s1 = peg$parseFunctionName();
-      if (s1 !== peg$FAILED) {
-        s2 = peg$parse_();
-        if (input.charCodeAt(peg$currPos) === 40) {
-          s3 = peg$c26;
-          peg$currPos++;
-        } else {
-          s3 = peg$FAILED;
-          if (peg$silentFails === 0) {
-            peg$fail(peg$e28);
-          }
-        }
-        if (s3 !== peg$FAILED) {
-          s4 = peg$parse_();
-          s5 = peg$parseExpressionList();
-          if (s5 === peg$FAILED) {
-            s5 = null;
-          }
-          s6 = peg$parse_();
-          if (input.charCodeAt(peg$currPos) === 41) {
-            s7 = peg$c27;
-            peg$currPos++;
-          } else {
-            s7 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e29);
-            }
-          }
-          if (s7 !== peg$FAILED) {
-            peg$savedPos = s0;
-            s0 = peg$f54(s1, s5);
-          } else {
-            peg$currPos = s0;
-            s0 = peg$FAILED;
-          }
-        } else {
-          peg$currPos = s0;
-          s0 = peg$FAILED;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parseFunctionName() {
-      var s0, s1;
-      s0 = peg$currPos;
-      if (input.substr(peg$currPos, 3).toLowerCase() === peg$c45) {
-        s1 = input.substr(peg$currPos, 3);
-        peg$currPos += 3;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) {
-          peg$fail(peg$e49);
-        }
-      }
-      if (s1 !== peg$FAILED) {
-        peg$savedPos = s0;
-        s1 = peg$f55();
-      }
-      s0 = s1;
-      if (s0 === peg$FAILED) {
-        s0 = peg$currPos;
-        if (input.substr(peg$currPos, 3).toLowerCase() === peg$c46) {
-          s1 = input.substr(peg$currPos, 3);
-          peg$currPos += 3;
-        } else {
-          s1 = peg$FAILED;
-          if (peg$silentFails === 0) {
-            peg$fail(peg$e50);
-          }
-        }
-        if (s1 !== peg$FAILED) {
-          peg$savedPos = s0;
-          s1 = peg$f56();
-        }
-        s0 = s1;
-        if (s0 === peg$FAILED) {
-          s0 = peg$currPos;
-          if (input.substr(peg$currPos, 3).toLowerCase() === peg$c47) {
-            s1 = input.substr(peg$currPos, 3);
-            peg$currPos += 3;
-          } else {
-            s1 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e51);
-            }
-          }
-          if (s1 !== peg$FAILED) {
-            peg$savedPos = s0;
-            s1 = peg$f57();
-          }
-          s0 = s1;
-          if (s0 === peg$FAILED) {
-            s0 = peg$currPos;
-            if (input.substr(peg$currPos, 3).toLowerCase() === peg$c48) {
-              s1 = input.substr(peg$currPos, 3);
-              peg$currPos += 3;
-            } else {
-              s1 = peg$FAILED;
-              if (peg$silentFails === 0) {
-                peg$fail(peg$e52);
-              }
-            }
-            if (s1 !== peg$FAILED) {
-              peg$savedPos = s0;
-              s1 = peg$f58();
-            }
-            s0 = s1;
-            if (s0 === peg$FAILED) {
-              s0 = peg$currPos;
-              if (input.substr(peg$currPos, 3).toLowerCase() === peg$c49) {
-                s1 = input.substr(peg$currPos, 3);
-                peg$currPos += 3;
-              } else {
-                s1 = peg$FAILED;
-                if (peg$silentFails === 0) {
-                  peg$fail(peg$e53);
-                }
-              }
-              if (s1 !== peg$FAILED) {
-                peg$savedPos = s0;
-                s1 = peg$f59();
-              }
-              s0 = s1;
-              if (s0 === peg$FAILED) {
-                s0 = peg$currPos;
-                if (input.substr(peg$currPos, 3).toLowerCase() === peg$c50) {
-                  s1 = input.substr(peg$currPos, 3);
-                  peg$currPos += 3;
-                } else {
-                  s1 = peg$FAILED;
-                  if (peg$silentFails === 0) {
-                    peg$fail(peg$e54);
-                  }
-                }
-                if (s1 !== peg$FAILED) {
-                  peg$savedPos = s0;
-                  s1 = peg$f60();
-                }
-                s0 = s1;
-                if (s0 === peg$FAILED) {
-                  s0 = peg$currPos;
-                  if (input.substr(peg$currPos, 4).toLowerCase() === peg$c51) {
-                    s1 = input.substr(peg$currPos, 4);
-                    peg$currPos += 4;
-                  } else {
-                    s1 = peg$FAILED;
-                    if (peg$silentFails === 0) {
-                      peg$fail(peg$e55);
-                    }
-                  }
-                  if (s1 !== peg$FAILED) {
-                    peg$savedPos = s0;
-                    s1 = peg$f61();
-                  }
-                  s0 = s1;
-                  if (s0 === peg$FAILED) {
-                    s0 = peg$currPos;
-                    if (input.substr(peg$currPos, 3).toLowerCase() === peg$c52) {
-                      s1 = input.substr(peg$currPos, 3);
-                      peg$currPos += 3;
-                    } else {
-                      s1 = peg$FAILED;
-                      if (peg$silentFails === 0) {
-                        peg$fail(peg$e56);
-                      }
-                    }
-                    if (s1 !== peg$FAILED) {
-                      peg$savedPos = s0;
-                      s1 = peg$f62();
-                    }
-                    s0 = s1;
-                    if (s0 === peg$FAILED) {
-                      s0 = peg$currPos;
-                      if (input.substr(peg$currPos, 3).toLowerCase() === peg$c53) {
-                        s1 = input.substr(peg$currPos, 3);
-                        peg$currPos += 3;
-                      } else {
-                        s1 = peg$FAILED;
-                        if (peg$silentFails === 0) {
-                          peg$fail(peg$e57);
-                        }
-                      }
-                      if (s1 !== peg$FAILED) {
-                        peg$savedPos = s0;
-                        s1 = peg$f63();
-                      }
-                      s0 = s1;
-                      if (s0 === peg$FAILED) {
-                        s0 = peg$currPos;
-                        if (input.substr(peg$currPos, 3).toLowerCase() === peg$c54) {
-                          s1 = input.substr(peg$currPos, 3);
-                          peg$currPos += 3;
-                        } else {
-                          s1 = peg$FAILED;
-                          if (peg$silentFails === 0) {
-                            peg$fail(peg$e58);
-                          }
-                        }
-                        if (s1 !== peg$FAILED) {
-                          peg$savedPos = s0;
-                          s1 = peg$f64();
-                        }
-                        s0 = s1;
-                        if (s0 === peg$FAILED) {
-                          s0 = peg$currPos;
-                          if (input.substr(peg$currPos, 5).toLowerCase() === peg$c55) {
-                            s1 = input.substr(peg$currPos, 5);
-                            peg$currPos += 5;
-                          } else {
-                            s1 = peg$FAILED;
-                            if (peg$silentFails === 0) {
-                              peg$fail(peg$e59);
-                            }
-                          }
-                          if (s1 !== peg$FAILED) {
-                            peg$savedPos = s0;
-                            s1 = peg$f65();
-                          }
-                          s0 = s1;
-                          if (s0 === peg$FAILED) {
-                            s0 = peg$currPos;
-                            if (input.substr(peg$currPos, 3).toLowerCase() === peg$c56) {
-                              s1 = input.substr(peg$currPos, 3);
-                              peg$currPos += 3;
-                            } else {
-                              s1 = peg$FAILED;
-                              if (peg$silentFails === 0) {
-                                peg$fail(peg$e60);
-                              }
-                            }
-                            if (s1 !== peg$FAILED) {
-                              peg$savedPos = s0;
-                              s1 = peg$f66();
-                            }
-                            s0 = s1;
-                            if (s0 === peg$FAILED) {
-                              s0 = peg$currPos;
-                              if (input.substr(peg$currPos, 3).toLowerCase() === peg$c57) {
-                                s1 = input.substr(peg$currPos, 3);
-                                peg$currPos += 3;
-                              } else {
-                                s1 = peg$FAILED;
-                                if (peg$silentFails === 0) {
-                                  peg$fail(peg$e61);
-                                }
-                              }
-                              if (s1 !== peg$FAILED) {
-                                peg$savedPos = s0;
-                                s1 = peg$f67();
-                              }
-                              s0 = s1;
-                              if (s0 === peg$FAILED) {
-                                s0 = peg$currPos;
-                                if (input.substr(peg$currPos, 3).toLowerCase() === peg$c58) {
-                                  s1 = input.substr(peg$currPos, 3);
-                                  peg$currPos += 3;
-                                } else {
-                                  s1 = peg$FAILED;
-                                  if (peg$silentFails === 0) {
-                                    peg$fail(peg$e62);
-                                  }
-                                }
-                                if (s1 !== peg$FAILED) {
-                                  peg$savedPos = s0;
-                                  s1 = peg$f68();
-                                }
-                                s0 = s1;
-                                if (s0 === peg$FAILED) {
-                                  s0 = peg$currPos;
-                                  if (input.substr(peg$currPos, 3).toLowerCase() === peg$c59) {
-                                    s1 = input.substr(peg$currPos, 3);
-                                    peg$currPos += 3;
-                                  } else {
-                                    s1 = peg$FAILED;
-                                    if (peg$silentFails === 0) {
-                                      peg$fail(peg$e63);
-                                    }
-                                  }
-                                  if (s1 !== peg$FAILED) {
-                                    peg$savedPos = s0;
-                                    s1 = peg$f69();
-                                  }
-                                  s0 = s1;
-                                  if (s0 === peg$FAILED) {
-                                    s0 = peg$currPos;
-                                    if (input.substr(peg$currPos, 5).toLowerCase() === peg$c60) {
-                                      s1 = input.substr(peg$currPos, 5);
-                                      peg$currPos += 5;
-                                    } else {
-                                      s1 = peg$FAILED;
-                                      if (peg$silentFails === 0) {
-                                        peg$fail(peg$e64);
-                                      }
-                                    }
-                                    if (s1 !== peg$FAILED) {
-                                      peg$savedPos = s0;
-                                      s1 = peg$f70();
-                                    }
-                                    s0 = s1;
-                                    if (s0 === peg$FAILED) {
-                                      s0 = peg$currPos;
-                                      if (input.substr(peg$currPos, 5).toLowerCase() === peg$c61) {
-                                        s1 = input.substr(peg$currPos, 5);
-                                        peg$currPos += 5;
-                                      } else {
-                                        s1 = peg$FAILED;
-                                        if (peg$silentFails === 0) {
-                                          peg$fail(peg$e65);
-                                        }
-                                      }
-                                      if (s1 !== peg$FAILED) {
-                                        peg$savedPos = s0;
-                                        s1 = peg$f71();
-                                      }
-                                      s0 = s1;
-                                      if (s0 === peg$FAILED) {
-                                        s0 = peg$currPos;
-                                        if (input.substr(peg$currPos, 3).toLowerCase() === peg$c62) {
-                                          s1 = input.substr(peg$currPos, 3);
-                                          peg$currPos += 3;
-                                        } else {
-                                          s1 = peg$FAILED;
-                                          if (peg$silentFails === 0) {
-                                            peg$fail(peg$e66);
-                                          }
-                                        }
-                                        if (s1 !== peg$FAILED) {
-                                          peg$savedPos = s0;
-                                          s1 = peg$f72();
-                                        }
-                                        s0 = s1;
-                                      }
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-      return s0;
-    }
-    function peg$parseVariable() {
-      var s0, s1, s2, s3, s4;
-      s0 = peg$currPos;
-      s1 = peg$parseIdentifier();
-      if (s1 !== peg$FAILED) {
-        if (input.charCodeAt(peg$currPos) === 40) {
-          s2 = peg$c26;
-          peg$currPos++;
-        } else {
-          s2 = peg$FAILED;
-          if (peg$silentFails === 0) {
-            peg$fail(peg$e28);
-          }
-        }
-        if (s2 !== peg$FAILED) {
-          s3 = peg$parseExpressionList();
-          if (s3 !== peg$FAILED) {
-            if (input.charCodeAt(peg$currPos) === 41) {
-              s4 = peg$c27;
-              peg$currPos++;
-            } else {
-              s4 = peg$FAILED;
-              if (peg$silentFails === 0) {
-                peg$fail(peg$e29);
-              }
-            }
-            if (s4 !== peg$FAILED) {
-              peg$savedPos = s0;
-              s0 = peg$f73(s1, s3);
-            } else {
-              peg$currPos = s0;
-              s0 = peg$FAILED;
-            }
-          } else {
-            peg$currPos = s0;
-            s0 = peg$FAILED;
-          }
-        } else {
-          peg$currPos = s0;
-          s0 = peg$FAILED;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      if (s0 === peg$FAILED) {
-        s0 = peg$currPos;
-        s1 = peg$parseIdentifier();
-        if (s1 !== peg$FAILED) {
-          peg$savedPos = s0;
-          s1 = peg$f74(s1);
-        }
-        s0 = s1;
-      }
-      return s0;
-    }
-    function peg$parseIdentifier() {
-      var s0, s1, s2, s3, s4;
-      s0 = peg$currPos;
-      s1 = peg$currPos;
-      peg$silentFails++;
-      s2 = peg$parseReservedWord();
-      peg$silentFails--;
-      if (s2 === peg$FAILED) {
-        s1 = void 0;
-      } else {
-        peg$currPos = s1;
-        s1 = peg$FAILED;
-      }
-      if (s1 !== peg$FAILED) {
-        if (peg$r3.test(input.charAt(peg$currPos))) {
-          s2 = input.charAt(peg$currPos);
-          peg$currPos++;
-        } else {
-          s2 = peg$FAILED;
-          if (peg$silentFails === 0) {
-            peg$fail(peg$e67);
-          }
-        }
-        if (s2 !== peg$FAILED) {
-          s3 = [];
-          if (peg$r4.test(input.charAt(peg$currPos))) {
-            s4 = input.charAt(peg$currPos);
-            peg$currPos++;
-          } else {
-            s4 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e68);
-            }
-          }
-          while (s4 !== peg$FAILED) {
-            s3.push(s4);
-            if (peg$r4.test(input.charAt(peg$currPos))) {
-              s4 = input.charAt(peg$currPos);
-              peg$currPos++;
-            } else {
-              s4 = peg$FAILED;
-              if (peg$silentFails === 0) {
-                peg$fail(peg$e68);
-              }
-            }
-          }
-          peg$savedPos = s0;
-          s0 = peg$f75(s2, s3);
-        } else {
-          peg$currPos = s0;
-          s0 = peg$FAILED;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parseReservedWord() {
-      var s0, s1, s2, s3;
-      s0 = peg$currPos;
-      if (input.substr(peg$currPos, 5).toLowerCase() === peg$c4) {
-        s1 = input.substr(peg$currPos, 5);
-        peg$currPos += 5;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) {
-          peg$fail(peg$e6);
-        }
-      }
-      if (s1 === peg$FAILED) {
-        if (input.substr(peg$currPos, 3).toLowerCase() === peg$c7) {
-          s1 = input.substr(peg$currPos, 3);
-          peg$currPos += 3;
-        } else {
-          s1 = peg$FAILED;
-          if (peg$silentFails === 0) {
-            peg$fail(peg$e9);
-          }
-        }
-        if (s1 === peg$FAILED) {
-          if (input.substr(peg$currPos, 2).toLowerCase() === peg$c9) {
-            s1 = input.substr(peg$currPos, 2);
-            peg$currPos += 2;
-          } else {
-            s1 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e11);
-            }
-          }
-          if (s1 === peg$FAILED) {
-            if (input.substr(peg$currPos, 4).toLowerCase() === peg$c10) {
-              s1 = input.substr(peg$currPos, 4);
-              peg$currPos += 4;
-            } else {
-              s1 = peg$FAILED;
-              if (peg$silentFails === 0) {
-                peg$fail(peg$e12);
-              }
-            }
-            if (s1 === peg$FAILED) {
-              if (input.substr(peg$currPos, 3).toLowerCase() === peg$c11) {
-                s1 = input.substr(peg$currPos, 3);
-                peg$currPos += 3;
-              } else {
-                s1 = peg$FAILED;
-                if (peg$silentFails === 0) {
-                  peg$fail(peg$e13);
-                }
-              }
-              if (s1 === peg$FAILED) {
-                if (input.substr(peg$currPos, 2).toLowerCase() === peg$c12) {
-                  s1 = input.substr(peg$currPos, 2);
-                  peg$currPos += 2;
-                } else {
-                  s1 = peg$FAILED;
-                  if (peg$silentFails === 0) {
-                    peg$fail(peg$e14);
-                  }
-                }
-                if (s1 === peg$FAILED) {
-                  if (input.substr(peg$currPos, 4).toLowerCase() === peg$c14) {
-                    s1 = input.substr(peg$currPos, 4);
-                    peg$currPos += 4;
-                  } else {
-                    s1 = peg$FAILED;
-                    if (peg$silentFails === 0) {
-                      peg$fail(peg$e16);
-                    }
-                  }
-                  if (s1 === peg$FAILED) {
-                    if (input.substr(peg$currPos, 4).toLowerCase() === peg$c15) {
-                      s1 = input.substr(peg$currPos, 4);
-                      peg$currPos += 4;
-                    } else {
-                      s1 = peg$FAILED;
-                      if (peg$silentFails === 0) {
-                        peg$fail(peg$e17);
-                      }
-                    }
-                    if (s1 === peg$FAILED) {
-                      if (input.substr(peg$currPos, 4).toLowerCase() === peg$c16) {
-                        s1 = input.substr(peg$currPos, 4);
-                        peg$currPos += 4;
-                      } else {
-                        s1 = peg$FAILED;
-                        if (peg$silentFails === 0) {
-                          peg$fail(peg$e18);
-                        }
-                      }
-                      if (s1 === peg$FAILED) {
-                        if (input.substr(peg$currPos, 5).toLowerCase() === peg$c17) {
-                          s1 = input.substr(peg$currPos, 5);
-                          peg$currPos += 5;
-                        } else {
-                          s1 = peg$FAILED;
-                          if (peg$silentFails === 0) {
-                            peg$fail(peg$e19);
-                          }
-                        }
-                        if (s1 === peg$FAILED) {
-                          if (input.substr(peg$currPos, 6).toLowerCase() === peg$c18) {
-                            s1 = input.substr(peg$currPos, 6);
-                            peg$currPos += 6;
-                          } else {
-                            s1 = peg$FAILED;
-                            if (peg$silentFails === 0) {
-                              peg$fail(peg$e20);
-                            }
-                          }
-                          if (s1 === peg$FAILED) {
-                            if (input.substr(peg$currPos, 3).toLowerCase() === peg$c19) {
-                              s1 = input.substr(peg$currPos, 3);
-                              peg$currPos += 3;
-                            } else {
-                              s1 = peg$FAILED;
-                              if (peg$silentFails === 0) {
-                                peg$fail(peg$e21);
-                              }
-                            }
-                            if (s1 === peg$FAILED) {
-                              if (input.substr(peg$currPos, 5).toLowerCase() === peg$c21) {
-                                s1 = input.substr(peg$currPos, 5);
-                                peg$currPos += 5;
-                              } else {
-                                s1 = peg$FAILED;
-                                if (peg$silentFails === 0) {
-                                  peg$fail(peg$e23);
-                                }
-                              }
-                              if (s1 === peg$FAILED) {
-                                if (input.substr(peg$currPos, 4).toLowerCase() === peg$c22) {
-                                  s1 = input.substr(peg$currPos, 4);
-                                  peg$currPos += 4;
-                                } else {
-                                  s1 = peg$FAILED;
-                                  if (peg$silentFails === 0) {
-                                    peg$fail(peg$e24);
-                                  }
-                                }
-                                if (s1 === peg$FAILED) {
-                                  if (input.substr(peg$currPos, 4).toLowerCase() === peg$c23) {
-                                    s1 = input.substr(peg$currPos, 4);
-                                    peg$currPos += 4;
-                                  } else {
-                                    s1 = peg$FAILED;
-                                    if (peg$silentFails === 0) {
-                                      peg$fail(peg$e25);
-                                    }
-                                  }
-                                  if (s1 === peg$FAILED) {
-                                    if (input.substr(peg$currPos, 7).toLowerCase() === peg$c24) {
-                                      s1 = input.substr(peg$currPos, 7);
-                                      peg$currPos += 7;
-                                    } else {
-                                      s1 = peg$FAILED;
-                                      if (peg$silentFails === 0) {
-                                        peg$fail(peg$e26);
-                                      }
-                                    }
-                                    if (s1 === peg$FAILED) {
-                                      if (input.substr(peg$currPos, 3).toLowerCase() === peg$c25) {
-                                        s1 = input.substr(peg$currPos, 3);
-                                        peg$currPos += 3;
-                                      } else {
-                                        s1 = peg$FAILED;
-                                        if (peg$silentFails === 0) {
-                                          peg$fail(peg$e27);
-                                        }
-                                      }
-                                      if (s1 === peg$FAILED) {
-                                        if (input.substr(peg$currPos, 3).toLowerCase() === peg$c28) {
-                                          s1 = input.substr(peg$currPos, 3);
-                                          peg$currPos += 3;
-                                        } else {
-                                          s1 = peg$FAILED;
-                                          if (peg$silentFails === 0) {
-                                            peg$fail(peg$e30);
-                                          }
-                                        }
-                                        if (s1 === peg$FAILED) {
-                                          if (input.substr(peg$currPos, 3).toLowerCase() === peg$c29) {
-                                            s1 = input.substr(peg$currPos, 3);
-                                            peg$currPos += 3;
-                                          } else {
-                                            s1 = peg$FAILED;
-                                            if (peg$silentFails === 0) {
-                                              peg$fail(peg$e33);
-                                            }
-                                          }
-                                          if (s1 === peg$FAILED) {
-                                            if (input.substr(peg$currPos, 5).toLowerCase() === peg$c30) {
-                                              s1 = input.substr(peg$currPos, 5);
-                                              peg$currPos += 5;
-                                            } else {
-                                              s1 = peg$FAILED;
-                                              if (peg$silentFails === 0) {
-                                                peg$fail(peg$e34);
-                                              }
-                                            }
-                                            if (s1 === peg$FAILED) {
-                                              if (input.substr(peg$currPos, 3).toLowerCase() === peg$c32) {
-                                                s1 = input.substr(peg$currPos, 3);
-                                                peg$currPos += 3;
-                                              } else {
-                                                s1 = peg$FAILED;
-                                                if (peg$silentFails === 0) {
-                                                  peg$fail(peg$e36);
-                                                }
-                                              }
-                                              if (s1 === peg$FAILED) {
-                                                if (input.substr(peg$currPos, 2).toLowerCase() === peg$c31) {
-                                                  s1 = input.substr(peg$currPos, 2);
-                                                  peg$currPos += 2;
-                                                } else {
-                                                  s1 = peg$FAILED;
-                                                  if (peg$silentFails === 0) {
-                                                    peg$fail(peg$e35);
-                                                  }
-                                                }
-                                                if (s1 === peg$FAILED) {
-                                                  if (input.substr(peg$currPos, 3).toLowerCase() === peg$c45) {
-                                                    s1 = input.substr(peg$currPos, 3);
-                                                    peg$currPos += 3;
-                                                  } else {
-                                                    s1 = peg$FAILED;
-                                                    if (peg$silentFails === 0) {
-                                                      peg$fail(peg$e49);
-                                                    }
-                                                  }
-                                                  if (s1 === peg$FAILED) {
-                                                    if (input.substr(peg$currPos, 3).toLowerCase() === peg$c46) {
-                                                      s1 = input.substr(peg$currPos, 3);
-                                                      peg$currPos += 3;
-                                                    } else {
-                                                      s1 = peg$FAILED;
-                                                      if (peg$silentFails === 0) {
-                                                        peg$fail(peg$e50);
-                                                      }
-                                                    }
-                                                    if (s1 === peg$FAILED) {
-                                                      if (input.substr(peg$currPos, 3).toLowerCase() === peg$c47) {
-                                                        s1 = input.substr(peg$currPos, 3);
-                                                        peg$currPos += 3;
-                                                      } else {
-                                                        s1 = peg$FAILED;
-                                                        if (peg$silentFails === 0) {
-                                                          peg$fail(peg$e51);
-                                                        }
-                                                      }
-                                                      if (s1 === peg$FAILED) {
-                                                        if (input.substr(peg$currPos, 3).toLowerCase() === peg$c48) {
-                                                          s1 = input.substr(peg$currPos, 3);
-                                                          peg$currPos += 3;
-                                                        } else {
-                                                          s1 = peg$FAILED;
-                                                          if (peg$silentFails === 0) {
-                                                            peg$fail(peg$e52);
-                                                          }
-                                                        }
-                                                        if (s1 === peg$FAILED) {
-                                                          if (input.substr(peg$currPos, 3).toLowerCase() === peg$c49) {
-                                                            s1 = input.substr(peg$currPos, 3);
-                                                            peg$currPos += 3;
-                                                          } else {
-                                                            s1 = peg$FAILED;
-                                                            if (peg$silentFails === 0) {
-                                                              peg$fail(peg$e53);
-                                                            }
-                                                          }
-                                                          if (s1 === peg$FAILED) {
-                                                            if (input.substr(peg$currPos, 3).toLowerCase() === peg$c50) {
-                                                              s1 = input.substr(peg$currPos, 3);
-                                                              peg$currPos += 3;
-                                                            } else {
-                                                              s1 = peg$FAILED;
-                                                              if (peg$silentFails === 0) {
-                                                                peg$fail(peg$e54);
-                                                              }
-                                                            }
-                                                            if (s1 === peg$FAILED) {
-                                                              if (input.substr(peg$currPos, 3).toLowerCase() === peg$c53) {
-                                                                s1 = input.substr(peg$currPos, 3);
-                                                                peg$currPos += 3;
-                                                              } else {
-                                                                s1 = peg$FAILED;
-                                                                if (peg$silentFails === 0) {
-                                                                  peg$fail(peg$e57);
-                                                                }
-                                                              }
-                                                              if (s1 === peg$FAILED) {
-                                                                if (input.substr(peg$currPos, 3).toLowerCase() === peg$c56) {
-                                                                  s1 = input.substr(peg$currPos, 3);
-                                                                  peg$currPos += 3;
-                                                                } else {
-                                                                  s1 = peg$FAILED;
-                                                                  if (peg$silentFails === 0) {
-                                                                    peg$fail(peg$e60);
-                                                                  }
-                                                                }
-                                                                if (s1 === peg$FAILED) {
-                                                                  if (input.substr(peg$currPos, 3).toLowerCase() === peg$c57) {
-                                                                    s1 = input.substr(peg$currPos, 3);
-                                                                    peg$currPos += 3;
-                                                                  } else {
-                                                                    s1 = peg$FAILED;
-                                                                    if (peg$silentFails === 0) {
-                                                                      peg$fail(peg$e61);
-                                                                    }
-                                                                  }
-                                                                  if (s1 === peg$FAILED) {
-                                                                    if (input.substr(peg$currPos, 3).toLowerCase() === peg$c58) {
-                                                                      s1 = input.substr(peg$currPos, 3);
-                                                                      peg$currPos += 3;
-                                                                    } else {
-                                                                      s1 = peg$FAILED;
-                                                                      if (peg$silentFails === 0) {
-                                                                        peg$fail(peg$e62);
-                                                                      }
-                                                                    }
-                                                                    if (s1 === peg$FAILED) {
-                                                                      if (input.substr(peg$currPos, 3).toLowerCase() === peg$c59) {
-                                                                        s1 = input.substr(peg$currPos, 3);
-                                                                        peg$currPos += 3;
-                                                                      } else {
-                                                                        s1 = peg$FAILED;
-                                                                        if (peg$silentFails === 0) {
-                                                                          peg$fail(peg$e63);
-                                                                        }
-                                                                      }
-                                                                      if (s1 === peg$FAILED) {
-                                                                        if (input.substr(peg$currPos, 3).toLowerCase() === peg$c62) {
-                                                                          s1 = input.substr(peg$currPos, 3);
-                                                                          peg$currPos += 3;
-                                                                        } else {
-                                                                          s1 = peg$FAILED;
-                                                                          if (peg$silentFails === 0) {
-                                                                            peg$fail(peg$e66);
-                                                                          }
-                                                                        }
-                                                                      }
-                                                                    }
-                                                                  }
-                                                                }
-                                                              }
-                                                            }
-                                                          }
-                                                        }
-                                                      }
-                                                    }
-                                                  }
-                                                }
-                                              }
-                                            }
-                                          }
-                                        }
-                                      }
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-      if (s1 !== peg$FAILED) {
-        s2 = peg$currPos;
-        peg$silentFails++;
-        if (peg$r4.test(input.charAt(peg$currPos))) {
-          s3 = input.charAt(peg$currPos);
-          peg$currPos++;
-        } else {
-          s3 = peg$FAILED;
-          if (peg$silentFails === 0) {
-            peg$fail(peg$e68);
-          }
-        }
-        peg$silentFails--;
-        if (s3 === peg$FAILED) {
-          s2 = void 0;
-        } else {
-          peg$currPos = s2;
-          s2 = peg$FAILED;
-        }
-        if (s2 !== peg$FAILED) {
-          s1 = [s1, s2];
-          s0 = s1;
-        } else {
-          peg$currPos = s0;
-          s0 = peg$FAILED;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parseNumberLiteral() {
-      var s0, s1;
-      s0 = peg$currPos;
-      s1 = peg$parseNumber();
-      if (s1 !== peg$FAILED) {
-        peg$savedPos = s0;
-        s1 = peg$f76(s1);
-      }
-      s0 = s1;
-      return s0;
-    }
-    function peg$parseNumber() {
-      var s0, s1, s2, s3;
-      s0 = peg$currPos;
-      s1 = peg$parseInteger();
-      if (s1 !== peg$FAILED) {
-        s2 = peg$parseFraction();
-        if (s2 === peg$FAILED) {
-          s2 = null;
-        }
-        s3 = peg$parseExponent();
-        if (s3 === peg$FAILED) {
-          s3 = null;
-        }
-        peg$savedPos = s0;
-        s0 = peg$f77(s1, s2, s3);
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parseInteger() {
-      var s0, s1, s2;
-      s0 = peg$currPos;
-      s1 = [];
-      if (peg$r1.test(input.charAt(peg$currPos))) {
-        s2 = input.charAt(peg$currPos);
-        peg$currPos++;
-      } else {
-        s2 = peg$FAILED;
-        if (peg$silentFails === 0) {
-          peg$fail(peg$e4);
-        }
-      }
-      if (s2 !== peg$FAILED) {
-        while (s2 !== peg$FAILED) {
-          s1.push(s2);
-          if (peg$r1.test(input.charAt(peg$currPos))) {
-            s2 = input.charAt(peg$currPos);
-            peg$currPos++;
-          } else {
-            s2 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e4);
-            }
-          }
-        }
-      } else {
-        s1 = peg$FAILED;
-      }
-      if (s1 !== peg$FAILED) {
-        peg$savedPos = s0;
-        s1 = peg$f78(s1);
-      }
-      s0 = s1;
-      return s0;
-    }
-    function peg$parseFraction() {
-      var s0, s1, s2, s3;
-      s0 = peg$currPos;
-      if (input.charCodeAt(peg$currPos) === 46) {
-        s1 = peg$c63;
-        peg$currPos++;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) {
-          peg$fail(peg$e69);
-        }
-      }
-      if (s1 !== peg$FAILED) {
-        s2 = [];
-        if (peg$r1.test(input.charAt(peg$currPos))) {
-          s3 = input.charAt(peg$currPos);
-          peg$currPos++;
-        } else {
-          s3 = peg$FAILED;
-          if (peg$silentFails === 0) {
-            peg$fail(peg$e4);
-          }
-        }
-        if (s3 !== peg$FAILED) {
-          while (s3 !== peg$FAILED) {
-            s2.push(s3);
-            if (peg$r1.test(input.charAt(peg$currPos))) {
-              s3 = input.charAt(peg$currPos);
-              peg$currPos++;
-            } else {
-              s3 = peg$FAILED;
-              if (peg$silentFails === 0) {
-                peg$fail(peg$e4);
-              }
-            }
-          }
-        } else {
-          s2 = peg$FAILED;
-        }
-        if (s2 !== peg$FAILED) {
-          peg$savedPos = s0;
-          s0 = peg$f79(s2);
-        } else {
-          peg$currPos = s0;
-          s0 = peg$FAILED;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parseExponent() {
-      var s0, s1, s2, s3, s4;
-      s0 = peg$currPos;
-      if (peg$r5.test(input.charAt(peg$currPos))) {
-        s1 = input.charAt(peg$currPos);
-        peg$currPos++;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) {
-          peg$fail(peg$e70);
-        }
-      }
-      if (s1 !== peg$FAILED) {
-        if (peg$r6.test(input.charAt(peg$currPos))) {
-          s2 = input.charAt(peg$currPos);
-          peg$currPos++;
-        } else {
-          s2 = peg$FAILED;
-          if (peg$silentFails === 0) {
-            peg$fail(peg$e71);
-          }
-        }
-        if (s2 === peg$FAILED) {
-          s2 = null;
-        }
-        s3 = [];
-        if (peg$r1.test(input.charAt(peg$currPos))) {
-          s4 = input.charAt(peg$currPos);
-          peg$currPos++;
-        } else {
-          s4 = peg$FAILED;
-          if (peg$silentFails === 0) {
-            peg$fail(peg$e4);
-          }
-        }
-        if (s4 !== peg$FAILED) {
-          while (s4 !== peg$FAILED) {
-            s3.push(s4);
-            if (peg$r1.test(input.charAt(peg$currPos))) {
-              s4 = input.charAt(peg$currPos);
-              peg$currPos++;
-            } else {
-              s4 = peg$FAILED;
-              if (peg$silentFails === 0) {
-                peg$fail(peg$e4);
-              }
-            }
-          }
-        } else {
-          s3 = peg$FAILED;
-        }
-        if (s3 !== peg$FAILED) {
-          peg$savedPos = s0;
-          s0 = peg$f80(s2, s3);
-        } else {
-          peg$currPos = s0;
-          s0 = peg$FAILED;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parseStringLiteral() {
-      var s0, s1, s2, s3;
-      s0 = peg$currPos;
-      if (input.charCodeAt(peg$currPos) === 34) {
-        s1 = peg$c64;
-        peg$currPos++;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) {
-          peg$fail(peg$e72);
-        }
-      }
-      if (s1 !== peg$FAILED) {
-        s2 = [];
-        if (peg$r7.test(input.charAt(peg$currPos))) {
-          s3 = input.charAt(peg$currPos);
-          peg$currPos++;
-        } else {
-          s3 = peg$FAILED;
-          if (peg$silentFails === 0) {
-            peg$fail(peg$e73);
-          }
-        }
-        while (s3 !== peg$FAILED) {
-          s2.push(s3);
-          if (peg$r7.test(input.charAt(peg$currPos))) {
-            s3 = input.charAt(peg$currPos);
-            peg$currPos++;
-          } else {
-            s3 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e73);
-            }
-          }
-        }
-        if (input.charCodeAt(peg$currPos) === 34) {
-          s3 = peg$c64;
-          peg$currPos++;
-        } else {
-          s3 = peg$FAILED;
-          if (peg$silentFails === 0) {
-            peg$fail(peg$e72);
-          }
-        }
-        if (s3 !== peg$FAILED) {
-          peg$savedPos = s0;
-          s0 = peg$f81(s2);
-        } else {
-          peg$currPos = s0;
-          s0 = peg$FAILED;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parseConstant() {
-      var s0;
-      s0 = peg$parseNumberLiteral();
-      if (s0 === peg$FAILED) {
-        s0 = peg$parseStringLiteral();
-      }
-      return s0;
-    }
-    function peg$parseinvalidCommand() {
-      var s0, s1, s2;
-      s0 = peg$currPos;
-      s1 = [];
-      if (peg$r3.test(input.charAt(peg$currPos))) {
-        s2 = input.charAt(peg$currPos);
-        peg$currPos++;
-      } else {
-        s2 = peg$FAILED;
-        if (peg$silentFails === 0) {
-          peg$fail(peg$e67);
-        }
-      }
-      if (s2 !== peg$FAILED) {
-        while (s2 !== peg$FAILED) {
-          s1.push(s2);
-          if (peg$r3.test(input.charAt(peg$currPos))) {
-            s2 = input.charAt(peg$currPos);
-            peg$currPos++;
-          } else {
-            s2 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e67);
-            }
-          }
-        }
-      } else {
-        s1 = peg$FAILED;
-      }
-      if (s1 !== peg$FAILED) {
-        peg$savedPos = s0;
-        s1 = peg$f82(s1);
-      }
-      s0 = s1;
-      return s0;
-    }
-    function peg$parseExpressionList() {
-      var s0, s1, s2, s3, s4, s5, s6, s7;
-      s0 = peg$currPos;
-      s1 = peg$parselogicalOr();
-      if (s1 !== peg$FAILED) {
-        s2 = [];
-        s3 = peg$currPos;
-        s4 = peg$parse_();
-        if (input.charCodeAt(peg$currPos) === 44) {
-          s5 = peg$c5;
-          peg$currPos++;
-        } else {
-          s5 = peg$FAILED;
-          if (peg$silentFails === 0) {
-            peg$fail(peg$e7);
-          }
-        }
-        if (s5 !== peg$FAILED) {
-          s6 = peg$parse_();
-          s7 = peg$parselogicalOr();
-          if (s7 !== peg$FAILED) {
-            peg$savedPos = s3;
-            s3 = peg$f83(s1, s7);
-          } else {
-            peg$currPos = s3;
-            s3 = peg$FAILED;
-          }
-        } else {
-          peg$currPos = s3;
-          s3 = peg$FAILED;
-        }
-        while (s3 !== peg$FAILED) {
-          s2.push(s3);
-          s3 = peg$currPos;
-          s4 = peg$parse_();
-          if (input.charCodeAt(peg$currPos) === 44) {
-            s5 = peg$c5;
-            peg$currPos++;
-          } else {
-            s5 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e7);
-            }
-          }
-          if (s5 !== peg$FAILED) {
-            s6 = peg$parse_();
-            s7 = peg$parselogicalOr();
-            if (s7 !== peg$FAILED) {
-              peg$savedPos = s3;
-              s3 = peg$f83(s1, s7);
-            } else {
-              peg$currPos = s3;
-              s3 = peg$FAILED;
-            }
-          } else {
-            peg$currPos = s3;
-            s3 = peg$FAILED;
-          }
-        }
-        peg$savedPos = s0;
-        s0 = peg$f84(s1, s2);
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parseVariableList() {
-      var s0, s1, s2, s3, s4, s5, s6, s7;
-      s0 = peg$currPos;
-      s1 = peg$parseVariable();
-      if (s1 !== peg$FAILED) {
-        s2 = [];
-        s3 = peg$currPos;
-        s4 = peg$parse_();
-        if (input.charCodeAt(peg$currPos) === 44) {
-          s5 = peg$c5;
-          peg$currPos++;
-        } else {
-          s5 = peg$FAILED;
-          if (peg$silentFails === 0) {
-            peg$fail(peg$e7);
-          }
-        }
-        if (s5 !== peg$FAILED) {
-          s6 = peg$parse_();
-          s7 = peg$parseVariable();
-          if (s7 !== peg$FAILED) {
-            peg$savedPos = s3;
-            s3 = peg$f85(s1, s7);
-          } else {
-            peg$currPos = s3;
-            s3 = peg$FAILED;
-          }
-        } else {
-          peg$currPos = s3;
-          s3 = peg$FAILED;
-        }
-        while (s3 !== peg$FAILED) {
-          s2.push(s3);
-          s3 = peg$currPos;
-          s4 = peg$parse_();
-          if (input.charCodeAt(peg$currPos) === 44) {
-            s5 = peg$c5;
-            peg$currPos++;
-          } else {
-            s5 = peg$FAILED;
-            if (peg$silentFails === 0) {
-              peg$fail(peg$e7);
-            }
-          }
-          if (s5 !== peg$FAILED) {
-            s6 = peg$parse_();
-            s7 = peg$parseVariable();
-            if (s7 !== peg$FAILED) {
-              peg$savedPos = s3;
-              s3 = peg$f85(s1, s7);
-            } else {
-              peg$currPos = s3;
-              s3 = peg$FAILED;
-            }
-          } else {
-            peg$currPos = s3;
-            s3 = peg$FAILED;
-          }
-        }
-        peg$savedPos = s0;
-        s0 = peg$f86(s1, s2);
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-      return s0;
-    }
-    function peg$parse_() {
-      var s0, s1;
-      s0 = [];
-      if (peg$r8.test(input.charAt(peg$currPos))) {
-        s1 = input.charAt(peg$currPos);
-        peg$currPos++;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) {
-          peg$fail(peg$e74);
-        }
-      }
-      while (s1 !== peg$FAILED) {
-        s0.push(s1);
-        if (peg$r8.test(input.charAt(peg$currPos))) {
-          s1 = input.charAt(peg$currPos);
-          peg$currPos++;
-        } else {
-          s1 = peg$FAILED;
-          if (peg$silentFails === 0) {
-            peg$fail(peg$e74);
-          }
-        }
-      }
-      return s0;
-    }
-    const keywords = {
-      // Control Flow
-      IF: "IF",
-      THEN: "THEN",
-      ELSE: "ELSE",
-      FOR: "FOR",
-      NEXT: "NEXT",
-      TO: "TO",
-      STEP: "STEP",
-      GOTO: "GOTO",
-      GOSUB: "GOSUB",
-      RETURN: "RETURN",
-      END: "END",
-      STOP: "STOP",
-      PAUSE: "PAUSE",
-      // Data and Variables
-      LET: "LET",
-      DIM: "DIM",
-      DATA: "DATA",
-      READ: "READ",
-      RESTORE: "RESTORE",
-      // Input/Output
-      PRINT: "PRINT",
-      INPUT: "INPUT",
-      // Functions
-      DEF: "DEF",
-      FN: "FN",
-      // Mathematical Functions
-      ABS: "ABS",
-      ATN: "ATN",
-      COS: "COS",
-      EXP: "EXP",
-      FIX: "FIX",
-      INT: "INT",
-      LOG: "LOG",
-      RND: "RND",
-      SGN: "SGN",
-      SIN: "SIN",
-      SQR: "SQR",
-      TAN: "TAN",
-      // Graphics (Basic)
-      CLS: "CLS",
-      COLOR: "COLOR",
-      PSET: "PSET",
-      LINE: "LINE",
-      CIRCLE: "CIRCLE",
-      PAINT: "PAINT",
-      // Comments
-      REM: "REM"
-    };
-    peg$result = peg$startRuleFunction();
-    if (peg$result !== peg$FAILED && peg$currPos === input.length) {
-      return peg$result;
-    } else {
-      if (peg$result !== peg$FAILED && peg$currPos < input.length) {
-        peg$fail(peg$endExpectation());
-      }
-      throw peg$buildStructuredError(
-        peg$maxFailExpected,
-        peg$maxFailPos < input.length ? input.charAt(peg$maxFailPos) : null,
-        peg$maxFailPos < input.length ? peg$computeLocation(peg$maxFailPos, peg$maxFailPos + 1) : peg$computeLocation(peg$maxFailPos, peg$maxFailPos)
-      );
-    }
-  }
-  var init_fbasic_parser = __esm({
-    "src/core/parser/fbasic-parser.js"() {
-      "use strict";
-      peg$subclass(peg$SyntaxError, Error);
-      peg$SyntaxError.prototype.format = function(sources) {
-        var str = "Error: " + this.message;
-        if (this.location) {
-          var src = null;
-          var k;
-          for (k = 0; k < sources.length; k++) {
-            if (sources[k].source === this.location.source) {
-              src = sources[k].text.split(/\r\n|\n|\r/g);
-              break;
-            }
-          }
-          var s = this.location.start;
-          var offset_s = this.location.source && typeof this.location.source.offset === "function" ? this.location.source.offset(s) : s;
-          var loc = this.location.source + ":" + offset_s.line + ":" + offset_s.column;
-          if (src) {
-            var e = this.location.end;
-            var filler = peg$padEnd("", offset_s.line.toString().length, " ");
-            var line = src[s.line - 1];
-            var last = s.line === e.line ? e.column : line.length + 1;
-            var hatLen = last - s.column || 1;
-            str += "\n --> " + loc + "\n" + filler + " |\n" + offset_s.line + " | " + line + "\n" + filler + " | " + peg$padEnd("", s.column - 1, " ") + peg$padEnd("", hatLen, "^");
-          } else {
-            str += "\n at " + loc;
-          }
-        }
-        return str;
-      };
-      peg$SyntaxError.buildMessage = function(expected, found) {
-        var DESCRIBE_EXPECTATION_FNS = {
-          literal: function(expectation) {
-            return '"' + literalEscape(expectation.text) + '"';
-          },
-          class: function(expectation) {
-            var escapedParts = expectation.parts.map(function(part) {
-              return Array.isArray(part) ? classEscape(part[0]) + "-" + classEscape(part[1]) : classEscape(part);
-            });
-            return "[" + (expectation.inverted ? "^" : "") + escapedParts.join("") + "]";
-          },
-          any: function() {
-            return "any character";
-          },
-          end: function() {
-            return "end of input";
-          },
-          other: function(expectation) {
-            return expectation.description;
-          }
-        };
-        function hex(ch) {
-          return ch.charCodeAt(0).toString(16).toUpperCase();
-        }
-        function literalEscape(s) {
-          return s.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\0/g, "\\0").replace(/\t/g, "\\t").replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/[\x00-\x0F]/g, function(ch) {
-            return "\\x0" + hex(ch);
-          }).replace(/[\x10-\x1F\x7F-\x9F]/g, function(ch) {
-            return "\\x" + hex(ch);
-          });
-        }
-        function classEscape(s) {
-          return s.replace(/\\/g, "\\\\").replace(/\]/g, "\\]").replace(/\^/g, "\\^").replace(/-/g, "\\-").replace(/\0/g, "\\0").replace(/\t/g, "\\t").replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/[\x00-\x0F]/g, function(ch) {
-            return "\\x0" + hex(ch);
-          }).replace(/[\x10-\x1F\x7F-\x9F]/g, function(ch) {
-            return "\\x" + hex(ch);
-          });
-        }
-        function describeExpectation(expectation) {
-          return DESCRIBE_EXPECTATION_FNS[expectation.type](expectation);
-        }
-        function describeExpected(expected2) {
-          var descriptions = expected2.map(describeExpectation);
-          var i, j;
-          descriptions.sort();
-          if (descriptions.length > 0) {
-            for (i = 1, j = 1; i < descriptions.length; i++) {
-              if (descriptions[i - 1] !== descriptions[i]) {
-                descriptions[j] = descriptions[i];
-                j++;
-              }
-            }
-            descriptions.length = j;
-          }
-          switch (descriptions.length) {
-            case 1:
-              return descriptions[0];
-            case 2:
-              return descriptions[0] + " or " + descriptions[1];
-            default:
-              return descriptions.slice(0, -1).join(", ") + ", or " + descriptions[descriptions.length - 1];
-          }
-        }
-        function describeFound(found2) {
-          return found2 ? '"' + literalEscape(found2) + '"' : "end of input";
-        }
-        return "Expected " + describeExpected(expected) + " but " + describeFound(found) + " found.";
-      };
-    }
-  });
 
   // src/core/constants.ts
   var EXECUTION_LIMITS = {
@@ -4353,12 +33,12 @@
       YIELD_DURATION: 1
       // Yield for 1ms to allow browser to process events
     },
-    SERVICE_WORKER: {
+    WEB_WORKER: {
       ENABLED_PRODUCTION: true,
       ENABLED_TEST: false,
       WORKER_SCRIPT: "/basic-interpreter-worker.js",
       MESSAGE_TIMEOUT: 3e4
-      // 30 seconds timeout for service worker messages
+      // 30 seconds timeout for web worker messages
     }
   };
   var ERROR_TYPES = {
@@ -4367,133 +47,9858 @@
     COMPILATION: "COMPILATION"
   };
 
-  // src/core/parser/FBasicParser.ts
-  var FBasicParser = class {
-    constructor() {
-      __publicField(this, "parser", null);
-      this.initializeParser();
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_freeGlobal.js
+  var freeGlobal = typeof global == "object" && global && global.Object === Object && global;
+  var freeGlobal_default = freeGlobal;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_root.js
+  var freeSelf = typeof self == "object" && self && self.Object === Object && self;
+  var root = freeGlobal_default || freeSelf || Function("return this")();
+  var root_default = root;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_Symbol.js
+  var Symbol2 = root_default.Symbol;
+  var Symbol_default = Symbol2;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_getRawTag.js
+  var objectProto = Object.prototype;
+  var hasOwnProperty = objectProto.hasOwnProperty;
+  var nativeObjectToString = objectProto.toString;
+  var symToStringTag = Symbol_default ? Symbol_default.toStringTag : void 0;
+  function getRawTag(value) {
+    var isOwn = hasOwnProperty.call(value, symToStringTag), tag2 = value[symToStringTag];
+    try {
+      value[symToStringTag] = void 0;
+      var unmasked = true;
+    } catch (e) {
     }
-    /**
-     * Initialize the parser from the generated parser file
-     */
-    async initializeParser() {
-      try {
-        const parserModule = await Promise.resolve().then(() => (init_fbasic_parser(), fbasic_parser_exports));
-        this.parser = parserModule.parse;
-        console.log("Generated parser loaded successfully");
-      } catch {
-        console.warn("Generated parser not found. Using fallback parser.");
-        console.log("Using fallback parser");
-        this.parser = this.createFallbackParser();
+    var result = nativeObjectToString.call(value);
+    if (unmasked) {
+      if (isOwn) {
+        value[symToStringTag] = tag2;
+      } else {
+        delete value[symToStringTag];
       }
     }
-    /**
-     * Create a fallback parser for development
-     */
-    createFallbackParser() {
-      return (source) => {
-        const lines = source.split("\n").filter((line) => line.trim());
-        const statements = [];
-        for (const line of lines) {
-          const trimmedLine = line.trim();
-          if (!trimmedLine) continue;
-          const lineNumberMatch = trimmedLine.match(/^(\d+)/);
-          if (!lineNumberMatch) continue;
-          const lineNumber = parseInt(lineNumberMatch[1], 10);
-          const commandText = trimmedLine.substring(lineNumberMatch[1].length).trim();
-          const command = this.parseCommand(commandText);
-          if (command) {
-            statements.push({
-              type: "Statement",
-              lineNumber,
-              command
-            });
-          }
+    return result;
+  }
+  var getRawTag_default = getRawTag;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_objectToString.js
+  var objectProto2 = Object.prototype;
+  var nativeObjectToString2 = objectProto2.toString;
+  function objectToString(value) {
+    return nativeObjectToString2.call(value);
+  }
+  var objectToString_default = objectToString;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseGetTag.js
+  var nullTag = "[object Null]";
+  var undefinedTag = "[object Undefined]";
+  var symToStringTag2 = Symbol_default ? Symbol_default.toStringTag : void 0;
+  function baseGetTag(value) {
+    if (value == null) {
+      return value === void 0 ? undefinedTag : nullTag;
+    }
+    return symToStringTag2 && symToStringTag2 in Object(value) ? getRawTag_default(value) : objectToString_default(value);
+  }
+  var baseGetTag_default = baseGetTag;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/isObjectLike.js
+  function isObjectLike(value) {
+    return value != null && typeof value == "object";
+  }
+  var isObjectLike_default = isObjectLike;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/isSymbol.js
+  var symbolTag = "[object Symbol]";
+  function isSymbol(value) {
+    return typeof value == "symbol" || isObjectLike_default(value) && baseGetTag_default(value) == symbolTag;
+  }
+  var isSymbol_default = isSymbol;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_arrayMap.js
+  function arrayMap(array, iteratee) {
+    var index = -1, length = array == null ? 0 : array.length, result = Array(length);
+    while (++index < length) {
+      result[index] = iteratee(array[index], index, array);
+    }
+    return result;
+  }
+  var arrayMap_default = arrayMap;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/isArray.js
+  var isArray = Array.isArray;
+  var isArray_default = isArray;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseToString.js
+  var INFINITY = 1 / 0;
+  var symbolProto = Symbol_default ? Symbol_default.prototype : void 0;
+  var symbolToString = symbolProto ? symbolProto.toString : void 0;
+  function baseToString(value) {
+    if (typeof value == "string") {
+      return value;
+    }
+    if (isArray_default(value)) {
+      return arrayMap_default(value, baseToString) + "";
+    }
+    if (isSymbol_default(value)) {
+      return symbolToString ? symbolToString.call(value) : "";
+    }
+    var result = value + "";
+    return result == "0" && 1 / value == -INFINITY ? "-0" : result;
+  }
+  var baseToString_default = baseToString;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_trimmedEndIndex.js
+  var reWhitespace = /\s/;
+  function trimmedEndIndex(string) {
+    var index = string.length;
+    while (index-- && reWhitespace.test(string.charAt(index))) {
+    }
+    return index;
+  }
+  var trimmedEndIndex_default = trimmedEndIndex;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseTrim.js
+  var reTrimStart = /^\s+/;
+  function baseTrim(string) {
+    return string ? string.slice(0, trimmedEndIndex_default(string) + 1).replace(reTrimStart, "") : string;
+  }
+  var baseTrim_default = baseTrim;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/isObject.js
+  function isObject(value) {
+    var type = typeof value;
+    return value != null && (type == "object" || type == "function");
+  }
+  var isObject_default = isObject;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/toNumber.js
+  var NAN = 0 / 0;
+  var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
+  var reIsBinary = /^0b[01]+$/i;
+  var reIsOctal = /^0o[0-7]+$/i;
+  var freeParseInt = parseInt;
+  function toNumber(value) {
+    if (typeof value == "number") {
+      return value;
+    }
+    if (isSymbol_default(value)) {
+      return NAN;
+    }
+    if (isObject_default(value)) {
+      var other = typeof value.valueOf == "function" ? value.valueOf() : value;
+      value = isObject_default(other) ? other + "" : other;
+    }
+    if (typeof value != "string") {
+      return value === 0 ? value : +value;
+    }
+    value = baseTrim_default(value);
+    var isBinary2 = reIsBinary.test(value);
+    return isBinary2 || reIsOctal.test(value) ? freeParseInt(value.slice(2), isBinary2 ? 2 : 8) : reIsBadHex.test(value) ? NAN : +value;
+  }
+  var toNumber_default = toNumber;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/toFinite.js
+  var INFINITY2 = 1 / 0;
+  var MAX_INTEGER = 17976931348623157e292;
+  function toFinite(value) {
+    if (!value) {
+      return value === 0 ? value : 0;
+    }
+    value = toNumber_default(value);
+    if (value === INFINITY2 || value === -INFINITY2) {
+      var sign2 = value < 0 ? -1 : 1;
+      return sign2 * MAX_INTEGER;
+    }
+    return value === value ? value : 0;
+  }
+  var toFinite_default = toFinite;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/toInteger.js
+  function toInteger(value) {
+    var result = toFinite_default(value), remainder = result % 1;
+    return result === result ? remainder ? result - remainder : result : 0;
+  }
+  var toInteger_default = toInteger;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/identity.js
+  function identity(value) {
+    return value;
+  }
+  var identity_default = identity;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/isFunction.js
+  var asyncTag = "[object AsyncFunction]";
+  var funcTag = "[object Function]";
+  var genTag = "[object GeneratorFunction]";
+  var proxyTag = "[object Proxy]";
+  function isFunction(value) {
+    if (!isObject_default(value)) {
+      return false;
+    }
+    var tag2 = baseGetTag_default(value);
+    return tag2 == funcTag || tag2 == genTag || tag2 == asyncTag || tag2 == proxyTag;
+  }
+  var isFunction_default = isFunction;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_coreJsData.js
+  var coreJsData = root_default["__core-js_shared__"];
+  var coreJsData_default = coreJsData;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_isMasked.js
+  var maskSrcKey = (function() {
+    var uid = /[^.]+$/.exec(coreJsData_default && coreJsData_default.keys && coreJsData_default.keys.IE_PROTO || "");
+    return uid ? "Symbol(src)_1." + uid : "";
+  })();
+  function isMasked(func) {
+    return !!maskSrcKey && maskSrcKey in func;
+  }
+  var isMasked_default = isMasked;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_toSource.js
+  var funcProto = Function.prototype;
+  var funcToString = funcProto.toString;
+  function toSource(func) {
+    if (func != null) {
+      try {
+        return funcToString.call(func);
+      } catch (e) {
+      }
+      try {
+        return func + "";
+      } catch (e) {
+      }
+    }
+    return "";
+  }
+  var toSource_default = toSource;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseIsNative.js
+  var reRegExpChar = /[\\^$.*+?()[\]{}|]/g;
+  var reIsHostCtor = /^\[object .+?Constructor\]$/;
+  var funcProto2 = Function.prototype;
+  var objectProto3 = Object.prototype;
+  var funcToString2 = funcProto2.toString;
+  var hasOwnProperty2 = objectProto3.hasOwnProperty;
+  var reIsNative = RegExp(
+    "^" + funcToString2.call(hasOwnProperty2).replace(reRegExpChar, "\\$&").replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, "$1.*?") + "$"
+  );
+  function baseIsNative(value) {
+    if (!isObject_default(value) || isMasked_default(value)) {
+      return false;
+    }
+    var pattern = isFunction_default(value) ? reIsNative : reIsHostCtor;
+    return pattern.test(toSource_default(value));
+  }
+  var baseIsNative_default = baseIsNative;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_getValue.js
+  function getValue(object, key) {
+    return object == null ? void 0 : object[key];
+  }
+  var getValue_default = getValue;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_getNative.js
+  function getNative(object, key) {
+    var value = getValue_default(object, key);
+    return baseIsNative_default(value) ? value : void 0;
+  }
+  var getNative_default = getNative;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_WeakMap.js
+  var WeakMap = getNative_default(root_default, "WeakMap");
+  var WeakMap_default = WeakMap;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseCreate.js
+  var objectCreate = Object.create;
+  var baseCreate = /* @__PURE__ */ (function() {
+    function object() {
+    }
+    return function(proto) {
+      if (!isObject_default(proto)) {
+        return {};
+      }
+      if (objectCreate) {
+        return objectCreate(proto);
+      }
+      object.prototype = proto;
+      var result = new object();
+      object.prototype = void 0;
+      return result;
+    };
+  })();
+  var baseCreate_default = baseCreate;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_apply.js
+  function apply(func, thisArg, args) {
+    switch (args.length) {
+      case 0:
+        return func.call(thisArg);
+      case 1:
+        return func.call(thisArg, args[0]);
+      case 2:
+        return func.call(thisArg, args[0], args[1]);
+      case 3:
+        return func.call(thisArg, args[0], args[1], args[2]);
+    }
+    return func.apply(thisArg, args);
+  }
+  var apply_default = apply;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/noop.js
+  function noop() {
+  }
+  var noop_default = noop;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_copyArray.js
+  function copyArray(source, array) {
+    var index = -1, length = source.length;
+    array || (array = Array(length));
+    while (++index < length) {
+      array[index] = source[index];
+    }
+    return array;
+  }
+  var copyArray_default = copyArray;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_shortOut.js
+  var HOT_COUNT = 800;
+  var HOT_SPAN = 16;
+  var nativeNow = Date.now;
+  function shortOut(func) {
+    var count = 0, lastCalled = 0;
+    return function() {
+      var stamp = nativeNow(), remaining = HOT_SPAN - (stamp - lastCalled);
+      lastCalled = stamp;
+      if (remaining > 0) {
+        if (++count >= HOT_COUNT) {
+          return arguments[0];
         }
-        return {
-          type: "Program",
-          statements
+      } else {
+        count = 0;
+      }
+      return func.apply(void 0, arguments);
+    };
+  }
+  var shortOut_default = shortOut;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/constant.js
+  function constant(value) {
+    return function() {
+      return value;
+    };
+  }
+  var constant_default = constant;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_defineProperty.js
+  var defineProperty = (function() {
+    try {
+      var func = getNative_default(Object, "defineProperty");
+      func({}, "", {});
+      return func;
+    } catch (e) {
+    }
+  })();
+  var defineProperty_default = defineProperty;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseSetToString.js
+  var baseSetToString = !defineProperty_default ? identity_default : function(func, string) {
+    return defineProperty_default(func, "toString", {
+      "configurable": true,
+      "enumerable": false,
+      "value": constant_default(string),
+      "writable": true
+    });
+  };
+  var baseSetToString_default = baseSetToString;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_setToString.js
+  var setToString = shortOut_default(baseSetToString_default);
+  var setToString_default = setToString;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_arrayEach.js
+  function arrayEach(array, iteratee) {
+    var index = -1, length = array == null ? 0 : array.length;
+    while (++index < length) {
+      if (iteratee(array[index], index, array) === false) {
+        break;
+      }
+    }
+    return array;
+  }
+  var arrayEach_default = arrayEach;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseFindIndex.js
+  function baseFindIndex(array, predicate, fromIndex, fromRight) {
+    var length = array.length, index = fromIndex + (fromRight ? 1 : -1);
+    while (fromRight ? index-- : ++index < length) {
+      if (predicate(array[index], index, array)) {
+        return index;
+      }
+    }
+    return -1;
+  }
+  var baseFindIndex_default = baseFindIndex;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseIsNaN.js
+  function baseIsNaN(value) {
+    return value !== value;
+  }
+  var baseIsNaN_default = baseIsNaN;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_strictIndexOf.js
+  function strictIndexOf(array, value, fromIndex) {
+    var index = fromIndex - 1, length = array.length;
+    while (++index < length) {
+      if (array[index] === value) {
+        return index;
+      }
+    }
+    return -1;
+  }
+  var strictIndexOf_default = strictIndexOf;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseIndexOf.js
+  function baseIndexOf(array, value, fromIndex) {
+    return value === value ? strictIndexOf_default(array, value, fromIndex) : baseFindIndex_default(array, baseIsNaN_default, fromIndex);
+  }
+  var baseIndexOf_default = baseIndexOf;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_arrayIncludes.js
+  function arrayIncludes(array, value) {
+    var length = array == null ? 0 : array.length;
+    return !!length && baseIndexOf_default(array, value, 0) > -1;
+  }
+  var arrayIncludes_default = arrayIncludes;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_isIndex.js
+  var MAX_SAFE_INTEGER = 9007199254740991;
+  var reIsUint = /^(?:0|[1-9]\d*)$/;
+  function isIndex(value, length) {
+    var type = typeof value;
+    length = length == null ? MAX_SAFE_INTEGER : length;
+    return !!length && (type == "number" || type != "symbol" && reIsUint.test(value)) && (value > -1 && value % 1 == 0 && value < length);
+  }
+  var isIndex_default = isIndex;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseAssignValue.js
+  function baseAssignValue(object, key, value) {
+    if (key == "__proto__" && defineProperty_default) {
+      defineProperty_default(object, key, {
+        "configurable": true,
+        "enumerable": true,
+        "value": value,
+        "writable": true
+      });
+    } else {
+      object[key] = value;
+    }
+  }
+  var baseAssignValue_default = baseAssignValue;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/eq.js
+  function eq(value, other) {
+    return value === other || value !== value && other !== other;
+  }
+  var eq_default = eq;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_assignValue.js
+  var objectProto4 = Object.prototype;
+  var hasOwnProperty3 = objectProto4.hasOwnProperty;
+  function assignValue(object, key, value) {
+    var objValue = object[key];
+    if (!(hasOwnProperty3.call(object, key) && eq_default(objValue, value)) || value === void 0 && !(key in object)) {
+      baseAssignValue_default(object, key, value);
+    }
+  }
+  var assignValue_default = assignValue;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_copyObject.js
+  function copyObject(source, props, object, customizer) {
+    var isNew = !object;
+    object || (object = {});
+    var index = -1, length = props.length;
+    while (++index < length) {
+      var key = props[index];
+      var newValue = customizer ? customizer(object[key], source[key], key, object, source) : void 0;
+      if (newValue === void 0) {
+        newValue = source[key];
+      }
+      if (isNew) {
+        baseAssignValue_default(object, key, newValue);
+      } else {
+        assignValue_default(object, key, newValue);
+      }
+    }
+    return object;
+  }
+  var copyObject_default = copyObject;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_overRest.js
+  var nativeMax = Math.max;
+  function overRest(func, start, transform) {
+    start = nativeMax(start === void 0 ? func.length - 1 : start, 0);
+    return function() {
+      var args = arguments, index = -1, length = nativeMax(args.length - start, 0), array = Array(length);
+      while (++index < length) {
+        array[index] = args[start + index];
+      }
+      index = -1;
+      var otherArgs = Array(start + 1);
+      while (++index < start) {
+        otherArgs[index] = args[index];
+      }
+      otherArgs[start] = transform(array);
+      return apply_default(func, this, otherArgs);
+    };
+  }
+  var overRest_default = overRest;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseRest.js
+  function baseRest(func, start) {
+    return setToString_default(overRest_default(func, start, identity_default), func + "");
+  }
+  var baseRest_default = baseRest;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/isLength.js
+  var MAX_SAFE_INTEGER2 = 9007199254740991;
+  function isLength(value) {
+    return typeof value == "number" && value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER2;
+  }
+  var isLength_default = isLength;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/isArrayLike.js
+  function isArrayLike(value) {
+    return value != null && isLength_default(value.length) && !isFunction_default(value);
+  }
+  var isArrayLike_default = isArrayLike;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_isIterateeCall.js
+  function isIterateeCall(value, index, object) {
+    if (!isObject_default(object)) {
+      return false;
+    }
+    var type = typeof index;
+    if (type == "number" ? isArrayLike_default(object) && isIndex_default(index, object.length) : type == "string" && index in object) {
+      return eq_default(object[index], value);
+    }
+    return false;
+  }
+  var isIterateeCall_default = isIterateeCall;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_createAssigner.js
+  function createAssigner(assigner) {
+    return baseRest_default(function(object, sources) {
+      var index = -1, length = sources.length, customizer = length > 1 ? sources[length - 1] : void 0, guard = length > 2 ? sources[2] : void 0;
+      customizer = assigner.length > 3 && typeof customizer == "function" ? (length--, customizer) : void 0;
+      if (guard && isIterateeCall_default(sources[0], sources[1], guard)) {
+        customizer = length < 3 ? void 0 : customizer;
+        length = 1;
+      }
+      object = Object(object);
+      while (++index < length) {
+        var source = sources[index];
+        if (source) {
+          assigner(object, source, index, customizer);
+        }
+      }
+      return object;
+    });
+  }
+  var createAssigner_default = createAssigner;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_isPrototype.js
+  var objectProto5 = Object.prototype;
+  function isPrototype(value) {
+    var Ctor = value && value.constructor, proto = typeof Ctor == "function" && Ctor.prototype || objectProto5;
+    return value === proto;
+  }
+  var isPrototype_default = isPrototype;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseTimes.js
+  function baseTimes(n, iteratee) {
+    var index = -1, result = Array(n);
+    while (++index < n) {
+      result[index] = iteratee(index);
+    }
+    return result;
+  }
+  var baseTimes_default = baseTimes;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseIsArguments.js
+  var argsTag = "[object Arguments]";
+  function baseIsArguments(value) {
+    return isObjectLike_default(value) && baseGetTag_default(value) == argsTag;
+  }
+  var baseIsArguments_default = baseIsArguments;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/isArguments.js
+  var objectProto6 = Object.prototype;
+  var hasOwnProperty4 = objectProto6.hasOwnProperty;
+  var propertyIsEnumerable = objectProto6.propertyIsEnumerable;
+  var isArguments = baseIsArguments_default(/* @__PURE__ */ (function() {
+    return arguments;
+  })()) ? baseIsArguments_default : function(value) {
+    return isObjectLike_default(value) && hasOwnProperty4.call(value, "callee") && !propertyIsEnumerable.call(value, "callee");
+  };
+  var isArguments_default = isArguments;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/stubFalse.js
+  function stubFalse() {
+    return false;
+  }
+  var stubFalse_default = stubFalse;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/isBuffer.js
+  var freeExports = typeof exports == "object" && exports && !exports.nodeType && exports;
+  var freeModule = freeExports && typeof module == "object" && module && !module.nodeType && module;
+  var moduleExports = freeModule && freeModule.exports === freeExports;
+  var Buffer2 = moduleExports ? root_default.Buffer : void 0;
+  var nativeIsBuffer = Buffer2 ? Buffer2.isBuffer : void 0;
+  var isBuffer = nativeIsBuffer || stubFalse_default;
+  var isBuffer_default = isBuffer;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseIsTypedArray.js
+  var argsTag2 = "[object Arguments]";
+  var arrayTag = "[object Array]";
+  var boolTag = "[object Boolean]";
+  var dateTag = "[object Date]";
+  var errorTag = "[object Error]";
+  var funcTag2 = "[object Function]";
+  var mapTag = "[object Map]";
+  var numberTag = "[object Number]";
+  var objectTag = "[object Object]";
+  var regexpTag = "[object RegExp]";
+  var setTag = "[object Set]";
+  var stringTag = "[object String]";
+  var weakMapTag = "[object WeakMap]";
+  var arrayBufferTag = "[object ArrayBuffer]";
+  var dataViewTag = "[object DataView]";
+  var float32Tag = "[object Float32Array]";
+  var float64Tag = "[object Float64Array]";
+  var int8Tag = "[object Int8Array]";
+  var int16Tag = "[object Int16Array]";
+  var int32Tag = "[object Int32Array]";
+  var uint8Tag = "[object Uint8Array]";
+  var uint8ClampedTag = "[object Uint8ClampedArray]";
+  var uint16Tag = "[object Uint16Array]";
+  var uint32Tag = "[object Uint32Array]";
+  var typedArrayTags = {};
+  typedArrayTags[float32Tag] = typedArrayTags[float64Tag] = typedArrayTags[int8Tag] = typedArrayTags[int16Tag] = typedArrayTags[int32Tag] = typedArrayTags[uint8Tag] = typedArrayTags[uint8ClampedTag] = typedArrayTags[uint16Tag] = typedArrayTags[uint32Tag] = true;
+  typedArrayTags[argsTag2] = typedArrayTags[arrayTag] = typedArrayTags[arrayBufferTag] = typedArrayTags[boolTag] = typedArrayTags[dataViewTag] = typedArrayTags[dateTag] = typedArrayTags[errorTag] = typedArrayTags[funcTag2] = typedArrayTags[mapTag] = typedArrayTags[numberTag] = typedArrayTags[objectTag] = typedArrayTags[regexpTag] = typedArrayTags[setTag] = typedArrayTags[stringTag] = typedArrayTags[weakMapTag] = false;
+  function baseIsTypedArray(value) {
+    return isObjectLike_default(value) && isLength_default(value.length) && !!typedArrayTags[baseGetTag_default(value)];
+  }
+  var baseIsTypedArray_default = baseIsTypedArray;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseUnary.js
+  function baseUnary(func) {
+    return function(value) {
+      return func(value);
+    };
+  }
+  var baseUnary_default = baseUnary;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_nodeUtil.js
+  var freeExports2 = typeof exports == "object" && exports && !exports.nodeType && exports;
+  var freeModule2 = freeExports2 && typeof module == "object" && module && !module.nodeType && module;
+  var moduleExports2 = freeModule2 && freeModule2.exports === freeExports2;
+  var freeProcess = moduleExports2 && freeGlobal_default.process;
+  var nodeUtil = (function() {
+    try {
+      var types = freeModule2 && freeModule2.require && freeModule2.require("util").types;
+      if (types) {
+        return types;
+      }
+      return freeProcess && freeProcess.binding && freeProcess.binding("util");
+    } catch (e) {
+    }
+  })();
+  var nodeUtil_default = nodeUtil;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/isTypedArray.js
+  var nodeIsTypedArray = nodeUtil_default && nodeUtil_default.isTypedArray;
+  var isTypedArray = nodeIsTypedArray ? baseUnary_default(nodeIsTypedArray) : baseIsTypedArray_default;
+  var isTypedArray_default = isTypedArray;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_arrayLikeKeys.js
+  var objectProto7 = Object.prototype;
+  var hasOwnProperty5 = objectProto7.hasOwnProperty;
+  function arrayLikeKeys(value, inherited) {
+    var isArr = isArray_default(value), isArg = !isArr && isArguments_default(value), isBuff = !isArr && !isArg && isBuffer_default(value), isType = !isArr && !isArg && !isBuff && isTypedArray_default(value), skipIndexes = isArr || isArg || isBuff || isType, result = skipIndexes ? baseTimes_default(value.length, String) : [], length = result.length;
+    for (var key in value) {
+      if ((inherited || hasOwnProperty5.call(value, key)) && !(skipIndexes && // Safari 9 has enumerable `arguments.length` in strict mode.
+      (key == "length" || // Node.js 0.10 has enumerable non-index properties on buffers.
+      isBuff && (key == "offset" || key == "parent") || // PhantomJS 2 has enumerable non-index properties on typed arrays.
+      isType && (key == "buffer" || key == "byteLength" || key == "byteOffset") || // Skip index properties.
+      isIndex_default(key, length)))) {
+        result.push(key);
+      }
+    }
+    return result;
+  }
+  var arrayLikeKeys_default = arrayLikeKeys;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_overArg.js
+  function overArg(func, transform) {
+    return function(arg) {
+      return func(transform(arg));
+    };
+  }
+  var overArg_default = overArg;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_nativeKeys.js
+  var nativeKeys = overArg_default(Object.keys, Object);
+  var nativeKeys_default = nativeKeys;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseKeys.js
+  var objectProto8 = Object.prototype;
+  var hasOwnProperty6 = objectProto8.hasOwnProperty;
+  function baseKeys(object) {
+    if (!isPrototype_default(object)) {
+      return nativeKeys_default(object);
+    }
+    var result = [];
+    for (var key in Object(object)) {
+      if (hasOwnProperty6.call(object, key) && key != "constructor") {
+        result.push(key);
+      }
+    }
+    return result;
+  }
+  var baseKeys_default = baseKeys;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/keys.js
+  function keys(object) {
+    return isArrayLike_default(object) ? arrayLikeKeys_default(object) : baseKeys_default(object);
+  }
+  var keys_default = keys;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/assign.js
+  var objectProto9 = Object.prototype;
+  var hasOwnProperty7 = objectProto9.hasOwnProperty;
+  var assign = createAssigner_default(function(object, source) {
+    if (isPrototype_default(source) || isArrayLike_default(source)) {
+      copyObject_default(source, keys_default(source), object);
+      return;
+    }
+    for (var key in source) {
+      if (hasOwnProperty7.call(source, key)) {
+        assignValue_default(object, key, source[key]);
+      }
+    }
+  });
+  var assign_default = assign;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_nativeKeysIn.js
+  function nativeKeysIn(object) {
+    var result = [];
+    if (object != null) {
+      for (var key in Object(object)) {
+        result.push(key);
+      }
+    }
+    return result;
+  }
+  var nativeKeysIn_default = nativeKeysIn;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseKeysIn.js
+  var objectProto10 = Object.prototype;
+  var hasOwnProperty8 = objectProto10.hasOwnProperty;
+  function baseKeysIn(object) {
+    if (!isObject_default(object)) {
+      return nativeKeysIn_default(object);
+    }
+    var isProto = isPrototype_default(object), result = [];
+    for (var key in object) {
+      if (!(key == "constructor" && (isProto || !hasOwnProperty8.call(object, key)))) {
+        result.push(key);
+      }
+    }
+    return result;
+  }
+  var baseKeysIn_default = baseKeysIn;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/keysIn.js
+  function keysIn(object) {
+    return isArrayLike_default(object) ? arrayLikeKeys_default(object, true) : baseKeysIn_default(object);
+  }
+  var keysIn_default = keysIn;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_isKey.js
+  var reIsDeepProp = /\.|\[(?:[^[\]]*|(["'])(?:(?!\1)[^\\]|\\.)*?\1)\]/;
+  var reIsPlainProp = /^\w*$/;
+  function isKey(value, object) {
+    if (isArray_default(value)) {
+      return false;
+    }
+    var type = typeof value;
+    if (type == "number" || type == "symbol" || type == "boolean" || value == null || isSymbol_default(value)) {
+      return true;
+    }
+    return reIsPlainProp.test(value) || !reIsDeepProp.test(value) || object != null && value in Object(object);
+  }
+  var isKey_default = isKey;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_nativeCreate.js
+  var nativeCreate = getNative_default(Object, "create");
+  var nativeCreate_default = nativeCreate;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_hashClear.js
+  function hashClear() {
+    this.__data__ = nativeCreate_default ? nativeCreate_default(null) : {};
+    this.size = 0;
+  }
+  var hashClear_default = hashClear;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_hashDelete.js
+  function hashDelete(key) {
+    var result = this.has(key) && delete this.__data__[key];
+    this.size -= result ? 1 : 0;
+    return result;
+  }
+  var hashDelete_default = hashDelete;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_hashGet.js
+  var HASH_UNDEFINED = "__lodash_hash_undefined__";
+  var objectProto11 = Object.prototype;
+  var hasOwnProperty9 = objectProto11.hasOwnProperty;
+  function hashGet(key) {
+    var data = this.__data__;
+    if (nativeCreate_default) {
+      var result = data[key];
+      return result === HASH_UNDEFINED ? void 0 : result;
+    }
+    return hasOwnProperty9.call(data, key) ? data[key] : void 0;
+  }
+  var hashGet_default = hashGet;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_hashHas.js
+  var objectProto12 = Object.prototype;
+  var hasOwnProperty10 = objectProto12.hasOwnProperty;
+  function hashHas(key) {
+    var data = this.__data__;
+    return nativeCreate_default ? data[key] !== void 0 : hasOwnProperty10.call(data, key);
+  }
+  var hashHas_default = hashHas;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_hashSet.js
+  var HASH_UNDEFINED2 = "__lodash_hash_undefined__";
+  function hashSet(key, value) {
+    var data = this.__data__;
+    this.size += this.has(key) ? 0 : 1;
+    data[key] = nativeCreate_default && value === void 0 ? HASH_UNDEFINED2 : value;
+    return this;
+  }
+  var hashSet_default = hashSet;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_Hash.js
+  function Hash(entries) {
+    var index = -1, length = entries == null ? 0 : entries.length;
+    this.clear();
+    while (++index < length) {
+      var entry = entries[index];
+      this.set(entry[0], entry[1]);
+    }
+  }
+  Hash.prototype.clear = hashClear_default;
+  Hash.prototype["delete"] = hashDelete_default;
+  Hash.prototype.get = hashGet_default;
+  Hash.prototype.has = hashHas_default;
+  Hash.prototype.set = hashSet_default;
+  var Hash_default = Hash;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_listCacheClear.js
+  function listCacheClear() {
+    this.__data__ = [];
+    this.size = 0;
+  }
+  var listCacheClear_default = listCacheClear;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_assocIndexOf.js
+  function assocIndexOf(array, key) {
+    var length = array.length;
+    while (length--) {
+      if (eq_default(array[length][0], key)) {
+        return length;
+      }
+    }
+    return -1;
+  }
+  var assocIndexOf_default = assocIndexOf;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_listCacheDelete.js
+  var arrayProto = Array.prototype;
+  var splice = arrayProto.splice;
+  function listCacheDelete(key) {
+    var data = this.__data__, index = assocIndexOf_default(data, key);
+    if (index < 0) {
+      return false;
+    }
+    var lastIndex = data.length - 1;
+    if (index == lastIndex) {
+      data.pop();
+    } else {
+      splice.call(data, index, 1);
+    }
+    --this.size;
+    return true;
+  }
+  var listCacheDelete_default = listCacheDelete;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_listCacheGet.js
+  function listCacheGet(key) {
+    var data = this.__data__, index = assocIndexOf_default(data, key);
+    return index < 0 ? void 0 : data[index][1];
+  }
+  var listCacheGet_default = listCacheGet;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_listCacheHas.js
+  function listCacheHas(key) {
+    return assocIndexOf_default(this.__data__, key) > -1;
+  }
+  var listCacheHas_default = listCacheHas;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_listCacheSet.js
+  function listCacheSet(key, value) {
+    var data = this.__data__, index = assocIndexOf_default(data, key);
+    if (index < 0) {
+      ++this.size;
+      data.push([key, value]);
+    } else {
+      data[index][1] = value;
+    }
+    return this;
+  }
+  var listCacheSet_default = listCacheSet;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_ListCache.js
+  function ListCache(entries) {
+    var index = -1, length = entries == null ? 0 : entries.length;
+    this.clear();
+    while (++index < length) {
+      var entry = entries[index];
+      this.set(entry[0], entry[1]);
+    }
+  }
+  ListCache.prototype.clear = listCacheClear_default;
+  ListCache.prototype["delete"] = listCacheDelete_default;
+  ListCache.prototype.get = listCacheGet_default;
+  ListCache.prototype.has = listCacheHas_default;
+  ListCache.prototype.set = listCacheSet_default;
+  var ListCache_default = ListCache;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_Map.js
+  var Map2 = getNative_default(root_default, "Map");
+  var Map_default = Map2;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_mapCacheClear.js
+  function mapCacheClear() {
+    this.size = 0;
+    this.__data__ = {
+      "hash": new Hash_default(),
+      "map": new (Map_default || ListCache_default)(),
+      "string": new Hash_default()
+    };
+  }
+  var mapCacheClear_default = mapCacheClear;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_isKeyable.js
+  function isKeyable(value) {
+    var type = typeof value;
+    return type == "string" || type == "number" || type == "symbol" || type == "boolean" ? value !== "__proto__" : value === null;
+  }
+  var isKeyable_default = isKeyable;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_getMapData.js
+  function getMapData(map2, key) {
+    var data = map2.__data__;
+    return isKeyable_default(key) ? data[typeof key == "string" ? "string" : "hash"] : data.map;
+  }
+  var getMapData_default = getMapData;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_mapCacheDelete.js
+  function mapCacheDelete(key) {
+    var result = getMapData_default(this, key)["delete"](key);
+    this.size -= result ? 1 : 0;
+    return result;
+  }
+  var mapCacheDelete_default = mapCacheDelete;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_mapCacheGet.js
+  function mapCacheGet(key) {
+    return getMapData_default(this, key).get(key);
+  }
+  var mapCacheGet_default = mapCacheGet;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_mapCacheHas.js
+  function mapCacheHas(key) {
+    return getMapData_default(this, key).has(key);
+  }
+  var mapCacheHas_default = mapCacheHas;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_mapCacheSet.js
+  function mapCacheSet(key, value) {
+    var data = getMapData_default(this, key), size = data.size;
+    data.set(key, value);
+    this.size += data.size == size ? 0 : 1;
+    return this;
+  }
+  var mapCacheSet_default = mapCacheSet;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_MapCache.js
+  function MapCache(entries) {
+    var index = -1, length = entries == null ? 0 : entries.length;
+    this.clear();
+    while (++index < length) {
+      var entry = entries[index];
+      this.set(entry[0], entry[1]);
+    }
+  }
+  MapCache.prototype.clear = mapCacheClear_default;
+  MapCache.prototype["delete"] = mapCacheDelete_default;
+  MapCache.prototype.get = mapCacheGet_default;
+  MapCache.prototype.has = mapCacheHas_default;
+  MapCache.prototype.set = mapCacheSet_default;
+  var MapCache_default = MapCache;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/memoize.js
+  var FUNC_ERROR_TEXT = "Expected a function";
+  function memoize(func, resolver) {
+    if (typeof func != "function" || resolver != null && typeof resolver != "function") {
+      throw new TypeError(FUNC_ERROR_TEXT);
+    }
+    var memoized = function() {
+      var args = arguments, key = resolver ? resolver.apply(this, args) : args[0], cache = memoized.cache;
+      if (cache.has(key)) {
+        return cache.get(key);
+      }
+      var result = func.apply(this, args);
+      memoized.cache = cache.set(key, result) || cache;
+      return result;
+    };
+    memoized.cache = new (memoize.Cache || MapCache_default)();
+    return memoized;
+  }
+  memoize.Cache = MapCache_default;
+  var memoize_default = memoize;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_memoizeCapped.js
+  var MAX_MEMOIZE_SIZE = 500;
+  function memoizeCapped(func) {
+    var result = memoize_default(func, function(key) {
+      if (cache.size === MAX_MEMOIZE_SIZE) {
+        cache.clear();
+      }
+      return key;
+    });
+    var cache = result.cache;
+    return result;
+  }
+  var memoizeCapped_default = memoizeCapped;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_stringToPath.js
+  var rePropName = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))/g;
+  var reEscapeChar = /\\(\\)?/g;
+  var stringToPath = memoizeCapped_default(function(string) {
+    var result = [];
+    if (string.charCodeAt(0) === 46) {
+      result.push("");
+    }
+    string.replace(rePropName, function(match, number, quote, subString) {
+      result.push(quote ? subString.replace(reEscapeChar, "$1") : number || match);
+    });
+    return result;
+  });
+  var stringToPath_default = stringToPath;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/toString.js
+  function toString(value) {
+    return value == null ? "" : baseToString_default(value);
+  }
+  var toString_default = toString;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_castPath.js
+  function castPath(value, object) {
+    if (isArray_default(value)) {
+      return value;
+    }
+    return isKey_default(value, object) ? [value] : stringToPath_default(toString_default(value));
+  }
+  var castPath_default = castPath;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_toKey.js
+  var INFINITY3 = 1 / 0;
+  function toKey(value) {
+    if (typeof value == "string" || isSymbol_default(value)) {
+      return value;
+    }
+    var result = value + "";
+    return result == "0" && 1 / value == -INFINITY3 ? "-0" : result;
+  }
+  var toKey_default = toKey;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseGet.js
+  function baseGet(object, path) {
+    path = castPath_default(path, object);
+    var index = 0, length = path.length;
+    while (object != null && index < length) {
+      object = object[toKey_default(path[index++])];
+    }
+    return index && index == length ? object : void 0;
+  }
+  var baseGet_default = baseGet;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/get.js
+  function get(object, path, defaultValue) {
+    var result = object == null ? void 0 : baseGet_default(object, path);
+    return result === void 0 ? defaultValue : result;
+  }
+  var get_default = get;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_arrayPush.js
+  function arrayPush(array, values2) {
+    var index = -1, length = values2.length, offset = array.length;
+    while (++index < length) {
+      array[offset + index] = values2[index];
+    }
+    return array;
+  }
+  var arrayPush_default = arrayPush;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_isFlattenable.js
+  var spreadableSymbol = Symbol_default ? Symbol_default.isConcatSpreadable : void 0;
+  function isFlattenable(value) {
+    return isArray_default(value) || isArguments_default(value) || !!(spreadableSymbol && value && value[spreadableSymbol]);
+  }
+  var isFlattenable_default = isFlattenable;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseFlatten.js
+  function baseFlatten(array, depth, predicate, isStrict, result) {
+    var index = -1, length = array.length;
+    predicate || (predicate = isFlattenable_default);
+    result || (result = []);
+    while (++index < length) {
+      var value = array[index];
+      if (depth > 0 && predicate(value)) {
+        if (depth > 1) {
+          baseFlatten(value, depth - 1, predicate, isStrict, result);
+        } else {
+          arrayPush_default(result, value);
+        }
+      } else if (!isStrict) {
+        result[result.length] = value;
+      }
+    }
+    return result;
+  }
+  var baseFlatten_default = baseFlatten;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/flatten.js
+  function flatten(array) {
+    var length = array == null ? 0 : array.length;
+    return length ? baseFlatten_default(array, 1) : [];
+  }
+  var flatten_default = flatten;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_getPrototype.js
+  var getPrototype = overArg_default(Object.getPrototypeOf, Object);
+  var getPrototype_default = getPrototype;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseSlice.js
+  function baseSlice(array, start, end) {
+    var index = -1, length = array.length;
+    if (start < 0) {
+      start = -start > length ? 0 : length + start;
+    }
+    end = end > length ? length : end;
+    if (end < 0) {
+      end += length;
+    }
+    length = start > end ? 0 : end - start >>> 0;
+    start >>>= 0;
+    var result = Array(length);
+    while (++index < length) {
+      result[index] = array[index + start];
+    }
+    return result;
+  }
+  var baseSlice_default = baseSlice;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_arrayReduce.js
+  function arrayReduce(array, iteratee, accumulator, initAccum) {
+    var index = -1, length = array == null ? 0 : array.length;
+    if (initAccum && length) {
+      accumulator = array[++index];
+    }
+    while (++index < length) {
+      accumulator = iteratee(accumulator, array[index], index, array);
+    }
+    return accumulator;
+  }
+  var arrayReduce_default = arrayReduce;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_stackClear.js
+  function stackClear() {
+    this.__data__ = new ListCache_default();
+    this.size = 0;
+  }
+  var stackClear_default = stackClear;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_stackDelete.js
+  function stackDelete(key) {
+    var data = this.__data__, result = data["delete"](key);
+    this.size = data.size;
+    return result;
+  }
+  var stackDelete_default = stackDelete;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_stackGet.js
+  function stackGet(key) {
+    return this.__data__.get(key);
+  }
+  var stackGet_default = stackGet;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_stackHas.js
+  function stackHas(key) {
+    return this.__data__.has(key);
+  }
+  var stackHas_default = stackHas;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_stackSet.js
+  var LARGE_ARRAY_SIZE = 200;
+  function stackSet(key, value) {
+    var data = this.__data__;
+    if (data instanceof ListCache_default) {
+      var pairs = data.__data__;
+      if (!Map_default || pairs.length < LARGE_ARRAY_SIZE - 1) {
+        pairs.push([key, value]);
+        this.size = ++data.size;
+        return this;
+      }
+      data = this.__data__ = new MapCache_default(pairs);
+    }
+    data.set(key, value);
+    this.size = data.size;
+    return this;
+  }
+  var stackSet_default = stackSet;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_Stack.js
+  function Stack(entries) {
+    var data = this.__data__ = new ListCache_default(entries);
+    this.size = data.size;
+  }
+  Stack.prototype.clear = stackClear_default;
+  Stack.prototype["delete"] = stackDelete_default;
+  Stack.prototype.get = stackGet_default;
+  Stack.prototype.has = stackHas_default;
+  Stack.prototype.set = stackSet_default;
+  var Stack_default = Stack;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseAssign.js
+  function baseAssign(object, source) {
+    return object && copyObject_default(source, keys_default(source), object);
+  }
+  var baseAssign_default = baseAssign;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseAssignIn.js
+  function baseAssignIn(object, source) {
+    return object && copyObject_default(source, keysIn_default(source), object);
+  }
+  var baseAssignIn_default = baseAssignIn;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_cloneBuffer.js
+  var freeExports3 = typeof exports == "object" && exports && !exports.nodeType && exports;
+  var freeModule3 = freeExports3 && typeof module == "object" && module && !module.nodeType && module;
+  var moduleExports3 = freeModule3 && freeModule3.exports === freeExports3;
+  var Buffer3 = moduleExports3 ? root_default.Buffer : void 0;
+  var allocUnsafe = Buffer3 ? Buffer3.allocUnsafe : void 0;
+  function cloneBuffer(buffer, isDeep) {
+    if (isDeep) {
+      return buffer.slice();
+    }
+    var length = buffer.length, result = allocUnsafe ? allocUnsafe(length) : new buffer.constructor(length);
+    buffer.copy(result);
+    return result;
+  }
+  var cloneBuffer_default = cloneBuffer;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_arrayFilter.js
+  function arrayFilter(array, predicate) {
+    var index = -1, length = array == null ? 0 : array.length, resIndex = 0, result = [];
+    while (++index < length) {
+      var value = array[index];
+      if (predicate(value, index, array)) {
+        result[resIndex++] = value;
+      }
+    }
+    return result;
+  }
+  var arrayFilter_default = arrayFilter;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/stubArray.js
+  function stubArray() {
+    return [];
+  }
+  var stubArray_default = stubArray;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_getSymbols.js
+  var objectProto13 = Object.prototype;
+  var propertyIsEnumerable2 = objectProto13.propertyIsEnumerable;
+  var nativeGetSymbols = Object.getOwnPropertySymbols;
+  var getSymbols = !nativeGetSymbols ? stubArray_default : function(object) {
+    if (object == null) {
+      return [];
+    }
+    object = Object(object);
+    return arrayFilter_default(nativeGetSymbols(object), function(symbol) {
+      return propertyIsEnumerable2.call(object, symbol);
+    });
+  };
+  var getSymbols_default = getSymbols;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_copySymbols.js
+  function copySymbols(source, object) {
+    return copyObject_default(source, getSymbols_default(source), object);
+  }
+  var copySymbols_default = copySymbols;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_getSymbolsIn.js
+  var nativeGetSymbols2 = Object.getOwnPropertySymbols;
+  var getSymbolsIn = !nativeGetSymbols2 ? stubArray_default : function(object) {
+    var result = [];
+    while (object) {
+      arrayPush_default(result, getSymbols_default(object));
+      object = getPrototype_default(object);
+    }
+    return result;
+  };
+  var getSymbolsIn_default = getSymbolsIn;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_copySymbolsIn.js
+  function copySymbolsIn(source, object) {
+    return copyObject_default(source, getSymbolsIn_default(source), object);
+  }
+  var copySymbolsIn_default = copySymbolsIn;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseGetAllKeys.js
+  function baseGetAllKeys(object, keysFunc, symbolsFunc) {
+    var result = keysFunc(object);
+    return isArray_default(object) ? result : arrayPush_default(result, symbolsFunc(object));
+  }
+  var baseGetAllKeys_default = baseGetAllKeys;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_getAllKeys.js
+  function getAllKeys(object) {
+    return baseGetAllKeys_default(object, keys_default, getSymbols_default);
+  }
+  var getAllKeys_default = getAllKeys;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_getAllKeysIn.js
+  function getAllKeysIn(object) {
+    return baseGetAllKeys_default(object, keysIn_default, getSymbolsIn_default);
+  }
+  var getAllKeysIn_default = getAllKeysIn;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_DataView.js
+  var DataView = getNative_default(root_default, "DataView");
+  var DataView_default = DataView;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_Promise.js
+  var Promise2 = getNative_default(root_default, "Promise");
+  var Promise_default = Promise2;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_Set.js
+  var Set = getNative_default(root_default, "Set");
+  var Set_default = Set;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_getTag.js
+  var mapTag2 = "[object Map]";
+  var objectTag2 = "[object Object]";
+  var promiseTag = "[object Promise]";
+  var setTag2 = "[object Set]";
+  var weakMapTag2 = "[object WeakMap]";
+  var dataViewTag2 = "[object DataView]";
+  var dataViewCtorString = toSource_default(DataView_default);
+  var mapCtorString = toSource_default(Map_default);
+  var promiseCtorString = toSource_default(Promise_default);
+  var setCtorString = toSource_default(Set_default);
+  var weakMapCtorString = toSource_default(WeakMap_default);
+  var getTag = baseGetTag_default;
+  if (DataView_default && getTag(new DataView_default(new ArrayBuffer(1))) != dataViewTag2 || Map_default && getTag(new Map_default()) != mapTag2 || Promise_default && getTag(Promise_default.resolve()) != promiseTag || Set_default && getTag(new Set_default()) != setTag2 || WeakMap_default && getTag(new WeakMap_default()) != weakMapTag2) {
+    getTag = function(value) {
+      var result = baseGetTag_default(value), Ctor = result == objectTag2 ? value.constructor : void 0, ctorString = Ctor ? toSource_default(Ctor) : "";
+      if (ctorString) {
+        switch (ctorString) {
+          case dataViewCtorString:
+            return dataViewTag2;
+          case mapCtorString:
+            return mapTag2;
+          case promiseCtorString:
+            return promiseTag;
+          case setCtorString:
+            return setTag2;
+          case weakMapCtorString:
+            return weakMapTag2;
+        }
+      }
+      return result;
+    };
+  }
+  var getTag_default = getTag;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_initCloneArray.js
+  var objectProto14 = Object.prototype;
+  var hasOwnProperty11 = objectProto14.hasOwnProperty;
+  function initCloneArray(array) {
+    var length = array.length, result = new array.constructor(length);
+    if (length && typeof array[0] == "string" && hasOwnProperty11.call(array, "index")) {
+      result.index = array.index;
+      result.input = array.input;
+    }
+    return result;
+  }
+  var initCloneArray_default = initCloneArray;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_Uint8Array.js
+  var Uint8Array2 = root_default.Uint8Array;
+  var Uint8Array_default = Uint8Array2;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_cloneArrayBuffer.js
+  function cloneArrayBuffer(arrayBuffer) {
+    var result = new arrayBuffer.constructor(arrayBuffer.byteLength);
+    new Uint8Array_default(result).set(new Uint8Array_default(arrayBuffer));
+    return result;
+  }
+  var cloneArrayBuffer_default = cloneArrayBuffer;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_cloneDataView.js
+  function cloneDataView(dataView, isDeep) {
+    var buffer = isDeep ? cloneArrayBuffer_default(dataView.buffer) : dataView.buffer;
+    return new dataView.constructor(buffer, dataView.byteOffset, dataView.byteLength);
+  }
+  var cloneDataView_default = cloneDataView;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_cloneRegExp.js
+  var reFlags = /\w*$/;
+  function cloneRegExp(regexp) {
+    var result = new regexp.constructor(regexp.source, reFlags.exec(regexp));
+    result.lastIndex = regexp.lastIndex;
+    return result;
+  }
+  var cloneRegExp_default = cloneRegExp;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_cloneSymbol.js
+  var symbolProto2 = Symbol_default ? Symbol_default.prototype : void 0;
+  var symbolValueOf = symbolProto2 ? symbolProto2.valueOf : void 0;
+  function cloneSymbol(symbol) {
+    return symbolValueOf ? Object(symbolValueOf.call(symbol)) : {};
+  }
+  var cloneSymbol_default = cloneSymbol;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_cloneTypedArray.js
+  function cloneTypedArray(typedArray, isDeep) {
+    var buffer = isDeep ? cloneArrayBuffer_default(typedArray.buffer) : typedArray.buffer;
+    return new typedArray.constructor(buffer, typedArray.byteOffset, typedArray.length);
+  }
+  var cloneTypedArray_default = cloneTypedArray;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_initCloneByTag.js
+  var boolTag2 = "[object Boolean]";
+  var dateTag2 = "[object Date]";
+  var mapTag3 = "[object Map]";
+  var numberTag2 = "[object Number]";
+  var regexpTag2 = "[object RegExp]";
+  var setTag3 = "[object Set]";
+  var stringTag2 = "[object String]";
+  var symbolTag2 = "[object Symbol]";
+  var arrayBufferTag2 = "[object ArrayBuffer]";
+  var dataViewTag3 = "[object DataView]";
+  var float32Tag2 = "[object Float32Array]";
+  var float64Tag2 = "[object Float64Array]";
+  var int8Tag2 = "[object Int8Array]";
+  var int16Tag2 = "[object Int16Array]";
+  var int32Tag2 = "[object Int32Array]";
+  var uint8Tag2 = "[object Uint8Array]";
+  var uint8ClampedTag2 = "[object Uint8ClampedArray]";
+  var uint16Tag2 = "[object Uint16Array]";
+  var uint32Tag2 = "[object Uint32Array]";
+  function initCloneByTag(object, tag2, isDeep) {
+    var Ctor = object.constructor;
+    switch (tag2) {
+      case arrayBufferTag2:
+        return cloneArrayBuffer_default(object);
+      case boolTag2:
+      case dateTag2:
+        return new Ctor(+object);
+      case dataViewTag3:
+        return cloneDataView_default(object, isDeep);
+      case float32Tag2:
+      case float64Tag2:
+      case int8Tag2:
+      case int16Tag2:
+      case int32Tag2:
+      case uint8Tag2:
+      case uint8ClampedTag2:
+      case uint16Tag2:
+      case uint32Tag2:
+        return cloneTypedArray_default(object, isDeep);
+      case mapTag3:
+        return new Ctor();
+      case numberTag2:
+      case stringTag2:
+        return new Ctor(object);
+      case regexpTag2:
+        return cloneRegExp_default(object);
+      case setTag3:
+        return new Ctor();
+      case symbolTag2:
+        return cloneSymbol_default(object);
+    }
+  }
+  var initCloneByTag_default = initCloneByTag;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_initCloneObject.js
+  function initCloneObject(object) {
+    return typeof object.constructor == "function" && !isPrototype_default(object) ? baseCreate_default(getPrototype_default(object)) : {};
+  }
+  var initCloneObject_default = initCloneObject;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseIsMap.js
+  var mapTag4 = "[object Map]";
+  function baseIsMap(value) {
+    return isObjectLike_default(value) && getTag_default(value) == mapTag4;
+  }
+  var baseIsMap_default = baseIsMap;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/isMap.js
+  var nodeIsMap = nodeUtil_default && nodeUtil_default.isMap;
+  var isMap = nodeIsMap ? baseUnary_default(nodeIsMap) : baseIsMap_default;
+  var isMap_default = isMap;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseIsSet.js
+  var setTag4 = "[object Set]";
+  function baseIsSet(value) {
+    return isObjectLike_default(value) && getTag_default(value) == setTag4;
+  }
+  var baseIsSet_default = baseIsSet;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/isSet.js
+  var nodeIsSet = nodeUtil_default && nodeUtil_default.isSet;
+  var isSet = nodeIsSet ? baseUnary_default(nodeIsSet) : baseIsSet_default;
+  var isSet_default = isSet;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseClone.js
+  var CLONE_DEEP_FLAG = 1;
+  var CLONE_FLAT_FLAG = 2;
+  var CLONE_SYMBOLS_FLAG = 4;
+  var argsTag3 = "[object Arguments]";
+  var arrayTag2 = "[object Array]";
+  var boolTag3 = "[object Boolean]";
+  var dateTag3 = "[object Date]";
+  var errorTag2 = "[object Error]";
+  var funcTag3 = "[object Function]";
+  var genTag2 = "[object GeneratorFunction]";
+  var mapTag5 = "[object Map]";
+  var numberTag3 = "[object Number]";
+  var objectTag3 = "[object Object]";
+  var regexpTag3 = "[object RegExp]";
+  var setTag5 = "[object Set]";
+  var stringTag3 = "[object String]";
+  var symbolTag3 = "[object Symbol]";
+  var weakMapTag3 = "[object WeakMap]";
+  var arrayBufferTag3 = "[object ArrayBuffer]";
+  var dataViewTag4 = "[object DataView]";
+  var float32Tag3 = "[object Float32Array]";
+  var float64Tag3 = "[object Float64Array]";
+  var int8Tag3 = "[object Int8Array]";
+  var int16Tag3 = "[object Int16Array]";
+  var int32Tag3 = "[object Int32Array]";
+  var uint8Tag3 = "[object Uint8Array]";
+  var uint8ClampedTag3 = "[object Uint8ClampedArray]";
+  var uint16Tag3 = "[object Uint16Array]";
+  var uint32Tag3 = "[object Uint32Array]";
+  var cloneableTags = {};
+  cloneableTags[argsTag3] = cloneableTags[arrayTag2] = cloneableTags[arrayBufferTag3] = cloneableTags[dataViewTag4] = cloneableTags[boolTag3] = cloneableTags[dateTag3] = cloneableTags[float32Tag3] = cloneableTags[float64Tag3] = cloneableTags[int8Tag3] = cloneableTags[int16Tag3] = cloneableTags[int32Tag3] = cloneableTags[mapTag5] = cloneableTags[numberTag3] = cloneableTags[objectTag3] = cloneableTags[regexpTag3] = cloneableTags[setTag5] = cloneableTags[stringTag3] = cloneableTags[symbolTag3] = cloneableTags[uint8Tag3] = cloneableTags[uint8ClampedTag3] = cloneableTags[uint16Tag3] = cloneableTags[uint32Tag3] = true;
+  cloneableTags[errorTag2] = cloneableTags[funcTag3] = cloneableTags[weakMapTag3] = false;
+  function baseClone(value, bitmask, customizer, key, object, stack) {
+    var result, isDeep = bitmask & CLONE_DEEP_FLAG, isFlat = bitmask & CLONE_FLAT_FLAG, isFull = bitmask & CLONE_SYMBOLS_FLAG;
+    if (customizer) {
+      result = object ? customizer(value, key, object, stack) : customizer(value);
+    }
+    if (result !== void 0) {
+      return result;
+    }
+    if (!isObject_default(value)) {
+      return value;
+    }
+    var isArr = isArray_default(value);
+    if (isArr) {
+      result = initCloneArray_default(value);
+      if (!isDeep) {
+        return copyArray_default(value, result);
+      }
+    } else {
+      var tag2 = getTag_default(value), isFunc = tag2 == funcTag3 || tag2 == genTag2;
+      if (isBuffer_default(value)) {
+        return cloneBuffer_default(value, isDeep);
+      }
+      if (tag2 == objectTag3 || tag2 == argsTag3 || isFunc && !object) {
+        result = isFlat || isFunc ? {} : initCloneObject_default(value);
+        if (!isDeep) {
+          return isFlat ? copySymbolsIn_default(value, baseAssignIn_default(result, value)) : copySymbols_default(value, baseAssign_default(result, value));
+        }
+      } else {
+        if (!cloneableTags[tag2]) {
+          return object ? value : {};
+        }
+        result = initCloneByTag_default(value, tag2, isDeep);
+      }
+    }
+    stack || (stack = new Stack_default());
+    var stacked = stack.get(value);
+    if (stacked) {
+      return stacked;
+    }
+    stack.set(value, result);
+    if (isSet_default(value)) {
+      value.forEach(function(subValue) {
+        result.add(baseClone(subValue, bitmask, customizer, subValue, value, stack));
+      });
+    } else if (isMap_default(value)) {
+      value.forEach(function(subValue, key2) {
+        result.set(key2, baseClone(subValue, bitmask, customizer, key2, value, stack));
+      });
+    }
+    var keysFunc = isFull ? isFlat ? getAllKeysIn_default : getAllKeys_default : isFlat ? keysIn_default : keys_default;
+    var props = isArr ? void 0 : keysFunc(value);
+    arrayEach_default(props || value, function(subValue, key2) {
+      if (props) {
+        key2 = subValue;
+        subValue = value[key2];
+      }
+      assignValue_default(result, key2, baseClone(subValue, bitmask, customizer, key2, value, stack));
+    });
+    return result;
+  }
+  var baseClone_default = baseClone;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/clone.js
+  var CLONE_SYMBOLS_FLAG2 = 4;
+  function clone(value) {
+    return baseClone_default(value, CLONE_SYMBOLS_FLAG2);
+  }
+  var clone_default = clone;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/compact.js
+  function compact(array) {
+    var index = -1, length = array == null ? 0 : array.length, resIndex = 0, result = [];
+    while (++index < length) {
+      var value = array[index];
+      if (value) {
+        result[resIndex++] = value;
+      }
+    }
+    return result;
+  }
+  var compact_default = compact;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_setCacheAdd.js
+  var HASH_UNDEFINED3 = "__lodash_hash_undefined__";
+  function setCacheAdd(value) {
+    this.__data__.set(value, HASH_UNDEFINED3);
+    return this;
+  }
+  var setCacheAdd_default = setCacheAdd;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_setCacheHas.js
+  function setCacheHas(value) {
+    return this.__data__.has(value);
+  }
+  var setCacheHas_default = setCacheHas;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_SetCache.js
+  function SetCache(values2) {
+    var index = -1, length = values2 == null ? 0 : values2.length;
+    this.__data__ = new MapCache_default();
+    while (++index < length) {
+      this.add(values2[index]);
+    }
+  }
+  SetCache.prototype.add = SetCache.prototype.push = setCacheAdd_default;
+  SetCache.prototype.has = setCacheHas_default;
+  var SetCache_default = SetCache;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_arraySome.js
+  function arraySome(array, predicate) {
+    var index = -1, length = array == null ? 0 : array.length;
+    while (++index < length) {
+      if (predicate(array[index], index, array)) {
+        return true;
+      }
+    }
+    return false;
+  }
+  var arraySome_default = arraySome;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_cacheHas.js
+  function cacheHas(cache, key) {
+    return cache.has(key);
+  }
+  var cacheHas_default = cacheHas;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_equalArrays.js
+  var COMPARE_PARTIAL_FLAG = 1;
+  var COMPARE_UNORDERED_FLAG = 2;
+  function equalArrays(array, other, bitmask, customizer, equalFunc, stack) {
+    var isPartial = bitmask & COMPARE_PARTIAL_FLAG, arrLength = array.length, othLength = other.length;
+    if (arrLength != othLength && !(isPartial && othLength > arrLength)) {
+      return false;
+    }
+    var arrStacked = stack.get(array);
+    var othStacked = stack.get(other);
+    if (arrStacked && othStacked) {
+      return arrStacked == other && othStacked == array;
+    }
+    var index = -1, result = true, seen = bitmask & COMPARE_UNORDERED_FLAG ? new SetCache_default() : void 0;
+    stack.set(array, other);
+    stack.set(other, array);
+    while (++index < arrLength) {
+      var arrValue = array[index], othValue = other[index];
+      if (customizer) {
+        var compared = isPartial ? customizer(othValue, arrValue, index, other, array, stack) : customizer(arrValue, othValue, index, array, other, stack);
+      }
+      if (compared !== void 0) {
+        if (compared) {
+          continue;
+        }
+        result = false;
+        break;
+      }
+      if (seen) {
+        if (!arraySome_default(other, function(othValue2, othIndex) {
+          if (!cacheHas_default(seen, othIndex) && (arrValue === othValue2 || equalFunc(arrValue, othValue2, bitmask, customizer, stack))) {
+            return seen.push(othIndex);
+          }
+        })) {
+          result = false;
+          break;
+        }
+      } else if (!(arrValue === othValue || equalFunc(arrValue, othValue, bitmask, customizer, stack))) {
+        result = false;
+        break;
+      }
+    }
+    stack["delete"](array);
+    stack["delete"](other);
+    return result;
+  }
+  var equalArrays_default = equalArrays;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_mapToArray.js
+  function mapToArray(map2) {
+    var index = -1, result = Array(map2.size);
+    map2.forEach(function(value, key) {
+      result[++index] = [key, value];
+    });
+    return result;
+  }
+  var mapToArray_default = mapToArray;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_setToArray.js
+  function setToArray(set) {
+    var index = -1, result = Array(set.size);
+    set.forEach(function(value) {
+      result[++index] = value;
+    });
+    return result;
+  }
+  var setToArray_default = setToArray;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_equalByTag.js
+  var COMPARE_PARTIAL_FLAG2 = 1;
+  var COMPARE_UNORDERED_FLAG2 = 2;
+  var boolTag4 = "[object Boolean]";
+  var dateTag4 = "[object Date]";
+  var errorTag3 = "[object Error]";
+  var mapTag6 = "[object Map]";
+  var numberTag4 = "[object Number]";
+  var regexpTag4 = "[object RegExp]";
+  var setTag6 = "[object Set]";
+  var stringTag4 = "[object String]";
+  var symbolTag4 = "[object Symbol]";
+  var arrayBufferTag4 = "[object ArrayBuffer]";
+  var dataViewTag5 = "[object DataView]";
+  var symbolProto3 = Symbol_default ? Symbol_default.prototype : void 0;
+  var symbolValueOf2 = symbolProto3 ? symbolProto3.valueOf : void 0;
+  function equalByTag(object, other, tag2, bitmask, customizer, equalFunc, stack) {
+    switch (tag2) {
+      case dataViewTag5:
+        if (object.byteLength != other.byteLength || object.byteOffset != other.byteOffset) {
+          return false;
+        }
+        object = object.buffer;
+        other = other.buffer;
+      case arrayBufferTag4:
+        if (object.byteLength != other.byteLength || !equalFunc(new Uint8Array_default(object), new Uint8Array_default(other))) {
+          return false;
+        }
+        return true;
+      case boolTag4:
+      case dateTag4:
+      case numberTag4:
+        return eq_default(+object, +other);
+      case errorTag3:
+        return object.name == other.name && object.message == other.message;
+      case regexpTag4:
+      case stringTag4:
+        return object == other + "";
+      case mapTag6:
+        var convert = mapToArray_default;
+      case setTag6:
+        var isPartial = bitmask & COMPARE_PARTIAL_FLAG2;
+        convert || (convert = setToArray_default);
+        if (object.size != other.size && !isPartial) {
+          return false;
+        }
+        var stacked = stack.get(object);
+        if (stacked) {
+          return stacked == other;
+        }
+        bitmask |= COMPARE_UNORDERED_FLAG2;
+        stack.set(object, other);
+        var result = equalArrays_default(convert(object), convert(other), bitmask, customizer, equalFunc, stack);
+        stack["delete"](object);
+        return result;
+      case symbolTag4:
+        if (symbolValueOf2) {
+          return symbolValueOf2.call(object) == symbolValueOf2.call(other);
+        }
+    }
+    return false;
+  }
+  var equalByTag_default = equalByTag;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_equalObjects.js
+  var COMPARE_PARTIAL_FLAG3 = 1;
+  var objectProto15 = Object.prototype;
+  var hasOwnProperty12 = objectProto15.hasOwnProperty;
+  function equalObjects(object, other, bitmask, customizer, equalFunc, stack) {
+    var isPartial = bitmask & COMPARE_PARTIAL_FLAG3, objProps = getAllKeys_default(object), objLength = objProps.length, othProps = getAllKeys_default(other), othLength = othProps.length;
+    if (objLength != othLength && !isPartial) {
+      return false;
+    }
+    var index = objLength;
+    while (index--) {
+      var key = objProps[index];
+      if (!(isPartial ? key in other : hasOwnProperty12.call(other, key))) {
+        return false;
+      }
+    }
+    var objStacked = stack.get(object);
+    var othStacked = stack.get(other);
+    if (objStacked && othStacked) {
+      return objStacked == other && othStacked == object;
+    }
+    var result = true;
+    stack.set(object, other);
+    stack.set(other, object);
+    var skipCtor = isPartial;
+    while (++index < objLength) {
+      key = objProps[index];
+      var objValue = object[key], othValue = other[key];
+      if (customizer) {
+        var compared = isPartial ? customizer(othValue, objValue, key, other, object, stack) : customizer(objValue, othValue, key, object, other, stack);
+      }
+      if (!(compared === void 0 ? objValue === othValue || equalFunc(objValue, othValue, bitmask, customizer, stack) : compared)) {
+        result = false;
+        break;
+      }
+      skipCtor || (skipCtor = key == "constructor");
+    }
+    if (result && !skipCtor) {
+      var objCtor = object.constructor, othCtor = other.constructor;
+      if (objCtor != othCtor && ("constructor" in object && "constructor" in other) && !(typeof objCtor == "function" && objCtor instanceof objCtor && typeof othCtor == "function" && othCtor instanceof othCtor)) {
+        result = false;
+      }
+    }
+    stack["delete"](object);
+    stack["delete"](other);
+    return result;
+  }
+  var equalObjects_default = equalObjects;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseIsEqualDeep.js
+  var COMPARE_PARTIAL_FLAG4 = 1;
+  var argsTag4 = "[object Arguments]";
+  var arrayTag3 = "[object Array]";
+  var objectTag4 = "[object Object]";
+  var objectProto16 = Object.prototype;
+  var hasOwnProperty13 = objectProto16.hasOwnProperty;
+  function baseIsEqualDeep(object, other, bitmask, customizer, equalFunc, stack) {
+    var objIsArr = isArray_default(object), othIsArr = isArray_default(other), objTag = objIsArr ? arrayTag3 : getTag_default(object), othTag = othIsArr ? arrayTag3 : getTag_default(other);
+    objTag = objTag == argsTag4 ? objectTag4 : objTag;
+    othTag = othTag == argsTag4 ? objectTag4 : othTag;
+    var objIsObj = objTag == objectTag4, othIsObj = othTag == objectTag4, isSameTag = objTag == othTag;
+    if (isSameTag && isBuffer_default(object)) {
+      if (!isBuffer_default(other)) {
+        return false;
+      }
+      objIsArr = true;
+      objIsObj = false;
+    }
+    if (isSameTag && !objIsObj) {
+      stack || (stack = new Stack_default());
+      return objIsArr || isTypedArray_default(object) ? equalArrays_default(object, other, bitmask, customizer, equalFunc, stack) : equalByTag_default(object, other, objTag, bitmask, customizer, equalFunc, stack);
+    }
+    if (!(bitmask & COMPARE_PARTIAL_FLAG4)) {
+      var objIsWrapped = objIsObj && hasOwnProperty13.call(object, "__wrapped__"), othIsWrapped = othIsObj && hasOwnProperty13.call(other, "__wrapped__");
+      if (objIsWrapped || othIsWrapped) {
+        var objUnwrapped = objIsWrapped ? object.value() : object, othUnwrapped = othIsWrapped ? other.value() : other;
+        stack || (stack = new Stack_default());
+        return equalFunc(objUnwrapped, othUnwrapped, bitmask, customizer, stack);
+      }
+    }
+    if (!isSameTag) {
+      return false;
+    }
+    stack || (stack = new Stack_default());
+    return equalObjects_default(object, other, bitmask, customizer, equalFunc, stack);
+  }
+  var baseIsEqualDeep_default = baseIsEqualDeep;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseIsEqual.js
+  function baseIsEqual(value, other, bitmask, customizer, stack) {
+    if (value === other) {
+      return true;
+    }
+    if (value == null || other == null || !isObjectLike_default(value) && !isObjectLike_default(other)) {
+      return value !== value && other !== other;
+    }
+    return baseIsEqualDeep_default(value, other, bitmask, customizer, baseIsEqual, stack);
+  }
+  var baseIsEqual_default = baseIsEqual;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseIsMatch.js
+  var COMPARE_PARTIAL_FLAG5 = 1;
+  var COMPARE_UNORDERED_FLAG3 = 2;
+  function baseIsMatch(object, source, matchData, customizer) {
+    var index = matchData.length, length = index, noCustomizer = !customizer;
+    if (object == null) {
+      return !length;
+    }
+    object = Object(object);
+    while (index--) {
+      var data = matchData[index];
+      if (noCustomizer && data[2] ? data[1] !== object[data[0]] : !(data[0] in object)) {
+        return false;
+      }
+    }
+    while (++index < length) {
+      data = matchData[index];
+      var key = data[0], objValue = object[key], srcValue = data[1];
+      if (noCustomizer && data[2]) {
+        if (objValue === void 0 && !(key in object)) {
+          return false;
+        }
+      } else {
+        var stack = new Stack_default();
+        if (customizer) {
+          var result = customizer(objValue, srcValue, key, object, source, stack);
+        }
+        if (!(result === void 0 ? baseIsEqual_default(srcValue, objValue, COMPARE_PARTIAL_FLAG5 | COMPARE_UNORDERED_FLAG3, customizer, stack) : result)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+  var baseIsMatch_default = baseIsMatch;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_isStrictComparable.js
+  function isStrictComparable(value) {
+    return value === value && !isObject_default(value);
+  }
+  var isStrictComparable_default = isStrictComparable;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_getMatchData.js
+  function getMatchData(object) {
+    var result = keys_default(object), length = result.length;
+    while (length--) {
+      var key = result[length], value = object[key];
+      result[length] = [key, value, isStrictComparable_default(value)];
+    }
+    return result;
+  }
+  var getMatchData_default = getMatchData;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_matchesStrictComparable.js
+  function matchesStrictComparable(key, srcValue) {
+    return function(object) {
+      if (object == null) {
+        return false;
+      }
+      return object[key] === srcValue && (srcValue !== void 0 || key in Object(object));
+    };
+  }
+  var matchesStrictComparable_default = matchesStrictComparable;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseMatches.js
+  function baseMatches(source) {
+    var matchData = getMatchData_default(source);
+    if (matchData.length == 1 && matchData[0][2]) {
+      return matchesStrictComparable_default(matchData[0][0], matchData[0][1]);
+    }
+    return function(object) {
+      return object === source || baseIsMatch_default(object, source, matchData);
+    };
+  }
+  var baseMatches_default = baseMatches;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseHasIn.js
+  function baseHasIn(object, key) {
+    return object != null && key in Object(object);
+  }
+  var baseHasIn_default = baseHasIn;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_hasPath.js
+  function hasPath(object, path, hasFunc) {
+    path = castPath_default(path, object);
+    var index = -1, length = path.length, result = false;
+    while (++index < length) {
+      var key = toKey_default(path[index]);
+      if (!(result = object != null && hasFunc(object, key))) {
+        break;
+      }
+      object = object[key];
+    }
+    if (result || ++index != length) {
+      return result;
+    }
+    length = object == null ? 0 : object.length;
+    return !!length && isLength_default(length) && isIndex_default(key, length) && (isArray_default(object) || isArguments_default(object));
+  }
+  var hasPath_default = hasPath;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/hasIn.js
+  function hasIn(object, path) {
+    return object != null && hasPath_default(object, path, baseHasIn_default);
+  }
+  var hasIn_default = hasIn;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseMatchesProperty.js
+  var COMPARE_PARTIAL_FLAG6 = 1;
+  var COMPARE_UNORDERED_FLAG4 = 2;
+  function baseMatchesProperty(path, srcValue) {
+    if (isKey_default(path) && isStrictComparable_default(srcValue)) {
+      return matchesStrictComparable_default(toKey_default(path), srcValue);
+    }
+    return function(object) {
+      var objValue = get_default(object, path);
+      return objValue === void 0 && objValue === srcValue ? hasIn_default(object, path) : baseIsEqual_default(srcValue, objValue, COMPARE_PARTIAL_FLAG6 | COMPARE_UNORDERED_FLAG4);
+    };
+  }
+  var baseMatchesProperty_default = baseMatchesProperty;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseProperty.js
+  function baseProperty(key) {
+    return function(object) {
+      return object == null ? void 0 : object[key];
+    };
+  }
+  var baseProperty_default = baseProperty;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_basePropertyDeep.js
+  function basePropertyDeep(path) {
+    return function(object) {
+      return baseGet_default(object, path);
+    };
+  }
+  var basePropertyDeep_default = basePropertyDeep;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/property.js
+  function property(path) {
+    return isKey_default(path) ? baseProperty_default(toKey_default(path)) : basePropertyDeep_default(path);
+  }
+  var property_default = property;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseIteratee.js
+  function baseIteratee(value) {
+    if (typeof value == "function") {
+      return value;
+    }
+    if (value == null) {
+      return identity_default;
+    }
+    if (typeof value == "object") {
+      return isArray_default(value) ? baseMatchesProperty_default(value[0], value[1]) : baseMatches_default(value);
+    }
+    return property_default(value);
+  }
+  var baseIteratee_default = baseIteratee;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_arrayAggregator.js
+  function arrayAggregator(array, setter, iteratee, accumulator) {
+    var index = -1, length = array == null ? 0 : array.length;
+    while (++index < length) {
+      var value = array[index];
+      setter(accumulator, value, iteratee(value), array);
+    }
+    return accumulator;
+  }
+  var arrayAggregator_default = arrayAggregator;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_createBaseFor.js
+  function createBaseFor(fromRight) {
+    return function(object, iteratee, keysFunc) {
+      var index = -1, iterable = Object(object), props = keysFunc(object), length = props.length;
+      while (length--) {
+        var key = props[fromRight ? length : ++index];
+        if (iteratee(iterable[key], key, iterable) === false) {
+          break;
+        }
+      }
+      return object;
+    };
+  }
+  var createBaseFor_default = createBaseFor;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseFor.js
+  var baseFor = createBaseFor_default();
+  var baseFor_default = baseFor;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseForOwn.js
+  function baseForOwn(object, iteratee) {
+    return object && baseFor_default(object, iteratee, keys_default);
+  }
+  var baseForOwn_default = baseForOwn;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_createBaseEach.js
+  function createBaseEach(eachFunc, fromRight) {
+    return function(collection, iteratee) {
+      if (collection == null) {
+        return collection;
+      }
+      if (!isArrayLike_default(collection)) {
+        return eachFunc(collection, iteratee);
+      }
+      var length = collection.length, index = fromRight ? length : -1, iterable = Object(collection);
+      while (fromRight ? index-- : ++index < length) {
+        if (iteratee(iterable[index], index, iterable) === false) {
+          break;
+        }
+      }
+      return collection;
+    };
+  }
+  var createBaseEach_default = createBaseEach;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseEach.js
+  var baseEach = createBaseEach_default(baseForOwn_default);
+  var baseEach_default = baseEach;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseAggregator.js
+  function baseAggregator(collection, setter, iteratee, accumulator) {
+    baseEach_default(collection, function(value, key, collection2) {
+      setter(accumulator, value, iteratee(value), collection2);
+    });
+    return accumulator;
+  }
+  var baseAggregator_default = baseAggregator;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_createAggregator.js
+  function createAggregator(setter, initializer) {
+    return function(collection, iteratee) {
+      var func = isArray_default(collection) ? arrayAggregator_default : baseAggregator_default, accumulator = initializer ? initializer() : {};
+      return func(collection, setter, baseIteratee_default(iteratee, 2), accumulator);
+    };
+  }
+  var createAggregator_default = createAggregator;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/defaults.js
+  var objectProto17 = Object.prototype;
+  var hasOwnProperty14 = objectProto17.hasOwnProperty;
+  var defaults = baseRest_default(function(object, sources) {
+    object = Object(object);
+    var index = -1;
+    var length = sources.length;
+    var guard = length > 2 ? sources[2] : void 0;
+    if (guard && isIterateeCall_default(sources[0], sources[1], guard)) {
+      length = 1;
+    }
+    while (++index < length) {
+      var source = sources[index];
+      var props = keysIn_default(source);
+      var propsIndex = -1;
+      var propsLength = props.length;
+      while (++propsIndex < propsLength) {
+        var key = props[propsIndex];
+        var value = object[key];
+        if (value === void 0 || eq_default(value, objectProto17[key]) && !hasOwnProperty14.call(object, key)) {
+          object[key] = source[key];
+        }
+      }
+    }
+    return object;
+  });
+  var defaults_default = defaults;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/isArrayLikeObject.js
+  function isArrayLikeObject(value) {
+    return isObjectLike_default(value) && isArrayLike_default(value);
+  }
+  var isArrayLikeObject_default = isArrayLikeObject;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_arrayIncludesWith.js
+  function arrayIncludesWith(array, value, comparator) {
+    var index = -1, length = array == null ? 0 : array.length;
+    while (++index < length) {
+      if (comparator(value, array[index])) {
+        return true;
+      }
+    }
+    return false;
+  }
+  var arrayIncludesWith_default = arrayIncludesWith;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseDifference.js
+  var LARGE_ARRAY_SIZE2 = 200;
+  function baseDifference(array, values2, iteratee, comparator) {
+    var index = -1, includes2 = arrayIncludes_default, isCommon = true, length = array.length, result = [], valuesLength = values2.length;
+    if (!length) {
+      return result;
+    }
+    if (iteratee) {
+      values2 = arrayMap_default(values2, baseUnary_default(iteratee));
+    }
+    if (comparator) {
+      includes2 = arrayIncludesWith_default;
+      isCommon = false;
+    } else if (values2.length >= LARGE_ARRAY_SIZE2) {
+      includes2 = cacheHas_default;
+      isCommon = false;
+      values2 = new SetCache_default(values2);
+    }
+    outer:
+      while (++index < length) {
+        var value = array[index], computed = iteratee == null ? value : iteratee(value);
+        value = comparator || value !== 0 ? value : 0;
+        if (isCommon && computed === computed) {
+          var valuesIndex = valuesLength;
+          while (valuesIndex--) {
+            if (values2[valuesIndex] === computed) {
+              continue outer;
+            }
+          }
+          result.push(value);
+        } else if (!includes2(values2, computed, comparator)) {
+          result.push(value);
+        }
+      }
+    return result;
+  }
+  var baseDifference_default = baseDifference;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/difference.js
+  var difference = baseRest_default(function(array, values2) {
+    return isArrayLikeObject_default(array) ? baseDifference_default(array, baseFlatten_default(values2, 1, isArrayLikeObject_default, true)) : [];
+  });
+  var difference_default = difference;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/last.js
+  function last(array) {
+    var length = array == null ? 0 : array.length;
+    return length ? array[length - 1] : void 0;
+  }
+  var last_default = last;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/drop.js
+  function drop(array, n, guard) {
+    var length = array == null ? 0 : array.length;
+    if (!length) {
+      return [];
+    }
+    n = guard || n === void 0 ? 1 : toInteger_default(n);
+    return baseSlice_default(array, n < 0 ? 0 : n, length);
+  }
+  var drop_default = drop;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/dropRight.js
+  function dropRight(array, n, guard) {
+    var length = array == null ? 0 : array.length;
+    if (!length) {
+      return [];
+    }
+    n = guard || n === void 0 ? 1 : toInteger_default(n);
+    n = length - n;
+    return baseSlice_default(array, 0, n < 0 ? 0 : n);
+  }
+  var dropRight_default = dropRight;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_castFunction.js
+  function castFunction(value) {
+    return typeof value == "function" ? value : identity_default;
+  }
+  var castFunction_default = castFunction;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/forEach.js
+  function forEach(collection, iteratee) {
+    var func = isArray_default(collection) ? arrayEach_default : baseEach_default;
+    return func(collection, castFunction_default(iteratee));
+  }
+  var forEach_default = forEach;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_arrayEvery.js
+  function arrayEvery(array, predicate) {
+    var index = -1, length = array == null ? 0 : array.length;
+    while (++index < length) {
+      if (!predicate(array[index], index, array)) {
+        return false;
+      }
+    }
+    return true;
+  }
+  var arrayEvery_default = arrayEvery;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseEvery.js
+  function baseEvery(collection, predicate) {
+    var result = true;
+    baseEach_default(collection, function(value, index, collection2) {
+      result = !!predicate(value, index, collection2);
+      return result;
+    });
+    return result;
+  }
+  var baseEvery_default = baseEvery;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/every.js
+  function every(collection, predicate, guard) {
+    var func = isArray_default(collection) ? arrayEvery_default : baseEvery_default;
+    if (guard && isIterateeCall_default(collection, predicate, guard)) {
+      predicate = void 0;
+    }
+    return func(collection, baseIteratee_default(predicate, 3));
+  }
+  var every_default = every;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseFilter.js
+  function baseFilter(collection, predicate) {
+    var result = [];
+    baseEach_default(collection, function(value, index, collection2) {
+      if (predicate(value, index, collection2)) {
+        result.push(value);
+      }
+    });
+    return result;
+  }
+  var baseFilter_default = baseFilter;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/filter.js
+  function filter(collection, predicate) {
+    var func = isArray_default(collection) ? arrayFilter_default : baseFilter_default;
+    return func(collection, baseIteratee_default(predicate, 3));
+  }
+  var filter_default = filter;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_createFind.js
+  function createFind(findIndexFunc) {
+    return function(collection, predicate, fromIndex) {
+      var iterable = Object(collection);
+      if (!isArrayLike_default(collection)) {
+        var iteratee = baseIteratee_default(predicate, 3);
+        collection = keys_default(collection);
+        predicate = function(key) {
+          return iteratee(iterable[key], key, iterable);
         };
+      }
+      var index = findIndexFunc(collection, predicate, fromIndex);
+      return index > -1 ? iterable[iteratee ? collection[index] : index] : void 0;
+    };
+  }
+  var createFind_default = createFind;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/findIndex.js
+  var nativeMax2 = Math.max;
+  function findIndex(array, predicate, fromIndex) {
+    var length = array == null ? 0 : array.length;
+    if (!length) {
+      return -1;
+    }
+    var index = fromIndex == null ? 0 : toInteger_default(fromIndex);
+    if (index < 0) {
+      index = nativeMax2(length + index, 0);
+    }
+    return baseFindIndex_default(array, baseIteratee_default(predicate, 3), index);
+  }
+  var findIndex_default = findIndex;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/find.js
+  var find = createFind_default(findIndex_default);
+  var find_default = find;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/head.js
+  function head(array) {
+    return array && array.length ? array[0] : void 0;
+  }
+  var head_default = head;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseMap.js
+  function baseMap(collection, iteratee) {
+    var index = -1, result = isArrayLike_default(collection) ? Array(collection.length) : [];
+    baseEach_default(collection, function(value, key, collection2) {
+      result[++index] = iteratee(value, key, collection2);
+    });
+    return result;
+  }
+  var baseMap_default = baseMap;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/map.js
+  function map(collection, iteratee) {
+    var func = isArray_default(collection) ? arrayMap_default : baseMap_default;
+    return func(collection, baseIteratee_default(iteratee, 3));
+  }
+  var map_default = map;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/flatMap.js
+  function flatMap(collection, iteratee) {
+    return baseFlatten_default(map_default(collection, iteratee), 1);
+  }
+  var flatMap_default = flatMap;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/groupBy.js
+  var objectProto18 = Object.prototype;
+  var hasOwnProperty15 = objectProto18.hasOwnProperty;
+  var groupBy = createAggregator_default(function(result, value, key) {
+    if (hasOwnProperty15.call(result, key)) {
+      result[key].push(value);
+    } else {
+      baseAssignValue_default(result, key, [value]);
+    }
+  });
+  var groupBy_default = groupBy;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseHas.js
+  var objectProto19 = Object.prototype;
+  var hasOwnProperty16 = objectProto19.hasOwnProperty;
+  function baseHas(object, key) {
+    return object != null && hasOwnProperty16.call(object, key);
+  }
+  var baseHas_default = baseHas;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/has.js
+  function has(object, path) {
+    return object != null && hasPath_default(object, path, baseHas_default);
+  }
+  var has_default = has;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/isString.js
+  var stringTag5 = "[object String]";
+  function isString(value) {
+    return typeof value == "string" || !isArray_default(value) && isObjectLike_default(value) && baseGetTag_default(value) == stringTag5;
+  }
+  var isString_default = isString;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseValues.js
+  function baseValues(object, props) {
+    return arrayMap_default(props, function(key) {
+      return object[key];
+    });
+  }
+  var baseValues_default = baseValues;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/values.js
+  function values(object) {
+    return object == null ? [] : baseValues_default(object, keys_default(object));
+  }
+  var values_default = values;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/includes.js
+  var nativeMax3 = Math.max;
+  function includes(collection, value, fromIndex, guard) {
+    collection = isArrayLike_default(collection) ? collection : values_default(collection);
+    fromIndex = fromIndex && !guard ? toInteger_default(fromIndex) : 0;
+    var length = collection.length;
+    if (fromIndex < 0) {
+      fromIndex = nativeMax3(length + fromIndex, 0);
+    }
+    return isString_default(collection) ? fromIndex <= length && collection.indexOf(value, fromIndex) > -1 : !!length && baseIndexOf_default(collection, value, fromIndex) > -1;
+  }
+  var includes_default = includes;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/indexOf.js
+  var nativeMax4 = Math.max;
+  function indexOf(array, value, fromIndex) {
+    var length = array == null ? 0 : array.length;
+    if (!length) {
+      return -1;
+    }
+    var index = fromIndex == null ? 0 : toInteger_default(fromIndex);
+    if (index < 0) {
+      index = nativeMax4(length + index, 0);
+    }
+    return baseIndexOf_default(array, value, index);
+  }
+  var indexOf_default = indexOf;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/isEmpty.js
+  var mapTag7 = "[object Map]";
+  var setTag7 = "[object Set]";
+  var objectProto20 = Object.prototype;
+  var hasOwnProperty17 = objectProto20.hasOwnProperty;
+  function isEmpty(value) {
+    if (value == null) {
+      return true;
+    }
+    if (isArrayLike_default(value) && (isArray_default(value) || typeof value == "string" || typeof value.splice == "function" || isBuffer_default(value) || isTypedArray_default(value) || isArguments_default(value))) {
+      return !value.length;
+    }
+    var tag2 = getTag_default(value);
+    if (tag2 == mapTag7 || tag2 == setTag7) {
+      return !value.size;
+    }
+    if (isPrototype_default(value)) {
+      return !baseKeys_default(value).length;
+    }
+    for (var key in value) {
+      if (hasOwnProperty17.call(value, key)) {
+        return false;
+      }
+    }
+    return true;
+  }
+  var isEmpty_default = isEmpty;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseIsRegExp.js
+  var regexpTag5 = "[object RegExp]";
+  function baseIsRegExp(value) {
+    return isObjectLike_default(value) && baseGetTag_default(value) == regexpTag5;
+  }
+  var baseIsRegExp_default = baseIsRegExp;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/isRegExp.js
+  var nodeIsRegExp = nodeUtil_default && nodeUtil_default.isRegExp;
+  var isRegExp = nodeIsRegExp ? baseUnary_default(nodeIsRegExp) : baseIsRegExp_default;
+  var isRegExp_default = isRegExp;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/isUndefined.js
+  function isUndefined(value) {
+    return value === void 0;
+  }
+  var isUndefined_default = isUndefined;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/negate.js
+  var FUNC_ERROR_TEXT2 = "Expected a function";
+  function negate(predicate) {
+    if (typeof predicate != "function") {
+      throw new TypeError(FUNC_ERROR_TEXT2);
+    }
+    return function() {
+      var args = arguments;
+      switch (args.length) {
+        case 0:
+          return !predicate.call(this);
+        case 1:
+          return !predicate.call(this, args[0]);
+        case 2:
+          return !predicate.call(this, args[0], args[1]);
+        case 3:
+          return !predicate.call(this, args[0], args[1], args[2]);
+      }
+      return !predicate.apply(this, args);
+    };
+  }
+  var negate_default = negate;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseSet.js
+  function baseSet(object, path, value, customizer) {
+    if (!isObject_default(object)) {
+      return object;
+    }
+    path = castPath_default(path, object);
+    var index = -1, length = path.length, lastIndex = length - 1, nested = object;
+    while (nested != null && ++index < length) {
+      var key = toKey_default(path[index]), newValue = value;
+      if (key === "__proto__" || key === "constructor" || key === "prototype") {
+        return object;
+      }
+      if (index != lastIndex) {
+        var objValue = nested[key];
+        newValue = customizer ? customizer(objValue, key, nested) : void 0;
+        if (newValue === void 0) {
+          newValue = isObject_default(objValue) ? objValue : isIndex_default(path[index + 1]) ? [] : {};
+        }
+      }
+      assignValue_default(nested, key, newValue);
+      nested = nested[key];
+    }
+    return object;
+  }
+  var baseSet_default = baseSet;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_basePickBy.js
+  function basePickBy(object, paths, predicate) {
+    var index = -1, length = paths.length, result = {};
+    while (++index < length) {
+      var path = paths[index], value = baseGet_default(object, path);
+      if (predicate(value, path)) {
+        baseSet_default(result, castPath_default(path, object), value);
+      }
+    }
+    return result;
+  }
+  var basePickBy_default = basePickBy;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/pickBy.js
+  function pickBy(object, predicate) {
+    if (object == null) {
+      return {};
+    }
+    var props = arrayMap_default(getAllKeysIn_default(object), function(prop) {
+      return [prop];
+    });
+    predicate = baseIteratee_default(predicate);
+    return basePickBy_default(object, props, function(value, path) {
+      return predicate(value, path[0]);
+    });
+  }
+  var pickBy_default = pickBy;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseReduce.js
+  function baseReduce(collection, iteratee, accumulator, initAccum, eachFunc) {
+    eachFunc(collection, function(value, index, collection2) {
+      accumulator = initAccum ? (initAccum = false, value) : iteratee(accumulator, value, index, collection2);
+    });
+    return accumulator;
+  }
+  var baseReduce_default = baseReduce;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/reduce.js
+  function reduce(collection, iteratee, accumulator) {
+    var func = isArray_default(collection) ? arrayReduce_default : baseReduce_default, initAccum = arguments.length < 3;
+    return func(collection, baseIteratee_default(iteratee, 4), accumulator, initAccum, baseEach_default);
+  }
+  var reduce_default = reduce;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/reject.js
+  function reject(collection, predicate) {
+    var func = isArray_default(collection) ? arrayFilter_default : baseFilter_default;
+    return func(collection, negate_default(baseIteratee_default(predicate, 3)));
+  }
+  var reject_default = reject;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseSome.js
+  function baseSome(collection, predicate) {
+    var result;
+    baseEach_default(collection, function(value, index, collection2) {
+      result = predicate(value, index, collection2);
+      return !result;
+    });
+    return !!result;
+  }
+  var baseSome_default = baseSome;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/some.js
+  function some(collection, predicate, guard) {
+    var func = isArray_default(collection) ? arraySome_default : baseSome_default;
+    if (guard && isIterateeCall_default(collection, predicate, guard)) {
+      predicate = void 0;
+    }
+    return func(collection, baseIteratee_default(predicate, 3));
+  }
+  var some_default = some;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_createSet.js
+  var INFINITY4 = 1 / 0;
+  var createSet = !(Set_default && 1 / setToArray_default(new Set_default([, -0]))[1] == INFINITY4) ? noop_default : function(values2) {
+    return new Set_default(values2);
+  };
+  var createSet_default = createSet;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_baseUniq.js
+  var LARGE_ARRAY_SIZE3 = 200;
+  function baseUniq(array, iteratee, comparator) {
+    var index = -1, includes2 = arrayIncludes_default, length = array.length, isCommon = true, result = [], seen = result;
+    if (comparator) {
+      isCommon = false;
+      includes2 = arrayIncludesWith_default;
+    } else if (length >= LARGE_ARRAY_SIZE3) {
+      var set = iteratee ? null : createSet_default(array);
+      if (set) {
+        return setToArray_default(set);
+      }
+      isCommon = false;
+      includes2 = cacheHas_default;
+      seen = new SetCache_default();
+    } else {
+      seen = iteratee ? [] : result;
+    }
+    outer:
+      while (++index < length) {
+        var value = array[index], computed = iteratee ? iteratee(value) : value;
+        value = comparator || value !== 0 ? value : 0;
+        if (isCommon && computed === computed) {
+          var seenIndex = seen.length;
+          while (seenIndex--) {
+            if (seen[seenIndex] === computed) {
+              continue outer;
+            }
+          }
+          if (iteratee) {
+            seen.push(computed);
+          }
+          result.push(value);
+        } else if (!includes2(seen, computed, comparator)) {
+          if (seen !== result) {
+            seen.push(computed);
+          }
+          result.push(value);
+        }
+      }
+    return result;
+  }
+  var baseUniq_default = baseUniq;
+
+  // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/uniq.js
+  function uniq(array) {
+    return array && array.length ? baseUniq_default(array) : [];
+  }
+  var uniq_default = uniq;
+
+  // node_modules/.pnpm/@chevrotain+utils@11.0.3/node_modules/@chevrotain/utils/lib/src/print.js
+  function PRINT_ERROR(msg) {
+    if (console && console.error) {
+      console.error(`Error: ${msg}`);
+    }
+  }
+  function PRINT_WARNING(msg) {
+    if (console && console.warn) {
+      console.warn(`Warning: ${msg}`);
+    }
+  }
+
+  // node_modules/.pnpm/@chevrotain+utils@11.0.3/node_modules/@chevrotain/utils/lib/src/timer.js
+  function timer(func) {
+    const start = (/* @__PURE__ */ new Date()).getTime();
+    const val = func();
+    const end = (/* @__PURE__ */ new Date()).getTime();
+    const total = end - start;
+    return { time: total, value: val };
+  }
+
+  // node_modules/.pnpm/@chevrotain+utils@11.0.3/node_modules/@chevrotain/utils/lib/src/to-fast-properties.js
+  function toFastProperties(toBecomeFast) {
+    function FakeConstructor() {
+    }
+    FakeConstructor.prototype = toBecomeFast;
+    const fakeInstance = new FakeConstructor();
+    function fakeAccess() {
+      return typeof fakeInstance.bar;
+    }
+    fakeAccess();
+    fakeAccess();
+    if (1)
+      return toBecomeFast;
+    (0, eval)(toBecomeFast);
+  }
+
+  // node_modules/.pnpm/@chevrotain+gast@11.0.3/node_modules/@chevrotain/gast/lib/src/model.js
+  function tokenLabel(tokType) {
+    if (hasTokenLabel(tokType)) {
+      return tokType.LABEL;
+    } else {
+      return tokType.name;
+    }
+  }
+  function hasTokenLabel(obj) {
+    return isString_default(obj.LABEL) && obj.LABEL !== "";
+  }
+  var AbstractProduction = class {
+    get definition() {
+      return this._definition;
+    }
+    set definition(value) {
+      this._definition = value;
+    }
+    constructor(_definition) {
+      this._definition = _definition;
+    }
+    accept(visitor) {
+      visitor.visit(this);
+      forEach_default(this.definition, (prod) => {
+        prod.accept(visitor);
+      });
+    }
+  };
+  var NonTerminal = class extends AbstractProduction {
+    constructor(options) {
+      super([]);
+      this.idx = 1;
+      assign_default(this, pickBy_default(options, (v) => v !== void 0));
+    }
+    set definition(definition) {
+    }
+    get definition() {
+      if (this.referencedRule !== void 0) {
+        return this.referencedRule.definition;
+      }
+      return [];
+    }
+    accept(visitor) {
+      visitor.visit(this);
+    }
+  };
+  var Rule = class extends AbstractProduction {
+    constructor(options) {
+      super(options.definition);
+      this.orgText = "";
+      assign_default(this, pickBy_default(options, (v) => v !== void 0));
+    }
+  };
+  var Alternative = class extends AbstractProduction {
+    constructor(options) {
+      super(options.definition);
+      this.ignoreAmbiguities = false;
+      assign_default(this, pickBy_default(options, (v) => v !== void 0));
+    }
+  };
+  var Option = class extends AbstractProduction {
+    constructor(options) {
+      super(options.definition);
+      this.idx = 1;
+      assign_default(this, pickBy_default(options, (v) => v !== void 0));
+    }
+  };
+  var RepetitionMandatory = class extends AbstractProduction {
+    constructor(options) {
+      super(options.definition);
+      this.idx = 1;
+      assign_default(this, pickBy_default(options, (v) => v !== void 0));
+    }
+  };
+  var RepetitionMandatoryWithSeparator = class extends AbstractProduction {
+    constructor(options) {
+      super(options.definition);
+      this.idx = 1;
+      assign_default(this, pickBy_default(options, (v) => v !== void 0));
+    }
+  };
+  var Repetition = class extends AbstractProduction {
+    constructor(options) {
+      super(options.definition);
+      this.idx = 1;
+      assign_default(this, pickBy_default(options, (v) => v !== void 0));
+    }
+  };
+  var RepetitionWithSeparator = class extends AbstractProduction {
+    constructor(options) {
+      super(options.definition);
+      this.idx = 1;
+      assign_default(this, pickBy_default(options, (v) => v !== void 0));
+    }
+  };
+  var Alternation = class extends AbstractProduction {
+    get definition() {
+      return this._definition;
+    }
+    set definition(value) {
+      this._definition = value;
+    }
+    constructor(options) {
+      super(options.definition);
+      this.idx = 1;
+      this.ignoreAmbiguities = false;
+      this.hasPredicates = false;
+      assign_default(this, pickBy_default(options, (v) => v !== void 0));
+    }
+  };
+  var Terminal = class {
+    constructor(options) {
+      this.idx = 1;
+      assign_default(this, pickBy_default(options, (v) => v !== void 0));
+    }
+    accept(visitor) {
+      visitor.visit(this);
+    }
+  };
+  function serializeGrammar(topRules) {
+    return map_default(topRules, serializeProduction);
+  }
+  function serializeProduction(node) {
+    function convertDefinition(definition) {
+      return map_default(definition, serializeProduction);
+    }
+    if (node instanceof NonTerminal) {
+      const serializedNonTerminal = {
+        type: "NonTerminal",
+        name: node.nonTerminalName,
+        idx: node.idx
+      };
+      if (isString_default(node.label)) {
+        serializedNonTerminal.label = node.label;
+      }
+      return serializedNonTerminal;
+    } else if (node instanceof Alternative) {
+      return {
+        type: "Alternative",
+        definition: convertDefinition(node.definition)
+      };
+    } else if (node instanceof Option) {
+      return {
+        type: "Option",
+        idx: node.idx,
+        definition: convertDefinition(node.definition)
+      };
+    } else if (node instanceof RepetitionMandatory) {
+      return {
+        type: "RepetitionMandatory",
+        idx: node.idx,
+        definition: convertDefinition(node.definition)
+      };
+    } else if (node instanceof RepetitionMandatoryWithSeparator) {
+      return {
+        type: "RepetitionMandatoryWithSeparator",
+        idx: node.idx,
+        separator: serializeProduction(new Terminal({ terminalType: node.separator })),
+        definition: convertDefinition(node.definition)
+      };
+    } else if (node instanceof RepetitionWithSeparator) {
+      return {
+        type: "RepetitionWithSeparator",
+        idx: node.idx,
+        separator: serializeProduction(new Terminal({ terminalType: node.separator })),
+        definition: convertDefinition(node.definition)
+      };
+    } else if (node instanceof Repetition) {
+      return {
+        type: "Repetition",
+        idx: node.idx,
+        definition: convertDefinition(node.definition)
+      };
+    } else if (node instanceof Alternation) {
+      return {
+        type: "Alternation",
+        idx: node.idx,
+        definition: convertDefinition(node.definition)
+      };
+    } else if (node instanceof Terminal) {
+      const serializedTerminal = {
+        type: "Terminal",
+        name: node.terminalType.name,
+        label: tokenLabel(node.terminalType),
+        idx: node.idx
+      };
+      if (isString_default(node.label)) {
+        serializedTerminal.terminalLabel = node.label;
+      }
+      const pattern = node.terminalType.PATTERN;
+      if (node.terminalType.PATTERN) {
+        serializedTerminal.pattern = isRegExp_default(pattern) ? pattern.source : pattern;
+      }
+      return serializedTerminal;
+    } else if (node instanceof Rule) {
+      return {
+        type: "Rule",
+        name: node.name,
+        orgText: node.orgText,
+        definition: convertDefinition(node.definition)
+      };
+    } else {
+      throw Error("non exhaustive match");
+    }
+  }
+
+  // node_modules/.pnpm/@chevrotain+gast@11.0.3/node_modules/@chevrotain/gast/lib/src/visitor.js
+  var GAstVisitor = class {
+    visit(node) {
+      const nodeAny = node;
+      switch (nodeAny.constructor) {
+        case NonTerminal:
+          return this.visitNonTerminal(nodeAny);
+        case Alternative:
+          return this.visitAlternative(nodeAny);
+        case Option:
+          return this.visitOption(nodeAny);
+        case RepetitionMandatory:
+          return this.visitRepetitionMandatory(nodeAny);
+        case RepetitionMandatoryWithSeparator:
+          return this.visitRepetitionMandatoryWithSeparator(nodeAny);
+        case RepetitionWithSeparator:
+          return this.visitRepetitionWithSeparator(nodeAny);
+        case Repetition:
+          return this.visitRepetition(nodeAny);
+        case Alternation:
+          return this.visitAlternation(nodeAny);
+        case Terminal:
+          return this.visitTerminal(nodeAny);
+        case Rule:
+          return this.visitRule(nodeAny);
+        /* c8 ignore next 2 */
+        default:
+          throw Error("non exhaustive match");
+      }
+    }
+    /* c8 ignore next */
+    visitNonTerminal(node) {
+    }
+    /* c8 ignore next */
+    visitAlternative(node) {
+    }
+    /* c8 ignore next */
+    visitOption(node) {
+    }
+    /* c8 ignore next */
+    visitRepetition(node) {
+    }
+    /* c8 ignore next */
+    visitRepetitionMandatory(node) {
+    }
+    /* c8 ignore next 3 */
+    visitRepetitionMandatoryWithSeparator(node) {
+    }
+    /* c8 ignore next */
+    visitRepetitionWithSeparator(node) {
+    }
+    /* c8 ignore next */
+    visitAlternation(node) {
+    }
+    /* c8 ignore next */
+    visitTerminal(node) {
+    }
+    /* c8 ignore next */
+    visitRule(node) {
+    }
+  };
+
+  // node_modules/.pnpm/@chevrotain+gast@11.0.3/node_modules/@chevrotain/gast/lib/src/helpers.js
+  function isSequenceProd(prod) {
+    return prod instanceof Alternative || prod instanceof Option || prod instanceof Repetition || prod instanceof RepetitionMandatory || prod instanceof RepetitionMandatoryWithSeparator || prod instanceof RepetitionWithSeparator || prod instanceof Terminal || prod instanceof Rule;
+  }
+  function isOptionalProd(prod, alreadyVisited = []) {
+    const isDirectlyOptional = prod instanceof Option || prod instanceof Repetition || prod instanceof RepetitionWithSeparator;
+    if (isDirectlyOptional) {
+      return true;
+    }
+    if (prod instanceof Alternation) {
+      return some_default(prod.definition, (subProd) => {
+        return isOptionalProd(subProd, alreadyVisited);
+      });
+    } else if (prod instanceof NonTerminal && includes_default(alreadyVisited, prod)) {
+      return false;
+    } else if (prod instanceof AbstractProduction) {
+      if (prod instanceof NonTerminal) {
+        alreadyVisited.push(prod);
+      }
+      return every_default(prod.definition, (subProd) => {
+        return isOptionalProd(subProd, alreadyVisited);
+      });
+    } else {
+      return false;
+    }
+  }
+  function isBranchingProd(prod) {
+    return prod instanceof Alternation;
+  }
+  function getProductionDslName(prod) {
+    if (prod instanceof NonTerminal) {
+      return "SUBRULE";
+    } else if (prod instanceof Option) {
+      return "OPTION";
+    } else if (prod instanceof Alternation) {
+      return "OR";
+    } else if (prod instanceof RepetitionMandatory) {
+      return "AT_LEAST_ONE";
+    } else if (prod instanceof RepetitionMandatoryWithSeparator) {
+      return "AT_LEAST_ONE_SEP";
+    } else if (prod instanceof RepetitionWithSeparator) {
+      return "MANY_SEP";
+    } else if (prod instanceof Repetition) {
+      return "MANY";
+    } else if (prod instanceof Terminal) {
+      return "CONSUME";
+    } else {
+      throw Error("non exhaustive match");
+    }
+  }
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/parse/grammar/rest.js
+  var RestWalker = class {
+    walk(prod, prevRest = []) {
+      forEach_default(prod.definition, (subProd, index) => {
+        const currRest = drop_default(prod.definition, index + 1);
+        if (subProd instanceof NonTerminal) {
+          this.walkProdRef(subProd, currRest, prevRest);
+        } else if (subProd instanceof Terminal) {
+          this.walkTerminal(subProd, currRest, prevRest);
+        } else if (subProd instanceof Alternative) {
+          this.walkFlat(subProd, currRest, prevRest);
+        } else if (subProd instanceof Option) {
+          this.walkOption(subProd, currRest, prevRest);
+        } else if (subProd instanceof RepetitionMandatory) {
+          this.walkAtLeastOne(subProd, currRest, prevRest);
+        } else if (subProd instanceof RepetitionMandatoryWithSeparator) {
+          this.walkAtLeastOneSep(subProd, currRest, prevRest);
+        } else if (subProd instanceof RepetitionWithSeparator) {
+          this.walkManySep(subProd, currRest, prevRest);
+        } else if (subProd instanceof Repetition) {
+          this.walkMany(subProd, currRest, prevRest);
+        } else if (subProd instanceof Alternation) {
+          this.walkOr(subProd, currRest, prevRest);
+        } else {
+          throw Error("non exhaustive match");
+        }
+      });
+    }
+    walkTerminal(terminal, currRest, prevRest) {
+    }
+    walkProdRef(refProd, currRest, prevRest) {
+    }
+    walkFlat(flatProd, currRest, prevRest) {
+      const fullOrRest = currRest.concat(prevRest);
+      this.walk(flatProd, fullOrRest);
+    }
+    walkOption(optionProd, currRest, prevRest) {
+      const fullOrRest = currRest.concat(prevRest);
+      this.walk(optionProd, fullOrRest);
+    }
+    walkAtLeastOne(atLeastOneProd, currRest, prevRest) {
+      const fullAtLeastOneRest = [
+        new Option({ definition: atLeastOneProd.definition })
+      ].concat(currRest, prevRest);
+      this.walk(atLeastOneProd, fullAtLeastOneRest);
+    }
+    walkAtLeastOneSep(atLeastOneSepProd, currRest, prevRest) {
+      const fullAtLeastOneSepRest = restForRepetitionWithSeparator(atLeastOneSepProd, currRest, prevRest);
+      this.walk(atLeastOneSepProd, fullAtLeastOneSepRest);
+    }
+    walkMany(manyProd, currRest, prevRest) {
+      const fullManyRest = [
+        new Option({ definition: manyProd.definition })
+      ].concat(currRest, prevRest);
+      this.walk(manyProd, fullManyRest);
+    }
+    walkManySep(manySepProd, currRest, prevRest) {
+      const fullManySepRest = restForRepetitionWithSeparator(manySepProd, currRest, prevRest);
+      this.walk(manySepProd, fullManySepRest);
+    }
+    walkOr(orProd, currRest, prevRest) {
+      const fullOrRest = currRest.concat(prevRest);
+      forEach_default(orProd.definition, (alt) => {
+        const prodWrapper = new Alternative({ definition: [alt] });
+        this.walk(prodWrapper, fullOrRest);
+      });
+    }
+  };
+  function restForRepetitionWithSeparator(repSepProd, currRest, prevRest) {
+    const repSepRest = [
+      new Option({
+        definition: [
+          new Terminal({ terminalType: repSepProd.separator })
+        ].concat(repSepProd.definition)
+      })
+    ];
+    const fullRepSepRest = repSepRest.concat(currRest, prevRest);
+    return fullRepSepRest;
+  }
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/parse/grammar/first.js
+  function first(prod) {
+    if (prod instanceof NonTerminal) {
+      return first(prod.referencedRule);
+    } else if (prod instanceof Terminal) {
+      return firstForTerminal(prod);
+    } else if (isSequenceProd(prod)) {
+      return firstForSequence(prod);
+    } else if (isBranchingProd(prod)) {
+      return firstForBranching(prod);
+    } else {
+      throw Error("non exhaustive match");
+    }
+  }
+  function firstForSequence(prod) {
+    let firstSet = [];
+    const seq = prod.definition;
+    let nextSubProdIdx = 0;
+    let hasInnerProdsRemaining = seq.length > nextSubProdIdx;
+    let currSubProd;
+    let isLastInnerProdOptional = true;
+    while (hasInnerProdsRemaining && isLastInnerProdOptional) {
+      currSubProd = seq[nextSubProdIdx];
+      isLastInnerProdOptional = isOptionalProd(currSubProd);
+      firstSet = firstSet.concat(first(currSubProd));
+      nextSubProdIdx = nextSubProdIdx + 1;
+      hasInnerProdsRemaining = seq.length > nextSubProdIdx;
+    }
+    return uniq_default(firstSet);
+  }
+  function firstForBranching(prod) {
+    const allAlternativesFirsts = map_default(prod.definition, (innerProd) => {
+      return first(innerProd);
+    });
+    return uniq_default(flatten_default(allAlternativesFirsts));
+  }
+  function firstForTerminal(terminal) {
+    return [terminal.terminalType];
+  }
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/parse/constants.js
+  var IN = "_~IN~_";
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/parse/grammar/follow.js
+  var ResyncFollowsWalker = class extends RestWalker {
+    constructor(topProd) {
+      super();
+      this.topProd = topProd;
+      this.follows = {};
+    }
+    startWalking() {
+      this.walk(this.topProd);
+      return this.follows;
+    }
+    walkTerminal(terminal, currRest, prevRest) {
+    }
+    walkProdRef(refProd, currRest, prevRest) {
+      const followName = buildBetweenProdsFollowPrefix(refProd.referencedRule, refProd.idx) + this.topProd.name;
+      const fullRest = currRest.concat(prevRest);
+      const restProd = new Alternative({ definition: fullRest });
+      const t_in_topProd_follows = first(restProd);
+      this.follows[followName] = t_in_topProd_follows;
+    }
+  };
+  function computeAllProdsFollows(topProductions) {
+    const reSyncFollows = {};
+    forEach_default(topProductions, (topProd) => {
+      const currRefsFollow = new ResyncFollowsWalker(topProd).startWalking();
+      assign_default(reSyncFollows, currRefsFollow);
+    });
+    return reSyncFollows;
+  }
+  function buildBetweenProdsFollowPrefix(inner, occurenceInParent) {
+    return inner.name + occurenceInParent + IN;
+  }
+
+  // node_modules/.pnpm/@chevrotain+regexp-to-ast@11.0.3/node_modules/@chevrotain/regexp-to-ast/lib/src/utils.js
+  function cc(char) {
+    return char.charCodeAt(0);
+  }
+  function insertToSet(item, set) {
+    if (Array.isArray(item)) {
+      item.forEach(function(subItem) {
+        set.push(subItem);
+      });
+    } else {
+      set.push(item);
+    }
+  }
+  function addFlag(flagObj, flagKey) {
+    if (flagObj[flagKey] === true) {
+      throw "duplicate flag " + flagKey;
+    }
+    const x = flagObj[flagKey];
+    flagObj[flagKey] = true;
+  }
+  function ASSERT_EXISTS(obj) {
+    if (obj === void 0) {
+      throw Error("Internal Error - Should never get here!");
+    }
+    return true;
+  }
+  function ASSERT_NEVER_REACH_HERE() {
+    throw Error("Internal Error - Should never get here!");
+  }
+  function isCharacter(obj) {
+    return obj["type"] === "Character";
+  }
+
+  // node_modules/.pnpm/@chevrotain+regexp-to-ast@11.0.3/node_modules/@chevrotain/regexp-to-ast/lib/src/character-classes.js
+  var digitsCharCodes = [];
+  for (let i = cc("0"); i <= cc("9"); i++) {
+    digitsCharCodes.push(i);
+  }
+  var wordCharCodes = [cc("_")].concat(digitsCharCodes);
+  for (let i = cc("a"); i <= cc("z"); i++) {
+    wordCharCodes.push(i);
+  }
+  for (let i = cc("A"); i <= cc("Z"); i++) {
+    wordCharCodes.push(i);
+  }
+  var whitespaceCodes = [
+    cc(" "),
+    cc("\f"),
+    cc("\n"),
+    cc("\r"),
+    cc("	"),
+    cc("\v"),
+    cc("	"),
+    cc("\xA0"),
+    cc("\u1680"),
+    cc("\u2000"),
+    cc("\u2001"),
+    cc("\u2002"),
+    cc("\u2003"),
+    cc("\u2004"),
+    cc("\u2005"),
+    cc("\u2006"),
+    cc("\u2007"),
+    cc("\u2008"),
+    cc("\u2009"),
+    cc("\u200A"),
+    cc("\u2028"),
+    cc("\u2029"),
+    cc("\u202F"),
+    cc("\u205F"),
+    cc("\u3000"),
+    cc("\uFEFF")
+  ];
+
+  // node_modules/.pnpm/@chevrotain+regexp-to-ast@11.0.3/node_modules/@chevrotain/regexp-to-ast/lib/src/regexp-parser.js
+  var hexDigitPattern = /[0-9a-fA-F]/;
+  var decimalPattern = /[0-9]/;
+  var decimalPatternNoZero = /[1-9]/;
+  var RegExpParser = class {
+    constructor() {
+      this.idx = 0;
+      this.input = "";
+      this.groupIdx = 0;
+    }
+    saveState() {
+      return {
+        idx: this.idx,
+        input: this.input,
+        groupIdx: this.groupIdx
       };
     }
-    /**
-     * Parse a command string into a command node
-     */
-    parseCommand(commandText) {
-      const upperCommand = commandText.toUpperCase();
-      if (upperCommand.startsWith("PRINT")) {
+    restoreState(newState) {
+      this.idx = newState.idx;
+      this.input = newState.input;
+      this.groupIdx = newState.groupIdx;
+    }
+    pattern(input) {
+      this.idx = 0;
+      this.input = input;
+      this.groupIdx = 0;
+      this.consumeChar("/");
+      const value = this.disjunction();
+      this.consumeChar("/");
+      const flags = {
+        type: "Flags",
+        loc: { begin: this.idx, end: input.length },
+        global: false,
+        ignoreCase: false,
+        multiLine: false,
+        unicode: false,
+        sticky: false
+      };
+      while (this.isRegExpFlag()) {
+        switch (this.popChar()) {
+          case "g":
+            addFlag(flags, "global");
+            break;
+          case "i":
+            addFlag(flags, "ignoreCase");
+            break;
+          case "m":
+            addFlag(flags, "multiLine");
+            break;
+          case "u":
+            addFlag(flags, "unicode");
+            break;
+          case "y":
+            addFlag(flags, "sticky");
+            break;
+        }
+      }
+      if (this.idx !== this.input.length) {
+        throw Error("Redundant input: " + this.input.substring(this.idx));
+      }
+      return {
+        type: "Pattern",
+        flags,
+        value,
+        loc: this.loc(0)
+      };
+    }
+    disjunction() {
+      const alts = [];
+      const begin = this.idx;
+      alts.push(this.alternative());
+      while (this.peekChar() === "|") {
+        this.consumeChar("|");
+        alts.push(this.alternative());
+      }
+      return { type: "Disjunction", value: alts, loc: this.loc(begin) };
+    }
+    alternative() {
+      const terms = [];
+      const begin = this.idx;
+      while (this.isTerm()) {
+        terms.push(this.term());
+      }
+      return { type: "Alternative", value: terms, loc: this.loc(begin) };
+    }
+    term() {
+      if (this.isAssertion()) {
+        return this.assertion();
+      } else {
+        return this.atom();
+      }
+    }
+    assertion() {
+      const begin = this.idx;
+      switch (this.popChar()) {
+        case "^":
+          return {
+            type: "StartAnchor",
+            loc: this.loc(begin)
+          };
+        case "$":
+          return { type: "EndAnchor", loc: this.loc(begin) };
+        // '\b' or '\B'
+        case "\\":
+          switch (this.popChar()) {
+            case "b":
+              return {
+                type: "WordBoundary",
+                loc: this.loc(begin)
+              };
+            case "B":
+              return {
+                type: "NonWordBoundary",
+                loc: this.loc(begin)
+              };
+          }
+          throw Error("Invalid Assertion Escape");
+        // '(?=' or '(?!'
+        case "(":
+          this.consumeChar("?");
+          let type;
+          switch (this.popChar()) {
+            case "=":
+              type = "Lookahead";
+              break;
+            case "!":
+              type = "NegativeLookahead";
+              break;
+          }
+          ASSERT_EXISTS(type);
+          const disjunction = this.disjunction();
+          this.consumeChar(")");
+          return {
+            type,
+            value: disjunction,
+            loc: this.loc(begin)
+          };
+      }
+      return ASSERT_NEVER_REACH_HERE();
+    }
+    quantifier(isBacktracking = false) {
+      let range = void 0;
+      const begin = this.idx;
+      switch (this.popChar()) {
+        case "*":
+          range = {
+            atLeast: 0,
+            atMost: Infinity
+          };
+          break;
+        case "+":
+          range = {
+            atLeast: 1,
+            atMost: Infinity
+          };
+          break;
+        case "?":
+          range = {
+            atLeast: 0,
+            atMost: 1
+          };
+          break;
+        case "{":
+          const atLeast = this.integerIncludingZero();
+          switch (this.popChar()) {
+            case "}":
+              range = {
+                atLeast,
+                atMost: atLeast
+              };
+              break;
+            case ",":
+              let atMost;
+              if (this.isDigit()) {
+                atMost = this.integerIncludingZero();
+                range = {
+                  atLeast,
+                  atMost
+                };
+              } else {
+                range = {
+                  atLeast,
+                  atMost: Infinity
+                };
+              }
+              this.consumeChar("}");
+              break;
+          }
+          if (isBacktracking === true && range === void 0) {
+            return void 0;
+          }
+          ASSERT_EXISTS(range);
+          break;
+      }
+      if (isBacktracking === true && range === void 0) {
+        return void 0;
+      }
+      if (ASSERT_EXISTS(range)) {
+        if (this.peekChar(0) === "?") {
+          this.consumeChar("?");
+          range.greedy = false;
+        } else {
+          range.greedy = true;
+        }
+        range.type = "Quantifier";
+        range.loc = this.loc(begin);
+        return range;
+      }
+    }
+    atom() {
+      let atom;
+      const begin = this.idx;
+      switch (this.peekChar()) {
+        case ".":
+          atom = this.dotAll();
+          break;
+        case "\\":
+          atom = this.atomEscape();
+          break;
+        case "[":
+          atom = this.characterClass();
+          break;
+        case "(":
+          atom = this.group();
+          break;
+      }
+      if (atom === void 0 && this.isPatternCharacter()) {
+        atom = this.patternCharacter();
+      }
+      if (ASSERT_EXISTS(atom)) {
+        atom.loc = this.loc(begin);
+        if (this.isQuantifier()) {
+          atom.quantifier = this.quantifier();
+        }
+        return atom;
+      }
+      return ASSERT_NEVER_REACH_HERE();
+    }
+    dotAll() {
+      this.consumeChar(".");
+      return {
+        type: "Set",
+        complement: true,
+        value: [cc("\n"), cc("\r"), cc("\u2028"), cc("\u2029")]
+      };
+    }
+    atomEscape() {
+      this.consumeChar("\\");
+      switch (this.peekChar()) {
+        case "1":
+        case "2":
+        case "3":
+        case "4":
+        case "5":
+        case "6":
+        case "7":
+        case "8":
+        case "9":
+          return this.decimalEscapeAtom();
+        case "d":
+        case "D":
+        case "s":
+        case "S":
+        case "w":
+        case "W":
+          return this.characterClassEscape();
+        case "f":
+        case "n":
+        case "r":
+        case "t":
+        case "v":
+          return this.controlEscapeAtom();
+        case "c":
+          return this.controlLetterEscapeAtom();
+        case "0":
+          return this.nulCharacterAtom();
+        case "x":
+          return this.hexEscapeSequenceAtom();
+        case "u":
+          return this.regExpUnicodeEscapeSequenceAtom();
+        default:
+          return this.identityEscapeAtom();
+      }
+    }
+    decimalEscapeAtom() {
+      const value = this.positiveInteger();
+      return { type: "GroupBackReference", value };
+    }
+    characterClassEscape() {
+      let set;
+      let complement = false;
+      switch (this.popChar()) {
+        case "d":
+          set = digitsCharCodes;
+          break;
+        case "D":
+          set = digitsCharCodes;
+          complement = true;
+          break;
+        case "s":
+          set = whitespaceCodes;
+          break;
+        case "S":
+          set = whitespaceCodes;
+          complement = true;
+          break;
+        case "w":
+          set = wordCharCodes;
+          break;
+        case "W":
+          set = wordCharCodes;
+          complement = true;
+          break;
+      }
+      if (ASSERT_EXISTS(set)) {
+        return { type: "Set", value: set, complement };
+      }
+      return ASSERT_NEVER_REACH_HERE();
+    }
+    controlEscapeAtom() {
+      let escapeCode;
+      switch (this.popChar()) {
+        case "f":
+          escapeCode = cc("\f");
+          break;
+        case "n":
+          escapeCode = cc("\n");
+          break;
+        case "r":
+          escapeCode = cc("\r");
+          break;
+        case "t":
+          escapeCode = cc("	");
+          break;
+        case "v":
+          escapeCode = cc("\v");
+          break;
+      }
+      if (ASSERT_EXISTS(escapeCode)) {
+        return { type: "Character", value: escapeCode };
+      }
+      return ASSERT_NEVER_REACH_HERE();
+    }
+    controlLetterEscapeAtom() {
+      this.consumeChar("c");
+      const letter = this.popChar();
+      if (/[a-zA-Z]/.test(letter) === false) {
+        throw Error("Invalid ");
+      }
+      const letterCode = letter.toUpperCase().charCodeAt(0) - 64;
+      return { type: "Character", value: letterCode };
+    }
+    nulCharacterAtom() {
+      this.consumeChar("0");
+      return { type: "Character", value: cc("\0") };
+    }
+    hexEscapeSequenceAtom() {
+      this.consumeChar("x");
+      return this.parseHexDigits(2);
+    }
+    regExpUnicodeEscapeSequenceAtom() {
+      this.consumeChar("u");
+      return this.parseHexDigits(4);
+    }
+    identityEscapeAtom() {
+      const escapedChar = this.popChar();
+      return { type: "Character", value: cc(escapedChar) };
+    }
+    classPatternCharacterAtom() {
+      switch (this.peekChar()) {
+        // istanbul ignore next
+        case "\n":
+        // istanbul ignore next
+        case "\r":
+        // istanbul ignore next
+        case "\u2028":
+        // istanbul ignore next
+        case "\u2029":
+        // istanbul ignore next
+        case "\\":
+        // istanbul ignore next
+        case "]":
+          throw Error("TBD");
+        default:
+          const nextChar = this.popChar();
+          return { type: "Character", value: cc(nextChar) };
+      }
+    }
+    characterClass() {
+      const set = [];
+      let complement = false;
+      this.consumeChar("[");
+      if (this.peekChar(0) === "^") {
+        this.consumeChar("^");
+        complement = true;
+      }
+      while (this.isClassAtom()) {
+        const from = this.classAtom();
+        const isFromSingleChar = from.type === "Character";
+        if (isCharacter(from) && this.isRangeDash()) {
+          this.consumeChar("-");
+          const to = this.classAtom();
+          const isToSingleChar = to.type === "Character";
+          if (isCharacter(to)) {
+            if (to.value < from.value) {
+              throw Error("Range out of order in character class");
+            }
+            set.push({ from: from.value, to: to.value });
+          } else {
+            insertToSet(from.value, set);
+            set.push(cc("-"));
+            insertToSet(to.value, set);
+          }
+        } else {
+          insertToSet(from.value, set);
+        }
+      }
+      this.consumeChar("]");
+      return { type: "Set", complement, value: set };
+    }
+    classAtom() {
+      switch (this.peekChar()) {
+        // istanbul ignore next
+        case "]":
+        // istanbul ignore next
+        case "\n":
+        // istanbul ignore next
+        case "\r":
+        // istanbul ignore next
+        case "\u2028":
+        // istanbul ignore next
+        case "\u2029":
+          throw Error("TBD");
+        case "\\":
+          return this.classEscape();
+        default:
+          return this.classPatternCharacterAtom();
+      }
+    }
+    classEscape() {
+      this.consumeChar("\\");
+      switch (this.peekChar()) {
+        // Matches a backspace.
+        // (Not to be confused with \b word boundary outside characterClass)
+        case "b":
+          this.consumeChar("b");
+          return { type: "Character", value: cc("\b") };
+        case "d":
+        case "D":
+        case "s":
+        case "S":
+        case "w":
+        case "W":
+          return this.characterClassEscape();
+        case "f":
+        case "n":
+        case "r":
+        case "t":
+        case "v":
+          return this.controlEscapeAtom();
+        case "c":
+          return this.controlLetterEscapeAtom();
+        case "0":
+          return this.nulCharacterAtom();
+        case "x":
+          return this.hexEscapeSequenceAtom();
+        case "u":
+          return this.regExpUnicodeEscapeSequenceAtom();
+        default:
+          return this.identityEscapeAtom();
+      }
+    }
+    group() {
+      let capturing = true;
+      this.consumeChar("(");
+      switch (this.peekChar(0)) {
+        case "?":
+          this.consumeChar("?");
+          this.consumeChar(":");
+          capturing = false;
+          break;
+        default:
+          this.groupIdx++;
+          break;
+      }
+      const value = this.disjunction();
+      this.consumeChar(")");
+      const groupAst = {
+        type: "Group",
+        capturing,
+        value
+      };
+      if (capturing) {
+        groupAst["idx"] = this.groupIdx;
+      }
+      return groupAst;
+    }
+    positiveInteger() {
+      let number = this.popChar();
+      if (decimalPatternNoZero.test(number) === false) {
+        throw Error("Expecting a positive integer");
+      }
+      while (decimalPattern.test(this.peekChar(0))) {
+        number += this.popChar();
+      }
+      return parseInt(number, 10);
+    }
+    integerIncludingZero() {
+      let number = this.popChar();
+      if (decimalPattern.test(number) === false) {
+        throw Error("Expecting an integer");
+      }
+      while (decimalPattern.test(this.peekChar(0))) {
+        number += this.popChar();
+      }
+      return parseInt(number, 10);
+    }
+    patternCharacter() {
+      const nextChar = this.popChar();
+      switch (nextChar) {
+        // istanbul ignore next
+        case "\n":
+        // istanbul ignore next
+        case "\r":
+        // istanbul ignore next
+        case "\u2028":
+        // istanbul ignore next
+        case "\u2029":
+        // istanbul ignore next
+        case "^":
+        // istanbul ignore next
+        case "$":
+        // istanbul ignore next
+        case "\\":
+        // istanbul ignore next
+        case ".":
+        // istanbul ignore next
+        case "*":
+        // istanbul ignore next
+        case "+":
+        // istanbul ignore next
+        case "?":
+        // istanbul ignore next
+        case "(":
+        // istanbul ignore next
+        case ")":
+        // istanbul ignore next
+        case "[":
+        // istanbul ignore next
+        case "|":
+          throw Error("TBD");
+        default:
+          return { type: "Character", value: cc(nextChar) };
+      }
+    }
+    isRegExpFlag() {
+      switch (this.peekChar(0)) {
+        case "g":
+        case "i":
+        case "m":
+        case "u":
+        case "y":
+          return true;
+        default:
+          return false;
+      }
+    }
+    isRangeDash() {
+      return this.peekChar() === "-" && this.isClassAtom(1);
+    }
+    isDigit() {
+      return decimalPattern.test(this.peekChar(0));
+    }
+    isClassAtom(howMuch = 0) {
+      switch (this.peekChar(howMuch)) {
+        case "]":
+        case "\n":
+        case "\r":
+        case "\u2028":
+        case "\u2029":
+          return false;
+        default:
+          return true;
+      }
+    }
+    isTerm() {
+      return this.isAtom() || this.isAssertion();
+    }
+    isAtom() {
+      if (this.isPatternCharacter()) {
+        return true;
+      }
+      switch (this.peekChar(0)) {
+        case ".":
+        case "\\":
+        // atomEscape
+        case "[":
+        // characterClass
+        // TODO: isAtom must be called before isAssertion - disambiguate
+        case "(":
+          return true;
+        default:
+          return false;
+      }
+    }
+    isAssertion() {
+      switch (this.peekChar(0)) {
+        case "^":
+        case "$":
+          return true;
+        // '\b' or '\B'
+        case "\\":
+          switch (this.peekChar(1)) {
+            case "b":
+            case "B":
+              return true;
+            default:
+              return false;
+          }
+        // '(?=' or '(?!'
+        case "(":
+          return this.peekChar(1) === "?" && (this.peekChar(2) === "=" || this.peekChar(2) === "!");
+        default:
+          return false;
+      }
+    }
+    isQuantifier() {
+      const prevState = this.saveState();
+      try {
+        return this.quantifier(true) !== void 0;
+      } catch (e) {
+        return false;
+      } finally {
+        this.restoreState(prevState);
+      }
+    }
+    isPatternCharacter() {
+      switch (this.peekChar()) {
+        case "^":
+        case "$":
+        case "\\":
+        case ".":
+        case "*":
+        case "+":
+        case "?":
+        case "(":
+        case ")":
+        case "[":
+        case "|":
+        case "/":
+        case "\n":
+        case "\r":
+        case "\u2028":
+        case "\u2029":
+          return false;
+        default:
+          return true;
+      }
+    }
+    parseHexDigits(howMany) {
+      let hexString = "";
+      for (let i = 0; i < howMany; i++) {
+        const hexChar = this.popChar();
+        if (hexDigitPattern.test(hexChar) === false) {
+          throw Error("Expecting a HexDecimal digits");
+        }
+        hexString += hexChar;
+      }
+      const charCode = parseInt(hexString, 16);
+      return { type: "Character", value: charCode };
+    }
+    peekChar(howMuch = 0) {
+      return this.input[this.idx + howMuch];
+    }
+    popChar() {
+      const nextChar = this.peekChar(0);
+      this.consumeChar(void 0);
+      return nextChar;
+    }
+    consumeChar(char) {
+      if (char !== void 0 && this.input[this.idx] !== char) {
+        throw Error("Expected: '" + char + "' but found: '" + this.input[this.idx] + "' at offset: " + this.idx);
+      }
+      if (this.idx >= this.input.length) {
+        throw Error("Unexpected end of input");
+      }
+      this.idx++;
+    }
+    loc(begin) {
+      return { begin, end: this.idx };
+    }
+  };
+
+  // node_modules/.pnpm/@chevrotain+regexp-to-ast@11.0.3/node_modules/@chevrotain/regexp-to-ast/lib/src/base-regexp-visitor.js
+  var BaseRegExpVisitor = class {
+    visitChildren(node) {
+      for (const key in node) {
+        const child = node[key];
+        if (node.hasOwnProperty(key)) {
+          if (child.type !== void 0) {
+            this.visit(child);
+          } else if (Array.isArray(child)) {
+            child.forEach((subChild) => {
+              this.visit(subChild);
+            }, this);
+          }
+        }
+      }
+    }
+    visit(node) {
+      switch (node.type) {
+        case "Pattern":
+          this.visitPattern(node);
+          break;
+        case "Flags":
+          this.visitFlags(node);
+          break;
+        case "Disjunction":
+          this.visitDisjunction(node);
+          break;
+        case "Alternative":
+          this.visitAlternative(node);
+          break;
+        case "StartAnchor":
+          this.visitStartAnchor(node);
+          break;
+        case "EndAnchor":
+          this.visitEndAnchor(node);
+          break;
+        case "WordBoundary":
+          this.visitWordBoundary(node);
+          break;
+        case "NonWordBoundary":
+          this.visitNonWordBoundary(node);
+          break;
+        case "Lookahead":
+          this.visitLookahead(node);
+          break;
+        case "NegativeLookahead":
+          this.visitNegativeLookahead(node);
+          break;
+        case "Character":
+          this.visitCharacter(node);
+          break;
+        case "Set":
+          this.visitSet(node);
+          break;
+        case "Group":
+          this.visitGroup(node);
+          break;
+        case "GroupBackReference":
+          this.visitGroupBackReference(node);
+          break;
+        case "Quantifier":
+          this.visitQuantifier(node);
+          break;
+      }
+      this.visitChildren(node);
+    }
+    visitPattern(node) {
+    }
+    visitFlags(node) {
+    }
+    visitDisjunction(node) {
+    }
+    visitAlternative(node) {
+    }
+    // Assertion
+    visitStartAnchor(node) {
+    }
+    visitEndAnchor(node) {
+    }
+    visitWordBoundary(node) {
+    }
+    visitNonWordBoundary(node) {
+    }
+    visitLookahead(node) {
+    }
+    visitNegativeLookahead(node) {
+    }
+    // atoms
+    visitCharacter(node) {
+    }
+    visitSet(node) {
+    }
+    visitGroup(node) {
+    }
+    visitGroupBackReference(node) {
+    }
+    visitQuantifier(node) {
+    }
+  };
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/scan/reg_exp_parser.js
+  var regExpAstCache = {};
+  var regExpParser = new RegExpParser();
+  function getRegExpAst(regExp) {
+    const regExpStr = regExp.toString();
+    if (regExpAstCache.hasOwnProperty(regExpStr)) {
+      return regExpAstCache[regExpStr];
+    } else {
+      const regExpAst = regExpParser.pattern(regExpStr);
+      regExpAstCache[regExpStr] = regExpAst;
+      return regExpAst;
+    }
+  }
+  function clearRegExpParserCache() {
+    regExpAstCache = {};
+  }
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/scan/reg_exp.js
+  var complementErrorMessage = "Complement Sets are not supported for first char optimization";
+  var failedOptimizationPrefixMsg = 'Unable to use "first char" lexer optimizations:\n';
+  function getOptimizedStartCodesIndices(regExp, ensureOptimizations = false) {
+    try {
+      const ast = getRegExpAst(regExp);
+      const firstChars = firstCharOptimizedIndices(ast.value, {}, ast.flags.ignoreCase);
+      return firstChars;
+    } catch (e) {
+      if (e.message === complementErrorMessage) {
+        if (ensureOptimizations) {
+          PRINT_WARNING(`${failedOptimizationPrefixMsg}	Unable to optimize: < ${regExp.toString()} >
+	Complement Sets cannot be automatically optimized.
+	This will disable the lexer's first char optimizations.
+	See: https://chevrotain.io/docs/guide/resolving_lexer_errors.html#COMPLEMENT for details.`);
+        }
+      } else {
+        let msgSuffix = "";
+        if (ensureOptimizations) {
+          msgSuffix = "\n	This will disable the lexer's first char optimizations.\n	See: https://chevrotain.io/docs/guide/resolving_lexer_errors.html#REGEXP_PARSING for details.";
+        }
+        PRINT_ERROR(`${failedOptimizationPrefixMsg}
+	Failed parsing: < ${regExp.toString()} >
+	Using the @chevrotain/regexp-to-ast library
+	Please open an issue at: https://github.com/chevrotain/chevrotain/issues` + msgSuffix);
+      }
+    }
+    return [];
+  }
+  function firstCharOptimizedIndices(ast, result, ignoreCase) {
+    switch (ast.type) {
+      case "Disjunction":
+        for (let i = 0; i < ast.value.length; i++) {
+          firstCharOptimizedIndices(ast.value[i], result, ignoreCase);
+        }
+        break;
+      case "Alternative":
+        const terms = ast.value;
+        for (let i = 0; i < terms.length; i++) {
+          const term = terms[i];
+          switch (term.type) {
+            case "EndAnchor":
+            // A group back reference cannot affect potential starting char.
+            // because if a back reference is the first production than automatically
+            // the group being referenced has had to come BEFORE so its codes have already been added
+            case "GroupBackReference":
+            // assertions do not affect potential starting codes
+            case "Lookahead":
+            case "NegativeLookahead":
+            case "StartAnchor":
+            case "WordBoundary":
+            case "NonWordBoundary":
+              continue;
+          }
+          const atom = term;
+          switch (atom.type) {
+            case "Character":
+              addOptimizedIdxToResult(atom.value, result, ignoreCase);
+              break;
+            case "Set":
+              if (atom.complement === true) {
+                throw Error(complementErrorMessage);
+              }
+              forEach_default(atom.value, (code) => {
+                if (typeof code === "number") {
+                  addOptimizedIdxToResult(code, result, ignoreCase);
+                } else {
+                  const range = code;
+                  if (ignoreCase === true) {
+                    for (let rangeCode = range.from; rangeCode <= range.to; rangeCode++) {
+                      addOptimizedIdxToResult(rangeCode, result, ignoreCase);
+                    }
+                  } else {
+                    for (let rangeCode = range.from; rangeCode <= range.to && rangeCode < minOptimizationVal; rangeCode++) {
+                      addOptimizedIdxToResult(rangeCode, result, ignoreCase);
+                    }
+                    if (range.to >= minOptimizationVal) {
+                      const minUnOptVal = range.from >= minOptimizationVal ? range.from : minOptimizationVal;
+                      const maxUnOptVal = range.to;
+                      const minOptIdx = charCodeToOptimizedIndex(minUnOptVal);
+                      const maxOptIdx = charCodeToOptimizedIndex(maxUnOptVal);
+                      for (let currOptIdx = minOptIdx; currOptIdx <= maxOptIdx; currOptIdx++) {
+                        result[currOptIdx] = currOptIdx;
+                      }
+                    }
+                  }
+                }
+              });
+              break;
+            case "Group":
+              firstCharOptimizedIndices(atom.value, result, ignoreCase);
+              break;
+            /* istanbul ignore next */
+            default:
+              throw Error("Non Exhaustive Match");
+          }
+          const isOptionalQuantifier = atom.quantifier !== void 0 && atom.quantifier.atLeast === 0;
+          if (
+            // A group may be optional due to empty contents /(?:)/
+            // or if everything inside it is optional /((a)?)/
+            atom.type === "Group" && isWholeOptional(atom) === false || // If this term is not a group it may only be optional if it has an optional quantifier
+            atom.type !== "Group" && isOptionalQuantifier === false
+          ) {
+            break;
+          }
+        }
+        break;
+      /* istanbul ignore next */
+      default:
+        throw Error("non exhaustive match!");
+    }
+    return values_default(result);
+  }
+  function addOptimizedIdxToResult(code, result, ignoreCase) {
+    const optimizedCharIdx = charCodeToOptimizedIndex(code);
+    result[optimizedCharIdx] = optimizedCharIdx;
+    if (ignoreCase === true) {
+      handleIgnoreCase(code, result);
+    }
+  }
+  function handleIgnoreCase(code, result) {
+    const char = String.fromCharCode(code);
+    const upperChar = char.toUpperCase();
+    if (upperChar !== char) {
+      const optimizedCharIdx = charCodeToOptimizedIndex(upperChar.charCodeAt(0));
+      result[optimizedCharIdx] = optimizedCharIdx;
+    } else {
+      const lowerChar = char.toLowerCase();
+      if (lowerChar !== char) {
+        const optimizedCharIdx = charCodeToOptimizedIndex(lowerChar.charCodeAt(0));
+        result[optimizedCharIdx] = optimizedCharIdx;
+      }
+    }
+  }
+  function findCode(setNode, targetCharCodes) {
+    return find_default(setNode.value, (codeOrRange) => {
+      if (typeof codeOrRange === "number") {
+        return includes_default(targetCharCodes, codeOrRange);
+      } else {
+        const range = codeOrRange;
+        return find_default(targetCharCodes, (targetCode) => range.from <= targetCode && targetCode <= range.to) !== void 0;
+      }
+    });
+  }
+  function isWholeOptional(ast) {
+    const quantifier = ast.quantifier;
+    if (quantifier && quantifier.atLeast === 0) {
+      return true;
+    }
+    if (!ast.value) {
+      return false;
+    }
+    return isArray_default(ast.value) ? every_default(ast.value, isWholeOptional) : isWholeOptional(ast.value);
+  }
+  var CharCodeFinder = class extends BaseRegExpVisitor {
+    constructor(targetCharCodes) {
+      super();
+      this.targetCharCodes = targetCharCodes;
+      this.found = false;
+    }
+    visitChildren(node) {
+      if (this.found === true) {
+        return;
+      }
+      switch (node.type) {
+        case "Lookahead":
+          this.visitLookahead(node);
+          return;
+        case "NegativeLookahead":
+          this.visitNegativeLookahead(node);
+          return;
+      }
+      super.visitChildren(node);
+    }
+    visitCharacter(node) {
+      if (includes_default(this.targetCharCodes, node.value)) {
+        this.found = true;
+      }
+    }
+    visitSet(node) {
+      if (node.complement) {
+        if (findCode(node, this.targetCharCodes) === void 0) {
+          this.found = true;
+        }
+      } else {
+        if (findCode(node, this.targetCharCodes) !== void 0) {
+          this.found = true;
+        }
+      }
+    }
+  };
+  function canMatchCharCode(charCodes, pattern) {
+    if (pattern instanceof RegExp) {
+      const ast = getRegExpAst(pattern);
+      const charCodeFinder = new CharCodeFinder(charCodes);
+      charCodeFinder.visit(ast);
+      return charCodeFinder.found;
+    } else {
+      return find_default(pattern, (char) => {
+        return includes_default(charCodes, char.charCodeAt(0));
+      }) !== void 0;
+    }
+  }
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/scan/lexer.js
+  var PATTERN = "PATTERN";
+  var DEFAULT_MODE = "defaultMode";
+  var MODES = "modes";
+  var SUPPORT_STICKY = typeof new RegExp("(?:)").sticky === "boolean";
+  function analyzeTokenTypes(tokenTypes, options) {
+    options = defaults_default(options, {
+      useSticky: SUPPORT_STICKY,
+      debug: false,
+      safeMode: false,
+      positionTracking: "full",
+      lineTerminatorCharacters: ["\r", "\n"],
+      tracer: (msg, action) => action()
+    });
+    const tracer = options.tracer;
+    tracer("initCharCodeToOptimizedIndexMap", () => {
+      initCharCodeToOptimizedIndexMap();
+    });
+    let onlyRelevantTypes;
+    tracer("Reject Lexer.NA", () => {
+      onlyRelevantTypes = reject_default(tokenTypes, (currType) => {
+        return currType[PATTERN] === Lexer.NA;
+      });
+    });
+    let hasCustom = false;
+    let allTransformedPatterns;
+    tracer("Transform Patterns", () => {
+      hasCustom = false;
+      allTransformedPatterns = map_default(onlyRelevantTypes, (currType) => {
+        const currPattern = currType[PATTERN];
+        if (isRegExp_default(currPattern)) {
+          const regExpSource = currPattern.source;
+          if (regExpSource.length === 1 && // only these regExp meta characters which can appear in a length one regExp
+          regExpSource !== "^" && regExpSource !== "$" && regExpSource !== "." && !currPattern.ignoreCase) {
+            return regExpSource;
+          } else if (regExpSource.length === 2 && regExpSource[0] === "\\" && // not a meta character
+          !includes_default([
+            "d",
+            "D",
+            "s",
+            "S",
+            "t",
+            "r",
+            "n",
+            "t",
+            "0",
+            "c",
+            "b",
+            "B",
+            "f",
+            "v",
+            "w",
+            "W"
+          ], regExpSource[1])) {
+            return regExpSource[1];
+          } else {
+            return options.useSticky ? addStickyFlag(currPattern) : addStartOfInput(currPattern);
+          }
+        } else if (isFunction_default(currPattern)) {
+          hasCustom = true;
+          return { exec: currPattern };
+        } else if (typeof currPattern === "object") {
+          hasCustom = true;
+          return currPattern;
+        } else if (typeof currPattern === "string") {
+          if (currPattern.length === 1) {
+            return currPattern;
+          } else {
+            const escapedRegExpString = currPattern.replace(/[\\^$.*+?()[\]{}|]/g, "\\$&");
+            const wrappedRegExp = new RegExp(escapedRegExpString);
+            return options.useSticky ? addStickyFlag(wrappedRegExp) : addStartOfInput(wrappedRegExp);
+          }
+        } else {
+          throw Error("non exhaustive match");
+        }
+      });
+    });
+    let patternIdxToType;
+    let patternIdxToGroup;
+    let patternIdxToLongerAltIdxArr;
+    let patternIdxToPushMode;
+    let patternIdxToPopMode;
+    tracer("misc mapping", () => {
+      patternIdxToType = map_default(onlyRelevantTypes, (currType) => currType.tokenTypeIdx);
+      patternIdxToGroup = map_default(onlyRelevantTypes, (clazz) => {
+        const groupName = clazz.GROUP;
+        if (groupName === Lexer.SKIPPED) {
+          return void 0;
+        } else if (isString_default(groupName)) {
+          return groupName;
+        } else if (isUndefined_default(groupName)) {
+          return false;
+        } else {
+          throw Error("non exhaustive match");
+        }
+      });
+      patternIdxToLongerAltIdxArr = map_default(onlyRelevantTypes, (clazz) => {
+        const longerAltType = clazz.LONGER_ALT;
+        if (longerAltType) {
+          const longerAltIdxArr = isArray_default(longerAltType) ? map_default(longerAltType, (type) => indexOf_default(onlyRelevantTypes, type)) : [indexOf_default(onlyRelevantTypes, longerAltType)];
+          return longerAltIdxArr;
+        }
+      });
+      patternIdxToPushMode = map_default(onlyRelevantTypes, (clazz) => clazz.PUSH_MODE);
+      patternIdxToPopMode = map_default(onlyRelevantTypes, (clazz) => has_default(clazz, "POP_MODE"));
+    });
+    let patternIdxToCanLineTerminator;
+    tracer("Line Terminator Handling", () => {
+      const lineTerminatorCharCodes = getCharCodes(options.lineTerminatorCharacters);
+      patternIdxToCanLineTerminator = map_default(onlyRelevantTypes, (tokType) => false);
+      if (options.positionTracking !== "onlyOffset") {
+        patternIdxToCanLineTerminator = map_default(onlyRelevantTypes, (tokType) => {
+          if (has_default(tokType, "LINE_BREAKS")) {
+            return !!tokType.LINE_BREAKS;
+          } else {
+            return checkLineBreaksIssues(tokType, lineTerminatorCharCodes) === false && canMatchCharCode(lineTerminatorCharCodes, tokType.PATTERN);
+          }
+        });
+      }
+    });
+    let patternIdxToIsCustom;
+    let patternIdxToShort;
+    let emptyGroups;
+    let patternIdxToConfig;
+    tracer("Misc Mapping #2", () => {
+      patternIdxToIsCustom = map_default(onlyRelevantTypes, isCustomPattern);
+      patternIdxToShort = map_default(allTransformedPatterns, isShortPattern);
+      emptyGroups = reduce_default(onlyRelevantTypes, (acc, clazz) => {
+        const groupName = clazz.GROUP;
+        if (isString_default(groupName) && !(groupName === Lexer.SKIPPED)) {
+          acc[groupName] = [];
+        }
+        return acc;
+      }, {});
+      patternIdxToConfig = map_default(allTransformedPatterns, (x, idx) => {
         return {
-          type: "PrintStatement",
-          printList: []
+          pattern: allTransformedPatterns[idx],
+          longerAlt: patternIdxToLongerAltIdxArr[idx],
+          canLineTerminator: patternIdxToCanLineTerminator[idx],
+          isCustom: patternIdxToIsCustom[idx],
+          short: patternIdxToShort[idx],
+          group: patternIdxToGroup[idx],
+          push: patternIdxToPushMode[idx],
+          pop: patternIdxToPopMode[idx],
+          tokenTypeIdx: patternIdxToType[idx],
+          tokenType: onlyRelevantTypes[idx]
         };
-      } else if (upperCommand.startsWith("LET")) {
-        return {
-          type: "LetStatement",
-          variable: { type: "Variable", name: "A", subscript: null },
-          expression: { type: "NumberLiteral", value: 0 },
-          hasLetKeyword: true
-        };
-      } else if (upperCommand.startsWith("IF")) {
-        return {
-          type: "IfStatement",
-          condition: { type: "NumberLiteral", value: 1 },
-          thenStatement: { type: "EndStatement" }
-        };
-      } else if (upperCommand.startsWith("FOR")) {
-        return {
-          type: "ForStatement",
-          variable: { type: "Variable", name: "I", subscript: null },
-          start: { type: "NumberLiteral", value: 1 },
-          end: { type: "NumberLiteral", value: 10 },
-          step: { type: "NumberLiteral", value: 1 }
-        };
-      } else if (upperCommand.startsWith("NEXT")) {
-        return {
-          type: "NextStatement",
-          variable: { type: "Variable", name: "I", subscript: null }
-        };
-      } else if (upperCommand.startsWith("GOTO")) {
-        return {
-          type: "GotoStatement",
-          target: { type: "NumberLiteral", value: 100 }
-        };
-      } else if (upperCommand.startsWith("GOSUB")) {
-        return {
-          type: "GosubStatement",
-          target: { type: "NumberLiteral", value: 100 }
-        };
-      } else if (upperCommand.startsWith("RETURN")) {
-        return { type: "ReturnStatement" };
-      } else if (upperCommand.startsWith("END")) {
-        return { type: "EndStatement" };
-      } else if (upperCommand.startsWith("REM")) {
-        return {
-          type: "RemStatement",
-          comment: commandText.substring(3).trim()
-        };
-      } else if (upperCommand.startsWith("CLS")) {
-        return { type: "ClsStatement" };
+      });
+    });
+    let canBeOptimized = true;
+    let charCodeToPatternIdxToConfig = [];
+    if (!options.safeMode) {
+      tracer("First Char Optimization", () => {
+        charCodeToPatternIdxToConfig = reduce_default(onlyRelevantTypes, (result, currTokType, idx) => {
+          if (typeof currTokType.PATTERN === "string") {
+            const charCode = currTokType.PATTERN.charCodeAt(0);
+            const optimizedIdx = charCodeToOptimizedIndex(charCode);
+            addToMapOfArrays(result, optimizedIdx, patternIdxToConfig[idx]);
+          } else if (isArray_default(currTokType.START_CHARS_HINT)) {
+            let lastOptimizedIdx;
+            forEach_default(currTokType.START_CHARS_HINT, (charOrInt) => {
+              const charCode = typeof charOrInt === "string" ? charOrInt.charCodeAt(0) : charOrInt;
+              const currOptimizedIdx = charCodeToOptimizedIndex(charCode);
+              if (lastOptimizedIdx !== currOptimizedIdx) {
+                lastOptimizedIdx = currOptimizedIdx;
+                addToMapOfArrays(result, currOptimizedIdx, patternIdxToConfig[idx]);
+              }
+            });
+          } else if (isRegExp_default(currTokType.PATTERN)) {
+            if (currTokType.PATTERN.unicode) {
+              canBeOptimized = false;
+              if (options.ensureOptimizations) {
+                PRINT_ERROR(`${failedOptimizationPrefixMsg}	Unable to analyze < ${currTokType.PATTERN.toString()} > pattern.
+	The regexp unicode flag is not currently supported by the regexp-to-ast library.
+	This will disable the lexer's first char optimizations.
+	For details See: https://chevrotain.io/docs/guide/resolving_lexer_errors.html#UNICODE_OPTIMIZE`);
+              }
+            } else {
+              const optimizedCodes = getOptimizedStartCodesIndices(currTokType.PATTERN, options.ensureOptimizations);
+              if (isEmpty_default(optimizedCodes)) {
+                canBeOptimized = false;
+              }
+              forEach_default(optimizedCodes, (code) => {
+                addToMapOfArrays(result, code, patternIdxToConfig[idx]);
+              });
+            }
+          } else {
+            if (options.ensureOptimizations) {
+              PRINT_ERROR(`${failedOptimizationPrefixMsg}	TokenType: <${currTokType.name}> is using a custom token pattern without providing <start_chars_hint> parameter.
+	This will disable the lexer's first char optimizations.
+	For details See: https://chevrotain.io/docs/guide/resolving_lexer_errors.html#CUSTOM_OPTIMIZE`);
+            }
+            canBeOptimized = false;
+          }
+          return result;
+        }, []);
+      });
+    }
+    return {
+      emptyGroups,
+      patternIdxToConfig,
+      charCodeToPatternIdxToConfig,
+      hasCustom,
+      canBeOptimized
+    };
+  }
+  function validatePatterns(tokenTypes, validModesNames) {
+    let errors = [];
+    const missingResult = findMissingPatterns(tokenTypes);
+    errors = errors.concat(missingResult.errors);
+    const invalidResult = findInvalidPatterns(missingResult.valid);
+    const validTokenTypes = invalidResult.valid;
+    errors = errors.concat(invalidResult.errors);
+    errors = errors.concat(validateRegExpPattern(validTokenTypes));
+    errors = errors.concat(findInvalidGroupType(validTokenTypes));
+    errors = errors.concat(findModesThatDoNotExist(validTokenTypes, validModesNames));
+    errors = errors.concat(findUnreachablePatterns(validTokenTypes));
+    return errors;
+  }
+  function validateRegExpPattern(tokenTypes) {
+    let errors = [];
+    const withRegExpPatterns = filter_default(tokenTypes, (currTokType) => isRegExp_default(currTokType[PATTERN]));
+    errors = errors.concat(findEndOfInputAnchor(withRegExpPatterns));
+    errors = errors.concat(findStartOfInputAnchor(withRegExpPatterns));
+    errors = errors.concat(findUnsupportedFlags(withRegExpPatterns));
+    errors = errors.concat(findDuplicatePatterns(withRegExpPatterns));
+    errors = errors.concat(findEmptyMatchRegExps(withRegExpPatterns));
+    return errors;
+  }
+  function findMissingPatterns(tokenTypes) {
+    const tokenTypesWithMissingPattern = filter_default(tokenTypes, (currType) => {
+      return !has_default(currType, PATTERN);
+    });
+    const errors = map_default(tokenTypesWithMissingPattern, (currType) => {
+      return {
+        message: "Token Type: ->" + currType.name + "<- missing static 'PATTERN' property",
+        type: LexerDefinitionErrorType.MISSING_PATTERN,
+        tokenTypes: [currType]
+      };
+    });
+    const valid = difference_default(tokenTypes, tokenTypesWithMissingPattern);
+    return { errors, valid };
+  }
+  function findInvalidPatterns(tokenTypes) {
+    const tokenTypesWithInvalidPattern = filter_default(tokenTypes, (currType) => {
+      const pattern = currType[PATTERN];
+      return !isRegExp_default(pattern) && !isFunction_default(pattern) && !has_default(pattern, "exec") && !isString_default(pattern);
+    });
+    const errors = map_default(tokenTypesWithInvalidPattern, (currType) => {
+      return {
+        message: "Token Type: ->" + currType.name + "<- static 'PATTERN' can only be a RegExp, a Function matching the {CustomPatternMatcherFunc} type or an Object matching the {ICustomPattern} interface.",
+        type: LexerDefinitionErrorType.INVALID_PATTERN,
+        tokenTypes: [currType]
+      };
+    });
+    const valid = difference_default(tokenTypes, tokenTypesWithInvalidPattern);
+    return { errors, valid };
+  }
+  var end_of_input = /[^\\][$]/;
+  function findEndOfInputAnchor(tokenTypes) {
+    class EndAnchorFinder extends BaseRegExpVisitor {
+      constructor() {
+        super(...arguments);
+        this.found = false;
+      }
+      visitEndAnchor(node) {
+        this.found = true;
+      }
+    }
+    const invalidRegex = filter_default(tokenTypes, (currType) => {
+      const pattern = currType.PATTERN;
+      try {
+        const regexpAst = getRegExpAst(pattern);
+        const endAnchorVisitor = new EndAnchorFinder();
+        endAnchorVisitor.visit(regexpAst);
+        return endAnchorVisitor.found;
+      } catch (e) {
+        return end_of_input.test(pattern.source);
+      }
+    });
+    const errors = map_default(invalidRegex, (currType) => {
+      return {
+        message: "Unexpected RegExp Anchor Error:\n	Token Type: ->" + currType.name + "<- static 'PATTERN' cannot contain end of input anchor '$'\n	See chevrotain.io/docs/guide/resolving_lexer_errors.html#ANCHORS	for details.",
+        type: LexerDefinitionErrorType.EOI_ANCHOR_FOUND,
+        tokenTypes: [currType]
+      };
+    });
+    return errors;
+  }
+  function findEmptyMatchRegExps(tokenTypes) {
+    const matchesEmptyString = filter_default(tokenTypes, (currType) => {
+      const pattern = currType.PATTERN;
+      return pattern.test("");
+    });
+    const errors = map_default(matchesEmptyString, (currType) => {
+      return {
+        message: "Token Type: ->" + currType.name + "<- static 'PATTERN' must not match an empty string",
+        type: LexerDefinitionErrorType.EMPTY_MATCH_PATTERN,
+        tokenTypes: [currType]
+      };
+    });
+    return errors;
+  }
+  var start_of_input = /[^\\[][\^]|^\^/;
+  function findStartOfInputAnchor(tokenTypes) {
+    class StartAnchorFinder extends BaseRegExpVisitor {
+      constructor() {
+        super(...arguments);
+        this.found = false;
+      }
+      visitStartAnchor(node) {
+        this.found = true;
+      }
+    }
+    const invalidRegex = filter_default(tokenTypes, (currType) => {
+      const pattern = currType.PATTERN;
+      try {
+        const regexpAst = getRegExpAst(pattern);
+        const startAnchorVisitor = new StartAnchorFinder();
+        startAnchorVisitor.visit(regexpAst);
+        return startAnchorVisitor.found;
+      } catch (e) {
+        return start_of_input.test(pattern.source);
+      }
+    });
+    const errors = map_default(invalidRegex, (currType) => {
+      return {
+        message: "Unexpected RegExp Anchor Error:\n	Token Type: ->" + currType.name + "<- static 'PATTERN' cannot contain start of input anchor '^'\n	See https://chevrotain.io/docs/guide/resolving_lexer_errors.html#ANCHORS	for details.",
+        type: LexerDefinitionErrorType.SOI_ANCHOR_FOUND,
+        tokenTypes: [currType]
+      };
+    });
+    return errors;
+  }
+  function findUnsupportedFlags(tokenTypes) {
+    const invalidFlags = filter_default(tokenTypes, (currType) => {
+      const pattern = currType[PATTERN];
+      return pattern instanceof RegExp && (pattern.multiline || pattern.global);
+    });
+    const errors = map_default(invalidFlags, (currType) => {
+      return {
+        message: "Token Type: ->" + currType.name + "<- static 'PATTERN' may NOT contain global('g') or multiline('m')",
+        type: LexerDefinitionErrorType.UNSUPPORTED_FLAGS_FOUND,
+        tokenTypes: [currType]
+      };
+    });
+    return errors;
+  }
+  function findDuplicatePatterns(tokenTypes) {
+    const found = [];
+    let identicalPatterns = map_default(tokenTypes, (outerType) => {
+      return reduce_default(tokenTypes, (result, innerType) => {
+        if (outerType.PATTERN.source === innerType.PATTERN.source && !includes_default(found, innerType) && innerType.PATTERN !== Lexer.NA) {
+          found.push(innerType);
+          result.push(innerType);
+          return result;
+        }
+        return result;
+      }, []);
+    });
+    identicalPatterns = compact_default(identicalPatterns);
+    const duplicatePatterns = filter_default(identicalPatterns, (currIdenticalSet) => {
+      return currIdenticalSet.length > 1;
+    });
+    const errors = map_default(duplicatePatterns, (setOfIdentical) => {
+      const tokenTypeNames = map_default(setOfIdentical, (currType) => {
+        return currType.name;
+      });
+      const dupPatternSrc = head_default(setOfIdentical).PATTERN;
+      return {
+        message: `The same RegExp pattern ->${dupPatternSrc}<-has been used in all of the following Token Types: ${tokenTypeNames.join(", ")} <-`,
+        type: LexerDefinitionErrorType.DUPLICATE_PATTERNS_FOUND,
+        tokenTypes: setOfIdentical
+      };
+    });
+    return errors;
+  }
+  function findInvalidGroupType(tokenTypes) {
+    const invalidTypes = filter_default(tokenTypes, (clazz) => {
+      if (!has_default(clazz, "GROUP")) {
+        return false;
+      }
+      const group = clazz.GROUP;
+      return group !== Lexer.SKIPPED && group !== Lexer.NA && !isString_default(group);
+    });
+    const errors = map_default(invalidTypes, (currType) => {
+      return {
+        message: "Token Type: ->" + currType.name + "<- static 'GROUP' can only be Lexer.SKIPPED/Lexer.NA/A String",
+        type: LexerDefinitionErrorType.INVALID_GROUP_TYPE_FOUND,
+        tokenTypes: [currType]
+      };
+    });
+    return errors;
+  }
+  function findModesThatDoNotExist(tokenTypes, validModes) {
+    const invalidModes = filter_default(tokenTypes, (clazz) => {
+      return clazz.PUSH_MODE !== void 0 && !includes_default(validModes, clazz.PUSH_MODE);
+    });
+    const errors = map_default(invalidModes, (tokType) => {
+      const msg = `Token Type: ->${tokType.name}<- static 'PUSH_MODE' value cannot refer to a Lexer Mode ->${tokType.PUSH_MODE}<-which does not exist`;
+      return {
+        message: msg,
+        type: LexerDefinitionErrorType.PUSH_MODE_DOES_NOT_EXIST,
+        tokenTypes: [tokType]
+      };
+    });
+    return errors;
+  }
+  function findUnreachablePatterns(tokenTypes) {
+    const errors = [];
+    const canBeTested = reduce_default(tokenTypes, (result, tokType, idx) => {
+      const pattern = tokType.PATTERN;
+      if (pattern === Lexer.NA) {
+        return result;
+      }
+      if (isString_default(pattern)) {
+        result.push({ str: pattern, idx, tokenType: tokType });
+      } else if (isRegExp_default(pattern) && noMetaChar(pattern)) {
+        result.push({ str: pattern.source, idx, tokenType: tokType });
+      }
+      return result;
+    }, []);
+    forEach_default(tokenTypes, (tokType, testIdx) => {
+      forEach_default(canBeTested, ({ str, idx, tokenType }) => {
+        if (testIdx < idx && testTokenType(str, tokType.PATTERN)) {
+          const msg = `Token: ->${tokenType.name}<- can never be matched.
+Because it appears AFTER the Token Type ->${tokType.name}<-in the lexer's definition.
+See https://chevrotain.io/docs/guide/resolving_lexer_errors.html#UNREACHABLE`;
+          errors.push({
+            message: msg,
+            type: LexerDefinitionErrorType.UNREACHABLE_PATTERN,
+            tokenTypes: [tokType, tokenType]
+          });
+        }
+      });
+    });
+    return errors;
+  }
+  function testTokenType(str, pattern) {
+    if (isRegExp_default(pattern)) {
+      const regExpArray = pattern.exec(str);
+      return regExpArray !== null && regExpArray.index === 0;
+    } else if (isFunction_default(pattern)) {
+      return pattern(str, 0, [], {});
+    } else if (has_default(pattern, "exec")) {
+      return pattern.exec(str, 0, [], {});
+    } else if (typeof pattern === "string") {
+      return pattern === str;
+    } else {
+      throw Error("non exhaustive match");
+    }
+  }
+  function noMetaChar(regExp) {
+    const metaChars = [
+      ".",
+      "\\",
+      "[",
+      "]",
+      "|",
+      "^",
+      "$",
+      "(",
+      ")",
+      "?",
+      "*",
+      "+",
+      "{"
+    ];
+    return find_default(metaChars, (char) => regExp.source.indexOf(char) !== -1) === void 0;
+  }
+  function addStartOfInput(pattern) {
+    const flags = pattern.ignoreCase ? "i" : "";
+    return new RegExp(`^(?:${pattern.source})`, flags);
+  }
+  function addStickyFlag(pattern) {
+    const flags = pattern.ignoreCase ? "iy" : "y";
+    return new RegExp(`${pattern.source}`, flags);
+  }
+  function performRuntimeChecks(lexerDefinition, trackLines, lineTerminatorCharacters) {
+    const errors = [];
+    if (!has_default(lexerDefinition, DEFAULT_MODE)) {
+      errors.push({
+        message: "A MultiMode Lexer cannot be initialized without a <" + DEFAULT_MODE + "> property in its definition\n",
+        type: LexerDefinitionErrorType.MULTI_MODE_LEXER_WITHOUT_DEFAULT_MODE
+      });
+    }
+    if (!has_default(lexerDefinition, MODES)) {
+      errors.push({
+        message: "A MultiMode Lexer cannot be initialized without a <" + MODES + "> property in its definition\n",
+        type: LexerDefinitionErrorType.MULTI_MODE_LEXER_WITHOUT_MODES_PROPERTY
+      });
+    }
+    if (has_default(lexerDefinition, MODES) && has_default(lexerDefinition, DEFAULT_MODE) && !has_default(lexerDefinition.modes, lexerDefinition.defaultMode)) {
+      errors.push({
+        message: `A MultiMode Lexer cannot be initialized with a ${DEFAULT_MODE}: <${lexerDefinition.defaultMode}>which does not exist
+`,
+        type: LexerDefinitionErrorType.MULTI_MODE_LEXER_DEFAULT_MODE_VALUE_DOES_NOT_EXIST
+      });
+    }
+    if (has_default(lexerDefinition, MODES)) {
+      forEach_default(lexerDefinition.modes, (currModeValue, currModeName) => {
+        forEach_default(currModeValue, (currTokType, currIdx) => {
+          if (isUndefined_default(currTokType)) {
+            errors.push({
+              message: `A Lexer cannot be initialized using an undefined Token Type. Mode:<${currModeName}> at index: <${currIdx}>
+`,
+              type: LexerDefinitionErrorType.LEXER_DEFINITION_CANNOT_CONTAIN_UNDEFINED
+            });
+          } else if (has_default(currTokType, "LONGER_ALT")) {
+            const longerAlt = isArray_default(currTokType.LONGER_ALT) ? currTokType.LONGER_ALT : [currTokType.LONGER_ALT];
+            forEach_default(longerAlt, (currLongerAlt) => {
+              if (!isUndefined_default(currLongerAlt) && !includes_default(currModeValue, currLongerAlt)) {
+                errors.push({
+                  message: `A MultiMode Lexer cannot be initialized with a longer_alt <${currLongerAlt.name}> on token <${currTokType.name}> outside of mode <${currModeName}>
+`,
+                  type: LexerDefinitionErrorType.MULTI_MODE_LEXER_LONGER_ALT_NOT_IN_CURRENT_MODE
+                });
+              }
+            });
+          }
+        });
+      });
+    }
+    return errors;
+  }
+  function performWarningRuntimeChecks(lexerDefinition, trackLines, lineTerminatorCharacters) {
+    const warnings = [];
+    let hasAnyLineBreak = false;
+    const allTokenTypes = compact_default(flatten_default(values_default(lexerDefinition.modes)));
+    const concreteTokenTypes = reject_default(allTokenTypes, (currType) => currType[PATTERN] === Lexer.NA);
+    const terminatorCharCodes = getCharCodes(lineTerminatorCharacters);
+    if (trackLines) {
+      forEach_default(concreteTokenTypes, (tokType) => {
+        const currIssue = checkLineBreaksIssues(tokType, terminatorCharCodes);
+        if (currIssue !== false) {
+          const message = buildLineBreakIssueMessage(tokType, currIssue);
+          const warningDescriptor = {
+            message,
+            type: currIssue.issue,
+            tokenType: tokType
+          };
+          warnings.push(warningDescriptor);
+        } else {
+          if (has_default(tokType, "LINE_BREAKS")) {
+            if (tokType.LINE_BREAKS === true) {
+              hasAnyLineBreak = true;
+            }
+          } else {
+            if (canMatchCharCode(terminatorCharCodes, tokType.PATTERN)) {
+              hasAnyLineBreak = true;
+            }
+          }
+        }
+      });
+    }
+    if (trackLines && !hasAnyLineBreak) {
+      warnings.push({
+        message: "Warning: No LINE_BREAKS Found.\n	This Lexer has been defined to track line and column information,\n	But none of the Token Types can be identified as matching a line terminator.\n	See https://chevrotain.io/docs/guide/resolving_lexer_errors.html#LINE_BREAKS \n	for details.",
+        type: LexerDefinitionErrorType.NO_LINE_BREAKS_FLAGS
+      });
+    }
+    return warnings;
+  }
+  function cloneEmptyGroups(emptyGroups) {
+    const clonedResult = {};
+    const groupKeys = keys_default(emptyGroups);
+    forEach_default(groupKeys, (currKey) => {
+      const currGroupValue = emptyGroups[currKey];
+      if (isArray_default(currGroupValue)) {
+        clonedResult[currKey] = [];
+      } else {
+        throw Error("non exhaustive match");
+      }
+    });
+    return clonedResult;
+  }
+  function isCustomPattern(tokenType) {
+    const pattern = tokenType.PATTERN;
+    if (isRegExp_default(pattern)) {
+      return false;
+    } else if (isFunction_default(pattern)) {
+      return true;
+    } else if (has_default(pattern, "exec")) {
+      return true;
+    } else if (isString_default(pattern)) {
+      return false;
+    } else {
+      throw Error("non exhaustive match");
+    }
+  }
+  function isShortPattern(pattern) {
+    if (isString_default(pattern) && pattern.length === 1) {
+      return pattern.charCodeAt(0);
+    } else {
+      return false;
+    }
+  }
+  var LineTerminatorOptimizedTester = {
+    // implements /\n|\r\n?/g.test
+    test: function(text) {
+      const len = text.length;
+      for (let i = this.lastIndex; i < len; i++) {
+        const c = text.charCodeAt(i);
+        if (c === 10) {
+          this.lastIndex = i + 1;
+          return true;
+        } else if (c === 13) {
+          if (text.charCodeAt(i + 1) === 10) {
+            this.lastIndex = i + 2;
+          } else {
+            this.lastIndex = i + 1;
+          }
+          return true;
+        }
+      }
+      return false;
+    },
+    lastIndex: 0
+  };
+  function checkLineBreaksIssues(tokType, lineTerminatorCharCodes) {
+    if (has_default(tokType, "LINE_BREAKS")) {
+      return false;
+    } else {
+      if (isRegExp_default(tokType.PATTERN)) {
+        try {
+          canMatchCharCode(lineTerminatorCharCodes, tokType.PATTERN);
+        } catch (e) {
+          return {
+            issue: LexerDefinitionErrorType.IDENTIFY_TERMINATOR,
+            errMsg: e.message
+          };
+        }
+        return false;
+      } else if (isString_default(tokType.PATTERN)) {
+        return false;
+      } else if (isCustomPattern(tokType)) {
+        return { issue: LexerDefinitionErrorType.CUSTOM_LINE_BREAK };
+      } else {
+        throw Error("non exhaustive match");
+      }
+    }
+  }
+  function buildLineBreakIssueMessage(tokType, details) {
+    if (details.issue === LexerDefinitionErrorType.IDENTIFY_TERMINATOR) {
+      return `Warning: unable to identify line terminator usage in pattern.
+	The problem is in the <${tokType.name}> Token Type
+	 Root cause: ${details.errMsg}.
+	For details See: https://chevrotain.io/docs/guide/resolving_lexer_errors.html#IDENTIFY_TERMINATOR`;
+    } else if (details.issue === LexerDefinitionErrorType.CUSTOM_LINE_BREAK) {
+      return `Warning: A Custom Token Pattern should specify the <line_breaks> option.
+	The problem is in the <${tokType.name}> Token Type
+	For details See: https://chevrotain.io/docs/guide/resolving_lexer_errors.html#CUSTOM_LINE_BREAK`;
+    } else {
+      throw Error("non exhaustive match");
+    }
+  }
+  function getCharCodes(charsOrCodes) {
+    const charCodes = map_default(charsOrCodes, (numOrString) => {
+      if (isString_default(numOrString)) {
+        return numOrString.charCodeAt(0);
+      } else {
+        return numOrString;
+      }
+    });
+    return charCodes;
+  }
+  function addToMapOfArrays(map2, key, value) {
+    if (map2[key] === void 0) {
+      map2[key] = [value];
+    } else {
+      map2[key].push(value);
+    }
+  }
+  var minOptimizationVal = 256;
+  var charCodeToOptimizedIdxMap = [];
+  function charCodeToOptimizedIndex(charCode) {
+    return charCode < minOptimizationVal ? charCode : charCodeToOptimizedIdxMap[charCode];
+  }
+  function initCharCodeToOptimizedIndexMap() {
+    if (isEmpty_default(charCodeToOptimizedIdxMap)) {
+      charCodeToOptimizedIdxMap = new Array(65536);
+      for (let i = 0; i < 65536; i++) {
+        charCodeToOptimizedIdxMap[i] = i > 255 ? 255 + ~~(i / 255) : i;
+      }
+    }
+  }
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/scan/tokens.js
+  function tokenStructuredMatcher(tokInstance, tokConstructor) {
+    const instanceType = tokInstance.tokenTypeIdx;
+    if (instanceType === tokConstructor.tokenTypeIdx) {
+      return true;
+    } else {
+      return tokConstructor.isParent === true && tokConstructor.categoryMatchesMap[instanceType] === true;
+    }
+  }
+  function tokenStructuredMatcherNoCategories(token, tokType) {
+    return token.tokenTypeIdx === tokType.tokenTypeIdx;
+  }
+  var tokenShortNameIdx = 1;
+  var tokenIdxToClass = {};
+  function augmentTokenTypes(tokenTypes) {
+    const tokenTypesAndParents = expandCategories(tokenTypes);
+    assignTokenDefaultProps(tokenTypesAndParents);
+    assignCategoriesMapProp(tokenTypesAndParents);
+    assignCategoriesTokensProp(tokenTypesAndParents);
+    forEach_default(tokenTypesAndParents, (tokType) => {
+      tokType.isParent = tokType.categoryMatches.length > 0;
+    });
+  }
+  function expandCategories(tokenTypes) {
+    let result = clone_default(tokenTypes);
+    let categories = tokenTypes;
+    let searching = true;
+    while (searching) {
+      categories = compact_default(flatten_default(map_default(categories, (currTokType) => currTokType.CATEGORIES)));
+      const newCategories = difference_default(categories, result);
+      result = result.concat(newCategories);
+      if (isEmpty_default(newCategories)) {
+        searching = false;
+      } else {
+        categories = newCategories;
+      }
+    }
+    return result;
+  }
+  function assignTokenDefaultProps(tokenTypes) {
+    forEach_default(tokenTypes, (currTokType) => {
+      if (!hasShortKeyProperty(currTokType)) {
+        tokenIdxToClass[tokenShortNameIdx] = currTokType;
+        currTokType.tokenTypeIdx = tokenShortNameIdx++;
+      }
+      if (hasCategoriesProperty(currTokType) && !isArray_default(currTokType.CATEGORIES)) {
+        currTokType.CATEGORIES = [currTokType.CATEGORIES];
+      }
+      if (!hasCategoriesProperty(currTokType)) {
+        currTokType.CATEGORIES = [];
+      }
+      if (!hasExtendingTokensTypesProperty(currTokType)) {
+        currTokType.categoryMatches = [];
+      }
+      if (!hasExtendingTokensTypesMapProperty(currTokType)) {
+        currTokType.categoryMatchesMap = {};
+      }
+    });
+  }
+  function assignCategoriesTokensProp(tokenTypes) {
+    forEach_default(tokenTypes, (currTokType) => {
+      currTokType.categoryMatches = [];
+      forEach_default(currTokType.categoryMatchesMap, (val, key) => {
+        currTokType.categoryMatches.push(tokenIdxToClass[key].tokenTypeIdx);
+      });
+    });
+  }
+  function assignCategoriesMapProp(tokenTypes) {
+    forEach_default(tokenTypes, (currTokType) => {
+      singleAssignCategoriesToksMap([], currTokType);
+    });
+  }
+  function singleAssignCategoriesToksMap(path, nextNode) {
+    forEach_default(path, (pathNode) => {
+      nextNode.categoryMatchesMap[pathNode.tokenTypeIdx] = true;
+    });
+    forEach_default(nextNode.CATEGORIES, (nextCategory) => {
+      const newPath = path.concat(nextNode);
+      if (!includes_default(newPath, nextCategory)) {
+        singleAssignCategoriesToksMap(newPath, nextCategory);
+      }
+    });
+  }
+  function hasShortKeyProperty(tokType) {
+    return has_default(tokType, "tokenTypeIdx");
+  }
+  function hasCategoriesProperty(tokType) {
+    return has_default(tokType, "CATEGORIES");
+  }
+  function hasExtendingTokensTypesProperty(tokType) {
+    return has_default(tokType, "categoryMatches");
+  }
+  function hasExtendingTokensTypesMapProperty(tokType) {
+    return has_default(tokType, "categoryMatchesMap");
+  }
+  function isTokenType(tokType) {
+    return has_default(tokType, "tokenTypeIdx");
+  }
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/scan/lexer_errors_public.js
+  var defaultLexerErrorProvider = {
+    buildUnableToPopLexerModeMessage(token) {
+      return `Unable to pop Lexer Mode after encountering Token ->${token.image}<- The Mode Stack is empty`;
+    },
+    buildUnexpectedCharactersMessage(fullText, startOffset, length, line, column) {
+      return `unexpected character: ->${fullText.charAt(startOffset)}<- at offset: ${startOffset}, skipped ${length} characters.`;
+    }
+  };
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/scan/lexer_public.js
+  var LexerDefinitionErrorType;
+  (function(LexerDefinitionErrorType2) {
+    LexerDefinitionErrorType2[LexerDefinitionErrorType2["MISSING_PATTERN"] = 0] = "MISSING_PATTERN";
+    LexerDefinitionErrorType2[LexerDefinitionErrorType2["INVALID_PATTERN"] = 1] = "INVALID_PATTERN";
+    LexerDefinitionErrorType2[LexerDefinitionErrorType2["EOI_ANCHOR_FOUND"] = 2] = "EOI_ANCHOR_FOUND";
+    LexerDefinitionErrorType2[LexerDefinitionErrorType2["UNSUPPORTED_FLAGS_FOUND"] = 3] = "UNSUPPORTED_FLAGS_FOUND";
+    LexerDefinitionErrorType2[LexerDefinitionErrorType2["DUPLICATE_PATTERNS_FOUND"] = 4] = "DUPLICATE_PATTERNS_FOUND";
+    LexerDefinitionErrorType2[LexerDefinitionErrorType2["INVALID_GROUP_TYPE_FOUND"] = 5] = "INVALID_GROUP_TYPE_FOUND";
+    LexerDefinitionErrorType2[LexerDefinitionErrorType2["PUSH_MODE_DOES_NOT_EXIST"] = 6] = "PUSH_MODE_DOES_NOT_EXIST";
+    LexerDefinitionErrorType2[LexerDefinitionErrorType2["MULTI_MODE_LEXER_WITHOUT_DEFAULT_MODE"] = 7] = "MULTI_MODE_LEXER_WITHOUT_DEFAULT_MODE";
+    LexerDefinitionErrorType2[LexerDefinitionErrorType2["MULTI_MODE_LEXER_WITHOUT_MODES_PROPERTY"] = 8] = "MULTI_MODE_LEXER_WITHOUT_MODES_PROPERTY";
+    LexerDefinitionErrorType2[LexerDefinitionErrorType2["MULTI_MODE_LEXER_DEFAULT_MODE_VALUE_DOES_NOT_EXIST"] = 9] = "MULTI_MODE_LEXER_DEFAULT_MODE_VALUE_DOES_NOT_EXIST";
+    LexerDefinitionErrorType2[LexerDefinitionErrorType2["LEXER_DEFINITION_CANNOT_CONTAIN_UNDEFINED"] = 10] = "LEXER_DEFINITION_CANNOT_CONTAIN_UNDEFINED";
+    LexerDefinitionErrorType2[LexerDefinitionErrorType2["SOI_ANCHOR_FOUND"] = 11] = "SOI_ANCHOR_FOUND";
+    LexerDefinitionErrorType2[LexerDefinitionErrorType2["EMPTY_MATCH_PATTERN"] = 12] = "EMPTY_MATCH_PATTERN";
+    LexerDefinitionErrorType2[LexerDefinitionErrorType2["NO_LINE_BREAKS_FLAGS"] = 13] = "NO_LINE_BREAKS_FLAGS";
+    LexerDefinitionErrorType2[LexerDefinitionErrorType2["UNREACHABLE_PATTERN"] = 14] = "UNREACHABLE_PATTERN";
+    LexerDefinitionErrorType2[LexerDefinitionErrorType2["IDENTIFY_TERMINATOR"] = 15] = "IDENTIFY_TERMINATOR";
+    LexerDefinitionErrorType2[LexerDefinitionErrorType2["CUSTOM_LINE_BREAK"] = 16] = "CUSTOM_LINE_BREAK";
+    LexerDefinitionErrorType2[LexerDefinitionErrorType2["MULTI_MODE_LEXER_LONGER_ALT_NOT_IN_CURRENT_MODE"] = 17] = "MULTI_MODE_LEXER_LONGER_ALT_NOT_IN_CURRENT_MODE";
+  })(LexerDefinitionErrorType || (LexerDefinitionErrorType = {}));
+  var DEFAULT_LEXER_CONFIG = {
+    deferDefinitionErrorsHandling: false,
+    positionTracking: "full",
+    lineTerminatorsPattern: /\n|\r\n?/g,
+    lineTerminatorCharacters: ["\n", "\r"],
+    ensureOptimizations: false,
+    safeMode: false,
+    errorMessageProvider: defaultLexerErrorProvider,
+    traceInitPerf: false,
+    skipValidations: false,
+    recoveryEnabled: true
+  };
+  Object.freeze(DEFAULT_LEXER_CONFIG);
+  var Lexer = class {
+    constructor(lexerDefinition, config2 = DEFAULT_LEXER_CONFIG) {
+      this.lexerDefinition = lexerDefinition;
+      this.lexerDefinitionErrors = [];
+      this.lexerDefinitionWarning = [];
+      this.patternIdxToConfig = {};
+      this.charCodeToPatternIdxToConfig = {};
+      this.modes = [];
+      this.emptyGroups = {};
+      this.trackStartLines = true;
+      this.trackEndLines = true;
+      this.hasCustom = false;
+      this.canModeBeOptimized = {};
+      this.TRACE_INIT = (phaseDesc, phaseImpl) => {
+        if (this.traceInitPerf === true) {
+          this.traceInitIndent++;
+          const indent = new Array(this.traceInitIndent + 1).join("	");
+          if (this.traceInitIndent < this.traceInitMaxIdent) {
+            console.log(`${indent}--> <${phaseDesc}>`);
+          }
+          const { time, value } = timer(phaseImpl);
+          const traceMethod = time > 10 ? console.warn : console.log;
+          if (this.traceInitIndent < this.traceInitMaxIdent) {
+            traceMethod(`${indent}<-- <${phaseDesc}> time: ${time}ms`);
+          }
+          this.traceInitIndent--;
+          return value;
+        } else {
+          return phaseImpl();
+        }
+      };
+      if (typeof config2 === "boolean") {
+        throw Error("The second argument to the Lexer constructor is now an ILexerConfig Object.\na boolean 2nd argument is no longer supported");
+      }
+      this.config = assign_default({}, DEFAULT_LEXER_CONFIG, config2);
+      const traceInitVal = this.config.traceInitPerf;
+      if (traceInitVal === true) {
+        this.traceInitMaxIdent = Infinity;
+        this.traceInitPerf = true;
+      } else if (typeof traceInitVal === "number") {
+        this.traceInitMaxIdent = traceInitVal;
+        this.traceInitPerf = true;
+      }
+      this.traceInitIndent = -1;
+      this.TRACE_INIT("Lexer Constructor", () => {
+        let actualDefinition;
+        let hasOnlySingleMode = true;
+        this.TRACE_INIT("Lexer Config handling", () => {
+          if (this.config.lineTerminatorsPattern === DEFAULT_LEXER_CONFIG.lineTerminatorsPattern) {
+            this.config.lineTerminatorsPattern = LineTerminatorOptimizedTester;
+          } else {
+            if (this.config.lineTerminatorCharacters === DEFAULT_LEXER_CONFIG.lineTerminatorCharacters) {
+              throw Error("Error: Missing <lineTerminatorCharacters> property on the Lexer config.\n	For details See: https://chevrotain.io/docs/guide/resolving_lexer_errors.html#MISSING_LINE_TERM_CHARS");
+            }
+          }
+          if (config2.safeMode && config2.ensureOptimizations) {
+            throw Error('"safeMode" and "ensureOptimizations" flags are mutually exclusive.');
+          }
+          this.trackStartLines = /full|onlyStart/i.test(this.config.positionTracking);
+          this.trackEndLines = /full/i.test(this.config.positionTracking);
+          if (isArray_default(lexerDefinition)) {
+            actualDefinition = {
+              modes: { defaultMode: clone_default(lexerDefinition) },
+              defaultMode: DEFAULT_MODE
+            };
+          } else {
+            hasOnlySingleMode = false;
+            actualDefinition = clone_default(lexerDefinition);
+          }
+        });
+        if (this.config.skipValidations === false) {
+          this.TRACE_INIT("performRuntimeChecks", () => {
+            this.lexerDefinitionErrors = this.lexerDefinitionErrors.concat(performRuntimeChecks(actualDefinition, this.trackStartLines, this.config.lineTerminatorCharacters));
+          });
+          this.TRACE_INIT("performWarningRuntimeChecks", () => {
+            this.lexerDefinitionWarning = this.lexerDefinitionWarning.concat(performWarningRuntimeChecks(actualDefinition, this.trackStartLines, this.config.lineTerminatorCharacters));
+          });
+        }
+        actualDefinition.modes = actualDefinition.modes ? actualDefinition.modes : {};
+        forEach_default(actualDefinition.modes, (currModeValue, currModeName) => {
+          actualDefinition.modes[currModeName] = reject_default(currModeValue, (currTokType) => isUndefined_default(currTokType));
+        });
+        const allModeNames = keys_default(actualDefinition.modes);
+        forEach_default(actualDefinition.modes, (currModDef, currModName) => {
+          this.TRACE_INIT(`Mode: <${currModName}> processing`, () => {
+            this.modes.push(currModName);
+            if (this.config.skipValidations === false) {
+              this.TRACE_INIT(`validatePatterns`, () => {
+                this.lexerDefinitionErrors = this.lexerDefinitionErrors.concat(validatePatterns(currModDef, allModeNames));
+              });
+            }
+            if (isEmpty_default(this.lexerDefinitionErrors)) {
+              augmentTokenTypes(currModDef);
+              let currAnalyzeResult;
+              this.TRACE_INIT(`analyzeTokenTypes`, () => {
+                currAnalyzeResult = analyzeTokenTypes(currModDef, {
+                  lineTerminatorCharacters: this.config.lineTerminatorCharacters,
+                  positionTracking: config2.positionTracking,
+                  ensureOptimizations: config2.ensureOptimizations,
+                  safeMode: config2.safeMode,
+                  tracer: this.TRACE_INIT
+                });
+              });
+              this.patternIdxToConfig[currModName] = currAnalyzeResult.patternIdxToConfig;
+              this.charCodeToPatternIdxToConfig[currModName] = currAnalyzeResult.charCodeToPatternIdxToConfig;
+              this.emptyGroups = assign_default({}, this.emptyGroups, currAnalyzeResult.emptyGroups);
+              this.hasCustom = currAnalyzeResult.hasCustom || this.hasCustom;
+              this.canModeBeOptimized[currModName] = currAnalyzeResult.canBeOptimized;
+            }
+          });
+        });
+        this.defaultMode = actualDefinition.defaultMode;
+        if (!isEmpty_default(this.lexerDefinitionErrors) && !this.config.deferDefinitionErrorsHandling) {
+          const allErrMessages = map_default(this.lexerDefinitionErrors, (error) => {
+            return error.message;
+          });
+          const allErrMessagesString = allErrMessages.join("-----------------------\n");
+          throw new Error("Errors detected in definition of Lexer:\n" + allErrMessagesString);
+        }
+        forEach_default(this.lexerDefinitionWarning, (warningDescriptor) => {
+          PRINT_WARNING(warningDescriptor.message);
+        });
+        this.TRACE_INIT("Choosing sub-methods implementations", () => {
+          if (SUPPORT_STICKY) {
+            this.chopInput = identity_default;
+            this.match = this.matchWithTest;
+          } else {
+            this.updateLastIndex = noop_default;
+            this.match = this.matchWithExec;
+          }
+          if (hasOnlySingleMode) {
+            this.handleModes = noop_default;
+          }
+          if (this.trackStartLines === false) {
+            this.computeNewColumn = identity_default;
+          }
+          if (this.trackEndLines === false) {
+            this.updateTokenEndLineColumnLocation = noop_default;
+          }
+          if (/full/i.test(this.config.positionTracking)) {
+            this.createTokenInstance = this.createFullToken;
+          } else if (/onlyStart/i.test(this.config.positionTracking)) {
+            this.createTokenInstance = this.createStartOnlyToken;
+          } else if (/onlyOffset/i.test(this.config.positionTracking)) {
+            this.createTokenInstance = this.createOffsetOnlyToken;
+          } else {
+            throw Error(`Invalid <positionTracking> config option: "${this.config.positionTracking}"`);
+          }
+          if (this.hasCustom) {
+            this.addToken = this.addTokenUsingPush;
+            this.handlePayload = this.handlePayloadWithCustom;
+          } else {
+            this.addToken = this.addTokenUsingMemberAccess;
+            this.handlePayload = this.handlePayloadNoCustom;
+          }
+        });
+        this.TRACE_INIT("Failed Optimization Warnings", () => {
+          const unOptimizedModes = reduce_default(this.canModeBeOptimized, (cannotBeOptimized, canBeOptimized, modeName) => {
+            if (canBeOptimized === false) {
+              cannotBeOptimized.push(modeName);
+            }
+            return cannotBeOptimized;
+          }, []);
+          if (config2.ensureOptimizations && !isEmpty_default(unOptimizedModes)) {
+            throw Error(`Lexer Modes: < ${unOptimizedModes.join(", ")} > cannot be optimized.
+	 Disable the "ensureOptimizations" lexer config flag to silently ignore this and run the lexer in an un-optimized mode.
+	 Or inspect the console log for details on how to resolve these issues.`);
+          }
+        });
+        this.TRACE_INIT("clearRegExpParserCache", () => {
+          clearRegExpParserCache();
+        });
+        this.TRACE_INIT("toFastProperties", () => {
+          toFastProperties(this);
+        });
+      });
+    }
+    tokenize(text, initialMode = this.defaultMode) {
+      if (!isEmpty_default(this.lexerDefinitionErrors)) {
+        const allErrMessages = map_default(this.lexerDefinitionErrors, (error) => {
+          return error.message;
+        });
+        const allErrMessagesString = allErrMessages.join("-----------------------\n");
+        throw new Error("Unable to Tokenize because Errors detected in definition of Lexer:\n" + allErrMessagesString);
+      }
+      return this.tokenizeInternal(text, initialMode);
+    }
+    // There is quite a bit of duplication between this and "tokenizeInternalLazy"
+    // This is intentional due to performance considerations.
+    // this method also used quite a bit of `!` none null assertions because it is too optimized
+    // for `tsc` to always understand it is "safe"
+    tokenizeInternal(text, initialMode) {
+      let i, j, k, matchAltImage, longerAlt, matchedImage, payload, altPayload, imageLength, group, tokType, newToken, errLength, droppedChar, msg, match;
+      const orgText = text;
+      const orgLength = orgText.length;
+      let offset = 0;
+      let matchedTokensIndex = 0;
+      const guessedNumberOfTokens = this.hasCustom ? 0 : Math.floor(text.length / 10);
+      const matchedTokens = new Array(guessedNumberOfTokens);
+      const errors = [];
+      let line = this.trackStartLines ? 1 : void 0;
+      let column = this.trackStartLines ? 1 : void 0;
+      const groups = cloneEmptyGroups(this.emptyGroups);
+      const trackLines = this.trackStartLines;
+      const lineTerminatorPattern = this.config.lineTerminatorsPattern;
+      let currModePatternsLength = 0;
+      let patternIdxToConfig = [];
+      let currCharCodeToPatternIdxToConfig = [];
+      const modeStack = [];
+      const emptyArray = [];
+      Object.freeze(emptyArray);
+      let getPossiblePatterns;
+      function getPossiblePatternsSlow() {
+        return patternIdxToConfig;
+      }
+      function getPossiblePatternsOptimized(charCode) {
+        const optimizedCharIdx = charCodeToOptimizedIndex(charCode);
+        const possiblePatterns = currCharCodeToPatternIdxToConfig[optimizedCharIdx];
+        if (possiblePatterns === void 0) {
+          return emptyArray;
+        } else {
+          return possiblePatterns;
+        }
+      }
+      const pop_mode = (popToken) => {
+        if (modeStack.length === 1 && // if we have both a POP_MODE and a PUSH_MODE this is in-fact a "transition"
+        // So no error should occur.
+        popToken.tokenType.PUSH_MODE === void 0) {
+          const msg2 = this.config.errorMessageProvider.buildUnableToPopLexerModeMessage(popToken);
+          errors.push({
+            offset: popToken.startOffset,
+            line: popToken.startLine,
+            column: popToken.startColumn,
+            length: popToken.image.length,
+            message: msg2
+          });
+        } else {
+          modeStack.pop();
+          const newMode = last_default(modeStack);
+          patternIdxToConfig = this.patternIdxToConfig[newMode];
+          currCharCodeToPatternIdxToConfig = this.charCodeToPatternIdxToConfig[newMode];
+          currModePatternsLength = patternIdxToConfig.length;
+          const modeCanBeOptimized = this.canModeBeOptimized[newMode] && this.config.safeMode === false;
+          if (currCharCodeToPatternIdxToConfig && modeCanBeOptimized) {
+            getPossiblePatterns = getPossiblePatternsOptimized;
+          } else {
+            getPossiblePatterns = getPossiblePatternsSlow;
+          }
+        }
+      };
+      function push_mode(newMode) {
+        modeStack.push(newMode);
+        currCharCodeToPatternIdxToConfig = this.charCodeToPatternIdxToConfig[newMode];
+        patternIdxToConfig = this.patternIdxToConfig[newMode];
+        currModePatternsLength = patternIdxToConfig.length;
+        currModePatternsLength = patternIdxToConfig.length;
+        const modeCanBeOptimized = this.canModeBeOptimized[newMode] && this.config.safeMode === false;
+        if (currCharCodeToPatternIdxToConfig && modeCanBeOptimized) {
+          getPossiblePatterns = getPossiblePatternsOptimized;
+        } else {
+          getPossiblePatterns = getPossiblePatternsSlow;
+        }
+      }
+      push_mode.call(this, initialMode);
+      let currConfig;
+      const recoveryEnabled = this.config.recoveryEnabled;
+      while (offset < orgLength) {
+        matchedImage = null;
+        const nextCharCode = orgText.charCodeAt(offset);
+        const chosenPatternIdxToConfig = getPossiblePatterns(nextCharCode);
+        const chosenPatternsLength = chosenPatternIdxToConfig.length;
+        for (i = 0; i < chosenPatternsLength; i++) {
+          currConfig = chosenPatternIdxToConfig[i];
+          const currPattern = currConfig.pattern;
+          payload = null;
+          const singleCharCode = currConfig.short;
+          if (singleCharCode !== false) {
+            if (nextCharCode === singleCharCode) {
+              matchedImage = currPattern;
+            }
+          } else if (currConfig.isCustom === true) {
+            match = currPattern.exec(orgText, offset, matchedTokens, groups);
+            if (match !== null) {
+              matchedImage = match[0];
+              if (match.payload !== void 0) {
+                payload = match.payload;
+              }
+            } else {
+              matchedImage = null;
+            }
+          } else {
+            this.updateLastIndex(currPattern, offset);
+            matchedImage = this.match(currPattern, text, offset);
+          }
+          if (matchedImage !== null) {
+            longerAlt = currConfig.longerAlt;
+            if (longerAlt !== void 0) {
+              const longerAltLength = longerAlt.length;
+              for (k = 0; k < longerAltLength; k++) {
+                const longerAltConfig = patternIdxToConfig[longerAlt[k]];
+                const longerAltPattern = longerAltConfig.pattern;
+                altPayload = null;
+                if (longerAltConfig.isCustom === true) {
+                  match = longerAltPattern.exec(orgText, offset, matchedTokens, groups);
+                  if (match !== null) {
+                    matchAltImage = match[0];
+                    if (match.payload !== void 0) {
+                      altPayload = match.payload;
+                    }
+                  } else {
+                    matchAltImage = null;
+                  }
+                } else {
+                  this.updateLastIndex(longerAltPattern, offset);
+                  matchAltImage = this.match(longerAltPattern, text, offset);
+                }
+                if (matchAltImage && matchAltImage.length > matchedImage.length) {
+                  matchedImage = matchAltImage;
+                  payload = altPayload;
+                  currConfig = longerAltConfig;
+                  break;
+                }
+              }
+            }
+            break;
+          }
+        }
+        if (matchedImage !== null) {
+          imageLength = matchedImage.length;
+          group = currConfig.group;
+          if (group !== void 0) {
+            tokType = currConfig.tokenTypeIdx;
+            newToken = this.createTokenInstance(matchedImage, offset, tokType, currConfig.tokenType, line, column, imageLength);
+            this.handlePayload(newToken, payload);
+            if (group === false) {
+              matchedTokensIndex = this.addToken(matchedTokens, matchedTokensIndex, newToken);
+            } else {
+              groups[group].push(newToken);
+            }
+          }
+          text = this.chopInput(text, imageLength);
+          offset = offset + imageLength;
+          column = this.computeNewColumn(column, imageLength);
+          if (trackLines === true && currConfig.canLineTerminator === true) {
+            let numOfLTsInMatch = 0;
+            let foundTerminator;
+            let lastLTEndOffset;
+            lineTerminatorPattern.lastIndex = 0;
+            do {
+              foundTerminator = lineTerminatorPattern.test(matchedImage);
+              if (foundTerminator === true) {
+                lastLTEndOffset = lineTerminatorPattern.lastIndex - 1;
+                numOfLTsInMatch++;
+              }
+            } while (foundTerminator === true);
+            if (numOfLTsInMatch !== 0) {
+              line = line + numOfLTsInMatch;
+              column = imageLength - lastLTEndOffset;
+              this.updateTokenEndLineColumnLocation(newToken, group, lastLTEndOffset, numOfLTsInMatch, line, column, imageLength);
+            }
+          }
+          this.handleModes(currConfig, pop_mode, push_mode, newToken);
+        } else {
+          const errorStartOffset = offset;
+          const errorLine = line;
+          const errorColumn = column;
+          let foundResyncPoint = recoveryEnabled === false;
+          while (foundResyncPoint === false && offset < orgLength) {
+            text = this.chopInput(text, 1);
+            offset++;
+            for (j = 0; j < currModePatternsLength; j++) {
+              const currConfig2 = patternIdxToConfig[j];
+              const currPattern = currConfig2.pattern;
+              const singleCharCode = currConfig2.short;
+              if (singleCharCode !== false) {
+                if (orgText.charCodeAt(offset) === singleCharCode) {
+                  foundResyncPoint = true;
+                }
+              } else if (currConfig2.isCustom === true) {
+                foundResyncPoint = currPattern.exec(orgText, offset, matchedTokens, groups) !== null;
+              } else {
+                this.updateLastIndex(currPattern, offset);
+                foundResyncPoint = currPattern.exec(text) !== null;
+              }
+              if (foundResyncPoint === true) {
+                break;
+              }
+            }
+          }
+          errLength = offset - errorStartOffset;
+          column = this.computeNewColumn(column, errLength);
+          msg = this.config.errorMessageProvider.buildUnexpectedCharactersMessage(orgText, errorStartOffset, errLength, errorLine, errorColumn);
+          errors.push({
+            offset: errorStartOffset,
+            line: errorLine,
+            column: errorColumn,
+            length: errLength,
+            message: msg
+          });
+          if (recoveryEnabled === false) {
+            break;
+          }
+        }
+      }
+      if (!this.hasCustom) {
+        matchedTokens.length = matchedTokensIndex;
+      }
+      return {
+        tokens: matchedTokens,
+        groups,
+        errors
+      };
+    }
+    handleModes(config2, pop_mode, push_mode, newToken) {
+      if (config2.pop === true) {
+        const pushMode = config2.push;
+        pop_mode(newToken);
+        if (pushMode !== void 0) {
+          push_mode.call(this, pushMode);
+        }
+      } else if (config2.push !== void 0) {
+        push_mode.call(this, config2.push);
+      }
+    }
+    chopInput(text, length) {
+      return text.substring(length);
+    }
+    updateLastIndex(regExp, newLastIndex) {
+      regExp.lastIndex = newLastIndex;
+    }
+    // TODO: decrease this under 600 characters? inspect stripping comments option in TSC compiler
+    updateTokenEndLineColumnLocation(newToken, group, lastLTIdx, numOfLTsInMatch, line, column, imageLength) {
+      let lastCharIsLT, fixForEndingInLT;
+      if (group !== void 0) {
+        lastCharIsLT = lastLTIdx === imageLength - 1;
+        fixForEndingInLT = lastCharIsLT ? -1 : 0;
+        if (!(numOfLTsInMatch === 1 && lastCharIsLT === true)) {
+          newToken.endLine = line + fixForEndingInLT;
+          newToken.endColumn = column - 1 + -fixForEndingInLT;
+        }
+      }
+    }
+    computeNewColumn(oldColumn, imageLength) {
+      return oldColumn + imageLength;
+    }
+    createOffsetOnlyToken(image, startOffset, tokenTypeIdx, tokenType) {
+      return {
+        image,
+        startOffset,
+        tokenTypeIdx,
+        tokenType
+      };
+    }
+    createStartOnlyToken(image, startOffset, tokenTypeIdx, tokenType, startLine, startColumn) {
+      return {
+        image,
+        startOffset,
+        startLine,
+        startColumn,
+        tokenTypeIdx,
+        tokenType
+      };
+    }
+    createFullToken(image, startOffset, tokenTypeIdx, tokenType, startLine, startColumn, imageLength) {
+      return {
+        image,
+        startOffset,
+        endOffset: startOffset + imageLength - 1,
+        startLine,
+        endLine: startLine,
+        startColumn,
+        endColumn: startColumn + imageLength - 1,
+        tokenTypeIdx,
+        tokenType
+      };
+    }
+    addTokenUsingPush(tokenVector, index, tokenToAdd) {
+      tokenVector.push(tokenToAdd);
+      return index;
+    }
+    addTokenUsingMemberAccess(tokenVector, index, tokenToAdd) {
+      tokenVector[index] = tokenToAdd;
+      index++;
+      return index;
+    }
+    handlePayloadNoCustom(token, payload) {
+    }
+    handlePayloadWithCustom(token, payload) {
+      if (payload !== null) {
+        token.payload = payload;
+      }
+    }
+    matchWithTest(pattern, text, offset) {
+      const found = pattern.test(text);
+      if (found === true) {
+        return text.substring(offset, pattern.lastIndex);
       }
       return null;
     }
+    matchWithExec(pattern, text) {
+      const regExpArray = pattern.exec(text);
+      return regExpArray !== null ? regExpArray[0] : null;
+    }
+  };
+  Lexer.SKIPPED = "This marks a skipped Token pattern, this means each token identified by it willbe consumed and then thrown into oblivion, this can be used to for example to completely ignore whitespace.";
+  Lexer.NA = /NOT_APPLICABLE/;
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/scan/tokens_public.js
+  function tokenLabel2(tokType) {
+    if (hasTokenLabel2(tokType)) {
+      return tokType.LABEL;
+    } else {
+      return tokType.name;
+    }
+  }
+  function hasTokenLabel2(obj) {
+    return isString_default(obj.LABEL) && obj.LABEL !== "";
+  }
+  var PARENT = "parent";
+  var CATEGORIES = "categories";
+  var LABEL = "label";
+  var GROUP = "group";
+  var PUSH_MODE = "push_mode";
+  var POP_MODE = "pop_mode";
+  var LONGER_ALT = "longer_alt";
+  var LINE_BREAKS = "line_breaks";
+  var START_CHARS_HINT = "start_chars_hint";
+  function createToken(config2) {
+    return createTokenInternal(config2);
+  }
+  function createTokenInternal(config2) {
+    const pattern = config2.pattern;
+    const tokenType = {};
+    tokenType.name = config2.name;
+    if (!isUndefined_default(pattern)) {
+      tokenType.PATTERN = pattern;
+    }
+    if (has_default(config2, PARENT)) {
+      throw "The parent property is no longer supported.\nSee: https://github.com/chevrotain/chevrotain/issues/564#issuecomment-349062346 for details.";
+    }
+    if (has_default(config2, CATEGORIES)) {
+      tokenType.CATEGORIES = config2[CATEGORIES];
+    }
+    augmentTokenTypes([tokenType]);
+    if (has_default(config2, LABEL)) {
+      tokenType.LABEL = config2[LABEL];
+    }
+    if (has_default(config2, GROUP)) {
+      tokenType.GROUP = config2[GROUP];
+    }
+    if (has_default(config2, POP_MODE)) {
+      tokenType.POP_MODE = config2[POP_MODE];
+    }
+    if (has_default(config2, PUSH_MODE)) {
+      tokenType.PUSH_MODE = config2[PUSH_MODE];
+    }
+    if (has_default(config2, LONGER_ALT)) {
+      tokenType.LONGER_ALT = config2[LONGER_ALT];
+    }
+    if (has_default(config2, LINE_BREAKS)) {
+      tokenType.LINE_BREAKS = config2[LINE_BREAKS];
+    }
+    if (has_default(config2, START_CHARS_HINT)) {
+      tokenType.START_CHARS_HINT = config2[START_CHARS_HINT];
+    }
+    return tokenType;
+  }
+  var EOF = createToken({ name: "EOF", pattern: Lexer.NA });
+  augmentTokenTypes([EOF]);
+  function createTokenInstance(tokType, image, startOffset, endOffset, startLine, endLine, startColumn, endColumn) {
+    return {
+      image,
+      startOffset,
+      endOffset,
+      startLine,
+      endLine,
+      startColumn,
+      endColumn,
+      tokenTypeIdx: tokType.tokenTypeIdx,
+      tokenType: tokType
+    };
+  }
+  function tokenMatcher(token, tokType) {
+    return tokenStructuredMatcher(token, tokType);
+  }
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/parse/errors_public.js
+  var defaultParserErrorProvider = {
+    buildMismatchTokenMessage({ expected, actual, previous, ruleName }) {
+      const hasLabel = hasTokenLabel2(expected);
+      const expectedMsg = hasLabel ? `--> ${tokenLabel2(expected)} <--` : `token of type --> ${expected.name} <--`;
+      const msg = `Expecting ${expectedMsg} but found --> '${actual.image}' <--`;
+      return msg;
+    },
+    buildNotAllInputParsedMessage({ firstRedundant, ruleName }) {
+      return "Redundant input, expecting EOF but found: " + firstRedundant.image;
+    },
+    buildNoViableAltMessage({ expectedPathsPerAlt, actual, previous, customUserDescription, ruleName }) {
+      const errPrefix = "Expecting: ";
+      const actualText = head_default(actual).image;
+      const errSuffix = "\nbut found: '" + actualText + "'";
+      if (customUserDescription) {
+        return errPrefix + customUserDescription + errSuffix;
+      } else {
+        const allLookAheadPaths = reduce_default(expectedPathsPerAlt, (result, currAltPaths) => result.concat(currAltPaths), []);
+        const nextValidTokenSequences = map_default(allLookAheadPaths, (currPath) => `[${map_default(currPath, (currTokenType) => tokenLabel2(currTokenType)).join(", ")}]`);
+        const nextValidSequenceItems = map_default(nextValidTokenSequences, (itemMsg, idx) => `  ${idx + 1}. ${itemMsg}`);
+        const calculatedDescription = `one of these possible Token sequences:
+${nextValidSequenceItems.join("\n")}`;
+        return errPrefix + calculatedDescription + errSuffix;
+      }
+    },
+    buildEarlyExitMessage({ expectedIterationPaths, actual, customUserDescription, ruleName }) {
+      const errPrefix = "Expecting: ";
+      const actualText = head_default(actual).image;
+      const errSuffix = "\nbut found: '" + actualText + "'";
+      if (customUserDescription) {
+        return errPrefix + customUserDescription + errSuffix;
+      } else {
+        const nextValidTokenSequences = map_default(expectedIterationPaths, (currPath) => `[${map_default(currPath, (currTokenType) => tokenLabel2(currTokenType)).join(",")}]`);
+        const calculatedDescription = `expecting at least one iteration which starts with one of these possible Token sequences::
+  <${nextValidTokenSequences.join(" ,")}>`;
+        return errPrefix + calculatedDescription + errSuffix;
+      }
+    }
+  };
+  Object.freeze(defaultParserErrorProvider);
+  var defaultGrammarResolverErrorProvider = {
+    buildRuleNotFoundError(topLevelRule, undefinedRule) {
+      const msg = "Invalid grammar, reference to a rule which is not defined: ->" + undefinedRule.nonTerminalName + "<-\ninside top level rule: ->" + topLevelRule.name + "<-";
+      return msg;
+    }
+  };
+  var defaultGrammarValidatorErrorProvider = {
+    buildDuplicateFoundError(topLevelRule, duplicateProds) {
+      function getExtraProductionArgument2(prod) {
+        if (prod instanceof Terminal) {
+          return prod.terminalType.name;
+        } else if (prod instanceof NonTerminal) {
+          return prod.nonTerminalName;
+        } else {
+          return "";
+        }
+      }
+      const topLevelName = topLevelRule.name;
+      const duplicateProd = head_default(duplicateProds);
+      const index = duplicateProd.idx;
+      const dslName = getProductionDslName(duplicateProd);
+      const extraArgument = getExtraProductionArgument2(duplicateProd);
+      const hasExplicitIndex = index > 0;
+      let msg = `->${dslName}${hasExplicitIndex ? index : ""}<- ${extraArgument ? `with argument: ->${extraArgument}<-` : ""}
+                  appears more than once (${duplicateProds.length} times) in the top level rule: ->${topLevelName}<-.                  
+                  For further details see: https://chevrotain.io/docs/FAQ.html#NUMERICAL_SUFFIXES 
+                  `;
+      msg = msg.replace(/[ \t]+/g, " ");
+      msg = msg.replace(/\s\s+/g, "\n");
+      return msg;
+    },
+    buildNamespaceConflictError(rule) {
+      const errMsg = `Namespace conflict found in grammar.
+The grammar has both a Terminal(Token) and a Non-Terminal(Rule) named: <${rule.name}>.
+To resolve this make sure each Terminal and Non-Terminal names are unique
+This is easy to accomplish by using the convention that Terminal names start with an uppercase letter
+and Non-Terminal names start with a lower case letter.`;
+      return errMsg;
+    },
+    buildAlternationPrefixAmbiguityError(options) {
+      const pathMsg = map_default(options.prefixPath, (currTok) => tokenLabel2(currTok)).join(", ");
+      const occurrence = options.alternation.idx === 0 ? "" : options.alternation.idx;
+      const errMsg = `Ambiguous alternatives: <${options.ambiguityIndices.join(" ,")}> due to common lookahead prefix
+in <OR${occurrence}> inside <${options.topLevelRule.name}> Rule,
+<${pathMsg}> may appears as a prefix path in all these alternatives.
+See: https://chevrotain.io/docs/guide/resolving_grammar_errors.html#COMMON_PREFIX
+For Further details.`;
+      return errMsg;
+    },
+    buildAlternationAmbiguityError(options) {
+      const pathMsg = map_default(options.prefixPath, (currtok) => tokenLabel2(currtok)).join(", ");
+      const occurrence = options.alternation.idx === 0 ? "" : options.alternation.idx;
+      let currMessage = `Ambiguous Alternatives Detected: <${options.ambiguityIndices.join(" ,")}> in <OR${occurrence}> inside <${options.topLevelRule.name}> Rule,
+<${pathMsg}> may appears as a prefix path in all these alternatives.
+`;
+      currMessage = currMessage + `See: https://chevrotain.io/docs/guide/resolving_grammar_errors.html#AMBIGUOUS_ALTERNATIVES
+For Further details.`;
+      return currMessage;
+    },
+    buildEmptyRepetitionError(options) {
+      let dslName = getProductionDslName(options.repetition);
+      if (options.repetition.idx !== 0) {
+        dslName += options.repetition.idx;
+      }
+      const errMsg = `The repetition <${dslName}> within Rule <${options.topLevelRule.name}> can never consume any tokens.
+This could lead to an infinite loop.`;
+      return errMsg;
+    },
+    // TODO: remove - `errors_public` from nyc.config.js exclude
+    //       once this method is fully removed from this file
+    buildTokenNameError(options) {
+      return "deprecated";
+    },
+    buildEmptyAlternationError(options) {
+      const errMsg = `Ambiguous empty alternative: <${options.emptyChoiceIdx + 1}> in <OR${options.alternation.idx}> inside <${options.topLevelRule.name}> Rule.
+Only the last alternative may be an empty alternative.`;
+      return errMsg;
+    },
+    buildTooManyAlternativesError(options) {
+      const errMsg = `An Alternation cannot have more than 256 alternatives:
+<OR${options.alternation.idx}> inside <${options.topLevelRule.name}> Rule.
+ has ${options.alternation.definition.length + 1} alternatives.`;
+      return errMsg;
+    },
+    buildLeftRecursionError(options) {
+      const ruleName = options.topLevelRule.name;
+      const pathNames = map_default(options.leftRecursionPath, (currRule) => currRule.name);
+      const leftRecursivePath = `${ruleName} --> ${pathNames.concat([ruleName]).join(" --> ")}`;
+      const errMsg = `Left Recursion found in grammar.
+rule: <${ruleName}> can be invoked from itself (directly or indirectly)
+without consuming any Tokens. The grammar path that causes this is: 
+ ${leftRecursivePath}
+ To fix this refactor your grammar to remove the left recursion.
+see: https://en.wikipedia.org/wiki/LL_parser#Left_factoring.`;
+      return errMsg;
+    },
+    // TODO: remove - `errors_public` from nyc.config.js exclude
+    //       once this method is fully removed from this file
+    buildInvalidRuleNameError(options) {
+      return "deprecated";
+    },
+    buildDuplicateRuleNameError(options) {
+      let ruleName;
+      if (options.topLevelRule instanceof Rule) {
+        ruleName = options.topLevelRule.name;
+      } else {
+        ruleName = options.topLevelRule;
+      }
+      const errMsg = `Duplicate definition, rule: ->${ruleName}<- is already defined in the grammar: ->${options.grammarName}<-`;
+      return errMsg;
+    }
+  };
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/parse/grammar/resolver.js
+  function resolveGrammar(topLevels, errMsgProvider) {
+    const refResolver = new GastRefResolverVisitor(topLevels, errMsgProvider);
+    refResolver.resolveRefs();
+    return refResolver.errors;
+  }
+  var GastRefResolverVisitor = class extends GAstVisitor {
+    constructor(nameToTopRule, errMsgProvider) {
+      super();
+      this.nameToTopRule = nameToTopRule;
+      this.errMsgProvider = errMsgProvider;
+      this.errors = [];
+    }
+    resolveRefs() {
+      forEach_default(values_default(this.nameToTopRule), (prod) => {
+        this.currTopLevel = prod;
+        prod.accept(this);
+      });
+    }
+    visitNonTerminal(node) {
+      const ref = this.nameToTopRule[node.nonTerminalName];
+      if (!ref) {
+        const msg = this.errMsgProvider.buildRuleNotFoundError(this.currTopLevel, node);
+        this.errors.push({
+          message: msg,
+          type: ParserDefinitionErrorType.UNRESOLVED_SUBRULE_REF,
+          ruleName: this.currTopLevel.name,
+          unresolvedRefName: node.nonTerminalName
+        });
+      } else {
+        node.referencedRule = ref;
+      }
+    }
+  };
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/parse/grammar/interpreter.js
+  var AbstractNextPossibleTokensWalker = class extends RestWalker {
+    constructor(topProd, path) {
+      super();
+      this.topProd = topProd;
+      this.path = path;
+      this.possibleTokTypes = [];
+      this.nextProductionName = "";
+      this.nextProductionOccurrence = 0;
+      this.found = false;
+      this.isAtEndOfPath = false;
+    }
+    startWalking() {
+      this.found = false;
+      if (this.path.ruleStack[0] !== this.topProd.name) {
+        throw Error("The path does not start with the walker's top Rule!");
+      }
+      this.ruleStack = clone_default(this.path.ruleStack).reverse();
+      this.occurrenceStack = clone_default(this.path.occurrenceStack).reverse();
+      this.ruleStack.pop();
+      this.occurrenceStack.pop();
+      this.updateExpectedNext();
+      this.walk(this.topProd);
+      return this.possibleTokTypes;
+    }
+    walk(prod, prevRest = []) {
+      if (!this.found) {
+        super.walk(prod, prevRest);
+      }
+    }
+    walkProdRef(refProd, currRest, prevRest) {
+      if (refProd.referencedRule.name === this.nextProductionName && refProd.idx === this.nextProductionOccurrence) {
+        const fullRest = currRest.concat(prevRest);
+        this.updateExpectedNext();
+        this.walk(refProd.referencedRule, fullRest);
+      }
+    }
+    updateExpectedNext() {
+      if (isEmpty_default(this.ruleStack)) {
+        this.nextProductionName = "";
+        this.nextProductionOccurrence = 0;
+        this.isAtEndOfPath = true;
+      } else {
+        this.nextProductionName = this.ruleStack.pop();
+        this.nextProductionOccurrence = this.occurrenceStack.pop();
+      }
+    }
+  };
+  var NextAfterTokenWalker = class extends AbstractNextPossibleTokensWalker {
+    constructor(topProd, path) {
+      super(topProd, path);
+      this.path = path;
+      this.nextTerminalName = "";
+      this.nextTerminalOccurrence = 0;
+      this.nextTerminalName = this.path.lastTok.name;
+      this.nextTerminalOccurrence = this.path.lastTokOccurrence;
+    }
+    walkTerminal(terminal, currRest, prevRest) {
+      if (this.isAtEndOfPath && terminal.terminalType.name === this.nextTerminalName && terminal.idx === this.nextTerminalOccurrence && !this.found) {
+        const fullRest = currRest.concat(prevRest);
+        const restProd = new Alternative({ definition: fullRest });
+        this.possibleTokTypes = first(restProd);
+        this.found = true;
+      }
+    }
+  };
+  var AbstractNextTerminalAfterProductionWalker = class extends RestWalker {
+    constructor(topRule, occurrence) {
+      super();
+      this.topRule = topRule;
+      this.occurrence = occurrence;
+      this.result = {
+        token: void 0,
+        occurrence: void 0,
+        isEndOfRule: void 0
+      };
+    }
+    startWalking() {
+      this.walk(this.topRule);
+      return this.result;
+    }
+  };
+  var NextTerminalAfterManyWalker = class extends AbstractNextTerminalAfterProductionWalker {
+    walkMany(manyProd, currRest, prevRest) {
+      if (manyProd.idx === this.occurrence) {
+        const firstAfterMany = head_default(currRest.concat(prevRest));
+        this.result.isEndOfRule = firstAfterMany === void 0;
+        if (firstAfterMany instanceof Terminal) {
+          this.result.token = firstAfterMany.terminalType;
+          this.result.occurrence = firstAfterMany.idx;
+        }
+      } else {
+        super.walkMany(manyProd, currRest, prevRest);
+      }
+    }
+  };
+  var NextTerminalAfterManySepWalker = class extends AbstractNextTerminalAfterProductionWalker {
+    walkManySep(manySepProd, currRest, prevRest) {
+      if (manySepProd.idx === this.occurrence) {
+        const firstAfterManySep = head_default(currRest.concat(prevRest));
+        this.result.isEndOfRule = firstAfterManySep === void 0;
+        if (firstAfterManySep instanceof Terminal) {
+          this.result.token = firstAfterManySep.terminalType;
+          this.result.occurrence = firstAfterManySep.idx;
+        }
+      } else {
+        super.walkManySep(manySepProd, currRest, prevRest);
+      }
+    }
+  };
+  var NextTerminalAfterAtLeastOneWalker = class extends AbstractNextTerminalAfterProductionWalker {
+    walkAtLeastOne(atLeastOneProd, currRest, prevRest) {
+      if (atLeastOneProd.idx === this.occurrence) {
+        const firstAfterAtLeastOne = head_default(currRest.concat(prevRest));
+        this.result.isEndOfRule = firstAfterAtLeastOne === void 0;
+        if (firstAfterAtLeastOne instanceof Terminal) {
+          this.result.token = firstAfterAtLeastOne.terminalType;
+          this.result.occurrence = firstAfterAtLeastOne.idx;
+        }
+      } else {
+        super.walkAtLeastOne(atLeastOneProd, currRest, prevRest);
+      }
+    }
+  };
+  var NextTerminalAfterAtLeastOneSepWalker = class extends AbstractNextTerminalAfterProductionWalker {
+    walkAtLeastOneSep(atleastOneSepProd, currRest, prevRest) {
+      if (atleastOneSepProd.idx === this.occurrence) {
+        const firstAfterfirstAfterAtLeastOneSep = head_default(currRest.concat(prevRest));
+        this.result.isEndOfRule = firstAfterfirstAfterAtLeastOneSep === void 0;
+        if (firstAfterfirstAfterAtLeastOneSep instanceof Terminal) {
+          this.result.token = firstAfterfirstAfterAtLeastOneSep.terminalType;
+          this.result.occurrence = firstAfterfirstAfterAtLeastOneSep.idx;
+        }
+      } else {
+        super.walkAtLeastOneSep(atleastOneSepProd, currRest, prevRest);
+      }
+    }
+  };
+  function possiblePathsFrom(targetDef, maxLength, currPath = []) {
+    currPath = clone_default(currPath);
+    let result = [];
+    let i = 0;
+    function remainingPathWith(nextDef) {
+      return nextDef.concat(drop_default(targetDef, i + 1));
+    }
+    function getAlternativesForProd(definition) {
+      const alternatives = possiblePathsFrom(remainingPathWith(definition), maxLength, currPath);
+      return result.concat(alternatives);
+    }
+    while (currPath.length < maxLength && i < targetDef.length) {
+      const prod = targetDef[i];
+      if (prod instanceof Alternative) {
+        return getAlternativesForProd(prod.definition);
+      } else if (prod instanceof NonTerminal) {
+        return getAlternativesForProd(prod.definition);
+      } else if (prod instanceof Option) {
+        result = getAlternativesForProd(prod.definition);
+      } else if (prod instanceof RepetitionMandatory) {
+        const newDef = prod.definition.concat([
+          new Repetition({
+            definition: prod.definition
+          })
+        ]);
+        return getAlternativesForProd(newDef);
+      } else if (prod instanceof RepetitionMandatoryWithSeparator) {
+        const newDef = [
+          new Alternative({ definition: prod.definition }),
+          new Repetition({
+            definition: [new Terminal({ terminalType: prod.separator })].concat(prod.definition)
+          })
+        ];
+        return getAlternativesForProd(newDef);
+      } else if (prod instanceof RepetitionWithSeparator) {
+        const newDef = prod.definition.concat([
+          new Repetition({
+            definition: [new Terminal({ terminalType: prod.separator })].concat(prod.definition)
+          })
+        ]);
+        result = getAlternativesForProd(newDef);
+      } else if (prod instanceof Repetition) {
+        const newDef = prod.definition.concat([
+          new Repetition({
+            definition: prod.definition
+          })
+        ]);
+        result = getAlternativesForProd(newDef);
+      } else if (prod instanceof Alternation) {
+        forEach_default(prod.definition, (currAlt) => {
+          if (isEmpty_default(currAlt.definition) === false) {
+            result = getAlternativesForProd(currAlt.definition);
+          }
+        });
+        return result;
+      } else if (prod instanceof Terminal) {
+        currPath.push(prod.terminalType);
+      } else {
+        throw Error("non exhaustive match");
+      }
+      i++;
+    }
+    result.push({
+      partialPath: currPath,
+      suffixDef: drop_default(targetDef, i)
+    });
+    return result;
+  }
+  function nextPossibleTokensAfter(initialDef, tokenVector, tokMatcher, maxLookAhead) {
+    const EXIT_NON_TERMINAL = "EXIT_NONE_TERMINAL";
+    const EXIT_NON_TERMINAL_ARR = [EXIT_NON_TERMINAL];
+    const EXIT_ALTERNATIVE = "EXIT_ALTERNATIVE";
+    let foundCompletePath = false;
+    const tokenVectorLength = tokenVector.length;
+    const minimalAlternativesIndex = tokenVectorLength - maxLookAhead - 1;
+    const result = [];
+    const possiblePaths = [];
+    possiblePaths.push({
+      idx: -1,
+      def: initialDef,
+      ruleStack: [],
+      occurrenceStack: []
+    });
+    while (!isEmpty_default(possiblePaths)) {
+      const currPath = possiblePaths.pop();
+      if (currPath === EXIT_ALTERNATIVE) {
+        if (foundCompletePath && last_default(possiblePaths).idx <= minimalAlternativesIndex) {
+          possiblePaths.pop();
+        }
+        continue;
+      }
+      const currDef = currPath.def;
+      const currIdx = currPath.idx;
+      const currRuleStack = currPath.ruleStack;
+      const currOccurrenceStack = currPath.occurrenceStack;
+      if (isEmpty_default(currDef)) {
+        continue;
+      }
+      const prod = currDef[0];
+      if (prod === EXIT_NON_TERMINAL) {
+        const nextPath = {
+          idx: currIdx,
+          def: drop_default(currDef),
+          ruleStack: dropRight_default(currRuleStack),
+          occurrenceStack: dropRight_default(currOccurrenceStack)
+        };
+        possiblePaths.push(nextPath);
+      } else if (prod instanceof Terminal) {
+        if (currIdx < tokenVectorLength - 1) {
+          const nextIdx = currIdx + 1;
+          const actualToken = tokenVector[nextIdx];
+          if (tokMatcher(actualToken, prod.terminalType)) {
+            const nextPath = {
+              idx: nextIdx,
+              def: drop_default(currDef),
+              ruleStack: currRuleStack,
+              occurrenceStack: currOccurrenceStack
+            };
+            possiblePaths.push(nextPath);
+          }
+        } else if (currIdx === tokenVectorLength - 1) {
+          result.push({
+            nextTokenType: prod.terminalType,
+            nextTokenOccurrence: prod.idx,
+            ruleStack: currRuleStack,
+            occurrenceStack: currOccurrenceStack
+          });
+          foundCompletePath = true;
+        } else {
+          throw Error("non exhaustive match");
+        }
+      } else if (prod instanceof NonTerminal) {
+        const newRuleStack = clone_default(currRuleStack);
+        newRuleStack.push(prod.nonTerminalName);
+        const newOccurrenceStack = clone_default(currOccurrenceStack);
+        newOccurrenceStack.push(prod.idx);
+        const nextPath = {
+          idx: currIdx,
+          def: prod.definition.concat(EXIT_NON_TERMINAL_ARR, drop_default(currDef)),
+          ruleStack: newRuleStack,
+          occurrenceStack: newOccurrenceStack
+        };
+        possiblePaths.push(nextPath);
+      } else if (prod instanceof Option) {
+        const nextPathWithout = {
+          idx: currIdx,
+          def: drop_default(currDef),
+          ruleStack: currRuleStack,
+          occurrenceStack: currOccurrenceStack
+        };
+        possiblePaths.push(nextPathWithout);
+        possiblePaths.push(EXIT_ALTERNATIVE);
+        const nextPathWith = {
+          idx: currIdx,
+          def: prod.definition.concat(drop_default(currDef)),
+          ruleStack: currRuleStack,
+          occurrenceStack: currOccurrenceStack
+        };
+        possiblePaths.push(nextPathWith);
+      } else if (prod instanceof RepetitionMandatory) {
+        const secondIteration = new Repetition({
+          definition: prod.definition,
+          idx: prod.idx
+        });
+        const nextDef = prod.definition.concat([secondIteration], drop_default(currDef));
+        const nextPath = {
+          idx: currIdx,
+          def: nextDef,
+          ruleStack: currRuleStack,
+          occurrenceStack: currOccurrenceStack
+        };
+        possiblePaths.push(nextPath);
+      } else if (prod instanceof RepetitionMandatoryWithSeparator) {
+        const separatorGast = new Terminal({
+          terminalType: prod.separator
+        });
+        const secondIteration = new Repetition({
+          definition: [separatorGast].concat(prod.definition),
+          idx: prod.idx
+        });
+        const nextDef = prod.definition.concat([secondIteration], drop_default(currDef));
+        const nextPath = {
+          idx: currIdx,
+          def: nextDef,
+          ruleStack: currRuleStack,
+          occurrenceStack: currOccurrenceStack
+        };
+        possiblePaths.push(nextPath);
+      } else if (prod instanceof RepetitionWithSeparator) {
+        const nextPathWithout = {
+          idx: currIdx,
+          def: drop_default(currDef),
+          ruleStack: currRuleStack,
+          occurrenceStack: currOccurrenceStack
+        };
+        possiblePaths.push(nextPathWithout);
+        possiblePaths.push(EXIT_ALTERNATIVE);
+        const separatorGast = new Terminal({
+          terminalType: prod.separator
+        });
+        const nthRepetition = new Repetition({
+          definition: [separatorGast].concat(prod.definition),
+          idx: prod.idx
+        });
+        const nextDef = prod.definition.concat([nthRepetition], drop_default(currDef));
+        const nextPathWith = {
+          idx: currIdx,
+          def: nextDef,
+          ruleStack: currRuleStack,
+          occurrenceStack: currOccurrenceStack
+        };
+        possiblePaths.push(nextPathWith);
+      } else if (prod instanceof Repetition) {
+        const nextPathWithout = {
+          idx: currIdx,
+          def: drop_default(currDef),
+          ruleStack: currRuleStack,
+          occurrenceStack: currOccurrenceStack
+        };
+        possiblePaths.push(nextPathWithout);
+        possiblePaths.push(EXIT_ALTERNATIVE);
+        const nthRepetition = new Repetition({
+          definition: prod.definition,
+          idx: prod.idx
+        });
+        const nextDef = prod.definition.concat([nthRepetition], drop_default(currDef));
+        const nextPathWith = {
+          idx: currIdx,
+          def: nextDef,
+          ruleStack: currRuleStack,
+          occurrenceStack: currOccurrenceStack
+        };
+        possiblePaths.push(nextPathWith);
+      } else if (prod instanceof Alternation) {
+        for (let i = prod.definition.length - 1; i >= 0; i--) {
+          const currAlt = prod.definition[i];
+          const currAltPath = {
+            idx: currIdx,
+            def: currAlt.definition.concat(drop_default(currDef)),
+            ruleStack: currRuleStack,
+            occurrenceStack: currOccurrenceStack
+          };
+          possiblePaths.push(currAltPath);
+          possiblePaths.push(EXIT_ALTERNATIVE);
+        }
+      } else if (prod instanceof Alternative) {
+        possiblePaths.push({
+          idx: currIdx,
+          def: prod.definition.concat(drop_default(currDef)),
+          ruleStack: currRuleStack,
+          occurrenceStack: currOccurrenceStack
+        });
+      } else if (prod instanceof Rule) {
+        possiblePaths.push(expandTopLevelRule(prod, currIdx, currRuleStack, currOccurrenceStack));
+      } else {
+        throw Error("non exhaustive match");
+      }
+    }
+    return result;
+  }
+  function expandTopLevelRule(topRule, currIdx, currRuleStack, currOccurrenceStack) {
+    const newRuleStack = clone_default(currRuleStack);
+    newRuleStack.push(topRule.name);
+    const newCurrOccurrenceStack = clone_default(currOccurrenceStack);
+    newCurrOccurrenceStack.push(1);
+    return {
+      idx: currIdx,
+      def: topRule.definition,
+      ruleStack: newRuleStack,
+      occurrenceStack: newCurrOccurrenceStack
+    };
+  }
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/parse/grammar/lookahead.js
+  var PROD_TYPE;
+  (function(PROD_TYPE2) {
+    PROD_TYPE2[PROD_TYPE2["OPTION"] = 0] = "OPTION";
+    PROD_TYPE2[PROD_TYPE2["REPETITION"] = 1] = "REPETITION";
+    PROD_TYPE2[PROD_TYPE2["REPETITION_MANDATORY"] = 2] = "REPETITION_MANDATORY";
+    PROD_TYPE2[PROD_TYPE2["REPETITION_MANDATORY_WITH_SEPARATOR"] = 3] = "REPETITION_MANDATORY_WITH_SEPARATOR";
+    PROD_TYPE2[PROD_TYPE2["REPETITION_WITH_SEPARATOR"] = 4] = "REPETITION_WITH_SEPARATOR";
+    PROD_TYPE2[PROD_TYPE2["ALTERNATION"] = 5] = "ALTERNATION";
+  })(PROD_TYPE || (PROD_TYPE = {}));
+  function getProdType(prod) {
+    if (prod instanceof Option || prod === "Option") {
+      return PROD_TYPE.OPTION;
+    } else if (prod instanceof Repetition || prod === "Repetition") {
+      return PROD_TYPE.REPETITION;
+    } else if (prod instanceof RepetitionMandatory || prod === "RepetitionMandatory") {
+      return PROD_TYPE.REPETITION_MANDATORY;
+    } else if (prod instanceof RepetitionMandatoryWithSeparator || prod === "RepetitionMandatoryWithSeparator") {
+      return PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR;
+    } else if (prod instanceof RepetitionWithSeparator || prod === "RepetitionWithSeparator") {
+      return PROD_TYPE.REPETITION_WITH_SEPARATOR;
+    } else if (prod instanceof Alternation || prod === "Alternation") {
+      return PROD_TYPE.ALTERNATION;
+    } else {
+      throw Error("non exhaustive match");
+    }
+  }
+  function buildLookaheadFuncForOr(occurrence, ruleGrammar, maxLookahead, hasPredicates, dynamicTokensEnabled, laFuncBuilder) {
+    const lookAheadPaths = getLookaheadPathsForOr(occurrence, ruleGrammar, maxLookahead);
+    const tokenMatcher2 = areTokenCategoriesNotUsed(lookAheadPaths) ? tokenStructuredMatcherNoCategories : tokenStructuredMatcher;
+    return laFuncBuilder(lookAheadPaths, hasPredicates, tokenMatcher2, dynamicTokensEnabled);
+  }
+  function buildLookaheadFuncForOptionalProd(occurrence, ruleGrammar, k, dynamicTokensEnabled, prodType, lookaheadBuilder) {
+    const lookAheadPaths = getLookaheadPathsForOptionalProd(occurrence, ruleGrammar, prodType, k);
+    const tokenMatcher2 = areTokenCategoriesNotUsed(lookAheadPaths) ? tokenStructuredMatcherNoCategories : tokenStructuredMatcher;
+    return lookaheadBuilder(lookAheadPaths[0], tokenMatcher2, dynamicTokensEnabled);
+  }
+  function buildAlternativesLookAheadFunc(alts, hasPredicates, tokenMatcher2, dynamicTokensEnabled) {
+    const numOfAlts = alts.length;
+    const areAllOneTokenLookahead = every_default(alts, (currAlt) => {
+      return every_default(currAlt, (currPath) => {
+        return currPath.length === 1;
+      });
+    });
+    if (hasPredicates) {
+      return function(orAlts) {
+        const predicates = map_default(orAlts, (currAlt) => currAlt.GATE);
+        for (let t = 0; t < numOfAlts; t++) {
+          const currAlt = alts[t];
+          const currNumOfPaths = currAlt.length;
+          const currPredicate = predicates[t];
+          if (currPredicate !== void 0 && currPredicate.call(this) === false) {
+            continue;
+          }
+          nextPath: for (let j = 0; j < currNumOfPaths; j++) {
+            const currPath = currAlt[j];
+            const currPathLength = currPath.length;
+            for (let i = 0; i < currPathLength; i++) {
+              const nextToken = this.LA(i + 1);
+              if (tokenMatcher2(nextToken, currPath[i]) === false) {
+                continue nextPath;
+              }
+            }
+            return t;
+          }
+        }
+        return void 0;
+      };
+    } else if (areAllOneTokenLookahead && !dynamicTokensEnabled) {
+      const singleTokenAlts = map_default(alts, (currAlt) => {
+        return flatten_default(currAlt);
+      });
+      const choiceToAlt = reduce_default(singleTokenAlts, (result, currAlt, idx) => {
+        forEach_default(currAlt, (currTokType) => {
+          if (!has_default(result, currTokType.tokenTypeIdx)) {
+            result[currTokType.tokenTypeIdx] = idx;
+          }
+          forEach_default(currTokType.categoryMatches, (currExtendingType) => {
+            if (!has_default(result, currExtendingType)) {
+              result[currExtendingType] = idx;
+            }
+          });
+        });
+        return result;
+      }, {});
+      return function() {
+        const nextToken = this.LA(1);
+        return choiceToAlt[nextToken.tokenTypeIdx];
+      };
+    } else {
+      return function() {
+        for (let t = 0; t < numOfAlts; t++) {
+          const currAlt = alts[t];
+          const currNumOfPaths = currAlt.length;
+          nextPath: for (let j = 0; j < currNumOfPaths; j++) {
+            const currPath = currAlt[j];
+            const currPathLength = currPath.length;
+            for (let i = 0; i < currPathLength; i++) {
+              const nextToken = this.LA(i + 1);
+              if (tokenMatcher2(nextToken, currPath[i]) === false) {
+                continue nextPath;
+              }
+            }
+            return t;
+          }
+        }
+        return void 0;
+      };
+    }
+  }
+  function buildSingleAlternativeLookaheadFunction(alt, tokenMatcher2, dynamicTokensEnabled) {
+    const areAllOneTokenLookahead = every_default(alt, (currPath) => {
+      return currPath.length === 1;
+    });
+    const numOfPaths = alt.length;
+    if (areAllOneTokenLookahead && !dynamicTokensEnabled) {
+      const singleTokensTypes = flatten_default(alt);
+      if (singleTokensTypes.length === 1 && isEmpty_default(singleTokensTypes[0].categoryMatches)) {
+        const expectedTokenType = singleTokensTypes[0];
+        const expectedTokenUniqueKey = expectedTokenType.tokenTypeIdx;
+        return function() {
+          return this.LA(1).tokenTypeIdx === expectedTokenUniqueKey;
+        };
+      } else {
+        const choiceToAlt = reduce_default(singleTokensTypes, (result, currTokType, idx) => {
+          result[currTokType.tokenTypeIdx] = true;
+          forEach_default(currTokType.categoryMatches, (currExtendingType) => {
+            result[currExtendingType] = true;
+          });
+          return result;
+        }, []);
+        return function() {
+          const nextToken = this.LA(1);
+          return choiceToAlt[nextToken.tokenTypeIdx] === true;
+        };
+      }
+    } else {
+      return function() {
+        nextPath: for (let j = 0; j < numOfPaths; j++) {
+          const currPath = alt[j];
+          const currPathLength = currPath.length;
+          for (let i = 0; i < currPathLength; i++) {
+            const nextToken = this.LA(i + 1);
+            if (tokenMatcher2(nextToken, currPath[i]) === false) {
+              continue nextPath;
+            }
+          }
+          return true;
+        }
+        return false;
+      };
+    }
+  }
+  var RestDefinitionFinderWalker = class extends RestWalker {
+    constructor(topProd, targetOccurrence, targetProdType) {
+      super();
+      this.topProd = topProd;
+      this.targetOccurrence = targetOccurrence;
+      this.targetProdType = targetProdType;
+    }
+    startWalking() {
+      this.walk(this.topProd);
+      return this.restDef;
+    }
+    checkIsTarget(node, expectedProdType, currRest, prevRest) {
+      if (node.idx === this.targetOccurrence && this.targetProdType === expectedProdType) {
+        this.restDef = currRest.concat(prevRest);
+        return true;
+      }
+      return false;
+    }
+    walkOption(optionProd, currRest, prevRest) {
+      if (!this.checkIsTarget(optionProd, PROD_TYPE.OPTION, currRest, prevRest)) {
+        super.walkOption(optionProd, currRest, prevRest);
+      }
+    }
+    walkAtLeastOne(atLeastOneProd, currRest, prevRest) {
+      if (!this.checkIsTarget(atLeastOneProd, PROD_TYPE.REPETITION_MANDATORY, currRest, prevRest)) {
+        super.walkOption(atLeastOneProd, currRest, prevRest);
+      }
+    }
+    walkAtLeastOneSep(atLeastOneSepProd, currRest, prevRest) {
+      if (!this.checkIsTarget(atLeastOneSepProd, PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR, currRest, prevRest)) {
+        super.walkOption(atLeastOneSepProd, currRest, prevRest);
+      }
+    }
+    walkMany(manyProd, currRest, prevRest) {
+      if (!this.checkIsTarget(manyProd, PROD_TYPE.REPETITION, currRest, prevRest)) {
+        super.walkOption(manyProd, currRest, prevRest);
+      }
+    }
+    walkManySep(manySepProd, currRest, prevRest) {
+      if (!this.checkIsTarget(manySepProd, PROD_TYPE.REPETITION_WITH_SEPARATOR, currRest, prevRest)) {
+        super.walkOption(manySepProd, currRest, prevRest);
+      }
+    }
+  };
+  var InsideDefinitionFinderVisitor = class extends GAstVisitor {
+    constructor(targetOccurrence, targetProdType, targetRef) {
+      super();
+      this.targetOccurrence = targetOccurrence;
+      this.targetProdType = targetProdType;
+      this.targetRef = targetRef;
+      this.result = [];
+    }
+    checkIsTarget(node, expectedProdName) {
+      if (node.idx === this.targetOccurrence && this.targetProdType === expectedProdName && (this.targetRef === void 0 || node === this.targetRef)) {
+        this.result = node.definition;
+      }
+    }
+    visitOption(node) {
+      this.checkIsTarget(node, PROD_TYPE.OPTION);
+    }
+    visitRepetition(node) {
+      this.checkIsTarget(node, PROD_TYPE.REPETITION);
+    }
+    visitRepetitionMandatory(node) {
+      this.checkIsTarget(node, PROD_TYPE.REPETITION_MANDATORY);
+    }
+    visitRepetitionMandatoryWithSeparator(node) {
+      this.checkIsTarget(node, PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR);
+    }
+    visitRepetitionWithSeparator(node) {
+      this.checkIsTarget(node, PROD_TYPE.REPETITION_WITH_SEPARATOR);
+    }
+    visitAlternation(node) {
+      this.checkIsTarget(node, PROD_TYPE.ALTERNATION);
+    }
+  };
+  function initializeArrayOfArrays(size) {
+    const result = new Array(size);
+    for (let i = 0; i < size; i++) {
+      result[i] = [];
+    }
+    return result;
+  }
+  function pathToHashKeys(path) {
+    let keys2 = [""];
+    for (let i = 0; i < path.length; i++) {
+      const tokType = path[i];
+      const longerKeys = [];
+      for (let j = 0; j < keys2.length; j++) {
+        const currShorterKey = keys2[j];
+        longerKeys.push(currShorterKey + "_" + tokType.tokenTypeIdx);
+        for (let t = 0; t < tokType.categoryMatches.length; t++) {
+          const categoriesKeySuffix = "_" + tokType.categoryMatches[t];
+          longerKeys.push(currShorterKey + categoriesKeySuffix);
+        }
+      }
+      keys2 = longerKeys;
+    }
+    return keys2;
+  }
+  function isUniquePrefixHash(altKnownPathsKeys, searchPathKeys, idx) {
+    for (let currAltIdx = 0; currAltIdx < altKnownPathsKeys.length; currAltIdx++) {
+      if (currAltIdx === idx) {
+        continue;
+      }
+      const otherAltKnownPathsKeys = altKnownPathsKeys[currAltIdx];
+      for (let searchIdx = 0; searchIdx < searchPathKeys.length; searchIdx++) {
+        const searchKey = searchPathKeys[searchIdx];
+        if (otherAltKnownPathsKeys[searchKey] === true) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+  function lookAheadSequenceFromAlternatives(altsDefs, k) {
+    const partialAlts = map_default(altsDefs, (currAlt) => possiblePathsFrom([currAlt], 1));
+    const finalResult = initializeArrayOfArrays(partialAlts.length);
+    const altsHashes = map_default(partialAlts, (currAltPaths) => {
+      const dict = {};
+      forEach_default(currAltPaths, (item) => {
+        const keys2 = pathToHashKeys(item.partialPath);
+        forEach_default(keys2, (currKey) => {
+          dict[currKey] = true;
+        });
+      });
+      return dict;
+    });
+    let newData = partialAlts;
+    for (let pathLength = 1; pathLength <= k; pathLength++) {
+      const currDataset = newData;
+      newData = initializeArrayOfArrays(currDataset.length);
+      for (let altIdx = 0; altIdx < currDataset.length; altIdx++) {
+        const currAltPathsAndSuffixes = currDataset[altIdx];
+        for (let currPathIdx = 0; currPathIdx < currAltPathsAndSuffixes.length; currPathIdx++) {
+          const currPathPrefix = currAltPathsAndSuffixes[currPathIdx].partialPath;
+          const suffixDef = currAltPathsAndSuffixes[currPathIdx].suffixDef;
+          const prefixKeys = pathToHashKeys(currPathPrefix);
+          const isUnique = isUniquePrefixHash(altsHashes, prefixKeys, altIdx);
+          if (isUnique || isEmpty_default(suffixDef) || currPathPrefix.length === k) {
+            const currAltResult = finalResult[altIdx];
+            if (containsPath(currAltResult, currPathPrefix) === false) {
+              currAltResult.push(currPathPrefix);
+              for (let j = 0; j < prefixKeys.length; j++) {
+                const currKey = prefixKeys[j];
+                altsHashes[altIdx][currKey] = true;
+              }
+            }
+          } else {
+            const newPartialPathsAndSuffixes = possiblePathsFrom(suffixDef, pathLength + 1, currPathPrefix);
+            newData[altIdx] = newData[altIdx].concat(newPartialPathsAndSuffixes);
+            forEach_default(newPartialPathsAndSuffixes, (item) => {
+              const prefixKeys2 = pathToHashKeys(item.partialPath);
+              forEach_default(prefixKeys2, (key) => {
+                altsHashes[altIdx][key] = true;
+              });
+            });
+          }
+        }
+      }
+    }
+    return finalResult;
+  }
+  function getLookaheadPathsForOr(occurrence, ruleGrammar, k, orProd) {
+    const visitor = new InsideDefinitionFinderVisitor(occurrence, PROD_TYPE.ALTERNATION, orProd);
+    ruleGrammar.accept(visitor);
+    return lookAheadSequenceFromAlternatives(visitor.result, k);
+  }
+  function getLookaheadPathsForOptionalProd(occurrence, ruleGrammar, prodType, k) {
+    const insideDefVisitor = new InsideDefinitionFinderVisitor(occurrence, prodType);
+    ruleGrammar.accept(insideDefVisitor);
+    const insideDef = insideDefVisitor.result;
+    const afterDefWalker = new RestDefinitionFinderWalker(ruleGrammar, occurrence, prodType);
+    const afterDef = afterDefWalker.startWalking();
+    const insideFlat = new Alternative({ definition: insideDef });
+    const afterFlat = new Alternative({ definition: afterDef });
+    return lookAheadSequenceFromAlternatives([insideFlat, afterFlat], k);
+  }
+  function containsPath(alternative, searchPath) {
+    compareOtherPath: for (let i = 0; i < alternative.length; i++) {
+      const otherPath = alternative[i];
+      if (otherPath.length !== searchPath.length) {
+        continue;
+      }
+      for (let j = 0; j < otherPath.length; j++) {
+        const searchTok = searchPath[j];
+        const otherTok = otherPath[j];
+        const matchingTokens = searchTok === otherTok || otherTok.categoryMatchesMap[searchTok.tokenTypeIdx] !== void 0;
+        if (matchingTokens === false) {
+          continue compareOtherPath;
+        }
+      }
+      return true;
+    }
+    return false;
+  }
+  function isStrictPrefixOfPath(prefix, other) {
+    return prefix.length < other.length && every_default(prefix, (tokType, idx) => {
+      const otherTokType = other[idx];
+      return tokType === otherTokType || otherTokType.categoryMatchesMap[tokType.tokenTypeIdx];
+    });
+  }
+  function areTokenCategoriesNotUsed(lookAheadPaths) {
+    return every_default(lookAheadPaths, (singleAltPaths) => every_default(singleAltPaths, (singlePath) => every_default(singlePath, (token) => isEmpty_default(token.categoryMatches))));
+  }
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/parse/grammar/checks.js
+  function validateLookahead(options) {
+    const lookaheadValidationErrorMessages = options.lookaheadStrategy.validate({
+      rules: options.rules,
+      tokenTypes: options.tokenTypes,
+      grammarName: options.grammarName
+    });
+    return map_default(lookaheadValidationErrorMessages, (errorMessage) => Object.assign({ type: ParserDefinitionErrorType.CUSTOM_LOOKAHEAD_VALIDATION }, errorMessage));
+  }
+  function validateGrammar(topLevels, tokenTypes, errMsgProvider, grammarName) {
+    const duplicateErrors = flatMap_default(topLevels, (currTopLevel) => validateDuplicateProductions(currTopLevel, errMsgProvider));
+    const termsNamespaceConflictErrors = checkTerminalAndNoneTerminalsNameSpace(topLevels, tokenTypes, errMsgProvider);
+    const tooManyAltsErrors = flatMap_default(topLevels, (curRule) => validateTooManyAlts(curRule, errMsgProvider));
+    const duplicateRulesError = flatMap_default(topLevels, (curRule) => validateRuleDoesNotAlreadyExist(curRule, topLevels, grammarName, errMsgProvider));
+    return duplicateErrors.concat(termsNamespaceConflictErrors, tooManyAltsErrors, duplicateRulesError);
+  }
+  function validateDuplicateProductions(topLevelRule, errMsgProvider) {
+    const collectorVisitor2 = new OccurrenceValidationCollector();
+    topLevelRule.accept(collectorVisitor2);
+    const allRuleProductions = collectorVisitor2.allProductions;
+    const productionGroups = groupBy_default(allRuleProductions, identifyProductionForDuplicates);
+    const duplicates = pickBy_default(productionGroups, (currGroup) => {
+      return currGroup.length > 1;
+    });
+    const errors = map_default(values_default(duplicates), (currDuplicates) => {
+      const firstProd = head_default(currDuplicates);
+      const msg = errMsgProvider.buildDuplicateFoundError(topLevelRule, currDuplicates);
+      const dslName = getProductionDslName(firstProd);
+      const defError = {
+        message: msg,
+        type: ParserDefinitionErrorType.DUPLICATE_PRODUCTIONS,
+        ruleName: topLevelRule.name,
+        dslName,
+        occurrence: firstProd.idx
+      };
+      const param = getExtraProductionArgument(firstProd);
+      if (param) {
+        defError.parameter = param;
+      }
+      return defError;
+    });
+    return errors;
+  }
+  function identifyProductionForDuplicates(prod) {
+    return `${getProductionDslName(prod)}_#_${prod.idx}_#_${getExtraProductionArgument(prod)}`;
+  }
+  function getExtraProductionArgument(prod) {
+    if (prod instanceof Terminal) {
+      return prod.terminalType.name;
+    } else if (prod instanceof NonTerminal) {
+      return prod.nonTerminalName;
+    } else {
+      return "";
+    }
+  }
+  var OccurrenceValidationCollector = class extends GAstVisitor {
+    constructor() {
+      super(...arguments);
+      this.allProductions = [];
+    }
+    visitNonTerminal(subrule) {
+      this.allProductions.push(subrule);
+    }
+    visitOption(option) {
+      this.allProductions.push(option);
+    }
+    visitRepetitionWithSeparator(manySep) {
+      this.allProductions.push(manySep);
+    }
+    visitRepetitionMandatory(atLeastOne) {
+      this.allProductions.push(atLeastOne);
+    }
+    visitRepetitionMandatoryWithSeparator(atLeastOneSep) {
+      this.allProductions.push(atLeastOneSep);
+    }
+    visitRepetition(many) {
+      this.allProductions.push(many);
+    }
+    visitAlternation(or) {
+      this.allProductions.push(or);
+    }
+    visitTerminal(terminal) {
+      this.allProductions.push(terminal);
+    }
+  };
+  function validateRuleDoesNotAlreadyExist(rule, allRules, className, errMsgProvider) {
+    const errors = [];
+    const occurrences = reduce_default(allRules, (result, curRule) => {
+      if (curRule.name === rule.name) {
+        return result + 1;
+      }
+      return result;
+    }, 0);
+    if (occurrences > 1) {
+      const errMsg = errMsgProvider.buildDuplicateRuleNameError({
+        topLevelRule: rule,
+        grammarName: className
+      });
+      errors.push({
+        message: errMsg,
+        type: ParserDefinitionErrorType.DUPLICATE_RULE_NAME,
+        ruleName: rule.name
+      });
+    }
+    return errors;
+  }
+  function validateRuleIsOverridden(ruleName, definedRulesNames, className) {
+    const errors = [];
+    let errMsg;
+    if (!includes_default(definedRulesNames, ruleName)) {
+      errMsg = `Invalid rule override, rule: ->${ruleName}<- cannot be overridden in the grammar: ->${className}<-as it is not defined in any of the super grammars `;
+      errors.push({
+        message: errMsg,
+        type: ParserDefinitionErrorType.INVALID_RULE_OVERRIDE,
+        ruleName
+      });
+    }
+    return errors;
+  }
+  function validateNoLeftRecursion(topRule, currRule, errMsgProvider, path = []) {
+    const errors = [];
+    const nextNonTerminals = getFirstNoneTerminal(currRule.definition);
+    if (isEmpty_default(nextNonTerminals)) {
+      return [];
+    } else {
+      const ruleName = topRule.name;
+      const foundLeftRecursion = includes_default(nextNonTerminals, topRule);
+      if (foundLeftRecursion) {
+        errors.push({
+          message: errMsgProvider.buildLeftRecursionError({
+            topLevelRule: topRule,
+            leftRecursionPath: path
+          }),
+          type: ParserDefinitionErrorType.LEFT_RECURSION,
+          ruleName
+        });
+      }
+      const validNextSteps = difference_default(nextNonTerminals, path.concat([topRule]));
+      const errorsFromNextSteps = flatMap_default(validNextSteps, (currRefRule) => {
+        const newPath = clone_default(path);
+        newPath.push(currRefRule);
+        return validateNoLeftRecursion(topRule, currRefRule, errMsgProvider, newPath);
+      });
+      return errors.concat(errorsFromNextSteps);
+    }
+  }
+  function getFirstNoneTerminal(definition) {
+    let result = [];
+    if (isEmpty_default(definition)) {
+      return result;
+    }
+    const firstProd = head_default(definition);
+    if (firstProd instanceof NonTerminal) {
+      result.push(firstProd.referencedRule);
+    } else if (firstProd instanceof Alternative || firstProd instanceof Option || firstProd instanceof RepetitionMandatory || firstProd instanceof RepetitionMandatoryWithSeparator || firstProd instanceof RepetitionWithSeparator || firstProd instanceof Repetition) {
+      result = result.concat(getFirstNoneTerminal(firstProd.definition));
+    } else if (firstProd instanceof Alternation) {
+      result = flatten_default(map_default(firstProd.definition, (currSubDef) => getFirstNoneTerminal(currSubDef.definition)));
+    } else if (firstProd instanceof Terminal) {
+    } else {
+      throw Error("non exhaustive match");
+    }
+    const isFirstOptional = isOptionalProd(firstProd);
+    const hasMore = definition.length > 1;
+    if (isFirstOptional && hasMore) {
+      const rest = drop_default(definition);
+      return result.concat(getFirstNoneTerminal(rest));
+    } else {
+      return result;
+    }
+  }
+  var OrCollector = class extends GAstVisitor {
+    constructor() {
+      super(...arguments);
+      this.alternations = [];
+    }
+    visitAlternation(node) {
+      this.alternations.push(node);
+    }
+  };
+  function validateEmptyOrAlternative(topLevelRule, errMsgProvider) {
+    const orCollector = new OrCollector();
+    topLevelRule.accept(orCollector);
+    const ors = orCollector.alternations;
+    const errors = flatMap_default(ors, (currOr) => {
+      const exceptLast = dropRight_default(currOr.definition);
+      return flatMap_default(exceptLast, (currAlternative, currAltIdx) => {
+        const possibleFirstInAlt = nextPossibleTokensAfter([currAlternative], [], tokenStructuredMatcher, 1);
+        if (isEmpty_default(possibleFirstInAlt)) {
+          return [
+            {
+              message: errMsgProvider.buildEmptyAlternationError({
+                topLevelRule,
+                alternation: currOr,
+                emptyChoiceIdx: currAltIdx
+              }),
+              type: ParserDefinitionErrorType.NONE_LAST_EMPTY_ALT,
+              ruleName: topLevelRule.name,
+              occurrence: currOr.idx,
+              alternative: currAltIdx + 1
+            }
+          ];
+        } else {
+          return [];
+        }
+      });
+    });
+    return errors;
+  }
+  function validateAmbiguousAlternationAlternatives(topLevelRule, globalMaxLookahead, errMsgProvider) {
+    const orCollector = new OrCollector();
+    topLevelRule.accept(orCollector);
+    let ors = orCollector.alternations;
+    ors = reject_default(ors, (currOr) => currOr.ignoreAmbiguities === true);
+    const errors = flatMap_default(ors, (currOr) => {
+      const currOccurrence = currOr.idx;
+      const actualMaxLookahead = currOr.maxLookahead || globalMaxLookahead;
+      const alternatives = getLookaheadPathsForOr(currOccurrence, topLevelRule, actualMaxLookahead, currOr);
+      const altsAmbiguityErrors = checkAlternativesAmbiguities(alternatives, currOr, topLevelRule, errMsgProvider);
+      const altsPrefixAmbiguityErrors = checkPrefixAlternativesAmbiguities(alternatives, currOr, topLevelRule, errMsgProvider);
+      return altsAmbiguityErrors.concat(altsPrefixAmbiguityErrors);
+    });
+    return errors;
+  }
+  var RepetitionCollector = class extends GAstVisitor {
+    constructor() {
+      super(...arguments);
+      this.allProductions = [];
+    }
+    visitRepetitionWithSeparator(manySep) {
+      this.allProductions.push(manySep);
+    }
+    visitRepetitionMandatory(atLeastOne) {
+      this.allProductions.push(atLeastOne);
+    }
+    visitRepetitionMandatoryWithSeparator(atLeastOneSep) {
+      this.allProductions.push(atLeastOneSep);
+    }
+    visitRepetition(many) {
+      this.allProductions.push(many);
+    }
+  };
+  function validateTooManyAlts(topLevelRule, errMsgProvider) {
+    const orCollector = new OrCollector();
+    topLevelRule.accept(orCollector);
+    const ors = orCollector.alternations;
+    const errors = flatMap_default(ors, (currOr) => {
+      if (currOr.definition.length > 255) {
+        return [
+          {
+            message: errMsgProvider.buildTooManyAlternativesError({
+              topLevelRule,
+              alternation: currOr
+            }),
+            type: ParserDefinitionErrorType.TOO_MANY_ALTS,
+            ruleName: topLevelRule.name,
+            occurrence: currOr.idx
+          }
+        ];
+      } else {
+        return [];
+      }
+    });
+    return errors;
+  }
+  function validateSomeNonEmptyLookaheadPath(topLevelRules, maxLookahead, errMsgProvider) {
+    const errors = [];
+    forEach_default(topLevelRules, (currTopRule) => {
+      const collectorVisitor2 = new RepetitionCollector();
+      currTopRule.accept(collectorVisitor2);
+      const allRuleProductions = collectorVisitor2.allProductions;
+      forEach_default(allRuleProductions, (currProd) => {
+        const prodType = getProdType(currProd);
+        const actualMaxLookahead = currProd.maxLookahead || maxLookahead;
+        const currOccurrence = currProd.idx;
+        const paths = getLookaheadPathsForOptionalProd(currOccurrence, currTopRule, prodType, actualMaxLookahead);
+        const pathsInsideProduction = paths[0];
+        if (isEmpty_default(flatten_default(pathsInsideProduction))) {
+          const errMsg = errMsgProvider.buildEmptyRepetitionError({
+            topLevelRule: currTopRule,
+            repetition: currProd
+          });
+          errors.push({
+            message: errMsg,
+            type: ParserDefinitionErrorType.NO_NON_EMPTY_LOOKAHEAD,
+            ruleName: currTopRule.name
+          });
+        }
+      });
+    });
+    return errors;
+  }
+  function checkAlternativesAmbiguities(alternatives, alternation, rule, errMsgProvider) {
+    const foundAmbiguousPaths = [];
+    const identicalAmbiguities = reduce_default(alternatives, (result, currAlt, currAltIdx) => {
+      if (alternation.definition[currAltIdx].ignoreAmbiguities === true) {
+        return result;
+      }
+      forEach_default(currAlt, (currPath) => {
+        const altsCurrPathAppearsIn = [currAltIdx];
+        forEach_default(alternatives, (currOtherAlt, currOtherAltIdx) => {
+          if (currAltIdx !== currOtherAltIdx && containsPath(currOtherAlt, currPath) && // ignore (skip) ambiguities with this "other" alternative
+          alternation.definition[currOtherAltIdx].ignoreAmbiguities !== true) {
+            altsCurrPathAppearsIn.push(currOtherAltIdx);
+          }
+        });
+        if (altsCurrPathAppearsIn.length > 1 && !containsPath(foundAmbiguousPaths, currPath)) {
+          foundAmbiguousPaths.push(currPath);
+          result.push({
+            alts: altsCurrPathAppearsIn,
+            path: currPath
+          });
+        }
+      });
+      return result;
+    }, []);
+    const currErrors = map_default(identicalAmbiguities, (currAmbDescriptor) => {
+      const ambgIndices = map_default(currAmbDescriptor.alts, (currAltIdx) => currAltIdx + 1);
+      const currMessage = errMsgProvider.buildAlternationAmbiguityError({
+        topLevelRule: rule,
+        alternation,
+        ambiguityIndices: ambgIndices,
+        prefixPath: currAmbDescriptor.path
+      });
+      return {
+        message: currMessage,
+        type: ParserDefinitionErrorType.AMBIGUOUS_ALTS,
+        ruleName: rule.name,
+        occurrence: alternation.idx,
+        alternatives: currAmbDescriptor.alts
+      };
+    });
+    return currErrors;
+  }
+  function checkPrefixAlternativesAmbiguities(alternatives, alternation, rule, errMsgProvider) {
+    const pathsAndIndices = reduce_default(alternatives, (result, currAlt, idx) => {
+      const currPathsAndIdx = map_default(currAlt, (currPath) => {
+        return { idx, path: currPath };
+      });
+      return result.concat(currPathsAndIdx);
+    }, []);
+    const errors = compact_default(flatMap_default(pathsAndIndices, (currPathAndIdx) => {
+      const alternativeGast = alternation.definition[currPathAndIdx.idx];
+      if (alternativeGast.ignoreAmbiguities === true) {
+        return [];
+      }
+      const targetIdx = currPathAndIdx.idx;
+      const targetPath = currPathAndIdx.path;
+      const prefixAmbiguitiesPathsAndIndices = filter_default(pathsAndIndices, (searchPathAndIdx) => {
+        return (
+          // ignore (skip) ambiguities with this "other" alternative
+          alternation.definition[searchPathAndIdx.idx].ignoreAmbiguities !== true && searchPathAndIdx.idx < targetIdx && // checking for strict prefix because identical lookaheads
+          // will be be detected using a different validation.
+          isStrictPrefixOfPath(searchPathAndIdx.path, targetPath)
+        );
+      });
+      const currPathPrefixErrors = map_default(prefixAmbiguitiesPathsAndIndices, (currAmbPathAndIdx) => {
+        const ambgIndices = [currAmbPathAndIdx.idx + 1, targetIdx + 1];
+        const occurrence = alternation.idx === 0 ? "" : alternation.idx;
+        const message = errMsgProvider.buildAlternationPrefixAmbiguityError({
+          topLevelRule: rule,
+          alternation,
+          ambiguityIndices: ambgIndices,
+          prefixPath: currAmbPathAndIdx.path
+        });
+        return {
+          message,
+          type: ParserDefinitionErrorType.AMBIGUOUS_PREFIX_ALTS,
+          ruleName: rule.name,
+          occurrence,
+          alternatives: ambgIndices
+        };
+      });
+      return currPathPrefixErrors;
+    }));
+    return errors;
+  }
+  function checkTerminalAndNoneTerminalsNameSpace(topLevels, tokenTypes, errMsgProvider) {
+    const errors = [];
+    const tokenNames = map_default(tokenTypes, (currToken) => currToken.name);
+    forEach_default(topLevels, (currRule) => {
+      const currRuleName = currRule.name;
+      if (includes_default(tokenNames, currRuleName)) {
+        const errMsg = errMsgProvider.buildNamespaceConflictError(currRule);
+        errors.push({
+          message: errMsg,
+          type: ParserDefinitionErrorType.CONFLICT_TOKENS_RULES_NAMESPACE,
+          ruleName: currRuleName
+        });
+      }
+    });
+    return errors;
+  }
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/parse/grammar/gast/gast_resolver_public.js
+  function resolveGrammar2(options) {
+    const actualOptions = defaults_default(options, {
+      errMsgProvider: defaultGrammarResolverErrorProvider
+    });
+    const topRulesTable = {};
+    forEach_default(options.rules, (rule) => {
+      topRulesTable[rule.name] = rule;
+    });
+    return resolveGrammar(topRulesTable, actualOptions.errMsgProvider);
+  }
+  function validateGrammar2(options) {
+    options = defaults_default(options, {
+      errMsgProvider: defaultGrammarValidatorErrorProvider
+    });
+    return validateGrammar(options.rules, options.tokenTypes, options.errMsgProvider, options.grammarName);
+  }
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/parse/exceptions_public.js
+  var MISMATCHED_TOKEN_EXCEPTION = "MismatchedTokenException";
+  var NO_VIABLE_ALT_EXCEPTION = "NoViableAltException";
+  var EARLY_EXIT_EXCEPTION = "EarlyExitException";
+  var NOT_ALL_INPUT_PARSED_EXCEPTION = "NotAllInputParsedException";
+  var RECOGNITION_EXCEPTION_NAMES = [
+    MISMATCHED_TOKEN_EXCEPTION,
+    NO_VIABLE_ALT_EXCEPTION,
+    EARLY_EXIT_EXCEPTION,
+    NOT_ALL_INPUT_PARSED_EXCEPTION
+  ];
+  Object.freeze(RECOGNITION_EXCEPTION_NAMES);
+  function isRecognitionException(error) {
+    return includes_default(RECOGNITION_EXCEPTION_NAMES, error.name);
+  }
+  var RecognitionException = class extends Error {
+    constructor(message, token) {
+      super(message);
+      this.token = token;
+      this.resyncedTokens = [];
+      Object.setPrototypeOf(this, new.target.prototype);
+      if (Error.captureStackTrace) {
+        Error.captureStackTrace(this, this.constructor);
+      }
+    }
+  };
+  var MismatchedTokenException = class extends RecognitionException {
+    constructor(message, token, previousToken) {
+      super(message, token);
+      this.previousToken = previousToken;
+      this.name = MISMATCHED_TOKEN_EXCEPTION;
+    }
+  };
+  var NoViableAltException = class extends RecognitionException {
+    constructor(message, token, previousToken) {
+      super(message, token);
+      this.previousToken = previousToken;
+      this.name = NO_VIABLE_ALT_EXCEPTION;
+    }
+  };
+  var NotAllInputParsedException = class extends RecognitionException {
+    constructor(message, token) {
+      super(message, token);
+      this.name = NOT_ALL_INPUT_PARSED_EXCEPTION;
+    }
+  };
+  var EarlyExitException = class extends RecognitionException {
+    constructor(message, token, previousToken) {
+      super(message, token);
+      this.previousToken = previousToken;
+      this.name = EARLY_EXIT_EXCEPTION;
+    }
+  };
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/parse/parser/traits/recoverable.js
+  var EOF_FOLLOW_KEY = {};
+  var IN_RULE_RECOVERY_EXCEPTION = "InRuleRecoveryException";
+  var InRuleRecoveryException = class extends Error {
+    constructor(message) {
+      super(message);
+      this.name = IN_RULE_RECOVERY_EXCEPTION;
+    }
+  };
+  var Recoverable = class {
+    initRecoverable(config2) {
+      this.firstAfterRepMap = {};
+      this.resyncFollows = {};
+      this.recoveryEnabled = has_default(config2, "recoveryEnabled") ? config2.recoveryEnabled : DEFAULT_PARSER_CONFIG.recoveryEnabled;
+      if (this.recoveryEnabled) {
+        this.attemptInRepetitionRecovery = attemptInRepetitionRecovery;
+      }
+    }
+    getTokenToInsert(tokType) {
+      const tokToInsert = createTokenInstance(tokType, "", NaN, NaN, NaN, NaN, NaN, NaN);
+      tokToInsert.isInsertedInRecovery = true;
+      return tokToInsert;
+    }
+    canTokenTypeBeInsertedInRecovery(tokType) {
+      return true;
+    }
+    canTokenTypeBeDeletedInRecovery(tokType) {
+      return true;
+    }
+    tryInRepetitionRecovery(grammarRule, grammarRuleArgs, lookAheadFunc, expectedTokType) {
+      const reSyncTokType = this.findReSyncTokenType();
+      const savedLexerState = this.exportLexerState();
+      const resyncedTokens = [];
+      let passedResyncPoint = false;
+      const nextTokenWithoutResync = this.LA(1);
+      let currToken = this.LA(1);
+      const generateErrorMessage = () => {
+        const previousToken = this.LA(0);
+        const msg = this.errorMessageProvider.buildMismatchTokenMessage({
+          expected: expectedTokType,
+          actual: nextTokenWithoutResync,
+          previous: previousToken,
+          ruleName: this.getCurrRuleFullName()
+        });
+        const error = new MismatchedTokenException(msg, nextTokenWithoutResync, this.LA(0));
+        error.resyncedTokens = dropRight_default(resyncedTokens);
+        this.SAVE_ERROR(error);
+      };
+      while (!passedResyncPoint) {
+        if (this.tokenMatcher(currToken, expectedTokType)) {
+          generateErrorMessage();
+          return;
+        } else if (lookAheadFunc.call(this)) {
+          generateErrorMessage();
+          grammarRule.apply(this, grammarRuleArgs);
+          return;
+        } else if (this.tokenMatcher(currToken, reSyncTokType)) {
+          passedResyncPoint = true;
+        } else {
+          currToken = this.SKIP_TOKEN();
+          this.addToResyncTokens(currToken, resyncedTokens);
+        }
+      }
+      this.importLexerState(savedLexerState);
+    }
+    shouldInRepetitionRecoveryBeTried(expectTokAfterLastMatch, nextTokIdx, notStuck) {
+      if (notStuck === false) {
+        return false;
+      }
+      if (this.tokenMatcher(this.LA(1), expectTokAfterLastMatch)) {
+        return false;
+      }
+      if (this.isBackTracking()) {
+        return false;
+      }
+      if (this.canPerformInRuleRecovery(expectTokAfterLastMatch, this.getFollowsForInRuleRecovery(expectTokAfterLastMatch, nextTokIdx))) {
+        return false;
+      }
+      return true;
+    }
+    // Error Recovery functionality
+    getFollowsForInRuleRecovery(tokType, tokIdxInRule) {
+      const grammarPath = this.getCurrentGrammarPath(tokType, tokIdxInRule);
+      const follows = this.getNextPossibleTokenTypes(grammarPath);
+      return follows;
+    }
+    tryInRuleRecovery(expectedTokType, follows) {
+      if (this.canRecoverWithSingleTokenInsertion(expectedTokType, follows)) {
+        const tokToInsert = this.getTokenToInsert(expectedTokType);
+        return tokToInsert;
+      }
+      if (this.canRecoverWithSingleTokenDeletion(expectedTokType)) {
+        const nextTok = this.SKIP_TOKEN();
+        this.consumeToken();
+        return nextTok;
+      }
+      throw new InRuleRecoveryException("sad sad panda");
+    }
+    canPerformInRuleRecovery(expectedToken, follows) {
+      return this.canRecoverWithSingleTokenInsertion(expectedToken, follows) || this.canRecoverWithSingleTokenDeletion(expectedToken);
+    }
+    canRecoverWithSingleTokenInsertion(expectedTokType, follows) {
+      if (!this.canTokenTypeBeInsertedInRecovery(expectedTokType)) {
+        return false;
+      }
+      if (isEmpty_default(follows)) {
+        return false;
+      }
+      const mismatchedTok = this.LA(1);
+      const isMisMatchedTokInFollows = find_default(follows, (possibleFollowsTokType) => {
+        return this.tokenMatcher(mismatchedTok, possibleFollowsTokType);
+      }) !== void 0;
+      return isMisMatchedTokInFollows;
+    }
+    canRecoverWithSingleTokenDeletion(expectedTokType) {
+      if (!this.canTokenTypeBeDeletedInRecovery(expectedTokType)) {
+        return false;
+      }
+      const isNextTokenWhatIsExpected = this.tokenMatcher(this.LA(2), expectedTokType);
+      return isNextTokenWhatIsExpected;
+    }
+    isInCurrentRuleReSyncSet(tokenTypeIdx) {
+      const followKey = this.getCurrFollowKey();
+      const currentRuleReSyncSet = this.getFollowSetFromFollowKey(followKey);
+      return includes_default(currentRuleReSyncSet, tokenTypeIdx);
+    }
+    findReSyncTokenType() {
+      const allPossibleReSyncTokTypes = this.flattenFollowSet();
+      let nextToken = this.LA(1);
+      let k = 2;
+      while (true) {
+        const foundMatch = find_default(allPossibleReSyncTokTypes, (resyncTokType) => {
+          const canMatch = tokenMatcher(nextToken, resyncTokType);
+          return canMatch;
+        });
+        if (foundMatch !== void 0) {
+          return foundMatch;
+        }
+        nextToken = this.LA(k);
+        k++;
+      }
+    }
+    getCurrFollowKey() {
+      if (this.RULE_STACK.length === 1) {
+        return EOF_FOLLOW_KEY;
+      }
+      const currRuleShortName = this.getLastExplicitRuleShortName();
+      const currRuleIdx = this.getLastExplicitRuleOccurrenceIndex();
+      const prevRuleShortName = this.getPreviousExplicitRuleShortName();
+      return {
+        ruleName: this.shortRuleNameToFullName(currRuleShortName),
+        idxInCallingRule: currRuleIdx,
+        inRule: this.shortRuleNameToFullName(prevRuleShortName)
+      };
+    }
+    buildFullFollowKeyStack() {
+      const explicitRuleStack = this.RULE_STACK;
+      const explicitOccurrenceStack = this.RULE_OCCURRENCE_STACK;
+      return map_default(explicitRuleStack, (ruleName, idx) => {
+        if (idx === 0) {
+          return EOF_FOLLOW_KEY;
+        }
+        return {
+          ruleName: this.shortRuleNameToFullName(ruleName),
+          idxInCallingRule: explicitOccurrenceStack[idx],
+          inRule: this.shortRuleNameToFullName(explicitRuleStack[idx - 1])
+        };
+      });
+    }
+    flattenFollowSet() {
+      const followStack = map_default(this.buildFullFollowKeyStack(), (currKey) => {
+        return this.getFollowSetFromFollowKey(currKey);
+      });
+      return flatten_default(followStack);
+    }
+    getFollowSetFromFollowKey(followKey) {
+      if (followKey === EOF_FOLLOW_KEY) {
+        return [EOF];
+      }
+      const followName = followKey.ruleName + followKey.idxInCallingRule + IN + followKey.inRule;
+      return this.resyncFollows[followName];
+    }
+    // It does not make any sense to include a virtual EOF token in the list of resynced tokens
+    // as EOF does not really exist and thus does not contain any useful information (line/column numbers)
+    addToResyncTokens(token, resyncTokens) {
+      if (!this.tokenMatcher(token, EOF)) {
+        resyncTokens.push(token);
+      }
+      return resyncTokens;
+    }
+    reSyncTo(tokType) {
+      const resyncedTokens = [];
+      let nextTok = this.LA(1);
+      while (this.tokenMatcher(nextTok, tokType) === false) {
+        nextTok = this.SKIP_TOKEN();
+        this.addToResyncTokens(nextTok, resyncedTokens);
+      }
+      return dropRight_default(resyncedTokens);
+    }
+    attemptInRepetitionRecovery(prodFunc, args, lookaheadFunc, dslMethodIdx, prodOccurrence, nextToksWalker, notStuck) {
+    }
+    getCurrentGrammarPath(tokType, tokIdxInRule) {
+      const pathRuleStack = this.getHumanReadableRuleStack();
+      const pathOccurrenceStack = clone_default(this.RULE_OCCURRENCE_STACK);
+      const grammarPath = {
+        ruleStack: pathRuleStack,
+        occurrenceStack: pathOccurrenceStack,
+        lastTok: tokType,
+        lastTokOccurrence: tokIdxInRule
+      };
+      return grammarPath;
+    }
+    getHumanReadableRuleStack() {
+      return map_default(this.RULE_STACK, (currShortName) => this.shortRuleNameToFullName(currShortName));
+    }
+  };
+  function attemptInRepetitionRecovery(prodFunc, args, lookaheadFunc, dslMethodIdx, prodOccurrence, nextToksWalker, notStuck) {
+    const key = this.getKeyForAutomaticLookahead(dslMethodIdx, prodOccurrence);
+    let firstAfterRepInfo = this.firstAfterRepMap[key];
+    if (firstAfterRepInfo === void 0) {
+      const currRuleName = this.getCurrRuleFullName();
+      const ruleGrammar = this.getGAstProductions()[currRuleName];
+      const walker = new nextToksWalker(ruleGrammar, prodOccurrence);
+      firstAfterRepInfo = walker.startWalking();
+      this.firstAfterRepMap[key] = firstAfterRepInfo;
+    }
+    let expectTokAfterLastMatch = firstAfterRepInfo.token;
+    let nextTokIdx = firstAfterRepInfo.occurrence;
+    const isEndOfRule = firstAfterRepInfo.isEndOfRule;
+    if (this.RULE_STACK.length === 1 && isEndOfRule && expectTokAfterLastMatch === void 0) {
+      expectTokAfterLastMatch = EOF;
+      nextTokIdx = 1;
+    }
+    if (expectTokAfterLastMatch === void 0 || nextTokIdx === void 0) {
+      return;
+    }
+    if (this.shouldInRepetitionRecoveryBeTried(expectTokAfterLastMatch, nextTokIdx, notStuck)) {
+      this.tryInRepetitionRecovery(prodFunc, args, lookaheadFunc, expectTokAfterLastMatch);
+    }
+  }
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/parse/grammar/keys.js
+  var BITS_FOR_METHOD_TYPE = 4;
+  var BITS_FOR_OCCURRENCE_IDX = 8;
+  var BITS_FOR_ALT_IDX = 8;
+  var OR_IDX = 1 << BITS_FOR_OCCURRENCE_IDX;
+  var OPTION_IDX = 2 << BITS_FOR_OCCURRENCE_IDX;
+  var MANY_IDX = 3 << BITS_FOR_OCCURRENCE_IDX;
+  var AT_LEAST_ONE_IDX = 4 << BITS_FOR_OCCURRENCE_IDX;
+  var MANY_SEP_IDX = 5 << BITS_FOR_OCCURRENCE_IDX;
+  var AT_LEAST_ONE_SEP_IDX = 6 << BITS_FOR_OCCURRENCE_IDX;
+  function getKeyForAutomaticLookahead(ruleIdx, dslMethodIdx, occurrence) {
+    return occurrence | dslMethodIdx | ruleIdx;
+  }
+  var BITS_START_FOR_ALT_IDX = 32 - BITS_FOR_ALT_IDX;
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/parse/grammar/llk_lookahead.js
+  var LLkLookaheadStrategy = class {
+    constructor(options) {
+      var _a;
+      this.maxLookahead = (_a = options === null || options === void 0 ? void 0 : options.maxLookahead) !== null && _a !== void 0 ? _a : DEFAULT_PARSER_CONFIG.maxLookahead;
+    }
+    validate(options) {
+      const leftRecursionErrors = this.validateNoLeftRecursion(options.rules);
+      if (isEmpty_default(leftRecursionErrors)) {
+        const emptyAltErrors = this.validateEmptyOrAlternatives(options.rules);
+        const ambiguousAltsErrors = this.validateAmbiguousAlternationAlternatives(options.rules, this.maxLookahead);
+        const emptyRepetitionErrors = this.validateSomeNonEmptyLookaheadPath(options.rules, this.maxLookahead);
+        const allErrors = [
+          ...leftRecursionErrors,
+          ...emptyAltErrors,
+          ...ambiguousAltsErrors,
+          ...emptyRepetitionErrors
+        ];
+        return allErrors;
+      }
+      return leftRecursionErrors;
+    }
+    validateNoLeftRecursion(rules) {
+      return flatMap_default(rules, (currTopRule) => validateNoLeftRecursion(currTopRule, currTopRule, defaultGrammarValidatorErrorProvider));
+    }
+    validateEmptyOrAlternatives(rules) {
+      return flatMap_default(rules, (currTopRule) => validateEmptyOrAlternative(currTopRule, defaultGrammarValidatorErrorProvider));
+    }
+    validateAmbiguousAlternationAlternatives(rules, maxLookahead) {
+      return flatMap_default(rules, (currTopRule) => validateAmbiguousAlternationAlternatives(currTopRule, maxLookahead, defaultGrammarValidatorErrorProvider));
+    }
+    validateSomeNonEmptyLookaheadPath(rules, maxLookahead) {
+      return validateSomeNonEmptyLookaheadPath(rules, maxLookahead, defaultGrammarValidatorErrorProvider);
+    }
+    buildLookaheadForAlternation(options) {
+      return buildLookaheadFuncForOr(options.prodOccurrence, options.rule, options.maxLookahead, options.hasPredicates, options.dynamicTokensEnabled, buildAlternativesLookAheadFunc);
+    }
+    buildLookaheadForOptional(options) {
+      return buildLookaheadFuncForOptionalProd(options.prodOccurrence, options.rule, options.maxLookahead, options.dynamicTokensEnabled, getProdType(options.prodType), buildSingleAlternativeLookaheadFunction);
+    }
+  };
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/parse/parser/traits/looksahead.js
+  var LooksAhead = class {
+    initLooksAhead(config2) {
+      this.dynamicTokensEnabled = has_default(config2, "dynamicTokensEnabled") ? config2.dynamicTokensEnabled : DEFAULT_PARSER_CONFIG.dynamicTokensEnabled;
+      this.maxLookahead = has_default(config2, "maxLookahead") ? config2.maxLookahead : DEFAULT_PARSER_CONFIG.maxLookahead;
+      this.lookaheadStrategy = has_default(config2, "lookaheadStrategy") ? config2.lookaheadStrategy : new LLkLookaheadStrategy({ maxLookahead: this.maxLookahead });
+      this.lookAheadFuncsCache = /* @__PURE__ */ new Map();
+    }
+    preComputeLookaheadFunctions(rules) {
+      forEach_default(rules, (currRule) => {
+        this.TRACE_INIT(`${currRule.name} Rule Lookahead`, () => {
+          const { alternation, repetition, option, repetitionMandatory, repetitionMandatoryWithSeparator, repetitionWithSeparator } = collectMethods(currRule);
+          forEach_default(alternation, (currProd) => {
+            const prodIdx = currProd.idx === 0 ? "" : currProd.idx;
+            this.TRACE_INIT(`${getProductionDslName(currProd)}${prodIdx}`, () => {
+              const laFunc = this.lookaheadStrategy.buildLookaheadForAlternation({
+                prodOccurrence: currProd.idx,
+                rule: currRule,
+                maxLookahead: currProd.maxLookahead || this.maxLookahead,
+                hasPredicates: currProd.hasPredicates,
+                dynamicTokensEnabled: this.dynamicTokensEnabled
+              });
+              const key = getKeyForAutomaticLookahead(this.fullRuleNameToShort[currRule.name], OR_IDX, currProd.idx);
+              this.setLaFuncCache(key, laFunc);
+            });
+          });
+          forEach_default(repetition, (currProd) => {
+            this.computeLookaheadFunc(currRule, currProd.idx, MANY_IDX, "Repetition", currProd.maxLookahead, getProductionDslName(currProd));
+          });
+          forEach_default(option, (currProd) => {
+            this.computeLookaheadFunc(currRule, currProd.idx, OPTION_IDX, "Option", currProd.maxLookahead, getProductionDslName(currProd));
+          });
+          forEach_default(repetitionMandatory, (currProd) => {
+            this.computeLookaheadFunc(currRule, currProd.idx, AT_LEAST_ONE_IDX, "RepetitionMandatory", currProd.maxLookahead, getProductionDslName(currProd));
+          });
+          forEach_default(repetitionMandatoryWithSeparator, (currProd) => {
+            this.computeLookaheadFunc(currRule, currProd.idx, AT_LEAST_ONE_SEP_IDX, "RepetitionMandatoryWithSeparator", currProd.maxLookahead, getProductionDslName(currProd));
+          });
+          forEach_default(repetitionWithSeparator, (currProd) => {
+            this.computeLookaheadFunc(currRule, currProd.idx, MANY_SEP_IDX, "RepetitionWithSeparator", currProd.maxLookahead, getProductionDslName(currProd));
+          });
+        });
+      });
+    }
+    computeLookaheadFunc(rule, prodOccurrence, prodKey, prodType, prodMaxLookahead, dslMethodName) {
+      this.TRACE_INIT(`${dslMethodName}${prodOccurrence === 0 ? "" : prodOccurrence}`, () => {
+        const laFunc = this.lookaheadStrategy.buildLookaheadForOptional({
+          prodOccurrence,
+          rule,
+          maxLookahead: prodMaxLookahead || this.maxLookahead,
+          dynamicTokensEnabled: this.dynamicTokensEnabled,
+          prodType
+        });
+        const key = getKeyForAutomaticLookahead(this.fullRuleNameToShort[rule.name], prodKey, prodOccurrence);
+        this.setLaFuncCache(key, laFunc);
+      });
+    }
+    // this actually returns a number, but it is always used as a string (object prop key)
+    getKeyForAutomaticLookahead(dslMethodIdx, occurrence) {
+      const currRuleShortName = this.getLastExplicitRuleShortName();
+      return getKeyForAutomaticLookahead(currRuleShortName, dslMethodIdx, occurrence);
+    }
+    getLaFuncFromCache(key) {
+      return this.lookAheadFuncsCache.get(key);
+    }
+    /* istanbul ignore next */
+    setLaFuncCache(key, value) {
+      this.lookAheadFuncsCache.set(key, value);
+    }
+  };
+  var DslMethodsCollectorVisitor = class extends GAstVisitor {
+    constructor() {
+      super(...arguments);
+      this.dslMethods = {
+        option: [],
+        alternation: [],
+        repetition: [],
+        repetitionWithSeparator: [],
+        repetitionMandatory: [],
+        repetitionMandatoryWithSeparator: []
+      };
+    }
+    reset() {
+      this.dslMethods = {
+        option: [],
+        alternation: [],
+        repetition: [],
+        repetitionWithSeparator: [],
+        repetitionMandatory: [],
+        repetitionMandatoryWithSeparator: []
+      };
+    }
+    visitOption(option) {
+      this.dslMethods.option.push(option);
+    }
+    visitRepetitionWithSeparator(manySep) {
+      this.dslMethods.repetitionWithSeparator.push(manySep);
+    }
+    visitRepetitionMandatory(atLeastOne) {
+      this.dslMethods.repetitionMandatory.push(atLeastOne);
+    }
+    visitRepetitionMandatoryWithSeparator(atLeastOneSep) {
+      this.dslMethods.repetitionMandatoryWithSeparator.push(atLeastOneSep);
+    }
+    visitRepetition(many) {
+      this.dslMethods.repetition.push(many);
+    }
+    visitAlternation(or) {
+      this.dslMethods.alternation.push(or);
+    }
+  };
+  var collectorVisitor = new DslMethodsCollectorVisitor();
+  function collectMethods(rule) {
+    collectorVisitor.reset();
+    rule.accept(collectorVisitor);
+    const dslMethods = collectorVisitor.dslMethods;
+    collectorVisitor.reset();
+    return dslMethods;
+  }
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/parse/cst/cst.js
+  function setNodeLocationOnlyOffset(currNodeLocation, newLocationInfo) {
+    if (isNaN(currNodeLocation.startOffset) === true) {
+      currNodeLocation.startOffset = newLocationInfo.startOffset;
+      currNodeLocation.endOffset = newLocationInfo.endOffset;
+    } else if (currNodeLocation.endOffset < newLocationInfo.endOffset === true) {
+      currNodeLocation.endOffset = newLocationInfo.endOffset;
+    }
+  }
+  function setNodeLocationFull(currNodeLocation, newLocationInfo) {
+    if (isNaN(currNodeLocation.startOffset) === true) {
+      currNodeLocation.startOffset = newLocationInfo.startOffset;
+      currNodeLocation.startColumn = newLocationInfo.startColumn;
+      currNodeLocation.startLine = newLocationInfo.startLine;
+      currNodeLocation.endOffset = newLocationInfo.endOffset;
+      currNodeLocation.endColumn = newLocationInfo.endColumn;
+      currNodeLocation.endLine = newLocationInfo.endLine;
+    } else if (currNodeLocation.endOffset < newLocationInfo.endOffset === true) {
+      currNodeLocation.endOffset = newLocationInfo.endOffset;
+      currNodeLocation.endColumn = newLocationInfo.endColumn;
+      currNodeLocation.endLine = newLocationInfo.endLine;
+    }
+  }
+  function addTerminalToCst(node, token, tokenTypeName) {
+    if (node.children[tokenTypeName] === void 0) {
+      node.children[tokenTypeName] = [token];
+    } else {
+      node.children[tokenTypeName].push(token);
+    }
+  }
+  function addNoneTerminalToCst(node, ruleName, ruleResult) {
+    if (node.children[ruleName] === void 0) {
+      node.children[ruleName] = [ruleResult];
+    } else {
+      node.children[ruleName].push(ruleResult);
+    }
+  }
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/lang/lang_extensions.js
+  var NAME = "name";
+  function defineNameProp(obj, nameValue) {
+    Object.defineProperty(obj, NAME, {
+      enumerable: false,
+      configurable: true,
+      writable: false,
+      value: nameValue
+    });
+  }
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/parse/cst/cst_visitor.js
+  function defaultVisit(ctx, param) {
+    const childrenNames = keys_default(ctx);
+    const childrenNamesLength = childrenNames.length;
+    for (let i = 0; i < childrenNamesLength; i++) {
+      const currChildName = childrenNames[i];
+      const currChildArray = ctx[currChildName];
+      const currChildArrayLength = currChildArray.length;
+      for (let j = 0; j < currChildArrayLength; j++) {
+        const currChild = currChildArray[j];
+        if (currChild.tokenTypeIdx === void 0) {
+          this[currChild.name](currChild.children, param);
+        }
+      }
+    }
+  }
+  function createBaseSemanticVisitorConstructor(grammarName, ruleNames) {
+    const derivedConstructor = function() {
+    };
+    defineNameProp(derivedConstructor, grammarName + "BaseSemantics");
+    const semanticProto = {
+      visit: function(cstNode, param) {
+        if (isArray_default(cstNode)) {
+          cstNode = cstNode[0];
+        }
+        if (isUndefined_default(cstNode)) {
+          return void 0;
+        }
+        return this[cstNode.name](cstNode.children, param);
+      },
+      validateVisitor: function() {
+        const semanticDefinitionErrors = validateVisitor(this, ruleNames);
+        if (!isEmpty_default(semanticDefinitionErrors)) {
+          const errorMessages = map_default(semanticDefinitionErrors, (currDefError) => currDefError.msg);
+          throw Error(`Errors Detected in CST Visitor <${this.constructor.name}>:
+	${errorMessages.join("\n\n").replace(/\n/g, "\n	")}`);
+        }
+      }
+    };
+    derivedConstructor.prototype = semanticProto;
+    derivedConstructor.prototype.constructor = derivedConstructor;
+    derivedConstructor._RULE_NAMES = ruleNames;
+    return derivedConstructor;
+  }
+  function createBaseVisitorConstructorWithDefaults(grammarName, ruleNames, baseConstructor) {
+    const derivedConstructor = function() {
+    };
+    defineNameProp(derivedConstructor, grammarName + "BaseSemanticsWithDefaults");
+    const withDefaultsProto = Object.create(baseConstructor.prototype);
+    forEach_default(ruleNames, (ruleName) => {
+      withDefaultsProto[ruleName] = defaultVisit;
+    });
+    derivedConstructor.prototype = withDefaultsProto;
+    derivedConstructor.prototype.constructor = derivedConstructor;
+    return derivedConstructor;
+  }
+  var CstVisitorDefinitionError;
+  (function(CstVisitorDefinitionError2) {
+    CstVisitorDefinitionError2[CstVisitorDefinitionError2["REDUNDANT_METHOD"] = 0] = "REDUNDANT_METHOD";
+    CstVisitorDefinitionError2[CstVisitorDefinitionError2["MISSING_METHOD"] = 1] = "MISSING_METHOD";
+  })(CstVisitorDefinitionError || (CstVisitorDefinitionError = {}));
+  function validateVisitor(visitorInstance, ruleNames) {
+    const missingErrors = validateMissingCstMethods(visitorInstance, ruleNames);
+    return missingErrors;
+  }
+  function validateMissingCstMethods(visitorInstance, ruleNames) {
+    const missingRuleNames = filter_default(ruleNames, (currRuleName) => {
+      return isFunction_default(visitorInstance[currRuleName]) === false;
+    });
+    const errors = map_default(missingRuleNames, (currRuleName) => {
+      return {
+        msg: `Missing visitor method: <${currRuleName}> on ${visitorInstance.constructor.name} CST Visitor.`,
+        type: CstVisitorDefinitionError.MISSING_METHOD,
+        methodName: currRuleName
+      };
+    });
+    return compact_default(errors);
+  }
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/parse/parser/traits/tree_builder.js
+  var TreeBuilder = class {
+    initTreeBuilder(config2) {
+      this.CST_STACK = [];
+      this.outputCst = config2.outputCst;
+      this.nodeLocationTracking = has_default(config2, "nodeLocationTracking") ? config2.nodeLocationTracking : DEFAULT_PARSER_CONFIG.nodeLocationTracking;
+      if (!this.outputCst) {
+        this.cstInvocationStateUpdate = noop_default;
+        this.cstFinallyStateUpdate = noop_default;
+        this.cstPostTerminal = noop_default;
+        this.cstPostNonTerminal = noop_default;
+        this.cstPostRule = noop_default;
+      } else {
+        if (/full/i.test(this.nodeLocationTracking)) {
+          if (this.recoveryEnabled) {
+            this.setNodeLocationFromToken = setNodeLocationFull;
+            this.setNodeLocationFromNode = setNodeLocationFull;
+            this.cstPostRule = noop_default;
+            this.setInitialNodeLocation = this.setInitialNodeLocationFullRecovery;
+          } else {
+            this.setNodeLocationFromToken = noop_default;
+            this.setNodeLocationFromNode = noop_default;
+            this.cstPostRule = this.cstPostRuleFull;
+            this.setInitialNodeLocation = this.setInitialNodeLocationFullRegular;
+          }
+        } else if (/onlyOffset/i.test(this.nodeLocationTracking)) {
+          if (this.recoveryEnabled) {
+            this.setNodeLocationFromToken = setNodeLocationOnlyOffset;
+            this.setNodeLocationFromNode = setNodeLocationOnlyOffset;
+            this.cstPostRule = noop_default;
+            this.setInitialNodeLocation = this.setInitialNodeLocationOnlyOffsetRecovery;
+          } else {
+            this.setNodeLocationFromToken = noop_default;
+            this.setNodeLocationFromNode = noop_default;
+            this.cstPostRule = this.cstPostRuleOnlyOffset;
+            this.setInitialNodeLocation = this.setInitialNodeLocationOnlyOffsetRegular;
+          }
+        } else if (/none/i.test(this.nodeLocationTracking)) {
+          this.setNodeLocationFromToken = noop_default;
+          this.setNodeLocationFromNode = noop_default;
+          this.cstPostRule = noop_default;
+          this.setInitialNodeLocation = noop_default;
+        } else {
+          throw Error(`Invalid <nodeLocationTracking> config option: "${config2.nodeLocationTracking}"`);
+        }
+      }
+    }
+    setInitialNodeLocationOnlyOffsetRecovery(cstNode) {
+      cstNode.location = {
+        startOffset: NaN,
+        endOffset: NaN
+      };
+    }
+    setInitialNodeLocationOnlyOffsetRegular(cstNode) {
+      cstNode.location = {
+        // without error recovery the starting Location of a new CstNode is guaranteed
+        // To be the next Token's startOffset (for valid inputs).
+        // For invalid inputs there won't be any CSTOutput so this potential
+        // inaccuracy does not matter
+        startOffset: this.LA(1).startOffset,
+        endOffset: NaN
+      };
+    }
+    setInitialNodeLocationFullRecovery(cstNode) {
+      cstNode.location = {
+        startOffset: NaN,
+        startLine: NaN,
+        startColumn: NaN,
+        endOffset: NaN,
+        endLine: NaN,
+        endColumn: NaN
+      };
+    }
     /**
-     * Parse F-Basic source code into an AST
+         *  @see setInitialNodeLocationOnlyOffsetRegular for explanation why this work
+    
+         * @param cstNode
+         */
+    setInitialNodeLocationFullRegular(cstNode) {
+      const nextToken = this.LA(1);
+      cstNode.location = {
+        startOffset: nextToken.startOffset,
+        startLine: nextToken.startLine,
+        startColumn: nextToken.startColumn,
+        endOffset: NaN,
+        endLine: NaN,
+        endColumn: NaN
+      };
+    }
+    cstInvocationStateUpdate(fullRuleName) {
+      const cstNode = {
+        name: fullRuleName,
+        children: /* @__PURE__ */ Object.create(null)
+      };
+      this.setInitialNodeLocation(cstNode);
+      this.CST_STACK.push(cstNode);
+    }
+    cstFinallyStateUpdate() {
+      this.CST_STACK.pop();
+    }
+    cstPostRuleFull(ruleCstNode) {
+      const prevToken = this.LA(0);
+      const loc = ruleCstNode.location;
+      if (loc.startOffset <= prevToken.startOffset === true) {
+        loc.endOffset = prevToken.endOffset;
+        loc.endLine = prevToken.endLine;
+        loc.endColumn = prevToken.endColumn;
+      } else {
+        loc.startOffset = NaN;
+        loc.startLine = NaN;
+        loc.startColumn = NaN;
+      }
+    }
+    cstPostRuleOnlyOffset(ruleCstNode) {
+      const prevToken = this.LA(0);
+      const loc = ruleCstNode.location;
+      if (loc.startOffset <= prevToken.startOffset === true) {
+        loc.endOffset = prevToken.endOffset;
+      } else {
+        loc.startOffset = NaN;
+      }
+    }
+    cstPostTerminal(key, consumedToken) {
+      const rootCst = this.CST_STACK[this.CST_STACK.length - 1];
+      addTerminalToCst(rootCst, consumedToken, key);
+      this.setNodeLocationFromToken(rootCst.location, consumedToken);
+    }
+    cstPostNonTerminal(ruleCstResult, ruleName) {
+      const preCstNode = this.CST_STACK[this.CST_STACK.length - 1];
+      addNoneTerminalToCst(preCstNode, ruleName, ruleCstResult);
+      this.setNodeLocationFromNode(preCstNode.location, ruleCstResult.location);
+    }
+    getBaseCstVisitorConstructor() {
+      if (isUndefined_default(this.baseCstVisitorConstructor)) {
+        const newBaseCstVisitorConstructor = createBaseSemanticVisitorConstructor(this.className, keys_default(this.gastProductionsCache));
+        this.baseCstVisitorConstructor = newBaseCstVisitorConstructor;
+        return newBaseCstVisitorConstructor;
+      }
+      return this.baseCstVisitorConstructor;
+    }
+    getBaseCstVisitorConstructorWithDefaults() {
+      if (isUndefined_default(this.baseCstVisitorWithDefaultsConstructor)) {
+        const newConstructor = createBaseVisitorConstructorWithDefaults(this.className, keys_default(this.gastProductionsCache), this.getBaseCstVisitorConstructor());
+        this.baseCstVisitorWithDefaultsConstructor = newConstructor;
+        return newConstructor;
+      }
+      return this.baseCstVisitorWithDefaultsConstructor;
+    }
+    getLastExplicitRuleShortName() {
+      const ruleStack = this.RULE_STACK;
+      return ruleStack[ruleStack.length - 1];
+    }
+    getPreviousExplicitRuleShortName() {
+      const ruleStack = this.RULE_STACK;
+      return ruleStack[ruleStack.length - 2];
+    }
+    getLastExplicitRuleOccurrenceIndex() {
+      const occurrenceStack = this.RULE_OCCURRENCE_STACK;
+      return occurrenceStack[occurrenceStack.length - 1];
+    }
+  };
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/parse/parser/traits/lexer_adapter.js
+  var LexerAdapter = class {
+    initLexerAdapter() {
+      this.tokVector = [];
+      this.tokVectorLength = 0;
+      this.currIdx = -1;
+    }
+    set input(newInput) {
+      if (this.selfAnalysisDone !== true) {
+        throw Error(`Missing <performSelfAnalysis> invocation at the end of the Parser's constructor.`);
+      }
+      this.reset();
+      this.tokVector = newInput;
+      this.tokVectorLength = newInput.length;
+    }
+    get input() {
+      return this.tokVector;
+    }
+    // skips a token and returns the next token
+    SKIP_TOKEN() {
+      if (this.currIdx <= this.tokVector.length - 2) {
+        this.consumeToken();
+        return this.LA(1);
+      } else {
+        return END_OF_FILE;
+      }
+    }
+    // Lexer (accessing Token vector) related methods which can be overridden to implement lazy lexers
+    // or lexers dependent on parser context.
+    LA(howMuch) {
+      const soughtIdx = this.currIdx + howMuch;
+      if (soughtIdx < 0 || this.tokVectorLength <= soughtIdx) {
+        return END_OF_FILE;
+      } else {
+        return this.tokVector[soughtIdx];
+      }
+    }
+    consumeToken() {
+      this.currIdx++;
+    }
+    exportLexerState() {
+      return this.currIdx;
+    }
+    importLexerState(newState) {
+      this.currIdx = newState;
+    }
+    resetLexerState() {
+      this.currIdx = -1;
+    }
+    moveToTerminatedState() {
+      this.currIdx = this.tokVector.length - 1;
+    }
+    getLexerPosition() {
+      return this.exportLexerState();
+    }
+  };
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/parse/parser/traits/recognizer_api.js
+  var RecognizerApi = class {
+    ACTION(impl) {
+      return impl.call(this);
+    }
+    consume(idx, tokType, options) {
+      return this.consumeInternal(tokType, idx, options);
+    }
+    subrule(idx, ruleToCall, options) {
+      return this.subruleInternal(ruleToCall, idx, options);
+    }
+    option(idx, actionORMethodDef) {
+      return this.optionInternal(actionORMethodDef, idx);
+    }
+    or(idx, altsOrOpts) {
+      return this.orInternal(altsOrOpts, idx);
+    }
+    many(idx, actionORMethodDef) {
+      return this.manyInternal(idx, actionORMethodDef);
+    }
+    atLeastOne(idx, actionORMethodDef) {
+      return this.atLeastOneInternal(idx, actionORMethodDef);
+    }
+    CONSUME(tokType, options) {
+      return this.consumeInternal(tokType, 0, options);
+    }
+    CONSUME1(tokType, options) {
+      return this.consumeInternal(tokType, 1, options);
+    }
+    CONSUME2(tokType, options) {
+      return this.consumeInternal(tokType, 2, options);
+    }
+    CONSUME3(tokType, options) {
+      return this.consumeInternal(tokType, 3, options);
+    }
+    CONSUME4(tokType, options) {
+      return this.consumeInternal(tokType, 4, options);
+    }
+    CONSUME5(tokType, options) {
+      return this.consumeInternal(tokType, 5, options);
+    }
+    CONSUME6(tokType, options) {
+      return this.consumeInternal(tokType, 6, options);
+    }
+    CONSUME7(tokType, options) {
+      return this.consumeInternal(tokType, 7, options);
+    }
+    CONSUME8(tokType, options) {
+      return this.consumeInternal(tokType, 8, options);
+    }
+    CONSUME9(tokType, options) {
+      return this.consumeInternal(tokType, 9, options);
+    }
+    SUBRULE(ruleToCall, options) {
+      return this.subruleInternal(ruleToCall, 0, options);
+    }
+    SUBRULE1(ruleToCall, options) {
+      return this.subruleInternal(ruleToCall, 1, options);
+    }
+    SUBRULE2(ruleToCall, options) {
+      return this.subruleInternal(ruleToCall, 2, options);
+    }
+    SUBRULE3(ruleToCall, options) {
+      return this.subruleInternal(ruleToCall, 3, options);
+    }
+    SUBRULE4(ruleToCall, options) {
+      return this.subruleInternal(ruleToCall, 4, options);
+    }
+    SUBRULE5(ruleToCall, options) {
+      return this.subruleInternal(ruleToCall, 5, options);
+    }
+    SUBRULE6(ruleToCall, options) {
+      return this.subruleInternal(ruleToCall, 6, options);
+    }
+    SUBRULE7(ruleToCall, options) {
+      return this.subruleInternal(ruleToCall, 7, options);
+    }
+    SUBRULE8(ruleToCall, options) {
+      return this.subruleInternal(ruleToCall, 8, options);
+    }
+    SUBRULE9(ruleToCall, options) {
+      return this.subruleInternal(ruleToCall, 9, options);
+    }
+    OPTION(actionORMethodDef) {
+      return this.optionInternal(actionORMethodDef, 0);
+    }
+    OPTION1(actionORMethodDef) {
+      return this.optionInternal(actionORMethodDef, 1);
+    }
+    OPTION2(actionORMethodDef) {
+      return this.optionInternal(actionORMethodDef, 2);
+    }
+    OPTION3(actionORMethodDef) {
+      return this.optionInternal(actionORMethodDef, 3);
+    }
+    OPTION4(actionORMethodDef) {
+      return this.optionInternal(actionORMethodDef, 4);
+    }
+    OPTION5(actionORMethodDef) {
+      return this.optionInternal(actionORMethodDef, 5);
+    }
+    OPTION6(actionORMethodDef) {
+      return this.optionInternal(actionORMethodDef, 6);
+    }
+    OPTION7(actionORMethodDef) {
+      return this.optionInternal(actionORMethodDef, 7);
+    }
+    OPTION8(actionORMethodDef) {
+      return this.optionInternal(actionORMethodDef, 8);
+    }
+    OPTION9(actionORMethodDef) {
+      return this.optionInternal(actionORMethodDef, 9);
+    }
+    OR(altsOrOpts) {
+      return this.orInternal(altsOrOpts, 0);
+    }
+    OR1(altsOrOpts) {
+      return this.orInternal(altsOrOpts, 1);
+    }
+    OR2(altsOrOpts) {
+      return this.orInternal(altsOrOpts, 2);
+    }
+    OR3(altsOrOpts) {
+      return this.orInternal(altsOrOpts, 3);
+    }
+    OR4(altsOrOpts) {
+      return this.orInternal(altsOrOpts, 4);
+    }
+    OR5(altsOrOpts) {
+      return this.orInternal(altsOrOpts, 5);
+    }
+    OR6(altsOrOpts) {
+      return this.orInternal(altsOrOpts, 6);
+    }
+    OR7(altsOrOpts) {
+      return this.orInternal(altsOrOpts, 7);
+    }
+    OR8(altsOrOpts) {
+      return this.orInternal(altsOrOpts, 8);
+    }
+    OR9(altsOrOpts) {
+      return this.orInternal(altsOrOpts, 9);
+    }
+    MANY(actionORMethodDef) {
+      this.manyInternal(0, actionORMethodDef);
+    }
+    MANY1(actionORMethodDef) {
+      this.manyInternal(1, actionORMethodDef);
+    }
+    MANY2(actionORMethodDef) {
+      this.manyInternal(2, actionORMethodDef);
+    }
+    MANY3(actionORMethodDef) {
+      this.manyInternal(3, actionORMethodDef);
+    }
+    MANY4(actionORMethodDef) {
+      this.manyInternal(4, actionORMethodDef);
+    }
+    MANY5(actionORMethodDef) {
+      this.manyInternal(5, actionORMethodDef);
+    }
+    MANY6(actionORMethodDef) {
+      this.manyInternal(6, actionORMethodDef);
+    }
+    MANY7(actionORMethodDef) {
+      this.manyInternal(7, actionORMethodDef);
+    }
+    MANY8(actionORMethodDef) {
+      this.manyInternal(8, actionORMethodDef);
+    }
+    MANY9(actionORMethodDef) {
+      this.manyInternal(9, actionORMethodDef);
+    }
+    MANY_SEP(options) {
+      this.manySepFirstInternal(0, options);
+    }
+    MANY_SEP1(options) {
+      this.manySepFirstInternal(1, options);
+    }
+    MANY_SEP2(options) {
+      this.manySepFirstInternal(2, options);
+    }
+    MANY_SEP3(options) {
+      this.manySepFirstInternal(3, options);
+    }
+    MANY_SEP4(options) {
+      this.manySepFirstInternal(4, options);
+    }
+    MANY_SEP5(options) {
+      this.manySepFirstInternal(5, options);
+    }
+    MANY_SEP6(options) {
+      this.manySepFirstInternal(6, options);
+    }
+    MANY_SEP7(options) {
+      this.manySepFirstInternal(7, options);
+    }
+    MANY_SEP8(options) {
+      this.manySepFirstInternal(8, options);
+    }
+    MANY_SEP9(options) {
+      this.manySepFirstInternal(9, options);
+    }
+    AT_LEAST_ONE(actionORMethodDef) {
+      this.atLeastOneInternal(0, actionORMethodDef);
+    }
+    AT_LEAST_ONE1(actionORMethodDef) {
+      return this.atLeastOneInternal(1, actionORMethodDef);
+    }
+    AT_LEAST_ONE2(actionORMethodDef) {
+      this.atLeastOneInternal(2, actionORMethodDef);
+    }
+    AT_LEAST_ONE3(actionORMethodDef) {
+      this.atLeastOneInternal(3, actionORMethodDef);
+    }
+    AT_LEAST_ONE4(actionORMethodDef) {
+      this.atLeastOneInternal(4, actionORMethodDef);
+    }
+    AT_LEAST_ONE5(actionORMethodDef) {
+      this.atLeastOneInternal(5, actionORMethodDef);
+    }
+    AT_LEAST_ONE6(actionORMethodDef) {
+      this.atLeastOneInternal(6, actionORMethodDef);
+    }
+    AT_LEAST_ONE7(actionORMethodDef) {
+      this.atLeastOneInternal(7, actionORMethodDef);
+    }
+    AT_LEAST_ONE8(actionORMethodDef) {
+      this.atLeastOneInternal(8, actionORMethodDef);
+    }
+    AT_LEAST_ONE9(actionORMethodDef) {
+      this.atLeastOneInternal(9, actionORMethodDef);
+    }
+    AT_LEAST_ONE_SEP(options) {
+      this.atLeastOneSepFirstInternal(0, options);
+    }
+    AT_LEAST_ONE_SEP1(options) {
+      this.atLeastOneSepFirstInternal(1, options);
+    }
+    AT_LEAST_ONE_SEP2(options) {
+      this.atLeastOneSepFirstInternal(2, options);
+    }
+    AT_LEAST_ONE_SEP3(options) {
+      this.atLeastOneSepFirstInternal(3, options);
+    }
+    AT_LEAST_ONE_SEP4(options) {
+      this.atLeastOneSepFirstInternal(4, options);
+    }
+    AT_LEAST_ONE_SEP5(options) {
+      this.atLeastOneSepFirstInternal(5, options);
+    }
+    AT_LEAST_ONE_SEP6(options) {
+      this.atLeastOneSepFirstInternal(6, options);
+    }
+    AT_LEAST_ONE_SEP7(options) {
+      this.atLeastOneSepFirstInternal(7, options);
+    }
+    AT_LEAST_ONE_SEP8(options) {
+      this.atLeastOneSepFirstInternal(8, options);
+    }
+    AT_LEAST_ONE_SEP9(options) {
+      this.atLeastOneSepFirstInternal(9, options);
+    }
+    RULE(name, implementation, config2 = DEFAULT_RULE_CONFIG) {
+      if (includes_default(this.definedRulesNames, name)) {
+        const errMsg = defaultGrammarValidatorErrorProvider.buildDuplicateRuleNameError({
+          topLevelRule: name,
+          grammarName: this.className
+        });
+        const error = {
+          message: errMsg,
+          type: ParserDefinitionErrorType.DUPLICATE_RULE_NAME,
+          ruleName: name
+        };
+        this.definitionErrors.push(error);
+      }
+      this.definedRulesNames.push(name);
+      const ruleImplementation = this.defineRule(name, implementation, config2);
+      this[name] = ruleImplementation;
+      return ruleImplementation;
+    }
+    OVERRIDE_RULE(name, impl, config2 = DEFAULT_RULE_CONFIG) {
+      const ruleErrors = validateRuleIsOverridden(name, this.definedRulesNames, this.className);
+      this.definitionErrors = this.definitionErrors.concat(ruleErrors);
+      const ruleImplementation = this.defineRule(name, impl, config2);
+      this[name] = ruleImplementation;
+      return ruleImplementation;
+    }
+    BACKTRACK(grammarRule, args) {
+      return function() {
+        this.isBackTrackingStack.push(1);
+        const orgState = this.saveRecogState();
+        try {
+          grammarRule.apply(this, args);
+          return true;
+        } catch (e) {
+          if (isRecognitionException(e)) {
+            return false;
+          } else {
+            throw e;
+          }
+        } finally {
+          this.reloadRecogState(orgState);
+          this.isBackTrackingStack.pop();
+        }
+      };
+    }
+    // GAST export APIs
+    getGAstProductions() {
+      return this.gastProductionsCache;
+    }
+    getSerializedGastProductions() {
+      return serializeGrammar(values_default(this.gastProductionsCache));
+    }
+  };
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/parse/parser/traits/recognizer_engine.js
+  var RecognizerEngine = class {
+    initRecognizerEngine(tokenVocabulary, config2) {
+      this.className = this.constructor.name;
+      this.shortRuleNameToFull = {};
+      this.fullRuleNameToShort = {};
+      this.ruleShortNameIdx = 256;
+      this.tokenMatcher = tokenStructuredMatcherNoCategories;
+      this.subruleIdx = 0;
+      this.definedRulesNames = [];
+      this.tokensMap = {};
+      this.isBackTrackingStack = [];
+      this.RULE_STACK = [];
+      this.RULE_OCCURRENCE_STACK = [];
+      this.gastProductionsCache = {};
+      if (has_default(config2, "serializedGrammar")) {
+        throw Error("The Parser's configuration can no longer contain a <serializedGrammar> property.\n	See: https://chevrotain.io/docs/changes/BREAKING_CHANGES.html#_6-0-0\n	For Further details.");
+      }
+      if (isArray_default(tokenVocabulary)) {
+        if (isEmpty_default(tokenVocabulary)) {
+          throw Error("A Token Vocabulary cannot be empty.\n	Note that the first argument for the parser constructor\n	is no longer a Token vector (since v4.0).");
+        }
+        if (typeof tokenVocabulary[0].startOffset === "number") {
+          throw Error("The Parser constructor no longer accepts a token vector as the first argument.\n	See: https://chevrotain.io/docs/changes/BREAKING_CHANGES.html#_4-0-0\n	For Further details.");
+        }
+      }
+      if (isArray_default(tokenVocabulary)) {
+        this.tokensMap = reduce_default(tokenVocabulary, (acc, tokType) => {
+          acc[tokType.name] = tokType;
+          return acc;
+        }, {});
+      } else if (has_default(tokenVocabulary, "modes") && every_default(flatten_default(values_default(tokenVocabulary.modes)), isTokenType)) {
+        const allTokenTypes2 = flatten_default(values_default(tokenVocabulary.modes));
+        const uniqueTokens = uniq_default(allTokenTypes2);
+        this.tokensMap = reduce_default(uniqueTokens, (acc, tokType) => {
+          acc[tokType.name] = tokType;
+          return acc;
+        }, {});
+      } else if (isObject_default(tokenVocabulary)) {
+        this.tokensMap = clone_default(tokenVocabulary);
+      } else {
+        throw new Error("<tokensDictionary> argument must be An Array of Token constructors, A dictionary of Token constructors or an IMultiModeLexerDefinition");
+      }
+      this.tokensMap["EOF"] = EOF;
+      const allTokenTypes = has_default(tokenVocabulary, "modes") ? flatten_default(values_default(tokenVocabulary.modes)) : values_default(tokenVocabulary);
+      const noTokenCategoriesUsed = every_default(allTokenTypes, (tokenConstructor) => isEmpty_default(tokenConstructor.categoryMatches));
+      this.tokenMatcher = noTokenCategoriesUsed ? tokenStructuredMatcherNoCategories : tokenStructuredMatcher;
+      augmentTokenTypes(values_default(this.tokensMap));
+    }
+    defineRule(ruleName, impl, config2) {
+      if (this.selfAnalysisDone) {
+        throw Error(`Grammar rule <${ruleName}> may not be defined after the 'performSelfAnalysis' method has been called'
+Make sure that all grammar rule definitions are done before 'performSelfAnalysis' is called.`);
+      }
+      const resyncEnabled = has_default(config2, "resyncEnabled") ? config2.resyncEnabled : DEFAULT_RULE_CONFIG.resyncEnabled;
+      const recoveryValueFunc = has_default(config2, "recoveryValueFunc") ? config2.recoveryValueFunc : DEFAULT_RULE_CONFIG.recoveryValueFunc;
+      const shortName = this.ruleShortNameIdx << BITS_FOR_METHOD_TYPE + BITS_FOR_OCCURRENCE_IDX;
+      this.ruleShortNameIdx++;
+      this.shortRuleNameToFull[shortName] = ruleName;
+      this.fullRuleNameToShort[ruleName] = shortName;
+      let invokeRuleWithTry;
+      if (this.outputCst === true) {
+        invokeRuleWithTry = function invokeRuleWithTry2(...args) {
+          try {
+            this.ruleInvocationStateUpdate(shortName, ruleName, this.subruleIdx);
+            impl.apply(this, args);
+            const cst = this.CST_STACK[this.CST_STACK.length - 1];
+            this.cstPostRule(cst);
+            return cst;
+          } catch (e) {
+            return this.invokeRuleCatch(e, resyncEnabled, recoveryValueFunc);
+          } finally {
+            this.ruleFinallyStateUpdate();
+          }
+        };
+      } else {
+        invokeRuleWithTry = function invokeRuleWithTryCst(...args) {
+          try {
+            this.ruleInvocationStateUpdate(shortName, ruleName, this.subruleIdx);
+            return impl.apply(this, args);
+          } catch (e) {
+            return this.invokeRuleCatch(e, resyncEnabled, recoveryValueFunc);
+          } finally {
+            this.ruleFinallyStateUpdate();
+          }
+        };
+      }
+      const wrappedGrammarRule = Object.assign(invokeRuleWithTry, { ruleName, originalGrammarAction: impl });
+      return wrappedGrammarRule;
+    }
+    invokeRuleCatch(e, resyncEnabledConfig, recoveryValueFunc) {
+      const isFirstInvokedRule = this.RULE_STACK.length === 1;
+      const reSyncEnabled = resyncEnabledConfig && !this.isBackTracking() && this.recoveryEnabled;
+      if (isRecognitionException(e)) {
+        const recogError = e;
+        if (reSyncEnabled) {
+          const reSyncTokType = this.findReSyncTokenType();
+          if (this.isInCurrentRuleReSyncSet(reSyncTokType)) {
+            recogError.resyncedTokens = this.reSyncTo(reSyncTokType);
+            if (this.outputCst) {
+              const partialCstResult = this.CST_STACK[this.CST_STACK.length - 1];
+              partialCstResult.recoveredNode = true;
+              return partialCstResult;
+            } else {
+              return recoveryValueFunc(e);
+            }
+          } else {
+            if (this.outputCst) {
+              const partialCstResult = this.CST_STACK[this.CST_STACK.length - 1];
+              partialCstResult.recoveredNode = true;
+              recogError.partialCstResult = partialCstResult;
+            }
+            throw recogError;
+          }
+        } else if (isFirstInvokedRule) {
+          this.moveToTerminatedState();
+          return recoveryValueFunc(e);
+        } else {
+          throw recogError;
+        }
+      } else {
+        throw e;
+      }
+    }
+    // Implementation of parsing DSL
+    optionInternal(actionORMethodDef, occurrence) {
+      const key = this.getKeyForAutomaticLookahead(OPTION_IDX, occurrence);
+      return this.optionInternalLogic(actionORMethodDef, occurrence, key);
+    }
+    optionInternalLogic(actionORMethodDef, occurrence, key) {
+      let lookAheadFunc = this.getLaFuncFromCache(key);
+      let action;
+      if (typeof actionORMethodDef !== "function") {
+        action = actionORMethodDef.DEF;
+        const predicate = actionORMethodDef.GATE;
+        if (predicate !== void 0) {
+          const orgLookaheadFunction = lookAheadFunc;
+          lookAheadFunc = () => {
+            return predicate.call(this) && orgLookaheadFunction.call(this);
+          };
+        }
+      } else {
+        action = actionORMethodDef;
+      }
+      if (lookAheadFunc.call(this) === true) {
+        return action.call(this);
+      }
+      return void 0;
+    }
+    atLeastOneInternal(prodOccurrence, actionORMethodDef) {
+      const laKey = this.getKeyForAutomaticLookahead(AT_LEAST_ONE_IDX, prodOccurrence);
+      return this.atLeastOneInternalLogic(prodOccurrence, actionORMethodDef, laKey);
+    }
+    atLeastOneInternalLogic(prodOccurrence, actionORMethodDef, key) {
+      let lookAheadFunc = this.getLaFuncFromCache(key);
+      let action;
+      if (typeof actionORMethodDef !== "function") {
+        action = actionORMethodDef.DEF;
+        const predicate = actionORMethodDef.GATE;
+        if (predicate !== void 0) {
+          const orgLookaheadFunction = lookAheadFunc;
+          lookAheadFunc = () => {
+            return predicate.call(this) && orgLookaheadFunction.call(this);
+          };
+        }
+      } else {
+        action = actionORMethodDef;
+      }
+      if (lookAheadFunc.call(this) === true) {
+        let notStuck = this.doSingleRepetition(action);
+        while (lookAheadFunc.call(this) === true && notStuck === true) {
+          notStuck = this.doSingleRepetition(action);
+        }
+      } else {
+        throw this.raiseEarlyExitException(prodOccurrence, PROD_TYPE.REPETITION_MANDATORY, actionORMethodDef.ERR_MSG);
+      }
+      this.attemptInRepetitionRecovery(this.atLeastOneInternal, [prodOccurrence, actionORMethodDef], lookAheadFunc, AT_LEAST_ONE_IDX, prodOccurrence, NextTerminalAfterAtLeastOneWalker);
+    }
+    atLeastOneSepFirstInternal(prodOccurrence, options) {
+      const laKey = this.getKeyForAutomaticLookahead(AT_LEAST_ONE_SEP_IDX, prodOccurrence);
+      this.atLeastOneSepFirstInternalLogic(prodOccurrence, options, laKey);
+    }
+    atLeastOneSepFirstInternalLogic(prodOccurrence, options, key) {
+      const action = options.DEF;
+      const separator = options.SEP;
+      const firstIterationLookaheadFunc = this.getLaFuncFromCache(key);
+      if (firstIterationLookaheadFunc.call(this) === true) {
+        action.call(this);
+        const separatorLookAheadFunc = () => {
+          return this.tokenMatcher(this.LA(1), separator);
+        };
+        while (this.tokenMatcher(this.LA(1), separator) === true) {
+          this.CONSUME(separator);
+          action.call(this);
+        }
+        this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal, [
+          prodOccurrence,
+          separator,
+          separatorLookAheadFunc,
+          action,
+          NextTerminalAfterAtLeastOneSepWalker
+        ], separatorLookAheadFunc, AT_LEAST_ONE_SEP_IDX, prodOccurrence, NextTerminalAfterAtLeastOneSepWalker);
+      } else {
+        throw this.raiseEarlyExitException(prodOccurrence, PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR, options.ERR_MSG);
+      }
+    }
+    manyInternal(prodOccurrence, actionORMethodDef) {
+      const laKey = this.getKeyForAutomaticLookahead(MANY_IDX, prodOccurrence);
+      return this.manyInternalLogic(prodOccurrence, actionORMethodDef, laKey);
+    }
+    manyInternalLogic(prodOccurrence, actionORMethodDef, key) {
+      let lookaheadFunction = this.getLaFuncFromCache(key);
+      let action;
+      if (typeof actionORMethodDef !== "function") {
+        action = actionORMethodDef.DEF;
+        const predicate = actionORMethodDef.GATE;
+        if (predicate !== void 0) {
+          const orgLookaheadFunction = lookaheadFunction;
+          lookaheadFunction = () => {
+            return predicate.call(this) && orgLookaheadFunction.call(this);
+          };
+        }
+      } else {
+        action = actionORMethodDef;
+      }
+      let notStuck = true;
+      while (lookaheadFunction.call(this) === true && notStuck === true) {
+        notStuck = this.doSingleRepetition(action);
+      }
+      this.attemptInRepetitionRecovery(
+        this.manyInternal,
+        [prodOccurrence, actionORMethodDef],
+        lookaheadFunction,
+        MANY_IDX,
+        prodOccurrence,
+        NextTerminalAfterManyWalker,
+        // The notStuck parameter is only relevant when "attemptInRepetitionRecovery"
+        // is invoked from manyInternal, in the MANY_SEP case and AT_LEAST_ONE[_SEP]
+        // An infinite loop cannot occur as:
+        // - Either the lookahead is guaranteed to consume something (Single Token Separator)
+        // - AT_LEAST_ONE by definition is guaranteed to consume something (or error out).
+        notStuck
+      );
+    }
+    manySepFirstInternal(prodOccurrence, options) {
+      const laKey = this.getKeyForAutomaticLookahead(MANY_SEP_IDX, prodOccurrence);
+      this.manySepFirstInternalLogic(prodOccurrence, options, laKey);
+    }
+    manySepFirstInternalLogic(prodOccurrence, options, key) {
+      const action = options.DEF;
+      const separator = options.SEP;
+      const firstIterationLaFunc = this.getLaFuncFromCache(key);
+      if (firstIterationLaFunc.call(this) === true) {
+        action.call(this);
+        const separatorLookAheadFunc = () => {
+          return this.tokenMatcher(this.LA(1), separator);
+        };
+        while (this.tokenMatcher(this.LA(1), separator) === true) {
+          this.CONSUME(separator);
+          action.call(this);
+        }
+        this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal, [
+          prodOccurrence,
+          separator,
+          separatorLookAheadFunc,
+          action,
+          NextTerminalAfterManySepWalker
+        ], separatorLookAheadFunc, MANY_SEP_IDX, prodOccurrence, NextTerminalAfterManySepWalker);
+      }
+    }
+    repetitionSepSecondInternal(prodOccurrence, separator, separatorLookAheadFunc, action, nextTerminalAfterWalker) {
+      while (separatorLookAheadFunc()) {
+        this.CONSUME(separator);
+        action.call(this);
+      }
+      this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal, [
+        prodOccurrence,
+        separator,
+        separatorLookAheadFunc,
+        action,
+        nextTerminalAfterWalker
+      ], separatorLookAheadFunc, AT_LEAST_ONE_SEP_IDX, prodOccurrence, nextTerminalAfterWalker);
+    }
+    doSingleRepetition(action) {
+      const beforeIteration = this.getLexerPosition();
+      action.call(this);
+      const afterIteration = this.getLexerPosition();
+      return afterIteration > beforeIteration;
+    }
+    orInternal(altsOrOpts, occurrence) {
+      const laKey = this.getKeyForAutomaticLookahead(OR_IDX, occurrence);
+      const alts = isArray_default(altsOrOpts) ? altsOrOpts : altsOrOpts.DEF;
+      const laFunc = this.getLaFuncFromCache(laKey);
+      const altIdxToTake = laFunc.call(this, alts);
+      if (altIdxToTake !== void 0) {
+        const chosenAlternative = alts[altIdxToTake];
+        return chosenAlternative.ALT.call(this);
+      }
+      this.raiseNoAltException(occurrence, altsOrOpts.ERR_MSG);
+    }
+    ruleFinallyStateUpdate() {
+      this.RULE_STACK.pop();
+      this.RULE_OCCURRENCE_STACK.pop();
+      this.cstFinallyStateUpdate();
+      if (this.RULE_STACK.length === 0 && this.isAtEndOfInput() === false) {
+        const firstRedundantTok = this.LA(1);
+        const errMsg = this.errorMessageProvider.buildNotAllInputParsedMessage({
+          firstRedundant: firstRedundantTok,
+          ruleName: this.getCurrRuleFullName()
+        });
+        this.SAVE_ERROR(new NotAllInputParsedException(errMsg, firstRedundantTok));
+      }
+    }
+    subruleInternal(ruleToCall, idx, options) {
+      let ruleResult;
+      try {
+        const args = options !== void 0 ? options.ARGS : void 0;
+        this.subruleIdx = idx;
+        ruleResult = ruleToCall.apply(this, args);
+        this.cstPostNonTerminal(ruleResult, options !== void 0 && options.LABEL !== void 0 ? options.LABEL : ruleToCall.ruleName);
+        return ruleResult;
+      } catch (e) {
+        throw this.subruleInternalError(e, options, ruleToCall.ruleName);
+      }
+    }
+    subruleInternalError(e, options, ruleName) {
+      if (isRecognitionException(e) && e.partialCstResult !== void 0) {
+        this.cstPostNonTerminal(e.partialCstResult, options !== void 0 && options.LABEL !== void 0 ? options.LABEL : ruleName);
+        delete e.partialCstResult;
+      }
+      throw e;
+    }
+    consumeInternal(tokType, idx, options) {
+      let consumedToken;
+      try {
+        const nextToken = this.LA(1);
+        if (this.tokenMatcher(nextToken, tokType) === true) {
+          this.consumeToken();
+          consumedToken = nextToken;
+        } else {
+          this.consumeInternalError(tokType, nextToken, options);
+        }
+      } catch (eFromConsumption) {
+        consumedToken = this.consumeInternalRecovery(tokType, idx, eFromConsumption);
+      }
+      this.cstPostTerminal(options !== void 0 && options.LABEL !== void 0 ? options.LABEL : tokType.name, consumedToken);
+      return consumedToken;
+    }
+    consumeInternalError(tokType, nextToken, options) {
+      let msg;
+      const previousToken = this.LA(0);
+      if (options !== void 0 && options.ERR_MSG) {
+        msg = options.ERR_MSG;
+      } else {
+        msg = this.errorMessageProvider.buildMismatchTokenMessage({
+          expected: tokType,
+          actual: nextToken,
+          previous: previousToken,
+          ruleName: this.getCurrRuleFullName()
+        });
+      }
+      throw this.SAVE_ERROR(new MismatchedTokenException(msg, nextToken, previousToken));
+    }
+    consumeInternalRecovery(tokType, idx, eFromConsumption) {
+      if (this.recoveryEnabled && // TODO: more robust checking of the exception type. Perhaps Typescript extending expressions?
+      eFromConsumption.name === "MismatchedTokenException" && !this.isBackTracking()) {
+        const follows = this.getFollowsForInRuleRecovery(tokType, idx);
+        try {
+          return this.tryInRuleRecovery(tokType, follows);
+        } catch (eFromInRuleRecovery) {
+          if (eFromInRuleRecovery.name === IN_RULE_RECOVERY_EXCEPTION) {
+            throw eFromConsumption;
+          } else {
+            throw eFromInRuleRecovery;
+          }
+        }
+      } else {
+        throw eFromConsumption;
+      }
+    }
+    saveRecogState() {
+      const savedErrors = this.errors;
+      const savedRuleStack = clone_default(this.RULE_STACK);
+      return {
+        errors: savedErrors,
+        lexerState: this.exportLexerState(),
+        RULE_STACK: savedRuleStack,
+        CST_STACK: this.CST_STACK
+      };
+    }
+    reloadRecogState(newState) {
+      this.errors = newState.errors;
+      this.importLexerState(newState.lexerState);
+      this.RULE_STACK = newState.RULE_STACK;
+    }
+    ruleInvocationStateUpdate(shortName, fullName, idxInCallingRule) {
+      this.RULE_OCCURRENCE_STACK.push(idxInCallingRule);
+      this.RULE_STACK.push(shortName);
+      this.cstInvocationStateUpdate(fullName);
+    }
+    isBackTracking() {
+      return this.isBackTrackingStack.length !== 0;
+    }
+    getCurrRuleFullName() {
+      const shortName = this.getLastExplicitRuleShortName();
+      return this.shortRuleNameToFull[shortName];
+    }
+    shortRuleNameToFullName(shortName) {
+      return this.shortRuleNameToFull[shortName];
+    }
+    isAtEndOfInput() {
+      return this.tokenMatcher(this.LA(1), EOF);
+    }
+    reset() {
+      this.resetLexerState();
+      this.subruleIdx = 0;
+      this.isBackTrackingStack = [];
+      this.errors = [];
+      this.RULE_STACK = [];
+      this.CST_STACK = [];
+      this.RULE_OCCURRENCE_STACK = [];
+    }
+  };
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/parse/parser/traits/error_handler.js
+  var ErrorHandler = class {
+    initErrorHandler(config2) {
+      this._errors = [];
+      this.errorMessageProvider = has_default(config2, "errorMessageProvider") ? config2.errorMessageProvider : DEFAULT_PARSER_CONFIG.errorMessageProvider;
+    }
+    SAVE_ERROR(error) {
+      if (isRecognitionException(error)) {
+        error.context = {
+          ruleStack: this.getHumanReadableRuleStack(),
+          ruleOccurrenceStack: clone_default(this.RULE_OCCURRENCE_STACK)
+        };
+        this._errors.push(error);
+        return error;
+      } else {
+        throw Error("Trying to save an Error which is not a RecognitionException");
+      }
+    }
+    get errors() {
+      return clone_default(this._errors);
+    }
+    set errors(newErrors) {
+      this._errors = newErrors;
+    }
+    // TODO: consider caching the error message computed information
+    raiseEarlyExitException(occurrence, prodType, userDefinedErrMsg) {
+      const ruleName = this.getCurrRuleFullName();
+      const ruleGrammar = this.getGAstProductions()[ruleName];
+      const lookAheadPathsPerAlternative = getLookaheadPathsForOptionalProd(occurrence, ruleGrammar, prodType, this.maxLookahead);
+      const insideProdPaths = lookAheadPathsPerAlternative[0];
+      const actualTokens = [];
+      for (let i = 1; i <= this.maxLookahead; i++) {
+        actualTokens.push(this.LA(i));
+      }
+      const msg = this.errorMessageProvider.buildEarlyExitMessage({
+        expectedIterationPaths: insideProdPaths,
+        actual: actualTokens,
+        previous: this.LA(0),
+        customUserDescription: userDefinedErrMsg,
+        ruleName
+      });
+      throw this.SAVE_ERROR(new EarlyExitException(msg, this.LA(1), this.LA(0)));
+    }
+    // TODO: consider caching the error message computed information
+    raiseNoAltException(occurrence, errMsgTypes) {
+      const ruleName = this.getCurrRuleFullName();
+      const ruleGrammar = this.getGAstProductions()[ruleName];
+      const lookAheadPathsPerAlternative = getLookaheadPathsForOr(occurrence, ruleGrammar, this.maxLookahead);
+      const actualTokens = [];
+      for (let i = 1; i <= this.maxLookahead; i++) {
+        actualTokens.push(this.LA(i));
+      }
+      const previousToken = this.LA(0);
+      const errMsg = this.errorMessageProvider.buildNoViableAltMessage({
+        expectedPathsPerAlt: lookAheadPathsPerAlternative,
+        actual: actualTokens,
+        previous: previousToken,
+        customUserDescription: errMsgTypes,
+        ruleName: this.getCurrRuleFullName()
+      });
+      throw this.SAVE_ERROR(new NoViableAltException(errMsg, this.LA(1), previousToken));
+    }
+  };
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/parse/parser/traits/context_assist.js
+  var ContentAssist = class {
+    initContentAssist() {
+    }
+    computeContentAssist(startRuleName, precedingInput) {
+      const startRuleGast = this.gastProductionsCache[startRuleName];
+      if (isUndefined_default(startRuleGast)) {
+        throw Error(`Rule ->${startRuleName}<- does not exist in this grammar.`);
+      }
+      return nextPossibleTokensAfter([startRuleGast], precedingInput, this.tokenMatcher, this.maxLookahead);
+    }
+    // TODO: should this be a member method or a utility? it does not have any state or usage of 'this'...
+    // TODO: should this be more explicitly part of the public API?
+    getNextPossibleTokenTypes(grammarPath) {
+      const topRuleName = head_default(grammarPath.ruleStack);
+      const gastProductions = this.getGAstProductions();
+      const topProduction = gastProductions[topRuleName];
+      const nextPossibleTokenTypes = new NextAfterTokenWalker(topProduction, grammarPath).startWalking();
+      return nextPossibleTokenTypes;
+    }
+  };
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/parse/parser/traits/gast_recorder.js
+  var RECORDING_NULL_OBJECT = {
+    description: "This Object indicates the Parser is during Recording Phase"
+  };
+  Object.freeze(RECORDING_NULL_OBJECT);
+  var HANDLE_SEPARATOR = true;
+  var MAX_METHOD_IDX = Math.pow(2, BITS_FOR_OCCURRENCE_IDX) - 1;
+  var RFT = createToken({ name: "RECORDING_PHASE_TOKEN", pattern: Lexer.NA });
+  augmentTokenTypes([RFT]);
+  var RECORDING_PHASE_TOKEN = createTokenInstance(
+    RFT,
+    "This IToken indicates the Parser is in Recording Phase\n	See: https://chevrotain.io/docs/guide/internals.html#grammar-recording for details",
+    // Using "-1" instead of NaN (as in EOF) because an actual number is less likely to
+    // cause errors if the output of LA or CONSUME would be (incorrectly) used during the recording phase.
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1
+  );
+  Object.freeze(RECORDING_PHASE_TOKEN);
+  var RECORDING_PHASE_CSTNODE = {
+    name: "This CSTNode indicates the Parser is in Recording Phase\n	See: https://chevrotain.io/docs/guide/internals.html#grammar-recording for details",
+    children: {}
+  };
+  var GastRecorder = class {
+    initGastRecorder(config2) {
+      this.recordingProdStack = [];
+      this.RECORDING_PHASE = false;
+    }
+    enableRecording() {
+      this.RECORDING_PHASE = true;
+      this.TRACE_INIT("Enable Recording", () => {
+        for (let i = 0; i < 10; i++) {
+          const idx = i > 0 ? i : "";
+          this[`CONSUME${idx}`] = function(arg1, arg2) {
+            return this.consumeInternalRecord(arg1, i, arg2);
+          };
+          this[`SUBRULE${idx}`] = function(arg1, arg2) {
+            return this.subruleInternalRecord(arg1, i, arg2);
+          };
+          this[`OPTION${idx}`] = function(arg1) {
+            return this.optionInternalRecord(arg1, i);
+          };
+          this[`OR${idx}`] = function(arg1) {
+            return this.orInternalRecord(arg1, i);
+          };
+          this[`MANY${idx}`] = function(arg1) {
+            this.manyInternalRecord(i, arg1);
+          };
+          this[`MANY_SEP${idx}`] = function(arg1) {
+            this.manySepFirstInternalRecord(i, arg1);
+          };
+          this[`AT_LEAST_ONE${idx}`] = function(arg1) {
+            this.atLeastOneInternalRecord(i, arg1);
+          };
+          this[`AT_LEAST_ONE_SEP${idx}`] = function(arg1) {
+            this.atLeastOneSepFirstInternalRecord(i, arg1);
+          };
+        }
+        this[`consume`] = function(idx, arg1, arg2) {
+          return this.consumeInternalRecord(arg1, idx, arg2);
+        };
+        this[`subrule`] = function(idx, arg1, arg2) {
+          return this.subruleInternalRecord(arg1, idx, arg2);
+        };
+        this[`option`] = function(idx, arg1) {
+          return this.optionInternalRecord(arg1, idx);
+        };
+        this[`or`] = function(idx, arg1) {
+          return this.orInternalRecord(arg1, idx);
+        };
+        this[`many`] = function(idx, arg1) {
+          this.manyInternalRecord(idx, arg1);
+        };
+        this[`atLeastOne`] = function(idx, arg1) {
+          this.atLeastOneInternalRecord(idx, arg1);
+        };
+        this.ACTION = this.ACTION_RECORD;
+        this.BACKTRACK = this.BACKTRACK_RECORD;
+        this.LA = this.LA_RECORD;
+      });
+    }
+    disableRecording() {
+      this.RECORDING_PHASE = false;
+      this.TRACE_INIT("Deleting Recording methods", () => {
+        const that = this;
+        for (let i = 0; i < 10; i++) {
+          const idx = i > 0 ? i : "";
+          delete that[`CONSUME${idx}`];
+          delete that[`SUBRULE${idx}`];
+          delete that[`OPTION${idx}`];
+          delete that[`OR${idx}`];
+          delete that[`MANY${idx}`];
+          delete that[`MANY_SEP${idx}`];
+          delete that[`AT_LEAST_ONE${idx}`];
+          delete that[`AT_LEAST_ONE_SEP${idx}`];
+        }
+        delete that[`consume`];
+        delete that[`subrule`];
+        delete that[`option`];
+        delete that[`or`];
+        delete that[`many`];
+        delete that[`atLeastOne`];
+        delete that.ACTION;
+        delete that.BACKTRACK;
+        delete that.LA;
+      });
+    }
+    //   Parser methods are called inside an ACTION?
+    //   Maybe try/catch/finally on ACTIONS while disabling the recorders state changes?
+    // @ts-expect-error -- noop place holder
+    ACTION_RECORD(impl) {
+    }
+    // Executing backtracking logic will break our recording logic assumptions
+    BACKTRACK_RECORD(grammarRule, args) {
+      return () => true;
+    }
+    // LA is part of the official API and may be used for custom lookahead logic
+    // by end users who may forget to wrap it in ACTION or inside a GATE
+    LA_RECORD(howMuch) {
+      return END_OF_FILE;
+    }
+    topLevelRuleRecord(name, def) {
+      try {
+        const newTopLevelRule = new Rule({ definition: [], name });
+        newTopLevelRule.name = name;
+        this.recordingProdStack.push(newTopLevelRule);
+        def.call(this);
+        this.recordingProdStack.pop();
+        return newTopLevelRule;
+      } catch (originalError) {
+        if (originalError.KNOWN_RECORDER_ERROR !== true) {
+          try {
+            originalError.message = originalError.message + '\n	 This error was thrown during the "grammar recording phase" For more info see:\n	https://chevrotain.io/docs/guide/internals.html#grammar-recording';
+          } catch (mutabilityError) {
+            throw originalError;
+          }
+        }
+        throw originalError;
+      }
+    }
+    // Implementation of parsing DSL
+    optionInternalRecord(actionORMethodDef, occurrence) {
+      return recordProd.call(this, Option, actionORMethodDef, occurrence);
+    }
+    atLeastOneInternalRecord(occurrence, actionORMethodDef) {
+      recordProd.call(this, RepetitionMandatory, actionORMethodDef, occurrence);
+    }
+    atLeastOneSepFirstInternalRecord(occurrence, options) {
+      recordProd.call(this, RepetitionMandatoryWithSeparator, options, occurrence, HANDLE_SEPARATOR);
+    }
+    manyInternalRecord(occurrence, actionORMethodDef) {
+      recordProd.call(this, Repetition, actionORMethodDef, occurrence);
+    }
+    manySepFirstInternalRecord(occurrence, options) {
+      recordProd.call(this, RepetitionWithSeparator, options, occurrence, HANDLE_SEPARATOR);
+    }
+    orInternalRecord(altsOrOpts, occurrence) {
+      return recordOrProd.call(this, altsOrOpts, occurrence);
+    }
+    subruleInternalRecord(ruleToCall, occurrence, options) {
+      assertMethodIdxIsValid(occurrence);
+      if (!ruleToCall || has_default(ruleToCall, "ruleName") === false) {
+        const error = new Error(`<SUBRULE${getIdxSuffix(occurrence)}> argument is invalid expecting a Parser method reference but got: <${JSON.stringify(ruleToCall)}>
+ inside top level rule: <${this.recordingProdStack[0].name}>`);
+        error.KNOWN_RECORDER_ERROR = true;
+        throw error;
+      }
+      const prevProd = last_default(this.recordingProdStack);
+      const ruleName = ruleToCall.ruleName;
+      const newNoneTerminal = new NonTerminal({
+        idx: occurrence,
+        nonTerminalName: ruleName,
+        label: options === null || options === void 0 ? void 0 : options.LABEL,
+        // The resolving of the `referencedRule` property will be done once all the Rule's GASTs have been created
+        referencedRule: void 0
+      });
+      prevProd.definition.push(newNoneTerminal);
+      return this.outputCst ? RECORDING_PHASE_CSTNODE : RECORDING_NULL_OBJECT;
+    }
+    consumeInternalRecord(tokType, occurrence, options) {
+      assertMethodIdxIsValid(occurrence);
+      if (!hasShortKeyProperty(tokType)) {
+        const error = new Error(`<CONSUME${getIdxSuffix(occurrence)}> argument is invalid expecting a TokenType reference but got: <${JSON.stringify(tokType)}>
+ inside top level rule: <${this.recordingProdStack[0].name}>`);
+        error.KNOWN_RECORDER_ERROR = true;
+        throw error;
+      }
+      const prevProd = last_default(this.recordingProdStack);
+      const newNoneTerminal = new Terminal({
+        idx: occurrence,
+        terminalType: tokType,
+        label: options === null || options === void 0 ? void 0 : options.LABEL
+      });
+      prevProd.definition.push(newNoneTerminal);
+      return RECORDING_PHASE_TOKEN;
+    }
+  };
+  function recordProd(prodConstructor, mainProdArg, occurrence, handleSep = false) {
+    assertMethodIdxIsValid(occurrence);
+    const prevProd = last_default(this.recordingProdStack);
+    const grammarAction = isFunction_default(mainProdArg) ? mainProdArg : mainProdArg.DEF;
+    const newProd = new prodConstructor({ definition: [], idx: occurrence });
+    if (handleSep) {
+      newProd.separator = mainProdArg.SEP;
+    }
+    if (has_default(mainProdArg, "MAX_LOOKAHEAD")) {
+      newProd.maxLookahead = mainProdArg.MAX_LOOKAHEAD;
+    }
+    this.recordingProdStack.push(newProd);
+    grammarAction.call(this);
+    prevProd.definition.push(newProd);
+    this.recordingProdStack.pop();
+    return RECORDING_NULL_OBJECT;
+  }
+  function recordOrProd(mainProdArg, occurrence) {
+    assertMethodIdxIsValid(occurrence);
+    const prevProd = last_default(this.recordingProdStack);
+    const hasOptions = isArray_default(mainProdArg) === false;
+    const alts = hasOptions === false ? mainProdArg : mainProdArg.DEF;
+    const newOrProd = new Alternation({
+      definition: [],
+      idx: occurrence,
+      ignoreAmbiguities: hasOptions && mainProdArg.IGNORE_AMBIGUITIES === true
+    });
+    if (has_default(mainProdArg, "MAX_LOOKAHEAD")) {
+      newOrProd.maxLookahead = mainProdArg.MAX_LOOKAHEAD;
+    }
+    const hasPredicates = some_default(alts, (currAlt) => isFunction_default(currAlt.GATE));
+    newOrProd.hasPredicates = hasPredicates;
+    prevProd.definition.push(newOrProd);
+    forEach_default(alts, (currAlt) => {
+      const currAltFlat = new Alternative({ definition: [] });
+      newOrProd.definition.push(currAltFlat);
+      if (has_default(currAlt, "IGNORE_AMBIGUITIES")) {
+        currAltFlat.ignoreAmbiguities = currAlt.IGNORE_AMBIGUITIES;
+      } else if (has_default(currAlt, "GATE")) {
+        currAltFlat.ignoreAmbiguities = true;
+      }
+      this.recordingProdStack.push(currAltFlat);
+      currAlt.ALT.call(this);
+      this.recordingProdStack.pop();
+    });
+    return RECORDING_NULL_OBJECT;
+  }
+  function getIdxSuffix(idx) {
+    return idx === 0 ? "" : `${idx}`;
+  }
+  function assertMethodIdxIsValid(idx) {
+    if (idx < 0 || idx > MAX_METHOD_IDX) {
+      const error = new Error(
+        // The stack trace will contain all the needed details
+        `Invalid DSL Method idx value: <${idx}>
+	Idx value must be a none negative value smaller than ${MAX_METHOD_IDX + 1}`
+      );
+      error.KNOWN_RECORDER_ERROR = true;
+      throw error;
+    }
+  }
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/parse/parser/traits/perf_tracer.js
+  var PerformanceTracer = class {
+    initPerformanceTracer(config2) {
+      if (has_default(config2, "traceInitPerf")) {
+        const userTraceInitPerf = config2.traceInitPerf;
+        const traceIsNumber = typeof userTraceInitPerf === "number";
+        this.traceInitMaxIdent = traceIsNumber ? userTraceInitPerf : Infinity;
+        this.traceInitPerf = traceIsNumber ? userTraceInitPerf > 0 : userTraceInitPerf;
+      } else {
+        this.traceInitMaxIdent = 0;
+        this.traceInitPerf = DEFAULT_PARSER_CONFIG.traceInitPerf;
+      }
+      this.traceInitIndent = -1;
+    }
+    TRACE_INIT(phaseDesc, phaseImpl) {
+      if (this.traceInitPerf === true) {
+        this.traceInitIndent++;
+        const indent = new Array(this.traceInitIndent + 1).join("	");
+        if (this.traceInitIndent < this.traceInitMaxIdent) {
+          console.log(`${indent}--> <${phaseDesc}>`);
+        }
+        const { time, value } = timer(phaseImpl);
+        const traceMethod = time > 10 ? console.warn : console.log;
+        if (this.traceInitIndent < this.traceInitMaxIdent) {
+          traceMethod(`${indent}<-- <${phaseDesc}> time: ${time}ms`);
+        }
+        this.traceInitIndent--;
+        return value;
+      } else {
+        return phaseImpl();
+      }
+    }
+  };
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/parse/parser/utils/apply_mixins.js
+  function applyMixins(derivedCtor, baseCtors) {
+    baseCtors.forEach((baseCtor) => {
+      const baseProto = baseCtor.prototype;
+      Object.getOwnPropertyNames(baseProto).forEach((propName) => {
+        if (propName === "constructor") {
+          return;
+        }
+        const basePropDescriptor = Object.getOwnPropertyDescriptor(baseProto, propName);
+        if (basePropDescriptor && (basePropDescriptor.get || basePropDescriptor.set)) {
+          Object.defineProperty(derivedCtor.prototype, propName, basePropDescriptor);
+        } else {
+          derivedCtor.prototype[propName] = baseCtor.prototype[propName];
+        }
+      });
+    });
+  }
+
+  // node_modules/.pnpm/chevrotain@11.0.3/node_modules/chevrotain/lib/src/parse/parser/parser.js
+  var END_OF_FILE = createTokenInstance(EOF, "", NaN, NaN, NaN, NaN, NaN, NaN);
+  Object.freeze(END_OF_FILE);
+  var DEFAULT_PARSER_CONFIG = Object.freeze({
+    recoveryEnabled: false,
+    maxLookahead: 3,
+    dynamicTokensEnabled: false,
+    outputCst: true,
+    errorMessageProvider: defaultParserErrorProvider,
+    nodeLocationTracking: "none",
+    traceInitPerf: false,
+    skipValidations: false
+  });
+  var DEFAULT_RULE_CONFIG = Object.freeze({
+    recoveryValueFunc: () => void 0,
+    resyncEnabled: true
+  });
+  var ParserDefinitionErrorType;
+  (function(ParserDefinitionErrorType2) {
+    ParserDefinitionErrorType2[ParserDefinitionErrorType2["INVALID_RULE_NAME"] = 0] = "INVALID_RULE_NAME";
+    ParserDefinitionErrorType2[ParserDefinitionErrorType2["DUPLICATE_RULE_NAME"] = 1] = "DUPLICATE_RULE_NAME";
+    ParserDefinitionErrorType2[ParserDefinitionErrorType2["INVALID_RULE_OVERRIDE"] = 2] = "INVALID_RULE_OVERRIDE";
+    ParserDefinitionErrorType2[ParserDefinitionErrorType2["DUPLICATE_PRODUCTIONS"] = 3] = "DUPLICATE_PRODUCTIONS";
+    ParserDefinitionErrorType2[ParserDefinitionErrorType2["UNRESOLVED_SUBRULE_REF"] = 4] = "UNRESOLVED_SUBRULE_REF";
+    ParserDefinitionErrorType2[ParserDefinitionErrorType2["LEFT_RECURSION"] = 5] = "LEFT_RECURSION";
+    ParserDefinitionErrorType2[ParserDefinitionErrorType2["NONE_LAST_EMPTY_ALT"] = 6] = "NONE_LAST_EMPTY_ALT";
+    ParserDefinitionErrorType2[ParserDefinitionErrorType2["AMBIGUOUS_ALTS"] = 7] = "AMBIGUOUS_ALTS";
+    ParserDefinitionErrorType2[ParserDefinitionErrorType2["CONFLICT_TOKENS_RULES_NAMESPACE"] = 8] = "CONFLICT_TOKENS_RULES_NAMESPACE";
+    ParserDefinitionErrorType2[ParserDefinitionErrorType2["INVALID_TOKEN_NAME"] = 9] = "INVALID_TOKEN_NAME";
+    ParserDefinitionErrorType2[ParserDefinitionErrorType2["NO_NON_EMPTY_LOOKAHEAD"] = 10] = "NO_NON_EMPTY_LOOKAHEAD";
+    ParserDefinitionErrorType2[ParserDefinitionErrorType2["AMBIGUOUS_PREFIX_ALTS"] = 11] = "AMBIGUOUS_PREFIX_ALTS";
+    ParserDefinitionErrorType2[ParserDefinitionErrorType2["TOO_MANY_ALTS"] = 12] = "TOO_MANY_ALTS";
+    ParserDefinitionErrorType2[ParserDefinitionErrorType2["CUSTOM_LOOKAHEAD_VALIDATION"] = 13] = "CUSTOM_LOOKAHEAD_VALIDATION";
+  })(ParserDefinitionErrorType || (ParserDefinitionErrorType = {}));
+  var Parser = class _Parser {
+    /**
+     *  @deprecated use the **instance** method with the same name instead
+     */
+    static performSelfAnalysis(parserInstance2) {
+      throw Error("The **static** `performSelfAnalysis` method has been deprecated.	\nUse the **instance** method with the same name instead.");
+    }
+    performSelfAnalysis() {
+      this.TRACE_INIT("performSelfAnalysis", () => {
+        let defErrorsMsgs;
+        this.selfAnalysisDone = true;
+        const className = this.className;
+        this.TRACE_INIT("toFastProps", () => {
+          toFastProperties(this);
+        });
+        this.TRACE_INIT("Grammar Recording", () => {
+          try {
+            this.enableRecording();
+            forEach_default(this.definedRulesNames, (currRuleName) => {
+              const wrappedRule = this[currRuleName];
+              const originalGrammarAction = wrappedRule["originalGrammarAction"];
+              let recordedRuleGast;
+              this.TRACE_INIT(`${currRuleName} Rule`, () => {
+                recordedRuleGast = this.topLevelRuleRecord(currRuleName, originalGrammarAction);
+              });
+              this.gastProductionsCache[currRuleName] = recordedRuleGast;
+            });
+          } finally {
+            this.disableRecording();
+          }
+        });
+        let resolverErrors = [];
+        this.TRACE_INIT("Grammar Resolving", () => {
+          resolverErrors = resolveGrammar2({
+            rules: values_default(this.gastProductionsCache)
+          });
+          this.definitionErrors = this.definitionErrors.concat(resolverErrors);
+        });
+        this.TRACE_INIT("Grammar Validations", () => {
+          if (isEmpty_default(resolverErrors) && this.skipValidations === false) {
+            const validationErrors = validateGrammar2({
+              rules: values_default(this.gastProductionsCache),
+              tokenTypes: values_default(this.tokensMap),
+              errMsgProvider: defaultGrammarValidatorErrorProvider,
+              grammarName: className
+            });
+            const lookaheadValidationErrors = validateLookahead({
+              lookaheadStrategy: this.lookaheadStrategy,
+              rules: values_default(this.gastProductionsCache),
+              tokenTypes: values_default(this.tokensMap),
+              grammarName: className
+            });
+            this.definitionErrors = this.definitionErrors.concat(validationErrors, lookaheadValidationErrors);
+          }
+        });
+        if (isEmpty_default(this.definitionErrors)) {
+          if (this.recoveryEnabled) {
+            this.TRACE_INIT("computeAllProdsFollows", () => {
+              const allFollows = computeAllProdsFollows(values_default(this.gastProductionsCache));
+              this.resyncFollows = allFollows;
+            });
+          }
+          this.TRACE_INIT("ComputeLookaheadFunctions", () => {
+            var _a, _b;
+            (_b = (_a = this.lookaheadStrategy).initialize) === null || _b === void 0 ? void 0 : _b.call(_a, {
+              rules: values_default(this.gastProductionsCache)
+            });
+            this.preComputeLookaheadFunctions(values_default(this.gastProductionsCache));
+          });
+        }
+        if (!_Parser.DEFER_DEFINITION_ERRORS_HANDLING && !isEmpty_default(this.definitionErrors)) {
+          defErrorsMsgs = map_default(this.definitionErrors, (defError) => defError.message);
+          throw new Error(`Parser Definition Errors detected:
+ ${defErrorsMsgs.join("\n-------------------------------\n")}`);
+        }
+      });
+    }
+    constructor(tokenVocabulary, config2) {
+      this.definitionErrors = [];
+      this.selfAnalysisDone = false;
+      const that = this;
+      that.initErrorHandler(config2);
+      that.initLexerAdapter();
+      that.initLooksAhead(config2);
+      that.initRecognizerEngine(tokenVocabulary, config2);
+      that.initRecoverable(config2);
+      that.initTreeBuilder(config2);
+      that.initContentAssist();
+      that.initGastRecorder(config2);
+      that.initPerformanceTracer(config2);
+      if (has_default(config2, "ignoredIssues")) {
+        throw new Error("The <ignoredIssues> IParserConfig property has been deprecated.\n	Please use the <IGNORE_AMBIGUITIES> flag on the relevant DSL method instead.\n	See: https://chevrotain.io/docs/guide/resolving_grammar_errors.html#IGNORING_AMBIGUITIES\n	For further details.");
+      }
+      this.skipValidations = has_default(config2, "skipValidations") ? config2.skipValidations : DEFAULT_PARSER_CONFIG.skipValidations;
+    }
+  };
+  Parser.DEFER_DEFINITION_ERRORS_HANDLING = false;
+  applyMixins(Parser, [
+    Recoverable,
+    LooksAhead,
+    TreeBuilder,
+    LexerAdapter,
+    RecognizerEngine,
+    RecognizerApi,
+    ErrorHandler,
+    ContentAssist,
+    GastRecorder,
+    PerformanceTracer
+  ]);
+  var CstParser = class extends Parser {
+    constructor(tokenVocabulary, config2 = DEFAULT_PARSER_CONFIG) {
+      const configClone = clone_default(config2);
+      configClone.outputCst = true;
+      super(tokenVocabulary, configClone);
+    }
+  };
+
+  // src/core/parser/parser-tokens.ts
+  var Let = createToken({ name: "Let", pattern: /\bLET\b/i });
+  var Print = createToken({ name: "Print", pattern: /\bPRINT\b/i });
+  var For = createToken({ name: "For", pattern: /\bFOR\b/i });
+  var To = createToken({ name: "To", pattern: /\bTO\b/i });
+  var Step = createToken({ name: "Step", pattern: /\bSTEP\b/i });
+  var Next = createToken({ name: "Next", pattern: /\bNEXT\b/i });
+  var End = createToken({ name: "End", pattern: /\bEND\b/i });
+  var Rem = createToken({ name: "Rem", pattern: /\bREM\b/i });
+  var Pause = createToken({ name: "Pause", pattern: /\bPAUSE\b/i });
+  var If = createToken({ name: "If", pattern: /\bIF\b/i });
+  var Then = createToken({ name: "Then", pattern: /\bTHEN\b/i });
+  var Goto = createToken({ name: "Goto", pattern: /\bGOTO\b/i });
+  var Len = createToken({ name: "Len", pattern: /\bLEN\b/i });
+  var Left = createToken({ name: "Left", pattern: /\bLEFT\$/i });
+  var Right = createToken({ name: "Right", pattern: /\bRIGHT\$/i });
+  var Mid = createToken({ name: "Mid", pattern: /\bMID\$/i });
+  var Str = createToken({ name: "Str", pattern: /\bSTR\$/i });
+  var Hex = createToken({ name: "Hex", pattern: /\bHEX\$/i });
+  var Abs = createToken({ name: "Abs", pattern: /\bABS\b/i });
+  var Sgn = createToken({ name: "Sgn", pattern: /\bSGN\b/i });
+  var Rnd = createToken({ name: "Rnd", pattern: /\bRND\b/i });
+  var Val = createToken({ name: "Val", pattern: /\bVAL\b/i });
+  var Stick = createToken({ name: "Stick", pattern: /\bSTICK\b/i });
+  var Strig = createToken({ name: "Strig", pattern: /\bSTRIG\b/i });
+  var And = createToken({ name: "And", pattern: /\bAND\b/i });
+  var Or = createToken({ name: "Or", pattern: /\bOR\b/i });
+  var Xor = createToken({ name: "Xor", pattern: /\bXOR\b/i });
+  var Not = createToken({ name: "Not", pattern: /\bNOT\b/i });
+  var GreaterThan = createToken({ name: "GreaterThan", pattern: />/ });
+  var LessThan = createToken({ name: "LessThan", pattern: /</ });
+  var NotEqual = createToken({ name: "NotEqual", pattern: /<>/ });
+  var GreaterThanOrEqual = createToken({ name: "GreaterThanOrEqual", pattern: />=/ });
+  var LessThanOrEqual = createToken({ name: "LessThanOrEqual", pattern: /<=/ });
+  var Equal = createToken({ name: "Equal", pattern: /=/ });
+  var Plus = createToken({ name: "Plus", pattern: /\+/ });
+  var Minus = createToken({ name: "Minus", pattern: /-/ });
+  var Multiply = createToken({ name: "Multiply", pattern: /\*/ });
+  var Divide = createToken({ name: "Divide", pattern: /\// });
+  var Mod = createToken({ name: "Mod", pattern: /\bMOD\b/i });
+  var Comma = createToken({ name: "Comma", pattern: /,/ });
+  var Semicolon = createToken({ name: "Semicolon", pattern: /;/ });
+  var Colon = createToken({ name: "Colon", pattern: /:/ });
+  var LParen = createToken({ name: "LParen", pattern: /\(/ });
+  var RParen = createToken({ name: "RParen", pattern: /\)/ });
+  var Period = createToken({ name: "Period", pattern: /\./ });
+  var Hash2 = createToken({ name: "Hash", pattern: /#/ });
+  var Dollar = createToken({ name: "Dollar", pattern: /\$/ });
+  var LBracket = createToken({ name: "LBracket", pattern: /\[/ });
+  var RBracket = createToken({ name: "RBracket", pattern: /\]/ });
+  var Exclamation = createToken({ name: "Exclamation", pattern: /!/ });
+  var Question = createToken({ name: "Question", pattern: /\?/ });
+  var AtSign = createToken({ name: "AtSign", pattern: /@/ });
+  var Percent = createToken({ name: "Percent", pattern: /%/ });
+  var LBrace = createToken({ name: "LBrace", pattern: /\{/ });
+  var RBrace = createToken({ name: "RBrace", pattern: /\}/ });
+  var Pipe = createToken({ name: "Pipe", pattern: /\|/ });
+  var Tilde = createToken({ name: "Tilde", pattern: /~/ });
+  var Underscore = createToken({ name: "Underscore", pattern: /_/ });
+  var Backslash = createToken({ name: "Backslash", pattern: /\\/ });
+  var Apostrophe = createToken({ name: "Apostrophe", pattern: /'/ });
+  var StringLiteral = createToken({
+    name: "StringLiteral",
+    pattern: /"[^"]*"/
+  });
+  var NumberLiteral = createToken({
+    name: "NumberLiteral",
+    pattern: /\d+/
+  });
+  var Identifier = createToken({
+    name: "Identifier",
+    pattern: /[A-Za-z][A-Za-z0-9$]*/
+  });
+  var Whitespace = createToken({
+    name: "Whitespace",
+    pattern: /\s+/,
+    group: Lexer.SKIPPED
+  });
+  var allTokens = [
+    Whitespace,
+    // Keywords
+    Let,
+    Print,
+    For,
+    To,
+    Step,
+    Next,
+    End,
+    Rem,
+    Pause,
+    If,
+    Then,
+    Goto,
+    // String functions (must come before Identifier)
+    Len,
+    Left,
+    Right,
+    Mid,
+    Str,
+    Hex,
+    // Arithmetic functions (must come before Identifier)
+    // Family BASIC only supports: ABS, SGN, RND, VAL
+    Abs,
+    Sgn,
+    Rnd,
+    Val,
+    // Controller input function keywords (must come before Identifier)
+    Stick,
+    Strig,
+    // Logical operators (must come before Identifier)
+    And,
+    Or,
+    Xor,
+    Not,
+    // Comparison operators (must come before Equal to avoid ambiguity)
+    GreaterThanOrEqual,
+    LessThanOrEqual,
+    NotEqual,
+    GreaterThan,
+    LessThan,
+    // Operators
+    Equal,
+    Plus,
+    Minus,
+    Multiply,
+    Divide,
+    Mod,
+    // Punctuation
+    Comma,
+    Semicolon,
+    Colon,
+    LParen,
+    RParen,
+    // Additional punctuation for REM statements (lower priority, after main punctuation)
+    Period,
+    Hash2,
+    Dollar,
+    LBracket,
+    RBracket,
+    Exclamation,
+    Question,
+    AtSign,
+    Percent,
+    LBrace,
+    RBrace,
+    Pipe,
+    Tilde,
+    Underscore,
+    Backslash,
+    Apostrophe,
+    // Literals
+    StringLiteral,
+    NumberLiteral,
+    Identifier
+  ];
+  var lexer = new Lexer(allTokens, {
+    positionTracking: "full"
+  });
+
+  // src/core/parser/FBasicChevrotainParser.ts
+  var FBasicChevrotainParser = class extends CstParser {
+    constructor() {
+      super(allTokens, {
+        recoveryEnabled: true
+      });
+      this.expressionList = this.RULE("expressionList", () => {
+        this.SUBRULE(this.expression);
+        this.MANY(() => {
+          this.CONSUME(Comma);
+          this.SUBRULE2(this.expression);
+        });
+      });
+      this.functionCall = this.RULE("functionCall", () => {
+        this.OR([
+          // String functions
+          { ALT: () => this.CONSUME(Len) },
+          { ALT: () => this.CONSUME(Left) },
+          { ALT: () => this.CONSUME(Right) },
+          { ALT: () => this.CONSUME(Mid) },
+          { ALT: () => this.CONSUME(Str) },
+          { ALT: () => this.CONSUME(Hex) },
+          // Arithmetic functions (Family BASIC only supports these)
+          { ALT: () => this.CONSUME(Abs) },
+          { ALT: () => this.CONSUME(Sgn) },
+          { ALT: () => this.CONSUME(Rnd) },
+          { ALT: () => this.CONSUME(Val) },
+          // Controller input functions
+          { ALT: () => this.CONSUME(Stick) },
+          { ALT: () => this.CONSUME(Strig) }
+        ]);
+        this.CONSUME(LParen);
+        this.OPTION(() => {
+          this.SUBRULE(this.expressionList);
+        });
+        this.CONSUME(RParen);
+      });
+      this.primary = this.RULE("primary", () => {
+        this.OR([
+          {
+            GATE: () => this.LA(1).tokenType === StringLiteral,
+            ALT: () => this.CONSUME(StringLiteral)
+          },
+          { ALT: () => this.CONSUME(NumberLiteral) },
+          {
+            // Function call: String functions and arithmetic functions
+            // Family BASIC arithmetic functions: ABS, SGN, RND, VAL
+            // String functions: LEN, LEFT$, RIGHT$, MID$, STR$, HEX$
+            GATE: () => this.LA(1).tokenType === Len || this.LA(1).tokenType === Left || this.LA(1).tokenType === Right || this.LA(1).tokenType === Mid || this.LA(1).tokenType === Str || this.LA(1).tokenType === Hex || this.LA(1).tokenType === Abs || this.LA(1).tokenType === Sgn || this.LA(1).tokenType === Rnd || this.LA(1).tokenType === Val || this.LA(1).tokenType === Stick || this.LA(1).tokenType === Strig,
+            ALT: () => this.SUBRULE(this.functionCall)
+          },
+          { ALT: () => this.CONSUME(Identifier) },
+          {
+            ALT: () => {
+              this.CONSUME(LParen);
+              this.SUBRULE(this.expression);
+              this.CONSUME(RParen);
+            }
+          }
+        ]);
+      });
+      this.unary = this.RULE("unary", () => {
+        this.OPTION(() => {
+          this.OR([
+            { ALT: () => this.CONSUME(Plus) },
+            { ALT: () => this.CONSUME(Minus) }
+          ]);
+        });
+        this.SUBRULE(this.primary);
+      });
+      this.multiplicative = this.RULE("multiplicative", () => {
+        this.SUBRULE(this.unary);
+        this.MANY(() => {
+          this.OR([
+            { ALT: () => this.CONSUME(Multiply) },
+            { ALT: () => this.CONSUME(Divide) }
+          ]);
+          this.SUBRULE2(this.unary);
+        });
+      });
+      this.modExpression = this.RULE("modExpression", () => {
+        this.SUBRULE(this.multiplicative);
+        this.MANY(() => {
+          this.CONSUME(Mod);
+          this.SUBRULE2(this.multiplicative);
+        });
+      });
+      this.additive = this.RULE("additive", () => {
+        this.SUBRULE(this.modExpression);
+        this.MANY(() => {
+          this.OR([
+            { ALT: () => this.CONSUME(Plus) },
+            { ALT: () => this.CONSUME(Minus) }
+          ]);
+          this.SUBRULE2(this.modExpression);
+        });
+      });
+      this.expression = this.RULE("expression", () => {
+        this.SUBRULE(this.additive);
+      });
+      this.comparisonExpression = this.RULE("comparisonExpression", () => {
+        this.SUBRULE(this.expression);
+        this.OPTION(() => {
+          this.OR([
+            { ALT: () => this.CONSUME(Equal) },
+            { ALT: () => this.CONSUME(NotEqual) },
+            { ALT: () => this.CONSUME(LessThan) },
+            { ALT: () => this.CONSUME(GreaterThan) },
+            { ALT: () => this.CONSUME(LessThanOrEqual) },
+            { ALT: () => this.CONSUME(GreaterThanOrEqual) }
+          ]);
+          this.SUBRULE2(this.expression);
+        });
+      });
+      this.logicalNotExpression = this.RULE("logicalNotExpression", () => {
+        this.OPTION(() => {
+          this.CONSUME(Not);
+        });
+        this.SUBRULE(this.comparisonExpression);
+      });
+      this.logicalAndExpression = this.RULE("logicalAndExpression", () => {
+        this.SUBRULE(this.logicalNotExpression);
+        this.MANY(() => {
+          this.CONSUME(And);
+          this.SUBRULE2(this.logicalNotExpression);
+        });
+      });
+      this.logicalOrExpression = this.RULE("logicalOrExpression", () => {
+        this.SUBRULE(this.logicalAndExpression);
+        this.MANY(() => {
+          this.CONSUME(Or);
+          this.SUBRULE2(this.logicalAndExpression);
+        });
+      });
+      this.logicalExpression = this.RULE("logicalExpression", () => {
+        this.SUBRULE(this.logicalOrExpression);
+        this.MANY(() => {
+          this.CONSUME(Xor);
+          this.SUBRULE2(this.logicalOrExpression);
+        });
+      });
+      this.printItem = this.RULE("printItem", () => {
+        this.OR([
+          {
+            GATE: () => this.LA(1).tokenType === StringLiteral,
+            ALT: () => this.CONSUME(StringLiteral)
+          },
+          { ALT: () => this.SUBRULE(this.expression) }
+        ]);
+      });
+      this.printList = this.RULE("printList", () => {
+        this.SUBRULE(this.printItem);
+        this.MANY(() => {
+          this.OR([
+            { ALT: () => this.CONSUME(Comma) },
+            { ALT: () => this.CONSUME(Semicolon) }
+          ]);
+          this.SUBRULE2(this.printItem);
+        });
+      });
+      this.printStatement = this.RULE("printStatement", () => {
+        this.CONSUME(Print);
+        this.OPTION(() => {
+          this.SUBRULE(this.printList);
+        });
+      });
+      this.letStatement = this.RULE("letStatement", () => {
+        this.OPTION(() => {
+          this.CONSUME(Let);
+        });
+        this.CONSUME(Identifier);
+        this.CONSUME(Equal);
+        this.SUBRULE(this.expression);
+      });
+      this.forStatement = this.RULE("forStatement", () => {
+        this.CONSUME(For);
+        this.CONSUME(Identifier);
+        this.CONSUME(Equal);
+        this.SUBRULE(this.expression);
+        this.CONSUME(To);
+        this.SUBRULE2(this.expression);
+        this.OPTION(() => {
+          this.CONSUME(Step);
+          this.SUBRULE3(this.expression);
+        });
+      });
+      this.nextStatement = this.RULE("nextStatement", () => {
+        this.CONSUME(Next);
+      });
+      this.endStatement = this.RULE("endStatement", () => {
+        this.CONSUME(End);
+      });
+      this.pauseStatement = this.RULE("pauseStatement", () => {
+        this.CONSUME(Pause);
+        this.SUBRULE(this.expression);
+      });
+      this.gotoStatement = this.RULE("gotoStatement", () => {
+        this.CONSUME(Goto);
+        this.CONSUME(NumberLiteral);
+      });
+      this.ifThenStatement = this.RULE("ifThenStatement", () => {
+        this.CONSUME(If);
+        this.SUBRULE(this.logicalExpression);
+        this.OR([
+          {
+            // IF ... THEN NumberLiteral (line number jump)
+            GATE: () => this.LA(1).tokenType === Then && this.LA(2).tokenType === NumberLiteral,
+            ALT: () => {
+              this.CONSUME(Then);
+              this.CONSUME(NumberLiteral);
+            }
+          },
+          {
+            // IF ... THEN CommandList (statements)
+            GATE: () => this.LA(1).tokenType === Then,
+            ALT: () => {
+              this.CONSUME2(Then);
+              this.SUBRULE(this.commandList);
+            }
+          },
+          {
+            // IF ... GOTO NumberLiteral (GOTO without THEN)
+            ALT: () => {
+              this.CONSUME(Goto);
+              this.CONSUME2(NumberLiteral);
+            }
+          }
+        ]);
+      });
+      this.remStatement = this.RULE("remStatement", () => {
+        this.CONSUME(Rem);
+        this.MANY(() => {
+          this.OR([
+            // Match tokens that could appear in comments, using suffixes to avoid conflicts
+            { ALT: () => this.CONSUME(StringLiteral) },
+            { ALT: () => this.CONSUME(NumberLiteral) },
+            { ALT: () => this.CONSUME(Identifier) },
+            { ALT: () => this.CONSUME(Let) },
+            { ALT: () => this.CONSUME(Print) },
+            { ALT: () => this.CONSUME(For) },
+            { ALT: () => this.CONSUME(To) },
+            { ALT: () => this.CONSUME(Step) },
+            { ALT: () => this.CONSUME(Next) },
+            { ALT: () => this.CONSUME(End) },
+            { ALT: () => this.CONSUME2(Rem) },
+            // Use CONSUME2 for second occurrence
+            { ALT: () => this.CONSUME(If) },
+            { ALT: () => this.CONSUME(Then) },
+            { ALT: () => this.CONSUME(Goto) },
+            { ALT: () => this.CONSUME(Pause) },
+            { ALT: () => this.CONSUME(Equal) },
+            { ALT: () => this.CONSUME(NotEqual) },
+            { ALT: () => this.CONSUME(LessThan) },
+            { ALT: () => this.CONSUME(GreaterThan) },
+            { ALT: () => this.CONSUME(LessThanOrEqual) },
+            { ALT: () => this.CONSUME(GreaterThanOrEqual) },
+            { ALT: () => this.CONSUME(Plus) },
+            { ALT: () => this.CONSUME(Minus) },
+            { ALT: () => this.CONSUME(Multiply) },
+            { ALT: () => this.CONSUME(Divide) },
+            { ALT: () => this.CONSUME(Mod) },
+            { ALT: () => this.CONSUME(And) },
+            { ALT: () => this.CONSUME(Or) },
+            { ALT: () => this.CONSUME(Xor) },
+            { ALT: () => this.CONSUME(Not) },
+            // Function tokens (must be consumed in REM)
+            { ALT: () => this.CONSUME(Len) },
+            { ALT: () => this.CONSUME(Left) },
+            { ALT: () => this.CONSUME(Right) },
+            { ALT: () => this.CONSUME(Mid) },
+            { ALT: () => this.CONSUME(Str) },
+            { ALT: () => this.CONSUME(Hex) },
+            { ALT: () => this.CONSUME(Abs) },
+            { ALT: () => this.CONSUME(Sgn) },
+            { ALT: () => this.CONSUME(Rnd) },
+            { ALT: () => this.CONSUME(Val) },
+            { ALT: () => this.CONSUME(Stick) },
+            { ALT: () => this.CONSUME(Strig) },
+            { ALT: () => this.CONSUME(Comma) },
+            { ALT: () => this.CONSUME(Semicolon) },
+            { ALT: () => this.CONSUME(Colon) },
+            // Colon ends REM and starts next command
+            { ALT: () => this.CONSUME(LParen) },
+            { ALT: () => this.CONSUME(RParen) },
+            // Additional punctuation and special characters
+            { ALT: () => this.CONSUME(Period) },
+            { ALT: () => this.CONSUME(Hash2) },
+            { ALT: () => this.CONSUME(Dollar) },
+            { ALT: () => this.CONSUME(LBracket) },
+            { ALT: () => this.CONSUME(RBracket) },
+            { ALT: () => this.CONSUME(Exclamation) },
+            { ALT: () => this.CONSUME(Question) },
+            { ALT: () => this.CONSUME(AtSign) },
+            { ALT: () => this.CONSUME(Percent) },
+            { ALT: () => this.CONSUME(LBrace) },
+            { ALT: () => this.CONSUME(RBrace) },
+            { ALT: () => this.CONSUME(Pipe) },
+            { ALT: () => this.CONSUME(Tilde) },
+            { ALT: () => this.CONSUME(Underscore) },
+            { ALT: () => this.CONSUME(Backslash) },
+            { ALT: () => this.CONSUME(Apostrophe) }
+          ]);
+        });
+      });
+      this.singleCommand = this.RULE("singleCommand", () => {
+        this.OR([
+          {
+            GATE: () => this.LA(1).tokenType === If,
+            ALT: () => this.SUBRULE(this.ifThenStatement)
+          },
+          {
+            GATE: () => this.LA(1).tokenType === Goto,
+            ALT: () => this.SUBRULE(this.gotoStatement)
+          },
+          {
+            GATE: () => this.LA(1).tokenType === Print,
+            ALT: () => this.SUBRULE(this.printStatement)
+          },
+          {
+            GATE: () => this.LA(1).tokenType === For,
+            ALT: () => this.SUBRULE(this.forStatement)
+          },
+          {
+            GATE: () => this.LA(1).tokenType === Next,
+            ALT: () => this.SUBRULE(this.nextStatement)
+          },
+          {
+            GATE: () => this.LA(1).tokenType === End,
+            ALT: () => this.SUBRULE(this.endStatement)
+          },
+          {
+            GATE: () => this.LA(1).tokenType === Rem,
+            ALT: () => this.SUBRULE(this.remStatement)
+          },
+          {
+            GATE: () => this.LA(1).tokenType === Pause,
+            ALT: () => this.SUBRULE(this.pauseStatement)
+          },
+          { ALT: () => this.SUBRULE(this.letStatement) }
+          // Must be last since it can start with Identifier
+        ]);
+      });
+      this.command = this.RULE("command", () => {
+        this.SUBRULE(this.singleCommand);
+      });
+      this.commandList = this.RULE("commandList", () => {
+        this.SUBRULE(this.command);
+        this.MANY(() => {
+          this.CONSUME(Colon);
+          this.SUBRULE2(this.command);
+        });
+      });
+      this.statement = this.RULE("statement", () => {
+        this.CONSUME(NumberLiteral);
+        this.SUBRULE(this.commandList);
+      });
+      this.performSelfAnalysis();
+    }
+  };
+  var parserInstance = new FBasicChevrotainParser();
+  function parseWithChevrotain(source) {
+    const lines = source.split(/\r?\n/);
+    const allErrors = [];
+    const statements = [];
+    for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+      const line = lines[lineIndex]?.trim();
+      if (!line) {
+        continue;
+      }
+      const lexResult = lexer.tokenize(line);
+      if (lexResult.errors.length > 0) {
+        allErrors.push(...lexResult.errors.map((err) => ({
+          message: err.message || "Lexical error",
+          line: lineIndex + 1,
+          column: err.column,
+          length: err.length,
+          location: {
+            start: {
+              line: lineIndex + 1,
+              column: err.column || 1
+            }
+          }
+        })));
+        continue;
+      }
+      parserInstance.input = lexResult.tokens;
+      const cst = parserInstance.statement();
+      const parseErrors = [...parserInstance.errors];
+      parserInstance.errors = [];
+      if (parseErrors.length > 0) {
+        allErrors.push(...parseErrors.map((err) => {
+          const token = err.token;
+          return {
+            message: err.message || "Syntax error",
+            line: lineIndex + 1,
+            column: token?.startColumn,
+            length: token?.endOffset ? token.endOffset - token.startOffset : 1,
+            location: {
+              start: {
+                line: lineIndex + 1,
+                column: token?.startColumn || 1
+              }
+            }
+          };
+        }));
+        continue;
+      }
+      if (cst) {
+        statements.push(cst);
+      }
+    }
+    if (allErrors.length > 0) {
+      return {
+        success: false,
+        errors: allErrors
+      };
+    }
+    const programCst = {
+      name: "program",
+      children: {
+        statement: statements
+      }
+    };
+    return {
+      success: true,
+      cst: programCst
+    };
+  }
+
+  // src/core/parser/FBasicParser.ts
+  var FBasicParser = class {
+    constructor() {
+    }
+    /**
+     * Parse F-Basic source code into a CST
      * 
      * @param source - The F-Basic source code to parse
-     * @returns Parse result with AST or errors
+     * @returns Parse result with CST or errors
      */
     async parse(source) {
       try {
-        if (!this.parser) {
-          await this.initializeParser();
+        const parseResult = parseWithChevrotain(source);
+        if (!parseResult.success) {
+          const errorMessages = parseResult.errors?.map((e) => e.message).join("; ") || "Unknown parse error";
+          return {
+            success: false,
+            errors: parseResult.errors?.map((err) => ({
+              message: `${err.message} (line ${err.line}, col ${err.column})`,
+              location: {
+                start: {
+                  offset: 0,
+                  line: err.line || 1,
+                  column: err.column || 1
+                },
+                end: {
+                  offset: 0,
+                  line: err.line || 1,
+                  column: (err.column || 1) + (err.length || 1)
+                }
+              }
+            })) || [{
+              message: errorMessages,
+              location: {
+                start: { offset: 0, line: 1, column: 1 },
+                end: { offset: 0, line: 1, column: 1 }
+              }
+            }]
+          };
         }
-        if (!this.parser) {
-          throw new Error("Failed to initialize parser");
+        if (!parseResult.cst) {
+          throw new Error("Parser succeeded but no CST returned");
         }
-        const ast = this.parser(source);
         return {
           success: true,
-          ast
+          cst: parseResult.cst
         };
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : "Parse error";
@@ -4513,74 +9918,34 @@
      * Parse a single statement
      * 
      * @param statementText - The statement text to parse
-     * @returns Parsed statement or null
+     * @returns Parsed statement CST or null
      */
     async parseStatement(statementText) {
       const result = await this.parse(statementText);
-      if (result.success && result.ast && result.ast.statements.length > 0) {
-        return result.ast.statements[0] || null;
-      }
-      return null;
-    }
-    /**
-     * Parse an expression
-     * 
-     * @param expressionText - The expression text to parse
-     * @returns Parsed expression or null
-     */
-    async parseExpression(expressionText) {
-      const trimmed = expressionText.trim();
-      if (/^-?\d+(\.\d+)?$/.test(trimmed)) {
-        return {
-          type: "NumberLiteral",
-          value: parseFloat(trimmed)
-        };
-      }
-      if (/^"[^"]*"$/.test(trimmed)) {
-        return {
-          type: "StringLiteral",
-          value: trimmed.slice(1, -1)
-        };
-      }
-      if (/^[A-Za-z][A-Za-z0-9$]*$/.test(trimmed)) {
-        return {
-          type: "Variable",
-          name: trimmed.toUpperCase(),
-          subscript: null
-        };
-      }
-      return null;
-    }
-    /**
-     * Validate parsed AST
-     * 
-     * @param ast - The AST to validate
-     * @returns Array of validation errors
-     */
-    validateAST(ast) {
-      const errors = [];
-      for (const statement of ast.statements) {
-        if (statement.lineNumber < 1 || statement.lineNumber > 65535) {
-          errors.push({
-            message: "Line number must be between 1 and 65535",
-            location: {
-              start: { offset: 0, line: 1, column: 1 },
-              end: { offset: 0, line: 1, column: 1 }
-            }
-          });
+      if (result.success && result.cst && result.cst.children.statement) {
+        const statements = result.cst.children.statement;
+        if (Array.isArray(statements) && statements.length > 0) {
+          const firstStmt = statements[0];
+          if (firstStmt && "children" in firstStmt) {
+            return firstStmt;
+          }
         }
       }
-      return errors;
+      return null;
     }
     /**
      * Get parser version and capabilities
      */
     getParserInfo() {
       return {
-        name: "F-Basic Parser",
-        version: "1.0.0",
+        name: "F-Basic Parser (Chevrotain)",
+        version: "2.0.0",
         capabilities: [
           "Complete F-Basic syntax support",
+          "TypeScript-native parser (Chevrotain)",
+          "No build step required",
+          "Excellent error recovery",
+          "Precise error locations",
           "280+ keywords including gaming APIs",
           "Sprite and animation commands",
           "Character generator commands",
@@ -4591,9 +9956,9 @@
           "Advanced graphics commands",
           "System commands"
         ],
-        features: ["ast-parsing", "error-reporting", "multi-statement"],
+        features: ["ast-parsing", "error-reporting", "multi-statement", "chevrotain", "no-build-step"],
         supportedStatements: ["PRINT", "LET", "IF", "FOR", "NEXT", "GOTO", "GOSUB", "RETURN", "END", "REM", "CLS", "DATA", "READ", "RESTORE", "DIM", "COLOR"],
-        supportedFunctions: ["ABS", "SQR", "SIN", "COS", "TAN", "ATN", "LOG", "EXP", "INT", "FIX", "SGN", "RND", "LEN", "LEFT", "RIGHT", "MID"],
+        supportedFunctions: ["ABS", "SGN", "RND", "VAL", "LEN", "LEFT$", "RIGHT$", "MID$", "STR$", "HEX$"],
         supportedOperators: ["+", "-", "*", "/", "^", "MOD", "=", "<>", "<", ">", "<=", ">=", "AND", "OR", "NOT"]
       };
     }
@@ -4601,13 +9966,16 @@
 
   // src/core/state/ExecutionContext.ts
   var ExecutionContext = class {
-    constructor(config) {
+    constructor(config2) {
       // Core state
       __publicField(this, "variables", /* @__PURE__ */ new Map());
       __publicField(this, "isRunning", false);
       __publicField(this, "shouldStop", false);
       __publicField(this, "currentStatementIndex", 0);
       __publicField(this, "statements", []);
+      // Expanded statements (flat list)
+      __publicField(this, "labelMap", /* @__PURE__ */ new Map());
+      // Line number -> statement indices
       __publicField(this, "iterationCount", 0);
       // Configuration
       __publicField(this, "config");
@@ -4625,7 +9993,7 @@
       // Device integration
       __publicField(this, "deviceAdapter");
       __publicField(this, "errors", []);
-      this.config = config;
+      this.config = config2;
     }
     /**
      * Reset the execution context to initial state
@@ -4636,6 +10004,7 @@
       this.shouldStop = false;
       this.currentStatementIndex = 0;
       this.statements = [];
+      this.labelMap.clear();
       this.iterationCount = 0;
       this.loopStack = [];
       this.gosubStack = [];
@@ -4709,10 +10078,21 @@
       this.currentStatementIndex = index;
     }
     /**
-     * Find statement index by line number
+     * Find statement indices by line number
+     */
+    findStatementIndicesByLine(lineNumber) {
+      return this.labelMap.get(lineNumber) || [];
+    }
+    /**
+     * Find first statement index by line number (for GOTO/GOSUB)
      */
     findStatementIndexByLine(lineNumber) {
-      return this.statements.findIndex((stmt) => stmt.lineNumber === lineNumber);
+      const indices = this.labelMap.get(lineNumber);
+      if (indices && indices.length > 0) {
+        const firstIndex = indices[0];
+        return firstIndex !== void 0 ? firstIndex : -1;
+      }
+      return -1;
     }
     /**
      * Get joystick state (cross buttons)
@@ -4738,189 +10118,2880 @@
     }
   };
 
+  // node_modules/.pnpm/decimal.js@10.6.0/node_modules/decimal.js/decimal.mjs
+  var EXP_LIMIT = 9e15;
+  var MAX_DIGITS = 1e9;
+  var NUMERALS = "0123456789abcdef";
+  var LN10 = "2.3025850929940456840179914546843642076011014886287729760333279009675726096773524802359972050895982983419677840422862486334095254650828067566662873690987816894829072083255546808437998948262331985283935053089653777326288461633662222876982198867465436674744042432743651550489343149393914796194044002221051017141748003688084012647080685567743216228355220114804663715659121373450747856947683463616792101806445070648000277502684916746550586856935673420670581136429224554405758925724208241314695689016758940256776311356919292033376587141660230105703089634572075440370847469940168269282808481184289314848524948644871927809676271275775397027668605952496716674183485704422507197965004714951050492214776567636938662976979522110718264549734772662425709429322582798502585509785265383207606726317164309505995087807523710333101197857547331541421808427543863591778117054309827482385045648019095610299291824318237525357709750539565187697510374970888692180205189339507238539205144634197265287286965110862571492198849978748873771345686209167058";
+  var PI = "3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679821480865132823066470938446095505822317253594081284811174502841027019385211055596446229489549303819644288109756659334461284756482337867831652712019091456485669234603486104543266482133936072602491412737245870066063155881748815209209628292540917153643678925903600113305305488204665213841469519415116094330572703657595919530921861173819326117931051185480744623799627495673518857527248912279381830119491298336733624406566430860213949463952247371907021798609437027705392171762931767523846748184676694051320005681271452635608277857713427577896091736371787214684409012249534301465495853710507922796892589235420199561121290219608640344181598136297747713099605187072113499999983729780499510597317328160963185950244594553469083026425223082533446850352619311881710100031378387528865875332083814206171776691473035982534904287554687311595628638823537875937519577818577805321712268066130019278766111959092164201989380952572010654858632789";
+  var DEFAULTS2 = {
+    // These values must be integers within the stated ranges (inclusive).
+    // Most of these values can be changed at run-time using the `Decimal.config` method.
+    // The maximum number of significant digits of the result of a calculation or base conversion.
+    // E.g. `Decimal.config({ precision: 20 });`
+    precision: 20,
+    // 1 to MAX_DIGITS
+    // The rounding mode used when rounding to `precision`.
+    //
+    // ROUND_UP         0 Away from zero.
+    // ROUND_DOWN       1 Towards zero.
+    // ROUND_CEIL       2 Towards +Infinity.
+    // ROUND_FLOOR      3 Towards -Infinity.
+    // ROUND_HALF_UP    4 Towards nearest neighbour. If equidistant, up.
+    // ROUND_HALF_DOWN  5 Towards nearest neighbour. If equidistant, down.
+    // ROUND_HALF_EVEN  6 Towards nearest neighbour. If equidistant, towards even neighbour.
+    // ROUND_HALF_CEIL  7 Towards nearest neighbour. If equidistant, towards +Infinity.
+    // ROUND_HALF_FLOOR 8 Towards nearest neighbour. If equidistant, towards -Infinity.
+    //
+    // E.g.
+    // `Decimal.rounding = 4;`
+    // `Decimal.rounding = Decimal.ROUND_HALF_UP;`
+    rounding: 4,
+    // 0 to 8
+    // The modulo mode used when calculating the modulus: a mod n.
+    // The quotient (q = a / n) is calculated according to the corresponding rounding mode.
+    // The remainder (r) is calculated as: r = a - n * q.
+    //
+    // UP         0 The remainder is positive if the dividend is negative, else is negative.
+    // DOWN       1 The remainder has the same sign as the dividend (JavaScript %).
+    // FLOOR      3 The remainder has the same sign as the divisor (Python %).
+    // HALF_EVEN  6 The IEEE 754 remainder function.
+    // EUCLID     9 Euclidian division. q = sign(n) * floor(a / abs(n)). Always positive.
+    //
+    // Truncated division (1), floored division (3), the IEEE 754 remainder (6), and Euclidian
+    // division (9) are commonly used for the modulus operation. The other rounding modes can also
+    // be used, but they may not give useful results.
+    modulo: 1,
+    // 0 to 9
+    // The exponent value at and beneath which `toString` returns exponential notation.
+    // JavaScript numbers: -7
+    toExpNeg: -7,
+    // 0 to -EXP_LIMIT
+    // The exponent value at and above which `toString` returns exponential notation.
+    // JavaScript numbers: 21
+    toExpPos: 21,
+    // 0 to EXP_LIMIT
+    // The minimum exponent value, beneath which underflow to zero occurs.
+    // JavaScript numbers: -324  (5e-324)
+    minE: -EXP_LIMIT,
+    // -1 to -EXP_LIMIT
+    // The maximum exponent value, above which overflow to Infinity occurs.
+    // JavaScript numbers: 308  (1.7976931348623157e+308)
+    maxE: EXP_LIMIT,
+    // 1 to EXP_LIMIT
+    // Whether to use cryptographically-secure random number generation, if available.
+    crypto: false
+    // true/false
+  };
+  var inexact;
+  var quadrant;
+  var external = true;
+  var decimalError = "[DecimalError] ";
+  var invalidArgument = decimalError + "Invalid argument: ";
+  var precisionLimitExceeded = decimalError + "Precision limit exceeded";
+  var cryptoUnavailable = decimalError + "crypto unavailable";
+  var tag = "[object Decimal]";
+  var mathfloor = Math.floor;
+  var mathpow = Math.pow;
+  var isBinary = /^0b([01]+(\.[01]*)?|\.[01]+)(p[+-]?\d+)?$/i;
+  var isHex = /^0x([0-9a-f]+(\.[0-9a-f]*)?|\.[0-9a-f]+)(p[+-]?\d+)?$/i;
+  var isOctal = /^0o([0-7]+(\.[0-7]*)?|\.[0-7]+)(p[+-]?\d+)?$/i;
+  var isDecimal = /^(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?$/i;
+  var BASE = 1e7;
+  var LOG_BASE = 7;
+  var MAX_SAFE_INTEGER3 = 9007199254740991;
+  var LN10_PRECISION = LN10.length - 1;
+  var PI_PRECISION = PI.length - 1;
+  var P = { toStringTag: tag };
+  P.absoluteValue = P.abs = function() {
+    var x = new this.constructor(this);
+    if (x.s < 0) x.s = 1;
+    return finalise(x);
+  };
+  P.ceil = function() {
+    return finalise(new this.constructor(this), this.e + 1, 2);
+  };
+  P.clampedTo = P.clamp = function(min2, max2) {
+    var k, x = this, Ctor = x.constructor;
+    min2 = new Ctor(min2);
+    max2 = new Ctor(max2);
+    if (!min2.s || !max2.s) return new Ctor(NaN);
+    if (min2.gt(max2)) throw Error(invalidArgument + max2);
+    k = x.cmp(min2);
+    return k < 0 ? min2 : x.cmp(max2) > 0 ? max2 : new Ctor(x);
+  };
+  P.comparedTo = P.cmp = function(y) {
+    var i, j, xdL, ydL, x = this, xd = x.d, yd = (y = new x.constructor(y)).d, xs = x.s, ys = y.s;
+    if (!xd || !yd) {
+      return !xs || !ys ? NaN : xs !== ys ? xs : xd === yd ? 0 : !xd ^ xs < 0 ? 1 : -1;
+    }
+    if (!xd[0] || !yd[0]) return xd[0] ? xs : yd[0] ? -ys : 0;
+    if (xs !== ys) return xs;
+    if (x.e !== y.e) return x.e > y.e ^ xs < 0 ? 1 : -1;
+    xdL = xd.length;
+    ydL = yd.length;
+    for (i = 0, j = xdL < ydL ? xdL : ydL; i < j; ++i) {
+      if (xd[i] !== yd[i]) return xd[i] > yd[i] ^ xs < 0 ? 1 : -1;
+    }
+    return xdL === ydL ? 0 : xdL > ydL ^ xs < 0 ? 1 : -1;
+  };
+  P.cosine = P.cos = function() {
+    var pr, rm, x = this, Ctor = x.constructor;
+    if (!x.d) return new Ctor(NaN);
+    if (!x.d[0]) return new Ctor(1);
+    pr = Ctor.precision;
+    rm = Ctor.rounding;
+    Ctor.precision = pr + Math.max(x.e, x.sd()) + LOG_BASE;
+    Ctor.rounding = 1;
+    x = cosine(Ctor, toLessThanHalfPi(Ctor, x));
+    Ctor.precision = pr;
+    Ctor.rounding = rm;
+    return finalise(quadrant == 2 || quadrant == 3 ? x.neg() : x, pr, rm, true);
+  };
+  P.cubeRoot = P.cbrt = function() {
+    var e, m, n, r, rep, s, sd, t, t3, t3plusx, x = this, Ctor = x.constructor;
+    if (!x.isFinite() || x.isZero()) return new Ctor(x);
+    external = false;
+    s = x.s * mathpow(x.s * x, 1 / 3);
+    if (!s || Math.abs(s) == 1 / 0) {
+      n = digitsToString(x.d);
+      e = x.e;
+      if (s = (e - n.length + 1) % 3) n += s == 1 || s == -2 ? "0" : "00";
+      s = mathpow(n, 1 / 3);
+      e = mathfloor((e + 1) / 3) - (e % 3 == (e < 0 ? -1 : 2));
+      if (s == 1 / 0) {
+        n = "5e" + e;
+      } else {
+        n = s.toExponential();
+        n = n.slice(0, n.indexOf("e") + 1) + e;
+      }
+      r = new Ctor(n);
+      r.s = x.s;
+    } else {
+      r = new Ctor(s.toString());
+    }
+    sd = (e = Ctor.precision) + 3;
+    for (; ; ) {
+      t = r;
+      t3 = t.times(t).times(t);
+      t3plusx = t3.plus(x);
+      r = divide(t3plusx.plus(x).times(t), t3plusx.plus(t3), sd + 2, 1);
+      if (digitsToString(t.d).slice(0, sd) === (n = digitsToString(r.d)).slice(0, sd)) {
+        n = n.slice(sd - 3, sd + 1);
+        if (n == "9999" || !rep && n == "4999") {
+          if (!rep) {
+            finalise(t, e + 1, 0);
+            if (t.times(t).times(t).eq(x)) {
+              r = t;
+              break;
+            }
+          }
+          sd += 4;
+          rep = 1;
+        } else {
+          if (!+n || !+n.slice(1) && n.charAt(0) == "5") {
+            finalise(r, e + 1, 1);
+            m = !r.times(r).times(r).eq(x);
+          }
+          break;
+        }
+      }
+    }
+    external = true;
+    return finalise(r, e, Ctor.rounding, m);
+  };
+  P.decimalPlaces = P.dp = function() {
+    var w, d = this.d, n = NaN;
+    if (d) {
+      w = d.length - 1;
+      n = (w - mathfloor(this.e / LOG_BASE)) * LOG_BASE;
+      w = d[w];
+      if (w) for (; w % 10 == 0; w /= 10) n--;
+      if (n < 0) n = 0;
+    }
+    return n;
+  };
+  P.dividedBy = P.div = function(y) {
+    return divide(this, new this.constructor(y));
+  };
+  P.dividedToIntegerBy = P.divToInt = function(y) {
+    var x = this, Ctor = x.constructor;
+    return finalise(divide(x, new Ctor(y), 0, 1, 1), Ctor.precision, Ctor.rounding);
+  };
+  P.equals = P.eq = function(y) {
+    return this.cmp(y) === 0;
+  };
+  P.floor = function() {
+    return finalise(new this.constructor(this), this.e + 1, 3);
+  };
+  P.greaterThan = P.gt = function(y) {
+    return this.cmp(y) > 0;
+  };
+  P.greaterThanOrEqualTo = P.gte = function(y) {
+    var k = this.cmp(y);
+    return k == 1 || k === 0;
+  };
+  P.hyperbolicCosine = P.cosh = function() {
+    var k, n, pr, rm, len, x = this, Ctor = x.constructor, one = new Ctor(1);
+    if (!x.isFinite()) return new Ctor(x.s ? 1 / 0 : NaN);
+    if (x.isZero()) return one;
+    pr = Ctor.precision;
+    rm = Ctor.rounding;
+    Ctor.precision = pr + Math.max(x.e, x.sd()) + 4;
+    Ctor.rounding = 1;
+    len = x.d.length;
+    if (len < 32) {
+      k = Math.ceil(len / 3);
+      n = (1 / tinyPow(4, k)).toString();
+    } else {
+      k = 16;
+      n = "2.3283064365386962890625e-10";
+    }
+    x = taylorSeries(Ctor, 1, x.times(n), new Ctor(1), true);
+    var cosh2_x, i = k, d8 = new Ctor(8);
+    for (; i--; ) {
+      cosh2_x = x.times(x);
+      x = one.minus(cosh2_x.times(d8.minus(cosh2_x.times(d8))));
+    }
+    return finalise(x, Ctor.precision = pr, Ctor.rounding = rm, true);
+  };
+  P.hyperbolicSine = P.sinh = function() {
+    var k, pr, rm, len, x = this, Ctor = x.constructor;
+    if (!x.isFinite() || x.isZero()) return new Ctor(x);
+    pr = Ctor.precision;
+    rm = Ctor.rounding;
+    Ctor.precision = pr + Math.max(x.e, x.sd()) + 4;
+    Ctor.rounding = 1;
+    len = x.d.length;
+    if (len < 3) {
+      x = taylorSeries(Ctor, 2, x, x, true);
+    } else {
+      k = 1.4 * Math.sqrt(len);
+      k = k > 16 ? 16 : k | 0;
+      x = x.times(1 / tinyPow(5, k));
+      x = taylorSeries(Ctor, 2, x, x, true);
+      var sinh2_x, d5 = new Ctor(5), d16 = new Ctor(16), d20 = new Ctor(20);
+      for (; k--; ) {
+        sinh2_x = x.times(x);
+        x = x.times(d5.plus(sinh2_x.times(d16.times(sinh2_x).plus(d20))));
+      }
+    }
+    Ctor.precision = pr;
+    Ctor.rounding = rm;
+    return finalise(x, pr, rm, true);
+  };
+  P.hyperbolicTangent = P.tanh = function() {
+    var pr, rm, x = this, Ctor = x.constructor;
+    if (!x.isFinite()) return new Ctor(x.s);
+    if (x.isZero()) return new Ctor(x);
+    pr = Ctor.precision;
+    rm = Ctor.rounding;
+    Ctor.precision = pr + 7;
+    Ctor.rounding = 1;
+    return divide(x.sinh(), x.cosh(), Ctor.precision = pr, Ctor.rounding = rm);
+  };
+  P.inverseCosine = P.acos = function() {
+    var x = this, Ctor = x.constructor, k = x.abs().cmp(1), pr = Ctor.precision, rm = Ctor.rounding;
+    if (k !== -1) {
+      return k === 0 ? x.isNeg() ? getPi(Ctor, pr, rm) : new Ctor(0) : new Ctor(NaN);
+    }
+    if (x.isZero()) return getPi(Ctor, pr + 4, rm).times(0.5);
+    Ctor.precision = pr + 6;
+    Ctor.rounding = 1;
+    x = new Ctor(1).minus(x).div(x.plus(1)).sqrt().atan();
+    Ctor.precision = pr;
+    Ctor.rounding = rm;
+    return x.times(2);
+  };
+  P.inverseHyperbolicCosine = P.acosh = function() {
+    var pr, rm, x = this, Ctor = x.constructor;
+    if (x.lte(1)) return new Ctor(x.eq(1) ? 0 : NaN);
+    if (!x.isFinite()) return new Ctor(x);
+    pr = Ctor.precision;
+    rm = Ctor.rounding;
+    Ctor.precision = pr + Math.max(Math.abs(x.e), x.sd()) + 4;
+    Ctor.rounding = 1;
+    external = false;
+    x = x.times(x).minus(1).sqrt().plus(x);
+    external = true;
+    Ctor.precision = pr;
+    Ctor.rounding = rm;
+    return x.ln();
+  };
+  P.inverseHyperbolicSine = P.asinh = function() {
+    var pr, rm, x = this, Ctor = x.constructor;
+    if (!x.isFinite() || x.isZero()) return new Ctor(x);
+    pr = Ctor.precision;
+    rm = Ctor.rounding;
+    Ctor.precision = pr + 2 * Math.max(Math.abs(x.e), x.sd()) + 6;
+    Ctor.rounding = 1;
+    external = false;
+    x = x.times(x).plus(1).sqrt().plus(x);
+    external = true;
+    Ctor.precision = pr;
+    Ctor.rounding = rm;
+    return x.ln();
+  };
+  P.inverseHyperbolicTangent = P.atanh = function() {
+    var pr, rm, wpr, xsd, x = this, Ctor = x.constructor;
+    if (!x.isFinite()) return new Ctor(NaN);
+    if (x.e >= 0) return new Ctor(x.abs().eq(1) ? x.s / 0 : x.isZero() ? x : NaN);
+    pr = Ctor.precision;
+    rm = Ctor.rounding;
+    xsd = x.sd();
+    if (Math.max(xsd, pr) < 2 * -x.e - 1) return finalise(new Ctor(x), pr, rm, true);
+    Ctor.precision = wpr = xsd - x.e;
+    x = divide(x.plus(1), new Ctor(1).minus(x), wpr + pr, 1);
+    Ctor.precision = pr + 4;
+    Ctor.rounding = 1;
+    x = x.ln();
+    Ctor.precision = pr;
+    Ctor.rounding = rm;
+    return x.times(0.5);
+  };
+  P.inverseSine = P.asin = function() {
+    var halfPi, k, pr, rm, x = this, Ctor = x.constructor;
+    if (x.isZero()) return new Ctor(x);
+    k = x.abs().cmp(1);
+    pr = Ctor.precision;
+    rm = Ctor.rounding;
+    if (k !== -1) {
+      if (k === 0) {
+        halfPi = getPi(Ctor, pr + 4, rm).times(0.5);
+        halfPi.s = x.s;
+        return halfPi;
+      }
+      return new Ctor(NaN);
+    }
+    Ctor.precision = pr + 6;
+    Ctor.rounding = 1;
+    x = x.div(new Ctor(1).minus(x.times(x)).sqrt().plus(1)).atan();
+    Ctor.precision = pr;
+    Ctor.rounding = rm;
+    return x.times(2);
+  };
+  P.inverseTangent = P.atan = function() {
+    var i, j, k, n, px, t, r, wpr, x2, x = this, Ctor = x.constructor, pr = Ctor.precision, rm = Ctor.rounding;
+    if (!x.isFinite()) {
+      if (!x.s) return new Ctor(NaN);
+      if (pr + 4 <= PI_PRECISION) {
+        r = getPi(Ctor, pr + 4, rm).times(0.5);
+        r.s = x.s;
+        return r;
+      }
+    } else if (x.isZero()) {
+      return new Ctor(x);
+    } else if (x.abs().eq(1) && pr + 4 <= PI_PRECISION) {
+      r = getPi(Ctor, pr + 4, rm).times(0.25);
+      r.s = x.s;
+      return r;
+    }
+    Ctor.precision = wpr = pr + 10;
+    Ctor.rounding = 1;
+    k = Math.min(28, wpr / LOG_BASE + 2 | 0);
+    for (i = k; i; --i) x = x.div(x.times(x).plus(1).sqrt().plus(1));
+    external = false;
+    j = Math.ceil(wpr / LOG_BASE);
+    n = 1;
+    x2 = x.times(x);
+    r = new Ctor(x);
+    px = x;
+    for (; i !== -1; ) {
+      px = px.times(x2);
+      t = r.minus(px.div(n += 2));
+      px = px.times(x2);
+      r = t.plus(px.div(n += 2));
+      if (r.d[j] !== void 0) for (i = j; r.d[i] === t.d[i] && i--; ) ;
+    }
+    if (k) r = r.times(2 << k - 1);
+    external = true;
+    return finalise(r, Ctor.precision = pr, Ctor.rounding = rm, true);
+  };
+  P.isFinite = function() {
+    return !!this.d;
+  };
+  P.isInteger = P.isInt = function() {
+    return !!this.d && mathfloor(this.e / LOG_BASE) > this.d.length - 2;
+  };
+  P.isNaN = function() {
+    return !this.s;
+  };
+  P.isNegative = P.isNeg = function() {
+    return this.s < 0;
+  };
+  P.isPositive = P.isPos = function() {
+    return this.s > 0;
+  };
+  P.isZero = function() {
+    return !!this.d && this.d[0] === 0;
+  };
+  P.lessThan = P.lt = function(y) {
+    return this.cmp(y) < 0;
+  };
+  P.lessThanOrEqualTo = P.lte = function(y) {
+    return this.cmp(y) < 1;
+  };
+  P.logarithm = P.log = function(base) {
+    var isBase10, d, denominator, k, inf, num, sd, r, arg = this, Ctor = arg.constructor, pr = Ctor.precision, rm = Ctor.rounding, guard = 5;
+    if (base == null) {
+      base = new Ctor(10);
+      isBase10 = true;
+    } else {
+      base = new Ctor(base);
+      d = base.d;
+      if (base.s < 0 || !d || !d[0] || base.eq(1)) return new Ctor(NaN);
+      isBase10 = base.eq(10);
+    }
+    d = arg.d;
+    if (arg.s < 0 || !d || !d[0] || arg.eq(1)) {
+      return new Ctor(d && !d[0] ? -1 / 0 : arg.s != 1 ? NaN : d ? 0 : 1 / 0);
+    }
+    if (isBase10) {
+      if (d.length > 1) {
+        inf = true;
+      } else {
+        for (k = d[0]; k % 10 === 0; ) k /= 10;
+        inf = k !== 1;
+      }
+    }
+    external = false;
+    sd = pr + guard;
+    num = naturalLogarithm(arg, sd);
+    denominator = isBase10 ? getLn10(Ctor, sd + 10) : naturalLogarithm(base, sd);
+    r = divide(num, denominator, sd, 1);
+    if (checkRoundingDigits(r.d, k = pr, rm)) {
+      do {
+        sd += 10;
+        num = naturalLogarithm(arg, sd);
+        denominator = isBase10 ? getLn10(Ctor, sd + 10) : naturalLogarithm(base, sd);
+        r = divide(num, denominator, sd, 1);
+        if (!inf) {
+          if (+digitsToString(r.d).slice(k + 1, k + 15) + 1 == 1e14) {
+            r = finalise(r, pr + 1, 0);
+          }
+          break;
+        }
+      } while (checkRoundingDigits(r.d, k += 10, rm));
+    }
+    external = true;
+    return finalise(r, pr, rm);
+  };
+  P.minus = P.sub = function(y) {
+    var d, e, i, j, k, len, pr, rm, xd, xe, xLTy, yd, x = this, Ctor = x.constructor;
+    y = new Ctor(y);
+    if (!x.d || !y.d) {
+      if (!x.s || !y.s) y = new Ctor(NaN);
+      else if (x.d) y.s = -y.s;
+      else y = new Ctor(y.d || x.s !== y.s ? x : NaN);
+      return y;
+    }
+    if (x.s != y.s) {
+      y.s = -y.s;
+      return x.plus(y);
+    }
+    xd = x.d;
+    yd = y.d;
+    pr = Ctor.precision;
+    rm = Ctor.rounding;
+    if (!xd[0] || !yd[0]) {
+      if (yd[0]) y.s = -y.s;
+      else if (xd[0]) y = new Ctor(x);
+      else return new Ctor(rm === 3 ? -0 : 0);
+      return external ? finalise(y, pr, rm) : y;
+    }
+    e = mathfloor(y.e / LOG_BASE);
+    xe = mathfloor(x.e / LOG_BASE);
+    xd = xd.slice();
+    k = xe - e;
+    if (k) {
+      xLTy = k < 0;
+      if (xLTy) {
+        d = xd;
+        k = -k;
+        len = yd.length;
+      } else {
+        d = yd;
+        e = xe;
+        len = xd.length;
+      }
+      i = Math.max(Math.ceil(pr / LOG_BASE), len) + 2;
+      if (k > i) {
+        k = i;
+        d.length = 1;
+      }
+      d.reverse();
+      for (i = k; i--; ) d.push(0);
+      d.reverse();
+    } else {
+      i = xd.length;
+      len = yd.length;
+      xLTy = i < len;
+      if (xLTy) len = i;
+      for (i = 0; i < len; i++) {
+        if (xd[i] != yd[i]) {
+          xLTy = xd[i] < yd[i];
+          break;
+        }
+      }
+      k = 0;
+    }
+    if (xLTy) {
+      d = xd;
+      xd = yd;
+      yd = d;
+      y.s = -y.s;
+    }
+    len = xd.length;
+    for (i = yd.length - len; i > 0; --i) xd[len++] = 0;
+    for (i = yd.length; i > k; ) {
+      if (xd[--i] < yd[i]) {
+        for (j = i; j && xd[--j] === 0; ) xd[j] = BASE - 1;
+        --xd[j];
+        xd[i] += BASE;
+      }
+      xd[i] -= yd[i];
+    }
+    for (; xd[--len] === 0; ) xd.pop();
+    for (; xd[0] === 0; xd.shift()) --e;
+    if (!xd[0]) return new Ctor(rm === 3 ? -0 : 0);
+    y.d = xd;
+    y.e = getBase10Exponent(xd, e);
+    return external ? finalise(y, pr, rm) : y;
+  };
+  P.modulo = P.mod = function(y) {
+    var q, x = this, Ctor = x.constructor;
+    y = new Ctor(y);
+    if (!x.d || !y.s || y.d && !y.d[0]) return new Ctor(NaN);
+    if (!y.d || x.d && !x.d[0]) {
+      return finalise(new Ctor(x), Ctor.precision, Ctor.rounding);
+    }
+    external = false;
+    if (Ctor.modulo == 9) {
+      q = divide(x, y.abs(), 0, 3, 1);
+      q.s *= y.s;
+    } else {
+      q = divide(x, y, 0, Ctor.modulo, 1);
+    }
+    q = q.times(y);
+    external = true;
+    return x.minus(q);
+  };
+  P.naturalExponential = P.exp = function() {
+    return naturalExponential(this);
+  };
+  P.naturalLogarithm = P.ln = function() {
+    return naturalLogarithm(this);
+  };
+  P.negated = P.neg = function() {
+    var x = new this.constructor(this);
+    x.s = -x.s;
+    return finalise(x);
+  };
+  P.plus = P.add = function(y) {
+    var carry, d, e, i, k, len, pr, rm, xd, yd, x = this, Ctor = x.constructor;
+    y = new Ctor(y);
+    if (!x.d || !y.d) {
+      if (!x.s || !y.s) y = new Ctor(NaN);
+      else if (!x.d) y = new Ctor(y.d || x.s === y.s ? x : NaN);
+      return y;
+    }
+    if (x.s != y.s) {
+      y.s = -y.s;
+      return x.minus(y);
+    }
+    xd = x.d;
+    yd = y.d;
+    pr = Ctor.precision;
+    rm = Ctor.rounding;
+    if (!xd[0] || !yd[0]) {
+      if (!yd[0]) y = new Ctor(x);
+      return external ? finalise(y, pr, rm) : y;
+    }
+    k = mathfloor(x.e / LOG_BASE);
+    e = mathfloor(y.e / LOG_BASE);
+    xd = xd.slice();
+    i = k - e;
+    if (i) {
+      if (i < 0) {
+        d = xd;
+        i = -i;
+        len = yd.length;
+      } else {
+        d = yd;
+        e = k;
+        len = xd.length;
+      }
+      k = Math.ceil(pr / LOG_BASE);
+      len = k > len ? k + 1 : len + 1;
+      if (i > len) {
+        i = len;
+        d.length = 1;
+      }
+      d.reverse();
+      for (; i--; ) d.push(0);
+      d.reverse();
+    }
+    len = xd.length;
+    i = yd.length;
+    if (len - i < 0) {
+      i = len;
+      d = yd;
+      yd = xd;
+      xd = d;
+    }
+    for (carry = 0; i; ) {
+      carry = (xd[--i] = xd[i] + yd[i] + carry) / BASE | 0;
+      xd[i] %= BASE;
+    }
+    if (carry) {
+      xd.unshift(carry);
+      ++e;
+    }
+    for (len = xd.length; xd[--len] == 0; ) xd.pop();
+    y.d = xd;
+    y.e = getBase10Exponent(xd, e);
+    return external ? finalise(y, pr, rm) : y;
+  };
+  P.precision = P.sd = function(z) {
+    var k, x = this;
+    if (z !== void 0 && z !== !!z && z !== 1 && z !== 0) throw Error(invalidArgument + z);
+    if (x.d) {
+      k = getPrecision(x.d);
+      if (z && x.e + 1 > k) k = x.e + 1;
+    } else {
+      k = NaN;
+    }
+    return k;
+  };
+  P.round = function() {
+    var x = this, Ctor = x.constructor;
+    return finalise(new Ctor(x), x.e + 1, Ctor.rounding);
+  };
+  P.sine = P.sin = function() {
+    var pr, rm, x = this, Ctor = x.constructor;
+    if (!x.isFinite()) return new Ctor(NaN);
+    if (x.isZero()) return new Ctor(x);
+    pr = Ctor.precision;
+    rm = Ctor.rounding;
+    Ctor.precision = pr + Math.max(x.e, x.sd()) + LOG_BASE;
+    Ctor.rounding = 1;
+    x = sine(Ctor, toLessThanHalfPi(Ctor, x));
+    Ctor.precision = pr;
+    Ctor.rounding = rm;
+    return finalise(quadrant > 2 ? x.neg() : x, pr, rm, true);
+  };
+  P.squareRoot = P.sqrt = function() {
+    var m, n, sd, r, rep, t, x = this, d = x.d, e = x.e, s = x.s, Ctor = x.constructor;
+    if (s !== 1 || !d || !d[0]) {
+      return new Ctor(!s || s < 0 && (!d || d[0]) ? NaN : d ? x : 1 / 0);
+    }
+    external = false;
+    s = Math.sqrt(+x);
+    if (s == 0 || s == 1 / 0) {
+      n = digitsToString(d);
+      if ((n.length + e) % 2 == 0) n += "0";
+      s = Math.sqrt(n);
+      e = mathfloor((e + 1) / 2) - (e < 0 || e % 2);
+      if (s == 1 / 0) {
+        n = "5e" + e;
+      } else {
+        n = s.toExponential();
+        n = n.slice(0, n.indexOf("e") + 1) + e;
+      }
+      r = new Ctor(n);
+    } else {
+      r = new Ctor(s.toString());
+    }
+    sd = (e = Ctor.precision) + 3;
+    for (; ; ) {
+      t = r;
+      r = t.plus(divide(x, t, sd + 2, 1)).times(0.5);
+      if (digitsToString(t.d).slice(0, sd) === (n = digitsToString(r.d)).slice(0, sd)) {
+        n = n.slice(sd - 3, sd + 1);
+        if (n == "9999" || !rep && n == "4999") {
+          if (!rep) {
+            finalise(t, e + 1, 0);
+            if (t.times(t).eq(x)) {
+              r = t;
+              break;
+            }
+          }
+          sd += 4;
+          rep = 1;
+        } else {
+          if (!+n || !+n.slice(1) && n.charAt(0) == "5") {
+            finalise(r, e + 1, 1);
+            m = !r.times(r).eq(x);
+          }
+          break;
+        }
+      }
+    }
+    external = true;
+    return finalise(r, e, Ctor.rounding, m);
+  };
+  P.tangent = P.tan = function() {
+    var pr, rm, x = this, Ctor = x.constructor;
+    if (!x.isFinite()) return new Ctor(NaN);
+    if (x.isZero()) return new Ctor(x);
+    pr = Ctor.precision;
+    rm = Ctor.rounding;
+    Ctor.precision = pr + 10;
+    Ctor.rounding = 1;
+    x = x.sin();
+    x.s = 1;
+    x = divide(x, new Ctor(1).minus(x.times(x)).sqrt(), pr + 10, 0);
+    Ctor.precision = pr;
+    Ctor.rounding = rm;
+    return finalise(quadrant == 2 || quadrant == 4 ? x.neg() : x, pr, rm, true);
+  };
+  P.times = P.mul = function(y) {
+    var carry, e, i, k, r, rL, t, xdL, ydL, x = this, Ctor = x.constructor, xd = x.d, yd = (y = new Ctor(y)).d;
+    y.s *= x.s;
+    if (!xd || !xd[0] || !yd || !yd[0]) {
+      return new Ctor(!y.s || xd && !xd[0] && !yd || yd && !yd[0] && !xd ? NaN : !xd || !yd ? y.s / 0 : y.s * 0);
+    }
+    e = mathfloor(x.e / LOG_BASE) + mathfloor(y.e / LOG_BASE);
+    xdL = xd.length;
+    ydL = yd.length;
+    if (xdL < ydL) {
+      r = xd;
+      xd = yd;
+      yd = r;
+      rL = xdL;
+      xdL = ydL;
+      ydL = rL;
+    }
+    r = [];
+    rL = xdL + ydL;
+    for (i = rL; i--; ) r.push(0);
+    for (i = ydL; --i >= 0; ) {
+      carry = 0;
+      for (k = xdL + i; k > i; ) {
+        t = r[k] + yd[i] * xd[k - i - 1] + carry;
+        r[k--] = t % BASE | 0;
+        carry = t / BASE | 0;
+      }
+      r[k] = (r[k] + carry) % BASE | 0;
+    }
+    for (; !r[--rL]; ) r.pop();
+    if (carry) ++e;
+    else r.shift();
+    y.d = r;
+    y.e = getBase10Exponent(r, e);
+    return external ? finalise(y, Ctor.precision, Ctor.rounding) : y;
+  };
+  P.toBinary = function(sd, rm) {
+    return toStringBinary(this, 2, sd, rm);
+  };
+  P.toDecimalPlaces = P.toDP = function(dp, rm) {
+    var x = this, Ctor = x.constructor;
+    x = new Ctor(x);
+    if (dp === void 0) return x;
+    checkInt32(dp, 0, MAX_DIGITS);
+    if (rm === void 0) rm = Ctor.rounding;
+    else checkInt32(rm, 0, 8);
+    return finalise(x, dp + x.e + 1, rm);
+  };
+  P.toExponential = function(dp, rm) {
+    var str, x = this, Ctor = x.constructor;
+    if (dp === void 0) {
+      str = finiteToString(x, true);
+    } else {
+      checkInt32(dp, 0, MAX_DIGITS);
+      if (rm === void 0) rm = Ctor.rounding;
+      else checkInt32(rm, 0, 8);
+      x = finalise(new Ctor(x), dp + 1, rm);
+      str = finiteToString(x, true, dp + 1);
+    }
+    return x.isNeg() && !x.isZero() ? "-" + str : str;
+  };
+  P.toFixed = function(dp, rm) {
+    var str, y, x = this, Ctor = x.constructor;
+    if (dp === void 0) {
+      str = finiteToString(x);
+    } else {
+      checkInt32(dp, 0, MAX_DIGITS);
+      if (rm === void 0) rm = Ctor.rounding;
+      else checkInt32(rm, 0, 8);
+      y = finalise(new Ctor(x), dp + x.e + 1, rm);
+      str = finiteToString(y, false, dp + y.e + 1);
+    }
+    return x.isNeg() && !x.isZero() ? "-" + str : str;
+  };
+  P.toFraction = function(maxD) {
+    var d, d0, d1, d2, e, k, n, n0, n1, pr, q, r, x = this, xd = x.d, Ctor = x.constructor;
+    if (!xd) return new Ctor(x);
+    n1 = d0 = new Ctor(1);
+    d1 = n0 = new Ctor(0);
+    d = new Ctor(d1);
+    e = d.e = getPrecision(xd) - x.e - 1;
+    k = e % LOG_BASE;
+    d.d[0] = mathpow(10, k < 0 ? LOG_BASE + k : k);
+    if (maxD == null) {
+      maxD = e > 0 ? d : n1;
+    } else {
+      n = new Ctor(maxD);
+      if (!n.isInt() || n.lt(n1)) throw Error(invalidArgument + n);
+      maxD = n.gt(d) ? e > 0 ? d : n1 : n;
+    }
+    external = false;
+    n = new Ctor(digitsToString(xd));
+    pr = Ctor.precision;
+    Ctor.precision = e = xd.length * LOG_BASE * 2;
+    for (; ; ) {
+      q = divide(n, d, 0, 1, 1);
+      d2 = d0.plus(q.times(d1));
+      if (d2.cmp(maxD) == 1) break;
+      d0 = d1;
+      d1 = d2;
+      d2 = n1;
+      n1 = n0.plus(q.times(d2));
+      n0 = d2;
+      d2 = d;
+      d = n.minus(q.times(d2));
+      n = d2;
+    }
+    d2 = divide(maxD.minus(d0), d1, 0, 1, 1);
+    n0 = n0.plus(d2.times(n1));
+    d0 = d0.plus(d2.times(d1));
+    n0.s = n1.s = x.s;
+    r = divide(n1, d1, e, 1).minus(x).abs().cmp(divide(n0, d0, e, 1).minus(x).abs()) < 1 ? [n1, d1] : [n0, d0];
+    Ctor.precision = pr;
+    external = true;
+    return r;
+  };
+  P.toHexadecimal = P.toHex = function(sd, rm) {
+    return toStringBinary(this, 16, sd, rm);
+  };
+  P.toNearest = function(y, rm) {
+    var x = this, Ctor = x.constructor;
+    x = new Ctor(x);
+    if (y == null) {
+      if (!x.d) return x;
+      y = new Ctor(1);
+      rm = Ctor.rounding;
+    } else {
+      y = new Ctor(y);
+      if (rm === void 0) {
+        rm = Ctor.rounding;
+      } else {
+        checkInt32(rm, 0, 8);
+      }
+      if (!x.d) return y.s ? x : y;
+      if (!y.d) {
+        if (y.s) y.s = x.s;
+        return y;
+      }
+    }
+    if (y.d[0]) {
+      external = false;
+      x = divide(x, y, 0, rm, 1).times(y);
+      external = true;
+      finalise(x);
+    } else {
+      y.s = x.s;
+      x = y;
+    }
+    return x;
+  };
+  P.toNumber = function() {
+    return +this;
+  };
+  P.toOctal = function(sd, rm) {
+    return toStringBinary(this, 8, sd, rm);
+  };
+  P.toPower = P.pow = function(y) {
+    var e, k, pr, r, rm, s, x = this, Ctor = x.constructor, yn = +(y = new Ctor(y));
+    if (!x.d || !y.d || !x.d[0] || !y.d[0]) return new Ctor(mathpow(+x, yn));
+    x = new Ctor(x);
+    if (x.eq(1)) return x;
+    pr = Ctor.precision;
+    rm = Ctor.rounding;
+    if (y.eq(1)) return finalise(x, pr, rm);
+    e = mathfloor(y.e / LOG_BASE);
+    if (e >= y.d.length - 1 && (k = yn < 0 ? -yn : yn) <= MAX_SAFE_INTEGER3) {
+      r = intPow(Ctor, x, k, pr);
+      return y.s < 0 ? new Ctor(1).div(r) : finalise(r, pr, rm);
+    }
+    s = x.s;
+    if (s < 0) {
+      if (e < y.d.length - 1) return new Ctor(NaN);
+      if ((y.d[e] & 1) == 0) s = 1;
+      if (x.e == 0 && x.d[0] == 1 && x.d.length == 1) {
+        x.s = s;
+        return x;
+      }
+    }
+    k = mathpow(+x, yn);
+    e = k == 0 || !isFinite(k) ? mathfloor(yn * (Math.log("0." + digitsToString(x.d)) / Math.LN10 + x.e + 1)) : new Ctor(k + "").e;
+    if (e > Ctor.maxE + 1 || e < Ctor.minE - 1) return new Ctor(e > 0 ? s / 0 : 0);
+    external = false;
+    Ctor.rounding = x.s = 1;
+    k = Math.min(12, (e + "").length);
+    r = naturalExponential(y.times(naturalLogarithm(x, pr + k)), pr);
+    if (r.d) {
+      r = finalise(r, pr + 5, 1);
+      if (checkRoundingDigits(r.d, pr, rm)) {
+        e = pr + 10;
+        r = finalise(naturalExponential(y.times(naturalLogarithm(x, e + k)), e), e + 5, 1);
+        if (+digitsToString(r.d).slice(pr + 1, pr + 15) + 1 == 1e14) {
+          r = finalise(r, pr + 1, 0);
+        }
+      }
+    }
+    r.s = s;
+    external = true;
+    Ctor.rounding = rm;
+    return finalise(r, pr, rm);
+  };
+  P.toPrecision = function(sd, rm) {
+    var str, x = this, Ctor = x.constructor;
+    if (sd === void 0) {
+      str = finiteToString(x, x.e <= Ctor.toExpNeg || x.e >= Ctor.toExpPos);
+    } else {
+      checkInt32(sd, 1, MAX_DIGITS);
+      if (rm === void 0) rm = Ctor.rounding;
+      else checkInt32(rm, 0, 8);
+      x = finalise(new Ctor(x), sd, rm);
+      str = finiteToString(x, sd <= x.e || x.e <= Ctor.toExpNeg, sd);
+    }
+    return x.isNeg() && !x.isZero() ? "-" + str : str;
+  };
+  P.toSignificantDigits = P.toSD = function(sd, rm) {
+    var x = this, Ctor = x.constructor;
+    if (sd === void 0) {
+      sd = Ctor.precision;
+      rm = Ctor.rounding;
+    } else {
+      checkInt32(sd, 1, MAX_DIGITS);
+      if (rm === void 0) rm = Ctor.rounding;
+      else checkInt32(rm, 0, 8);
+    }
+    return finalise(new Ctor(x), sd, rm);
+  };
+  P.toString = function() {
+    var x = this, Ctor = x.constructor, str = finiteToString(x, x.e <= Ctor.toExpNeg || x.e >= Ctor.toExpPos);
+    return x.isNeg() && !x.isZero() ? "-" + str : str;
+  };
+  P.truncated = P.trunc = function() {
+    return finalise(new this.constructor(this), this.e + 1, 1);
+  };
+  P.valueOf = P.toJSON = function() {
+    var x = this, Ctor = x.constructor, str = finiteToString(x, x.e <= Ctor.toExpNeg || x.e >= Ctor.toExpPos);
+    return x.isNeg() ? "-" + str : str;
+  };
+  function digitsToString(d) {
+    var i, k, ws, indexOfLastWord = d.length - 1, str = "", w = d[0];
+    if (indexOfLastWord > 0) {
+      str += w;
+      for (i = 1; i < indexOfLastWord; i++) {
+        ws = d[i] + "";
+        k = LOG_BASE - ws.length;
+        if (k) str += getZeroString(k);
+        str += ws;
+      }
+      w = d[i];
+      ws = w + "";
+      k = LOG_BASE - ws.length;
+      if (k) str += getZeroString(k);
+    } else if (w === 0) {
+      return "0";
+    }
+    for (; w % 10 === 0; ) w /= 10;
+    return str + w;
+  }
+  function checkInt32(i, min2, max2) {
+    if (i !== ~~i || i < min2 || i > max2) {
+      throw Error(invalidArgument + i);
+    }
+  }
+  function checkRoundingDigits(d, i, rm, repeating) {
+    var di, k, r, rd;
+    for (k = d[0]; k >= 10; k /= 10) --i;
+    if (--i < 0) {
+      i += LOG_BASE;
+      di = 0;
+    } else {
+      di = Math.ceil((i + 1) / LOG_BASE);
+      i %= LOG_BASE;
+    }
+    k = mathpow(10, LOG_BASE - i);
+    rd = d[di] % k | 0;
+    if (repeating == null) {
+      if (i < 3) {
+        if (i == 0) rd = rd / 100 | 0;
+        else if (i == 1) rd = rd / 10 | 0;
+        r = rm < 4 && rd == 99999 || rm > 3 && rd == 49999 || rd == 5e4 || rd == 0;
+      } else {
+        r = (rm < 4 && rd + 1 == k || rm > 3 && rd + 1 == k / 2) && (d[di + 1] / k / 100 | 0) == mathpow(10, i - 2) - 1 || (rd == k / 2 || rd == 0) && (d[di + 1] / k / 100 | 0) == 0;
+      }
+    } else {
+      if (i < 4) {
+        if (i == 0) rd = rd / 1e3 | 0;
+        else if (i == 1) rd = rd / 100 | 0;
+        else if (i == 2) rd = rd / 10 | 0;
+        r = (repeating || rm < 4) && rd == 9999 || !repeating && rm > 3 && rd == 4999;
+      } else {
+        r = ((repeating || rm < 4) && rd + 1 == k || !repeating && rm > 3 && rd + 1 == k / 2) && (d[di + 1] / k / 1e3 | 0) == mathpow(10, i - 3) - 1;
+      }
+    }
+    return r;
+  }
+  function convertBase(str, baseIn, baseOut) {
+    var j, arr = [0], arrL, i = 0, strL = str.length;
+    for (; i < strL; ) {
+      for (arrL = arr.length; arrL--; ) arr[arrL] *= baseIn;
+      arr[0] += NUMERALS.indexOf(str.charAt(i++));
+      for (j = 0; j < arr.length; j++) {
+        if (arr[j] > baseOut - 1) {
+          if (arr[j + 1] === void 0) arr[j + 1] = 0;
+          arr[j + 1] += arr[j] / baseOut | 0;
+          arr[j] %= baseOut;
+        }
+      }
+    }
+    return arr.reverse();
+  }
+  function cosine(Ctor, x) {
+    var k, len, y;
+    if (x.isZero()) return x;
+    len = x.d.length;
+    if (len < 32) {
+      k = Math.ceil(len / 3);
+      y = (1 / tinyPow(4, k)).toString();
+    } else {
+      k = 16;
+      y = "2.3283064365386962890625e-10";
+    }
+    Ctor.precision += k;
+    x = taylorSeries(Ctor, 1, x.times(y), new Ctor(1));
+    for (var i = k; i--; ) {
+      var cos2x = x.times(x);
+      x = cos2x.times(cos2x).minus(cos2x).times(8).plus(1);
+    }
+    Ctor.precision -= k;
+    return x;
+  }
+  var divide = /* @__PURE__ */ (function() {
+    function multiplyInteger(x, k, base) {
+      var temp, carry = 0, i = x.length;
+      for (x = x.slice(); i--; ) {
+        temp = x[i] * k + carry;
+        x[i] = temp % base | 0;
+        carry = temp / base | 0;
+      }
+      if (carry) x.unshift(carry);
+      return x;
+    }
+    function compare(a, b, aL, bL) {
+      var i, r;
+      if (aL != bL) {
+        r = aL > bL ? 1 : -1;
+      } else {
+        for (i = r = 0; i < aL; i++) {
+          if (a[i] != b[i]) {
+            r = a[i] > b[i] ? 1 : -1;
+            break;
+          }
+        }
+      }
+      return r;
+    }
+    function subtract(a, b, aL, base) {
+      var i = 0;
+      for (; aL--; ) {
+        a[aL] -= i;
+        i = a[aL] < b[aL] ? 1 : 0;
+        a[aL] = i * base + a[aL] - b[aL];
+      }
+      for (; !a[0] && a.length > 1; ) a.shift();
+    }
+    return function(x, y, pr, rm, dp, base) {
+      var cmp, e, i, k, logBase, more, prod, prodL, q, qd, rem, remL, rem0, sd, t, xi, xL, yd0, yL, yz, Ctor = x.constructor, sign2 = x.s == y.s ? 1 : -1, xd = x.d, yd = y.d;
+      if (!xd || !xd[0] || !yd || !yd[0]) {
+        return new Ctor(
+          // Return NaN if either NaN, or both Infinity or 0.
+          !x.s || !y.s || (xd ? yd && xd[0] == yd[0] : !yd) ? NaN : (
+            // Return ±0 if x is 0 or y is ±Infinity, or return ±Infinity as y is 0.
+            xd && xd[0] == 0 || !yd ? sign2 * 0 : sign2 / 0
+          )
+        );
+      }
+      if (base) {
+        logBase = 1;
+        e = x.e - y.e;
+      } else {
+        base = BASE;
+        logBase = LOG_BASE;
+        e = mathfloor(x.e / logBase) - mathfloor(y.e / logBase);
+      }
+      yL = yd.length;
+      xL = xd.length;
+      q = new Ctor(sign2);
+      qd = q.d = [];
+      for (i = 0; yd[i] == (xd[i] || 0); i++) ;
+      if (yd[i] > (xd[i] || 0)) e--;
+      if (pr == null) {
+        sd = pr = Ctor.precision;
+        rm = Ctor.rounding;
+      } else if (dp) {
+        sd = pr + (x.e - y.e) + 1;
+      } else {
+        sd = pr;
+      }
+      if (sd < 0) {
+        qd.push(1);
+        more = true;
+      } else {
+        sd = sd / logBase + 2 | 0;
+        i = 0;
+        if (yL == 1) {
+          k = 0;
+          yd = yd[0];
+          sd++;
+          for (; (i < xL || k) && sd--; i++) {
+            t = k * base + (xd[i] || 0);
+            qd[i] = t / yd | 0;
+            k = t % yd | 0;
+          }
+          more = k || i < xL;
+        } else {
+          k = base / (yd[0] + 1) | 0;
+          if (k > 1) {
+            yd = multiplyInteger(yd, k, base);
+            xd = multiplyInteger(xd, k, base);
+            yL = yd.length;
+            xL = xd.length;
+          }
+          xi = yL;
+          rem = xd.slice(0, yL);
+          remL = rem.length;
+          for (; remL < yL; ) rem[remL++] = 0;
+          yz = yd.slice();
+          yz.unshift(0);
+          yd0 = yd[0];
+          if (yd[1] >= base / 2) ++yd0;
+          do {
+            k = 0;
+            cmp = compare(yd, rem, yL, remL);
+            if (cmp < 0) {
+              rem0 = rem[0];
+              if (yL != remL) rem0 = rem0 * base + (rem[1] || 0);
+              k = rem0 / yd0 | 0;
+              if (k > 1) {
+                if (k >= base) k = base - 1;
+                prod = multiplyInteger(yd, k, base);
+                prodL = prod.length;
+                remL = rem.length;
+                cmp = compare(prod, rem, prodL, remL);
+                if (cmp == 1) {
+                  k--;
+                  subtract(prod, yL < prodL ? yz : yd, prodL, base);
+                }
+              } else {
+                if (k == 0) cmp = k = 1;
+                prod = yd.slice();
+              }
+              prodL = prod.length;
+              if (prodL < remL) prod.unshift(0);
+              subtract(rem, prod, remL, base);
+              if (cmp == -1) {
+                remL = rem.length;
+                cmp = compare(yd, rem, yL, remL);
+                if (cmp < 1) {
+                  k++;
+                  subtract(rem, yL < remL ? yz : yd, remL, base);
+                }
+              }
+              remL = rem.length;
+            } else if (cmp === 0) {
+              k++;
+              rem = [0];
+            }
+            qd[i++] = k;
+            if (cmp && rem[0]) {
+              rem[remL++] = xd[xi] || 0;
+            } else {
+              rem = [xd[xi]];
+              remL = 1;
+            }
+          } while ((xi++ < xL || rem[0] !== void 0) && sd--);
+          more = rem[0] !== void 0;
+        }
+        if (!qd[0]) qd.shift();
+      }
+      if (logBase == 1) {
+        q.e = e;
+        inexact = more;
+      } else {
+        for (i = 1, k = qd[0]; k >= 10; k /= 10) i++;
+        q.e = i + e * logBase - 1;
+        finalise(q, dp ? pr + q.e + 1 : pr, rm, more);
+      }
+      return q;
+    };
+  })();
+  function finalise(x, sd, rm, isTruncated) {
+    var digits, i, j, k, rd, roundUp, w, xd, xdi, Ctor = x.constructor;
+    out: if (sd != null) {
+      xd = x.d;
+      if (!xd) return x;
+      for (digits = 1, k = xd[0]; k >= 10; k /= 10) digits++;
+      i = sd - digits;
+      if (i < 0) {
+        i += LOG_BASE;
+        j = sd;
+        w = xd[xdi = 0];
+        rd = w / mathpow(10, digits - j - 1) % 10 | 0;
+      } else {
+        xdi = Math.ceil((i + 1) / LOG_BASE);
+        k = xd.length;
+        if (xdi >= k) {
+          if (isTruncated) {
+            for (; k++ <= xdi; ) xd.push(0);
+            w = rd = 0;
+            digits = 1;
+            i %= LOG_BASE;
+            j = i - LOG_BASE + 1;
+          } else {
+            break out;
+          }
+        } else {
+          w = k = xd[xdi];
+          for (digits = 1; k >= 10; k /= 10) digits++;
+          i %= LOG_BASE;
+          j = i - LOG_BASE + digits;
+          rd = j < 0 ? 0 : w / mathpow(10, digits - j - 1) % 10 | 0;
+        }
+      }
+      isTruncated = isTruncated || sd < 0 || xd[xdi + 1] !== void 0 || (j < 0 ? w : w % mathpow(10, digits - j - 1));
+      roundUp = rm < 4 ? (rd || isTruncated) && (rm == 0 || rm == (x.s < 0 ? 3 : 2)) : rd > 5 || rd == 5 && (rm == 4 || isTruncated || rm == 6 && // Check whether the digit to the left of the rounding digit is odd.
+      (i > 0 ? j > 0 ? w / mathpow(10, digits - j) : 0 : xd[xdi - 1]) % 10 & 1 || rm == (x.s < 0 ? 8 : 7));
+      if (sd < 1 || !xd[0]) {
+        xd.length = 0;
+        if (roundUp) {
+          sd -= x.e + 1;
+          xd[0] = mathpow(10, (LOG_BASE - sd % LOG_BASE) % LOG_BASE);
+          x.e = -sd || 0;
+        } else {
+          xd[0] = x.e = 0;
+        }
+        return x;
+      }
+      if (i == 0) {
+        xd.length = xdi;
+        k = 1;
+        xdi--;
+      } else {
+        xd.length = xdi + 1;
+        k = mathpow(10, LOG_BASE - i);
+        xd[xdi] = j > 0 ? (w / mathpow(10, digits - j) % mathpow(10, j) | 0) * k : 0;
+      }
+      if (roundUp) {
+        for (; ; ) {
+          if (xdi == 0) {
+            for (i = 1, j = xd[0]; j >= 10; j /= 10) i++;
+            j = xd[0] += k;
+            for (k = 1; j >= 10; j /= 10) k++;
+            if (i != k) {
+              x.e++;
+              if (xd[0] == BASE) xd[0] = 1;
+            }
+            break;
+          } else {
+            xd[xdi] += k;
+            if (xd[xdi] != BASE) break;
+            xd[xdi--] = 0;
+            k = 1;
+          }
+        }
+      }
+      for (i = xd.length; xd[--i] === 0; ) xd.pop();
+    }
+    if (external) {
+      if (x.e > Ctor.maxE) {
+        x.d = null;
+        x.e = NaN;
+      } else if (x.e < Ctor.minE) {
+        x.e = 0;
+        x.d = [0];
+      }
+    }
+    return x;
+  }
+  function finiteToString(x, isExp, sd) {
+    if (!x.isFinite()) return nonFiniteToString(x);
+    var k, e = x.e, str = digitsToString(x.d), len = str.length;
+    if (isExp) {
+      if (sd && (k = sd - len) > 0) {
+        str = str.charAt(0) + "." + str.slice(1) + getZeroString(k);
+      } else if (len > 1) {
+        str = str.charAt(0) + "." + str.slice(1);
+      }
+      str = str + (x.e < 0 ? "e" : "e+") + x.e;
+    } else if (e < 0) {
+      str = "0." + getZeroString(-e - 1) + str;
+      if (sd && (k = sd - len) > 0) str += getZeroString(k);
+    } else if (e >= len) {
+      str += getZeroString(e + 1 - len);
+      if (sd && (k = sd - e - 1) > 0) str = str + "." + getZeroString(k);
+    } else {
+      if ((k = e + 1) < len) str = str.slice(0, k) + "." + str.slice(k);
+      if (sd && (k = sd - len) > 0) {
+        if (e + 1 === len) str += ".";
+        str += getZeroString(k);
+      }
+    }
+    return str;
+  }
+  function getBase10Exponent(digits, e) {
+    var w = digits[0];
+    for (e *= LOG_BASE; w >= 10; w /= 10) e++;
+    return e;
+  }
+  function getLn10(Ctor, sd, pr) {
+    if (sd > LN10_PRECISION) {
+      external = true;
+      if (pr) Ctor.precision = pr;
+      throw Error(precisionLimitExceeded);
+    }
+    return finalise(new Ctor(LN10), sd, 1, true);
+  }
+  function getPi(Ctor, sd, rm) {
+    if (sd > PI_PRECISION) throw Error(precisionLimitExceeded);
+    return finalise(new Ctor(PI), sd, rm, true);
+  }
+  function getPrecision(digits) {
+    var w = digits.length - 1, len = w * LOG_BASE + 1;
+    w = digits[w];
+    if (w) {
+      for (; w % 10 == 0; w /= 10) len--;
+      for (w = digits[0]; w >= 10; w /= 10) len++;
+    }
+    return len;
+  }
+  function getZeroString(k) {
+    var zs = "";
+    for (; k--; ) zs += "0";
+    return zs;
+  }
+  function intPow(Ctor, x, n, pr) {
+    var isTruncated, r = new Ctor(1), k = Math.ceil(pr / LOG_BASE + 4);
+    external = false;
+    for (; ; ) {
+      if (n % 2) {
+        r = r.times(x);
+        if (truncate(r.d, k)) isTruncated = true;
+      }
+      n = mathfloor(n / 2);
+      if (n === 0) {
+        n = r.d.length - 1;
+        if (isTruncated && r.d[n] === 0) ++r.d[n];
+        break;
+      }
+      x = x.times(x);
+      truncate(x.d, k);
+    }
+    external = true;
+    return r;
+  }
+  function isOdd(n) {
+    return n.d[n.d.length - 1] & 1;
+  }
+  function maxOrMin(Ctor, args, n) {
+    var k, y, x = new Ctor(args[0]), i = 0;
+    for (; ++i < args.length; ) {
+      y = new Ctor(args[i]);
+      if (!y.s) {
+        x = y;
+        break;
+      }
+      k = x.cmp(y);
+      if (k === n || k === 0 && x.s === n) {
+        x = y;
+      }
+    }
+    return x;
+  }
+  function naturalExponential(x, sd) {
+    var denominator, guard, j, pow2, sum2, t, wpr, rep = 0, i = 0, k = 0, Ctor = x.constructor, rm = Ctor.rounding, pr = Ctor.precision;
+    if (!x.d || !x.d[0] || x.e > 17) {
+      return new Ctor(x.d ? !x.d[0] ? 1 : x.s < 0 ? 0 : 1 / 0 : x.s ? x.s < 0 ? 0 : x : 0 / 0);
+    }
+    if (sd == null) {
+      external = false;
+      wpr = pr;
+    } else {
+      wpr = sd;
+    }
+    t = new Ctor(0.03125);
+    while (x.e > -2) {
+      x = x.times(t);
+      k += 5;
+    }
+    guard = Math.log(mathpow(2, k)) / Math.LN10 * 2 + 5 | 0;
+    wpr += guard;
+    denominator = pow2 = sum2 = new Ctor(1);
+    Ctor.precision = wpr;
+    for (; ; ) {
+      pow2 = finalise(pow2.times(x), wpr, 1);
+      denominator = denominator.times(++i);
+      t = sum2.plus(divide(pow2, denominator, wpr, 1));
+      if (digitsToString(t.d).slice(0, wpr) === digitsToString(sum2.d).slice(0, wpr)) {
+        j = k;
+        while (j--) sum2 = finalise(sum2.times(sum2), wpr, 1);
+        if (sd == null) {
+          if (rep < 3 && checkRoundingDigits(sum2.d, wpr - guard, rm, rep)) {
+            Ctor.precision = wpr += 10;
+            denominator = pow2 = t = new Ctor(1);
+            i = 0;
+            rep++;
+          } else {
+            return finalise(sum2, Ctor.precision = pr, rm, external = true);
+          }
+        } else {
+          Ctor.precision = pr;
+          return sum2;
+        }
+      }
+      sum2 = t;
+    }
+  }
+  function naturalLogarithm(y, sd) {
+    var c, c0, denominator, e, numerator, rep, sum2, t, wpr, x1, x2, n = 1, guard = 10, x = y, xd = x.d, Ctor = x.constructor, rm = Ctor.rounding, pr = Ctor.precision;
+    if (x.s < 0 || !xd || !xd[0] || !x.e && xd[0] == 1 && xd.length == 1) {
+      return new Ctor(xd && !xd[0] ? -1 / 0 : x.s != 1 ? NaN : xd ? 0 : x);
+    }
+    if (sd == null) {
+      external = false;
+      wpr = pr;
+    } else {
+      wpr = sd;
+    }
+    Ctor.precision = wpr += guard;
+    c = digitsToString(xd);
+    c0 = c.charAt(0);
+    if (Math.abs(e = x.e) < 15e14) {
+      while (c0 < 7 && c0 != 1 || c0 == 1 && c.charAt(1) > 3) {
+        x = x.times(y);
+        c = digitsToString(x.d);
+        c0 = c.charAt(0);
+        n++;
+      }
+      e = x.e;
+      if (c0 > 1) {
+        x = new Ctor("0." + c);
+        e++;
+      } else {
+        x = new Ctor(c0 + "." + c.slice(1));
+      }
+    } else {
+      t = getLn10(Ctor, wpr + 2, pr).times(e + "");
+      x = naturalLogarithm(new Ctor(c0 + "." + c.slice(1)), wpr - guard).plus(t);
+      Ctor.precision = pr;
+      return sd == null ? finalise(x, pr, rm, external = true) : x;
+    }
+    x1 = x;
+    sum2 = numerator = x = divide(x.minus(1), x.plus(1), wpr, 1);
+    x2 = finalise(x.times(x), wpr, 1);
+    denominator = 3;
+    for (; ; ) {
+      numerator = finalise(numerator.times(x2), wpr, 1);
+      t = sum2.plus(divide(numerator, new Ctor(denominator), wpr, 1));
+      if (digitsToString(t.d).slice(0, wpr) === digitsToString(sum2.d).slice(0, wpr)) {
+        sum2 = sum2.times(2);
+        if (e !== 0) sum2 = sum2.plus(getLn10(Ctor, wpr + 2, pr).times(e + ""));
+        sum2 = divide(sum2, new Ctor(n), wpr, 1);
+        if (sd == null) {
+          if (checkRoundingDigits(sum2.d, wpr - guard, rm, rep)) {
+            Ctor.precision = wpr += guard;
+            t = numerator = x = divide(x1.minus(1), x1.plus(1), wpr, 1);
+            x2 = finalise(x.times(x), wpr, 1);
+            denominator = rep = 1;
+          } else {
+            return finalise(sum2, Ctor.precision = pr, rm, external = true);
+          }
+        } else {
+          Ctor.precision = pr;
+          return sum2;
+        }
+      }
+      sum2 = t;
+      denominator += 2;
+    }
+  }
+  function nonFiniteToString(x) {
+    return String(x.s * x.s / 0);
+  }
+  function parseDecimal(x, str) {
+    var e, i, len;
+    if ((e = str.indexOf(".")) > -1) str = str.replace(".", "");
+    if ((i = str.search(/e/i)) > 0) {
+      if (e < 0) e = i;
+      e += +str.slice(i + 1);
+      str = str.substring(0, i);
+    } else if (e < 0) {
+      e = str.length;
+    }
+    for (i = 0; str.charCodeAt(i) === 48; i++) ;
+    for (len = str.length; str.charCodeAt(len - 1) === 48; --len) ;
+    str = str.slice(i, len);
+    if (str) {
+      len -= i;
+      x.e = e = e - i - 1;
+      x.d = [];
+      i = (e + 1) % LOG_BASE;
+      if (e < 0) i += LOG_BASE;
+      if (i < len) {
+        if (i) x.d.push(+str.slice(0, i));
+        for (len -= LOG_BASE; i < len; ) x.d.push(+str.slice(i, i += LOG_BASE));
+        str = str.slice(i);
+        i = LOG_BASE - str.length;
+      } else {
+        i -= len;
+      }
+      for (; i--; ) str += "0";
+      x.d.push(+str);
+      if (external) {
+        if (x.e > x.constructor.maxE) {
+          x.d = null;
+          x.e = NaN;
+        } else if (x.e < x.constructor.minE) {
+          x.e = 0;
+          x.d = [0];
+        }
+      }
+    } else {
+      x.e = 0;
+      x.d = [0];
+    }
+    return x;
+  }
+  function parseOther(x, str) {
+    var base, Ctor, divisor, i, isFloat, len, p, xd, xe;
+    if (str.indexOf("_") > -1) {
+      str = str.replace(/(\d)_(?=\d)/g, "$1");
+      if (isDecimal.test(str)) return parseDecimal(x, str);
+    } else if (str === "Infinity" || str === "NaN") {
+      if (!+str) x.s = NaN;
+      x.e = NaN;
+      x.d = null;
+      return x;
+    }
+    if (isHex.test(str)) {
+      base = 16;
+      str = str.toLowerCase();
+    } else if (isBinary.test(str)) {
+      base = 2;
+    } else if (isOctal.test(str)) {
+      base = 8;
+    } else {
+      throw Error(invalidArgument + str);
+    }
+    i = str.search(/p/i);
+    if (i > 0) {
+      p = +str.slice(i + 1);
+      str = str.substring(2, i);
+    } else {
+      str = str.slice(2);
+    }
+    i = str.indexOf(".");
+    isFloat = i >= 0;
+    Ctor = x.constructor;
+    if (isFloat) {
+      str = str.replace(".", "");
+      len = str.length;
+      i = len - i;
+      divisor = intPow(Ctor, new Ctor(base), i, i * 2);
+    }
+    xd = convertBase(str, base, BASE);
+    xe = xd.length - 1;
+    for (i = xe; xd[i] === 0; --i) xd.pop();
+    if (i < 0) return new Ctor(x.s * 0);
+    x.e = getBase10Exponent(xd, xe);
+    x.d = xd;
+    external = false;
+    if (isFloat) x = divide(x, divisor, len * 4);
+    if (p) x = x.times(Math.abs(p) < 54 ? mathpow(2, p) : Decimal.pow(2, p));
+    external = true;
+    return x;
+  }
+  function sine(Ctor, x) {
+    var k, len = x.d.length;
+    if (len < 3) {
+      return x.isZero() ? x : taylorSeries(Ctor, 2, x, x);
+    }
+    k = 1.4 * Math.sqrt(len);
+    k = k > 16 ? 16 : k | 0;
+    x = x.times(1 / tinyPow(5, k));
+    x = taylorSeries(Ctor, 2, x, x);
+    var sin2_x, d5 = new Ctor(5), d16 = new Ctor(16), d20 = new Ctor(20);
+    for (; k--; ) {
+      sin2_x = x.times(x);
+      x = x.times(d5.plus(sin2_x.times(d16.times(sin2_x).minus(d20))));
+    }
+    return x;
+  }
+  function taylorSeries(Ctor, n, x, y, isHyperbolic) {
+    var j, t, u, x2, i = 1, pr = Ctor.precision, k = Math.ceil(pr / LOG_BASE);
+    external = false;
+    x2 = x.times(x);
+    u = new Ctor(y);
+    for (; ; ) {
+      t = divide(u.times(x2), new Ctor(n++ * n++), pr, 1);
+      u = isHyperbolic ? y.plus(t) : y.minus(t);
+      y = divide(t.times(x2), new Ctor(n++ * n++), pr, 1);
+      t = u.plus(y);
+      if (t.d[k] !== void 0) {
+        for (j = k; t.d[j] === u.d[j] && j--; ) ;
+        if (j == -1) break;
+      }
+      j = u;
+      u = y;
+      y = t;
+      t = j;
+      i++;
+    }
+    external = true;
+    t.d.length = k + 1;
+    return t;
+  }
+  function tinyPow(b, e) {
+    var n = b;
+    while (--e) n *= b;
+    return n;
+  }
+  function toLessThanHalfPi(Ctor, x) {
+    var t, isNeg = x.s < 0, pi = getPi(Ctor, Ctor.precision, 1), halfPi = pi.times(0.5);
+    x = x.abs();
+    if (x.lte(halfPi)) {
+      quadrant = isNeg ? 4 : 1;
+      return x;
+    }
+    t = x.divToInt(pi);
+    if (t.isZero()) {
+      quadrant = isNeg ? 3 : 2;
+    } else {
+      x = x.minus(t.times(pi));
+      if (x.lte(halfPi)) {
+        quadrant = isOdd(t) ? isNeg ? 2 : 3 : isNeg ? 4 : 1;
+        return x;
+      }
+      quadrant = isOdd(t) ? isNeg ? 1 : 4 : isNeg ? 3 : 2;
+    }
+    return x.minus(pi).abs();
+  }
+  function toStringBinary(x, baseOut, sd, rm) {
+    var base, e, i, k, len, roundUp, str, xd, y, Ctor = x.constructor, isExp = sd !== void 0;
+    if (isExp) {
+      checkInt32(sd, 1, MAX_DIGITS);
+      if (rm === void 0) rm = Ctor.rounding;
+      else checkInt32(rm, 0, 8);
+    } else {
+      sd = Ctor.precision;
+      rm = Ctor.rounding;
+    }
+    if (!x.isFinite()) {
+      str = nonFiniteToString(x);
+    } else {
+      str = finiteToString(x);
+      i = str.indexOf(".");
+      if (isExp) {
+        base = 2;
+        if (baseOut == 16) {
+          sd = sd * 4 - 3;
+        } else if (baseOut == 8) {
+          sd = sd * 3 - 2;
+        }
+      } else {
+        base = baseOut;
+      }
+      if (i >= 0) {
+        str = str.replace(".", "");
+        y = new Ctor(1);
+        y.e = str.length - i;
+        y.d = convertBase(finiteToString(y), 10, base);
+        y.e = y.d.length;
+      }
+      xd = convertBase(str, 10, base);
+      e = len = xd.length;
+      for (; xd[--len] == 0; ) xd.pop();
+      if (!xd[0]) {
+        str = isExp ? "0p+0" : "0";
+      } else {
+        if (i < 0) {
+          e--;
+        } else {
+          x = new Ctor(x);
+          x.d = xd;
+          x.e = e;
+          x = divide(x, y, sd, rm, 0, base);
+          xd = x.d;
+          e = x.e;
+          roundUp = inexact;
+        }
+        i = xd[sd];
+        k = base / 2;
+        roundUp = roundUp || xd[sd + 1] !== void 0;
+        roundUp = rm < 4 ? (i !== void 0 || roundUp) && (rm === 0 || rm === (x.s < 0 ? 3 : 2)) : i > k || i === k && (rm === 4 || roundUp || rm === 6 && xd[sd - 1] & 1 || rm === (x.s < 0 ? 8 : 7));
+        xd.length = sd;
+        if (roundUp) {
+          for (; ++xd[--sd] > base - 1; ) {
+            xd[sd] = 0;
+            if (!sd) {
+              ++e;
+              xd.unshift(1);
+            }
+          }
+        }
+        for (len = xd.length; !xd[len - 1]; --len) ;
+        for (i = 0, str = ""; i < len; i++) str += NUMERALS.charAt(xd[i]);
+        if (isExp) {
+          if (len > 1) {
+            if (baseOut == 16 || baseOut == 8) {
+              i = baseOut == 16 ? 4 : 3;
+              for (--len; len % i; len++) str += "0";
+              xd = convertBase(str, base, baseOut);
+              for (len = xd.length; !xd[len - 1]; --len) ;
+              for (i = 1, str = "1."; i < len; i++) str += NUMERALS.charAt(xd[i]);
+            } else {
+              str = str.charAt(0) + "." + str.slice(1);
+            }
+          }
+          str = str + (e < 0 ? "p" : "p+") + e;
+        } else if (e < 0) {
+          for (; ++e; ) str = "0" + str;
+          str = "0." + str;
+        } else {
+          if (++e > len) for (e -= len; e--; ) str += "0";
+          else if (e < len) str = str.slice(0, e) + "." + str.slice(e);
+        }
+      }
+      str = (baseOut == 16 ? "0x" : baseOut == 2 ? "0b" : baseOut == 8 ? "0o" : "") + str;
+    }
+    return x.s < 0 ? "-" + str : str;
+  }
+  function truncate(arr, len) {
+    if (arr.length > len) {
+      arr.length = len;
+      return true;
+    }
+  }
+  function abs(x) {
+    return new this(x).abs();
+  }
+  function acos(x) {
+    return new this(x).acos();
+  }
+  function acosh(x) {
+    return new this(x).acosh();
+  }
+  function add(x, y) {
+    return new this(x).plus(y);
+  }
+  function asin(x) {
+    return new this(x).asin();
+  }
+  function asinh(x) {
+    return new this(x).asinh();
+  }
+  function atan(x) {
+    return new this(x).atan();
+  }
+  function atanh(x) {
+    return new this(x).atanh();
+  }
+  function atan2(y, x) {
+    y = new this(y);
+    x = new this(x);
+    var r, pr = this.precision, rm = this.rounding, wpr = pr + 4;
+    if (!y.s || !x.s) {
+      r = new this(NaN);
+    } else if (!y.d && !x.d) {
+      r = getPi(this, wpr, 1).times(x.s > 0 ? 0.25 : 0.75);
+      r.s = y.s;
+    } else if (!x.d || y.isZero()) {
+      r = x.s < 0 ? getPi(this, pr, rm) : new this(0);
+      r.s = y.s;
+    } else if (!y.d || x.isZero()) {
+      r = getPi(this, wpr, 1).times(0.5);
+      r.s = y.s;
+    } else if (x.s < 0) {
+      this.precision = wpr;
+      this.rounding = 1;
+      r = this.atan(divide(y, x, wpr, 1));
+      x = getPi(this, wpr, 1);
+      this.precision = pr;
+      this.rounding = rm;
+      r = y.s < 0 ? r.minus(x) : r.plus(x);
+    } else {
+      r = this.atan(divide(y, x, wpr, 1));
+    }
+    return r;
+  }
+  function cbrt(x) {
+    return new this(x).cbrt();
+  }
+  function ceil(x) {
+    return finalise(x = new this(x), x.e + 1, 2);
+  }
+  function clamp(x, min2, max2) {
+    return new this(x).clamp(min2, max2);
+  }
+  function config(obj) {
+    if (!obj || typeof obj !== "object") throw Error(decimalError + "Object expected");
+    var i, p, v, useDefaults = obj.defaults === true, ps = [
+      "precision",
+      1,
+      MAX_DIGITS,
+      "rounding",
+      0,
+      8,
+      "toExpNeg",
+      -EXP_LIMIT,
+      0,
+      "toExpPos",
+      0,
+      EXP_LIMIT,
+      "maxE",
+      0,
+      EXP_LIMIT,
+      "minE",
+      -EXP_LIMIT,
+      0,
+      "modulo",
+      0,
+      9
+    ];
+    for (i = 0; i < ps.length; i += 3) {
+      if (p = ps[i], useDefaults) this[p] = DEFAULTS2[p];
+      if ((v = obj[p]) !== void 0) {
+        if (mathfloor(v) === v && v >= ps[i + 1] && v <= ps[i + 2]) this[p] = v;
+        else throw Error(invalidArgument + p + ": " + v);
+      }
+    }
+    if (p = "crypto", useDefaults) this[p] = DEFAULTS2[p];
+    if ((v = obj[p]) !== void 0) {
+      if (v === true || v === false || v === 0 || v === 1) {
+        if (v) {
+          if (typeof crypto != "undefined" && crypto && (crypto.getRandomValues || crypto.randomBytes)) {
+            this[p] = true;
+          } else {
+            throw Error(cryptoUnavailable);
+          }
+        } else {
+          this[p] = false;
+        }
+      } else {
+        throw Error(invalidArgument + p + ": " + v);
+      }
+    }
+    return this;
+  }
+  function cos(x) {
+    return new this(x).cos();
+  }
+  function cosh(x) {
+    return new this(x).cosh();
+  }
+  function clone2(obj) {
+    var i, p, ps;
+    function Decimal2(v) {
+      var e, i2, t, x = this;
+      if (!(x instanceof Decimal2)) return new Decimal2(v);
+      x.constructor = Decimal2;
+      if (isDecimalInstance(v)) {
+        x.s = v.s;
+        if (external) {
+          if (!v.d || v.e > Decimal2.maxE) {
+            x.e = NaN;
+            x.d = null;
+          } else if (v.e < Decimal2.minE) {
+            x.e = 0;
+            x.d = [0];
+          } else {
+            x.e = v.e;
+            x.d = v.d.slice();
+          }
+        } else {
+          x.e = v.e;
+          x.d = v.d ? v.d.slice() : v.d;
+        }
+        return;
+      }
+      t = typeof v;
+      if (t === "number") {
+        if (v === 0) {
+          x.s = 1 / v < 0 ? -1 : 1;
+          x.e = 0;
+          x.d = [0];
+          return;
+        }
+        if (v < 0) {
+          v = -v;
+          x.s = -1;
+        } else {
+          x.s = 1;
+        }
+        if (v === ~~v && v < 1e7) {
+          for (e = 0, i2 = v; i2 >= 10; i2 /= 10) e++;
+          if (external) {
+            if (e > Decimal2.maxE) {
+              x.e = NaN;
+              x.d = null;
+            } else if (e < Decimal2.minE) {
+              x.e = 0;
+              x.d = [0];
+            } else {
+              x.e = e;
+              x.d = [v];
+            }
+          } else {
+            x.e = e;
+            x.d = [v];
+          }
+          return;
+        }
+        if (v * 0 !== 0) {
+          if (!v) x.s = NaN;
+          x.e = NaN;
+          x.d = null;
+          return;
+        }
+        return parseDecimal(x, v.toString());
+      }
+      if (t === "string") {
+        if ((i2 = v.charCodeAt(0)) === 45) {
+          v = v.slice(1);
+          x.s = -1;
+        } else {
+          if (i2 === 43) v = v.slice(1);
+          x.s = 1;
+        }
+        return isDecimal.test(v) ? parseDecimal(x, v) : parseOther(x, v);
+      }
+      if (t === "bigint") {
+        if (v < 0) {
+          v = -v;
+          x.s = -1;
+        } else {
+          x.s = 1;
+        }
+        return parseDecimal(x, v.toString());
+      }
+      throw Error(invalidArgument + v);
+    }
+    Decimal2.prototype = P;
+    Decimal2.ROUND_UP = 0;
+    Decimal2.ROUND_DOWN = 1;
+    Decimal2.ROUND_CEIL = 2;
+    Decimal2.ROUND_FLOOR = 3;
+    Decimal2.ROUND_HALF_UP = 4;
+    Decimal2.ROUND_HALF_DOWN = 5;
+    Decimal2.ROUND_HALF_EVEN = 6;
+    Decimal2.ROUND_HALF_CEIL = 7;
+    Decimal2.ROUND_HALF_FLOOR = 8;
+    Decimal2.EUCLID = 9;
+    Decimal2.config = Decimal2.set = config;
+    Decimal2.clone = clone2;
+    Decimal2.isDecimal = isDecimalInstance;
+    Decimal2.abs = abs;
+    Decimal2.acos = acos;
+    Decimal2.acosh = acosh;
+    Decimal2.add = add;
+    Decimal2.asin = asin;
+    Decimal2.asinh = asinh;
+    Decimal2.atan = atan;
+    Decimal2.atanh = atanh;
+    Decimal2.atan2 = atan2;
+    Decimal2.cbrt = cbrt;
+    Decimal2.ceil = ceil;
+    Decimal2.clamp = clamp;
+    Decimal2.cos = cos;
+    Decimal2.cosh = cosh;
+    Decimal2.div = div;
+    Decimal2.exp = exp;
+    Decimal2.floor = floor;
+    Decimal2.hypot = hypot;
+    Decimal2.ln = ln;
+    Decimal2.log = log;
+    Decimal2.log10 = log10;
+    Decimal2.log2 = log2;
+    Decimal2.max = max;
+    Decimal2.min = min;
+    Decimal2.mod = mod;
+    Decimal2.mul = mul;
+    Decimal2.pow = pow;
+    Decimal2.random = random;
+    Decimal2.round = round;
+    Decimal2.sign = sign;
+    Decimal2.sin = sin;
+    Decimal2.sinh = sinh;
+    Decimal2.sqrt = sqrt;
+    Decimal2.sub = sub;
+    Decimal2.sum = sum;
+    Decimal2.tan = tan;
+    Decimal2.tanh = tanh;
+    Decimal2.trunc = trunc;
+    if (obj === void 0) obj = {};
+    if (obj) {
+      if (obj.defaults !== true) {
+        ps = ["precision", "rounding", "toExpNeg", "toExpPos", "maxE", "minE", "modulo", "crypto"];
+        for (i = 0; i < ps.length; ) if (!obj.hasOwnProperty(p = ps[i++])) obj[p] = this[p];
+      }
+    }
+    Decimal2.config(obj);
+    return Decimal2;
+  }
+  function div(x, y) {
+    return new this(x).div(y);
+  }
+  function exp(x) {
+    return new this(x).exp();
+  }
+  function floor(x) {
+    return finalise(x = new this(x), x.e + 1, 3);
+  }
+  function hypot() {
+    var i, n, t = new this(0);
+    external = false;
+    for (i = 0; i < arguments.length; ) {
+      n = new this(arguments[i++]);
+      if (!n.d) {
+        if (n.s) {
+          external = true;
+          return new this(1 / 0);
+        }
+        t = n;
+      } else if (t.d) {
+        t = t.plus(n.times(n));
+      }
+    }
+    external = true;
+    return t.sqrt();
+  }
+  function isDecimalInstance(obj) {
+    return obj instanceof Decimal || obj && obj.toStringTag === tag || false;
+  }
+  function ln(x) {
+    return new this(x).ln();
+  }
+  function log(x, y) {
+    return new this(x).log(y);
+  }
+  function log2(x) {
+    return new this(x).log(2);
+  }
+  function log10(x) {
+    return new this(x).log(10);
+  }
+  function max() {
+    return maxOrMin(this, arguments, -1);
+  }
+  function min() {
+    return maxOrMin(this, arguments, 1);
+  }
+  function mod(x, y) {
+    return new this(x).mod(y);
+  }
+  function mul(x, y) {
+    return new this(x).mul(y);
+  }
+  function pow(x, y) {
+    return new this(x).pow(y);
+  }
+  function random(sd) {
+    var d, e, k, n, i = 0, r = new this(1), rd = [];
+    if (sd === void 0) sd = this.precision;
+    else checkInt32(sd, 1, MAX_DIGITS);
+    k = Math.ceil(sd / LOG_BASE);
+    if (!this.crypto) {
+      for (; i < k; ) rd[i++] = Math.random() * 1e7 | 0;
+    } else if (crypto.getRandomValues) {
+      d = crypto.getRandomValues(new Uint32Array(k));
+      for (; i < k; ) {
+        n = d[i];
+        if (n >= 429e7) {
+          d[i] = crypto.getRandomValues(new Uint32Array(1))[0];
+        } else {
+          rd[i++] = n % 1e7;
+        }
+      }
+    } else if (crypto.randomBytes) {
+      d = crypto.randomBytes(k *= 4);
+      for (; i < k; ) {
+        n = d[i] + (d[i + 1] << 8) + (d[i + 2] << 16) + ((d[i + 3] & 127) << 24);
+        if (n >= 214e7) {
+          crypto.randomBytes(4).copy(d, i);
+        } else {
+          rd.push(n % 1e7);
+          i += 4;
+        }
+      }
+      i = k / 4;
+    } else {
+      throw Error(cryptoUnavailable);
+    }
+    k = rd[--i];
+    sd %= LOG_BASE;
+    if (k && sd) {
+      n = mathpow(10, LOG_BASE - sd);
+      rd[i] = (k / n | 0) * n;
+    }
+    for (; rd[i] === 0; i--) rd.pop();
+    if (i < 0) {
+      e = 0;
+      rd = [0];
+    } else {
+      e = -1;
+      for (; rd[0] === 0; e -= LOG_BASE) rd.shift();
+      for (k = 1, n = rd[0]; n >= 10; n /= 10) k++;
+      if (k < LOG_BASE) e -= LOG_BASE - k;
+    }
+    r.e = e;
+    r.d = rd;
+    return r;
+  }
+  function round(x) {
+    return finalise(x = new this(x), x.e + 1, this.rounding);
+  }
+  function sign(x) {
+    x = new this(x);
+    return x.d ? x.d[0] ? x.s : 0 * x.s : x.s || NaN;
+  }
+  function sin(x) {
+    return new this(x).sin();
+  }
+  function sinh(x) {
+    return new this(x).sinh();
+  }
+  function sqrt(x) {
+    return new this(x).sqrt();
+  }
+  function sub(x, y) {
+    return new this(x).sub(y);
+  }
+  function sum() {
+    var i = 0, args = arguments, x = new this(args[i]);
+    external = false;
+    for (; x.s && ++i < args.length; ) x = x.plus(args[i]);
+    external = true;
+    return finalise(x, this.precision, this.rounding);
+  }
+  function tan(x) {
+    return new this(x).tan();
+  }
+  function tanh(x) {
+    return new this(x).tanh();
+  }
+  function trunc(x) {
+    return finalise(x = new this(x), x.e + 1, 1);
+  }
+  P[Symbol.for("nodejs.util.inspect.custom")] = P.toString;
+  P[Symbol.toStringTag] = "Decimal";
+  var Decimal = P.constructor = clone2(DEFAULTS2);
+  LN10 = new Decimal(LN10);
+  PI = new Decimal(PI);
+  var decimal_default = Decimal;
+
+  // src/core/parser/cst-helpers.ts
+  function isCstNode(cst) {
+    return "children" in cst;
+  }
+  function isCstToken(cst) {
+    return "image" in cst;
+  }
+  function getFirstCstNode(children) {
+    if (!children) return void 0;
+    const node = children.find(isCstNode);
+    return node;
+  }
+  function getCstNodes(children) {
+    if (!children) return [];
+    return children.filter(isCstNode);
+  }
+  function getFirstToken(children) {
+    if (!children) return void 0;
+    const token = children.find(isCstToken);
+    return token;
+  }
+  function getTokens(children) {
+    if (!children) return [];
+    return children.filter(isCstToken);
+  }
+
+  // src/core/evaluation/FunctionEvaluator.ts
+  function toNumber2(value) {
+    if (typeof value === "number") {
+      return Math.trunc(value);
+    }
+    if (typeof value === "boolean") return value ? 1 : 0;
+    if (typeof value === "string") {
+      const parsed = parseFloat(value);
+      return isNaN(parsed) ? 0 : Math.trunc(parsed);
+    }
+    return 0;
+  }
+  var FunctionEvaluator = class {
+    constructor(context, evaluateExpression) {
+      this.context = context;
+      this.evaluateExpression = evaluateExpression;
+    }
+    /**
+     * Evaluate function call: String functions, arithmetic functions, and controller input functions
+     * Family BASIC arithmetic functions: ABS, SGN, RND, VAL
+     * String functions: LEN, LEFT$, RIGHT$, MID$, STR$, HEX$
+     * Controller input functions: STICK, STRIG
+     */
+    evaluateFunctionCall(cst) {
+      const lenToken = getFirstToken(cst.children.Len);
+      const leftToken = getFirstToken(cst.children.Left);
+      const rightToken = getFirstToken(cst.children.Right);
+      const midToken = getFirstToken(cst.children.Mid);
+      const strToken = getFirstToken(cst.children.Str);
+      const hexToken = getFirstToken(cst.children.Hex);
+      const absToken = getFirstToken(cst.children.Abs);
+      const sgnToken = getFirstToken(cst.children.Sgn);
+      const rndToken = getFirstToken(cst.children.Rnd);
+      const valToken = getFirstToken(cst.children.Val);
+      const stickToken = getFirstToken(cst.children.Stick);
+      const strigToken = getFirstToken(cst.children.Strig);
+      const expressionListCst = getFirstCstNode(cst.children.expressionList);
+      const args = [];
+      if (expressionListCst) {
+        const expressions = getCstNodes(expressionListCst.children.expression);
+        for (const exprCst of expressions) {
+          args.push(this.evaluateExpression(exprCst));
+        }
+      }
+      if (lenToken) {
+        return this.evaluateLen(args);
+      }
+      if (leftToken) {
+        return this.evaluateLeft(args);
+      }
+      if (rightToken) {
+        return this.evaluateRight(args);
+      }
+      if (midToken) {
+        return this.evaluateMid(args);
+      }
+      if (strToken) {
+        return this.evaluateStr(args);
+      }
+      if (hexToken) {
+        return this.evaluateHex(args);
+      }
+      if (absToken) {
+        return this.evaluateAbs(args);
+      }
+      if (sgnToken) {
+        return this.evaluateSgn(args);
+      }
+      if (rndToken) {
+        return this.evaluateRnd(args);
+      }
+      if (valToken) {
+        return this.evaluateVal(args);
+      }
+      if (stickToken) {
+        return this.evaluateStick(args);
+      }
+      if (strigToken) {
+        return this.evaluateStrig(args);
+      }
+      throw new Error("Unknown function call");
+    }
+    // ============================================================================
+    // String Functions
+    // ============================================================================
+    /**
+     * LEN(string) - returns the length of a string
+     */
+    evaluateLen(args) {
+      if (args.length !== 1) {
+        throw new Error("LEN function requires exactly 1 argument");
+      }
+      const str = String(args[0] ?? "");
+      return str.length;
+    }
+    /**
+     * LEFT$(string, n) - returns leftmost n characters
+     */
+    evaluateLeft(args) {
+      if (args.length !== 2) {
+        throw new Error("LEFT$ function requires exactly 2 arguments");
+      }
+      const str = String(args[0] ?? "");
+      const n = Math.floor(toNumber2(args[1]));
+      if (n < 0) {
+        return "";
+      }
+      return str.substring(0, n);
+    }
+    /**
+     * RIGHT$(string, n) - returns rightmost n characters
+     */
+    evaluateRight(args) {
+      if (args.length !== 2) {
+        throw new Error("RIGHT$ function requires exactly 2 arguments");
+      }
+      const str = String(args[0] ?? "");
+      const n = Math.floor(toNumber2(args[1]));
+      if (n < 0) {
+        return "";
+      }
+      const start = Math.max(0, str.length - n);
+      return str.substring(start);
+    }
+    /**
+     * MID$(string, start, length) - returns substring starting at position start with length characters
+     */
+    evaluateMid(args) {
+      if (args.length !== 3) {
+        throw new Error("MID$ function requires exactly 3 arguments");
+      }
+      const str = String(args[0] ?? "");
+      const start = Math.floor(toNumber2(args[1]));
+      const length = Math.floor(toNumber2(args[2]));
+      if (start <= 0 || length <= 0) {
+        return "";
+      }
+      const startIndex = start - 1;
+      if (startIndex >= str.length) {
+        return "";
+      }
+      return str.substring(startIndex, startIndex + length);
+    }
+    /**
+     * STR$(x) - converts numerical value to string
+     * For positive numbers, inserts a single character space at the beginning
+     */
+    evaluateStr(args) {
+      if (args.length !== 1) {
+        throw new Error("STR$ function requires exactly 1 argument");
+      }
+      const num = toNumber2(args[0] ?? 0);
+      if (num >= 0) {
+        return " " + String(num);
+      }
+      return String(num);
+    }
+    /**
+     * HEX$(x) - converts numerical value to hexadecimal string
+     * Input range: -32768 to +32767
+     * Returns hexadecimal digits without &H prefix (uppercase)
+     */
+    evaluateHex(args) {
+      if (args.length !== 1) {
+        throw new Error("HEX$ function requires exactly 1 argument");
+      }
+      const num = toNumber2(args[0] ?? 0);
+      let value;
+      if (num < 0) {
+        value = num + 65536;
+      } else {
+        value = num;
+      }
+      if (value < 0) value = 0;
+      if (value > 65535) value = 65535;
+      return value.toString(16).toUpperCase();
+    }
+    // ============================================================================
+    // Arithmetic Functions
+    // ============================================================================
+    /**
+     * ABS(x) - absolute value
+     */
+    evaluateAbs(args) {
+      if (args.length !== 1) {
+        throw new Error("ABS function requires exactly 1 argument");
+      }
+      const x = toNumber2(args[0] ?? 0);
+      return Math.abs(Math.trunc(x));
+    }
+    /**
+     * SGN(x) - sign function: -1 if x < 0, 0 if x = 0, 1 if x > 0
+     */
+    evaluateSgn(args) {
+      if (args.length !== 1) {
+        throw new Error("SGN function requires exactly 1 argument");
+      }
+      const x = toNumber2(args[0] ?? 0);
+      if (x < 0) return -1;
+      if (x > 0) return 1;
+      return 0;
+    }
+    /**
+     * RND(x) - random number
+     * According to Family BASIC spec:
+     * - x must be 1 to 32767
+     * - Returns random integer from 0 to (x-1)
+     * - RND(1) always returns 0
+     */
+    evaluateRnd(args) {
+      if (args.length !== 1) {
+        throw new Error("RND function requires exactly 1 argument");
+      }
+      const x = toNumber2(args[0] ?? 0);
+      if (x < 1 || x > 32767) {
+        throw new Error(`RND argument must be between 1 and 32767, got ${x}`);
+      }
+      if (x === 1) {
+        return 0;
+      }
+      return Math.trunc(Math.random() * x);
+    }
+    /**
+     * VAL(string) - converts string to numerical value
+     * Supports decimal numbers (-32768 to +32767) and hexadecimal (&H0 to &H7FFF)
+     * If first character is not +, -, &, or a number, returns 0
+     * If non-numeric characters appear (except hex A-F), everything after is ignored
+     */
+    evaluateVal(args) {
+      if (args.length !== 1) {
+        throw new Error("VAL function requires exactly 1 argument");
+      }
+      const str = String(args[0] ?? "").trim();
+      if (str.length === 0) {
+        return 0;
+      }
+      const firstChar = str[0];
+      if (!firstChar || firstChar !== "+" && firstChar !== "-" && firstChar !== "&" && !/[0-9]/.test(firstChar)) {
+        return 0;
+      }
+      if (str.length >= 2 && str[0] === "&" && (str[1] === "H" || str[1] === "h")) {
+        const hexPart = str.substring(2);
+        let hexDigits = "";
+        for (let i = 0; i < hexPart.length; i++) {
+          const char = hexPart[i];
+          if (!char) break;
+          if (/[0-9A-Fa-f]/.test(char)) {
+            hexDigits += char;
+          } else {
+            break;
+          }
+        }
+        if (hexDigits.length === 0) {
+          return 0;
+        }
+        const hexValue = parseInt(hexDigits, 16);
+        if (hexValue > 32767) {
+          return 32767;
+        }
+        return hexValue;
+      }
+      let numStr = "";
+      let foundDigit = false;
+      for (let i = 0; i < str.length; i++) {
+        const char = str[i];
+        if (!char) break;
+        if (/[0-9]/.test(char)) {
+          numStr += char;
+          foundDigit = true;
+        } else if ((char === "+" || char === "-") && numStr.length === 0) {
+          numStr += char;
+        } else {
+          break;
+        }
+      }
+      if (!foundDigit || numStr.length === 0) {
+        return 0;
+      }
+      const numValue = parseInt(numStr, 10);
+      if (numValue > 32767) {
+        return 32767;
+      }
+      if (numValue < -32768) {
+        return -32768;
+      }
+      return numValue;
+    }
+    // ============================================================================
+    // Controller Input Functions
+    // ============================================================================
+    /**
+     * STICK(joystickId) - returns D-pad input value
+     * joystickId: 0 = controller I, 1 = controller II
+     * Returns: 0 (nothing), 1 (RIGHT), 2 (LEFT), 4 (DOWN), 8 (UP)
+     */
+    evaluateStick(args) {
+      if (args.length !== 1) {
+        throw new Error("STICK function requires exactly 1 argument");
+      }
+      const joystickId = Math.floor(toNumber2(args[0] ?? 0));
+      if (joystickId < 0 || joystickId > 1) {
+        throw new Error("STICK joystickId must be 0 or 1");
+      }
+      return this.context.getStickState(joystickId);
+    }
+    /**
+     * STRIG(joystickId) - returns trigger button input value
+     * joystickId: 0 = controller I, 1 = controller II
+     * Controller I: START (1), SELECT (2), B (4), A (8)
+     * Controller II: B (4), A (8)
+     * Returns: 0 when nothing is pressed, or the button value when pressed
+     */
+    evaluateStrig(args) {
+      if (args.length !== 1) {
+        throw new Error("STRIG function requires exactly 1 argument");
+      }
+      const joystickId = Math.floor(toNumber2(args[0] ?? 0));
+      if (joystickId < 0 || joystickId > 1) {
+        throw new Error("STRIG joystickId must be 0 or 1");
+      }
+      return this.context.consumeStrigState(joystickId);
+    }
+  };
+
   // src/core/evaluation/ExpressionEvaluator.ts
   var ExpressionEvaluator = class {
     constructor(context) {
       this.context = context;
+      __publicField(this, "functionEvaluator");
+      this.functionEvaluator = new FunctionEvaluator(
+        context,
+        (exprCst) => this.evaluateExpression(exprCst)
+      );
     }
     /**
-     * Evaluate a BASIC expression
+     * Evaluate a BASIC expression from CST
      */
-    evaluateExpression(expr) {
-      switch (expr.type) {
-        case "Expression":
-          return this.evaluateExpression(expr.expression);
-        case "NumberLiteral":
-          return expr.value;
-        case "StringLiteral":
-          return expr.value;
-        case "Variable": {
-          if (expr.subscript) {
-            const array = this.context.arrays.get(expr.name);
-            if (array) {
-              const indices = expr.subscript.map((index) => this.evaluateExpression(index));
-              let value = array;
-              for (const index of indices) {
-                const numIndex = this.toNumber(index);
-                if (Array.isArray(value)) {
-                  const element = value[Math.floor(numIndex)];
-                  if (element !== void 0) {
-                    value = element;
-                  } else {
-                    return 0;
-                  }
-                } else {
-                  return 0;
-                }
-              }
-              return typeof value !== "object" ? value : 0;
-            }
-            return 0;
+    evaluateExpression(exprCst) {
+      const additiveCst = getFirstCstNode(exprCst.children.additive);
+      if (additiveCst) {
+        return this.evaluateAdditive(additiveCst);
+      }
+      throw new Error("Invalid expression CST");
+    }
+    /**
+     * Evaluate a logical expression from CST
+     * Returns -1 for true, 0 for false (per Family BASIC spec)
+     * Supports: NOT, AND, OR, XOR
+     * Precedence: NOT > AND > OR > XOR
+     * Structure: LogicalOrExpression (XOR LogicalOrExpression)*
+     */
+    evaluateLogicalExpression(logicalCst) {
+      const logicalOrExprs = getCstNodes(logicalCst.children.logicalOrExpression);
+      if (logicalOrExprs.length === 0) {
+        throw new Error("Invalid logical expression: missing logical OR expression");
+      }
+      let result = this.evaluateLogicalOrExpression(logicalOrExprs[0]);
+      const xorTokens = getTokens(logicalCst.children.Xor);
+      for (let i = 0; i < xorTokens.length && i + 1 < logicalOrExprs.length; i++) {
+        const operand = this.evaluateLogicalOrExpression(logicalOrExprs[i + 1]);
+        const leftIsTrue = result !== 0;
+        const rightIsTrue = operand !== 0;
+        result = leftIsTrue !== rightIsTrue ? -1 : 0;
+      }
+      return result;
+    }
+    /**
+     * Evaluate a logical OR expression from CST
+     * Structure: LogicalAndExpression (OR LogicalAndExpression)*
+     * OR combines LogicalAndExpressions
+     */
+    evaluateLogicalOrExpression(cst) {
+      const logicalAndExprs = getCstNodes(cst.children.logicalAndExpression);
+      if (logicalAndExprs.length === 0) {
+        throw new Error("Invalid logical OR expression: missing logical AND expression");
+      }
+      let result = this.evaluateLogicalAndExpression(logicalAndExprs[0]);
+      const orTokens = getTokens(cst.children.Or);
+      for (let i = 0; i < orTokens.length && i + 1 < logicalAndExprs.length; i++) {
+        const operand = this.evaluateLogicalAndExpression(logicalAndExprs[i + 1]);
+        result = result !== 0 || operand !== 0 ? -1 : 0;
+      }
+      return result;
+    }
+    /**
+     * Evaluate a logical AND expression from CST
+     * Structure: LogicalNotExpression (AND LogicalNotExpression)*
+     * AND has middle precedence (combines LogicalNotExpressions)
+     */
+    evaluateLogicalAndExpression(cst) {
+      const logicalNotExprs = getCstNodes(cst.children.logicalNotExpression);
+      if (logicalNotExprs.length === 0) {
+        throw new Error("Invalid logical AND expression: missing logical NOT expression");
+      }
+      let result = this.evaluateLogicalNotExpression(logicalNotExprs[0]);
+      const andTokens = getTokens(cst.children.And);
+      for (let i = 0; i < andTokens.length && i + 1 < logicalNotExprs.length; i++) {
+        const operand = this.evaluateLogicalNotExpression(logicalNotExprs[i + 1]);
+        result = result !== 0 && operand !== 0 ? -1 : 0;
+      }
+      return result;
+    }
+    /**
+     * Evaluate a logical NOT expression from CST
+     * Structure: (NOT)? ComparisonExpression
+     * NOT has highest precedence (applies to ComparisonExpression)
+     */
+    evaluateLogicalNotExpression(cst) {
+      const comparisonExprCst = getFirstCstNode(cst.children.comparisonExpression);
+      if (!comparisonExprCst) {
+        throw new Error("Invalid logical NOT expression: missing comparison expression");
+      }
+      let result = this.evaluateComparisonExpression(comparisonExprCst);
+      const notTokens = getTokens(cst.children.Not);
+      if (notTokens.length > 0) {
+        result = result !== 0 ? 0 : -1;
+      }
+      return result;
+    }
+    /**
+     * Evaluate a comparison expression from CST
+     * Returns -1 for true, 0 for false (per Family BASIC spec)
+     * Supports: =, <>, <, >, <=, >=
+     * Also supports single expression (non-zero = true, zero = false)
+     */
+    evaluateComparisonExpression(comparisonCst) {
+      const expressions = getCstNodes(comparisonCst.children.expression);
+      if (expressions.length === 0) {
+        throw new Error("Invalid comparison expression: missing expression");
+      }
+      const leftValue = this.evaluateExpression(expressions[0]);
+      if (expressions.length === 1) {
+        if (typeof leftValue === "string") {
+          return leftValue.length > 0 ? -1 : 0;
+        }
+        return leftValue !== 0 ? -1 : 0;
+      }
+      const rightValue = this.evaluateExpression(expressions[1]);
+      const equalToken = getFirstToken(comparisonCst.children.Equal);
+      const notEqualToken = getFirstToken(comparisonCst.children.NotEqual);
+      const lessThanToken = getFirstToken(comparisonCst.children.LessThan);
+      const greaterThanToken = getFirstToken(comparisonCst.children.GreaterThan);
+      const lessThanOrEqualToken = getFirstToken(comparisonCst.children.LessThanOrEqual);
+      const greaterThanOrEqualToken = getFirstToken(comparisonCst.children.GreaterThanOrEqual);
+      let operator = null;
+      if (equalToken) operator = "=";
+      else if (notEqualToken) operator = "<>";
+      else if (lessThanToken) operator = "<";
+      else if (greaterThanToken) operator = ">";
+      else if (lessThanOrEqualToken) operator = "<=";
+      else if (greaterThanOrEqualToken) operator = ">=";
+      if (!operator) {
+        throw new Error("Invalid comparison expression: missing operator");
+      }
+      if (typeof leftValue === "string" || typeof rightValue === "string") {
+        const leftStr = String(leftValue);
+        const rightStr = String(rightValue);
+        switch (operator) {
+          case "=":
+            return leftStr === rightStr ? -1 : 0;
+          case "<>":
+            return leftStr !== rightStr ? -1 : 0;
+          case "<":
+            return leftStr < rightStr ? -1 : 0;
+          case ">":
+            return leftStr > rightStr ? -1 : 0;
+          case "<=":
+            return leftStr <= rightStr ? -1 : 0;
+          case ">=":
+            return leftStr >= rightStr ? -1 : 0;
+        }
+      } else {
+        const leftNum = Number(leftValue);
+        const rightNum = Number(rightValue);
+        switch (operator) {
+          case "=":
+            return leftNum === rightNum ? -1 : 0;
+          case "<>":
+            return leftNum !== rightNum ? -1 : 0;
+          case "<":
+            return leftNum < rightNum ? -1 : 0;
+          case ">":
+            return leftNum > rightNum ? -1 : 0;
+          case "<=":
+            return leftNum <= rightNum ? -1 : 0;
+          case ">=":
+            return leftNum >= rightNum ? -1 : 0;
+        }
+      }
+      return 0;
+    }
+    /**
+     * Evaluate additive expression: ModExpression ((Plus | Minus) ModExpression)*
+     */
+    evaluateAdditive(cst) {
+      const modExpressionNodes = getCstNodes(cst.children.modExpression);
+      if (modExpressionNodes.length === 0) {
+        throw new Error("Invalid additive expression");
+      }
+      let result = this.evaluateModExpression(modExpressionNodes[0]);
+      const plusTokens = getTokens(cst.children.Plus);
+      const minusTokens = getTokens(cst.children.Minus);
+      const operators = [];
+      let tokenIndex = 0;
+      for (let i = 1; i < modExpressionNodes.length; i++) {
+        const op = tokenIndex < plusTokens.length ? "+" : "-";
+        operators.push({ op, operand: modExpressionNodes[i] });
+        tokenIndex++;
+        if (tokenIndex >= plusTokens.length + minusTokens.length) break;
+      }
+      for (const { op, operand } of operators) {
+        const operandValue = this.evaluateModExpression(operand);
+        if (op === "+") {
+          if (typeof result === "string" || typeof operandValue === "string") {
+            result = String(result) + String(operandValue);
           } else {
-            const variable = this.context.variables.get(expr.name);
-            return variable ? variable.value : 0;
+            const resultDecimal = this.toDecimal(result);
+            const operandDecimal = this.toDecimal(operandValue);
+            result = resultDecimal.plus(operandDecimal).truncated().toNumber();
           }
+        } else {
+          const resultDecimal = this.toDecimal(result);
+          const operandDecimal = this.toDecimal(operandValue);
+          result = resultDecimal.minus(operandDecimal).truncated().toNumber();
         }
-        case "BinaryExpression": {
-          const left = this.evaluateExpression(expr.left);
-          const right = this.evaluateExpression(expr.right);
-          const leftNum = typeof left === "number" ? left : typeof left === "boolean" ? left ? 1 : 0 : 0;
-          const rightNum = typeof right === "number" ? right : typeof right === "boolean" ? right ? 1 : 0 : 0;
-          switch (expr.operator) {
-            case "+":
-              if (typeof left === "string" || typeof right === "string") {
-                return String(left) + String(right);
-              }
-              return leftNum + rightNum;
-            case "-":
-              return leftNum - rightNum;
-            case "*":
-              return leftNum * rightNum;
-            case "/":
-              return rightNum !== 0 ? leftNum / rightNum : 0;
-            case "MOD":
-              return rightNum !== 0 ? leftNum % rightNum : 0;
-            case "^":
-              return Math.pow(leftNum, rightNum);
-            case "=":
-              return left === right ? 1 : 0;
-            case "<>":
-              return left !== right ? 1 : 0;
-            case "<":
-              return leftNum < rightNum ? 1 : 0;
-            case ">":
-              return leftNum > rightNum ? 1 : 0;
-            case "<=":
-              return leftNum <= rightNum ? 1 : 0;
-            case ">=":
-              return leftNum >= rightNum ? 1 : 0;
-            case "AND":
-              return left && right ? 1 : 0;
-            case "OR":
-              return left || right ? 1 : 0;
-            default:
-              return 0;
-          }
-        }
-        case "UnaryExpression": {
-          const operand = this.evaluateExpression(expr.operand);
-          switch (expr.operator) {
-            case "-":
-              return -this.toNumber(operand);
-            case "NOT":
-              return !operand ? 1 : 0;
-            default:
-              return operand;
-          }
-        }
-        case "FunctionCall":
-          return this.evaluateFunctionCall(expr);
-        default:
-          return 0;
       }
+      return result;
     }
     /**
-     * Evaluate a function call
+     * Evaluate MOD expression: Multiplicative ((MOD) Multiplicative)*
+     * MOD has priority 2 (after *, / but before +, -)
      */
-    evaluateFunctionCall(funcCall) {
-      const args = funcCall.arguments.map((arg) => {
-        return this.evaluateExpression(arg);
-      });
-      switch (funcCall.name) {
-        // Mathematical functions
-        case "ABS":
-          return Math.abs(this.toNumber(args[0] || 0));
-        case "SQR":
-          return Math.sqrt(this.toNumber(args[0] || 0));
-        case "SIN":
-          return Math.sin(this.toNumber(args[0] || 0));
-        case "COS":
-          return Math.cos(this.toNumber(args[0] || 0));
-        case "TAN":
-          return Math.tan(this.toNumber(args[0] || 0));
-        case "ATN":
-          return Math.atan(this.toNumber(args[0] || 0));
-        case "LOG":
-          return Math.log(this.toNumber(args[0] || 0));
-        case "EXP":
-          return Math.exp(this.toNumber(args[0] || 0));
-        case "INT": {
-          const intValue = this.toNumber(args[0] || 0);
-          return intValue >= 0 ? Math.floor(intValue) : Math.ceil(intValue);
-        }
-        case "FIX":
-          return Math.trunc(this.toNumber(args[0] || 0));
-        case "SGN":
-          return Math.sign(this.toNumber(args[0] || 0));
-        case "RND":
-          return Math.random();
-        // String functions
-        case "LEN": {
-          const str = args[0];
-          return typeof str === "string" ? str.length : 0;
-        }
-        case "LEFT": {
-          const str = args[0];
-          const count = this.toNumber(args[1] || 0);
-          if (typeof str !== "string") return "";
-          return str.substring(0, Math.max(0, count));
-        }
-        case "RIGHT": {
-          const str = args[0];
-          const count = this.toNumber(args[1] || 0);
-          if (typeof str !== "string") return "";
-          return str.substring(Math.max(0, str.length - count));
-        }
-        case "MID": {
-          const str = args[0];
-          const start = this.toNumber(args[1] || 0);
-          const count = this.toNumber(args[2] || 0);
-          if (typeof str !== "string") return "";
-          const startIndex = Math.max(0, start - 1);
-          return str.substring(startIndex, startIndex + count);
-        }
-        // Joystick functions (Family BASIC v3)
-        case "STICK": {
-          const joystickId = this.toNumber(args[0] || 0);
-          return this.context.deviceAdapter?.getStickState(joystickId) || 0;
-        }
-        case "STRIG": {
-          const joystickId = this.toNumber(args[0] || 0);
-          return this.context.deviceAdapter?.consumeStrigState(joystickId) || 0;
-        }
-        default:
-          return 0;
+    evaluateModExpression(cst) {
+      const multiplicativeNodes = getCstNodes(cst.children.multiplicative);
+      if (multiplicativeNodes.length === 0) {
+        throw new Error("Invalid MOD expression");
       }
+      let result = this.evaluateMultiplicative(multiplicativeNodes[0]);
+      const modTokens = getTokens(cst.children.Mod);
+      for (let i = 0; i < modTokens.length && i + 1 < multiplicativeNodes.length; i++) {
+        const operandValue = this.evaluateMultiplicative(multiplicativeNodes[i + 1]);
+        if (typeof result === "string" || typeof operandValue === "string") {
+          throw new Error("MOD operator requires numeric operands");
+        }
+        const resultDecimal = this.toDecimal(result);
+        const operandDecimal = this.toDecimal(operandValue);
+        if (operandDecimal.isZero()) {
+          result = 0;
+        } else {
+          result = resultDecimal.mod(operandDecimal).truncated().toNumber();
+        }
+      }
+      return result;
     }
     /**
-     * Convert a value to a number
+     * Evaluate multiplicative expression: Unary ((Multiply | Divide) Unary)*
+     */
+    evaluateMultiplicative(cst) {
+      const unaryNodes = getCstNodes(cst.children.unary);
+      if (unaryNodes.length === 0) {
+        throw new Error("Invalid multiplicative expression");
+      }
+      let result = this.evaluateUnary(unaryNodes[0]);
+      const multiplyTokens = getTokens(cst.children.Multiply);
+      const divideTokens = getTokens(cst.children.Divide);
+      let tokenIndex = 0;
+      for (let i = 1; i < unaryNodes.length; i++) {
+        const op = tokenIndex < multiplyTokens.length ? "*" : "/";
+        const operandValue = this.evaluateUnary(unaryNodes[i]);
+        if (op === "*") {
+          const resultDecimal = this.toDecimal(result);
+          const operandDecimal = this.toDecimal(operandValue);
+          result = resultDecimal.times(operandDecimal).truncated().toNumber();
+        } else {
+          const divisorDecimal = this.toDecimal(operandValue);
+          if (divisorDecimal.isZero()) {
+            result = 0;
+          } else {
+            const dividendDecimal = this.toDecimal(result);
+            result = dividendDecimal.dividedBy(divisorDecimal).truncated().toNumber();
+          }
+        }
+        tokenIndex++;
+        if (tokenIndex >= multiplyTokens.length + divideTokens.length) break;
+      }
+      return typeof result === "string" ? result : this.toNumber(result);
+    }
+    /**
+     * Evaluate unary expression: (Plus | Minus)? Primary
+     */
+    evaluateUnary(cst) {
+      const primaryCst = getFirstCstNode(cst.children.primary);
+      if (!primaryCst) {
+        throw new Error("Invalid unary expression: missing primary");
+      }
+      const primaryValue = this.evaluatePrimary(primaryCst);
+      const minusTokens = getTokens(cst.children.Minus);
+      if (minusTokens.length > 0) {
+        const valueDecimal = this.toDecimal(primaryValue);
+        return valueDecimal.negated().truncated().toNumber();
+      }
+      return primaryValue;
+    }
+    /**
+     * Evaluate primary expression: NumberLiteral | StringLiteral | Identifier | FunctionCall | (LParen Expression RParen)
+     */
+    evaluatePrimary(cst) {
+      const functionCallCst = getFirstCstNode(cst.children.functionCall);
+      if (functionCallCst) {
+        return this.evaluateFunctionCall(functionCallCst);
+      }
+      if (cst.children.LParen && !functionCallCst) {
+        const exprCst = getFirstCstNode(cst.children.expression);
+        if (exprCst) {
+          return this.evaluateExpression(exprCst);
+        }
+        throw new Error("Invalid parenthesized expression");
+      }
+      const numberToken = getFirstToken(cst.children.NumberLiteral);
+      if (numberToken) {
+        return parseInt(numberToken.image, 10);
+      }
+      const stringToken = getFirstToken(cst.children.StringLiteral);
+      if (stringToken) {
+        return stringToken.image.slice(1, -1);
+      }
+      const identifierToken = getFirstToken(cst.children.Identifier);
+      if (identifierToken) {
+        const varName = identifierToken.image.toUpperCase();
+        const variable = this.context.variables.get(varName);
+        if (variable) {
+          return variable.value;
+        }
+        return varName.endsWith("$") ? "" : 0;
+      }
+      throw new Error("Invalid primary expression");
+    }
+    /**
+     * Evaluate function call: Delegates to FunctionEvaluator
+     */
+    evaluateFunctionCall(cst) {
+      return this.functionEvaluator.evaluateFunctionCall(cst);
+    }
+    /**
+     * Convert a value to a Decimal for precise arithmetic
+     */
+    toDecimal(value) {
+      if (typeof value === "number") {
+        return new decimal_default(value);
+      }
+      if (typeof value === "boolean") {
+        return new decimal_default(value ? 1 : 0);
+      }
+      if (typeof value === "string") {
+        const parsed = parseFloat(value);
+        return isNaN(parsed) ? new decimal_default(0) : new decimal_default(parsed);
+      }
+      return new decimal_default(0);
+    }
+    /**
+     * Convert a value to an integer
+     * Family Basic only supports integer numerical values
      */
     toNumber(value) {
-      if (typeof value === "number") return value;
+      if (typeof value === "number") {
+        return Math.trunc(value);
+      }
       if (typeof value === "boolean") return value ? 1 : 0;
       if (typeof value === "string") {
         const parsed = parseFloat(value);
-        return isNaN(parsed) ? 0 : parsed;
+        return isNaN(parsed) ? 0 : Math.trunc(parsed);
       }
       return 0;
     }
@@ -4934,37 +13005,19 @@
       this.deviceAdapter = deviceAdapter;
     }
     /**
-     * Print values to output
+     * Print values to output (accepts array of values: number | string)
      */
-    printValues(expressions) {
+    printValues(values2) {
       let output = "";
-      for (let i = 0; i < expressions.length; i++) {
-        const expr = expressions[i];
-        let actualExpr;
-        let separator;
-        const hasSeparator = (obj) => {
-          return obj !== null && typeof obj === "object" && "item" in obj && "separator" in obj;
-        };
-        if (hasSeparator(expr)) {
-          actualExpr = expr.item;
-          separator = expr.separator;
-        } else {
-          actualExpr = expr;
-          separator = void 0;
-        }
-        const value = this.evaluator.evaluateExpression(actualExpr);
+      for (let i = 0; i < values2.length; i++) {
+        const value = values2[i];
+        if (value === void 0) continue;
         const formatted = this.formatValue(value);
         if (this.context.config.enableDebugMode) {
-          this.context.addDebugOutput(`PRINT: evaluating expression ${JSON.stringify(actualExpr)} = ${value}, separator: ${separator}`);
+          this.context.addDebugOutput(`PRINT: value = ${value}`);
         }
-        if (separator === ";") {
-          output += formatted;
-        } else if (separator === ",") {
-          if (output.length > 0) {
-            output += " " + formatted;
-          } else {
-            output += formatted;
-          }
+        if (i > 0) {
+          output += " " + formatted;
         } else {
           output += formatted;
         }
@@ -4972,17 +13025,6 @@
       this.context.addOutput(output);
       if (this.context.config.enableDebugMode) {
         this.context.addDebugOutput(`PRINT: ${output}`);
-      }
-    }
-    /**
-     * Print a single value
-     */
-    printValue(expression) {
-      const value = this.evaluator.evaluateExpression(expression);
-      const formatted = this.formatValue(value);
-      this.context.addOutput(formatted);
-      if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(`PRINT: ${formatted}`);
       }
     }
     /**
@@ -5031,14 +13073,34 @@
 
   // src/core/execution/executors/PrintExecutor.ts
   var PrintExecutor = class {
-    constructor(ioService) {
+    constructor(ioService, evaluator) {
       this.ioService = ioService;
+      this.evaluator = evaluator;
     }
     /**
-     * Execute a PRINT statement
+     * Execute a PRINT statement from CST
      */
-    execute(printStmt) {
-      this.ioService.printValues(printStmt.printList || []);
+    execute(printStmtCst) {
+      const printListCst = getFirstCstNode(printStmtCst.children.printList);
+      if (!printListCst) {
+        this.ioService.printValues([]);
+        return;
+      }
+      const printItems = getCstNodes(printListCst.children.printItem);
+      const values2 = [];
+      for (const item of printItems) {
+        const strToken = getFirstToken(item.children.StringLiteral);
+        if (strToken) {
+          values2.push(strToken.image.slice(1, -1));
+        } else {
+          const exprCst = getFirstCstNode(item.children.expression);
+          if (exprCst) {
+            const value = this.evaluator.evaluateExpression(exprCst);
+            values2.push(value);
+          }
+        }
+      }
+      this.ioService.printValues(values2);
     }
   };
 
@@ -5065,10 +13127,10 @@
       this.context.variables.set(name, variable);
     }
     /**
-     * Set a variable from an expression
+     * Set a variable from a CST expression node
      */
-    setVariableFromExpression(name, expression) {
-      const value = this.evaluator.evaluateExpression(expression);
+    setVariableFromExpressionCst(name, expressionCst) {
+      const value = this.evaluator.evaluateExpression(expressionCst);
       const basicValue = typeof value === "boolean" ? value ? 1 : 0 : value;
       this.setVariable(name, basicValue);
     }
@@ -5098,11 +13160,11 @@
       }
     }
     /**
-     * Set an array element from expressions
+     * Set an array element from CST expression nodes
      */
-    setArrayElementFromExpressions(name, indexExpressions, valueExpression) {
-      const indices = indexExpressions.map((expr) => this.toNumber(this.evaluator.evaluateExpression(expr)));
-      const value = this.evaluator.evaluateExpression(valueExpression);
+    setArrayElementFromExpressionsCst(name, indexExpressionsCst, valueExpressionCst) {
+      const indices = indexExpressionsCst.map((exprCst) => this.toNumber(this.evaluator.evaluateExpression(exprCst)));
+      const value = this.evaluator.evaluateExpression(valueExpressionCst);
       const basicValue = typeof value === "boolean" ? value ? 1 : 0 : value;
       this.setArrayElement(name, indices, basicValue);
     }
@@ -5127,13 +13189,6 @@
         }
       }
       return typeof value !== "object" ? value : 0;
-    }
-    /**
-     * Get an array element from expressions
-     */
-    getArrayElementFromExpressions(name, indexExpressions) {
-      const indices = indexExpressions.map((expr) => this.toNumber(this.evaluator.evaluateExpression(expr)));
-      return this.getArrayElement(name, indices);
     }
     /**
      * Create an array with specified dimensions
@@ -5197,14 +13252,18 @@
       this.context.arrays.clear();
     }
     /**
-     * Convert a value to a number
+     * Convert a value to an integer
+     * Family Basic only supports integer numerical values
+     * Uses Decimal.js for precise conversion
      */
     toNumber(value) {
-      if (typeof value === "number") return value;
+      if (typeof value === "number") {
+        return new decimal_default(value).truncated().toNumber();
+      }
       if (typeof value === "boolean") return value ? 1 : 0;
       if (typeof value === "string") {
         const parsed = parseFloat(value);
-        return isNaN(parsed) ? 0 : parsed;
+        return isNaN(parsed) ? 0 : new decimal_default(parsed).truncated().toNumber();
       }
       return 0;
     }
@@ -5216,25 +13275,329 @@
       this.variableService = variableService;
     }
     /**
-     * Execute a LET statement
+     * Execute a LET statement from CST
      */
-    execute(letStmt) {
-      if (letStmt.variable.subscript) {
-        this.variableService.setArrayElementFromExpressions(
-          letStmt.variable.name,
-          letStmt.variable.subscript,
-          letStmt.expression
-        );
-      } else {
-        this.variableService.setVariableFromExpression(
-          letStmt.variable.name,
-          letStmt.expression
-        );
-        if (this.variableService.context.config.enableDebugMode) {
-          const value = this.variableService.evaluator.evaluateExpression(letStmt.expression);
-          this.variableService.context.addDebugOutput(`LET: ${letStmt.variable.name} = ${value}`);
-        }
+    execute(letStmtCst) {
+      const identifierToken = getFirstToken(letStmtCst.children.Identifier);
+      const expressionCst = getFirstCstNode(letStmtCst.children.expression);
+      if (!identifierToken || !expressionCst) {
+        throw new Error("Invalid LET statement: missing identifier or expression");
       }
+      const varName = identifierToken.image.toUpperCase();
+      this.variableService.setVariableFromExpressionCst(varName, expressionCst);
+      if (this.variableService.context.config.enableDebugMode) {
+        const value = this.variableService.evaluator.evaluateExpression(expressionCst);
+        this.variableService.context.addDebugOutput(`LET: ${varName} = ${value}`);
+      }
+    }
+  };
+
+  // src/core/execution/executors/ForExecutor.ts
+  var ForExecutor = class {
+    constructor(context, evaluator, variableService) {
+      this.context = context;
+      this.evaluator = evaluator;
+      this.variableService = variableService;
+    }
+    /**
+     * Execute a FOR statement from CST
+     * Initializes the loop variable and pushes loop state onto the stack
+     * If loop is already active (jumped back from NEXT), skip re-initialization
+     */
+    execute(forStmtCst, statementIndex, lineNumber) {
+      const identifierToken = getFirstToken(forStmtCst.children.Identifier);
+      const expressions = getCstNodes(forStmtCst.children.expression);
+      const startExprCst = expressions[0];
+      const endExprCst = expressions[1];
+      if (!identifierToken || !startExprCst || !endExprCst) {
+        this.context.addError({
+          line: lineNumber,
+          message: "Invalid FOR statement: missing variable or expressions",
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      const varName = identifierToken.image.toUpperCase();
+      const existingLoop = this.context.loopStack.find(
+        (loop) => loop.variableName === varName && loop.statementIndex === statementIndex
+      );
+      if (existingLoop) {
+        if (this.context.config.enableDebugMode) {
+          this.context.addDebugOutput(
+            `FOR: ${varName} loop already active, skipping re-initialization`
+          );
+        }
+        return;
+      }
+      const startValue = this.evaluator.evaluateExpression(startExprCst);
+      const endValue = this.evaluator.evaluateExpression(endExprCst);
+      if (typeof startValue !== "number" || typeof endValue !== "number") {
+        this.context.addError({
+          line: lineNumber,
+          message: "FOR loop requires numeric values",
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      let stepValue = 1;
+      const stepExprCst = expressions[2];
+      if (stepExprCst) {
+        const stepValueResult = this.evaluator.evaluateExpression(stepExprCst);
+        if (typeof stepValueResult !== "number") {
+          this.context.addError({
+            line: lineNumber,
+            message: "FOR STEP requires numeric value",
+            type: ERROR_TYPES.RUNTIME
+          });
+          return;
+        }
+        stepValue = stepValueResult;
+      }
+      this.variableService.setVariable(varName, startValue);
+      const loopState = {
+        variableName: varName,
+        startValue,
+        endValue,
+        stepValue,
+        currentValue: startValue,
+        statementIndex,
+        // Jump back to the same statement index
+        shouldExecute: this.shouldExecuteLoop(startValue, endValue, stepValue)
+      };
+      this.context.loopStack.push(loopState);
+      if (this.context.config.enableDebugMode) {
+        this.context.addDebugOutput(
+          `FOR: ${varName} = ${startValue} TO ${endValue} STEP ${stepValue} (shouldExecute: ${loopState.shouldExecute})`
+        );
+      }
+    }
+    /**
+     * Determine if loop should execute based on start, end, and step values
+     */
+    shouldExecuteLoop(start, end, step) {
+      if (step > 0) {
+        return start <= end;
+      } else if (step < 0) {
+        return start >= end;
+      } else {
+        return false;
+      }
+    }
+  };
+
+  // src/core/execution/executors/NextExecutor.ts
+  var NextExecutor = class {
+    constructor(context, variableService) {
+      this.context = context;
+      this.variableService = variableService;
+    }
+    /**
+     * Execute a NEXT statement from CST
+     * Increments the loop variable and checks if loop should continue
+     * Returns true if loop should continue, false if loop should exit
+     * 
+     * Note: Family BASIC spec states that NEXT cannot have a variable name
+     */
+    execute(nextStmtCst, lineNumber) {
+      if (this.context.loopStack.length === 0) {
+        this.context.addError({
+          line: lineNumber,
+          message: "NEXT without FOR",
+          type: ERROR_TYPES.RUNTIME
+        });
+        return false;
+      }
+      const loopState = this.context.loopStack[this.context.loopStack.length - 1];
+      loopState.currentValue += loopState.stepValue;
+      this.variableService.setVariable(loopState.variableName, loopState.currentValue);
+      const shouldContinue = this.shouldContinueLoop(
+        loopState.currentValue,
+        loopState.endValue,
+        loopState.stepValue
+      );
+      if (this.context.config.enableDebugMode) {
+        this.context.addDebugOutput(
+          `NEXT: ${loopState.variableName} = ${loopState.currentValue} (shouldContinue: ${shouldContinue})`
+        );
+      }
+      if (shouldContinue) {
+        this.context.jumpToStatement(loopState.statementIndex);
+      } else {
+        this.context.loopStack.pop();
+      }
+      return shouldContinue;
+    }
+    /**
+     * Determine if loop should continue based on current value, end value, and step
+     */
+    shouldContinueLoop(current, end, step) {
+      if (step > 0) {
+        return current <= end;
+      } else if (step < 0) {
+        return current >= end;
+      } else {
+        return false;
+      }
+    }
+  };
+
+  // src/core/execution/executors/EndExecutor.ts
+  var EndExecutor = class {
+    constructor(context) {
+      this.context = context;
+    }
+    /**
+     * Execute an END statement from CST
+     * Stops program execution immediately
+     */
+    execute(_endStmtCst) {
+      this.context.shouldStop = true;
+      this.context.isRunning = false;
+      if (this.context.config.enableDebugMode) {
+        this.context.addDebugOutput("END: Program terminated");
+      }
+    }
+  };
+
+  // src/core/execution/executors/PauseExecutor.ts
+  var PauseExecutor = class {
+    constructor(context, evaluator) {
+      this.context = context;
+      this.evaluator = evaluator;
+    }
+    /**
+     * Execute a PAUSE statement from CST
+     * Pauses execution for the specified duration (in milliseconds)
+     */
+    async execute(pauseStmtCst) {
+      const expressionCst = getFirstCstNode(pauseStmtCst.children.expression);
+      if (!expressionCst) {
+        throw new Error("Invalid PAUSE statement: missing expression");
+      }
+      const durationValue = this.evaluator.evaluateExpression(expressionCst);
+      const duration = typeof durationValue === "number" ? Math.max(0, Math.floor(durationValue)) : Math.max(0, Math.floor(parseFloat(String(durationValue)) || 0));
+      if (duration > 0) {
+        await new Promise((resolve) => setTimeout(resolve, duration));
+      }
+      if (this.context.config.enableDebugMode) {
+        this.context.addDebugOutput(`PAUSE: ${duration}ms`);
+      }
+    }
+  };
+
+  // src/core/execution/executors/IfThenExecutor.ts
+  var IfThenExecutor = class {
+    constructor(context, evaluator) {
+      this.context = context;
+      this.evaluator = evaluator;
+    }
+    /**
+     * Evaluate the condition of an IF-THEN statement
+     * Returns true if condition is true (non-zero), false otherwise
+     */
+    evaluateCondition(ifThenStmtCst, lineNumber) {
+      const logicalExprCst = getFirstCstNode(ifThenStmtCst.children.logicalExpression);
+      if (!logicalExprCst) {
+        this.context.addError({
+          line: lineNumber,
+          message: "Invalid IF-THEN statement: missing condition",
+          type: ERROR_TYPES.RUNTIME
+        });
+        return false;
+      }
+      let conditionResult;
+      try {
+        conditionResult = this.evaluator.evaluateLogicalExpression(logicalExprCst);
+      } catch (error) {
+        this.context.addError({
+          line: lineNumber,
+          message: `Error evaluating IF condition: ${error instanceof Error ? error.message : String(error)}`,
+          type: ERROR_TYPES.RUNTIME
+        });
+        return false;
+      }
+      const conditionIsTrue = conditionResult !== 0;
+      if (this.context.config.enableDebugMode) {
+        this.context.addDebugOutput(`IF-THEN: condition = ${conditionResult} (${conditionIsTrue ? "true" : "false"})`);
+      }
+      return conditionIsTrue;
+    }
+    /**
+     * Get the THEN clause commandList CST node from an IF-THEN statement
+     * Returns undefined if THEN clause is a line number (not statements)
+     */
+    getThenClause(ifThenStmtCst) {
+      return getFirstCstNode(ifThenStmtCst.children.commandList);
+    }
+    /**
+     * Check if IF-THEN has a line number (either THEN number or GOTO number)
+     * Returns the line number if present, undefined otherwise
+     * 
+     * Parser structure:
+     * - IF ... THEN NumberLiteral -> children.NumberLiteral exists
+     * - IF ... THEN CommandList -> children.commandList exists
+     * - IF ... GOTO NumberLiteral -> children.Goto token exists, children.NumberLiteral exists
+     */
+    getLineNumber(ifThenStmtCst) {
+      const lineNumberToken = getFirstToken(ifThenStmtCst.children.NumberLiteral);
+      if (lineNumberToken) {
+        const lineNumber = parseInt(lineNumberToken.image, 10);
+        return isNaN(lineNumber) ? void 0 : lineNumber;
+      }
+      return void 0;
+    }
+    /**
+     * Check if IF-THEN uses line number jump (either THEN number or GOTO number)
+     * Returns true if a line number jump should be performed
+     */
+    hasLineNumberJump(ifThenStmtCst) {
+      const hasNumberLiteral = !!getFirstToken(ifThenStmtCst.children.NumberLiteral);
+      const hasCommandList = !!getFirstCstNode(ifThenStmtCst.children.commandList);
+      return hasNumberLiteral && !hasCommandList;
+    }
+  };
+
+  // src/core/execution/executors/GotoExecutor.ts
+  var GotoExecutor = class {
+    constructor(context) {
+      this.context = context;
+    }
+    /**
+     * Execute a GOTO statement from CST
+     * Jumps to the specified line number
+     */
+    execute(gotoStmtCst, lineNumber) {
+      const lineNumberToken = getFirstToken(gotoStmtCst.children.NumberLiteral);
+      if (!lineNumberToken) {
+        this.context.addError({
+          line: lineNumber,
+          message: "GOTO: missing line number",
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      const targetLineNumber = parseInt(lineNumberToken.image, 10);
+      if (isNaN(targetLineNumber)) {
+        this.context.addError({
+          line: lineNumber,
+          message: `GOTO: invalid line number: ${lineNumberToken.image}`,
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      const targetStatementIndex = this.context.findStatementIndexByLine(targetLineNumber);
+      if (targetStatementIndex === -1) {
+        this.context.addError({
+          line: lineNumber,
+          message: `GOTO: line number ${targetLineNumber} not found`,
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      if (this.context.config.enableDebugMode) {
+        this.context.addDebugOutput(`GOTO: jumping to line ${targetLineNumber} (statement index ${targetStatementIndex})`);
+      }
+      this.context.jumpToStatement(targetStatementIndex);
     }
   };
 
@@ -5245,16 +13608,22 @@
       this.evaluator = evaluator;
     }
     /**
-     * Add data values from a DATA statement
+     * Add data values from a DATA statement (CST version)
      */
-    addDataValues(expressions) {
-      for (const expr of expressions) {
-        const value = this.evaluator.evaluateExpression(expr);
+    addDataValuesCst(expressionCsts) {
+      for (const exprCst of expressionCsts) {
+        const value = this.evaluator.evaluateExpression(exprCst);
         this.context.dataValues.push(value);
       }
       if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(`DATA: Added ${expressions.length} values`);
+        this.context.addDebugOutput(`DATA: Added ${expressionCsts.length} values`);
       }
+    }
+    /**
+     * Add data values from a DATA statement (AST version - deprecated)
+     */
+    addDataValues(expressions) {
+      console.warn("addDataValues called with AST - use addDataValuesCst instead");
     }
     /**
      * Read the next data value
@@ -5332,16 +13701,6 @@
      * Find the index of the first DATA statement at or after the specified line
      */
     findDataStatementIndex(lineNumber) {
-      let valueIndex = 0;
-      for (let i = 0; i < this.context.statements.length; i++) {
-        const statement = this.context.statements[i];
-        if (statement && statement.type === "Statement" && statement.command.type === "DataStatement") {
-          if (statement.lineNumber >= lineNumber) {
-            return valueIndex;
-          }
-          valueIndex += (statement.command.constants || []).length;
-        }
-      }
       return -1;
     }
     /**
@@ -5349,11 +13708,6 @@
      */
     preprocessDataStatements() {
       this.context.dataValues = [];
-      for (const statement of this.context.statements) {
-        if (statement && statement.type === "Statement" && statement.command.type === "DataStatement") {
-          this.addDataValues(statement.command.constants || []);
-        }
-      }
       if (this.context.config.enableDebugMode) {
         this.context.addDebugOutput(`Preprocessed ${this.context.dataValues.length} data values`);
       }
@@ -5370,326 +13724,167 @@
       this.dataService = dataService;
       __publicField(this, "printExecutor");
       __publicField(this, "letExecutor");
-      this.printExecutor = new PrintExecutor(ioService);
+      __publicField(this, "forExecutor");
+      __publicField(this, "nextExecutor");
+      __publicField(this, "endExecutor");
+      __publicField(this, "pauseExecutor");
+      __publicField(this, "ifThenExecutor");
+      __publicField(this, "gotoExecutor");
+      this.printExecutor = new PrintExecutor(ioService, evaluator);
       this.letExecutor = new LetExecutor(variableService);
+      this.forExecutor = new ForExecutor(context, evaluator, variableService);
+      this.nextExecutor = new NextExecutor(context, variableService);
+      this.endExecutor = new EndExecutor(context);
+      this.pauseExecutor = new PauseExecutor(context, evaluator);
+      this.ifThenExecutor = new IfThenExecutor(context, evaluator);
+      this.gotoExecutor = new GotoExecutor(context);
     }
     /**
-     * Route a statement to its appropriate executor
+     * Route an expanded statement to its appropriate executor
+     * Each expanded statement contains a single command (colon-separated commands are already expanded)
      */
-    async executeStatement(statement) {
-      switch (statement.command.type) {
-        case "PrintStatement":
-          this.printExecutor.execute(statement.command);
-          break;
-        case "LetStatement":
-          this.letExecutor.execute(statement.command);
-          break;
-        case "IfStatement":
-          await this.executeIfStatement(statement.command);
-          break;
-        case "ForStatement":
-          await this.executeForStatement(statement.command);
-          break;
-        case "NextStatement":
-          await this.executeNextStatement(statement.command);
-          break;
-        case "GotoStatement":
-          await this.executeGotoStatement(statement.command);
-          break;
-        case "GosubStatement":
-          await this.executeGosubStatement(statement.command);
-          break;
-        case "ReturnStatement":
-          await this.executeReturnStatement(statement.command);
-          break;
-        case "InputStatement":
-          await this.executeInputStatement(statement.command);
-          break;
-        case "DataStatement":
-          this.dataService.addDataValues(statement.command.constants || []);
-          break;
-        case "ReadStatement":
-          await this.executeReadStatement(statement.command);
-          break;
-        case "RestoreStatement":
-          await this.executeRestoreStatement(statement.command);
-          break;
-        case "DimStatement":
-          await this.executeDimStatement(statement.command);
-          break;
-        case "ClsStatement":
-          this.ioService.clearScreen();
-          break;
-        case "ColorStatement":
-          await this.executeColorStatement(statement.command);
-          break;
-        case "EndStatement":
-          this.context.shouldStop = true;
-          break;
-        case "PauseStatement":
-          await this.executePauseStatement(statement.command);
-          break;
-        case "RemStatement":
-          break;
-        case "StatementBlockExecutor":
-          await this.executeStatementBlock(statement.command.statements);
-          break;
-        default:
-          this.context.addError({
-            line: statement.lineNumber,
-            message: `Unsupported statement type: ${statement.command.type}`,
-            type: ERROR_TYPES.RUNTIME
-          });
-      }
-    }
-    /**
-     * Execute a StatementBlock by executing each statement in sequence
-     */
-    async executeStatementBlock(statements) {
-      for (const cmd of statements) {
-        const statementNode = {
-          type: "Statement",
-          lineNumber: 0,
-          // Use 0 for nested statements
-          command: cmd
-        };
-        await this.executeStatement(statementNode);
-      }
-    }
-    // Placeholder methods for statements not yet extracted
-    async executeIfStatement(ifStmt) {
-      const condition = this.evaluator.evaluateExpression(ifStmt.condition);
-      if (condition) {
-        await this.executeStatement({
-          type: "Statement",
-          lineNumber: 0,
-          command: ifStmt.thenStatement
-        });
-      }
-    }
-    async executeForStatement(forStmt) {
-      const varName = forStmt.variable.name;
-      const existingLoopIndex = this.context.loopStack.findIndex((loop) => loop.variableName === varName);
-      if (existingLoopIndex !== -1) {
-        if (this.context.config.enableDebugMode) {
-          this.context.addDebugOutput(`FOR: reusing existing loop state for ${varName}`);
-        }
-        return;
-      }
-      const startValue = this.evaluator.evaluateExpression(forStmt.start);
-      const endValue = this.evaluator.evaluateExpression(forStmt.end);
-      const stepValue = forStmt.step ? this.evaluator.evaluateExpression(forStmt.step) : 1;
-      const startNum = this.toNumber(startValue);
-      const endNum = this.toNumber(endValue);
-      const stepNum = this.toNumber(stepValue);
-      if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(`FOR: ${varName} = ${startValue} TO ${endValue} STEP ${stepValue}`);
-      }
-      this.variableService.setVariable(varName, startValue);
-      if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(`FOR: creating new loop state for ${varName}, storing statementIndex ${this.context.currentStatementIndex}`);
-      }
-      const shouldExecute = stepNum > 0 && startNum <= endNum || stepNum < 0 && startNum >= endNum;
-      this.context.loopStack.push({
-        variableName: varName,
-        startValue: startNum,
-        endValue: endNum,
-        stepValue: stepNum,
-        currentValue: startNum,
-        statementIndex: this.context.currentStatementIndex,
-        shouldExecute
-      });
-      if (!shouldExecute) {
-        if (this.context.config.enableDebugMode) {
-          this.context.addDebugOutput(`FOR: loop will not execute (${startNum} ${stepNum > 0 ? ">" : "<"} ${endNum}), skipping to NEXT`);
-        }
-        const nextStatementIndex = this.findNextStatementIndex(this.context.currentStatementIndex, varName);
-        if (nextStatementIndex !== -1) {
-          this.context.currentStatementIndex = nextStatementIndex;
-        }
-      }
-    }
-    async executeNextStatement(nextStmt) {
-      if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(`NEXT: loopStack length = ${this.context.loopStack.length}`);
-      }
-      if (this.context.loopStack.length === 0) {
+    async executeStatement(expandedStatement) {
+      const commandCst = expandedStatement.command;
+      const singleCommandCst = getFirstCstNode(commandCst.children.singleCommand);
+      if (!singleCommandCst) {
         this.context.addError({
-          line: 0,
-          message: "NEXT without FOR",
+          line: expandedStatement.lineNumber,
+          message: "Invalid command: missing single command",
           type: ERROR_TYPES.RUNTIME
         });
         return;
       }
-      let loopStateIndex = -1;
-      if (nextStmt.variable) {
-        const variableName = nextStmt.variable.name;
-        for (let i = this.context.loopStack.length - 1; i >= 0; i--) {
-          if (this.context.loopStack[i] && this.context.loopStack[i].variableName === variableName) {
-            loopStateIndex = i;
-            break;
+      if (singleCommandCst.children.ifThenStatement) {
+        const ifThenStmtCst = getFirstCstNode(singleCommandCst.children.ifThenStatement);
+        if (ifThenStmtCst) {
+          const conditionIsTrue = this.ifThenExecutor.evaluateCondition(ifThenStmtCst, expandedStatement.lineNumber);
+          if (conditionIsTrue) {
+            if (this.ifThenExecutor.hasLineNumberJump(ifThenStmtCst)) {
+              const targetLineNumber = this.ifThenExecutor.getLineNumber(ifThenStmtCst);
+              if (targetLineNumber !== void 0) {
+                const targetStatementIndex = this.context.findStatementIndexByLine(targetLineNumber);
+                if (targetStatementIndex === -1) {
+                  this.context.addError({
+                    line: expandedStatement.lineNumber,
+                    message: `IF-THEN: line number ${targetLineNumber} not found`,
+                    type: ERROR_TYPES.RUNTIME
+                  });
+                } else {
+                  if (this.context.config.enableDebugMode) {
+                    this.context.addDebugOutput(`IF-THEN: jumping to line ${targetLineNumber} (statement index ${targetStatementIndex})`);
+                  }
+                  this.context.jumpToStatement(targetStatementIndex);
+                  return;
+                }
+              }
+            }
+            const thenCommandListCst = this.ifThenExecutor.getThenClause(ifThenStmtCst);
+            if (thenCommandListCst) {
+              const thenCommands = getCstNodes(thenCommandListCst.children.command);
+              let thenCommandIndex = 0;
+              while (thenCommandIndex < thenCommands.length) {
+                const commandCst2 = thenCommands[thenCommandIndex];
+                if (!commandCst2) break;
+                const thenStatement = {
+                  statementIndex: expandedStatement.statementIndex,
+                  // Keep same statement index
+                  lineNumber: expandedStatement.lineNumber,
+                  command: commandCst2
+                };
+                await this.executeStatement(thenStatement);
+                const singleCommandCst2 = getFirstCstNode(commandCst2.children.singleCommand);
+                if (singleCommandCst2?.children.nextStatement) {
+                  const nextStmtCst = getFirstCstNode(singleCommandCst2.children.nextStatement);
+                  if (nextStmtCst) {
+                    const activeLoop = this.context.loopStack.find(
+                      (loop) => loop.statementIndex === expandedStatement.statementIndex
+                    );
+                    if (activeLoop) {
+                      const varName = activeLoop.variableName;
+                      for (let i = 0; i < thenCommands.length; i++) {
+                        const cmd = thenCommands[i];
+                        const singleCmd = getFirstCstNode(cmd?.children.singleCommand);
+                        const forStmt = getFirstCstNode(singleCmd?.children.forStatement);
+                        if (forStmt) {
+                          const forVarToken = getFirstToken(forStmt.children.Identifier);
+                          if (forVarToken && forVarToken.image.toUpperCase() === varName) {
+                            thenCommandIndex = i;
+                            break;
+                          }
+                        }
+                      }
+                      continue;
+                    }
+                  }
+                }
+                thenCommandIndex++;
+              }
+            }
           }
         }
-      } else {
-        loopStateIndex = this.context.loopStack.length - 1;
-      }
-      if (loopStateIndex === -1) {
-        if (this.context.loopStack.length > 0) {
-          loopStateIndex = this.context.loopStack.length - 1;
-          if (this.context.config.enableDebugMode) {
-            this.context.addDebugOutput(`NEXT: no matching FOR found for variable ${nextStmt.variable?.name || "unnamed"}, using most recent FOR loop`);
-          }
-        } else {
-          if (this.context.config.enableDebugMode) {
-            this.context.addDebugOutput(`NEXT: no matching FOR found for variable ${nextStmt.variable?.name || "unnamed"}, continuing execution`);
-          }
+      } else if (singleCommandCst.children.gotoStatement) {
+        const gotoStmtCst = getFirstCstNode(singleCommandCst.children.gotoStatement);
+        if (gotoStmtCst) {
+          this.gotoExecutor.execute(gotoStmtCst, expandedStatement.lineNumber);
           return;
         }
-      }
-      const loopState = this.context.loopStack[loopStateIndex];
-      if (!loopState) {
-        if (this.context.config.enableDebugMode) {
-          this.context.addDebugOutput(`NEXT: no valid loop state found, continuing execution`);
+      } else if (singleCommandCst.children.printStatement) {
+        const printStmtCst = getFirstCstNode(singleCommandCst.children.printStatement);
+        if (printStmtCst) {
+          this.printExecutor.execute(printStmtCst);
         }
-        return;
-      }
-      if (loopState.shouldExecute === false) {
-        this.context.loopStack.splice(loopStateIndex, 1);
-        if (this.context.config.enableDebugMode) {
-          this.context.addDebugOutput(`NEXT: loop was not executed, popping from stack`);
+      } else if (singleCommandCst.children.letStatement) {
+        const letStmtCst = getFirstCstNode(singleCommandCst.children.letStatement);
+        if (letStmtCst) {
+          this.letExecutor.execute(letStmtCst);
         }
-        return;
-      }
-      loopState.currentValue += loopState.stepValue;
-      if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(`NEXT: currentValue=${loopState.currentValue}, endValue=${loopState.endValue}, stepValue=${loopState.stepValue}`);
-      }
-      if (loopState.stepValue > 0 && loopState.currentValue <= loopState.endValue || loopState.stepValue < 0 && loopState.currentValue >= loopState.endValue) {
-        this.variableService.setVariable(loopState.variableName, loopState.currentValue);
-        this.context.currentStatementIndex = loopState.statementIndex;
-        if (this.context.config.enableDebugMode) {
-          this.context.addDebugOutput(`NEXT: continuing loop, jumping to statement ${loopState.statementIndex}`);
+      } else if (singleCommandCst.children.forStatement) {
+        const forStmtCst = getFirstCstNode(singleCommandCst.children.forStatement);
+        if (forStmtCst) {
+          const identifierToken = getFirstToken(forStmtCst.children.Identifier);
+          if (identifierToken) {
+            const varName = identifierToken.image.toUpperCase();
+            const existingLoop = this.context.loopStack.find(
+              (loop) => loop.variableName === varName && loop.statementIndex === expandedStatement.statementIndex
+            );
+            if (existingLoop) {
+              return;
+            }
+          }
+          this.forExecutor.execute(forStmtCst, expandedStatement.statementIndex, expandedStatement.lineNumber);
         }
-      } else {
-        this.context.loopStack.splice(loopStateIndex, 1);
-        if (this.context.config.enableDebugMode) {
-          this.context.addDebugOutput(`NEXT: loop completed, removed from stack`);
-        }
-      }
-    }
-    async executeGotoStatement(gotoStmt) {
-      const targetLine = this.evaluator.evaluateExpression(gotoStmt.target);
-      const targetIndex = this.context.findStatementIndexByLine(this.toNumber(targetLine));
-      if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(`GOTO: target line ${targetLine}, target index ${targetIndex}`);
-        this.context.addDebugOutput(`GOTO: available statements: ${this.context.statements.map((s, i) => `${i}:L${s.lineNumber}`).join(", ")}`);
-      }
-      if (targetIndex !== -1) {
-        this.context.currentStatementIndex = targetIndex;
-        if (this.context.config.enableDebugMode) {
-          this.context.addDebugOutput(`GOTO: jumping to statement ${targetIndex}`);
-        }
-      } else {
-        this.context.addError({
-          line: 0,
-          message: `GOTO target line ${targetLine} not found`,
-          type: ERROR_TYPES.RUNTIME
-        });
-      }
-    }
-    async executeGosubStatement(gosubStmt) {
-      this.context.gosubStack.push(this.context.currentStatementIndex + 1);
-      const targetLine = this.evaluator.evaluateExpression(gosubStmt.target);
-      const targetIndex = this.context.findStatementIndexByLine(this.toNumber(targetLine));
-      if (targetIndex !== -1) {
-        this.context.currentStatementIndex = targetIndex;
-      } else {
-        this.context.addError({
-          line: 0,
-          message: `GOSUB target line ${targetLine} not found`,
-          type: ERROR_TYPES.RUNTIME
-        });
-      }
-    }
-    async executeReturnStatement(_returnStmt) {
-      if (this.context.gosubStack.length === 0) {
-        this.context.addError({
-          line: 0,
-          message: "RETURN without GOSUB",
-          type: ERROR_TYPES.RUNTIME
-        });
-        return;
-      }
-      const returnIndex = this.context.gosubStack.pop();
-      this.context.currentStatementIndex = returnIndex;
-    }
-    async executeInputStatement(_inputStmt) {
-      this.ioService.inputValue();
-    }
-    async executeReadStatement(readStmt) {
-      for (const variable of readStmt.variables) {
-        const value = this.dataService.readNextDataValue();
-        if (variable.subscript) {
-          this.variableService.setArrayElementFromExpressions(
-            variable.name,
-            variable.subscript,
-            { type: "NumberLiteral", value }
-          );
-        } else {
-          this.variableService.setVariable(variable.name, value);
-        }
-      }
-    }
-    async executeRestoreStatement(restoreStmt) {
-      const lineNumber = restoreStmt.lineNumber ? this.evaluator.evaluateExpression(restoreStmt.lineNumber) : void 0;
-      this.dataService.restoreData(lineNumber ? this.toNumber(lineNumber) : void 0);
-    }
-    async executeDimStatement(dimStmt) {
-      for (const arrayDecl of dimStmt.arrays) {
-        const dimensions = arrayDecl.dimensions.map(
-          (dim) => this.toNumber(this.evaluator.evaluateExpression(dim))
-        );
-        this.variableService.createArray(arrayDecl.variable.name, dimensions);
-      }
-    }
-    async executeColorStatement(colorStmt) {
-      const foreground = this.toNumber(this.evaluator.evaluateExpression(colorStmt.foreground));
-      const background = colorStmt.background ? this.toNumber(this.evaluator.evaluateExpression(colorStmt.background)) : 0;
-      this.context.addDebugOutput(`COLOR: foreground=${foreground}, background=${background}`);
-    }
-    async executePauseStatement(pauseStmt) {
-      const durationValue = this.evaluator.evaluateExpression(pauseStmt.duration);
-      const durationMs = this.toNumber(durationValue);
-      const pauseDuration = Math.max(0, durationMs);
-      if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(`PAUSE: ${pauseDuration}ms`);
-      }
-      if (pauseDuration > 0) {
-        await new Promise((resolve) => setTimeout(resolve, pauseDuration));
-      }
-    }
-    toNumber(value) {
-      if (typeof value === "number") return value;
-      if (typeof value === "boolean") return value ? 1 : 0;
-      if (typeof value === "string") {
-        const parsed = parseFloat(value);
-        return isNaN(parsed) ? 0 : parsed;
-      }
-      return 0;
-    }
-    /**
-     * Find the NEXT statement for a given variable
-     */
-    findNextStatementIndex(startIndex, variableName) {
-      for (let i = startIndex + 1; i < this.context.statements.length; i++) {
-        const stmt = this.context.statements[i];
-        if (stmt && stmt.command.type === "NextStatement") {
-          if (!stmt.command.variable || stmt.command.variable.name === variableName) {
-            return i;
+      } else if (singleCommandCst.children.nextStatement) {
+        const nextStmtCst = getFirstCstNode(singleCommandCst.children.nextStatement);
+        if (nextStmtCst) {
+          const shouldContinue = this.nextExecutor.execute(nextStmtCst, expandedStatement.lineNumber);
+          if (shouldContinue) {
+            return;
           }
         }
+      } else if (singleCommandCst.children.endStatement) {
+        const endStmtCst = getFirstCstNode(singleCommandCst.children.endStatement);
+        if (endStmtCst) {
+          this.endExecutor.execute(endStmtCst);
+          return;
+        }
+      } else if (singleCommandCst.children.remStatement) {
+        if (this.context.config.enableDebugMode) {
+          this.context.addDebugOutput("REM: Comment ignored");
+        }
+        return;
+      } else if (singleCommandCst.children.pauseStatement) {
+        const pauseStmtCst = getFirstCstNode(singleCommandCst.children.pauseStatement);
+        if (pauseStmtCst) {
+          await this.pauseExecutor.execute(pauseStmtCst);
+        }
+        return;
+      } else {
+        this.context.addError({
+          line: expandedStatement.lineNumber,
+          message: "Unsupported statement type",
+          type: ERROR_TYPES.RUNTIME
+        });
       }
-      return -1;
     }
   };
 
@@ -5716,56 +13911,18 @@
       );
     }
     /**
-     * Preprocess statement blocks by flattening colon-separated statements
+     * Preprocess statements (statements are already expanded)
      */
-    preprocessStatementBlocks() {
-      const flattenedStatements = [];
-      for (const statement of this.context.statements) {
-        if (statement.command.type === "StatementBlock") {
-          const block = statement.command;
-          for (const cmd of block.statements) {
-            const processedCmd = this.processNestedStatementBlocks(cmd);
-            flattenedStatements.push({
-              type: "Statement",
-              lineNumber: statement.lineNumber,
-              command: processedCmd
-            });
-          }
-        } else {
-          const processedStatement = {
-            ...statement,
-            command: this.processNestedStatementBlocks(statement.command)
-          };
-          flattenedStatements.push(processedStatement);
-        }
-      }
-      this.context.statements = flattenedStatements;
+    preprocessStatements() {
       if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(`Preprocessed ${flattenedStatements.length} statements (flattened statement blocks)`);
-        for (let i = 0; i < flattenedStatements.length; i++) {
-          const stmt = flattenedStatements[i];
+        this.context.addDebugOutput(`Preprocessed ${this.context.statements.length} expanded statements`);
+        for (let i = 0; i < this.context.statements.length; i++) {
+          const stmt = this.context.statements[i];
           if (stmt) {
-            this.context.addDebugOutput(`Statement ${i}: Line ${stmt.lineNumber}, Type: ${stmt.command.type}`);
+            this.context.addDebugOutput(`Statement ${i}: Line ${stmt.lineNumber}`);
           }
         }
-      }
-    }
-    /**
-     * Recursively process nested StatementBlocks in commands
-     */
-    processNestedStatementBlocks(command) {
-      if (command.type === "StatementBlock") {
-        return {
-          type: "StatementBlockExecutor",
-          statements: command.statements
-        };
-      } else if (command.type === "IfStatement") {
-        return {
-          ...command,
-          thenStatement: this.processNestedStatementBlocks(command.thenStatement)
-        };
-      } else {
-        return command;
+        this.context.addDebugOutput(`Label map: ${this.context.labelMap.size} line numbers`);
       }
     }
     /**
@@ -5775,17 +13932,17 @@
       const startTime = Date.now();
       try {
         this.dataService.preprocessDataStatements();
-        this.preprocessStatementBlocks();
+        this.preprocessStatements();
         this.context.isRunning = true;
         this.context.shouldStop = false;
         while (this.context.shouldContinue()) {
-          const statement = this.context.getCurrentStatement();
-          if (!statement) break;
+          const expandedStatement = this.context.getCurrentStatement();
+          if (!expandedStatement) break;
           const statementIndexBefore = this.context.currentStatementIndex;
           if (this.context.config.enableDebugMode) {
-            this.context.addDebugOutput(`Executing statement ${statementIndexBefore}: ${statement.command.type}`);
+            this.context.addDebugOutput(`Executing statement ${statementIndexBefore}: Line ${expandedStatement.lineNumber}`);
           }
-          await this.statementRouter.executeStatement(statement);
+          await this.statementRouter.executeStatement(expandedStatement);
           if (this.context.currentStatementIndex === statementIndexBefore) {
             this.context.nextStatement();
             if (this.context.config.enableDebugMode) {
@@ -5851,26 +14008,62 @@
     }
   };
 
+  // src/core/execution/statement-expander.ts
+  function expandStatements(statementsCst) {
+    const expandedStatements = [];
+    const labelMap = /* @__PURE__ */ new Map();
+    for (const statementCst of statementsCst) {
+      const lineNumberToken = getFirstToken(statementCst.children.NumberLiteral);
+      if (!lineNumberToken) {
+        continue;
+      }
+      const lineNumber = parseInt(lineNumberToken.image, 10);
+      if (isNaN(lineNumber)) {
+        continue;
+      }
+      const commandListCst = getFirstCstNode(statementCst.children.commandList);
+      if (!commandListCst) {
+        continue;
+      }
+      const commands = getCstNodes(commandListCst.children.command);
+      const statementIndices = [];
+      for (const commandCst of commands) {
+        const statementIndex = expandedStatements.length;
+        expandedStatements.push({
+          command: commandCst,
+          lineNumber,
+          statementIndex
+        });
+        statementIndices.push(statementIndex);
+      }
+      labelMap.set(lineNumber, statementIndices);
+    }
+    return {
+      statements: expandedStatements,
+      labelMap
+    };
+  }
+
   // src/core/BasicInterpreter.ts
   var BasicInterpreter = class {
-    constructor(config) {
+    constructor(config2) {
       __publicField(this, "config");
       __publicField(this, "parser");
       __publicField(this, "executionEngine");
       __publicField(this, "context");
       console.log("\u{1F527} [MAIN] BasicInterpreter constructor called with config:", {
-        hasDeviceAdapter: !!config?.deviceAdapter,
-        maxIterations: config?.maxIterations,
-        maxOutputLines: config?.maxOutputLines,
-        enableDebugMode: config?.enableDebugMode,
-        strictMode: config?.strictMode
+        hasDeviceAdapter: !!config2?.deviceAdapter,
+        maxIterations: config2?.maxIterations,
+        maxOutputLines: config2?.maxOutputLines,
+        enableDebugMode: config2?.enableDebugMode,
+        strictMode: config2?.strictMode
       });
       this.config = {
         maxIterations: EXECUTION_LIMITS.MAX_ITERATIONS_TEST,
         maxOutputLines: EXECUTION_LIMITS.MAX_OUTPUT_LINES_TEST,
         enableDebugMode: false,
         strictMode: false,
-        ...config
+        ...config2
       };
       console.log("\u{1F527} [MAIN] Final config after merge:", {
         maxIterations: this.config.maxIterations,
@@ -5910,7 +14103,16 @@
         }
         const preservedDeviceAdapter = this.context.deviceAdapter;
         this.context.reset();
-        this.context.statements = parseResult.ast?.statements || [];
+        if (parseResult.cst?.children.statement) {
+          const statementsCst = parseResult.cst.children.statement;
+          const validStatements = Array.isArray(statementsCst) ? statementsCst.filter((s) => "children" in s) : [];
+          const { statements, labelMap } = expandStatements(validStatements);
+          this.context.statements = statements;
+          this.context.labelMap = labelMap;
+        } else {
+          this.context.statements = [];
+          this.context.labelMap = /* @__PURE__ */ new Map();
+        }
         this.context.deviceAdapter = preservedDeviceAdapter;
         const result = await this.executionEngine.execute();
         return result;
@@ -5975,103 +14177,102 @@
     }
   };
 
-  // src/core/devices/ServiceWorkerDeviceAdapter.ts
-  var ServiceWorkerDeviceAdapter = class _ServiceWorkerDeviceAdapter {
+  // src/core/devices/WebWorkerDeviceAdapter.ts
+  var WebWorkerDeviceAdapter = class _WebWorkerDeviceAdapter {
     constructor() {
       // === DEVICE STATE ===
       __publicField(this, "strigClickBuffer", /* @__PURE__ */ new Map());
       __publicField(this, "stickStates", /* @__PURE__ */ new Map());
       __publicField(this, "isEnabled", true);
-      // === SERVICE WORKER MANAGEMENT ===
+      __publicField(this, "currentExecutionId", null);
+      // === WEB WORKER MANAGEMENT ===
       __publicField(this, "worker", null);
       __publicField(this, "messageId", 0);
       __publicField(this, "pendingMessages", /* @__PURE__ */ new Map());
-      console.log("\u{1F50C} [SERVICE_WORKER_DEVICE] ServiceWorkerDeviceAdapter created");
+      console.log("\u{1F50C} [WEB_WORKER_DEVICE] WebWorkerDeviceAdapter created");
       this.setupMessageListener();
     }
-    // === SERVICE WORKER MANAGEMENT METHODS ===
+    // === WEB WORKER MANAGEMENT METHODS ===
     /**
-     * Check if service workers are supported
+     * Check if web workers are supported
      */
     static isSupported() {
-      const supported = typeof Worker !== "undefined" && "serviceWorker" in navigator;
-      console.log("\u{1F50D} [SERVICE_WORKER] isSupported check:", {
+      const supported = typeof Worker !== "undefined";
+      console.log("\u{1F50D} [WEB_WORKER] isSupported check:", {
         hasWorker: typeof Worker !== "undefined",
-        hasServiceWorker: "serviceWorker" in navigator,
         supported
       });
       return supported;
     }
     /**
-     * Check if we're currently running in a service worker context
+     * Check if we're currently running in a web worker context
      */
-    static isInServiceWorker() {
-      const inServiceWorker = typeof window === "undefined" && typeof self !== "undefined" && "importScripts" in self;
-      console.log("\u{1F50D} [SERVICE_WORKER] isInServiceWorker check:", {
+    static isInWebWorker() {
+      const inWebWorker = typeof window === "undefined" && typeof self !== "undefined";
+      console.log("\u{1F50D} [WEB_WORKER] isInWebWorker check:", {
         hasWindow: typeof window !== "undefined",
         hasSelf: typeof self !== "undefined",
-        hasImportScripts: typeof self !== "undefined" && "importScripts" in self,
-        inServiceWorker
+        inWebWorker
       });
-      return inServiceWorker;
+      return inWebWorker;
     }
     /**
-     * Initialize the service worker
+     * Initialize the web worker
      */
     async initialize(workerScript) {
-      console.log("\u{1F527} [SERVICE_WORKER] ServiceWorkerDeviceAdapter.initialize called with script:", workerScript);
-      if (!_ServiceWorkerDeviceAdapter.isSupported()) {
-        console.error("\u274C [SERVICE_WORKER] Service workers are not supported in this environment");
-        throw new Error("Service workers are not supported in this environment");
+      console.log("\u{1F527} [WEB_WORKER] WebWorkerDeviceAdapter.initialize called with script:", workerScript);
+      if (!_WebWorkerDeviceAdapter.isSupported()) {
+        console.error("\u274C [WEB_WORKER] Web workers are not supported in this environment");
+        throw new Error("Web workers are not supported in this environment");
       }
       if (this.worker) {
-        console.log("\u2705 [SERVICE_WORKER] Worker already initialized");
+        console.log("\u2705 [WEB_WORKER] Worker already initialized");
         return;
       }
-      const script = workerScript || DEFAULTS.SERVICE_WORKER.WORKER_SCRIPT;
-      console.log("\u{1F527} [SERVICE_WORKER] Creating worker with script:", script);
+      const script = workerScript || DEFAULTS.WEB_WORKER.WORKER_SCRIPT;
+      console.log("\u{1F527} [WEB_WORKER] Creating worker with script:", script);
       try {
         this.worker = new Worker(script);
-        console.log("\u2705 [SERVICE_WORKER] Worker created successfully");
+        console.log("\u2705 [WEB_WORKER] Worker created successfully");
       } catch (error) {
-        console.error("\u274C [SERVICE_WORKER] Failed to create worker:", error);
+        console.error("\u274C [WEB_WORKER] Failed to create worker:", error);
         throw error;
       }
       this.setupMessageListener();
       this.worker.onerror = (error) => {
-        console.error("\u274C [SERVICE_WORKER] Service worker error:", error);
-        this.rejectAllPending("Service worker error: " + error.message);
+        console.error("\u274C [WEB_WORKER] Web worker error:", error);
+        this.rejectAllPending("Web worker error: " + error.message);
       };
       this.worker.onmessageerror = (error) => {
-        console.error("\u274C [SERVICE_WORKER] Service worker message error:", error);
-        this.rejectAllPending("Service worker message error");
+        console.error("\u274C [WEB_WORKER] Web worker message error:", error);
+        this.rejectAllPending("Web worker message error");
       };
-      console.log("\u2705 [SERVICE_WORKER] Worker initialization completed successfully");
+      console.log("\u2705 [WEB_WORKER] Worker initialization completed successfully");
     }
     /**
-     * Execute BASIC code in the service worker
+     * Execute BASIC code in the web worker
      */
-    async executeInWorker(code, config, options = {}) {
+    async executeInWorker(code, config2, options = {}) {
       console.log("executeInWorker called with code:", code.substring(0, 50) + "...");
       if (!this.worker) {
         console.log("Worker not initialized, initializing...");
-        await this.initialize(DEFAULTS.SERVICE_WORKER.WORKER_SCRIPT);
+        await this.initialize(DEFAULTS.WEB_WORKER.WORKER_SCRIPT);
       }
       if (!this.worker) {
-        throw new Error("Failed to initialize service worker");
+        throw new Error("Failed to initialize web worker");
       }
       const messageId = (++this.messageId).toString();
-      const timeout = options.timeout || DEFAULTS.SERVICE_WORKER.MESSAGE_TIMEOUT;
+      const timeout = options.timeout || DEFAULTS.WEB_WORKER.MESSAGE_TIMEOUT;
       console.log("Sending message with ID:", messageId, "timeout:", timeout);
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve, reject2) => {
         const timeoutHandle = setTimeout(() => {
-          console.log("Service worker timeout after", timeout, "ms for message ID:", messageId);
+          console.log("Web worker timeout after", timeout, "ms for message ID:", messageId);
           this.pendingMessages.delete(messageId);
-          reject(new Error(`Service worker execution timeout after ${timeout}ms`));
+          reject2(new Error(`Web worker execution timeout after ${timeout}ms`));
         }, timeout);
         this.pendingMessages.set(messageId, {
           resolve,
-          reject,
+          reject: reject2,
           timeout: timeoutHandle
         });
         const message = {
@@ -6080,7 +14281,7 @@
           timestamp: Date.now(),
           data: {
             code,
-            config,
+            config: config2,
             options: {
               timeout,
               enableProgress: options.onProgress !== void 0
@@ -6092,14 +14293,14 @@
           id: message.id,
           timestamp: message.timestamp,
           dataSize: JSON.stringify(message.data).length,
-          hasDeviceAdapter: !!config.deviceAdapter
+          hasDeviceAdapter: !!config2.deviceAdapter
         });
         this.worker.postMessage(message);
         console.log("\u2705 [MAIN\u2192WORKER] Message posted to worker successfully");
       });
     }
     /**
-     * Stop execution in the service worker
+     * Stop execution in the web worker
      */
     stopExecution() {
       if (!this.worker) return;
@@ -6122,11 +14323,11 @@
       console.log("\u2705 [MAIN\u2192WORKER] STOP message posted to worker successfully");
     }
     /**
-     * Send a STRIG event to the service worker
+     * Send a STRIG event to the web worker
      */
     sendStrigEvent(joystickId, state) {
       if (!this.worker) {
-        console.log("\u{1F50C} [SERVICE_WORKER] No worker available for STRIG event");
+        console.log("\u{1F50C} [WEB_WORKER] No worker available for STRIG event");
         return;
       }
       const message = {
@@ -6139,7 +14340,7 @@
           timestamp: Date.now()
         }
       };
-      console.log("\u{1F50C} [SERVICE_WORKER] Sending STRIG event to service worker:", {
+      console.log("\u{1F50C} [WEB_WORKER] Sending STRIG event to web worker:", {
         joystickId,
         state,
         messageId: message.id
@@ -6147,7 +14348,7 @@
       this.worker.postMessage(message);
     }
     /**
-     * Send a message to the service worker
+     * Send a message to the web worker
      */
     sendMessage(message) {
       if (this.worker) {
@@ -6155,13 +14356,13 @@
       }
     }
     /**
-     * Terminate the service worker
+     * Terminate the web worker
      */
     terminate() {
       if (this.worker) {
         this.worker.terminate();
         this.worker = null;
-        this.rejectAllPending("Service worker terminated");
+        this.rejectAllPending("Web worker terminated");
       }
     }
     // === DEVICE ADAPTER METHODS ===
@@ -6170,7 +14371,7 @@
      */
     setEnabled(enabled) {
       this.isEnabled = enabled;
-      console.log("\u{1F50C} [SERVICE_WORKER_DEVICE] Device adapter enabled:", enabled);
+      console.log("\u{1F50C} [WEB_WORKER_DEVICE] Device adapter enabled:", enabled);
     }
     // === JOYSTICK INPUT METHODS ===
     getJoystickCount() {
@@ -6181,18 +14382,18 @@
     }
     setStickState(joystickId, state) {
       this.stickStates.set(joystickId, state);
-      console.log("\u{1F50C} [SERVICE_WORKER_DEVICE] Stick state set:", { joystickId, state });
+      console.log("\u{1F50C} [WEB_WORKER_DEVICE] Stick state set:", { joystickId, state });
     }
     pushStrigState(joystickId, state) {
       if (!this.isEnabled) return;
-      console.log("\u{1F50C} [SERVICE_WORKER_DEVICE] pushStrigState called:", { joystickId, state });
+      console.log("\u{1F50C} [WEB_WORKER_DEVICE] pushStrigState called:", { joystickId, state });
       if (state > 0) {
         if (!this.strigClickBuffer.has(joystickId)) {
           this.strigClickBuffer.set(joystickId, []);
         }
         const buffer = this.strigClickBuffer.get(joystickId);
         buffer.push(state);
-        console.log("\u{1F50C} [SERVICE_WORKER_DEVICE] STRIG pulse buffered:", {
+        console.log("\u{1F50C} [WEB_WORKER_DEVICE] STRIG pulse buffered:", {
           joystickId,
           state,
           bufferSize: buffer.length
@@ -6211,61 +14412,70 @@
         return 0;
       }
       const clickValue = buffer.shift();
-      console.log(`\u{1F50C} [SERVICE_WORKER_DEVICE] consumeStrigState: consumed STRIG event for joystick ${joystickId}, value=${clickValue}, remaining=${buffer.length}`);
+      console.log(`\u{1F50C} [WEB_WORKER_DEVICE] consumeStrigState: consumed STRIG event for joystick ${joystickId}, value=${clickValue}, remaining=${buffer.length}`);
       return clickValue;
     }
     // === TEXT OUTPUT METHODS ===
     printOutput(output) {
-      console.log("\u{1F50C} [SERVICE_WORKER_DEVICE] Print output:", output);
+      console.log("\u{1F50C} [WEB_WORKER_DEVICE] Print output:", output);
       self.postMessage({
         type: "OUTPUT",
         id: `output-${Date.now()}`,
         timestamp: Date.now(),
         data: {
-          executionId: "current",
+          executionId: this.currentExecutionId || "unknown",
           output,
-          outputType: "print"
+          outputType: "print",
+          timestamp: Date.now()
         }
       });
     }
     debugOutput(output) {
-      console.log("\u{1F50C} [SERVICE_WORKER_DEVICE] Debug output:", output);
+      console.log("\u{1F50C} [WEB_WORKER_DEVICE] Debug output:", output);
       self.postMessage({
         type: "OUTPUT",
         id: `debug-${Date.now()}`,
         timestamp: Date.now(),
         data: {
-          executionId: "current",
+          executionId: this.currentExecutionId || "unknown",
           output,
-          outputType: "debug"
+          outputType: "debug",
+          timestamp: Date.now()
         }
       });
     }
     errorOutput(output) {
-      console.error("\u{1F50C} [SERVICE_WORKER_DEVICE] Error output:", output);
+      console.error("\u{1F50C} [WEB_WORKER_DEVICE] Error output:", output);
       self.postMessage({
         type: "OUTPUT",
         id: `error-${Date.now()}`,
         timestamp: Date.now(),
         data: {
-          executionId: "current",
+          executionId: this.currentExecutionId || "unknown",
           output,
-          outputType: "error"
+          outputType: "error",
+          timestamp: Date.now()
         }
       });
     }
     clearScreen() {
-      console.log("\u{1F50C} [SERVICE_WORKER_DEVICE] Clear screen");
+      console.log("\u{1F50C} [WEB_WORKER_DEVICE] Clear screen");
       self.postMessage({
         type: "CLEAR_SCREEN",
         id: `clear-${Date.now()}`,
         timestamp: Date.now(),
-        data: { executionId: "current" }
+        data: { executionId: this.currentExecutionId || "unknown" }
       });
+    }
+    /**
+     * Set the current execution ID (called by WebWorkerInterpreter)
+     */
+    setCurrentExecutionId(executionId) {
+      this.currentExecutionId = executionId;
     }
     // === PRIVATE METHODS ===
     /**
-     * Set up message listener for service worker responses
+     * Set up message listener for web worker responses
      */
     setupMessageListener() {
       if (typeof window === "undefined") return;
@@ -6283,7 +14493,7 @@
       }
     }
     /**
-     * Handle messages from the service worker
+     * Handle messages from the web worker
      */
     handleWorkerMessage(message) {
       console.log("\u{1F50D} [MAIN] Processing worker message:", {
@@ -6315,10 +14525,10 @@
           clearTimeout(pending.timeout);
           this.pendingMessages.delete(message.id);
           if (resultMessage.data.errors?.some((error) => error.message.includes("not yet fully implemented"))) {
-            console.log("\u26A0\uFE0F [MAIN] Service worker indicates fallback needed, rejecting to trigger fallback");
-            pending.reject(new Error("Service worker execution not implemented, falling back to main thread"));
+            console.log("\u26A0\uFE0F [MAIN] Web worker indicates fallback needed, rejecting to trigger fallback");
+            pending.reject(new Error("Web worker execution not implemented, falling back to main thread"));
           } else {
-            console.log("\u2705 [MAIN] Service worker result is valid, resolving pending promise");
+            console.log("\u2705 [MAIN] Web worker result is valid, resolving pending promise");
             pending.resolve(resultMessage.data);
           }
           break;
@@ -6346,7 +14556,7 @@
       }
     }
     /**
-     * Handle OUTPUT messages from the service worker
+     * Handle OUTPUT messages from the web worker
      */
     handleOutputMessage(message) {
       console.log("\u{1F4E4} [MAIN] Handling OUTPUT message:", {
@@ -6366,23 +14576,23 @@
     }
   };
 
-  // src/core/workers/ServiceWorkerInterpreter.ts
-  var ServiceWorkerInterpreter = class {
+  // src/core/workers/WebWorkerInterpreter.ts
+  var WebWorkerInterpreter = class {
     constructor() {
       __publicField(this, "interpreter", null);
       __publicField(this, "isRunning", false);
       __publicField(this, "currentExecutionId", null);
-      __publicField(this, "serviceWorkerDeviceAdapter", null);
+      __publicField(this, "webWorkerDeviceAdapter", null);
       this.interpreter = null;
       this.isRunning = false;
       this.currentExecutionId = null;
-      this.serviceWorkerDeviceAdapter = new ServiceWorkerDeviceAdapter();
+      this.webWorkerDeviceAdapter = new WebWorkerDeviceAdapter();
       this.setupMessageListener();
     }
     setupMessageListener() {
       if (typeof self === "undefined") return;
       self.addEventListener("message", (event) => {
-        console.log("\u{1F4E8} [WORKER] Service worker received message from main thread:", {
+        console.log("\u{1F4E8} [WORKER] Web worker received message from main thread:", {
           type: event.data.type,
           id: event.data.id,
           timestamp: event.data.timestamp,
@@ -6423,36 +14633,39 @@
     }
     async handleExecute(message) {
       try {
-        const { code, config } = message.data;
+        const { code, config: config2 } = message.data;
         this.currentExecutionId = message.id;
+        if (this.webWorkerDeviceAdapter) {
+          this.webWorkerDeviceAdapter.setCurrentExecutionId(message.id);
+        }
         console.log("\u25B6\uFE0F [WORKER] Starting execution:", {
           executionId: message.id,
           codeLength: code.length
         });
-        console.log("\u{1F527} [WORKER] Creating interpreter with ServiceWorkerDeviceAdapter:", {
-          hasOriginalDeviceAdapter: !!config.deviceAdapter,
-          maxIterations: config.maxIterations,
-          maxOutputLines: config.maxOutputLines
+        console.log("\u{1F527} [WORKER] Creating interpreter with WebWorkerDeviceAdapter:", {
+          hasOriginalDeviceAdapter: !!config2.deviceAdapter,
+          maxIterations: config2.maxIterations,
+          maxOutputLines: config2.maxOutputLines
         });
         this.interpreter = new BasicInterpreter({
-          ...config,
-          deviceAdapter: this.serviceWorkerDeviceAdapter
-          // Use ServiceWorkerDeviceAdapter (non-null assertion)
+          ...config2,
+          deviceAdapter: this.webWorkerDeviceAdapter
+          // Use WebWorkerDeviceAdapter (non-null assertion)
         });
-        console.log("\u2705 [WORKER] Interpreter created with ServiceWorkerDeviceAdapter");
+        console.log("\u2705 [WORKER] Interpreter created with WebWorkerDeviceAdapter");
         console.log("\u{1F680} [WORKER] Executing BASIC code");
         this.isRunning = true;
         const result = await this.interpreter.execute(code);
         this.isRunning = false;
         console.log("\u2705 [WORKER] Execution completed:", {
           success: result.success,
-          outputLines: this.serviceWorkerDeviceAdapter?.printOutput.length || 0,
+          outputLines: this.webWorkerDeviceAdapter?.printOutput.length || 0,
           executionTime: result.executionTime
         });
         const enhancedResult = {
           ...result,
           executionId: message.id,
-          workerId: "service-worker-1"
+          workerId: "web-worker-1"
         };
         this.sendResult(message.id, enhancedResult);
       } catch (error) {
@@ -6474,21 +14687,21 @@
     handleStrigEvent(message) {
       const { joystickId, state } = message.data;
       console.log("\u{1F3AE} [WORKER] Processing STRIG event:", { joystickId, state });
-      if (this.serviceWorkerDeviceAdapter) {
-        console.log("\u{1F3AE} [WORKER] Updating ServiceWorkerDeviceAdapter STRIG buffer");
-        this.serviceWorkerDeviceAdapter.pushStrigState(joystickId, state);
+      if (this.webWorkerDeviceAdapter) {
+        console.log("\u{1F3AE} [WORKER] Updating WebWorkerDeviceAdapter STRIG buffer");
+        this.webWorkerDeviceAdapter.pushStrigState(joystickId, state);
       } else {
-        console.log("\u{1F3AE} [WORKER] No ServiceWorkerDeviceAdapter available for STRIG event");
+        console.log("\u{1F3AE} [WORKER] No WebWorkerDeviceAdapter available for STRIG event");
       }
     }
     handleStickEvent(message) {
       const { joystickId, state } = message.data;
       console.log("\u{1F3AE} [WORKER] Processing STICK event:", { joystickId, state });
-      if (this.serviceWorkerDeviceAdapter) {
-        console.log("\u{1F3AE} [WORKER] Updating ServiceWorkerDeviceAdapter STICK state");
-        this.serviceWorkerDeviceAdapter.setStickState(joystickId, state);
+      if (this.webWorkerDeviceAdapter) {
+        console.log("\u{1F3AE} [WORKER] Updating WebWorkerDeviceAdapter STICK state");
+        this.webWorkerDeviceAdapter.setStickState(joystickId, state);
       } else {
-        console.log("\u{1F3AE} [WORKER] No ServiceWorkerDeviceAdapter available for STICK event");
+        console.log("\u{1F3AE} [WORKER] No WebWorkerDeviceAdapter available for STICK event");
       }
     }
     sendOutput(output, outputType) {
@@ -6547,5 +14760,27 @@
       self.postMessage(message);
     }
   };
-  new ServiceWorkerInterpreter();
+  new WebWorkerInterpreter();
 })();
+/*! Bundled license information:
+
+lodash-es/lodash.js:
+  (**
+   * @license
+   * Lodash (Custom Build) <https://lodash.com/>
+   * Build: `lodash modularize exports="es" -o ./`
+   * Copyright OpenJS Foundation and other contributors <https://openjsf.org/>
+   * Released under MIT license <https://lodash.com/license>
+   * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
+   * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+   *)
+
+decimal.js/decimal.mjs:
+  (*!
+   *  decimal.js v10.6.0
+   *  An arbitrary-precision Decimal type for JavaScript.
+   *  https://github.com/MikeMcl/decimal.js
+   *  Copyright (c) 2025 Michael Mclaughlin <M8ch88l@gmail.com>
+   *  MIT Licence
+   *)
+*/

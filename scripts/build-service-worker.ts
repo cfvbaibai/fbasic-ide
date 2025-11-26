@@ -1,5 +1,5 @@
 /**
- * Build script for creating a service worker-compatible BASIC interpreter
+ * Build script for creating a web worker-compatible BASIC interpreter
  */
 
 import * as esbuild from 'esbuild'
@@ -11,11 +11,11 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-const workerEntrypoint = path.resolve(__dirname, '../src/core/workers/ServiceWorkerInterpreter.ts')
+const workerEntrypoint = path.resolve(__dirname, '../src/core/workers/WebWorkerInterpreter.ts')
 const workerOutputPath = path.resolve(__dirname, '../public/basic-interpreter-worker.js')
 
-async function buildServiceWorker() {
-  console.log('Building service worker with full interpreter...')
+async function buildWebWorker() {
+  console.log('Building web worker with full interpreter...')
   try {
     await esbuild.build({
       entryPoints: [workerEntrypoint],
@@ -26,19 +26,19 @@ async function buildServiceWorker() {
       target: 'es2020',
       minify: false, // Keep readable for debugging
       sourcemap: false,
-      external: ['vue', 'element-plus', 'lodash-es'], // Exclude main app dependencies
+      external: ['vue', 'element-plus'], // Exclude main app dependencies (lodash-es must be bundled for Chevrotain)
       define: {
         'process.env.NODE_ENV': '"production"', // Ensure production environment
       },
       // Bundle all interpreter dependencies
       packages: 'bundle',
     })
-    console.log(`Service worker with full interpreter generated successfully!`)
+    console.log(`Web worker with full interpreter generated successfully!`)
     console.log(`Output: ${workerOutputPath}`)
   } catch (error) {
-    console.error('Error building service worker:', error)
+    console.error('Error building web worker:', error)
     process.exit(1)
   }
 }
 
-buildServiceWorker()
+buildWebWorker()

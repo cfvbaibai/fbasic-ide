@@ -4,10 +4,11 @@
  * Handles DATA, READ, and RESTORE operations for storing and retrieving data.
  */
 
-import type { ExpressionNode } from '../parser/ast-types'
+import type { CstNode } from 'chevrotain'
 import { ExpressionEvaluator, type EvaluationContext } from '../evaluation/ExpressionEvaluator'
 import { ERROR_TYPES } from '../constants'
 import type { BasicScalarValue } from '../types/BasicTypes'
+import { getLineNumberFromStatement } from '../parser/cst-helpers'
 
 export class DataService {
   constructor(
@@ -16,17 +17,26 @@ export class DataService {
   ) {}
 
   /**
-   * Add data values from a DATA statement
+   * Add data values from a DATA statement (CST version)
    */
-  addDataValues(expressions: ExpressionNode[]): void {
-    for (const expr of expressions) {
-      const value = this.evaluator.evaluateExpression(expr)
+  addDataValuesCst(expressionCsts: CstNode[]): void {
+    for (const exprCst of expressionCsts) {
+      const value = this.evaluator.evaluateExpression(exprCst)
       this.context.dataValues.push(value)
     }
     
     if (this.context.config.enableDebugMode) {
-      this.context.addDebugOutput(`DATA: Added ${expressions.length} values`)
+      this.context.addDebugOutput(`DATA: Added ${expressionCsts.length} values`)
     }
+  }
+
+  /**
+   * Add data values from a DATA statement (AST version - deprecated)
+   */
+  addDataValues(expressions: any[]): void {
+    // This method is kept for compatibility but should not be used
+    // Use addDataValuesCst instead
+    console.warn('addDataValues called with AST - use addDataValuesCst instead')
   }
 
   /**
@@ -118,21 +128,8 @@ export class DataService {
    * Find the index of the first DATA statement at or after the specified line
    */
   private findDataStatementIndex(lineNumber: number): number {
-    let valueIndex = 0
-    
-    for (let i = 0; i < this.context.statements.length; i++) {
-      const statement = this.context.statements[i]
-      
-      if (statement && statement.type === 'Statement' && 
-          statement.command.type === 'DataStatement') {
-        if (statement.lineNumber >= lineNumber) {
-          return valueIndex
-        }
-        // Count the values in this DATA statement
-        valueIndex += (statement.command.constants || []).length
-      }
-    }
-    
+    // For now, DATA statements are not yet implemented in CST parser
+    // This will be implemented when DATA statement parsing is added
     return -1
   }
 
@@ -140,14 +137,9 @@ export class DataService {
    * Preprocess all DATA statements to build the data array
    */
   preprocessDataStatements(): void {
+    // For now, DATA statements are not yet implemented in CST parser
+    // This will be implemented when DATA statement parsing is added
     this.context.dataValues = []
-    
-    for (const statement of this.context.statements) {
-      if (statement && statement.type === 'Statement' && 
-          statement.command.type === 'DataStatement') {
-        this.addDataValues(statement.command.constants || [])
-      }
-    }
     
     if (this.context.config.enableDebugMode) {
       this.context.addDebugOutput(`Preprocessed ${this.context.dataValues.length} data values`)

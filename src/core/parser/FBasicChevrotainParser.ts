@@ -1,0 +1,662 @@
+/**
+ * F-BASIC Chevrotain Parser
+ * 
+ * Complete Chevrotain-based parser implementation for F-BASIC language.
+ * This replaces the Peggy.js parser with a TypeScript-native solution.
+ * 
+ * Uses line-by-line parsing approach: split code by line breaks,
+ * parse each line independently, then combine results.
+ * 
+ * Note: Parsing is line-based (BASIC syntax requires line numbers),
+ * but execution is statement-based (statements are expanded into a flat list).
+ */
+
+import {
+  CstParser
+} from 'chevrotain';
+import type {
+  CstNode,
+  ILexingError,
+  IRecognitionException
+} from 'chevrotain';
+import {
+  // Keywords
+  Let, Print, For, To, Step, Next, End, Rem, Pause, If, Then, Goto,
+  // String functions
+  Len, Left, Right, Mid, Str, Hex,
+  // Arithmetic functions
+  Abs, Sgn, Rnd, Val,
+  // Controller input functions
+  Stick, Strig,
+  // Logical operators
+  And, Or, Xor, Not,
+  // Comparison operators
+  GreaterThan, LessThan, NotEqual, GreaterThanOrEqual, LessThanOrEqual,
+  // Operators
+  Equal, Plus, Minus, Multiply, Divide, Mod,
+  // Punctuation
+  Comma, Semicolon, Colon, LParen, RParen,
+  // Additional punctuation for REM statements
+  Period, Hash, Dollar, LBracket, RBracket, Exclamation, Question, AtSign, Percent,
+  LBrace, RBrace, Pipe, Tilde, Underscore, Backslash, Apostrophe,
+  // Literals
+  StringLiteral, NumberLiteral, Identifier,
+  // Lexer
+  lexer,
+  allTokens
+} from './parser-tokens';
+
+// ============================================================================
+// PARSER CLASS
+// ============================================================================
+
+class FBasicChevrotainParser extends CstParser {
+  // Declare rule methods for TypeScript
+  declare primary: () => CstNode;
+  declare unary: () => CstNode;
+  declare multiplicative: () => CstNode;
+  declare modExpression: () => CstNode;
+  declare additive: () => CstNode;
+  declare expression: () => CstNode;
+  declare printItem: () => CstNode;
+  declare printList: () => CstNode;
+  declare printStatement: () => CstNode;
+  declare letStatement: () => CstNode;
+  declare forStatement: () => CstNode;
+  declare nextStatement: () => CstNode;
+  declare endStatement: () => CstNode;
+  declare remStatement: () => CstNode;
+  declare pauseStatement: () => CstNode;
+  declare comparisonExpression: () => CstNode;
+  declare logicalNotExpression: () => CstNode;
+  declare logicalAndExpression: () => CstNode;
+  declare logicalOrExpression: () => CstNode;
+  declare logicalExpression: () => CstNode;
+  declare ifThenStatement: () => CstNode;
+  declare gotoStatement: () => CstNode;
+  declare expressionList: () => CstNode;
+  declare functionCall: () => CstNode;
+  declare singleCommand: () => CstNode;
+  declare command: () => CstNode;
+  declare commandList: () => CstNode;
+  declare statement: () => CstNode;
+
+  constructor() {
+    super(allTokens, {
+      recoveryEnabled: true
+    });
+
+    // Define rules in dependency order (bottom-up)
+    
+    // ExpressionList = Expression (Comma Expression)*
+    this.expressionList = this.RULE('expressionList', () => {
+      this.SUBRULE(this.expression);
+      this.MANY(() => {
+        this.CONSUME(Comma);
+        this.SUBRULE2(this.expression);
+      });
+    });
+
+    // FunctionCall = (StringFunction | ArithmeticFunction) LParen ExpressionList? RParen
+    // Family BASIC arithmetic functions: ABS, SGN, RND, VAL
+    // String functions: LEN, LEFT$, RIGHT$, MID$, STR$, HEX$
+    this.functionCall = this.RULE('functionCall', () => {
+      this.OR([
+        // String functions
+        { ALT: () => this.CONSUME(Len) },
+        { ALT: () => this.CONSUME(Left) },
+        { ALT: () => this.CONSUME(Right) },
+        { ALT: () => this.CONSUME(Mid) },
+        { ALT: () => this.CONSUME(Str) },
+        { ALT: () => this.CONSUME(Hex) },
+        // Arithmetic functions (Family BASIC only supports these)
+        { ALT: () => this.CONSUME(Abs) },
+        { ALT: () => this.CONSUME(Sgn) },
+        { ALT: () => this.CONSUME(Rnd) },
+        { ALT: () => this.CONSUME(Val) },
+        // Controller input functions
+        { ALT: () => this.CONSUME(Stick) },
+        { ALT: () => this.CONSUME(Strig) }
+      ]);
+      this.CONSUME(LParen);
+      this.OPTION(() => {
+        this.SUBRULE(this.expressionList);
+      });
+      this.CONSUME(RParen);
+    });
+
+    // Primary = NumberLiteral | StringLiteral | Identifier | FunctionCall | (LParen Expression RParen)
+    this.primary = this.RULE('primary', () => {
+      this.OR([
+        {
+          GATE: () => this.LA(1).tokenType === StringLiteral,
+          ALT: () => this.CONSUME(StringLiteral)
+        },
+        { ALT: () => this.CONSUME(NumberLiteral) },
+        {
+          // Function call: String functions and arithmetic functions
+          // Family BASIC arithmetic functions: ABS, SGN, RND, VAL
+          // String functions: LEN, LEFT$, RIGHT$, MID$, STR$, HEX$
+          GATE: () => 
+            this.LA(1).tokenType === Len ||
+            this.LA(1).tokenType === Left ||
+            this.LA(1).tokenType === Right ||
+            this.LA(1).tokenType === Mid ||
+            this.LA(1).tokenType === Str ||
+            this.LA(1).tokenType === Hex ||
+            this.LA(1).tokenType === Abs ||
+            this.LA(1).tokenType === Sgn ||
+            this.LA(1).tokenType === Rnd ||
+            this.LA(1).tokenType === Val ||
+            this.LA(1).tokenType === Stick ||
+            this.LA(1).tokenType === Strig,
+          ALT: () => this.SUBRULE(this.functionCall)
+        },
+        { ALT: () => this.CONSUME(Identifier) },
+        {
+          ALT: () => {
+            this.CONSUME(LParen);
+            this.SUBRULE(this.expression);
+            this.CONSUME(RParen);
+          }
+        }
+      ]);
+    });
+
+    // Unary = (Plus | Minus)? Primary
+    // Handles unary plus and minus operators (e.g., -5, +10, -X)
+    this.unary = this.RULE('unary', () => {
+      this.OPTION(() => {
+        this.OR([
+          { ALT: () => this.CONSUME(Plus) },
+          { ALT: () => this.CONSUME(Minus) }
+        ]);
+      });
+      this.SUBRULE(this.primary);
+    });
+
+    // Multiplicative = Unary ((Multiply | Divide) Unary)*
+    // Priority 1: *, /
+    this.multiplicative = this.RULE('multiplicative', () => {
+      this.SUBRULE(this.unary);
+      this.MANY(() => {
+        this.OR([
+          { ALT: () => this.CONSUME(Multiply) },
+          { ALT: () => this.CONSUME(Divide) }
+        ]);
+        this.SUBRULE2(this.unary);
+      });
+    });
+
+    // ModExpression = Multiplicative ((MOD) Multiplicative)*
+    // Priority 2: MOD (after *, / but before +, -)
+    this.modExpression = this.RULE('modExpression', () => {
+      this.SUBRULE(this.multiplicative);
+      this.MANY(() => {
+        this.CONSUME(Mod);
+        this.SUBRULE2(this.multiplicative);
+      });
+    });
+
+    // Additive = ModExpression ((Plus | Minus) ModExpression)*
+    // Priority 3: +, -
+    this.additive = this.RULE('additive', () => {
+      this.SUBRULE(this.modExpression);
+      this.MANY(() => {
+        this.OR([
+          { ALT: () => this.CONSUME(Plus) },
+          { ALT: () => this.CONSUME(Minus) }
+        ]);
+        this.SUBRULE2(this.modExpression);
+      });
+    });
+
+    // Expression = Additive (for now, simplified)
+    this.expression = this.RULE('expression', () => {
+      this.SUBRULE(this.additive);
+    });
+
+    // ComparisonExpression = Expression (ComparisonOperator Expression)?
+    // Supports: =, <>, <, >, <=, >=
+    // In BASIC, a single expression can be used as a condition (non-zero = true, zero = false)
+    // Or two expressions can be compared
+    this.comparisonExpression = this.RULE('comparisonExpression', () => {
+      this.SUBRULE(this.expression);
+      this.OPTION(() => {
+        this.OR([
+          { ALT: () => this.CONSUME(Equal) },
+          { ALT: () => this.CONSUME(NotEqual) },
+          { ALT: () => this.CONSUME(LessThan) },
+          { ALT: () => this.CONSUME(GreaterThan) },
+          { ALT: () => this.CONSUME(LessThanOrEqual) },
+          { ALT: () => this.CONSUME(GreaterThanOrEqual) }
+        ]);
+        this.SUBRULE2(this.expression);
+      });
+    });
+
+    // LogicalNotExpression = (NOT)? ComparisonExpression
+    // NOT has highest precedence (applies to ComparisonExpression)
+    this.logicalNotExpression = this.RULE('logicalNotExpression', () => {
+      this.OPTION(() => {
+        this.CONSUME(Not);
+      });
+      this.SUBRULE(this.comparisonExpression);
+    });
+
+    // LogicalAndExpression = LogicalNotExpression (AND LogicalNotExpression)*
+    // AND has middle precedence (combines LogicalNotExpressions)
+    this.logicalAndExpression = this.RULE('logicalAndExpression', () => {
+      this.SUBRULE(this.logicalNotExpression);
+      this.MANY(() => {
+        this.CONSUME(And);
+        this.SUBRULE2(this.logicalNotExpression);
+      });
+    });
+
+    // LogicalOrExpression = LogicalAndExpression (OR LogicalAndExpression)*
+    // OR combines LogicalAndExpressions
+    this.logicalOrExpression = this.RULE('logicalOrExpression', () => {
+      this.SUBRULE(this.logicalAndExpression);
+      this.MANY(() => {
+        this.CONSUME(Or);
+        this.SUBRULE2(this.logicalAndExpression);
+      });
+    });
+
+    // LogicalExpression = LogicalOrExpression (XOR LogicalOrExpression)*
+    // XOR has lowest precedence (combines LogicalOrExpressions)
+    // This ensures correct precedence: NOT > AND > OR > XOR
+    this.logicalExpression = this.RULE('logicalExpression', () => {
+      this.SUBRULE(this.logicalOrExpression);
+      this.MANY(() => {
+        this.CONSUME(Xor);
+        this.SUBRULE2(this.logicalOrExpression);
+      });
+    });
+
+    // PrintItem = Expression | StringLiteral
+    this.printItem = this.RULE('printItem', () => {
+      this.OR([
+        {
+          GATE: () => this.LA(1).tokenType === StringLiteral,
+          ALT: () => this.CONSUME(StringLiteral)
+        },
+        { ALT: () => this.SUBRULE(this.expression) }
+      ]);
+    });
+
+    // PrintList = PrintItem (Comma|Semicolon PrintItem)*
+    this.printList = this.RULE('printList', () => {
+      this.SUBRULE(this.printItem);
+      this.MANY(() => {
+        this.OR([
+          { ALT: () => this.CONSUME(Comma) },
+          { ALT: () => this.CONSUME(Semicolon) }
+        ]);
+        this.SUBRULE2(this.printItem);
+      });
+    });
+
+    // PRINT PrintList?
+    this.printStatement = this.RULE('printStatement', () => {
+      this.CONSUME(Print);
+      this.OPTION(() => {
+        this.SUBRULE(this.printList);
+      });
+    });
+
+    // LET? Identifier = Expression
+    this.letStatement = this.RULE('letStatement', () => {
+      this.OPTION(() => {
+        this.CONSUME(Let);
+      });
+      this.CONSUME(Identifier);
+      this.CONSUME(Equal);
+      this.SUBRULE(this.expression);
+    });
+
+    // FOR Identifier = Expression TO Expression (STEP Expression)?
+    this.forStatement = this.RULE('forStatement', () => {
+      this.CONSUME(For);
+      this.CONSUME(Identifier); // Loop variable
+      this.CONSUME(Equal);
+      this.SUBRULE(this.expression); // Start value
+      this.CONSUME(To);
+      this.SUBRULE2(this.expression); // End value
+      this.OPTION(() => {
+        this.CONSUME(Step);
+        this.SUBRULE3(this.expression); // Step value (defaults to 1)
+      });
+    });
+
+    // NEXT (no variable name allowed - Family BASIC spec)
+    // According to spec: "You can not add a loop variable name after NEXT. (An error will occur)"
+    this.nextStatement = this.RULE('nextStatement', () => {
+      this.CONSUME(Next);
+      // No identifier allowed - NEXT must be standalone
+    });
+
+    // END
+    this.endStatement = this.RULE('endStatement', () => {
+      this.CONSUME(End);
+    });
+
+    // PAUSE Expression
+    // Pauses program execution for the specified number of milliseconds/frames
+    this.pauseStatement = this.RULE('pauseStatement', () => {
+      this.CONSUME(Pause);
+      this.SUBRULE(this.expression);
+    });
+
+    // GOTO NumberLiteral
+    // Jumps unconditionally to the specified line number
+    this.gotoStatement = this.RULE('gotoStatement', () => {
+      this.CONSUME(Goto);
+      this.CONSUME(NumberLiteral); // Line number to jump to
+    });
+
+    // IF LogicalExpression THEN (CommandList | NumberLiteral)
+    // IF LogicalExpression GOTO NumberLiteral
+    // Executes the commands after THEN or jumps to line number if condition is true
+    // Supports colon-separated statements: IF X THEN PRINT A: PRINT B
+    // Supports line number jumps: IF X=10 THEN 500 or IF X=10 GOTO 500
+    // Supports logical operators: IF X>0 AND Y<10 THEN 100, IF NOT X=0 THEN PRINT X
+    this.ifThenStatement = this.RULE('ifThenStatement', () => {
+      this.CONSUME(If);
+      this.SUBRULE(this.logicalExpression);
+      // THEN or GOTO (GOTO can be used without THEN)
+      this.OR([
+        {
+          // IF ... THEN NumberLiteral (line number jump)
+          GATE: () => this.LA(1).tokenType === Then && this.LA(2).tokenType === NumberLiteral,
+          ALT: () => {
+            this.CONSUME(Then);
+            this.CONSUME(NumberLiteral);
+          }
+        },
+        {
+          // IF ... THEN CommandList (statements)
+          GATE: () => this.LA(1).tokenType === Then,
+          ALT: () => {
+            this.CONSUME2(Then); // Use CONSUME2 for second occurrence
+            this.SUBRULE(this.commandList);
+          }
+        },
+        {
+          // IF ... GOTO NumberLiteral (GOTO without THEN)
+          ALT: () => {
+            this.CONSUME(Goto);
+            this.CONSUME2(NumberLiteral); // Use CONSUME2 for second occurrence
+          }
+        }
+      ]);
+    });
+
+    // REM (any remaining tokens)*
+    // REM is followed by optional comment text (everything after REM is ignored)
+    // We consume all remaining tokens as comment text
+    // Note: In BASIC, REM consumes everything after it until colon or end of line
+    this.remStatement = this.RULE('remStatement', () => {
+      this.CONSUME(Rem);
+      // Consume all remaining tokens as comment (they're ignored)
+      // Use MANY to consume tokens until colon (which starts next command) or end of input
+      // We need to use numerical suffixes for tokens that appear multiple times
+      this.MANY(() => {
+        this.OR([
+          // Match tokens that could appear in comments, using suffixes to avoid conflicts
+          { ALT: () => this.CONSUME(StringLiteral) },
+          { ALT: () => this.CONSUME(NumberLiteral) },
+          { ALT: () => this.CONSUME(Identifier) },
+          { ALT: () => this.CONSUME(Let) },
+          { ALT: () => this.CONSUME(Print) },
+          { ALT: () => this.CONSUME(For) },
+          { ALT: () => this.CONSUME(To) },
+          { ALT: () => this.CONSUME(Step) },
+          { ALT: () => this.CONSUME(Next) },
+          { ALT: () => this.CONSUME(End) },
+          { ALT: () => this.CONSUME2(Rem) }, // Use CONSUME2 for second occurrence
+          { ALT: () => this.CONSUME(If) },
+          { ALT: () => this.CONSUME(Then) },
+          { ALT: () => this.CONSUME(Goto) },
+          { ALT: () => this.CONSUME(Pause) },
+          { ALT: () => this.CONSUME(Equal) },
+          { ALT: () => this.CONSUME(NotEqual) },
+          { ALT: () => this.CONSUME(LessThan) },
+          { ALT: () => this.CONSUME(GreaterThan) },
+          { ALT: () => this.CONSUME(LessThanOrEqual) },
+          { ALT: () => this.CONSUME(GreaterThanOrEqual) },
+          { ALT: () => this.CONSUME(Plus) },
+          { ALT: () => this.CONSUME(Minus) },
+          { ALT: () => this.CONSUME(Multiply) },
+          { ALT: () => this.CONSUME(Divide) },
+          { ALT: () => this.CONSUME(Mod) },
+          { ALT: () => this.CONSUME(And) },
+          { ALT: () => this.CONSUME(Or) },
+          { ALT: () => this.CONSUME(Xor) },
+          { ALT: () => this.CONSUME(Not) },
+          // Function tokens (must be consumed in REM)
+          { ALT: () => this.CONSUME(Len) },
+          { ALT: () => this.CONSUME(Left) },
+          { ALT: () => this.CONSUME(Right) },
+          { ALT: () => this.CONSUME(Mid) },
+          { ALT: () => this.CONSUME(Str) },
+          { ALT: () => this.CONSUME(Hex) },
+          { ALT: () => this.CONSUME(Abs) },
+          { ALT: () => this.CONSUME(Sgn) },
+          { ALT: () => this.CONSUME(Rnd) },
+          { ALT: () => this.CONSUME(Val) },
+          { ALT: () => this.CONSUME(Stick) },
+          { ALT: () => this.CONSUME(Strig) },
+          { ALT: () => this.CONSUME(Comma) },
+          { ALT: () => this.CONSUME(Semicolon) },
+          { ALT: () => this.CONSUME(Colon) }, // Colon ends REM and starts next command
+          { ALT: () => this.CONSUME(LParen) },
+          { ALT: () => this.CONSUME(RParen) },
+          // Additional punctuation and special characters
+          { ALT: () => this.CONSUME(Period) },
+          { ALT: () => this.CONSUME(Hash) },
+          { ALT: () => this.CONSUME(Dollar) },
+          { ALT: () => this.CONSUME(LBracket) },
+          { ALT: () => this.CONSUME(RBracket) },
+          { ALT: () => this.CONSUME(Exclamation) },
+          { ALT: () => this.CONSUME(Question) },
+          { ALT: () => this.CONSUME(AtSign) },
+          { ALT: () => this.CONSUME(Percent) },
+          { ALT: () => this.CONSUME(LBrace) },
+          { ALT: () => this.CONSUME(RBrace) },
+          { ALT: () => this.CONSUME(Pipe) },
+          { ALT: () => this.CONSUME(Tilde) },
+          { ALT: () => this.CONSUME(Underscore) },
+          { ALT: () => this.CONSUME(Backslash) },
+          { ALT: () => this.CONSUME(Apostrophe) }
+        ]);
+      });
+    });
+
+    // SingleCommand = IfThenStatement | GotoStatement | LetStatement | PrintStatement | ForStatement | NextStatement | EndStatement | RemStatement | PauseStatement
+    // Order matters: keyword-based statements (that start with a keyword) should come before letStatement
+    // because letStatement can start with just an Identifier (LET is optional)
+    // Use GATE conditions to ensure keywords are matched correctly before trying letStatement
+    this.singleCommand = this.RULE('singleCommand', () => {
+      this.OR([
+        {
+          GATE: () => this.LA(1).tokenType === If,
+          ALT: () => this.SUBRULE(this.ifThenStatement)
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Goto,
+          ALT: () => this.SUBRULE(this.gotoStatement)
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Print,
+          ALT: () => this.SUBRULE(this.printStatement)
+        },
+        {
+          GATE: () => this.LA(1).tokenType === For,
+          ALT: () => this.SUBRULE(this.forStatement)
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Next,
+          ALT: () => this.SUBRULE(this.nextStatement)
+        },
+        {
+          GATE: () => this.LA(1).tokenType === End,
+          ALT: () => this.SUBRULE(this.endStatement)
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Rem,
+          ALT: () => this.SUBRULE(this.remStatement)
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Pause,
+          ALT: () => this.SUBRULE(this.pauseStatement)
+        },
+        { ALT: () => this.SUBRULE(this.letStatement) } // Must be last since it can start with Identifier
+      ]);
+    });
+
+    // Command = SingleCommand
+    this.command = this.RULE('command', () => {
+      this.SUBRULE(this.singleCommand);
+    });
+
+    // CommandList = Command (Colon Command)*
+    // Allows multiple commands per line separated by colons
+    this.commandList = this.RULE('commandList', () => {
+      this.SUBRULE(this.command);
+      this.MANY(() => {
+        this.CONSUME(Colon);
+        this.SUBRULE2(this.command);
+      });
+    });
+
+    // Statement = LineNumber CommandList
+    // LineNumber is a NumberLiteral at the start (acts as a label for GOTO/GOSUB)
+    // CommandList may contain multiple commands separated by colons
+    this.statement = this.RULE('statement', () => {
+      this.CONSUME(NumberLiteral); // Line number (label)
+      this.SUBRULE(this.commandList);
+    });
+
+    this.performSelfAnalysis();
+  }
+}
+
+// ============================================================================
+// PARSER INSTANCE AND EXPORT
+// ============================================================================
+
+// Create parser instance
+const parserInstance = new FBasicChevrotainParser();
+
+// Export parse function
+export function parseWithChevrotain(source: string): {
+  success: boolean;
+  cst?: CstNode;
+  errors?: Array<{
+    message: string;
+    line?: number;
+    column?: number;
+    length?: number;
+    location?: { start: { line?: number; column?: number } };
+  }>;
+} {
+  // Split source code by line breaks
+  const lines = source.split(/\r?\n/);
+  const allErrors: Array<{
+    message: string;
+    line?: number;
+    column?: number;
+    length?: number;
+    location?: { start: { line?: number; column?: number } };
+  }> = [];
+  const statements: CstNode[] = [];
+
+  // Parse each line independently
+  for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+    const line = lines[lineIndex]?.trim();
+    if (!line) {
+      continue;
+    }
+
+    // Tokenize the line
+    const lexResult = lexer.tokenize(line);
+
+    // Check for lexing errors
+    if (lexResult.errors.length > 0) {
+      allErrors.push(...lexResult.errors.map((err: ILexingError) => ({
+        message: err.message || 'Lexical error',
+        line: lineIndex + 1,
+        column: err.column,
+        length: err.length,
+        location: {
+          start: {
+            line: lineIndex + 1,
+            column: err.column || 1
+          }
+        }
+      })));
+      continue;
+    }
+
+    // Parse the line
+    parserInstance.input = lexResult.tokens;
+    const cst = parserInstance.statement();
+    
+    // Clear errors before checking (they accumulate)
+    const parseErrors = [...parserInstance.errors];
+    parserInstance.errors = [];
+
+    // Check for parsing errors
+    if (parseErrors.length > 0) {
+      allErrors.push(...parseErrors.map((err: IRecognitionException) => {
+        const token = err.token;
+        return {
+          message: err.message || 'Syntax error',
+          line: lineIndex + 1,
+          column: token?.startColumn,
+          length: token?.endOffset
+            ? token.endOffset - token.startOffset
+            : 1,
+          location: {
+            start: {
+              line: lineIndex + 1,
+              column: token?.startColumn || 1
+            }
+          }
+        };
+      }));
+      continue;
+    }
+
+    // Successfully parsed - add to statements
+    if (cst) {
+      statements.push(cst);
+    }
+  }
+
+  // If there were any errors, return failure
+  if (allErrors.length > 0) {
+    return {
+      success: false,
+      errors: allErrors
+    };
+  }
+
+  // Combine all statements into a program CST
+  const programCst: CstNode = {
+    name: 'program',
+    children: {
+      statement: statements
+    }
+  };
+
+  return {
+    success: true,
+    cst: programCst
+  };
+}
+
+// Export for use in CST to AST converter
+export { parserInstance };

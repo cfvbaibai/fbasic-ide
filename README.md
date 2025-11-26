@@ -26,6 +26,8 @@ To preserve and modernize the Family Basic programming language by providing an 
 - **Frontend Framework**: Vue 3 with Composition API
 - **Build Tool**: Vite for fast development and optimized builds
 - **Language**: TypeScript for type safety and better developer experience
+- **Parser**: Chevrotain for TypeScript-native parsing (no build step)
+- **Editor**: Monaco Editor for advanced code editing features
 - **UI Components**: Element Plus for professional interface components
 - **Testing**: Vitest for unit testing with Vue Test Utils
 - **Code Quality**: ESLint + Prettier for consistent code formatting
@@ -39,12 +41,14 @@ To preserve and modernize the Family Basic programming language by providing an 
 ├─────────────────────────────────────────────────────────────┤
 │  Components: CodeEditor, RuntimeOutput, IdeControls         │
 │  Composables: useBasicIdeEnhanced (state management)        │
+│  Integrations: Monaco Editor integration                    │
 ├─────────────────────────────────────────────────────────────┤
 │                    Core Interpreter Layer                   │
 ├─────────────────────────────────────────────────────────────┤
-│  BasicInterpreter (AST-based interpreter)                   │
-│  Parser: FBasicParser (Peggy.js grammar-based)              │
-│  AST Types: Comprehensive type definitions                  │
+│  BasicInterpreter (CST-based interpreter)                   │
+│  Parser: FBasicParser (Chevrotain-based)                    │
+│  Execution: Direct CST execution (no AST conversion)        │
+│  Executors: PrintExecutor, LetExecutor, etc.                │
 ├─────────────────────────────────────────────────────────────┤
 │                    Data Layer                               │
 ├─────────────────────────────────────────────────────────────┤
@@ -54,11 +58,12 @@ To preserve and modernize the Family Basic programming language by providing an 
 ```
 
 ### Key Design Principles
-1. **AST-Based Parsing** - Modern grammar-based parser using Peggy.js
+1. **CST-Based Parsing** - Direct execution from Concrete Syntax Tree using Chevrotain
 2. **Type Safety** - Comprehensive TypeScript interfaces and type checking
-3. **Testability** - Extensive unit test coverage (145 tests)
-4. **Maintainability** - Clean code with consistent patterns
+3. **Testability** - Extensive unit test coverage (58 tests)
+4. **Maintainability** - Clean code with consistent patterns and separation of concerns
 5. **Performance** - Optimized with tree-shaking and native methods
+6. **Framework Agnostic Core** - Core interpreter has no DOM dependencies
 
 ### UI Component Library (Element Plus)
 
@@ -178,9 +183,18 @@ fbasic-emu/
 ├── src/
 │   ├── components/                  # Vue components
 │   ├── composables/                 # Vue composables
-│   ├── core/                        # Core interpreter logic
-│   │   └── parser/                  # Parser system
+│   ├── core/                        # Core interpreter logic (DOM-free)
+│   │   ├── parser/                  # Chevrotain parser (CST-based)
+│   │   ├── execution/               # Execution engine and executors
+│   │   ├── evaluation/              # Expression evaluator
+│   │   ├── services/                # Variable, I/O, Data services
+│   │   └── state/                   # Execution context
+│   ├── integrations/                # UI/framework integrations
+│   │   └── monaco-integration.ts    # Monaco Editor integration
 │   ├── test/                        # Unit tests
+│   │   ├── parser/                  # Parser tests
+│   │   └── executors/               # Executor tests
+│   ├── views/                       # Vue views/pages
 │   ├── App.vue                      # Main application component
 │   ├── main.ts                      # Application entry point
 │   └── style.css                    # Global styles
@@ -207,7 +221,8 @@ fbasic-emu/
 - **File Size Limit**: No `.ts` file larger than 300 lines
 - **Single Responsibility**: Each file/function has one clear purpose
 - **Constants**: All magic numbers/strings in `constants.ts`
-- **AST-Based**: Use AST nodes for all parsing and execution
+- **CST-Based**: Use CST (Concrete Syntax Tree) nodes directly for execution
+- **Core Separation**: Core folder is DOM-free; UI integrations in `integrations/`
 
 ### Naming Conventions
 - **Files**: PascalCase for components, camelCase for utilities
@@ -241,7 +256,7 @@ When working with this codebase, follow these AI-specific instructions:
 #### File Size Management
 - **Never exceed 300 lines** in any `.ts` file
 - If approaching limit, extract functionality to focused modules
-- Use AST-based patterns for parsing and execution
+- Use CST-based patterns for parsing and execution
 
 #### Constant Usage
 - **Always use constants** from `constants.ts` instead of magic values
@@ -255,7 +270,7 @@ When working with this codebase, follow these AI-specific instructions:
 
 #### Testing Requirements
 - **Write tests for all new functionality**
-- Follow existing test patterns in `src/test/`
+- Follow existing test patterns in `test/`
 - Ensure all tests pass before submitting changes
 - Use `beforeEach`/`afterEach` for proper test isolation
 
@@ -279,10 +294,11 @@ When working with this codebase, follow these AI-specific instructions:
 - Log errors appropriately for debugging
 
 #### Refactoring Guidelines
-- **Maintain AST-based architecture** - use parser and AST nodes for all operations
-- **Keep BasicInterpreter.ts under 300 lines** - delegate to AST methods when needed
-- **Preserve existing functionality** - all 145 tests must continue to pass
+- **Maintain CST-based architecture** - use parser and CST nodes directly for execution
+- **Keep BasicInterpreter.ts under 300 lines** - delegate to execution engine when needed
+- **Preserve existing functionality** - all tests must continue to pass
 - **Update tests** when changing behavior
+- **Keep core DOM-free** - move UI dependencies to `integrations/` folder
 
 #### Code Quality
 - **Follow ESLint rules** - run `pnpm lint` before committing
@@ -291,19 +307,21 @@ When working with this codebase, follow these AI-specific instructions:
 - **Test coverage** - run `pnpm test:run` to ensure all tests pass
 
 ### Development Workflow
-1. **Read existing code** to understand AST-based patterns and structure
+1. **Read existing code** to understand CST-based patterns and structure
 2. **Check constants.ts** for existing constants before adding new ones
-3. **Follow AST patterns** - use parser and AST nodes for all operations
+3. **Follow CST patterns** - use parser and CST nodes directly for execution
 4. **Write tests first** for new functionality
 5. **Run quality checks** before submitting changes
 6. **Maintain file size limits** by extracting to focused modules when needed
+7. **Keep core DOM-free** - place UI integrations in `integrations/` folder
 
 ### Common Patterns
-- **Interpreter Methods**: Use AST-based execution with `executeStatement()` dispatch
+- **Interpreter Methods**: Use CST-based execution with executor pattern
 - **Error Handling**: Use `errors.push()` pattern with proper error objects
 - **Variable Management**: Use `Map<string, BasicVariable>` for variable storage
-- **Statement Parsing**: Use `FBasicParser.parse()` for AST generation
-- **Expression Evaluation**: Use `evaluateExpression()` for safe expression evaluation
+- **Statement Parsing**: Use `FBasicParser.parse()` to get CST directly
+- **Expression Evaluation**: Use `evaluateExpression()` with CST nodes
+- **CST Navigation**: Use `cst-helpers.ts` utilities for navigating CST nodes
 - **UI Components**: Use Element Plus components with semantic props and consistent sizing
 - **Button Patterns**: `<el-button type="primary" :disabled="!canRun" @click="action">`
 - **Status Indicators**: `<el-tag type="danger" size="small">Error Count</el-tag>`
@@ -311,40 +329,42 @@ When working with this codebase, follow these AI-specific instructions:
 
 ---
 
-## 🏗️ AST-Based Architecture
+## 🏗️ CST-Based Architecture
 
 ### Parser System
-The project uses a modern **Abstract Syntax Tree (AST)** based approach for parsing and executing F-BASIC programs:
+The project uses a **Concrete Syntax Tree (CST)** based approach for parsing and executing F-BASIC programs, executing directly from the CST without AST conversion:
 
-#### Grammar Definition
-- **File**: `src/core/parser/fbasic-grammar-minimal.pegjs`
-- **Tool**: Peggy.js parser generator
-- **Format**: PEG (Parsing Expression Grammar)
-- **Features**: Comprehensive F-BASIC syntax support
-
-#### AST Types
-- **File**: `src/core/parser/ast-types.ts`
-- **Coverage**: All statement and expression types
-- **Type Safety**: Full TypeScript support
-- **Extensibility**: Easy to add new language features
+#### Parser Implementation
+- **File**: `src/core/parser/FBasicChevrotainParser.ts`
+- **Tool**: Chevrotain (TypeScript-first parser toolkit)
+- **Format**: TypeScript parser definitions
+- **Features**: Line-by-line parsing for F-BASIC's strict structure
+- **Current Support**: LET and PRINT statements with arithmetic expressions
 
 #### Parser Interface
 - **File**: `src/core/parser/FBasicParser.ts`
-- **Methods**: `parse()`, `parseStatement()`, `parseExpression()`
+- **Methods**: `parse()` returns CST directly
 - **Error Handling**: Detailed error reporting with line numbers
-- **Fallback**: Graceful degradation for parsing errors
+- **Output**: `CstNode` from Chevrotain (no AST conversion)
 
-#### Build Process
-1. **Grammar** → Peggy.js generates parser
-2. **Parser** → TypeScript interfaces for AST nodes
-3. **Interpreter** → Executes AST nodes directly
+#### CST Helpers
+- **File**: `src/core/parser/cst-helpers.ts`
+- **Utilities**: Functions for navigating CST nodes (`getFirstCstNode`, `getTokens`, etc.)
+- **Usage**: Used throughout execution layer for extracting data from CST
+
+#### Execution Flow
+1. **Source Code** → Chevrotain parser generates CST
+2. **CST** → Executors process CST nodes directly
+3. **No Conversion** → Execution happens directly on CST structure
 
 ### Benefits
-- **Accuracy**: Grammar-based parsing ensures correct syntax
+- **Simplicity**: No AST conversion step - direct execution from parser output
+- **Type Safety**: Chevrotain provides full TypeScript support
+- **Performance**: One less transformation step
 - **Maintainability**: Clear separation between parsing and execution
-- **Extensibility**: Easy to add new language features
-- **Performance**: Optimized parser generation
+- **Extensibility**: Easy to add new statement types incrementally
 - **Error Reporting**: Precise line number and context information
+- **Framework Agnostic**: Core parser has no DOM dependencies
 
 ---
 
@@ -394,24 +414,32 @@ pnpm type-check   # Run TypeScript compiler
 ### Current Implementation
 - ✅ **PRINT** - Output text and variables
 - ✅ **LET** - Variable assignment (numbers and strings)
-- ✅ **FOR/NEXT** - Loop structures with STEP support
-- ✅ **IF/THEN** - Conditional statements with all comparison operators
-- ✅ **GOTO** - Jump statements with line number support
-- ✅ **END** - Program termination
 - ✅ **Variables** - Numeric and string variables
-- ✅ **Expressions** - Arithmetic, comparison, and logical operations
-- ✅ **Mathematical Functions** - ABS, SQR, SIN, COS, TAN, ATN, LOG, EXP, INT, FIX, SGN, RND
-- ✅ **String Operations** - Concatenation and comparison
+- ✅ **Expressions** - Basic arithmetic operations (+, -, *, /)
 - ✅ **Error Handling** - Comprehensive error reporting with line numbers
-- ✅ **AST-Based Parser** - Modern grammar-based parsing with Peggy.js
+- ✅ **CST-Based Parser** - TypeScript-native parser using Chevrotain
+- ✅ **Monaco Editor Integration** - Syntax highlighting and live error checking
+- ✅ **Line-by-Line Parsing** - Leverages F-BASIC's strict line structure
 
-### Planned Features
-- 🔄 **Graphics** - Sprite and background rendering
-- 🔄 **File I/O** - Save and load programs
+### In Progress (Parser Migration)
+The parser is being migrated from PEG.js to Chevrotain. Currently implemented:
+- **LET** and **PRINT** statements with basic arithmetic expressions
+
+### Planned Features (To be re-implemented with Chevrotain)
+- 🔄 **FOR/NEXT** - Loop structures with STEP support
+- 🔄 **IF/THEN** - Conditional statements with all comparison operators
+- 🔄 **GOTO** - Jump statements with line number support
+- 🔄 **END** - Program termination
+- 🔄 **Mathematical Functions** - ABS, SQR, SIN, COS, TAN, ATN, LOG, EXP, INT, FIX, SGN, RND
+- 🔄 **String Operations** - Concatenation and comparison
 - 🔄 **Arrays** - Multi-dimensional arrays
 - 🔄 **Subroutines** - GOSUB/RETURN
 - 🔄 **Input** - User input statements
 - 🔄 **Data/Read** - Data storage and retrieval
+
+### Future Enhancements
+- 🔄 **Graphics** - Sprite and background rendering
+- 🔄 **File I/O** - Save and load programs
 
 ---
 

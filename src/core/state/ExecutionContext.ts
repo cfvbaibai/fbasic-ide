@@ -11,9 +11,9 @@ import type {
   InterpreterConfig,
   BasicDeviceAdapter 
 } from '../interfaces'
-import type { StatementNode } from '../parser/ast-types'
 import type { EvaluationContext } from '../evaluation/ExpressionEvaluator'
 import type { BasicScalarValue, BasicArrayValue } from '../types/BasicTypes'
+import type { ExpandedStatement } from '../execution/statement-expander'
 
 export interface LoopState {
   variableName: string
@@ -21,7 +21,7 @@ export interface LoopState {
   endValue: number
   stepValue: number
   currentValue: number
-  statementIndex: number
+  statementIndex: number // Index in expanded statements list
   shouldExecute?: boolean
 }
 
@@ -31,7 +31,8 @@ export class ExecutionContext implements EvaluationContext {
   public isRunning = false
   public shouldStop = false
   public currentStatementIndex = 0
-  public statements: StatementNode[] = []
+  public statements: ExpandedStatement[] = [] // Expanded statements (flat list)
+  public labelMap: Map<number, number[]> = new Map() // Line number -> statement indices
   public iterationCount = 0
   
   // Configuration
@@ -64,6 +65,7 @@ export class ExecutionContext implements EvaluationContext {
     this.shouldStop = false
     this.currentStatementIndex = 0
     this.statements = []
+    this.labelMap.clear()
     this.iterationCount = 0
     this.loopStack = []
     this.gosubStack = []
@@ -131,7 +133,7 @@ export class ExecutionContext implements EvaluationContext {
   /**
    * Get current statement
    */
-  getCurrentStatement(): StatementNode | undefined {
+  getCurrentStatement(): ExpandedStatement | undefined {
     return this.statements[this.currentStatementIndex]
   }
 
@@ -150,10 +152,22 @@ export class ExecutionContext implements EvaluationContext {
   }
 
   /**
-   * Find statement index by line number
+   * Find statement indices by line number
+   */
+  findStatementIndicesByLine(lineNumber: number): number[] {
+    return this.labelMap.get(lineNumber) || []
+  }
+
+  /**
+   * Find first statement index by line number (for GOTO/GOSUB)
    */
   findStatementIndexByLine(lineNumber: number): number {
-    return this.statements.findIndex(stmt => stmt.lineNumber === lineNumber)
+    const indices = this.labelMap.get(lineNumber)
+    if (indices && indices.length > 0) {
+      const firstIndex = indices[0]
+      return firstIndex !== undefined ? firstIndex : -1
+    }
+    return -1
   }
 
   /**

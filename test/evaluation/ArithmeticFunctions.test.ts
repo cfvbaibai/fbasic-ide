@@ -1,0 +1,154 @@
+/**
+ * Arithmetic Functions Tests
+ * 
+ * Tests for Family BASIC arithmetic functions: ABS, SGN, RND
+ */
+
+import { describe, it, expect, beforeEach } from 'vitest'
+import { BasicInterpreter } from '@/core/BasicInterpreter'
+import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
+
+describe('Arithmetic Functions', () => {
+  let interpreter: BasicInterpreter
+  let deviceAdapter: TestDeviceAdapter
+
+  beforeEach(() => {
+    deviceAdapter = new TestDeviceAdapter()
+    interpreter = new BasicInterpreter({
+      maxIterations: 1000,
+      maxOutputLines: 100,
+      enableDebugMode: false,
+      strictMode: false,
+      deviceAdapter: deviceAdapter
+    })
+  })
+
+  describe('ABS function', () => {
+    it('should return absolute value of positive number', async () => {
+      const source = '10 LET X = ABS(5)\n20 PRINT X\n30 END'
+      const result = await interpreter.execute(source)
+      expect(result.success).toBe(true)
+      expect(deviceAdapter.getAllOutputs()).toContain('5')
+    })
+
+    it('should return absolute value of negative number', async () => {
+      const source = '10 LET X = ABS(-5)\n20 PRINT X\n30 END'
+      const result = await interpreter.execute(source)
+      expect(result.success).toBe(true)
+      expect(deviceAdapter.getAllOutputs()).toContain('5')
+    })
+
+    it('should return 0 for ABS(0)', async () => {
+      const source = '10 LET X = ABS(0)\n20 PRINT X\n30 END'
+      const result = await interpreter.execute(source)
+      expect(result.success).toBe(true)
+      expect(deviceAdapter.getAllOutputs()).toContain('0')
+    })
+  })
+
+
+  describe('SGN function', () => {
+    it('should return 1 for positive number', async () => {
+      const source = '10 LET X = SGN(5)\n20 PRINT X\n30 END'
+      const result = await interpreter.execute(source)
+      expect(result.success).toBe(true)
+      expect(deviceAdapter.getAllOutputs()).toContain('1')
+    })
+
+    it('should return -1 for negative number', async () => {
+      const source = '10 LET X = SGN(-5)\n20 PRINT X\n30 END'
+      const result = await interpreter.execute(source)
+      expect(result.success).toBe(true)
+      expect(deviceAdapter.getAllOutputs()).toContain('-1')
+    })
+
+    it('should return 0 for zero', async () => {
+      const source = '10 LET X = SGN(0)\n20 PRINT X\n30 END'
+      const result = await interpreter.execute(source)
+      expect(result.success).toBe(true)
+      expect(deviceAdapter.getAllOutputs()).toContain('0')
+    })
+  })
+
+  describe('RND function', () => {
+    it('should return random number between 0 and (x-1) when x > 1', async () => {
+      const source = '10 LET X = RND(10)\n20 PRINT X\n30 END'
+      const result = await interpreter.execute(source)
+      expect(result.success).toBe(true)
+      // Check that output contains a number between 0 and 9 (10-1)
+      const outputs = deviceAdapter.printOutputs
+      expect(outputs.length).toBeGreaterThan(0)
+      const outputValue = parseInt(outputs[0] ?? '0', 10)
+      expect(outputValue).toBeGreaterThanOrEqual(0)
+      expect(outputValue).toBeLessThanOrEqual(9)
+    })
+
+    it('should always return 0 for RND(1)', async () => {
+      const source = '10 LET X = RND(1)\n20 PRINT X\n30 END'
+      const result = await interpreter.execute(source)
+      expect(result.success).toBe(true)
+      // RND(1) always returns 0 according to spec
+      expect(deviceAdapter.getAllOutputs()).toContain('0')
+    })
+
+    it('should return random number between 0 and 7 for RND(8)', async () => {
+      const source = '10 LET X = RND(8)\n20 PRINT X\n30 END'
+      const result = await interpreter.execute(source)
+      expect(result.success).toBe(true)
+      // Check that output contains a number between 0 and 7 (8-1)
+      const outputs = deviceAdapter.printOutputs
+      expect(outputs.length).toBeGreaterThan(0)
+      const outputValue = parseInt(outputs[0] ?? '0', 10)
+      expect(outputValue).toBeGreaterThanOrEqual(0)
+      expect(outputValue).toBeLessThanOrEqual(7)
+    })
+
+    it('should error for RND(0)', async () => {
+      const source = '10 LET X = RND(0)\n20 PRINT X\n30 END'
+      const result = await interpreter.execute(source)
+      expect(result.success).toBe(false)
+      expect(result.errors.length).toBeGreaterThan(0)
+    })
+
+    it('should error for RND with negative argument', async () => {
+      const source = '10 LET X = RND(-5)\n20 PRINT X\n30 END'
+      const result = await interpreter.execute(source)
+      expect(result.success).toBe(false)
+      expect(result.errors.length).toBeGreaterThan(0)
+    })
+
+    it('should error for RND with argument > 32767', async () => {
+      const source = '10 LET X = RND(32768)\n20 PRINT X\n30 END'
+      const result = await interpreter.execute(source)
+      expect(result.success).toBe(false)
+      expect(result.errors.length).toBeGreaterThan(0)
+    })
+  })
+
+
+  describe('Function composition', () => {
+    it('should handle nested function calls', async () => {
+      const source = '10 LET X = ABS(SGN(-5))\n20 PRINT X\n30 END'
+      const result = await interpreter.execute(source)
+      expect(result.success).toBe(true)
+      // SGN(-5) = -1, ABS(-1) = 1
+      expect(deviceAdapter.getAllOutputs()).toContain('1')
+    })
+
+    it('should handle functions in expressions', async () => {
+      const source = '10 LET X = ABS(-5) + SGN(10)\n20 PRINT X\n30 END'
+      const result = await interpreter.execute(source)
+      expect(result.success).toBe(true)
+      // ABS(-5) = 5, SGN(10) = 1, 5 + 1 = 6
+      expect(deviceAdapter.getAllOutputs()).toContain('6')
+    })
+
+    it('should handle functions with variables', async () => {
+      const source = '10 LET A = -10\n20 LET X = ABS(A)\n30 PRINT X\n40 END'
+      const result = await interpreter.execute(source)
+      expect(result.success).toBe(true)
+      expect(deviceAdapter.getAllOutputs()).toContain('10')
+    })
+  })
+})
+

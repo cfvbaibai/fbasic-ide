@@ -17,6 +17,7 @@ import type {
   InterpreterConfig, 
   ExecutionResult
 } from './interfaces'
+import type { CstNode } from 'chevrotain'
 
 // Import the FBasicParser
 import { FBasicParser } from './parser/FBasicParser'
@@ -26,6 +27,7 @@ import {
   ExecutionEngine, 
   ExecutionContext 
 } from './execution'
+import { expandStatements } from './execution/statement-expander'
 
 /**
  * Main interpreter class for executing Family Basic programs
@@ -104,7 +106,22 @@ export class BasicInterpreter {
       const preservedDeviceAdapter = this.context.deviceAdapter
       
       this.context.reset()
-      this.context.statements = parseResult.ast?.statements || []
+      
+      // Extract statement nodes from CST program node and expand them
+      if (parseResult.cst?.children.statement) {
+        const statementsCst = parseResult.cst.children.statement;
+        const validStatements = Array.isArray(statementsCst) 
+          ? statementsCst.filter((s): s is CstNode => 'children' in s)
+          : [];
+        
+        // Expand statements (flatten colon-separated commands) and create label map
+        const { statements, labelMap } = expandStatements(validStatements)
+        this.context.statements = statements
+        this.context.labelMap = labelMap
+      } else {
+        this.context.statements = []
+        this.context.labelMap = new Map()
+      }
       
       // Restore preserved values
       this.context.deviceAdapter = preservedDeviceAdapter

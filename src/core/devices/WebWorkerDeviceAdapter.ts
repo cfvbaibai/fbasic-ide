@@ -1,8 +1,8 @@
 /**
- * Service Worker Device Adapter
+ * Web Worker Device Adapter
  * 
- * A comprehensive device adapter that handles both device operations and service worker management.
- * Merges ServiceWorkerManager functionality for unified service worker communication.
+ * A comprehensive device adapter that handles both device operations and web worker management.
+ * Merges WebWorkerManager functionality for unified web worker communication.
  */
 
 /* global Worker, NodeJS, navigator, self, clearTimeout */
@@ -21,19 +21,20 @@ import type {
 } from '../interfaces'
 import { DEFAULTS } from '../constants'
 
-export interface ServiceWorkerExecutionOptions {
+export interface WebWorkerExecutionOptions {
   onProgress?: (iterationCount: number, currentStatement?: string) => void
   onError?: (error: Error) => void
   timeout?: number
 }
 
-export class ServiceWorkerDeviceAdapter implements BasicDeviceAdapter {
+export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   // === DEVICE STATE ===
   private strigClickBuffer: Map<number, number[]> = new Map()
   private stickStates: Map<number, number> = new Map()
   private isEnabled = true
+  private currentExecutionId: string | null = null
 
-  // === SERVICE WORKER MANAGEMENT ===
+  // === WEB WORKER MANAGEMENT ===
   private worker: Worker | null = null
   private messageId = 0
   private pendingMessages = new Map<string, {
@@ -43,62 +44,60 @@ export class ServiceWorkerDeviceAdapter implements BasicDeviceAdapter {
   }>()
 
   constructor() {
-    console.log('🔌 [SERVICE_WORKER_DEVICE] ServiceWorkerDeviceAdapter created')
+    console.log('🔌 [WEB_WORKER_DEVICE] WebWorkerDeviceAdapter created')
     this.setupMessageListener()
   }
 
-  // === SERVICE WORKER MANAGEMENT METHODS ===
+  // === WEB WORKER MANAGEMENT METHODS ===
 
   /**
-   * Check if service workers are supported
+   * Check if web workers are supported
    */
   static isSupported(): boolean {
-    const supported = typeof Worker !== 'undefined' && 'serviceWorker' in navigator
-    console.log('🔍 [SERVICE_WORKER] isSupported check:', {
+    const supported = typeof Worker !== 'undefined'
+    console.log('🔍 [WEB_WORKER] isSupported check:', {
       hasWorker: typeof Worker !== 'undefined',
-      hasServiceWorker: 'serviceWorker' in navigator,
       supported
     })
     return supported
   }
 
   /**
-   * Check if we're currently running in a service worker context
+   * Check if we're currently running in a web worker context
    */
-  static isInServiceWorker(): boolean {
-    const inServiceWorker = typeof window === 'undefined' && typeof self !== 'undefined' && 'importScripts' in self
-    console.log('🔍 [SERVICE_WORKER] isInServiceWorker check:', {
+  static isInWebWorker(): boolean {
+    const inWebWorker = typeof window === 'undefined' && typeof self !== 'undefined'
+    console.log('🔍 [WEB_WORKER] isInWebWorker check:', {
       hasWindow: typeof window !== 'undefined',
       hasSelf: typeof self !== 'undefined',
-      hasImportScripts: typeof self !== 'undefined' && 'importScripts' in self,
-      inServiceWorker
+      inWebWorker
     })
-    return inServiceWorker
+    return inWebWorker
   }
 
   /**
-   * Initialize the service worker
+   * Initialize the web worker
    */
   async initialize(workerScript?: string): Promise<void> {
-    console.log('🔧 [SERVICE_WORKER] ServiceWorkerDeviceAdapter.initialize called with script:', workerScript)
-    if (!ServiceWorkerDeviceAdapter.isSupported()) {
-      console.error('❌ [SERVICE_WORKER] Service workers are not supported in this environment')
-      throw new Error('Service workers are not supported in this environment')
+    console.log('🔧 [WEB_WORKER] WebWorkerDeviceAdapter.initialize called with script:', workerScript)
+    if (!WebWorkerDeviceAdapter.isSupported()) {
+      console.error('❌ [WEB_WORKER] Web workers are not supported in this environment')
+      throw new Error('Web workers are not supported in this environment')
     }
 
     if (this.worker) {
-      console.log('✅ [SERVICE_WORKER] Worker already initialized')
+      console.log('✅ [WEB_WORKER] Worker already initialized')
       return // Already initialized
     }
 
-    const script = workerScript || DEFAULTS.SERVICE_WORKER.WORKER_SCRIPT
-    console.log('🔧 [SERVICE_WORKER] Creating worker with script:', script)
+    const script = workerScript || DEFAULTS.WEB_WORKER.WORKER_SCRIPT
+    console.log('🔧 [WEB_WORKER] Creating worker with script:', script)
     
     try {
       this.worker = new Worker(script)
-      console.log('✅ [SERVICE_WORKER] Worker created successfully')
+      console.log('✅ [WEB_WORKER] Worker created successfully')
     } catch (error) {
-      console.error('❌ [SERVICE_WORKER] Failed to create worker:', error)
+      console.error('❌ [WEB_WORKER] Failed to create worker:', error)
       throw error
     }
     
@@ -107,47 +106,47 @@ export class ServiceWorkerDeviceAdapter implements BasicDeviceAdapter {
     
     // Handle worker errors
     this.worker.onerror = (error) => {
-      console.error('❌ [SERVICE_WORKER] Service worker error:', error)
-      this.rejectAllPending('Service worker error: ' + error.message)
+      console.error('❌ [WEB_WORKER] Web worker error:', error)
+      this.rejectAllPending('Web worker error: ' + error.message)
     }
 
     // Handle worker termination
     this.worker.onmessageerror = (error) => {
-      console.error('❌ [SERVICE_WORKER] Service worker message error:', error)
-      this.rejectAllPending('Service worker message error')
+      console.error('❌ [WEB_WORKER] Web worker message error:', error)
+      this.rejectAllPending('Web worker message error')
     }
     
-    console.log('✅ [SERVICE_WORKER] Worker initialization completed successfully')
+    console.log('✅ [WEB_WORKER] Worker initialization completed successfully')
   }
 
   /**
-   * Execute BASIC code in the service worker
+   * Execute BASIC code in the web worker
    */
   async executeInWorker(
     code: string, 
     config: InterpreterConfig,
-    options: ServiceWorkerExecutionOptions = {}
+    options: WebWorkerExecutionOptions = {}
   ): Promise<ExecutionResult> {
     console.log('executeInWorker called with code:', code.substring(0, 50) + '...')
     if (!this.worker) {
       console.log('Worker not initialized, initializing...')
-      await this.initialize(DEFAULTS.SERVICE_WORKER.WORKER_SCRIPT)
+      await this.initialize(DEFAULTS.WEB_WORKER.WORKER_SCRIPT)
     }
 
     if (!this.worker) {
-      throw new Error('Failed to initialize service worker')
+      throw new Error('Failed to initialize web worker')
     }
 
     const messageId = (++this.messageId).toString()
-    const timeout = options.timeout || DEFAULTS.SERVICE_WORKER.MESSAGE_TIMEOUT
+    const timeout = options.timeout || DEFAULTS.WEB_WORKER.MESSAGE_TIMEOUT
     console.log('Sending message with ID:', messageId, 'timeout:', timeout)
 
     return new Promise<ExecutionResult>((resolve, reject) => {
       // Set up timeout
       const timeoutHandle = setTimeout(() => {
-        console.log('Service worker timeout after', timeout, 'ms for message ID:', messageId)
+        console.log('Web worker timeout after', timeout, 'ms for message ID:', messageId)
         this.pendingMessages.delete(messageId)
-        reject(new Error(`Service worker execution timeout after ${timeout}ms`))
+        reject(new Error(`Web worker execution timeout after ${timeout}ms`))
       }, timeout)
 
       // Store pending message
@@ -185,7 +184,7 @@ export class ServiceWorkerDeviceAdapter implements BasicDeviceAdapter {
   }
 
   /**
-   * Stop execution in the service worker
+   * Stop execution in the web worker
    */
   stopExecution(): void {
     if (!this.worker) return
@@ -211,11 +210,11 @@ export class ServiceWorkerDeviceAdapter implements BasicDeviceAdapter {
   }
 
   /**
-   * Send a STRIG event to the service worker
+   * Send a STRIG event to the web worker
    */
   sendStrigEvent(joystickId: number, state: number): void {
     if (!this.worker) {
-      console.log('🔌 [SERVICE_WORKER] No worker available for STRIG event')
+      console.log('🔌 [WEB_WORKER] No worker available for STRIG event')
       return
     }
 
@@ -230,7 +229,7 @@ export class ServiceWorkerDeviceAdapter implements BasicDeviceAdapter {
       }
     }
     
-    console.log('🔌 [SERVICE_WORKER] Sending STRIG event to service worker:', {
+    console.log('🔌 [WEB_WORKER] Sending STRIG event to web worker:', {
       joystickId,
       state,
       messageId: message.id
@@ -240,7 +239,7 @@ export class ServiceWorkerDeviceAdapter implements BasicDeviceAdapter {
   }
 
   /**
-   * Send a message to the service worker
+   * Send a message to the web worker
    */
   sendMessage(message: any): void {
     if (this.worker) {
@@ -249,13 +248,13 @@ export class ServiceWorkerDeviceAdapter implements BasicDeviceAdapter {
   }
 
   /**
-   * Terminate the service worker
+   * Terminate the web worker
    */
   terminate(): void {
     if (this.worker) {
       this.worker.terminate()
       this.worker = null
-      this.rejectAllPending('Service worker terminated')
+      this.rejectAllPending('Web worker terminated')
     }
   }
 
@@ -266,7 +265,7 @@ export class ServiceWorkerDeviceAdapter implements BasicDeviceAdapter {
    */
   setEnabled(enabled: boolean): void {
     this.isEnabled = enabled
-    console.log('🔌 [SERVICE_WORKER_DEVICE] Device adapter enabled:', enabled)
+    console.log('🔌 [WEB_WORKER_DEVICE] Device adapter enabled:', enabled)
   }
 
   // === JOYSTICK INPUT METHODS ===
@@ -281,13 +280,13 @@ export class ServiceWorkerDeviceAdapter implements BasicDeviceAdapter {
 
   setStickState(joystickId: number, state: number): void {
     this.stickStates.set(joystickId, state)
-    console.log('🔌 [SERVICE_WORKER_DEVICE] Stick state set:', { joystickId, state })
+    console.log('🔌 [WEB_WORKER_DEVICE] Stick state set:', { joystickId, state })
   }
 
   pushStrigState(joystickId: number, state: number): void {
     if (!this.isEnabled) return
 
-    console.log('🔌 [SERVICE_WORKER_DEVICE] pushStrigState called:', { joystickId, state })
+    console.log('🔌 [WEB_WORKER_DEVICE] pushStrigState called:', { joystickId, state })
 
     if (state > 0) {
       if (!this.strigClickBuffer.has(joystickId)) {
@@ -295,7 +294,7 @@ export class ServiceWorkerDeviceAdapter implements BasicDeviceAdapter {
       }
       const buffer = this.strigClickBuffer.get(joystickId)!
       buffer.push(state)
-      console.log('🔌 [SERVICE_WORKER_DEVICE] STRIG pulse buffered:', {
+      console.log('🔌 [WEB_WORKER_DEVICE] STRIG pulse buffered:', {
         joystickId,
         state,
         bufferSize: buffer.length
@@ -318,7 +317,7 @@ export class ServiceWorkerDeviceAdapter implements BasicDeviceAdapter {
     }
     
     const clickValue = buffer.shift()!
-    console.log(`🔌 [SERVICE_WORKER_DEVICE] consumeStrigState: consumed STRIG event ` +
+    console.log(`🔌 [WEB_WORKER_DEVICE] consumeStrigState: consumed STRIG event ` +
       `for joystick ${joystickId}, value=${clickValue}, remaining=${buffer.length}`)
     return clickValue
   }
@@ -326,64 +325,74 @@ export class ServiceWorkerDeviceAdapter implements BasicDeviceAdapter {
   // === TEXT OUTPUT METHODS ===
 
   printOutput(output: string): void {
-    console.log('🔌 [SERVICE_WORKER_DEVICE] Print output:', output)
+    console.log('🔌 [WEB_WORKER_DEVICE] Print output:', output)
     // Send print output to main thread
     self.postMessage({
       type: 'OUTPUT',
       id: `output-${Date.now()}`,
       timestamp: Date.now(),
       data: {
-        executionId: 'current',
+        executionId: this.currentExecutionId || 'unknown',
         output: output,
-        outputType: 'print'
+        outputType: 'print',
+        timestamp: Date.now()
       }
     })
   }
 
   debugOutput(output: string): void {
-    console.log('🔌 [SERVICE_WORKER_DEVICE] Debug output:', output)
+    console.log('🔌 [WEB_WORKER_DEVICE] Debug output:', output)
     // Send debug output to main thread
     self.postMessage({
       type: 'OUTPUT',
       id: `debug-${Date.now()}`,
       timestamp: Date.now(),
       data: {
-        executionId: 'current',
+        executionId: this.currentExecutionId || 'unknown',
         output: output,
-        outputType: 'debug'
+        outputType: 'debug',
+        timestamp: Date.now()
       }
     })
   }
 
   errorOutput(output: string): void {
-    console.error('🔌 [SERVICE_WORKER_DEVICE] Error output:', output)
+    console.error('🔌 [WEB_WORKER_DEVICE] Error output:', output)
     // Send error output to main thread
     self.postMessage({
       type: 'OUTPUT',
       id: `error-${Date.now()}`,
       timestamp: Date.now(),
       data: {
-        executionId: 'current',
+        executionId: this.currentExecutionId || 'unknown',
         output: output,
-        outputType: 'error'
+        outputType: 'error',
+        timestamp: Date.now()
       }
     })
   }
 
   clearScreen(): void {
-    console.log('🔌 [SERVICE_WORKER_DEVICE] Clear screen')
+    console.log('🔌 [WEB_WORKER_DEVICE] Clear screen')
     // Send clear screen command to main thread
     self.postMessage({
       type: 'CLEAR_SCREEN',
       id: `clear-${Date.now()}`,
       timestamp: Date.now(),
-      data: { executionId: 'current' }
+      data: { executionId: this.currentExecutionId || 'unknown' }
     })
+  }
+
+  /**
+   * Set the current execution ID (called by WebWorkerInterpreter)
+   */
+  setCurrentExecutionId(executionId: string | null): void {
+    this.currentExecutionId = executionId
   }
   // === PRIVATE METHODS ===
 
   /**
-   * Set up message listener for service worker responses
+   * Set up message listener for web worker responses
    */
   private setupMessageListener(): void {
     if (typeof window === 'undefined') return // Not in main thread
@@ -404,7 +413,7 @@ export class ServiceWorkerDeviceAdapter implements BasicDeviceAdapter {
   }
 
   /**
-   * Handle messages from the service worker
+   * Handle messages from the web worker
    */
   private handleWorkerMessage(message: AnyServiceWorkerMessage): void {
     console.log('🔍 [MAIN] Processing worker message:', {
@@ -440,13 +449,13 @@ export class ServiceWorkerDeviceAdapter implements BasicDeviceAdapter {
         clearTimeout(pending.timeout)
         this.pendingMessages.delete(message.id)
         
-        // Check if service worker indicates fallback is needed
+        // Check if web worker indicates fallback is needed
         if (resultMessage.data.errors?.some(error => error.message.includes('not yet fully implemented'))) {
-          console.log('⚠️ [MAIN] Service worker indicates fallback needed, rejecting to trigger fallback')
-          // Service worker can't handle the execution, reject to trigger fallback
-          pending.reject(new Error('Service worker execution not implemented, falling back to main thread'))
+          console.log('⚠️ [MAIN] Web worker indicates fallback needed, rejecting to trigger fallback')
+          // Web worker can't handle the execution, reject to trigger fallback
+          pending.reject(new Error('Web worker execution not implemented, falling back to main thread'))
         } else {
-          console.log('✅ [MAIN] Service worker result is valid, resolving pending promise')
+          console.log('✅ [MAIN] Web worker result is valid, resolving pending promise')
           pending.resolve(resultMessage.data)
         }
         break
@@ -479,7 +488,7 @@ export class ServiceWorkerDeviceAdapter implements BasicDeviceAdapter {
   }
 
   /**
-   * Handle OUTPUT messages from the service worker
+   * Handle OUTPUT messages from the web worker
    */
   private handleOutputMessage(message: OutputMessage): void {
     console.log('📤 [MAIN] Handling OUTPUT message:', {
@@ -487,7 +496,7 @@ export class ServiceWorkerDeviceAdapter implements BasicDeviceAdapter {
       outputLength: message.data.output.length
     })
     
-    // Output is now handled by the device adapter in the service worker
+    // Output is now handled by the device adapter in the web worker
     // No need to forward to main thread callbacks
   }
 
@@ -502,3 +511,4 @@ export class ServiceWorkerDeviceAdapter implements BasicDeviceAdapter {
     this.pendingMessages.clear()
   }
 }
+

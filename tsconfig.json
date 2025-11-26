@@ -4,7 +4,8 @@
     "env.d.ts",
     "src/**/*",
     "src/**/*.vue",
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "test/**/*.ts"
   ],
   "exclude": [
     "src/**/__tests__/*",
@@ -16,6 +17,7 @@
     "paths": {
       "@/*": ["./src/*"]
     },
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "types": [
       "element-plus/global"
     ]

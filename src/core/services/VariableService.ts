@@ -4,8 +4,9 @@
  * Handles variable management including simple variables and arrays.
  */
 
+import Decimal from 'decimal.js'
 import type { BasicVariable } from '../interfaces'
-import type { ExpressionNode } from '../parser/ast-types'
+import type { CstNode } from 'chevrotain'
 import { ExpressionEvaluator, type EvaluationContext } from '../evaluation/ExpressionEvaluator'
 import type { BasicScalarValue, BasicArrayValue } from '../types/BasicTypes'
 
@@ -34,10 +35,10 @@ export class VariableService {
   }
 
   /**
-   * Set a variable from an expression
+   * Set a variable from a CST expression node
    */
-  setVariableFromExpression(name: string, expression: ExpressionNode): void {
-    const value = this.evaluator.evaluateExpression(expression)
+  setVariableFromExpressionCst(name: string, expressionCst: CstNode): void {
+    const value = this.evaluator.evaluateExpression(expressionCst)
     // Convert boolean to number for BASIC compatibility
     const basicValue = typeof value === 'boolean' ? (value ? 1 : 0) : value
     this.setVariable(name, basicValue as BasicScalarValue)
@@ -75,11 +76,11 @@ export class VariableService {
   }
 
   /**
-   * Set an array element from expressions
+   * Set an array element from CST expression nodes
    */
-  setArrayElementFromExpressions(name: string, indexExpressions: ExpressionNode[], valueExpression: ExpressionNode): void {
-    const indices = indexExpressions.map(expr => this.toNumber(this.evaluator.evaluateExpression(expr)))
-    const value = this.evaluator.evaluateExpression(valueExpression)
+  setArrayElementFromExpressionsCst(name: string, indexExpressionsCst: CstNode[], valueExpressionCst: CstNode): void {
+    const indices = indexExpressionsCst.map(exprCst => this.toNumber(this.evaluator.evaluateExpression(exprCst)))
+    const value = this.evaluator.evaluateExpression(valueExpressionCst)
     // Convert boolean to number for BASIC compatibility
     const basicValue = typeof value === 'boolean' ? (value ? 1 : 0) : value
     this.setArrayElement(name, indices, basicValue as BasicScalarValue)
@@ -109,14 +110,6 @@ export class VariableService {
 
     // At this point, value should be a scalar (not an array)
     return (typeof value !== 'object') ? value : 0
-  }
-
-  /**
-   * Get an array element from expressions
-   */
-  getArrayElementFromExpressions(name: string, indexExpressions: ExpressionNode[]): BasicScalarValue {
-    const indices = indexExpressions.map(expr => this.toNumber(this.evaluator.evaluateExpression(expr)))
-    return this.getArrayElement(name, indices)
   }
 
   /**
@@ -192,14 +185,20 @@ export class VariableService {
   }
 
   /**
-   * Convert a value to a number
+   * Convert a value to an integer
+   * Family Basic only supports integer numerical values
+   * Uses Decimal.js for precise conversion
    */
   private toNumber(value: number | string | boolean): number {
-    if (typeof value === 'number') return value
+    if (typeof value === 'number') {
+      // Truncate to integer (toward zero) using Decimal
+      return new Decimal(value).truncated().toNumber()
+    }
     if (typeof value === 'boolean') return value ? 1 : 0
     if (typeof value === 'string') {
+      // Parse as integer (truncate toward zero) using Decimal
       const parsed = parseFloat(value)
-      return isNaN(parsed) ? 0 : parsed
+      return isNaN(parsed) ? 0 : new Decimal(parsed).truncated().toNumber()
     }
     return 0
   }

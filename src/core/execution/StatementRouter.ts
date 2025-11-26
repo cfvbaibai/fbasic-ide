@@ -1,37 +1,34 @@
 /**
  * Statement Router
  * 
- * Routes BASIC statements to their appropriate executors.
+ * Routes BASIC statements to their appropriate executors using CST.
  */
 
-import type { 
-  StatementNode, 
-  StatementBlockExecutorNode, 
-  IfStatementNode, 
-  ForStatementNode, 
-  NextStatementNode, 
-  GotoStatementNode, 
-  GosubStatementNode, 
-  ReturnStatementNode, 
-  InputStatementNode, 
-  ReadStatementNode, 
-  RestoreStatementNode, 
-  DimStatementNode, 
-  ColorStatementNode,
-  NumberLiteralNode,
-  PauseStatementNode
-} from '../parser/ast-types'
 import { ERROR_TYPES } from '../constants'
 import { PrintExecutor } from './executors/PrintExecutor'
 import { LetExecutor } from './executors/LetExecutor'
+import { ForExecutor } from './executors/ForExecutor'
+import { NextExecutor } from './executors/NextExecutor'
+import { EndExecutor } from './executors/EndExecutor'
+import { PauseExecutor } from './executors/PauseExecutor'
+import { IfThenExecutor } from './executors/IfThenExecutor'
+import { GotoExecutor } from './executors/GotoExecutor'
 import { IoService } from '../services/IoService'
 import { VariableService } from '../services/VariableService'
 import { DataService } from '../services/DataService'
 import { ExpressionEvaluator, type EvaluationContext } from '../evaluation/ExpressionEvaluator'
+import { getFirstCstNode, getFirstToken, getCstNodes } from '../parser/cst-helpers'
+import type { ExpandedStatement } from './statement-expander'
 
 export class StatementRouter {
   private printExecutor: PrintExecutor
   private letExecutor: LetExecutor
+  private forExecutor: ForExecutor
+  private nextExecutor: NextExecutor
+  private endExecutor: EndExecutor
+  private pauseExecutor: PauseExecutor
+  private ifThenExecutor: IfThenExecutor
+  private gotoExecutor: GotoExecutor
 
   constructor(
     private context: EvaluationContext,
@@ -40,427 +37,196 @@ export class StatementRouter {
     private ioService: IoService,
     private dataService: DataService
   ) {
-    this.printExecutor = new PrintExecutor(ioService)
+    this.printExecutor = new PrintExecutor(ioService, evaluator)
     this.letExecutor = new LetExecutor(variableService)
+    this.forExecutor = new ForExecutor(context, evaluator, variableService)
+    this.nextExecutor = new NextExecutor(context, variableService)
+    this.endExecutor = new EndExecutor(context)
+    this.pauseExecutor = new PauseExecutor(context, evaluator)
+    this.ifThenExecutor = new IfThenExecutor(context, evaluator)
+    this.gotoExecutor = new GotoExecutor(context)
   }
 
   /**
-   * Route a statement to its appropriate executor
+   * Route an expanded statement to its appropriate executor
+   * Each expanded statement contains a single command (colon-separated commands are already expanded)
    */
-  async executeStatement(statement: StatementNode): Promise<void> {
-    switch (statement.command.type) {
-      case 'PrintStatement':
-        this.printExecutor.execute(statement.command)
-        break
-
-      case 'LetStatement':
-        this.letExecutor.execute(statement.command)
-        break
-
-      case 'IfStatement':
-        await this.executeIfStatement(statement.command)
-        break
-
-      case 'ForStatement':
-        await this.executeForStatement(statement.command)
-        break
-
-      case 'NextStatement':
-        await this.executeNextStatement(statement.command)
-        break
-
-      case 'GotoStatement':
-        await this.executeGotoStatement(statement.command)
-        break
-
-      case 'GosubStatement':
-        await this.executeGosubStatement(statement.command)
-        break
-
-      case 'ReturnStatement':
-        await this.executeReturnStatement(statement.command)
-        break
-
-      case 'InputStatement':
-        await this.executeInputStatement(statement.command)
-        break
-
-      case 'DataStatement':
-        this.dataService.addDataValues(statement.command.constants || [])
-        break
-
-      case 'ReadStatement':
-        await this.executeReadStatement(statement.command)
-        break
-
-      case 'RestoreStatement':
-        await this.executeRestoreStatement(statement.command)
-        break
-
-      case 'DimStatement':
-        await this.executeDimStatement(statement.command)
-        break
-
-      case 'ClsStatement':
-        this.ioService.clearScreen()
-        break
-
-      case 'ColorStatement':
-        await this.executeColorStatement(statement.command)
-        break
-
-
-      case 'EndStatement':
-        // END statement - stop execution
-        this.context.shouldStop = true
-        break
-
-      case 'PauseStatement':
-        // PAUSE statement - pause execution for specified duration
-        await this.executePauseStatement(statement.command)
-        break
-
-      case 'RemStatement':
-        // REM statement - no operation (comments are ignored)
-        break
-
-      case 'StatementBlockExecutor':
-        // Execute nested StatementBlock statements in sequence
-        await this.executeStatementBlock(statement.command.statements)
-        break
-
-      default:
-        this.context.addError({
-          line: statement.lineNumber,
-          message: `Unsupported statement type: ${(statement.command as { type: string }).type}`,
-          type: ERROR_TYPES.RUNTIME
-        })
-    }
-  }
-
-  /**
-   * Execute a StatementBlock by executing each statement in sequence
-   */
-  private async executeStatementBlock(statements: StatementBlockExecutorNode['statements']): Promise<void> {
-    for (const cmd of statements) {
-      // Wrap each command in a StatementNode and execute it
-      const statementNode: StatementNode = {
-        type: 'Statement',
-        lineNumber: 0, // Use 0 for nested statements
-        command: cmd
-      }
-      await this.executeStatement(statementNode)
-    }
-  }
-
-  // Placeholder methods for statements not yet extracted
-  private async executeIfStatement(ifStmt: IfStatementNode): Promise<void> {
-    // TODO: Extract to IfExecutor
-    const condition = this.evaluator.evaluateExpression(ifStmt.condition)
-    if (condition) {
-      // thenStatement is a CommandNode, wrap it in a StatementNode
-      await this.executeStatement({
-        type: 'Statement',
-        lineNumber: 0,
-        command: ifStmt.thenStatement
-      })
-    }
-  }
-
-  private async executeForStatement(forStmt: ForStatementNode): Promise<void> {
-    // TODO: Extract to ForExecutor
-    const varName = forStmt.variable.name
+  async executeStatement(expandedStatement: ExpandedStatement): Promise<void> {
+    const commandCst = expandedStatement.command
+    const singleCommandCst = getFirstCstNode(commandCst.children.singleCommand)
     
-    // Check if there's already a loop state for this variable
-    const existingLoopIndex = this.context.loopStack.findIndex(loop => loop.variableName === varName)
-    
-    if (existingLoopIndex !== -1) {
-      // Reuse existing loop state - don't create a new one
-      if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(`FOR: reusing existing loop state for ${varName}`)
-      }
-      return
-    }
-    
-    // Create new loop state
-    const startValue = this.evaluator.evaluateExpression(forStmt.start)
-    const endValue = this.evaluator.evaluateExpression(forStmt.end)
-    const stepValue = forStmt.step ? this.evaluator.evaluateExpression(forStmt.step) : 1
-    
-    const startNum = this.toNumber(startValue)
-    const endNum = this.toNumber(endValue)
-    const stepNum = this.toNumber(stepValue)
-    
-    if (this.context.config.enableDebugMode) {
-      this.context.addDebugOutput(`FOR: ${varName} = ${startValue} TO ${endValue} STEP ${stepValue}`)
-    }
-    
-    this.variableService.setVariable(varName, startValue)
-    
-    if (this.context.config.enableDebugMode) {
-      this.context.addDebugOutput(`FOR: creating new loop state for ${varName}, storing statementIndex ${this.context.currentStatementIndex}`)
-    }
-    
-    // Check if loop should execute at all
-    const shouldExecute = (stepNum > 0 && startNum <= endNum) || (stepNum < 0 && startNum >= endNum)
-    
-    this.context.loopStack.push({
-      variableName: varName,
-      startValue: startNum,
-      endValue: endNum,
-      stepValue: stepNum,
-      currentValue: startNum,
-      statementIndex: this.context.currentStatementIndex,
-      shouldExecute: shouldExecute
-    })
-    
-    // If loop shouldn't execute, skip to the NEXT statement
-    if (!shouldExecute) {
-      if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(`FOR: loop will not execute (${startNum} ${stepNum > 0 ? '>' : '<'} ${endNum}), skipping to NEXT`)
-      }
-      // Find the NEXT statement and jump to it
-      const nextStatementIndex = this.findNextStatementIndex(this.context.currentStatementIndex, varName)
-      if (nextStatementIndex !== -1) {
-        this.context.currentStatementIndex = nextStatementIndex
-      }
-    }
-  }
-
-  private async executeNextStatement(nextStmt: NextStatementNode): Promise<void> {
-    // TODO: Extract to NextExecutor
-    if (this.context.config.enableDebugMode) {
-      this.context.addDebugOutput(`NEXT: loopStack length = ${this.context.loopStack.length}`)
-    }
-    
-    if (this.context.loopStack.length === 0) {
+    if (!singleCommandCst) {
       this.context.addError({
-        line: 0,
-        message: 'NEXT without FOR',
+        line: expandedStatement.lineNumber,
+        message: 'Invalid command: missing single command',
         type: ERROR_TYPES.RUNTIME
       })
       return
     }
 
-    // Find the loop state that matches the variable name
-    let loopStateIndex = -1
-    if (nextStmt.variable) {
-      const variableName = nextStmt.variable.name
-      // Find the most recent loop with this variable name
-      for (let i = this.context.loopStack.length - 1; i >= 0; i--) {
-        if (this.context.loopStack[i] && this.context.loopStack[i]!.variableName === variableName) {
-          loopStateIndex = i
-          break
+    // Check which command type we have
+    if (singleCommandCst.children.ifThenStatement) {
+      const ifThenStmtCst = getFirstCstNode(singleCommandCst.children.ifThenStatement)
+      if (ifThenStmtCst) {
+        // Evaluate condition
+        const conditionIsTrue = this.ifThenExecutor.evaluateCondition(ifThenStmtCst, expandedStatement.lineNumber)
+        
+        // Execute THEN clause if condition is true
+        if (conditionIsTrue) {
+          // Check if it's a line number jump (IF ... THEN number or IF ... GOTO number)
+          if (this.ifThenExecutor.hasLineNumberJump(ifThenStmtCst)) {
+            const targetLineNumber = this.ifThenExecutor.getLineNumber(ifThenStmtCst)
+            if (targetLineNumber !== undefined) {
+              const targetStatementIndex = this.context.findStatementIndexByLine(targetLineNumber)
+              if (targetStatementIndex === -1) {
+                this.context.addError({
+                  line: expandedStatement.lineNumber,
+                  message: `IF-THEN: line number ${targetLineNumber} not found`,
+                  type: ERROR_TYPES.RUNTIME
+                })
+              } else {
+                if (this.context.config.enableDebugMode) {
+                  this.context.addDebugOutput(`IF-THEN: jumping to line ${targetLineNumber} (statement index ${targetStatementIndex})`)
+                }
+                this.context.jumpToStatement(targetStatementIndex)
+                return // Don't advance to next statement
+              }
+            }
+          }
+          
+          // Otherwise, execute statements in THEN clause
+          const thenCommandListCst = this.ifThenExecutor.getThenClause(ifThenStmtCst)
+          if (thenCommandListCst) {
+            // Get all commands from the command list (colon-separated commands)
+            const thenCommands = getCstNodes(thenCommandListCst.children.command)
+            
+            // Execute each command in the THEN clause sequentially
+            // Use a local index counter to track position within THEN clause for FOR/NEXT loops
+            let thenCommandIndex = 0
+            while (thenCommandIndex < thenCommands.length) {
+              const commandCst = thenCommands[thenCommandIndex]
+              if (!commandCst) break
+              
+              const thenStatement: ExpandedStatement = {
+                statementIndex: expandedStatement.statementIndex, // Keep same statement index
+                lineNumber: expandedStatement.lineNumber,
+                command: commandCst
+              }
+              
+              // Execute the command
+              await this.executeStatement(thenStatement)
+              
+              // Check if NEXT caused a jump back (loop continuation)
+              // If so, we need to restart from the FOR statement in the THEN clause
+              const singleCommandCst = getFirstCstNode(commandCst.children.singleCommand)
+              if (singleCommandCst?.children.nextStatement) {
+                const nextStmtCst = getFirstCstNode(singleCommandCst.children.nextStatement)
+                if (nextStmtCst) {
+                  // Check if NEXT caused a jump - if loop stack has a loop for this line
+                  // and the current statement index matches, we need to find the FOR in THEN clause
+                  // NEXT always refers to the innermost loop (no variable name in Family BASIC)
+                  const activeLoop = this.context.loopStack.find(
+                    loop => loop.statementIndex === expandedStatement.statementIndex
+                  )
+                  if (activeLoop) {
+                    // Loop is active - find the FOR statement in THEN clause and restart from there
+                    // Find the index of the FOR statement for this variable
+                    const varName = activeLoop.variableName
+                    for (let i = 0; i < thenCommands.length; i++) {
+                      const cmd = thenCommands[i]
+                      const singleCmd = getFirstCstNode(cmd?.children.singleCommand)
+                      const forStmt = getFirstCstNode(singleCmd?.children.forStatement)
+                      if (forStmt) {
+                        const forVarToken = getFirstToken(forStmt.children.Identifier)
+                        if (forVarToken && forVarToken.image.toUpperCase() === varName) {
+                          thenCommandIndex = i // Jump back to FOR statement
+                          break
+                        }
+                      }
+                    }
+                    continue // Continue loop to re-execute from FOR
+                  }
+                }
+              }
+              
+              // Move to next command
+              thenCommandIndex++
+            }
+          }
         }
       }
-    } else {
-      // No variable specified, use the most recent loop
-      loopStateIndex = this.context.loopStack.length - 1
-    }
-
-    if (loopStateIndex === -1) {
-      // Handle mismatched NEXT variable gracefully - use the most recent FOR loop
-      if (this.context.loopStack.length > 0) {
-        loopStateIndex = this.context.loopStack.length - 1
-        if (this.context.config.enableDebugMode) {
-          this.context.addDebugOutput(`NEXT: no matching FOR found for variable ${nextStmt.variable?.name || 'unnamed'}, using most recent FOR loop`)
-        }
-      } else {
-        // No FOR loops on stack, just continue execution
-        if (this.context.config.enableDebugMode) {
-          this.context.addDebugOutput(`NEXT: no matching FOR found for variable ${nextStmt.variable?.name || 'unnamed'}, continuing execution`)
-        }
+    } else if (singleCommandCst.children.gotoStatement) {
+      const gotoStmtCst = getFirstCstNode(singleCommandCst.children.gotoStatement)
+      if (gotoStmtCst) {
+        // GOTO jumps to another line - don't advance to next statement
+        this.gotoExecutor.execute(gotoStmtCst, expandedStatement.lineNumber)
         return
       }
-    }
-
-    const loopState = this.context.loopStack[loopStateIndex]
-    
-    if (!loopState) {
-      // This should not happen, but handle gracefully
-      if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(`NEXT: no valid loop state found, continuing execution`)
+    } else if (singleCommandCst.children.printStatement) {
+      const printStmtCst = getFirstCstNode(singleCommandCst.children.printStatement)
+      if (printStmtCst) {
+        this.printExecutor.execute(printStmtCst)
       }
-      return
-    }
-    
-    // If the loop was marked as not executing, just pop it and continue
-    if (loopState.shouldExecute === false) {
-      this.context.loopStack.splice(loopStateIndex, 1)
-      if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(`NEXT: loop was not executed, popping from stack`)
+    } else if (singleCommandCst.children.letStatement) {
+      const letStmtCst = getFirstCstNode(singleCommandCst.children.letStatement)
+      if (letStmtCst) {
+        this.letExecutor.execute(letStmtCst)
       }
-      return
-    }
-    
-    loopState.currentValue += loopState.stepValue
-
-    if (this.context.config.enableDebugMode) {
-      this.context.addDebugOutput(`NEXT: currentValue=${loopState.currentValue}, endValue=${loopState.endValue}, stepValue=${loopState.stepValue}`)
-    }
-
-    if ((loopState.stepValue > 0 && loopState.currentValue <= loopState.endValue) ||
-        (loopState.stepValue < 0 && loopState.currentValue >= loopState.endValue)) {
-      this.variableService.setVariable(loopState.variableName, loopState.currentValue)
-      this.context.currentStatementIndex = loopState.statementIndex
-      if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(`NEXT: continuing loop, jumping to statement ${loopState.statementIndex}`)
-      }
-    } else {
-      this.context.loopStack.splice(loopStateIndex, 1)
-      if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(`NEXT: loop completed, removed from stack`)
-      }
-    }
-  }
-
-  private async executeGotoStatement(gotoStmt: GotoStatementNode): Promise<void> {
-    // TODO: Extract to GotoExecutor
-    const targetLine = this.evaluator.evaluateExpression(gotoStmt.target)
-    const targetIndex = this.context.findStatementIndexByLine(this.toNumber(targetLine))
-
-    if (this.context.config.enableDebugMode) {
-      this.context.addDebugOutput(`GOTO: target line ${targetLine}, target index ${targetIndex}`)
-      this.context.addDebugOutput(`GOTO: available statements: ${this.context.statements.map((s, i) => `${i}:L${s.lineNumber}`).join(', ')}`)
-    }
-
-    if (targetIndex !== -1) {
-      this.context.currentStatementIndex = targetIndex
-      if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(`GOTO: jumping to statement ${targetIndex}`)
-      }
-    } else {
-      this.context.addError({
-        line: 0,
-        message: `GOTO target line ${targetLine} not found`,
-        type: ERROR_TYPES.RUNTIME
-      })
-    }
-  }
-
-  private async executeGosubStatement(gosubStmt: GosubStatementNode): Promise<void> {
-    // TODO: Extract to GosubExecutor
-    this.context.gosubStack.push(this.context.currentStatementIndex + 1)
-    const targetLine = this.evaluator.evaluateExpression(gosubStmt.target)
-    const targetIndex = this.context.findStatementIndexByLine(this.toNumber(targetLine))
-
-    if (targetIndex !== -1) {
-      this.context.currentStatementIndex = targetIndex
-    } else {
-      this.context.addError({
-        line: 0,
-        message: `GOSUB target line ${targetLine} not found`,
-        type: ERROR_TYPES.RUNTIME
-      })
-    }
-  }
-
-  private async executeReturnStatement(_returnStmt: ReturnStatementNode): Promise<void> {
-    // TODO: Extract to ReturnExecutor
-    if (this.context.gosubStack.length === 0) {
-      this.context.addError({
-        line: 0,
-        message: 'RETURN without GOSUB',
-        type: ERROR_TYPES.RUNTIME
-      })
-      return
-    }
-
-    const returnIndex = this.context.gosubStack.pop()!
-    this.context.currentStatementIndex = returnIndex
-  }
-
-  private async executeInputStatement(_inputStmt: InputStatementNode): Promise<void> {
-    // TODO: Extract to InputExecutor
-    this.ioService.inputValue()
-  }
-
-  private async executeReadStatement(readStmt: ReadStatementNode): Promise<void> {
-    // TODO: Extract to ReadExecutor
-    for (const variable of readStmt.variables) {
-      const value = this.dataService.readNextDataValue()
-      
-      if (variable.subscript) {
-        this.variableService.setArrayElementFromExpressions(
-          variable.name,
-          variable.subscript,
-          { type: 'NumberLiteral', value } as NumberLiteralNode
-        )
-      } else {
-        this.variableService.setVariable(variable.name, value)
-      }
-    }
-  }
-
-  private async executeRestoreStatement(restoreStmt: RestoreStatementNode): Promise<void> {
-    // TODO: Extract to RestoreExecutor
-    const lineNumber = restoreStmt.lineNumber ? 
-      this.evaluator.evaluateExpression(restoreStmt.lineNumber) : 
-      undefined
-    this.dataService.restoreData(lineNumber ? this.toNumber(lineNumber) : undefined)
-  }
-
-  private async executeDimStatement(dimStmt: DimStatementNode): Promise<void> {
-    // TODO: Extract to DimExecutor
-    for (const arrayDecl of dimStmt.arrays) {
-      const dimensions = arrayDecl.dimensions.map((dim) => 
-        this.toNumber(this.evaluator.evaluateExpression(dim))
-      )
-      this.variableService.createArray(arrayDecl.variable.name, dimensions)
-    }
-  }
-
-  private async executeColorStatement(colorStmt: ColorStatementNode): Promise<void> {
-    // TODO: Extract to ColorExecutor
-    const foreground = this.toNumber(this.evaluator.evaluateExpression(colorStmt.foreground))
-    const background = colorStmt.background ? 
-      this.toNumber(this.evaluator.evaluateExpression(colorStmt.background)) : 0
-    
-    // Placeholder - actual color implementation would go here
-    this.context.addDebugOutput(`COLOR: foreground=${foreground}, background=${background}`)
-  }
-
-  private async executePauseStatement(pauseStmt: PauseStatementNode): Promise<void> {
-    // Evaluate the duration expression
-    const durationValue = this.evaluator.evaluateExpression(pauseStmt.duration)
-    const durationMs = this.toNumber(durationValue)
-    
-    // Ensure duration is non-negative
-    const pauseDuration = Math.max(0, durationMs)
-    
-    if (this.context.config.enableDebugMode) {
-      this.context.addDebugOutput(`PAUSE: ${pauseDuration}ms`)
-    }
-    
-    // Pause execution for the specified duration
-    if (pauseDuration > 0) {
-      await new Promise(resolve => setTimeout(resolve, pauseDuration))
-    }
-  }
-
-  private toNumber(value: number | string | boolean | undefined): number {
-    if (typeof value === 'number') return value
-    if (typeof value === 'boolean') return value ? 1 : 0
-    if (typeof value === 'string') {
-      const parsed = parseFloat(value)
-      return isNaN(parsed) ? 0 : parsed
-    }
-    return 0
-  }
-
-  /**
-   * Find the NEXT statement for a given variable
-   */
-  private findNextStatementIndex(startIndex: number, variableName: string): number {
-    for (let i = startIndex + 1; i < this.context.statements.length; i++) {
-      const stmt = this.context.statements[i]
-      if (stmt && stmt.command.type === 'NextStatement') {
-        // Check if this NEXT matches our variable (or no variable specified)
-        if (!stmt.command.variable || stmt.command.variable.name === variableName) {
-          return i
+    } else if (singleCommandCst.children.forStatement) {
+      const forStmtCst = getFirstCstNode(singleCommandCst.children.forStatement)
+      if (forStmtCst) {
+        // Check if loop is already active (jumped back from NEXT)
+        // If so, skip FOR initialization
+        const identifierToken = getFirstToken(forStmtCst.children.Identifier)
+        if (identifierToken) {
+          const varName = identifierToken.image.toUpperCase()
+          const existingLoop = this.context.loopStack.find(
+            loop => loop.variableName === varName && loop.statementIndex === expandedStatement.statementIndex
+          )
+          if (existingLoop) {
+            // Loop already active - skip FOR initialization
+            return
+          }
         }
+        // Pass current statement index and line number for loop tracking
+        this.forExecutor.execute(forStmtCst, expandedStatement.statementIndex, expandedStatement.lineNumber)
       }
+      } else if (singleCommandCst.children.nextStatement) {
+        const nextStmtCst = getFirstCstNode(singleCommandCst.children.nextStatement)
+        if (nextStmtCst) {
+          // NEXT may modify statement index (jump back to FOR)
+          const shouldContinue = this.nextExecutor.execute(nextStmtCst, expandedStatement.lineNumber)
+          if (shouldContinue) {
+            // Loop continues - don't advance to next statement
+            return
+          }
+        }
+    } else if (singleCommandCst.children.endStatement) {
+      const endStmtCst = getFirstCstNode(singleCommandCst.children.endStatement)
+      if (endStmtCst) {
+        // END stops execution immediately
+        this.endExecutor.execute(endStmtCst)
+        return // Don't continue executing
+      }
+    } else if (singleCommandCst.children.remStatement) {
+      // REM statements are comments - do nothing (no-op)
+      if (this.context.config.enableDebugMode) {
+        this.context.addDebugOutput('REM: Comment ignored')
+      }
+      return
+    } else if (singleCommandCst.children.pauseStatement) {
+      const pauseStmtCst = getFirstCstNode(singleCommandCst.children.pauseStatement)
+      if (pauseStmtCst) {
+        await this.pauseExecutor.execute(pauseStmtCst)
+      }
+      return
+    } else {
+      // Other statement types not yet implemented
+      this.context.addError({
+        line: expandedStatement.lineNumber,
+        message: 'Unsupported statement type',
+        type: ERROR_TYPES.RUNTIME
+      })
     }
-    return -1
   }
 }

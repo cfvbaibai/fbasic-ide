@@ -11,10 +11,22 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  // Configure Monaco Editor workers
+  optimizeDeps: {
+    include: ['monaco-editor']
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        // Ensure Monaco workers are handled correctly
+        manualChunks: undefined
+      }
+    }
+  },
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: ['./src/test/setup.ts'],
+    setupFiles: ['./test/setup.ts'],
     testTimeout: 10000,
     hookTimeout: 10000,
     teardownTimeout: 10000,

@@ -4,7 +4,6 @@
  * Handles input and output operations including PRINT, INPUT, and CLS.
  */
 
-import type { ExpressionNode } from '../parser/ast-types'
 import { ExpressionEvaluator, type EvaluationContext } from '../evaluation/ExpressionEvaluator'
 import type { BasicDeviceAdapter } from '../interfaces'
 
@@ -16,53 +15,24 @@ export class IoService {
   ) {}
 
   /**
-   * Print values to output
+   * Print values to output (accepts array of values: number | string)
    */
-  printValues(expressions: ExpressionNode[]): void {
+  printValues(values: Array<number | string>): void {
     let output = ''
 
-    for (let i = 0; i < expressions.length; i++) {
-      const expr = expressions[i]
-
-      // Handle separator-aware print items
-      let actualExpr: ExpressionNode
-      let separator: string | undefined
-
-      // Type guard to check if expr has separator properties
-      const hasSeparator = (obj: unknown): obj is { item: ExpressionNode; separator: string } => {
-        return obj !== null && typeof obj === 'object' && 'item' in obj && 'separator' in obj
-      }
-
-      if (hasSeparator(expr)) {
-        // This is a separator-aware item from the tail
-        actualExpr = expr.item
-        separator = expr.separator
-      } else {
-        // This is the head item or a regular item
-        actualExpr = expr as ExpressionNode
-        separator = undefined
-      }
-
-      const value = this.evaluator.evaluateExpression(actualExpr)
+    for (let i = 0; i < values.length; i++) {
+      const value = values[i]
+      if (value === undefined) continue
       const formatted = this.formatValue(value)
 
       if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(`PRINT: evaluating expression ${JSON.stringify(actualExpr)} = ${value}, separator: ${separator}`)
+        this.context.addDebugOutput(`PRINT: value = ${value}`)
       }
 
-      // Handle separator logic
-      if (separator === ';') {
-        // Semicolon means concatenate without space (official BASIC specification)
-        output += formatted
-      } else if (separator === ',') {
-        // Comma means add a space before the value
-        if (output.length > 0) {
-          output += ' ' + formatted
-        } else {
-          output += formatted
-        }
+      // Simple concatenation for now (separator handling can be added later)
+      if (i > 0) {
+        output += ' ' + formatted
       } else {
-        // First item or no separator info - just add
         output += formatted
       }
     }
@@ -71,19 +41,6 @@ export class IoService {
 
     if (this.context.config.enableDebugMode) {
       this.context.addDebugOutput(`PRINT: ${output}`)
-    }
-  }
-
-  /**
-   * Print a single value
-   */
-  printValue(expression: ExpressionNode): void {
-    const value = this.evaluator.evaluateExpression(expression)
-    const formatted = this.formatValue(value)
-    this.context.addOutput(formatted)
-    
-    if (this.context.config.enableDebugMode) {
-      this.context.addDebugOutput(`PRINT: ${formatted}`)
     }
   }
 

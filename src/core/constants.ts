@@ -43,11 +43,11 @@ export const DEFAULTS = {
     YIELD_INTERVAL: 100, // Yield every 100 iterations in production
     YIELD_DURATION: 1, // Yield for 1ms to allow browser to process events
   },
-  SERVICE_WORKER: {
+  WEB_WORKER: {
     ENABLED_PRODUCTION: true,
     ENABLED_TEST: false,
     WORKER_SCRIPT: '/basic-interpreter-worker.js',
-    MESSAGE_TIMEOUT: 30000, // 30 seconds timeout for service worker messages
+    MESSAGE_TIMEOUT: 30000, // 30 seconds timeout for web worker messages
   }
 } as const
 

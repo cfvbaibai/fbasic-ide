@@ -1,12 +1,12 @@
 /**
- * Service Worker Entry Point for BASIC Interpreter
+ * Web Worker Entry Point for BASIC Interpreter
  * 
- * This is the main entry point for the service worker that will be bundled
+ * This is the main entry point for the web worker that will be bundled
  * with the interpreter code.
  */
 
 import { BasicInterpreter } from '../BasicInterpreter'
-import { ServiceWorkerDeviceAdapter } from '../devices/ServiceWorkerDeviceAdapter'
+import { WebWorkerDeviceAdapter } from '../devices/WebWorkerDeviceAdapter'
 import type { 
   AnyServiceWorkerMessage,
   ExecuteMessage,
@@ -18,20 +18,18 @@ import type {
   StickEventMessage
 } from '../interfaces'
 
-/* global self */
-
-// Service Worker Interpreter Implementation
-class ServiceWorkerInterpreter {
+// Web Worker Interpreter Implementation
+class WebWorkerInterpreter {
   private interpreter: BasicInterpreter | null = null
   private isRunning: boolean = false
   private currentExecutionId: string | null = null
-  private serviceWorkerDeviceAdapter: ServiceWorkerDeviceAdapter | null = null
+  private webWorkerDeviceAdapter: WebWorkerDeviceAdapter | null = null
 
   constructor() {
     this.interpreter = null
     this.isRunning = false
     this.currentExecutionId = null
-    this.serviceWorkerDeviceAdapter = new ServiceWorkerDeviceAdapter()
+    this.webWorkerDeviceAdapter = new WebWorkerDeviceAdapter()
 
     this.setupMessageListener()
   }
@@ -40,7 +38,7 @@ class ServiceWorkerInterpreter {
     if (typeof self === 'undefined') return
 
     self.addEventListener('message', (event) => {
-      console.log('📨 [WORKER] Service worker received message from main thread:', {
+      console.log('📨 [WORKER] Web worker received message from main thread:', {
         type: event.data.type,
         id: event.data.id,
         timestamp: event.data.timestamp,
@@ -87,22 +85,27 @@ class ServiceWorkerInterpreter {
       const { code, config } = message.data
       this.currentExecutionId = message.id
       
+      // Set execution ID in device adapter so it can include it in OUTPUT messages
+      if (this.webWorkerDeviceAdapter) {
+        this.webWorkerDeviceAdapter.setCurrentExecutionId(message.id)
+      }
+      
       console.log('▶️ [WORKER] Starting execution:', {
         executionId: message.id,
         codeLength: code.length,
       })
       
       // Create a new interpreter for each execution to ensure correct configuration
-      console.log('🔧 [WORKER] Creating interpreter with ServiceWorkerDeviceAdapter:', {
+      console.log('🔧 [WORKER] Creating interpreter with WebWorkerDeviceAdapter:', {
         hasOriginalDeviceAdapter: !!config.deviceAdapter,
         maxIterations: config.maxIterations,
         maxOutputLines: config.maxOutputLines
       })
       this.interpreter = new BasicInterpreter({
         ...config,
-        deviceAdapter: this.serviceWorkerDeviceAdapter!, // Use ServiceWorkerDeviceAdapter (non-null assertion)
+        deviceAdapter: this.webWorkerDeviceAdapter!, // Use WebWorkerDeviceAdapter (non-null assertion)
       })
-      console.log('✅ [WORKER] Interpreter created with ServiceWorkerDeviceAdapter')
+      console.log('✅ [WORKER] Interpreter created with WebWorkerDeviceAdapter')
 
       // Execute the BASIC code
       console.log('🚀 [WORKER] Executing BASIC code')
@@ -112,7 +115,7 @@ class ServiceWorkerInterpreter {
 
       console.log('✅ [WORKER] Execution completed:', {
         success: result.success,
-        outputLines: this.serviceWorkerDeviceAdapter?.printOutput.length || 0,
+        outputLines: this.webWorkerDeviceAdapter?.printOutput.length || 0,
         executionTime: result.executionTime
       })
 
@@ -120,7 +123,7 @@ class ServiceWorkerInterpreter {
       const enhancedResult: ResultMessage['data'] = {
         ...result,
         executionId: message.id,
-        workerId: 'service-worker-1'
+        workerId: 'web-worker-1'
       }
 
       this.sendResult(message.id, enhancedResult)
@@ -146,12 +149,12 @@ class ServiceWorkerInterpreter {
     const { joystickId, state } = message.data
     console.log('🎮 [WORKER] Processing STRIG event:', { joystickId, state })
     
-    // Update the ServiceWorkerDeviceAdapter directly
-    if (this.serviceWorkerDeviceAdapter) {
-      console.log('🎮 [WORKER] Updating ServiceWorkerDeviceAdapter STRIG buffer')
-      this.serviceWorkerDeviceAdapter.pushStrigState(joystickId, state)
+    // Update the WebWorkerDeviceAdapter directly
+    if (this.webWorkerDeviceAdapter) {
+      console.log('🎮 [WORKER] Updating WebWorkerDeviceAdapter STRIG buffer')
+      this.webWorkerDeviceAdapter.pushStrigState(joystickId, state)
     } else {
-      console.log('🎮 [WORKER] No ServiceWorkerDeviceAdapter available for STRIG event')
+      console.log('🎮 [WORKER] No WebWorkerDeviceAdapter available for STRIG event')
     }
   }
 
@@ -159,12 +162,12 @@ class ServiceWorkerInterpreter {
     const { joystickId, state } = message.data
     console.log('🎮 [WORKER] Processing STICK event:', { joystickId, state })
     
-    // Update the ServiceWorkerDeviceAdapter directly
-    if (this.serviceWorkerDeviceAdapter) {
-      console.log('🎮 [WORKER] Updating ServiceWorkerDeviceAdapter STICK state')
-      this.serviceWorkerDeviceAdapter.setStickState(joystickId, state)
+    // Update the WebWorkerDeviceAdapter directly
+    if (this.webWorkerDeviceAdapter) {
+      console.log('🎮 [WORKER] Updating WebWorkerDeviceAdapter STICK state')
+      this.webWorkerDeviceAdapter.setStickState(joystickId, state)
     } else {
-      console.log('🎮 [WORKER] No ServiceWorkerDeviceAdapter available for STICK event')
+      console.log('🎮 [WORKER] No WebWorkerDeviceAdapter available for STICK event')
     }
   }
 
@@ -228,5 +231,6 @@ class ServiceWorkerInterpreter {
   }
 }
 
-// Initialize service worker interpreter
-new ServiceWorkerInterpreter()
+// Initialize web worker interpreter
+new WebWorkerInterpreter()
+

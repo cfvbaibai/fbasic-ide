@@ -29,7 +29,7 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 30 FOR I = 5 TO 1 STEP -1
 40   PRINT "Countdown: "; I
 50   PAUSE 1000
-60 NEXT I
+60 NEXT
 70 PRINT "Blast off!"
 80 PAUSE 2000
 90 PRINT "Mission complete!"
@@ -56,15 +56,15 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 150 PRINT "Monitoring joystick inputs..."
 160 PRINT ""
 170 REM Check for any joystick input
-180 LET STICK_VAL_0 = 0: LET STICK_VAL_1 = 0
-185 LET STRIG_VAL_0 = 0: LET STRIG_VAL_1 = 0
-190 LET STICK_VAL_0 = STICK(0): LET STICK_VAL_1 = STICK(1)
-195 LET STRIG_VAL_0 = STRIG(0): LET STRIG_VAL_1 = STRIG(1)
-250 IF STICK_VAL_0 > 0 OR STRIG_VAL_0 > 0 OR STICK_VAL_1 > 0 OR STRIG_VAL_1 > 0 THEN PRINT "INPUT DETECTED!"
-260 IF STICK_VAL_0 > 0 OR STRIG_VAL_0 > 0 THEN PRINT "  Joystick 0: STICK="; STICK_VAL_0; ", STRIG="; STRIG_VAL_0
-270 IF STICK_VAL_1 > 0 OR STRIG_VAL_1 > 0 THEN PRINT "  Joystick 1: STICK="; STICK_VAL_1; ", STRIG="; STRIG_VAL_1
+180 LET S0 = 0: LET S1 = 0
+185 LET T0 = 0: LET T1 = 0
+190 LET S0 = STICK(0): LET S1 = STICK(1)
+195 LET T0 = STRIG(0): LET T1 = STRIG(1)
+250 IF S0 > 0 OR T0 > 0 OR S1 > 0 OR T1 > 0 THEN PRINT "INPUT DETECTED!"
+260 IF S0 > 0 OR T0 > 0 THEN PRINT "  Joystick 0: STICK="; S0; ", STRIG="; T0
+270 IF S1 > 0 OR T1 > 0 THEN PRINT "  Joystick 1: STICK="; S1; ", STRIG="; T1
 310 REM Check for exit condition (START button on joystick #1)
-320 IF STRIG_VAL_1 = 1 THEN GOTO 360
+320 IF T1 = 1 THEN GOTO 360
 330 PAUSE 200
 340 GOTO 180
 350 PRINT ""
@@ -82,20 +82,20 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 40 FOR I = 1 TO 10
 50   IF I MOD 2 = 0 THEN PRINT "Even: "; I
 60   IF I MOD 2 = 1 THEN PRINT "Odd: "; I
-70 NEXT I
+70 NEXT
 80 PRINT
-90 LET SUM = 0
+90 LET S = 0
 100 FOR J = 1 TO 100
-110   SUM = SUM + J
-120 NEXT J
-130 PRINT "Sum of 1 to 100 = "; SUM
+110   S = S + J
+120 NEXT
+130 PRINT "Sum of 1 to 100 = "; S
 140 PRINT
 150 PRINT "String functions demo:"
-160 LET TEXT$ = "Hello World"
-170 PRINT "Length of '"; TEXT$; "' = "; LEN(TEXT$)
-180 PRINT "Left 5 chars: "; LEFT(TEXT$, 5)
-190 PRINT "Right 5 chars: "; RIGHT(TEXT$, 5)
-200 PRINT "Middle chars: "; MID(TEXT$, 3, 5)
+160 LET T$ = "Hello World"
+170 PRINT "Length of '"; T$; "' = "; LEN(T$)
+180 PRINT "Left 5 chars: "; LEFT$(T$, 5)
+190 PRINT "Right 5 chars: "; RIGHT$(T$, 5)
+200 PRINT "Middle chars: "; MID$(T$, 3, 5)
 210 END`
   },
 
@@ -107,31 +107,32 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 30 PRINT "=========================="
 40 PRINT ""
 50 PRINT "Mathematical functions:"
-60 LET X = 16
-70 PRINT "SQR("; X; ") = "; SQR(X)
-80 PRINT "ABS(-5) = "; ABS(-5)
-90 PRINT "INT(3.7) = "; INT(3.7)
+60 PRINT "ABS(-5) = "; ABS(-5)
+70 PRINT "SGN(-10) = "; SGN(-10)
+80 PRINT "SGN(10) = "; SGN(10)
+90 PRINT "RND(100) = "; RND(100)
 100 PRINT ""
 110 PRINT "String functions:"
-120 LET TEXT$ = "Hello World"
-130 PRINT "LEN('"; TEXT$; "') = "; LEN(TEXT$)
-140 PRINT "LEFT('"; TEXT$; "', 5) = "; LEFT(TEXT$, 5)
-150 PRINT "RIGHT('"; TEXT$; "', 5) = "; RIGHT(TEXT$, 5)
-160 PRINT ""
-170 PRINT "Control structures:"
-180 FOR I = 1 TO 3
-190   IF I MOD 2 = 0 THEN PRINT "Even: "; I
-195   IF I MOD 2 = 1 THEN PRINT "Odd: "; I
-200 NEXT I
-210 PRINT ""
-220 PRINT "Variables and expressions:"
-230 LET A = 10
-240 LET B = 20
-250 LET C = A + B * 2
-260 PRINT "A = "; A; ", B = "; B; ", C = A + B * 2 = "; C
-270 PRINT ""
-280 PRINT "Demo completed successfully!"
-290 END`
+120 LET T$ = "Hello World"
+130 PRINT "LEN('"; T$; "') = "; LEN(T$)
+140 PRINT "LEFT$('"; T$; "', 5) = "; LEFT$(T$, 5)
+150 PRINT "RIGHT$('"; T$; "', 5) = "; RIGHT$(T$, 5)
+160 PRINT "MID$('"; T$; "', 3, 5) = "; MID$(T$, 3, 5)
+170 PRINT ""
+180 PRINT "Control structures:"
+190 FOR I = 1 TO 3
+200   IF I MOD 2 = 0 THEN PRINT "Even: "; I
+205   IF I MOD 2 = 1 THEN PRINT "Odd: "; I
+210 NEXT
+220 PRINT ""
+230 PRINT "Variables and expressions:"
+240 LET A = 10
+250 LET B = 20
+260 LET C = A + B * 2
+270 PRINT "A = "; A; ", B = "; B; ", C = A + B * 2 = "; C
+280 PRINT ""
+290 PRINT "Demo completed successfully!"
+300 END`
   }
 }
 
