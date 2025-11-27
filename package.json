@@ -18,7 +18,8 @@
         "test:coverage": "vitest run --coverage",
         "build-web-worker": "tsx scripts/build-service-worker.ts",
         "build-service-worker": "pnpm build-web-worker",
-        "test-service-worker": "tsx scripts/test-service-worker.ts"
+        "test-service-worker": "tsx scripts/test-service-worker.ts",
+        "visualize-cst": "tsx scripts/visualize-cst.ts"
     },
     "dependencies": {
         "@element-plus/icons-vue": "^2.3.2",
