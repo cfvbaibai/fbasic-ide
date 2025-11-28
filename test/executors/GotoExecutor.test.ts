@@ -37,10 +37,7 @@ describe('GotoExecutor', () => {
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
-    expect(outputs).toContain('Start')
-    expect(outputs).toContain('Jumped here')
-    expect(outputs).not.toContain('Skipped')
-    expect(outputs).not.toContain('Also skipped')
+    expect(outputs).toEqual('Start\nJumped here')
   })
 
   it('should handle GOTO in a loop', async () => {
@@ -57,10 +54,8 @@ describe('GotoExecutor', () => {
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
-    expect(outputs).toContain('1')
-    expect(outputs).toContain('2')
-    expect(outputs).toContain('3')
-    expect(outputs).toContain('Done')
+    // Numbers always get a space BEFORE them
+    expect(outputs).toEqual(' 1\n 2\n 3\nDone')
   })
 
   it('should handle GOTO to earlier line (backward jump)', async () => {
@@ -76,10 +71,8 @@ describe('GotoExecutor', () => {
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
-    // Should print "Loop" 3 times (X = 0, 1, 2)
-    const loopCount = (outputs.match(/Loop/g) || []).length
-    expect(loopCount).toBe(3)
-    expect(outputs).toContain('End')
+    // Should print "Loop" 3 times (X = 0, 1, 2), then "End"
+    expect(outputs).toEqual('Loop\nLoop\nLoop\nEnd')
   })
 
   it('should handle GOTO to later line (forward jump)', async () => {
@@ -97,9 +90,7 @@ describe('GotoExecutor', () => {
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
-    expect(outputs).toContain('Start')
-    expect(outputs).toContain('Target')
-    expect(outputs).not.toContain('Skipped')
+    expect(outputs).toEqual('Start\nTarget')
   })
 
   it('should handle GOTO on same line as other statements', async () => {
@@ -114,24 +105,27 @@ describe('GotoExecutor', () => {
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
-    expect(outputs).toContain('Before')
-    expect(outputs).toContain('After')
-    expect(outputs).not.toContain('Never')
-    expect(outputs).not.toContain('Also never')
+    expect(outputs).toEqual('Before\nAfter')
   })
 
   it('should error on GOTO to non-existent line number', async () => {
     const source = `
 10 PRINT "Start"
 20 GOTO 999
-30 END
+30 PRINT "This should not print"
+40 END
 `
     const result = await interpreter.execute(source)
     
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
     const errorMessages = result.errors.map(e => e.message).join(' ')
-    expect(errorMessages).toContain('line number 999 not found')
+    expect(errorMessages).toEqual('GOTO: line number 999 not found')
+    
+    // Verify that PRINT statements after the error are not executed
+    // getAllOutputs() includes error output formatted as "RUNTIME: {message}" to match IDE format
+    const outputs = deviceAdapter.getAllOutputs()
+    expect(outputs).toEqual('Start\nRUNTIME: GOTO: line number 999 not found')
   })
 
   it('should handle multiple GOTO statements', async () => {
@@ -150,11 +144,7 @@ describe('GotoExecutor', () => {
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
-    expect(outputs).toContain('A')
-    expect(outputs).toContain('C')
-    expect(outputs).toContain('E')
-    expect(outputs).not.toContain('B')
-    expect(outputs).not.toContain('D')
+    expect(outputs).toEqual('A\nC\nE')
   })
 
   it('should handle GOTO with IF-THEN', async () => {
@@ -171,8 +161,7 @@ describe('GotoExecutor', () => {
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
-    expect(outputs).toContain('True branch')
-    expect(outputs).not.toContain('False branch')
+    expect(outputs).toEqual('True branch')
   })
 })
 

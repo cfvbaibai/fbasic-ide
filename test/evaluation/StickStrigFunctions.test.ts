@@ -40,7 +40,8 @@ describe('STICK and STRIG Functions', () => {
       
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      expect(deviceAdapter.getAllOutputs()).toContain('0')
+      // Numbers get leading space
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 0')
     })
 
     it('should return 1 for RIGHT direction', async () => {
@@ -53,7 +54,8 @@ describe('STICK and STRIG Functions', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('1')
+      // Numbers get leading space
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 1')
     })
 
     it('should return 2 for LEFT direction', async () => {
@@ -66,7 +68,8 @@ describe('STICK and STRIG Functions', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('2')
+      // Numbers get leading space
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 2')
     })
 
     it('should return 4 for DOWN direction', async () => {
@@ -79,7 +82,8 @@ describe('STICK and STRIG Functions', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('4')
+      // Numbers get leading space
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 4')
     })
 
     it('should return 8 for UP direction', async () => {
@@ -92,7 +96,8 @@ describe('STICK and STRIG Functions', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('8')
+      // Numbers get leading space
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 8')
     })
 
     it('should work with controller II (joystickId = 1)', async () => {
@@ -105,7 +110,8 @@ describe('STICK and STRIG Functions', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('1')
+      // Numbers get leading space
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 1')
     })
 
     it('should error for invalid joystickId', async () => {
@@ -129,7 +135,7 @@ describe('STICK and STRIG Functions', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('RIGHT')
+      expect(deviceAdapter.getAllOutputs()).toEqual('RIGHT')
     })
   })
 
@@ -145,7 +151,8 @@ describe('STICK and STRIG Functions', () => {
       
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      expect(deviceAdapter.getAllOutputs()).toContain('0')
+      // Numbers get leading space
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 0')
     })
 
     it('should return 1 for START button (Controller I)', async () => {
@@ -158,7 +165,8 @@ describe('STICK and STRIG Functions', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('1')
+      // Numbers get leading space
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 1')
     })
 
     it('should return 2 for SELECT button (Controller I)', async () => {
@@ -171,7 +179,8 @@ describe('STICK and STRIG Functions', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('2')
+      // Numbers get leading space
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 2')
     })
 
     it('should return 4 for B button', async () => {
@@ -184,7 +193,8 @@ describe('STICK and STRIG Functions', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('4')
+      // Numbers get leading space
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 4')
     })
 
     it('should return 8 for A button', async () => {
@@ -197,7 +207,8 @@ describe('STICK and STRIG Functions', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('8')
+      // Numbers get leading space
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 8')
     })
 
     it('should work with controller II (joystickId = 1)', async () => {
@@ -210,7 +221,8 @@ describe('STICK and STRIG Functions', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('4')
+      // Numbers get leading space
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 4')
     })
 
     it('should consume button state (only returns value once)', async () => {
@@ -225,8 +237,8 @@ describe('STICK and STRIG Functions', () => {
       
       expect(result.success).toBe(true)
       // First call should return 1, second call should return 0 (consumed)
-      expect(deviceAdapter.getAllOutputs()).toContain('1')
-      expect(deviceAdapter.getAllOutputs()).toContain('0')
+      // PRINT with semicolon keeps values on same line, numbers get leading space
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 1 0')
     })
 
     it('should error for invalid joystickId', async () => {
@@ -250,7 +262,7 @@ describe('STICK and STRIG Functions', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('A BUTTON')
+      expect(deviceAdapter.getAllOutputs()).toEqual('A BUTTON')
     })
   })
 
@@ -270,8 +282,7 @@ describe('STICK and STRIG Functions', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('RIGHT')
-      expect(deviceAdapter.getAllOutputs()).not.toContain('NOT PRESSED')
+      expect(deviceAdapter.getAllOutputs()).toEqual('RIGHT')
     })
 
     it('should handle STRIG sample program', async () => {
@@ -288,7 +299,7 @@ describe('STICK and STRIG Functions', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('A')
+      expect(deviceAdapter.getAllOutputs()).toEqual('A')
     })
   })
 })

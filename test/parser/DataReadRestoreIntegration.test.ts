@@ -233,7 +233,8 @@ describe('DATA/READ/RESTORE Integration', () => {
     it('should report OD ERROR when reading more data than available', async () => {
       const code = `10 DATA 10, 20
 20 READ A, B, C
-30 END`
+30 PRINT "This should not print"
+40 END`
 
       const result = await interpreter.execute(code)
 
@@ -242,6 +243,10 @@ describe('DATA/READ/RESTORE Integration', () => {
       expect(errors.length).toBeGreaterThan(0)
       const odError = errors.find(e => e.message === 'OD ERROR')
       expect(odError).toBeDefined()
+      
+      // Verify that PRINT statements after the error are not executed
+      // printOutputMock should not be called because execution halts on error
+      expect(printOutputMock).not.toHaveBeenCalled()
     })
   })
 

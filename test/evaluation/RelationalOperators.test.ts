@@ -34,7 +34,7 @@ describe('Relational Operators', () => {
       
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      expect(deviceAdapter.getAllOutputs()).toContain('-1')
+      expect(deviceAdapter.getAllOutputs()).toEqual('-1')
     })
 
     it('should return 0 (false) when numbers are not equal', async () => {
@@ -45,7 +45,7 @@ describe('Relational Operators', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).not.toContain('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('')
     })
 
     it('should compare strings correctly', async () => {
@@ -57,7 +57,7 @@ describe('Relational Operators', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('Match')
+      expect(deviceAdapter.getAllOutputs()).toEqual('Match')
     })
   })
 
@@ -70,7 +70,7 @@ describe('Relational Operators', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('True')
     })
 
     it('should return 0 (false) when numbers are equal', async () => {
@@ -81,7 +81,7 @@ describe('Relational Operators', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).not.toContain('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('')
     })
   })
 
@@ -94,7 +94,7 @@ describe('Relational Operators', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('True')
     })
 
     it('should return 0 (false) when left is not less than right', async () => {
@@ -105,7 +105,7 @@ describe('Relational Operators', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).not.toContain('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('')
     })
   })
 
@@ -118,7 +118,7 @@ describe('Relational Operators', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('True')
     })
 
     it('should return 0 (false) when left is not greater than right', async () => {
@@ -129,7 +129,7 @@ describe('Relational Operators', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).not.toContain('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('')
     })
   })
 
@@ -142,7 +142,7 @@ describe('Relational Operators', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('True')
     })
 
     it('should return -1 (true) when left equals right', async () => {
@@ -153,7 +153,7 @@ describe('Relational Operators', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('True')
     })
 
     it('should return 0 (false) when left is greater than right', async () => {
@@ -164,7 +164,7 @@ describe('Relational Operators', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).not.toContain('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('')
     })
   })
 
@@ -177,7 +177,7 @@ describe('Relational Operators', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('True')
     })
 
     it('should return -1 (true) when left equals right', async () => {
@@ -188,7 +188,7 @@ describe('Relational Operators', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('True')
     })
 
     it('should return 0 (false) when left is less than right', async () => {
@@ -199,7 +199,7 @@ describe('Relational Operators', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).not.toContain('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('')
     })
   })
 
@@ -212,7 +212,7 @@ describe('Relational Operators', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('Less')
+      expect(deviceAdapter.getAllOutputs()).toEqual('Less')
     })
 
     it('should handle string equality', async () => {
@@ -223,7 +223,7 @@ describe('Relational Operators', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('Equal')
+      expect(deviceAdapter.getAllOutputs()).toEqual('Equal')
     })
   })
 })

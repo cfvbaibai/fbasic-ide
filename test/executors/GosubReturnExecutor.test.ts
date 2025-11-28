@@ -72,7 +72,8 @@ describe('GOSUB/RETURN Executor', () => {
     it('should error on GOSUB to non-existent line number', async () => {
       const source = `
 10 GOSUB 999
-20 END
+20 PRINT "This should not print"
+30 END
 `
       const result = await interpreter.execute(source)
       
@@ -80,6 +81,10 @@ describe('GOSUB/RETURN Executor', () => {
       expect(result.errors.length).toBeGreaterThan(0)
       const errorMessages = result.errors.map(e => e.message).join(' ')
       expect(errorMessages).toEqual('GOSUB: line number 999 not found')
+      
+      // Verify that PRINT statements after the error are not executed
+      const outputs = deviceAdapter.getAllOutputs()
+      expect(outputs).toEqual('RUNTIME: GOSUB: line number 999 not found')
     })
   })
 
@@ -123,7 +128,8 @@ describe('GOSUB/RETURN Executor', () => {
     it('should error on RETURN without GOSUB', async () => {
       const source = `
 10 RETURN
-20 END
+20 PRINT "This should not print"
+30 END
 `
       const result = await interpreter.execute(source)
       
@@ -131,12 +137,17 @@ describe('GOSUB/RETURN Executor', () => {
       expect(result.errors.length).toBeGreaterThan(0)
       const errorMessages = result.errors.map(e => e.message).join(' ')
       expect(errorMessages).toEqual('RETURN: no GOSUB to return from')
+      
+      // Verify that PRINT statements after the error are not executed
+      const outputs = deviceAdapter.getAllOutputs()
+      expect(outputs).toEqual('RUNTIME: RETURN: no GOSUB to return from')
     })
 
     it('should error on RETURN to non-existent line number', async () => {
       const source = `
 10 GOSUB 100
-20 END
+20 PRINT "This should not print"
+30 END
 100 RETURN 999
 `
       const result = await interpreter.execute(source)
@@ -145,6 +156,10 @@ describe('GOSUB/RETURN Executor', () => {
       expect(result.errors.length).toBeGreaterThan(0)
       const errorMessages = result.errors.map(e => e.message).join(' ')
       expect(errorMessages).toEqual('RETURN: line number 999 not found')
+      
+      // Verify that PRINT statements after the error are not executed
+      const outputs = deviceAdapter.getAllOutputs()
+      expect(outputs).toEqual('RUNTIME: RETURN: line number 999 not found')
     })
   })
 

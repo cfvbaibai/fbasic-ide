@@ -172,7 +172,7 @@ describe('Operator Precedence', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('True')
     })
 
     it('should evaluate relational operators after multiplication', async () => {
@@ -184,7 +184,7 @@ describe('Operator Precedence', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('True')
     })
 
     it('should evaluate relational operators after MOD', async () => {
@@ -196,7 +196,7 @@ describe('Operator Precedence', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('True')
     })
   })
 
@@ -210,7 +210,7 @@ describe('Operator Precedence', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('True')
     })
 
     it('should evaluate NOT after arithmetic and relational', async () => {
@@ -222,7 +222,7 @@ describe('Operator Precedence', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).not.toContain('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('')
     })
   })
 
@@ -236,7 +236,7 @@ describe('Operator Precedence', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('True')
     })
 
     it('should evaluate AND after relational operators', async () => {
@@ -248,7 +248,7 @@ describe('Operator Precedence', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('True')
     })
 
     it('should evaluate AND after arithmetic and relational', async () => {
@@ -260,7 +260,7 @@ describe('Operator Precedence', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('True')
     })
   })
 
@@ -274,7 +274,7 @@ describe('Operator Precedence', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).not.toContain('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('')
     })
 
     it('should evaluate OR after NOT and AND', async () => {
@@ -286,7 +286,7 @@ describe('Operator Precedence', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('True')
     })
   })
 
@@ -300,7 +300,7 @@ describe('Operator Precedence', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).not.toContain('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('')
     })
 
     it('should evaluate XOR after AND and OR', async () => {
@@ -312,7 +312,7 @@ describe('Operator Precedence', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).not.toContain('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('')
     })
   })
 
@@ -332,7 +332,7 @@ describe('Operator Precedence', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).not.toContain('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('')
     })
 
     it('should handle nested logical operators with arithmetic', async () => {
@@ -350,7 +350,7 @@ describe('Operator Precedence', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('True')
     })
 
     it('should handle function calls in logical expressions', async () => {
@@ -367,7 +367,7 @@ describe('Operator Precedence', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('True')
     })
   })
 })

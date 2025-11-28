@@ -28,21 +28,24 @@ describe('Arithmetic Functions', () => {
       const source = '10 LET X = ABS(5)\n20 PRINT X\n30 END'
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('5')
+      // Numbers get leading space
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 5')
     })
 
     it('should return absolute value of negative number', async () => {
       const source = '10 LET X = ABS(-5)\n20 PRINT X\n30 END'
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('5')
+      // Numbers get leading space
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 5')
     })
 
     it('should return 0 for ABS(0)', async () => {
       const source = '10 LET X = ABS(0)\n20 PRINT X\n30 END'
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('0')
+      // Numbers get leading space
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 0')
     })
   })
 
@@ -52,21 +55,24 @@ describe('Arithmetic Functions', () => {
       const source = '10 LET X = SGN(5)\n20 PRINT X\n30 END'
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('1')
+      // Numbers get leading space
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 1')
     })
 
     it('should return -1 for negative number', async () => {
       const source = '10 LET X = SGN(-5)\n20 PRINT X\n30 END'
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('-1')
+      // Negative numbers don't get leading space
+      expect(deviceAdapter.getAllOutputs()).toEqual('-1')
     })
 
     it('should return 0 for zero', async () => {
       const source = '10 LET X = SGN(0)\n20 PRINT X\n30 END'
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('0')
+      // Numbers get leading space
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 0')
     })
   })
 
@@ -88,7 +94,8 @@ describe('Arithmetic Functions', () => {
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
       // RND(1) always returns 0 according to spec
-      expect(deviceAdapter.getAllOutputs()).toContain('0')
+      // Numbers get leading space
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 0')
     })
 
     it('should return random number between 0 and 7 for RND(8)', async () => {
@@ -132,7 +139,8 @@ describe('Arithmetic Functions', () => {
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
       // SGN(-5) = -1, ABS(-1) = 1
-      expect(deviceAdapter.getAllOutputs()).toContain('1')
+      // Numbers get leading space
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 1')
     })
 
     it('should handle functions in expressions', async () => {
@@ -140,14 +148,16 @@ describe('Arithmetic Functions', () => {
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
       // ABS(-5) = 5, SGN(10) = 1, 5 + 1 = 6
-      expect(deviceAdapter.getAllOutputs()).toContain('6')
+      // Numbers get leading space
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 6')
     })
 
     it('should handle functions with variables', async () => {
       const source = '10 LET A = -10\n20 LET X = ABS(A)\n30 PRINT X\n40 END'
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toContain('10')
+      // Numbers get leading space
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 10')
     })
   })
 })

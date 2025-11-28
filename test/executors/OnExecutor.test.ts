@@ -42,10 +42,7 @@ describe('OnExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toContain('First')
-      expect(outputs).not.toContain('Second')
-      expect(outputs).not.toContain('Third')
-      expect(outputs).not.toContain('Skipped')
+      expect(outputs).toEqual('First')
     })
 
     it('should jump to second line when expression is 2', async () => {
@@ -66,10 +63,7 @@ describe('OnExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).not.toContain('First')
-      expect(outputs).toContain('Second')
-      expect(outputs).not.toContain('Third')
-      expect(outputs).not.toContain('Skipped')
+      expect(outputs).toEqual('Second')
     })
 
     it('should jump to third line when expression is 3', async () => {
@@ -90,10 +84,7 @@ describe('OnExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).not.toContain('First')
-      expect(outputs).not.toContain('Second')
-      expect(outputs).toContain('Third')
-      expect(outputs).not.toContain('Skipped')
+      expect(outputs).toEqual('Third')
     })
 
     it('should proceed to next line when expression is 0', async () => {
@@ -115,10 +106,7 @@ describe('OnExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toContain('Next')
-      expect(outputs).not.toContain('First')
-      expect(outputs).not.toContain('Second')
-      expect(outputs).not.toContain('Third')
+      expect(outputs).toEqual('Next')
     })
 
     it('should proceed to next line when expression exceeds number of lines', async () => {
@@ -140,10 +128,7 @@ describe('OnExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toContain('Next')
-      expect(outputs).not.toContain('First')
-      expect(outputs).not.toContain('Second')
-      expect(outputs).not.toContain('Third')
+      expect(outputs).toEqual('Next')
     })
 
     it('should handle ON with expression', async () => {
@@ -164,10 +149,7 @@ describe('OnExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).not.toContain('First')
-      expect(outputs).toContain('Second')
-      expect(outputs).not.toContain('Third')
-      expect(outputs).not.toContain('Skipped')
+      expect(outputs).toEqual('Second')
     })
 
     it('should handle negative expression value', async () => {
@@ -188,10 +170,7 @@ describe('OnExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toContain('Next')
-      expect(outputs).not.toContain('First')
-      expect(outputs).not.toContain('Second')
-      expect(outputs).not.toContain('Third')
+      expect(outputs).toEqual('Next')
     })
 
     it('should handle fractional expression value (truncated to integer)', async () => {
@@ -214,10 +193,7 @@ describe('OnExecutor', () => {
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
       // 5 / 2 = 2.5 truncated to 2, so should jump to second line
-      expect(outputs).not.toContain('First')
-      expect(outputs).toContain('Second')
-      expect(outputs).not.toContain('Third')
-      expect(outputs).not.toContain('Skipped')
+      expect(outputs).toEqual('Second')
     })
   })
 
@@ -241,10 +217,7 @@ describe('OnExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toContain('First')
-      expect(outputs).toContain('After')
-      expect(outputs).not.toContain('Second')
-      expect(outputs).not.toContain('Third')
+      expect(outputs).toEqual('First\nAfter')
     })
 
     it('should handle ON-GOSUB matching manual example structure', async () => {
@@ -268,7 +241,9 @@ describe('OnExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toContain('HOPE')
+      // Manual example: N=2, so ON N GOSUB calls line 200 which sets X$="HOPE"
+      // Then prints: " 2 IS THE SYMBOL OF HOPE."
+      expect(outputs).toEqual(' 2 IS THE SYMBOL OF HOPE.')
     })
   })
 
@@ -293,11 +268,7 @@ describe('OnExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toContain('First')
-      expect(outputs).toContain('After')
-      expect(outputs).not.toContain('Never')
-      expect(outputs).not.toContain('Second')
-      expect(outputs).not.toContain('Third')
+      expect(outputs).toEqual('First\nAfter')
     })
 
     it('should return to second line when expression is 2', async () => {
@@ -320,11 +291,7 @@ describe('OnExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toContain('Second')
-      expect(outputs).toContain('After')
-      expect(outputs).not.toContain('Never')
-      expect(outputs).not.toContain('First')
-      expect(outputs).not.toContain('Third')
+      expect(outputs).toEqual('Second\nAfter')
     })
   })
 
@@ -346,9 +313,8 @@ describe('OnExecutor', () => {
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
       // Should read from line 10: 10, 20, 30
-      expect(outputs).toContain('10')
-      expect(outputs).toContain('20')
-      expect(outputs).toContain('30')
+      // Numbers get leading space, comma separator uses tab stops
+      expect(outputs).toEqual(' 10\t 20\t 30')
     })
 
     it('should restore data pointer to second line when expression is 2', async () => {
@@ -368,9 +334,8 @@ describe('OnExecutor', () => {
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
       // Should read from line 20: 40, 50, 60
-      expect(outputs).toContain('40')
-      expect(outputs).toContain('50')
-      expect(outputs).toContain('60')
+      // Numbers get leading space, comma separator uses tab stops
+      expect(outputs).toEqual(' 40\t 50\t 60')
     })
 
     it('should proceed to next line when expression is 0 or out of range', async () => {
@@ -389,7 +354,8 @@ describe('OnExecutor', () => {
       expect(result.errors).toHaveLength(0)
       // Should read from default position (beginning): 10
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toContain('10')
+      // Numbers get leading space
+      expect(outputs).toEqual(' 10')
     })
   })
 
@@ -398,21 +364,27 @@ describe('OnExecutor', () => {
       const source = `
 10 LET X = 1
 20 ON X GOTO 999
-30 END
+30 PRINT "This should not print"
+40 END
 `
       const result = await interpreter.execute(source)
       
       expect(result.success).toBe(false)
       expect(result.errors.length).toBeGreaterThan(0)
       const errorMessages = result.errors.map(e => e.message).join(' ')
-      expect(errorMessages).toContain('line number 999 not found')
+      expect(errorMessages).toEqual('ON: line number 999 not found')
+      
+      // Verify that PRINT statements after the error are not executed
+      const outputs = deviceAdapter.getAllOutputs()
+      expect(outputs).toEqual('RUNTIME: ON: line number 999 not found')
     })
 
     it('should handle ON with multiple line numbers where one is invalid', async () => {
       const source = `
 10 LET X = 2
 20 ON X GOTO 100, 999, 300
-30 END
+30 PRINT "This should not print"
+40 END
 100 PRINT "First"
 110 END
 300 PRINT "Third"
@@ -423,7 +395,11 @@ describe('OnExecutor', () => {
       expect(result.success).toBe(false)
       expect(result.errors.length).toBeGreaterThan(0)
       const errorMessages = result.errors.map(e => e.message).join(' ')
-      expect(errorMessages).toContain('line number 999 not found')
+      expect(errorMessages).toEqual('ON: line number 999 not found')
+      
+      // Verify that PRINT statements after the error are not executed
+      const outputs = deviceAdapter.getAllOutputs()
+      expect(outputs).toEqual('RUNTIME: ON: line number 999 not found')
     })
   })
 
@@ -457,12 +433,7 @@ describe('OnExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toContain('Three')
-      expect(outputs).not.toContain('One')
-      expect(outputs).not.toContain('Two')
-      expect(outputs).not.toContain('Four')
-      expect(outputs).not.toContain('Five')
-      expect(outputs).not.toContain('Skipped')
+      expect(outputs).toEqual('Three')
     })
   })
 })

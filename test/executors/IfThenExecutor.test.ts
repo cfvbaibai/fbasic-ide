@@ -249,7 +249,8 @@ describe('IfThenExecutor', () => {
     const source = `
 10 LET X = 5
 20 IF X = 5 THEN 999
-30 END
+30 PRINT "This should not print"
+40 END
 `
     const result = await interpreter.execute(source)
     
@@ -257,6 +258,10 @@ describe('IfThenExecutor', () => {
     expect(result.errors.length).toBeGreaterThan(0)
     const errorMessages = result.errors.map(e => e.message).join(' ')
     expect(errorMessages).toEqual('IF-THEN: line number 999 not found')
+    
+    // Verify that PRINT statements after the error are not executed
+    const outputs = deviceAdapter.getAllOutputs()
+    expect(outputs).toEqual('RUNTIME: IF-THEN: line number 999 not found')
   })
 
   it('should handle IF-THEN line number on same line as other statements', async () => {

@@ -370,7 +370,8 @@ describe('FOR/NEXT Executor', () => {
     it('should error on NEXT without FOR', async () => {
       const source = `
 10 NEXT
-20 END
+20 PRINT "This should not print"
+30 END
 `
       const result = await interpreter.execute(source)
       
@@ -378,41 +379,70 @@ describe('FOR/NEXT Executor', () => {
       expect(result.errors.length).toBeGreaterThan(0)
       const errorMessages = result.errors.map(e => e.message).join(' ')
       expect(errorMessages).toEqual('NEXT without FOR')
+      
+      // Verify that PRINT statements after the error are not executed
+      const outputs = deviceAdapter.getAllOutputs()
+      expect(outputs).toEqual('RUNTIME: NEXT without FOR')
     })
 
     it('should error on FOR with non-numeric start value', async () => {
       const source = `
 10 FOR I = "A" TO 5
 20 NEXT
-30 END
+30 PRINT "This should not print"
+40 END
 `
       const result = await interpreter.execute(source)
       
       // This should either error or be handled gracefully
       // The exact behavior depends on implementation
       expect(result.errors.length).toBeGreaterThan(0)
+      
+      // Verify that PRINT statements after the error are not executed
+      const outputs = deviceAdapter.getAllOutputs()
+      // Error message format depends on implementation, but should not contain PRINT output
+      // Should only contain error message, not the PRINT output
+      expect(outputs).not.toEqual('This should not print')
+      // Output should start with "RUNTIME:" for runtime errors
+      expect(outputs.startsWith('RUNTIME:')).toBe(true)
     })
 
     it('should error on FOR with non-numeric end value', async () => {
       const source = `
 10 FOR I = 1 TO "B"
 20 NEXT
-30 END
+30 PRINT "This should not print"
+40 END
 `
       const result = await interpreter.execute(source)
       
       expect(result.errors.length).toBeGreaterThan(0)
+      
+      // Verify that PRINT statements after the error are not executed
+      const outputs = deviceAdapter.getAllOutputs()
+      // Should only contain error message, not the PRINT output
+      expect(outputs).not.toEqual('This should not print')
+      // Output should start with "RUNTIME:" for runtime errors
+      expect(outputs.startsWith('RUNTIME:')).toBe(true)
     })
 
     it('should error on FOR with non-numeric STEP value', async () => {
       const source = `
 10 FOR I = 1 TO 5 STEP "C"
 20 NEXT
-30 END
+30 PRINT "This should not print"
+40 END
 `
       const result = await interpreter.execute(source)
       
       expect(result.errors.length).toBeGreaterThan(0)
+      
+      // Verify that PRINT statements after the error are not executed
+      const outputs = deviceAdapter.getAllOutputs()
+      // Should only contain error message, not the PRINT output
+      expect(outputs).not.toEqual('This should not print')
+      // Output should start with "RUNTIME:" for runtime errors
+      expect(outputs.startsWith('RUNTIME:')).toBe(true)
     })
   })
 
