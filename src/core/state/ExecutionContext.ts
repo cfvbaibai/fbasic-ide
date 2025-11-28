@@ -33,6 +33,7 @@ export class ExecutionContext {
   public statements: ExpandedStatement[] = [] // Expanded statements (flat list)
   public labelMap: Map<number, number[]> = new Map() // Line number -> statement indices
   public iterationCount = 0
+  private currentLineNumber: number = 0 // Current line number being executed
   
   // Configuration
   public config: InterpreterConfig
@@ -75,6 +76,8 @@ export class ExecutionContext {
     this.dataIndex = 0
     this.arrays.clear()
     this.lastPrintEndedWithSemicolon = false
+    this.currentLineNumber = 0
+    this.errors = []
   }
 
   /**
@@ -86,10 +89,17 @@ export class ExecutionContext {
 
   /**
    * Add error to the context
+   * Runtime errors are fatal and halt execution immediately
    */
   addError(error: BasicError): void {
     this.deviceAdapter?.errorOutput(error.message)
     this.errors.push(error)
+    
+    // Runtime errors are fatal - halt execution immediately
+    if (error.type === ERROR_TYPES.RUNTIME) {
+      this.shouldStop = true
+      this.isRunning = false
+    }
   }
 
   /**
@@ -171,6 +181,20 @@ export class ExecutionContext {
       return firstIndex !== undefined ? firstIndex : -1
     }
     return -1
+  }
+
+  /**
+   * Get the current line number being executed
+   */
+  getCurrentLineNumber(): number {
+    return this.currentLineNumber
+  }
+
+  /**
+   * Set the current line number being executed
+   */
+  setCurrentLineNumber(lineNumber: number): void {
+    this.currentLineNumber = lineNumber
   }
 
   /**

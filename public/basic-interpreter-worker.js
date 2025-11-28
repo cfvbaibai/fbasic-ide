@@ -9278,6 +9278,9 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
   var If = createToken({ name: "If", pattern: /\bIF\b/i });
   var Then = createToken({ name: "Then", pattern: /\bTHEN\b/i });
   var Goto = createToken({ name: "Goto", pattern: /\bGOTO\b/i });
+  var Gosub = createToken({ name: "Gosub", pattern: /\bGOSUB\b/i });
+  var Return = createToken({ name: "Return", pattern: /\bRETURN\b/i });
+  var On = createToken({ name: "On", pattern: /\bON\b/i });
   var Dim = createToken({ name: "Dim", pattern: /\bDIM\b/i });
   var Data = createToken({ name: "Data", pattern: /\bDATA\b/i });
   var Read = createToken({ name: "Read", pattern: /\bREAD\b/i });
@@ -9362,6 +9365,9 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     If,
     Then,
     Goto,
+    Gosub,
+    Return,
+    On,
     Dim,
     Data,
     Read,
@@ -9653,6 +9659,53 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         this.CONSUME(Goto);
         this.CONSUME(NumberLiteral);
       });
+      this.gosubStatement = this.RULE("gosubStatement", () => {
+        this.CONSUME(Gosub);
+        this.CONSUME(NumberLiteral);
+      });
+      this.returnStatement = this.RULE("returnStatement", () => {
+        this.CONSUME(Return);
+        this.OPTION(() => {
+          this.CONSUME(NumberLiteral);
+        });
+      });
+      this.lineNumberList = this.RULE("lineNumberList", () => {
+        this.CONSUME(NumberLiteral);
+        this.MANY(() => {
+          this.CONSUME(Comma);
+          this.CONSUME2(NumberLiteral);
+        });
+      });
+      this.onStatement = this.RULE("onStatement", () => {
+        this.CONSUME(On);
+        this.SUBRULE(this.expression);
+        this.OR([
+          {
+            ALT: () => {
+              this.CONSUME(Goto);
+              this.SUBRULE(this.lineNumberList);
+            }
+          },
+          {
+            ALT: () => {
+              this.CONSUME(Gosub);
+              this.SUBRULE2(this.lineNumberList);
+            }
+          },
+          {
+            ALT: () => {
+              this.CONSUME(Return);
+              this.SUBRULE3(this.lineNumberList);
+            }
+          },
+          {
+            ALT: () => {
+              this.CONSUME(Restore);
+              this.SUBRULE4(this.lineNumberList);
+            }
+          }
+        ]);
+      });
       this.dimensionList = this.RULE("dimensionList", () => {
         this.SUBRULE(this.expression);
         this.OPTION(() => {
@@ -9762,8 +9815,20 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
             ALT: () => this.SUBRULE(this.ifThenStatement)
           },
           {
+            GATE: () => this.LA(1).tokenType === On,
+            ALT: () => this.SUBRULE(this.onStatement)
+          },
+          {
             GATE: () => this.LA(1).tokenType === Goto,
             ALT: () => this.SUBRULE(this.gotoStatement)
+          },
+          {
+            GATE: () => this.LA(1).tokenType === Gosub,
+            ALT: () => this.SUBRULE(this.gosubStatement)
+          },
+          {
+            GATE: () => this.LA(1).tokenType === Return,
+            ALT: () => this.SUBRULE(this.returnStatement)
           },
           {
             GATE: () => this.LA(1).tokenType === Print,
@@ -10022,6 +10087,8 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       __publicField(this, "labelMap", /* @__PURE__ */ new Map());
       // Line number -> statement indices
       __publicField(this, "iterationCount", 0);
+      __publicField(this, "currentLineNumber", 0);
+      // Current line number being executed
       // Configuration
       __publicField(this, "config");
       // Control flow
@@ -10035,6 +10102,9 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       // Current position in DATA
       __publicField(this, "arrays", /* @__PURE__ */ new Map());
       // Array storage
+      // PRINT state tracking
+      __publicField(this, "lastPrintEndedWithSemicolon", false);
+      // Track if last PRINT statement ended with semicolon
       // Device integration
       __publicField(this, "deviceAdapter");
       __publicField(this, "errors", []);
@@ -10056,6 +10126,9 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       this.dataValues = [];
       this.dataIndex = 0;
       this.arrays.clear();
+      this.lastPrintEndedWithSemicolon = false;
+      this.currentLineNumber = 0;
+      this.errors = [];
     }
     /**
      * Add output to the context
@@ -10065,10 +10138,15 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     }
     /**
      * Add error to the context
+     * Runtime errors are fatal and halt execution immediately
      */
     addError(error) {
       this.deviceAdapter?.errorOutput(error.message);
       this.errors.push(error);
+      if (error.type === ERROR_TYPES.RUNTIME) {
+        this.shouldStop = true;
+        this.isRunning = false;
+      }
     }
     /**
      * Get errors
@@ -10138,6 +10216,18 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         return firstIndex !== void 0 ? firstIndex : -1;
       }
       return -1;
+    }
+    /**
+     * Get the current line number being executed
+     */
+    getCurrentLineNumber() {
+      return this.currentLineNumber;
+    }
+    /**
+     * Set the current line number being executed
+     */
+    setCurrentLineNumber(lineNumber) {
+      this.currentLineNumber = lineNumber;
     }
     /**
      * Get joystick state (cross buttons)
@@ -12913,6 +13003,11 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         const resultDecimal = this.toDecimal(result);
         const operandDecimal = this.toDecimal(operandValue);
         if (operandDecimal.isZero()) {
+          this.context.addError({
+            line: this.context.getCurrentLineNumber(),
+            message: "Division by zero",
+            type: ERROR_TYPES.RUNTIME
+          });
           result = 0;
         } else {
           result = resultDecimal.mod(operandDecimal).truncated().toNumber();
@@ -12942,6 +13037,11 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         } else {
           const divisorDecimal = this.toDecimal(operandValue);
           if (divisorDecimal.isZero()) {
+            this.context.addError({
+              line: this.context.getCurrentLineNumber(),
+              message: "Division by zero",
+              type: ERROR_TYPES.RUNTIME
+            });
             result = 0;
           } else {
             const dividendDecimal = this.toDecimal(result);
@@ -13089,84 +13189,10 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     }
   };
 
-  // src/core/services/IoService.ts
-  var IoService = class {
-    constructor(context, evaluator, deviceAdapter) {
-      this.context = context;
-      this.evaluator = evaluator;
-      this.deviceAdapter = deviceAdapter;
-    }
-    /**
-     * Print values to output (accepts array of values: number | string)
-     */
-    printValues(values2) {
-      let output = "";
-      for (let i = 0; i < values2.length; i++) {
-        const value = values2[i];
-        if (value === void 0) continue;
-        const formatted = this.formatValue(value);
-        if (this.context.config.enableDebugMode) {
-          this.context.addDebugOutput(`PRINT: value = ${value}`);
-        }
-        if (i > 0) {
-          output += " " + formatted;
-        } else {
-          output += formatted;
-        }
-      }
-      this.context.addOutput(output);
-      if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(`PRINT: ${output}`);
-      }
-    }
-    /**
-     * Clear the screen (output)
-     */
-    clearScreen() {
-      this.context.deviceAdapter?.clearScreen();
-      if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput("CLS: Screen cleared");
-      }
-    }
-    /**
-     * Handle INPUT statement (placeholder for now)
-     */
-    inputValue(prompt) {
-      const message = prompt ? `INPUT: ${prompt}` : "INPUT: Waiting for user input";
-      this.context.addOutput(message);
-      if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(message);
-      }
-    }
-    /**
-     * Format a value for output
-     */
-    formatValue(value) {
-      if (typeof value === "string") {
-        return value;
-      } else if (typeof value === "boolean") {
-        return value ? "1" : "0";
-      } else if (typeof value === "number") {
-        if (Number.isInteger(value)) {
-          return value.toString();
-        } else {
-          return value.toString();
-        }
-      }
-      return "0";
-    }
-    /**
-     * Add raw output
-     */
-    addRawOutput(text) {
-      this.context.addOutput(text);
-    }
-  };
-
   // src/core/execution/executors/PrintExecutor.ts
   var PrintExecutor = class {
-    constructor(ioService, evaluator) {
-      this.ioService = ioService;
+    constructor(context, evaluator) {
+      this.context = context;
       this.evaluator = evaluator;
     }
     /**
@@ -13175,24 +13201,192 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     execute(printStmtCst) {
       const printListCst = getFirstCstNode(printStmtCst.children.printList);
       if (!printListCst) {
-        this.ioService.printValues([]);
+        const shouldAppend = this.context.lastPrintEndedWithSemicolon;
+        this.printOutput("", shouldAppend);
+        this.context.lastPrintEndedWithSemicolon = false;
         return;
       }
       const printItems = getCstNodes(printListCst.children.printItem);
-      const values2 = [];
-      for (const item of printItems) {
+      const commaTokens = getTokens(printListCst.children.Comma);
+      const semicolonTokens = getTokens(printListCst.children.Semicolon);
+      const elements = [];
+      printItems.forEach((item, index) => {
         const strToken = getFirstToken(item.children.StringLiteral);
+        const exprCst = getFirstCstNode(item.children.expression);
+        let startOffset = 0;
         if (strToken) {
-          values2.push(strToken.image.slice(1, -1));
-        } else {
-          const exprCst = getFirstCstNode(item.children.expression);
-          if (exprCst) {
-            const value = this.evaluator.evaluateExpression(exprCst);
-            values2.push(value);
+          startOffset = strToken.startOffset;
+        } else if (exprCst) {
+          const firstToken = this.getFirstTokenFromNode(exprCst);
+          if (firstToken) {
+            startOffset = firstToken.startOffset;
+          }
+        }
+        elements.push({
+          type: "item",
+          itemIndex: index,
+          startOffset
+        });
+      });
+      commaTokens.forEach((token) => {
+        elements.push({
+          type: "separator",
+          separator: ",",
+          startOffset: token.startOffset
+        });
+      });
+      semicolonTokens.forEach((token) => {
+        elements.push({
+          type: "separator",
+          separator: ";",
+          startOffset: token.startOffset
+        });
+      });
+      elements.sort((a, b) => a.startOffset - b.startOffset);
+      const items = [];
+      for (let i = 0; i < elements.length; i++) {
+        const element = elements[i];
+        if (!element) continue;
+        if (element.type === "item" && element.itemIndex !== void 0) {
+          const item = printItems[element.itemIndex];
+          if (!item) continue;
+          let value;
+          const strToken = getFirstToken(item.children.StringLiteral);
+          if (strToken) {
+            value = strToken.image.slice(1, -1);
+          } else {
+            const exprCst = getFirstCstNode(item.children.expression);
+            if (exprCst) {
+              value = this.evaluator.evaluateExpression(exprCst);
+            }
+          }
+          if (value !== void 0) {
+            let separator = null;
+            const nextElement = elements[i + 1];
+            if (nextElement && nextElement.type === "separator") {
+              separator = nextElement.separator || null;
+            }
+            items.push({ value, separator });
           }
         }
       }
-      this.ioService.printValues(values2);
+      let output = this.buildOutputString(items);
+      const lastItem = items[items.length - 1];
+      const endsWithSemicolon = lastItem?.separator === ";";
+      const shouldAppendToPrevious = this.context.lastPrintEndedWithSemicolon;
+      this.printOutput(output, shouldAppendToPrevious);
+      this.context.lastPrintEndedWithSemicolon = endsWithSemicolon;
+    }
+    /**
+     * Build output string from PRINT items, handling all PRINT semantics.
+     * 
+     * This method separates two concerns:
+     * 1. Building the string representation of each item (via toString method)
+     * 2. Processing separators between items
+     */
+    buildOutputString(items) {
+      if (items.length === 0) {
+        return "";
+      }
+      let output = "";
+      let currentColumn = 0;
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        if (!item || item.value === void 0) continue;
+        const itemString = this.toString(item.value);
+        if (this.context.config.enableDebugMode) {
+          this.context.addDebugOutput(`PRINT: value = ${item.value}, separator = ${item.separator}`);
+        }
+        if (i === 0) {
+          output += itemString;
+          currentColumn += itemString.length;
+        } else {
+          const prevSeparator = items[i - 1]?.separator;
+          if (prevSeparator === ",") {
+            output += "	";
+            const nextTabStop = this.getNextTabStop(currentColumn);
+            currentColumn = nextTabStop;
+            output += itemString;
+            currentColumn += itemString.length;
+          } else if (prevSeparator === ";") {
+            output += itemString;
+            currentColumn += itemString.length;
+          } else {
+            this.context.addError({
+              line: this.context.getCurrentLineNumber(),
+              message: "PRINT: Invalid separator: " + prevSeparator,
+              type: ERROR_TYPES.RUNTIME
+            });
+            return "";
+          }
+        }
+      }
+      return output;
+    }
+    /**
+     * Get the next tab stop (8-character block boundary)
+     * Block 1: 0-7, Block 2: 8-15, Block 3: 16-23, Block 4: 24-27
+     */
+    getNextTabStop(currentColumn) {
+      if (currentColumn < 8) return 8;
+      if (currentColumn < 16) return 16;
+      if (currentColumn < 24) return 24;
+      return 28;
+    }
+    /**
+     * Convert a printable value to its string representation.
+     * This acts as the "toString" method for printable items.
+     * 
+     * For numbers: always outputs a sign char (space for 0 and positive, dash for negative)
+     * followed by the absolute value of the number.
+     * For strings: outputs the string itself.
+     */
+    toString(value) {
+      if (typeof value === "string") {
+        return value;
+      } else if (typeof value === "boolean") {
+        return this.toString(value ? 1 : 0);
+      } else if (typeof value === "number") {
+        const sign2 = value >= 0 ? " " : "-";
+        const absValue = Math.abs(value);
+        const absValueStr = Number.isInteger(absValue) ? absValue.toString() : absValue.toString();
+        return sign2 + absValueStr;
+      }
+      this.context.addError({
+        line: this.context.getCurrentLineNumber(),
+        message: `PRINT: Invalid value type: ${typeof value} for value: ${value}`,
+        type: ERROR_TYPES.RUNTIME
+      });
+      return " 0";
+    }
+    /**
+     * Recursively get the first token from a CST node
+     */
+    getFirstTokenFromNode(node) {
+      const children = Object.values(node.children).flat();
+      for (const child of children) {
+        if (isCstToken(child)) {
+          return child;
+        }
+        if (isCstNode(child)) {
+          const token = this.getFirstTokenFromNode(child);
+          if (token) return token;
+        }
+      }
+      return void 0;
+    }
+    /**
+     * Output text, handling appending to previous output for test device adapter
+     */
+    printOutput(text, shouldAppend = false) {
+      if (shouldAppend && this.context.deviceAdapter && "printOutputs" in this.context.deviceAdapter) {
+        const adapter = this.context.deviceAdapter;
+        if (adapter.printOutputs && adapter.printOutputs.length > 0) {
+          adapter.printOutputs[adapter.printOutputs.length - 1] += text;
+          return;
+        }
+      }
+      this.context.addOutput(text);
     }
   };
 
@@ -13412,9 +13606,10 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           throw new Error("Invalid LET statement: missing identifier");
         }
         const varName = identifierToken.image.toUpperCase();
-        this.variableService.setVariableFromExpressionCst(varName, expressionCst);
-        if (this.variableService.context.config.enableDebugMode) {
-          const value = this.variableService.evaluator.evaluateExpression(expressionCst);
+        const value = this.variableService.evaluator.evaluateExpression(expressionCst);
+        const basicValue = typeof value === "boolean" ? value ? 1 : 0 : value;
+        this.variableService.setVariable(varName, basicValue);
+        if (this.variableService.context.config.enableDebugMode && !this.variableService.context.shouldStop) {
           this.variableService.context.addDebugOutput(`LET: ${varName} = ${value}`);
         }
       }
@@ -13730,82 +13925,110 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     }
   };
 
-  // src/core/execution/executors/DimExecutor.ts
-  var DimExecutor = class {
-    constructor(context, evaluator, variableService) {
+  // src/core/execution/executors/GosubExecutor.ts
+  var GosubExecutor = class {
+    constructor(context) {
       this.context = context;
-      this.evaluator = evaluator;
-      this.variableService = variableService;
     }
     /**
-     * Execute DIM statement
-     * DIM ArrayDeclaration (Comma ArrayDeclaration)*
+     * Execute a GOSUB statement from CST
+     * Jumps to the specified line number and pushes return address to stack
      */
-    execute(cst, lineNumber) {
-      const arrayDeclarations = getCstNodes(cst.children.arrayDeclaration);
-      for (const arrayDeclCst of arrayDeclarations) {
-        const identifierToken = getFirstToken(arrayDeclCst.children.Identifier);
-        if (!identifierToken) {
+    execute(gosubStmtCst, lineNumber) {
+      const lineNumberToken = getFirstToken(gosubStmtCst.children.NumberLiteral);
+      if (!lineNumberToken) {
+        this.context.addError({
+          line: lineNumber,
+          message: "GOSUB: missing line number",
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      const targetLineNumber = parseInt(lineNumberToken.image, 10);
+      if (isNaN(targetLineNumber)) {
+        this.context.addError({
+          line: lineNumber,
+          message: `GOSUB: invalid line number: ${lineNumberToken.image}`,
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      const targetStatementIndex = this.context.findStatementIndexByLine(targetLineNumber);
+      if (targetStatementIndex === -1) {
+        this.context.addError({
+          line: lineNumber,
+          message: `GOSUB: line number ${targetLineNumber} not found`,
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      const returnStatementIndex = this.context.currentStatementIndex + 1;
+      this.context.gosubStack.push(returnStatementIndex);
+      if (this.context.config.enableDebugMode) {
+        this.context.addDebugOutput(`GOSUB: jumping to line ${targetLineNumber} (statement index ${targetStatementIndex}), return address: ${returnStatementIndex}`);
+      }
+      this.context.jumpToStatement(targetStatementIndex);
+    }
+  };
+
+  // src/core/execution/executors/ReturnExecutor.ts
+  var ReturnExecutor = class {
+    constructor(context) {
+      this.context = context;
+    }
+    /**
+     * Execute a RETURN statement from CST
+     * Returns from subroutine by jumping to the return address on stack
+     * If line number is specified, returns to that line instead
+     */
+    execute(returnStmtCst, lineNumber) {
+      const lineNumberToken = getFirstToken(returnStmtCst.children.NumberLiteral);
+      if (lineNumberToken) {
+        const targetLineNumber = parseInt(lineNumberToken.image, 10);
+        if (isNaN(targetLineNumber)) {
           this.context.addError({
             line: lineNumber,
-            message: "DIM: Missing array name",
+            message: `RETURN: invalid line number: ${lineNumberToken.image}`,
             type: ERROR_TYPES.RUNTIME
           });
-          continue;
+          return;
         }
-        const arrayName = identifierToken.image;
-        const dimensionListCst = getFirstCstNode(arrayDeclCst.children.dimensionList);
-        if (!dimensionListCst) {
+        const targetStatementIndex = this.context.findStatementIndexByLine(targetLineNumber);
+        if (targetStatementIndex === -1) {
           this.context.addError({
             line: lineNumber,
-            message: `DIM: Missing dimensions for array ${arrayName}`,
+            message: `RETURN: line number ${targetLineNumber} not found`,
             type: ERROR_TYPES.RUNTIME
           });
-          continue;
+          return;
         }
-        const dimensionExpressions = getCstNodes(dimensionListCst.children.expression);
-        const dimensions = [];
-        for (const exprCst of dimensionExpressions) {
-          const value = this.evaluator.evaluateExpression(exprCst);
-          const numValue = this.toNumber(value);
-          if (numValue < 0) {
-            this.context.addError({
-              line: lineNumber,
-              message: `DIM: Array dimension must be >= 0 for ${arrayName}`,
-              type: ERROR_TYPES.RUNTIME
-            });
-            return;
-          }
-          dimensions.push(numValue);
-        }
-        if (dimensions.length < 1 || dimensions.length > 2) {
-          this.context.addError({
-            line: lineNumber,
-            message: `DIM: Arrays can have 1 or 2 dimensions only for ${arrayName}`,
-            type: ERROR_TYPES.RUNTIME
-          });
-          continue;
-        }
-        this.variableService.createArray(arrayName, dimensions);
         if (this.context.config.enableDebugMode) {
-          const dimStr = dimensions.join(",");
-          this.context.addDebugOutput(`DIM: Created array ${arrayName}(${dimStr})`);
+          this.context.addDebugOutput(`RETURN: returning to line ${targetLineNumber} (statement index ${targetStatementIndex})`);
         }
+        this.context.jumpToStatement(targetStatementIndex);
+        return;
       }
-    }
-    /**
-     * Convert a value to an integer
-     */
-    toNumber(value) {
-      if (typeof value === "number") {
-        return Math.floor(value);
+      if (this.context.gosubStack.length === 0) {
+        this.context.addError({
+          line: lineNumber,
+          message: "RETURN: no GOSUB to return from",
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
       }
-      if (typeof value === "boolean") return value ? 1 : 0;
-      if (typeof value === "string") {
-        const parsed = parseInt(value, 10);
-        return isNaN(parsed) ? 0 : parsed;
+      const returnStatementIndex = this.context.gosubStack.pop();
+      if (returnStatementIndex < 0 || returnStatementIndex >= this.context.statements.length) {
+        this.context.addError({
+          line: lineNumber,
+          message: `RETURN: invalid return address: ${returnStatementIndex}`,
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
       }
-      return 0;
+      if (this.context.config.enableDebugMode) {
+        this.context.addDebugOutput(`RETURN: returning to statement index ${returnStatementIndex}`);
+      }
+      this.context.jumpToStatement(returnStatementIndex);
     }
   };
 
@@ -13977,6 +14200,224 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     }
   };
 
+  // src/core/execution/executors/OnExecutor.ts
+  var OnExecutor = class {
+    constructor(context, evaluator, dataService) {
+      this.context = context;
+      this.evaluator = evaluator;
+      this.dataService = dataService;
+    }
+    /**
+     * Execute an ON statement from CST
+     * ON expression {GOTO | GOSUB} line number(, line number, ...)
+     * 
+     * If expression value is 1, jumps to first line number
+     * If expression value is 2, jumps to second line number
+     * If expression value is 0 or exceeds the number of line numbers, proceeds to next line
+     */
+    execute(onStmtCst, lineNumber) {
+      const expressionCst = getFirstCstNode(onStmtCst.children.expression);
+      if (!expressionCst) {
+        this.context.addError({
+          line: lineNumber,
+          message: "ON: missing expression",
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      let expressionValue;
+      try {
+        expressionValue = this.evaluator.evaluateExpression(expressionCst);
+      } catch (error) {
+        this.context.addError({
+          line: lineNumber,
+          message: `ON: failed to evaluate expression: ${error instanceof Error ? error.message : String(error)}`,
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      const numericValue = typeof expressionValue === "string" ? parseFloat(expressionValue) : Number(expressionValue);
+      const index = Math.floor(numericValue);
+      if (index < 1) {
+        if (this.context.config.enableDebugMode) {
+          this.context.addDebugOutput(`ON: expression value ${index} is less than 1, proceeding to next line`);
+        }
+        return;
+      }
+      const lineNumberListCst = getFirstCstNode(onStmtCst.children.lineNumberList);
+      if (!lineNumberListCst) {
+        this.context.addError({
+          line: lineNumber,
+          message: "ON: missing line number list",
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      const lineNumberTokens = getTokens(lineNumberListCst.children.NumberLiteral);
+      if (!lineNumberTokens || lineNumberTokens.length === 0) {
+        this.context.addError({
+          line: lineNumber,
+          message: "ON: no line numbers specified",
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      if (index > lineNumberTokens.length) {
+        if (this.context.config.enableDebugMode) {
+          this.context.addDebugOutput(`ON: expression value ${index} exceeds number of line numbers (${lineNumberTokens.length}), proceeding to next line`);
+        }
+        return;
+      }
+      const targetLineNumberToken = lineNumberTokens[index - 1];
+      if (!targetLineNumberToken) {
+        this.context.addError({
+          line: lineNumber,
+          message: `ON: invalid line number at index ${index}`,
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      const targetLineNumber = parseInt(targetLineNumberToken.image, 10);
+      if (isNaN(targetLineNumber)) {
+        this.context.addError({
+          line: lineNumber,
+          message: `ON: invalid line number: ${targetLineNumberToken.image}`,
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      const targetStatementIndex = this.context.findStatementIndexByLine(targetLineNumber);
+      if (targetStatementIndex === -1) {
+        this.context.addError({
+          line: lineNumber,
+          message: `ON: line number ${targetLineNumber} not found`,
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      const gotoToken = getFirstToken(onStmtCst.children.Goto);
+      const gosubToken = getFirstToken(onStmtCst.children.Gosub);
+      const returnToken = getFirstToken(onStmtCst.children.Return);
+      const restoreToken = getFirstToken(onStmtCst.children.Restore);
+      if (gosubToken) {
+        const returnStatementIndex = this.context.currentStatementIndex + 1;
+        this.context.gosubStack.push(returnStatementIndex);
+        if (this.context.config.enableDebugMode) {
+          this.context.addDebugOutput(`ON-GOSUB: jumping to line ${targetLineNumber} (statement index ${targetStatementIndex}), return address: ${returnStatementIndex}`);
+        }
+        this.context.jumpToStatement(targetStatementIndex);
+      } else if (gotoToken) {
+        if (this.context.config.enableDebugMode) {
+          this.context.addDebugOutput(`ON-GOTO: jumping to line ${targetLineNumber} (statement index ${targetStatementIndex})`);
+        }
+        this.context.jumpToStatement(targetStatementIndex);
+      } else if (returnToken) {
+        if (this.context.config.enableDebugMode) {
+          this.context.addDebugOutput(`ON-RETURN: returning to line ${targetLineNumber} (statement index ${targetStatementIndex})`);
+        }
+        this.context.jumpToStatement(targetStatementIndex);
+      } else if (restoreToken) {
+        if (!this.dataService) {
+          this.context.addError({
+            line: lineNumber,
+            message: "ON-RESTORE: DataService not available",
+            type: ERROR_TYPES.RUNTIME
+          });
+          return;
+        }
+        if (this.context.config.enableDebugMode) {
+          this.context.addDebugOutput(`ON-RESTORE: restoring data pointer to line ${targetLineNumber}`);
+        }
+        this.dataService.restoreData(targetLineNumber);
+      } else {
+        this.context.addError({
+          line: lineNumber,
+          message: "ON: missing GOTO, GOSUB, RETURN, or RESTORE keyword",
+          type: ERROR_TYPES.RUNTIME
+        });
+      }
+    }
+  };
+
+  // src/core/execution/executors/DimExecutor.ts
+  var DimExecutor = class {
+    constructor(context, evaluator, variableService) {
+      this.context = context;
+      this.evaluator = evaluator;
+      this.variableService = variableService;
+    }
+    /**
+     * Execute DIM statement
+     * DIM ArrayDeclaration (Comma ArrayDeclaration)*
+     */
+    execute(cst, lineNumber) {
+      const arrayDeclarations = getCstNodes(cst.children.arrayDeclaration);
+      for (const arrayDeclCst of arrayDeclarations) {
+        const identifierToken = getFirstToken(arrayDeclCst.children.Identifier);
+        if (!identifierToken) {
+          this.context.addError({
+            line: lineNumber,
+            message: "DIM: Missing array name",
+            type: ERROR_TYPES.RUNTIME
+          });
+          continue;
+        }
+        const arrayName = identifierToken.image;
+        const dimensionListCst = getFirstCstNode(arrayDeclCst.children.dimensionList);
+        if (!dimensionListCst) {
+          this.context.addError({
+            line: lineNumber,
+            message: `DIM: Missing dimensions for array ${arrayName}`,
+            type: ERROR_TYPES.RUNTIME
+          });
+          continue;
+        }
+        const dimensionExpressions = getCstNodes(dimensionListCst.children.expression);
+        const dimensions = [];
+        for (const exprCst of dimensionExpressions) {
+          const value = this.evaluator.evaluateExpression(exprCst);
+          const numValue = this.toNumber(value);
+          if (numValue < 0) {
+            this.context.addError({
+              line: lineNumber,
+              message: `DIM: Array dimension must be >= 0 for ${arrayName}`,
+              type: ERROR_TYPES.RUNTIME
+            });
+            return;
+          }
+          dimensions.push(numValue);
+        }
+        if (dimensions.length < 1 || dimensions.length > 2) {
+          this.context.addError({
+            line: lineNumber,
+            message: `DIM: Arrays can have 1 or 2 dimensions only for ${arrayName}`,
+            type: ERROR_TYPES.RUNTIME
+          });
+          continue;
+        }
+        this.variableService.createArray(arrayName, dimensions);
+        if (this.context.config.enableDebugMode) {
+          const dimStr = dimensions.join(",");
+          this.context.addDebugOutput(`DIM: Created array ${arrayName}(${dimStr})`);
+        }
+      }
+    }
+    /**
+     * Convert a value to an integer
+     */
+    toNumber(value) {
+      if (typeof value === "number") {
+        return Math.floor(value);
+      }
+      if (typeof value === "boolean") return value ? 1 : 0;
+      if (typeof value === "string") {
+        const parsed = parseInt(value, 10);
+        return isNaN(parsed) ? 0 : parsed;
+      }
+      return 0;
+    }
+  };
+
   // src/core/execution/executors/DataExecutor.ts
   var DataExecutor = class {
     constructor(dataService) {
@@ -14062,11 +14503,10 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
 
   // src/core/execution/StatementRouter.ts
   var StatementRouter = class {
-    constructor(context, evaluator, variableService, ioService, dataService) {
+    constructor(context, evaluator, variableService, dataService) {
       this.context = context;
       this.evaluator = evaluator;
       this.variableService = variableService;
-      this.ioService = ioService;
       this.dataService = dataService;
       __publicField(this, "printExecutor");
       __publicField(this, "letExecutor");
@@ -14076,11 +14516,14 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       __publicField(this, "pauseExecutor");
       __publicField(this, "ifThenExecutor");
       __publicField(this, "gotoExecutor");
+      __publicField(this, "gosubExecutor");
+      __publicField(this, "returnExecutor");
+      __publicField(this, "onExecutor");
       __publicField(this, "dimExecutor");
       __publicField(this, "dataExecutor");
       __publicField(this, "readExecutor");
       __publicField(this, "restoreExecutor");
-      this.printExecutor = new PrintExecutor(ioService, evaluator);
+      this.printExecutor = new PrintExecutor(context, evaluator);
       this.letExecutor = new LetExecutor(variableService);
       this.forExecutor = new ForExecutor(context, evaluator, variableService);
       this.nextExecutor = new NextExecutor(context, variableService);
@@ -14088,6 +14531,9 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       this.pauseExecutor = new PauseExecutor(context, evaluator);
       this.ifThenExecutor = new IfThenExecutor(context, evaluator);
       this.gotoExecutor = new GotoExecutor(context);
+      this.gosubExecutor = new GosubExecutor(context);
+      this.returnExecutor = new ReturnExecutor(context);
+      this.onExecutor = new OnExecutor(context, evaluator, dataService);
       this.dimExecutor = new DimExecutor(context, evaluator, variableService);
       this.dataExecutor = new DataExecutor(dataService);
       this.readExecutor = new ReadExecutor(dataService, variableService, evaluator);
@@ -14176,10 +14622,28 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
             }
           }
         }
+      } else if (singleCommandCst.children.onStatement) {
+        const onStmtCst = getFirstCstNode(singleCommandCst.children.onStatement);
+        if (onStmtCst) {
+          this.onExecutor.execute(onStmtCst, expandedStatement.lineNumber);
+          return;
+        }
       } else if (singleCommandCst.children.gotoStatement) {
         const gotoStmtCst = getFirstCstNode(singleCommandCst.children.gotoStatement);
         if (gotoStmtCst) {
           this.gotoExecutor.execute(gotoStmtCst, expandedStatement.lineNumber);
+          return;
+        }
+      } else if (singleCommandCst.children.gosubStatement) {
+        const gosubStmtCst = getFirstCstNode(singleCommandCst.children.gosubStatement);
+        if (gosubStmtCst) {
+          this.gosubExecutor.execute(gosubStmtCst, expandedStatement.lineNumber);
+          return;
+        }
+      } else if (singleCommandCst.children.returnStatement) {
+        const returnStmtCst = getFirstCstNode(singleCommandCst.children.returnStatement);
+        if (returnStmtCst) {
+          this.returnExecutor.execute(returnStmtCst, expandedStatement.lineNumber);
           return;
         }
       } else if (singleCommandCst.children.printStatement) {
@@ -14261,23 +14725,20 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
 
   // src/core/execution/ExecutionEngine.ts
   var ExecutionEngine = class {
-    constructor(context, deviceAdapter) {
+    constructor(context, _deviceAdapter) {
       __publicField(this, "context");
       __publicField(this, "evaluator");
       __publicField(this, "variableService");
-      __publicField(this, "ioService");
       __publicField(this, "dataService");
       __publicField(this, "statementRouter");
       this.context = context;
       this.evaluator = new ExpressionEvaluator(this.context);
       this.variableService = new VariableService(this.context, this.evaluator);
-      this.ioService = new IoService(this.context, this.evaluator, deviceAdapter);
       this.dataService = new DataService(this.context, this.evaluator);
       this.statementRouter = new StatementRouter(
         this.context,
         this.evaluator,
         this.variableService,
-        this.ioService,
         this.dataService
       );
     }
@@ -14309,11 +14770,15 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         while (this.context.shouldContinue()) {
           const expandedStatement = this.context.getCurrentStatement();
           if (!expandedStatement) break;
+          this.context.setCurrentLineNumber(expandedStatement.lineNumber);
           const statementIndexBefore = this.context.currentStatementIndex;
           if (this.context.config.enableDebugMode) {
             this.context.addDebugOutput(`Executing statement ${statementIndexBefore}: Line ${expandedStatement.lineNumber}`);
           }
           await this.statementRouter.executeStatement(expandedStatement);
+          if (!this.context.isRunning) {
+            break;
+          }
           if (this.context.currentStatementIndex === statementIndexBefore) {
             this.context.nextStatement();
             if (this.context.config.enableDebugMode) {

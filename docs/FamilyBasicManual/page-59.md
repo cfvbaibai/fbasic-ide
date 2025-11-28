@@ -78,7 +78,15 @@ Constants, variables, functions -> information displayed on screen
 
 When outputting values with `PRINT`, these can be separated by `;` or `,` to write several multiples. In this case `;` and `,` are called "separators".
 
-When using `;` as a separator, you can write immediately after a character. However, a ` ` (blank) is needed right before and right after the symbol of a value (for a positive value).
+When using `;` as a separator, you can write immediately after a character. However, a ` ` (blank) is needed right before and right after the symbol of a value (for a positive value). For negative numbers, no leading space is added because the minus sign (`-`) occupies the sign position that would otherwise be a space for positive numbers.
+
+**Number Formatting:**
+- Positive numbers (including zero): Always have a leading space before them (reserved for the sign position)
+- Negative numbers: No leading space (the minus sign takes the sign position)
+- Examples:
+  - `PRINT 5` outputs ` 5` (with leading space)
+  - `PRINT -5` outputs `-5` (no leading space)
+  - `PRINT 1-3` outputs `-2` (no leading space for negative result)
 
 When using `,` as a separator, it is output consecutively in units of 8 characters on screen. The display field on screen is divided in 4 blocks like below and the output information is always displayed at the beginning of each block.
 

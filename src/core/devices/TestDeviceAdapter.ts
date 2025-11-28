@@ -141,12 +141,13 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
 
   /**
    * Get all captured outputs as a single string
+   * Error outputs are formatted as "RUNTIME: {message}" to match IDE format
    */
   getAllOutputs(): string {
     return [
       ...this.printOutputs,
       ...this.debugOutputs.map(o => `DEBUG: ${o}`),
-      ...this.errorOutputs.map(o => `ERROR: ${o}`)
+      ...this.errorOutputs.map(o => `RUNTIME: ${o}`)
     ].join('\n')
   }
 

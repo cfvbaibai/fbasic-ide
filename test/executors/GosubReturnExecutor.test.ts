@@ -45,7 +45,9 @@ describe('GOSUB/RETURN Executor', () => {
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
       // Should print stars for I=1,2,3 and then "END"
-      expect(outputs).toContain('END')
+      // I=1: J=0,1 -> ** (2 stars), I=2: J=0,1,2 -> *** (3 stars), I=3: J=0,1,2,3 -> **** (4 stars)
+      // Each PRINT "*"; outputs on same line, then PRINT adds newline
+      expect(outputs).toEqual('**\n***\n****\nEND')
     })
 
     it('should handle nested GOSUB calls', async () => {
@@ -64,9 +66,7 @@ describe('GOSUB/RETURN Executor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toContain('Sub1')
-      expect(outputs).toContain('Sub2')
-      expect(outputs).toContain('Main')
+      expect(outputs).toEqual('Sub1\nSub2\nMain')
     })
 
     it('should error on GOSUB to non-existent line number', async () => {
@@ -79,7 +79,7 @@ describe('GOSUB/RETURN Executor', () => {
       expect(result.success).toBe(false)
       expect(result.errors.length).toBeGreaterThan(0)
       const errorMessages = result.errors.map(e => e.message).join(' ')
-      expect(errorMessages).toContain('line number 999 not found')
+      expect(errorMessages).toEqual('GOSUB: line number 999 not found')
     })
   })
 
@@ -99,10 +99,7 @@ describe('GOSUB/RETURN Executor', () => {
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
       // Should execute: Before, Subroutine, After
-      const outputLines = outputs.split('\n').filter(l => l.trim())
-      expect(outputLines[0]).toContain('Before')
-      expect(outputLines[1]).toContain('Subroutine')
-      expect(outputLines[2]).toContain('After')
+      expect(outputs).toEqual('Before\nSubroutine\nAfter')
     })
 
     it('should return to specific line number when specified', async () => {
@@ -120,10 +117,7 @@ describe('GOSUB/RETURN Executor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toContain('Start')
-      expect(outputs).toContain('Subroutine')
-      expect(outputs).toContain('Target')
-      expect(outputs).not.toContain('Skipped')
+      expect(outputs).toEqual('Start\nSubroutine\nTarget')
     })
 
     it('should error on RETURN without GOSUB', async () => {
@@ -136,7 +130,7 @@ describe('GOSUB/RETURN Executor', () => {
       expect(result.success).toBe(false)
       expect(result.errors.length).toBeGreaterThan(0)
       const errorMessages = result.errors.map(e => e.message).join(' ')
-      expect(errorMessages).toContain('no GOSUB to return from')
+      expect(errorMessages).toEqual('RETURN: no GOSUB to return from')
     })
 
     it('should error on RETURN to non-existent line number', async () => {
@@ -150,7 +144,7 @@ describe('GOSUB/RETURN Executor', () => {
       expect(result.success).toBe(false)
       expect(result.errors.length).toBeGreaterThan(0)
       const errorMessages = result.errors.map(e => e.message).join(' ')
-      expect(errorMessages).toContain('line number 999 not found')
+      expect(errorMessages).toEqual('RETURN: line number 999 not found')
     })
   })
 
@@ -188,9 +182,8 @@ describe('GOSUB/RETURN Executor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toContain('1')
-      expect(outputs).toContain('2')
-      expect(outputs).toContain('3')
+      // Numbers always get a space BEFORE them
+      expect(outputs).toEqual(' 1\n 2\n 3')
     })
   })
 })

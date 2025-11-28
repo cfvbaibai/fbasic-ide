@@ -11,6 +11,7 @@ import type { BasicScalarValue, BasicArrayValue } from '../types/BasicTypes'
 import { getFirstCstNode, getCstNodes, getFirstToken, getTokens } from '../parser/cst-helpers'
 import { FunctionEvaluator } from './FunctionEvaluator'
 import { ExecutionContext } from '../state/ExecutionContext'
+import { ERROR_TYPES } from '../constants'
 
 export class ExpressionEvaluator {
   private functionEvaluator: FunctionEvaluator
@@ -309,6 +310,13 @@ export class ExpressionEvaluator {
       const operandDecimal = this.toDecimal(operandValue)
       
       if (operandDecimal.isZero()) {
+        // MOD by zero is a fatal runtime error
+        this.context.addError({
+          line: this.context.getCurrentLineNumber(),
+          message: 'Division by zero',
+          type: ERROR_TYPES.RUNTIME
+        })
+        // Return 0 as fallback (execution will halt due to error)
         result = 0
       } else {
         // MOD: remainder after division (toward zero)
@@ -347,6 +355,13 @@ export class ExpressionEvaluator {
         // Integer division: truncate toward zero using Decimal
         const divisorDecimal = this.toDecimal(operandValue)
         if (divisorDecimal.isZero()) {
+          // Division by zero is a fatal runtime error
+          this.context.addError({
+            line: this.context.getCurrentLineNumber(),
+            message: 'Division by zero',
+            type: ERROR_TYPES.RUNTIME
+          })
+          // Return 0 as fallback (execution will halt due to error)
           result = 0
         } else {
           const dividendDecimal = this.toDecimal(result)

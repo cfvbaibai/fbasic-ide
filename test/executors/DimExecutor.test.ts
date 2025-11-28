@@ -11,6 +11,7 @@ import { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
 import { ExecutionContext } from '@/core/state/ExecutionContext'
 import { FBasicParser } from '@/core/parser/FBasicParser'
 import { getFirstCstNode } from '@/core/parser/cst-helpers'
+import type { BasicArrayValue, BasicScalarValue } from '@/core/types/BasicTypes'
 
 describe('DimExecutor', () => {
   let executor: DimExecutor
@@ -65,11 +66,11 @@ describe('DimExecutor', () => {
       executor.execute(dimStmtCst!, 10)
 
       expect(context.arrays.has('A')).toBe(true)
-      const array = context.arrays.get('A')
+      const array = context.arrays.get('A') as BasicArrayValue[]
       expect(array).toBeDefined()
       expect(Array.isArray(array)).toBe(true)
       // Array size should be 4 (indices 0, 1, 2, 3)
-      expect((array as unknown[]).length).toBe(4)
+      expect(array.length).toBe(4)
     })
 
     it('should initialize numeric array elements to 0', async () => {
@@ -78,13 +79,13 @@ describe('DimExecutor', () => {
 
       executor.execute(dimStmtCst!, 10)
 
-      const array = context.arrays.get('A')
+      const array = context.arrays.get('A') as BasicArrayValue[]
       expect(array).toBeDefined()
       expect(Array.isArray(array)).toBe(true)
       // All elements should be initialized to 0
-      expect((array as number[])[0]).toBe(0)
-      expect((array as number[])[1]).toBe(0)
-      expect((array as number[])[2]).toBe(0)
+      expect(array[0]).toBe(0)
+      expect(array[1]).toBe(0)
+      expect(array[2]).toBe(0)
     })
 
     it('should create 1D string array', async () => {
@@ -94,10 +95,10 @@ describe('DimExecutor', () => {
       executor.execute(dimStmtCst!, 20)
 
       expect(context.arrays.has('A$')).toBe(true)
-      const array = context.arrays.get('A$')
+      const array = context.arrays.get('A$') as BasicArrayValue[]
       expect(array).toBeDefined()
       expect(Array.isArray(array)).toBe(true)
-      expect((array as unknown[]).length).toBe(4)
+      expect(array.length).toBe(4)
     })
 
     it('should initialize string array elements to empty string', async () => {
@@ -106,13 +107,13 @@ describe('DimExecutor', () => {
 
       executor.execute(dimStmtCst!, 20)
 
-      const array = context.arrays.get('A$')
+      const array = context.arrays.get('A$') as BasicArrayValue[]
       expect(array).toBeDefined()
       expect(Array.isArray(array)).toBe(true)
       // All elements should be initialized to empty string
-      expect((array as string[])[0]).toBe('')
-      expect((array as string[])[1]).toBe('')
-      expect((array as string[])[2]).toBe('')
+      expect(array[0]).toBe('')
+      expect(array[1]).toBe('')
+      expect(array[2]).toBe('')
     })
   })
 
@@ -124,14 +125,15 @@ describe('DimExecutor', () => {
       executor.execute(dimStmtCst!, 30)
 
       expect(context.arrays.has('B')).toBe(true)
-      const array = context.arrays.get('B')
+      const array = context.arrays.get('B') as BasicArrayValue[]
       expect(array).toBeDefined()
       expect(Array.isArray(array)).toBe(true)
       // First dimension should have 4 elements
-      expect((array as unknown[]).length).toBe(4)
+      expect(array.length).toBe(4)
       // Each element should be an array of 4 elements
-      expect(Array.isArray((array as unknown[])[0])).toBe(true)
-      expect(((array as unknown[])[0] as unknown[]).length).toBe(4)
+      const firstRow = array[0] as BasicScalarValue[]
+      expect(Array.isArray(firstRow)).toBe(true)
+      expect(firstRow.length).toBe(4)
     })
 
     it('should initialize 2D numeric array elements to 0', async () => {
@@ -140,9 +142,11 @@ describe('DimExecutor', () => {
 
       executor.execute(dimStmtCst!, 30)
 
-      const array = context.arrays.get('B')
+      const array = context.arrays.get('B') as BasicArrayValue[]
       expect(array).toBeDefined()
-      const firstRow = (array as unknown[])[0] as number[]
+      const firstRow = array[0] as BasicScalarValue[]
+      expect(Array.isArray(firstRow)).toBe(true)
+      expect(firstRow.length).toBe(3)
       expect(firstRow[0]).toBe(0)
       expect(firstRow[1]).toBe(0)
       expect(firstRow[2]).toBe(0)
@@ -155,10 +159,10 @@ describe('DimExecutor', () => {
       executor.execute(dimStmtCst!, 40)
 
       expect(context.arrays.has('B$')).toBe(true)
-      const array = context.arrays.get('B$')
+      const array = context.arrays.get('B$') as BasicArrayValue[]
       expect(array).toBeDefined()
       expect(Array.isArray(array)).toBe(true)
-      expect((array as unknown[]).length).toBe(4)
+      expect(array.length).toBe(4)
     })
   })
 
@@ -184,7 +188,7 @@ describe('DimExecutor', () => {
 
       const errors = context.getErrors()
       expect(errors.length).toBeGreaterThan(0)
-      expect(errors[0]?.message).toContain('dimension must be >= 0')
+      expect(errors[0]?.message).toEqual('DIM: Array dimension must be >= 0 for A')
     })
 
     it('should accept dimension 0 for 1D array', async () => {
@@ -196,12 +200,12 @@ describe('DimExecutor', () => {
       
       // Dimension 0 is valid - creates array with 1 element
       expect(context.arrays.has('A')).toBe(true)
-      const array = context.arrays.get('A')
+      const array = context.arrays.get('A') as BasicScalarValue[]
       expect(array).toBeDefined()
       expect(Array.isArray(array)).toBe(true)
-      expect((array as unknown[]).length).toBe(1)
+      expect(array.length).toBe(1)
       // Element at index 0 should be initialized to 0
-      expect((array as number[])[0]).toBe(0)
+      expect(array[0]).toBe(0)
     })
 
     it('should handle expression dimensions correctly', async () => {
@@ -227,13 +231,15 @@ describe('DimExecutor', () => {
       expect(context.arrays.has('B')).toBe(true)
       
       // A should have size 8 (indices 0-7, since 2*3+1 = 7)
-      const arrayA = context.arrays.get('A')
-      expect((arrayA as unknown[]).length).toBe(8)
+      const arrayA = context.arrays.get('A') as BasicScalarValue[]
+      expect(arrayA.length).toBe(8)
       
       // B should be 2D: 6x5 (indices 0-5, 0-4)
-      const arrayB = context.arrays.get('B')
-      expect((arrayB as unknown[]).length).toBe(6)
-      expect(((arrayB as unknown[])[0] as unknown[]).length).toBe(5)
+      const arrayB = context.arrays.get('B') as BasicArrayValue[]
+      expect(arrayB.length).toBe(6)
+      const firstRow = arrayB[0] as BasicScalarValue[]
+      expect(Array.isArray(firstRow)).toBe(true)
+      expect(firstRow.length).toBe(5)
     })
 
     it('should re-declare array and overwrite existing array', async () => {
@@ -252,12 +258,12 @@ describe('DimExecutor', () => {
       executor.execute(dimStmtCst2!, 110)
       
       // Array should be recreated and all elements should be 0
-      const array = context.arrays.get('A')
+      const array = context.arrays.get('A') as BasicScalarValue[]
       expect(array).toBeDefined()
-      expect((array as unknown[]).length).toBe(5) // indices 0-4
-      expect((array as number[])[0]).toBe(0)
-      expect((array as number[])[1]).toBe(0)
-      expect((array as number[])[2]).toBe(0)
+      expect(array.length).toBe(5) // indices 0-4
+      expect(array[0]).toBe(0)
+      expect(array[1]).toBe(0)
+      expect(array[2]).toBe(0)
     })
 
     it('should initialize 2D string array elements to empty string', async () => {
@@ -266,17 +272,128 @@ describe('DimExecutor', () => {
       
       executor.execute(dimStmtCst!, 120)
       
-      const array = context.arrays.get('B$')
+      const array = context.arrays.get('B$') as BasicArrayValue[]
       expect(array).toBeDefined()
-      const firstRow = (array as unknown[])[0] as string[]
+      const firstRow = array[0] as BasicScalarValue[]
       expect(firstRow[0]).toBe('')
       expect(firstRow[1]).toBe('')
       expect(firstRow[2]).toBe('')
       
-      const secondRow = (array as unknown[])[1] as string[]
+      const secondRow = array[1] as BasicScalarValue[]
       expect(secondRow[0]).toBe('')
       expect(secondRow[1]).toBe('')
       expect(secondRow[2]).toBe('')
+    })
+
+    it('should accept dimension 0 for 2D array', async () => {
+      // DIM A(0,0) is valid - creates 1x1 array
+      const dimStmtCst = await parseDimStatement('130 DIM A(0,0)')
+      expect(dimStmtCst).not.toBeNull()
+      
+      executor.execute(dimStmtCst!, 130)
+      
+      expect(context.arrays.has('A')).toBe(true)
+      const array = context.arrays.get('A') as BasicArrayValue[]
+      expect(array).toBeDefined()
+      expect(Array.isArray(array)).toBe(true)
+      expect(array.length).toBe(1)
+      const firstRow = array[0] as BasicScalarValue[]
+      expect(Array.isArray(firstRow)).toBe(true)
+      expect(firstRow.length).toBe(1)
+      expect(firstRow[0]).toBe(0)
+    })
+
+    it('should handle DIM with variable expressions', async () => {
+      // Set variable first
+      context.variables.set('X', { value: 5, type: 'number' })
+      
+      const dimStmtCst = await parseDimStatement('140 DIM A(X)')
+      expect(dimStmtCst).not.toBeNull()
+      
+      executor.execute(dimStmtCst!, 140)
+      
+      expect(context.arrays.has('A')).toBe(true)
+      const array = context.arrays.get('A') as BasicArrayValue[]
+      expect(array).toBeDefined()
+      // Should create array with size 6 (indices 0-5)
+      expect(array.length).toBe(6)
+    })
+
+    it('should truncate fractional dimension expressions to integer', async () => {
+      // Set variable to fractional value
+      context.variables.set('X', { value: 5, type: 'number' })
+      
+      // X / 2 = 2.5, should truncate to 2
+      const dimStmtCst = await parseDimStatement('150 DIM A(X/2)')
+      expect(dimStmtCst).not.toBeNull()
+      
+      executor.execute(dimStmtCst!, 150)
+      
+      expect(context.arrays.has('A')).toBe(true)
+      const array = context.arrays.get('A') as BasicArrayValue[]
+      expect(array).toBeDefined()
+      // Should truncate 2.5 to 2, creating array with size 3 (indices 0-2)
+      expect(array.length).toBe(3)
+    })
+  })
+
+  describe('Manual Example Programs', () => {
+    it('should match manual example (1) - numeric arrays', async () => {
+      // From manual page 62, example (1)
+      const dimStmtCst = await parseDimStatement('20 DIM A(3),B(3,3)')
+      expect(dimStmtCst).not.toBeNull()
+      
+      executor.execute(dimStmtCst!, 20)
+      
+      // Verify arrays are created
+      expect(context.arrays.has('A')).toBe(true)
+      expect(context.arrays.has('B')).toBe(true)
+      
+      // Verify 1D array A(3) - indices 0-3
+      const arrayA = context.arrays.get('A') as BasicScalarValue[]
+      expect(arrayA.length).toBe(4)
+      expect(arrayA[0]).toBe(0)
+      expect(arrayA[3]).toBe(0)
+      
+      // Verify 2D array B(3,3) - indices 0-3, 0-3
+      const arrayB = context.arrays.get('B') as BasicArrayValue[]
+      expect(arrayB.length).toBe(4)
+      const firstRowB = arrayB[0] as BasicScalarValue[]
+      expect(Array.isArray(firstRowB)).toBe(true)
+      expect(firstRowB.length).toBe(4)
+      expect(firstRowB[0]).toBe(0)
+      const lastRowB = arrayB[3] as BasicScalarValue[]
+      expect(Array.isArray(lastRowB)).toBe(true)
+      expect(lastRowB[3]).toBe(0)
+    })
+
+    it('should match manual example (2) - string arrays', async () => {
+      // From manual page 62, example (2)
+      const dimStmtCst = await parseDimStatement('20 DIM A$(3),B$(3,3)')
+      expect(dimStmtCst).not.toBeNull()
+      
+      executor.execute(dimStmtCst!, 20)
+      
+      // Verify arrays are created
+      expect(context.arrays.has('A$')).toBe(true)
+      expect(context.arrays.has('B$')).toBe(true)
+      
+      // Verify 1D string array A$(3) - indices 0-3
+      const arrayA = context.arrays.get('A$') as BasicScalarValue[]
+      expect(arrayA.length).toBe(4)
+      expect(arrayA[0]).toBe('')
+      expect(arrayA[3]).toBe('')
+      
+      // Verify 2D string array B$(3,3) - indices 0-3, 0-3
+      const arrayB = context.arrays.get('B$') as BasicArrayValue[]
+      expect(arrayB.length).toBe(4)
+      const firstRowB = arrayB[0] as BasicScalarValue[]
+      expect(Array.isArray(firstRowB)).toBe(true)
+      expect(firstRowB.length).toBe(4)
+      expect(firstRowB[0]).toBe('')
+      const lastRowB = arrayB[3] as BasicScalarValue[]
+      expect(Array.isArray(lastRowB)).toBe(true)
+      expect(lastRowB[3]).toBe('')
     })
   })
 })

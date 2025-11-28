@@ -40,7 +40,7 @@ The BASIC interpreter has pointers which point to DATA and when executing READ s
 110 PRINT A;
 120 NEXT
 130 REM
-1000 DATA 23, 43, 55, 65, 42,9
+1000 DATA 23,43,55,65,42,9
 1010 DATA 12,56,34,68,53,2
 RUN
 ```

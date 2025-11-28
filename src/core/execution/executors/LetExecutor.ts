@@ -66,11 +66,15 @@ export class LetExecutor {
       }
 
       const varName = identifierToken.image.toUpperCase()
-      this.variableService.setVariableFromExpressionCst(varName, expressionCst)
+      
+      // Evaluate expression once and reuse the value
+      const value = this.variableService.evaluator.evaluateExpression(expressionCst)
+      // Convert boolean to number for BASIC compatibility
+      const basicValue = typeof value === 'boolean' ? (value ? 1 : 0) : value
+      this.variableService.setVariable(varName, basicValue as BasicScalarValue)
 
-      // Add debug output
-      if (this.variableService.context.config.enableDebugMode) {
-        const value = this.variableService.evaluator.evaluateExpression(expressionCst)
+      // Add debug output (only if execution hasn't been halted by a runtime error)
+      if (this.variableService.context.config.enableDebugMode && !this.variableService.context.shouldStop) {
         this.variableService.context.addDebugOutput(`LET: ${varName} = ${value}`)
       }
     }

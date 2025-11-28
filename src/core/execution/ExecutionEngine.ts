@@ -75,6 +75,9 @@ export class ExecutionEngine {
         const expandedStatement = this.context.getCurrentStatement()
         if (!expandedStatement) break
         
+        // Set current line number for error reporting
+        this.context.setCurrentLineNumber(expandedStatement.lineNumber)
+        
         // Track the statement index before execution
         const statementIndexBefore = this.context.currentStatementIndex
         
@@ -84,6 +87,11 @@ export class ExecutionEngine {
         
         // Execute the statement
         await this.statementRouter.executeStatement(expandedStatement)
+        
+        // Check if a runtime error occurred (execution should have been halted)
+        if (!this.context.isRunning) {
+          break
+        }
         
         // Only move to next statement if the index wasn't modified by the statement
         if (this.context.currentStatementIndex === statementIndexBefore) {

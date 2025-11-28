@@ -377,7 +377,7 @@ describe('FOR/NEXT Executor', () => {
       expect(result.success).toBe(false)
       expect(result.errors.length).toBeGreaterThan(0)
       const errorMessages = result.errors.map(e => e.message).join(' ')
-      expect(errorMessages).toContain('NEXT without FOR')
+      expect(errorMessages).toEqual('NEXT without FOR')
     })
 
     it('should error on FOR with non-numeric start value', async () => {
@@ -479,8 +479,10 @@ describe('FOR/NEXT Executor', () => {
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
       // PRINT ends with semicolon, so all outputs are on same line
-      // Numbers always get a space BEFORE them (including negative numbers)
-      expect(outputs).toEqual(' 5 3 1 -1 -3 -5')
+      // Positive numbers get a space BEFORE them (sign position)
+      // Negative numbers do NOT get a leading space (minus sign occupies sign position)
+      // Verified on real Famicom: PRINT -5 outputs "-5" (no leading space)
+      expect(outputs).toEqual(' 5 3 1-1-3-5')
     })
   })
 })

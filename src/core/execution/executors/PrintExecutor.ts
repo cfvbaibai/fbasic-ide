@@ -8,6 +8,7 @@ import type { CstNode, IToken } from 'chevrotain'
 import { ExpressionEvaluator } from '../../evaluation/ExpressionEvaluator'
 import { ExecutionContext } from '../../state/ExecutionContext'
 import { getFirstCstNode, getCstNodes, getFirstToken, getTokens, isCstToken, isCstNode } from '../../parser/cst-helpers'
+import { ERROR_TYPES } from '@/core/constants'
 
 export type PrintSeparator = ',' | ';' | null
 
@@ -146,19 +147,10 @@ export class PrintExecutor {
     // Only append if previous PRINT ended with semicolon
     const shouldAppendToPrevious = this.context.lastPrintEndedWithSemicolon
     
-    // When appending, check if we need to add space before the new output
-    // Negative numbers don't get leading space in their own PRINT, but need space when concatenated
-    if (shouldAppendToPrevious && items.length > 0) {
-      const firstItem = items[0]
-      if (firstItem) {
-        const isFirstItemNumber = typeof firstItem.value === 'number'
-        const isFirstItemPositive = isFirstItemNumber && (firstItem.value as number) >= 0
-        if (isFirstItemNumber && !isFirstItemPositive) {
-          // Negative number - add space before it when concatenating
-          output = ' ' + output
-        }
-      }
-    }
+    // Note: buildOutputString already handles spacing correctly:
+    // - First item: adds space before if positive, no space if negative
+    // - Subsequent items with semicolon: adds space before if positive, no space if negative
+    // So when appending, we don't need to add extra spacing - buildOutputString already did it
     
     // Output the string
     this.printOutput(output, shouldAppendToPrevious)
@@ -168,7 +160,11 @@ export class PrintExecutor {
   }
 
   /**
-   * Build output string from PRINT items, handling all PRINT semantics
+   * Build output string from PRINT items, handling all PRINT semantics.
+   * 
+   * This method separates two concerns:
+   * 1. Building the string representation of each item (via toString method)
+   * 2. Processing separators between items
    */
   private buildOutputString(items: PrintItem[]): string {
     if (items.length === 0) {
@@ -182,66 +178,46 @@ export class PrintExecutor {
       const item = items[i]
       if (!item || item.value === undefined) continue
       
-      const formatted = this.formatValue(item.value)
-      const separator: PrintSeparator = item.separator
+      // Step 1: Build the string representation of the item
+      // The toString method already handles the sign char for numbers
+      const itemString = this.toString(item.value)
 
       if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(`PRINT: value = ${item.value}, separator = ${separator}`)
+        this.context.addDebugOutput(`PRINT: value = ${item.value}, separator = ${item.separator}`)
       }
 
-      // According to manual and FamiCon behavior: positive numbers always get a space BEFORE them
-      // Negative numbers don't get a space (minus sign is part of the number)
-      // Example: PRINT 12;34 outputs " 12 34", PRINT "A";"B" outputs "AB"
-      const isNumber = typeof item.value === 'number'
-      const isPositiveNumber = isNumber && (item.value as number) >= 0
-      
+      // Step 2: Process the separator from the previous item (if any)
       if (i === 0) {
-        // First item - add space before if it's a positive number
-        if (isPositiveNumber) {
-          output += ' '
-          currentColumn += 1
-        }
-        output += formatted
-        currentColumn += formatted.length
+        // First item: no separator to process, just output the item string
+        // The toString method already includes the sign char for numbers
+        output += itemString
+        currentColumn += itemString.length
       } else {
-        // Handle separator from previous item
+        // Process separator from previous item
         const prevSeparator = items[i - 1]?.separator
         
         if (prevSeparator === ',') {
           // Comma separator: use tab character to move to next 8-character tab stop
           // Block 1: 0-7, Block 2: 8-15, Block 3: 16-23, Block 4: 24-27
-          // Positive numbers get a space BEFORE them, even after comma
-          if (isPositiveNumber) {
-            output += '\t '
-            const nextTabStop = this.getNextTabStop(currentColumn)
-            currentColumn = nextTabStop + 1
-          } else {
-            output += '\t'
-            const nextTabStop = this.getNextTabStop(currentColumn)
-            currentColumn = nextTabStop
-          }
+          output += '\t'
+          const nextTabStop = this.getNextTabStop(currentColumn)
+          currentColumn = nextTabStop
+          // Then output the item string (which already has the sign char for numbers)
+          output += itemString
+          currentColumn += itemString.length
         } else if (prevSeparator === ';') {
-          // Semicolon separator: add space before positive numbers
-          // For negative numbers, also add space (they follow immediately but need separation)
-          // According to manual: "a blank is needed right before and right after the symbol of a value (for a positive value)"
-          if (isPositiveNumber) {
-            // Add space before positive numbers
-            output += ' '
-            currentColumn += 1
-          } else if (isNumber) {
-            // Negative numbers: add space before them too (for separation)
-            output += ' '
-            currentColumn += 1
-          }
-          // For strings, no space (prints immediately)
+          // Semicolon separator: output immediately (no spacing)
+          // The toString method already handles the sign char, so we just append
+          output += itemString
+          currentColumn += itemString.length
         } else {
-          // No separator (shouldn't happen, but fallback to space)
-          output += ' '
-          currentColumn += 1
+          this.context.addError({
+            line: this.context.getCurrentLineNumber(),
+            message: 'PRINT: Invalid separator: ' + prevSeparator,
+            type: ERROR_TYPES.RUNTIME
+          })
+          return ''
         }
-        
-        output += formatted
-        currentColumn += formatted.length
       }
     }
 
@@ -260,23 +236,36 @@ export class PrintExecutor {
   }
 
   /**
-   * Format a value for output
+   * Convert a printable value to its string representation.
+   * This acts as the "toString" method for printable items.
+   * 
+   * For numbers: always outputs a sign char (space for 0 and positive, dash for negative)
+   * followed by the absolute value of the number.
+   * For strings: outputs the string itself.
    */
-  private formatValue(value: number | string | boolean): string {
+  private toString(value: number | string | boolean): string {
     if (typeof value === 'string') {
       return value
     } else if (typeof value === 'boolean') {
-      return value ? '1' : '0'
+      // Boolean values are converted to numbers (1 or 0) before printing
+      return this.toString(value ? 1 : 0)
     } else if (typeof value === 'number') {
-      // Handle BASIC number formatting
-      if (Number.isInteger(value)) {
-        return value.toString()
-      } else {
-        // Format floating point numbers
-        return value.toString()
-      }
+      // Numbers always have a sign char: space for 0 and positive, dash for negative
+      const sign = value >= 0 ? ' ' : '-'
+      const absValue = Math.abs(value)
+      // Format the absolute value (handle integers and floats)
+      const absValueStr = Number.isInteger(absValue) 
+        ? absValue.toString() 
+        : absValue.toString()
+      return sign + absValueStr
     }
-    return '0'
+    // This should never happen due to TypeScript type checking, but handle it gracefully
+    this.context.addError({
+      line: this.context.getCurrentLineNumber(),
+      message: `PRINT: Invalid value type: ${typeof value} for value: ${value}`,
+      type: ERROR_TYPES.RUNTIME
+    })
+    return ' 0'
   }
 
   /**

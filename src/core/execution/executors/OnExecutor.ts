@@ -9,7 +9,8 @@
 import type { CstNode } from 'chevrotain'
 import { ExecutionContext } from '../../state/ExecutionContext'
 import { ExpressionEvaluator } from '../../evaluation/ExpressionEvaluator'
-import { getFirstToken, getCstNodes, getTokens } from '../../parser/cst-helpers'
+import { getFirstToken, getTokens, getFirstCstNode } from '../../parser/cst-helpers'
+import { DataService } from '../../services/DataService'
 import { ERROR_TYPES } from '../../constants'
 
 export class OnExecutor {
@@ -29,7 +30,7 @@ export class OnExecutor {
    */
   execute(onStmtCst: CstNode, lineNumber: number): void {
     // Evaluate the expression
-    const expressionCst = onStmtCst.children.expression?.[0]
+    const expressionCst = getFirstCstNode(onStmtCst.children.expression)
     if (!expressionCst) {
       this.context.addError({
         line: lineNumber,
@@ -65,7 +66,7 @@ export class OnExecutor {
     }
 
     // Get the line number list
-    const lineNumberListCst = onStmtCst.children.lineNumberList?.[0]
+    const lineNumberListCst = getFirstCstNode(onStmtCst.children.lineNumberList)
     if (!lineNumberListCst) {
       this.context.addError({
         line: lineNumber,

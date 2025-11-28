@@ -12,16 +12,20 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { FBasicParser } from '@/core/parser/FBasicParser'
+import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
 
 describe('Arithmetic Calculations', () => {
   let interpreter: BasicInterpreter
+  let deviceAdapter: TestDeviceAdapter
 
   beforeEach(() => {
+    deviceAdapter = new TestDeviceAdapter()
     interpreter = new BasicInterpreter({
       maxIterations: 1000,
       maxOutputLines: 100,
       enableDebugMode: false,
-      strictMode: false
+      strictMode: false,
+      deviceAdapter: deviceAdapter
     })
   })
 
@@ -183,13 +187,16 @@ describe('Arithmetic Calculations', () => {
       expect(result.variables.get('X')?.value).toBe(10)
     })
 
-    it('should handle division by zero (returns 0)', async () => {
+    it('should error on division by zero', async () => {
       const code = '10 LET X = 10 / 0'
       const result = await interpreter.execute(code)
       
-      expect(result.success).toBe(true)
-      expect(result.errors).toHaveLength(0)
-      expect(result.variables.get('X')?.value).toBe(0)
+      expect(result.success).toBe(false)
+      expect(result.errors.length).toBeGreaterThan(0)
+      const errorMessages = result.errors.map(e => e.message).join(' ')
+      expect(errorMessages).toEqual('Division by zero')
+      expect(result.errors[0]?.line).toBe(10)
+      expect(result.errors[0]?.type).toBe('RUNTIME')
     })
 
     it('should divide variables', async () => {
@@ -201,6 +208,99 @@ describe('Arithmetic Calculations', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('X')?.value).toBe(5)
+    })
+
+    it('should error on division by zero with variable', async () => {
+      const code = `10 LET A = 20
+20 LET B = 0
+30 LET X = A / B
+40 PRINT "This should not print"`
+      const result = await interpreter.execute(code)
+      
+      expect(result.success).toBe(false)
+      expect(result.errors.length).toBeGreaterThan(0)
+      const errorMessages = result.errors.map(e => e.message).join(' ')
+      expect(errorMessages).toEqual('Division by zero')
+      expect(result.errors[0]?.line).toBe(30)
+      expect(result.errors[0]?.type).toBe('RUNTIME')
+      
+      // Verify that PRINT statement after the error is not executed
+      // getAllOutputs() includes error output formatted as "RUNTIME: {message}" to match IDE format
+      const outputs = deviceAdapter.getAllOutputs()
+      expect(outputs).toEqual('RUNTIME: Division by zero')
+    })
+
+    it('should error on division by zero in complex expression', async () => {
+      const code = `10 LET X = (10 + 5) / 0
+20 PRINT "This should not print"`
+      const result = await interpreter.execute(code)
+      
+      expect(result.success).toBe(false)
+      expect(result.errors.length).toBeGreaterThan(0)
+      const errorMessages = result.errors.map(e => e.message).join(' ')
+      expect(errorMessages).toEqual('Division by zero')
+      expect(result.errors[0]?.line).toBe(10)
+      
+      // Verify that PRINT statement after the error is not executed
+      // getAllOutputs() includes error output formatted as "RUNTIME: {message}" to match IDE format
+      const outputs = deviceAdapter.getAllOutputs()
+      expect(outputs).toEqual('RUNTIME: Division by zero')
+    })
+
+    it('should halt execution on division by zero', async () => {
+      const code = `10 LET X = 10 / 0
+20 PRINT "This should not print"
+30 PRINT "This also should not print"`
+      const result = await interpreter.execute(code)
+      
+      expect(result.success).toBe(false)
+      expect(result.errors.length).toBeGreaterThan(0)
+      const errorMessages = result.errors.map(e => e.message).join(' ')
+      expect(errorMessages).toEqual('Division by zero')
+      expect(result.errors[0]?.line).toBe(10)
+      expect(result.errors[0]?.type).toBe('RUNTIME')
+      
+      // Verify that PRINT statements after the error are not executed
+      // getAllOutputs() includes error output formatted as "RUNTIME: {message}" to match IDE format
+      const outputs = deviceAdapter.getAllOutputs()
+      expect(outputs).toEqual('RUNTIME: Division by zero')
+    })
+
+    it('should error on MOD by zero', async () => {
+      const code = `10 LET X = 10 MOD 0
+20 PRINT "This should not print"`
+      const result = await interpreter.execute(code)
+      
+      expect(result.success).toBe(false)
+      expect(result.errors.length).toBeGreaterThan(0)
+      const errorMessages = result.errors.map(e => e.message).join(' ')
+      expect(errorMessages).toEqual('Division by zero')
+      expect(result.errors[0]?.line).toBe(10)
+      expect(result.errors[0]?.type).toBe('RUNTIME')
+      
+      // Verify that PRINT statement after the error is not executed
+      // getAllOutputs() includes error output formatted as "RUNTIME: {message}" to match IDE format
+      const outputs = deviceAdapter.getAllOutputs()
+      expect(outputs).toEqual('RUNTIME: Division by zero')
+    })
+
+    it('should error on MOD by zero with variable', async () => {
+      const code = `10 LET A = 10
+20 LET B = 0
+30 LET X = A MOD B
+40 PRINT "This should not print"`
+      const result = await interpreter.execute(code)
+      
+      expect(result.success).toBe(false)
+      expect(result.errors.length).toBeGreaterThan(0)
+      const errorMessages = result.errors.map(e => e.message).join(' ')
+      expect(errorMessages).toEqual('Division by zero')
+      expect(result.errors[0]?.line).toBe(30)
+      
+      // Verify that PRINT statement after the error is not executed
+      // getAllOutputs() includes error output formatted as "RUNTIME: {message}" to match IDE format
+      const outputs = deviceAdapter.getAllOutputs()
+      expect(outputs).toEqual('RUNTIME: Division by zero')
     })
   })
 

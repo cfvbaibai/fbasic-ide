@@ -141,7 +141,7 @@ describe('ReadExecutor', () => {
     evaluator = new ExpressionEvaluator(context)
     dataService = new DataService(context, evaluator)
     variableService = new VariableService(context, evaluator)
-    executor = new ReadExecutor(dataService, variableService)
+    executor = new ReadExecutor(dataService, variableService, evaluator)
     parser = new FBasicParser()
     
     // Clear data values and variables before each test
