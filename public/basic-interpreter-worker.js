@@ -9497,8 +9497,8 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           {
             // Function call: String functions and arithmetic functions
             // Family BASIC arithmetic functions: ABS, SGN, RND, VAL
-            // String functions: LEN, LEFT$, RIGHT$, MID$, STR$, HEX$
-            GATE: () => this.LA(1).tokenType === Len || this.LA(1).tokenType === Left || this.LA(1).tokenType === Right || this.LA(1).tokenType === Mid || this.LA(1).tokenType === Str || this.LA(1).tokenType === Hex || this.LA(1).tokenType === Abs || this.LA(1).tokenType === Sgn || this.LA(1).tokenType === Rnd || this.LA(1).tokenType === Val || this.LA(1).tokenType === Stick || this.LA(1).tokenType === Strig,
+            // String functions: LEN, LEFT$, RIGHT$, MID$, STR$, HEX$, CHR$, ASC
+            GATE: () => this.LA(1).tokenType === Len || this.LA(1).tokenType === Left || this.LA(1).tokenType === Right || this.LA(1).tokenType === Mid || this.LA(1).tokenType === Str || this.LA(1).tokenType === Hex || this.LA(1).tokenType === Chr || this.LA(1).tokenType === Asc || this.LA(1).tokenType === Abs || this.LA(1).tokenType === Sgn || this.LA(1).tokenType === Rnd || this.LA(1).tokenType === Val || this.LA(1).tokenType === Stick || this.LA(1).tokenType === Strig,
             ALT: () => this.SUBRULE(this.functionCall)
           },
           {
