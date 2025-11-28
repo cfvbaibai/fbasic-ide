@@ -12,13 +12,14 @@
 
 import type { CstNode } from 'chevrotain'
 import { VariableService } from '../../services/VariableService'
-import { ExpressionEvaluator, type EvaluationContext } from '../../evaluation/ExpressionEvaluator'
+import { ExpressionEvaluator } from '../../evaluation/ExpressionEvaluator'
+import { ExecutionContext } from '../../state/ExecutionContext'
 import { ERROR_TYPES } from '../../constants'
 import { getFirstCstNode, getCstNodes, getFirstToken } from '../../parser/cst-helpers'
 
 export class DimExecutor {
   constructor(
-    private context: EvaluationContext,
+    private context: ExecutionContext,
     private evaluator: ExpressionEvaluator,
     private variableService: VariableService
   ) {}

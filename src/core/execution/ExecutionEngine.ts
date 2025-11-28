@@ -10,33 +10,29 @@ import { ExecutionContext } from '../state/ExecutionContext'
 import { ExpressionEvaluator } from '../evaluation/ExpressionEvaluator'
 import { StatementRouter } from './StatementRouter'
 import { VariableService } from '../services/VariableService'
-import { IoService } from '../services/IoService'
 import { DataService } from '../services/DataService'
 
 export class ExecutionEngine {
   private context: ExecutionContext
   private evaluator: ExpressionEvaluator
   private variableService: VariableService
-  private ioService: IoService
   private dataService: DataService
   private statementRouter: StatementRouter
 
   constructor(
     context: ExecutionContext,
-    deviceAdapter?: BasicDeviceAdapter
+    _deviceAdapter?: BasicDeviceAdapter
   ) {
     this.context = context
     
     // Initialize services
     this.evaluator = new ExpressionEvaluator(this.context)
     this.variableService = new VariableService(this.context, this.evaluator)
-    this.ioService = new IoService(this.context, this.evaluator, deviceAdapter)
     this.dataService = new DataService(this.context, this.evaluator)
     this.statementRouter = new StatementRouter(
       this.context,
       this.evaluator,
       this.variableService,
-      this.ioService,
       this.dataService
     )
   }

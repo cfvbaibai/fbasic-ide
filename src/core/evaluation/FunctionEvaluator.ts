@@ -7,7 +7,7 @@
 
 import type { CstNode } from 'chevrotain'
 import { getFirstCstNode, getCstNodes, getFirstToken } from '../parser/cst-helpers'
-import type { EvaluationContext } from './ExpressionEvaluator'
+import { ExecutionContext } from '../state/ExecutionContext'
 
 /**
  * Helper to convert a value to an integer
@@ -34,7 +34,7 @@ function toNumber(value: number | string | boolean | undefined): number {
  */
 export class FunctionEvaluator {
   constructor(
-    private context: EvaluationContext,
+    private context: ExecutionContext,
     private evaluateExpression: (exprCst: CstNode) => number | string
   ) {}
 

@@ -21,7 +21,7 @@ import type {
 } from 'chevrotain';
 import {
   // Keywords
-  Let, Print, For, To, Step, Next, End, Pause, If, Then, Goto, Dim, Data, Read, Restore,
+  Let, Print, For, To, Step, Next, End, Pause, If, Then, Goto, Gosub, Return, On, Dim, Data, Read, Restore,
   // String functions
   Len, Left, Right, Mid, Str, Hex,
   // Arithmetic functions
@@ -70,6 +70,10 @@ class FBasicChevrotainParser extends CstParser {
   declare logicalExpression: () => CstNode;
   declare ifThenStatement: () => CstNode;
   declare gotoStatement: () => CstNode;
+  declare gosubStatement: () => CstNode;
+  declare returnStatement: () => CstNode;
+  declare onStatement: () => CstNode;
+  declare lineNumberList: () => CstNode;
   declare dimStatement: () => CstNode;
   declare dataStatement: () => CstNode;
   declare readStatement: () => CstNode;
@@ -396,6 +400,74 @@ class FBasicChevrotainParser extends CstParser {
       this.CONSUME(NumberLiteral); // Line number to jump to
     });
 
+    // GOSUB NumberLiteral
+    // Calls a subroutine at the specified line number
+    // Example: GOSUB 1000
+    this.gosubStatement = this.RULE('gosubStatement', () => {
+      this.CONSUME(Gosub);
+      this.CONSUME(NumberLiteral);
+    });
+
+    // RETURN (NumberLiteral)?
+    // Returns from a subroutine
+    // Example: RETURN or RETURN 100
+    this.returnStatement = this.RULE('returnStatement', () => {
+      this.CONSUME(Return);
+      this.OPTION(() => {
+        this.CONSUME(NumberLiteral); // Optional line number
+      });
+    });
+
+    // LineNumberList = NumberLiteral (Comma NumberLiteral)*
+    // List of line numbers for ON statement
+    // Example: 100, 200, 300
+    this.lineNumberList = this.RULE('lineNumberList', () => {
+      this.CONSUME(NumberLiteral);
+      this.MANY(() => {
+        this.CONSUME(Comma);
+        this.CONSUME2(NumberLiteral);
+      });
+    });
+
+    // ON Expression {GOTO | GOSUB | RETURN | RESTORE} LineNumberList
+    // Jumps to line number based on expression value (1 = first, 2 = second, etc.)
+    // If value is 0 or exceeds list length, proceeds to next line
+    // Example: ON X GOTO 100, 200, 300
+    // Example: ON N GOSUB 100, 200, 300, 400, 500, 600
+    // Example: ON X RETURN 100, 200, 300
+    // Example: ON X RESTORE 100, 200, 300
+    this.onStatement = this.RULE('onStatement', () => {
+      this.CONSUME(On);
+      this.SUBRULE(this.expression);
+      // GOTO, GOSUB, RETURN, or RESTORE
+      this.OR([
+        {
+          ALT: () => {
+            this.CONSUME(Goto);
+            this.SUBRULE(this.lineNumberList);
+          }
+        },
+        {
+          ALT: () => {
+            this.CONSUME(Gosub);
+            this.SUBRULE2(this.lineNumberList);
+          }
+        },
+        {
+          ALT: () => {
+            this.CONSUME(Return);
+            this.SUBRULE3(this.lineNumberList);
+          }
+        },
+        {
+          ALT: () => {
+            this.CONSUME(Restore);
+            this.SUBRULE4(this.lineNumberList);
+          }
+        }
+      ]);
+    });
+
     // DimensionList = Expression (Comma Expression)?
     // For 1D array: (m1)
     // For 2D array: (m1, m2)
@@ -555,8 +627,20 @@ class FBasicChevrotainParser extends CstParser {
           ALT: () => this.SUBRULE(this.ifThenStatement)
         },
         {
+          GATE: () => this.LA(1).tokenType === On,
+          ALT: () => this.SUBRULE(this.onStatement)
+        },
+        {
           GATE: () => this.LA(1).tokenType === Goto,
           ALT: () => this.SUBRULE(this.gotoStatement)
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Gosub,
+          ALT: () => this.SUBRULE(this.gosubStatement)
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Return,
+          ALT: () => this.SUBRULE(this.returnStatement)
         },
         {
           GATE: () => this.LA(1).tokenType === Print,

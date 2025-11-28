@@ -3,7 +3,7 @@
  */
 
 import { VARIABLE_TYPES, ERROR_TYPES } from './constants'
-import type { EvaluationContext } from './execution'
+import type { ExecutionContext } from './state/ExecutionContext'
 import type { BasicArrayValue } from './types/BasicTypes'
 
 /**
@@ -91,7 +91,7 @@ export interface ExecutionResult {
  * Interface for command handlers
  */
 export interface CommandHandler {
-  execute(_statement: BasicStatement, _context: EvaluationContext): Promise<void>
+  execute(_statement: BasicStatement, _context: ExecutionContext): Promise<void>
   validate(_statement: BasicStatement): BasicError[]
 }
 
@@ -99,7 +99,7 @@ export interface CommandHandler {
  * Interface for expression evaluators
  */
 export interface ExpressionEvaluator {
-  evaluate(_expression: string, _context: EvaluationContext): number | string
+  evaluate(_expression: string, _context: ExecutionContext): number | string
   validate(_expression: string): BasicError[]
 }
 

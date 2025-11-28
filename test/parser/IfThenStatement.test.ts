@@ -140,6 +140,52 @@ describe('IF-THEN Statement', () => {
       
       expect(result.success).toBe(false)
     })
+
+    it('should parse IF-THEN with multiple statements in THEN clause', () => {
+      // From manual page 64: IF A$<>"Y" THEN BEEP:GOTO 30
+      const source = '10 IF X = 5 THEN PRINT "Yes": PRINT "No"'
+      const result = parseWithChevrotain(source)
+      
+      expect(result.success).toBe(true)
+    })
+
+    it('should parse IF-THEN with AND operator', () => {
+      // From manual page 52: IF X>0 AND X<10 THEN 1000
+      const source = '10 IF X > 0 AND X < 10 THEN PRINT "Between"'
+      const result = parseWithChevrotain(source)
+      
+      expect(result.success).toBe(true)
+    })
+
+    it('should parse IF-THEN with OR operator', () => {
+      // From manual page 52: IF X<0 OR X>10 THEN 1000
+      const source = '10 IF X < 0 OR X > 10 THEN PRINT "Outside"'
+      const result = parseWithChevrotain(source)
+      
+      expect(result.success).toBe(true)
+    })
+
+    it('should parse IF-THEN with complex logical expression', () => {
+      const source = '10 IF X > 0 AND X < 10 OR X = 20 THEN PRINT "Valid"'
+      const result = parseWithChevrotain(source)
+      
+      expect(result.success).toBe(true)
+    })
+
+    it('should parse IF-THEN with NOT operator', () => {
+      const source = '10 IF NOT X = 0 THEN PRINT "Not Zero"'
+      const result = parseWithChevrotain(source)
+      
+      expect(result.success).toBe(true)
+    })
+
+    it('should parse IF-THEN with string not equal comparison', () => {
+      // From manual page 64 example: IF A$<>"Y" THEN BEEP:GOTO 30
+      const source = '10 IF A$ <> "Y" THEN PRINT "Not Y"'
+      const result = parseWithChevrotain(source)
+      
+      expect(result.success).toBe(true)
+    })
   })
 })
 

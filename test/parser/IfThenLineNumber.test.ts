@@ -86,6 +86,19 @@ describe('IF-THEN with Line Number Parser', () => {
       expect(result.success).toBe(true)
       expect(result.cst).toBeDefined()
     })
+
+    it('should parse program matching manual example', async () => {
+      // From manual page 64 example structure
+      const code = `10 REM * IF - THEN *
+20 PRINT "PUSH Y!";
+30 A$="N"
+40 IF A$<>"Y" THEN PRINT "BEEP":GOTO 30
+50 PRINT:PRINT"Y was pressed."
+60 END`
+      const result = await parser.parse(code)
+      expect(result.success).toBe(true)
+      expect(result.cst).toBeDefined()
+    })
   })
 })
 

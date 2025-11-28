@@ -5,10 +5,10 @@
  */
 
 import type { CstNode } from 'chevrotain'
-import type { EvaluationContext } from '../../evaluation/ExpressionEvaluator'
+import { ExecutionContext } from '../../state/ExecutionContext'
 
 export class EndExecutor {
-  constructor(private context: EvaluationContext) {}
+  constructor(private context: ExecutionContext) {}
 
   /**
    * Execute an END statement from CST

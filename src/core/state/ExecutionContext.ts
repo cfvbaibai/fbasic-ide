@@ -11,7 +11,6 @@ import type {
   InterpreterConfig,
   BasicDeviceAdapter 
 } from '../interfaces'
-import type { EvaluationContext } from '../evaluation/ExpressionEvaluator'
 import type { BasicScalarValue, BasicArrayValue } from '../types/BasicTypes'
 import type { ExpandedStatement } from '../execution/statement-expander'
 
@@ -25,7 +24,7 @@ export interface LoopState {
   shouldExecute?: boolean
 }
 
-export class ExecutionContext implements EvaluationContext {
+export class ExecutionContext {
   // Core state
   public variables: Map<string, BasicVariable> = new Map()
   public isRunning = false
@@ -46,6 +45,9 @@ export class ExecutionContext implements EvaluationContext {
   public dataValues: BasicScalarValue[] = [] // Storage for DATA values
   public dataIndex = 0 // Current position in DATA
   public arrays: Map<string, BasicArrayValue> = new Map() // Array storage
+  
+  // PRINT state tracking
+  public lastPrintEndedWithSemicolon = false // Track if last PRINT statement ended with semicolon
   
   // Device integration
   public deviceAdapter?: BasicDeviceAdapter
@@ -72,6 +74,7 @@ export class ExecutionContext implements EvaluationContext {
     this.dataValues = []
     this.dataIndex = 0
     this.arrays.clear()
+    this.lastPrintEndedWithSemicolon = false
   }
 
   /**

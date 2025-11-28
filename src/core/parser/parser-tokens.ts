@@ -27,6 +27,9 @@ export const Pause = createToken({ name: 'Pause', pattern: /\bPAUSE\b/i });
 export const If = createToken({ name: 'If', pattern: /\bIF\b/i });
 export const Then = createToken({ name: 'Then', pattern: /\bTHEN\b/i });
 export const Goto = createToken({ name: 'Goto', pattern: /\bGOTO\b/i });
+export const Gosub = createToken({ name: 'Gosub', pattern: /\bGOSUB\b/i });
+export const Return = createToken({ name: 'Return', pattern: /\bRETURN\b/i });
+export const On = createToken({ name: 'On', pattern: /\bON\b/i });
 export const Dim = createToken({ name: 'Dim', pattern: /\bDIM\b/i });
 export const Data = createToken({ name: 'Data', pattern: /\bDATA\b/i });
 export const Read = createToken({ name: 'Read', pattern: /\bREAD\b/i });
@@ -128,7 +131,7 @@ export const Whitespace = createToken({
 export const allTokens = [
   Whitespace,
   // Keywords
-  Let, Print, For, To, Step, Next, End, Rem, Pause, If, Then, Goto, Dim, Data, Read, Restore,
+  Let, Print, For, To, Step, Next, End, Rem, Pause, If, Then, Goto, Gosub, Return, On, Dim, Data, Read, Restore,
   // String functions (must come before Identifier)
   Len, Left, Right, Mid, Str, Hex,
   // Arithmetic functions (must come before Identifier)

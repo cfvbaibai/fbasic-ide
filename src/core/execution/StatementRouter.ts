@@ -13,14 +13,17 @@ import { EndExecutor } from './executors/EndExecutor'
 import { PauseExecutor } from './executors/PauseExecutor'
 import { IfThenExecutor } from './executors/IfThenExecutor'
 import { GotoExecutor } from './executors/GotoExecutor'
+import { GosubExecutor } from './executors/GosubExecutor'
+import { ReturnExecutor } from './executors/ReturnExecutor'
+import { OnExecutor } from './executors/OnExecutor'
 import { DimExecutor } from './executors/DimExecutor'
 import { DataExecutor } from './executors/DataExecutor'
 import { ReadExecutor } from './executors/ReadExecutor'
 import { RestoreExecutor } from './executors/RestoreExecutor'
-import { IoService } from '../services/IoService'
 import { VariableService } from '../services/VariableService'
 import { DataService } from '../services/DataService'
-import { ExpressionEvaluator, type EvaluationContext } from '../evaluation/ExpressionEvaluator'
+import { ExpressionEvaluator } from '../evaluation/ExpressionEvaluator'
+import { ExecutionContext } from '../state/ExecutionContext'
 import { getFirstCstNode, getFirstToken, getCstNodes } from '../parser/cst-helpers'
 import type { ExpandedStatement } from './statement-expander'
 
@@ -33,19 +36,21 @@ export class StatementRouter {
   private pauseExecutor: PauseExecutor
   private ifThenExecutor: IfThenExecutor
   private gotoExecutor: GotoExecutor
+  private gosubExecutor: GosubExecutor
+  private returnExecutor: ReturnExecutor
+  private onExecutor: OnExecutor
   private dimExecutor: DimExecutor
   private dataExecutor: DataExecutor
   private readExecutor: ReadExecutor
   private restoreExecutor: RestoreExecutor
 
   constructor(
-    private context: EvaluationContext,
+    private context: ExecutionContext,
     private evaluator: ExpressionEvaluator,
     private variableService: VariableService,
-    private ioService: IoService,
     private dataService: DataService
   ) {
-    this.printExecutor = new PrintExecutor(ioService, evaluator)
+    this.printExecutor = new PrintExecutor(context, evaluator)
     this.letExecutor = new LetExecutor(variableService)
     this.forExecutor = new ForExecutor(context, evaluator, variableService)
     this.nextExecutor = new NextExecutor(context, variableService)
@@ -53,6 +58,9 @@ export class StatementRouter {
     this.pauseExecutor = new PauseExecutor(context, evaluator)
     this.ifThenExecutor = new IfThenExecutor(context, evaluator)
     this.gotoExecutor = new GotoExecutor(context)
+    this.gosubExecutor = new GosubExecutor(context)
+    this.returnExecutor = new ReturnExecutor(context)
+    this.onExecutor = new OnExecutor(context, evaluator, dataService)
     this.dimExecutor = new DimExecutor(context, evaluator, variableService)
     this.dataExecutor = new DataExecutor(dataService)
     this.readExecutor = new ReadExecutor(dataService, variableService, evaluator)
@@ -167,11 +175,32 @@ export class StatementRouter {
           }
         }
       }
+    } else if (singleCommandCst.children.onStatement) {
+      const onStmtCst = getFirstCstNode(singleCommandCst.children.onStatement)
+      if (onStmtCst) {
+        // ON may jump to another line - don't advance to next statement if it jumps
+        this.onExecutor.execute(onStmtCst, expandedStatement.lineNumber)
+        return
+      }
     } else if (singleCommandCst.children.gotoStatement) {
       const gotoStmtCst = getFirstCstNode(singleCommandCst.children.gotoStatement)
       if (gotoStmtCst) {
         // GOTO jumps to another line - don't advance to next statement
         this.gotoExecutor.execute(gotoStmtCst, expandedStatement.lineNumber)
+        return
+      }
+    } else if (singleCommandCst.children.gosubStatement) {
+      const gosubStmtCst = getFirstCstNode(singleCommandCst.children.gosubStatement)
+      if (gosubStmtCst) {
+        // GOSUB jumps to another line - don't advance to next statement
+        this.gosubExecutor.execute(gosubStmtCst, expandedStatement.lineNumber)
+        return
+      }
+    } else if (singleCommandCst.children.returnStatement) {
+      const returnStmtCst = getFirstCstNode(singleCommandCst.children.returnStatement)
+      if (returnStmtCst) {
+        // RETURN may jump to another line - don't advance to next statement if it jumps
+        this.returnExecutor.execute(returnStmtCst, expandedStatement.lineNumber)
         return
       }
     } else if (singleCommandCst.children.printStatement) {

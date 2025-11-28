@@ -10,11 +10,11 @@ import { VariableService } from '../../services/VariableService'
 import { getFirstToken } from '../../parser/cst-helpers'
 import { ERROR_TYPES } from '../../constants'
 
-import type { EvaluationContext } from '../../evaluation/ExpressionEvaluator'
+import { ExecutionContext } from '../../state/ExecutionContext'
 
 export class NextExecutor {
   constructor(
-    private context: EvaluationContext,
+    private context: ExecutionContext,
     private variableService: VariableService
   ) {}
 

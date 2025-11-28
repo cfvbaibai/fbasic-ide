@@ -5,13 +5,13 @@
  */
 
 import type { CstNode } from 'chevrotain'
-import type { EvaluationContext } from '../../evaluation/ExpressionEvaluator'
+import { ExecutionContext } from '../../state/ExecutionContext'
 import { ExpressionEvaluator } from '../../evaluation/ExpressionEvaluator'
 import { getFirstCstNode } from '../../parser/cst-helpers'
 
 export class PauseExecutor {
   constructor(
-    private context: EvaluationContext,
+    private context: ExecutionContext,
     private evaluator: ExpressionEvaluator
   ) {}
 

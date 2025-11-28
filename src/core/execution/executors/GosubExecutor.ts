@@ -1,8 +1,8 @@
 /**
- * GOTO Statement Executor
+ * GOSUB Statement Executor
  * 
- * Handles execution of GOTO statements from CST.
- * Jumps to the specified line number.
+ * Handles execution of GOSUB statements from CST.
+ * Calls a subroutine and pushes return address to stack.
  */
 
 import type { CstNode } from 'chevrotain'
@@ -10,22 +10,22 @@ import { ExecutionContext } from '../../state/ExecutionContext'
 import { getFirstToken } from '../../parser/cst-helpers'
 import { ERROR_TYPES } from '../../constants'
 
-export class GotoExecutor {
+export class GosubExecutor {
   constructor(
     private context: ExecutionContext
   ) {}
 
   /**
-   * Execute a GOTO statement from CST
-   * Jumps to the specified line number
+   * Execute a GOSUB statement from CST
+   * Jumps to the specified line number and pushes return address to stack
    */
-  execute(gotoStmtCst: CstNode, lineNumber: number): void {
-    const lineNumberToken = getFirstToken(gotoStmtCst.children.NumberLiteral)
+  execute(gosubStmtCst: CstNode, lineNumber: number): void {
+    const lineNumberToken = getFirstToken(gosubStmtCst.children.NumberLiteral)
     
     if (!lineNumberToken) {
       this.context.addError({
         line: lineNumber,
-        message: 'GOTO: missing line number',
+        message: 'GOSUB: missing line number',
         type: ERROR_TYPES.RUNTIME
       })
       return
@@ -36,7 +36,7 @@ export class GotoExecutor {
     if (isNaN(targetLineNumber)) {
       this.context.addError({
         line: lineNumber,
-        message: `GOTO: invalid line number: ${lineNumberToken.image}`,
+        message: `GOSUB: invalid line number: ${lineNumberToken.image}`,
         type: ERROR_TYPES.RUNTIME
       })
       return
@@ -48,14 +48,18 @@ export class GotoExecutor {
     if (targetStatementIndex === -1) {
       this.context.addError({
         line: lineNumber,
-        message: `GOTO: line number ${targetLineNumber} not found`,
+        message: `GOSUB: line number ${targetLineNumber} not found`,
         type: ERROR_TYPES.RUNTIME
       })
       return
     }
 
+    // Push return address to stack (statement index after the current GOSUB statement)
+    const returnStatementIndex = this.context.currentStatementIndex + 1
+    this.context.gosubStack.push(returnStatementIndex)
+
     if (this.context.config.enableDebugMode) {
-      this.context.addDebugOutput(`GOTO: jumping to line ${targetLineNumber} (statement index ${targetStatementIndex})`)
+      this.context.addDebugOutput(`GOSUB: jumping to line ${targetLineNumber} (statement index ${targetStatementIndex}), return address: ${returnStatementIndex}`)
     }
 
     // Jump to the target statement

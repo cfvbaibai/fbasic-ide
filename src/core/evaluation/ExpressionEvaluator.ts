@@ -7,51 +7,15 @@
 
 import type { CstNode } from 'chevrotain'
 import Decimal from 'decimal.js'
-import type { BasicError, InterpreterConfig } from '../interfaces'
-import type { BasicVariable, BasicDeviceAdapter } from '../interfaces'
-import type { LoopState } from '../state/ExecutionContext'
 import type { BasicScalarValue, BasicArrayValue } from '../types/BasicTypes'
 import { getFirstCstNode, getCstNodes, getFirstToken, getTokens } from '../parser/cst-helpers'
-import type { ExpandedStatement } from '../execution/statement-expander'
 import { FunctionEvaluator } from './FunctionEvaluator'
-
-export interface EvaluationContext {
-  variables: Map<string, BasicVariable>
-  arrays: Map<string, BasicArrayValue>
-  deviceAdapter?: BasicDeviceAdapter
-  
-  // Additional properties needed for execution
-  isRunning: boolean
-  shouldStop: boolean
-  currentStatementIndex: number
-  statements: ExpandedStatement[] // Expanded statements (flat list)
-  labelMap: Map<number, number[]> // Line number -> statement indices
-  iterationCount: number
-  config: InterpreterConfig
-  loopStack: LoopState[]
-  gosubStack: number[]
-  dataValues: BasicScalarValue[]
-  dataIndex: number
-  
-  // Methods
-  addOutput: (text: string) => void
-  addError: (error: BasicError) => void
-  addDebugOutput: (message: string) => void
-  getErrors: () => BasicError[]
-  getStickState: (joystickId: number) => number
-  consumeStrigState: (joystickId: number) => number
-  findStatementIndexByLine: (lineNumber: number) => number
-  findStatementIndicesByLine: (lineNumber: number) => number[]
-  nextStatement: () => void
-  jumpToStatement: (index: number) => void
-  shouldContinue: () => boolean
-  reset: () => void
-}
+import { ExecutionContext } from '../state/ExecutionContext'
 
 export class ExpressionEvaluator {
   private functionEvaluator: FunctionEvaluator
 
-  constructor(private context: EvaluationContext) {
+  constructor(private context: ExecutionContext) {
     // Create function evaluator with reference to evaluateExpression method
     // We'll set it up after construction to avoid circular dependency
     this.functionEvaluator = new FunctionEvaluator(

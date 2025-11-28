@@ -5,14 +5,15 @@
  */
 
 import type { CstNode } from 'chevrotain'
-import { ExpressionEvaluator, type EvaluationContext } from '../evaluation/ExpressionEvaluator'
+import { ExpressionEvaluator } from '../evaluation/ExpressionEvaluator'
+import { ExecutionContext } from '../state/ExecutionContext'
 import { ERROR_TYPES } from '../constants'
 import type { BasicScalarValue } from '../types/BasicTypes'
 import { getFirstCstNode, getCstNodes, getFirstToken } from '../parser/cst-helpers'
 
 export class DataService {
   constructor(
-    private context: EvaluationContext,
+    private context: ExecutionContext,
     private evaluator: ExpressionEvaluator
   ) {}
 

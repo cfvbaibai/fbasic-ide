@@ -62,6 +62,22 @@ describe('DIM Statement Parser', () => {
       const statements = result.cst?.children.statement
       expect(Array.isArray(statements) ? statements.length : 0).toBe(1)
     })
+
+    it('should parse DIM statement with dimension 0', async () => {
+      const result = await parser.parse('70 DIM A(0)')
+      expect(result.success).toBe(true)
+      expect(result.cst).toBeDefined()
+      const statements = result.cst?.children.statement
+      expect(Array.isArray(statements) ? statements.length : 0).toBe(1)
+    })
+
+    it('should parse DIM statement with complex expression dimensions', async () => {
+      const result = await parser.parse('80 DIM A(2*3+1), B(10-5, 2+2)')
+      expect(result.success).toBe(true)
+      expect(result.cst).toBeDefined()
+      const statements = result.cst?.children.statement
+      expect(Array.isArray(statements) ? statements.length : 0).toBe(1)
+    })
   })
 
   describe('DIM Statement Errors', () => {

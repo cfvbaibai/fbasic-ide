@@ -274,6 +274,17 @@ When working with this codebase, follow these AI-specific instructions:
 - Ensure all tests pass before submitting changes
 - Use `beforeEach`/`afterEach` for proper test isolation
 
+#### Testing Details
+- **Running Specific Test Files**: Use `pnpm test:run <file-path>` (without `--` separator)
+  - ✅ Correct: `pnpm test:run test/executors/RestoreExecutor.test.ts`
+  - ❌ Incorrect: `pnpm test:run -- test/executors/RestoreExecutor.test.ts`
+- **Test Assertions**: Use `.toEqual()` for exact value matching instead of `.toContain()`
+  - ✅ Correct: `expect(outputs).toEqual('PRINT: Hello')`
+  - ❌ Incorrect: `expect(outputs).toContain('Hello')` (unless checking for substring is intentional)
+  - **Rationale**: `.toEqual()` provides precise verification and fails fast on mismatches, while `.toContain()` can hide partial matches and make debugging harder
+- **Test Filtering**: Use `-t` flag for filtering by test name pattern
+  - Example: `pnpm test:run -t "RestoreExecutor"`
+
 #### Lodash Usage Rules
 - **Use native methods** for simple operations: `.map()`, `.filter()`, `.forEach()`
 - **Use lodash** only for complex utilities: `isEmpty()`, `isNumber()`, `includes()`

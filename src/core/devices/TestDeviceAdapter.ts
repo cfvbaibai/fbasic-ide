@@ -144,7 +144,7 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
    */
   getAllOutputs(): string {
     return [
-      ...this.printOutputs.map(o => `PRINT: ${o}`),
+      ...this.printOutputs,
       ...this.debugOutputs.map(o => `DEBUG: ${o}`),
       ...this.errorOutputs.map(o => `ERROR: ${o}`)
     ].join('\n')

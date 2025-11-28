@@ -6,14 +6,14 @@
  */
 
 import type { CstNode } from 'chevrotain'
-import type { EvaluationContext } from '../../evaluation/ExpressionEvaluator'
+import { ExecutionContext } from '../../state/ExecutionContext'
 import { ExpressionEvaluator } from '../../evaluation/ExpressionEvaluator'
 import { getFirstCstNode, getFirstToken } from '../../parser/cst-helpers'
 import { ERROR_TYPES } from '../../constants'
 
 export class IfThenExecutor {
   constructor(
-    private context: EvaluationContext,
+    private context: ExecutionContext,
     private evaluator: ExpressionEvaluator
   ) {}
 
