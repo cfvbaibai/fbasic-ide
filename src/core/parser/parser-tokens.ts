@@ -42,6 +42,8 @@ export const Right = createToken({ name: 'Right', pattern: /\bRIGHT\$/i });
 export const Mid = createToken({ name: 'Mid', pattern: /\bMID\$/i });
 export const Str = createToken({ name: 'Str', pattern: /\bSTR\$/i });
 export const Hex = createToken({ name: 'Hex', pattern: /\bHEX\$/i });
+export const Chr = createToken({ name: 'Chr', pattern: /\bCHR\$/i });
+export const Asc = createToken({ name: 'Asc', pattern: /\bASC\b/i });
 
 // Arithmetic function keywords (must be before Identifier)
 // Family BASIC only supports: ABS, SGN, RND
@@ -133,7 +135,7 @@ export const allTokens = [
   // Keywords
   Let, Print, For, To, Step, Next, End, Rem, Pause, If, Then, Goto, Gosub, Return, On, Dim, Data, Read, Restore,
   // String functions (must come before Identifier)
-  Len, Left, Right, Mid, Str, Hex,
+  Len, Left, Right, Mid, Str, Hex, Chr, Asc,
   // Arithmetic functions (must come before Identifier)
   // Family BASIC only supports: ABS, SGN, RND, VAL
   Abs, Sgn, Rnd, Val,

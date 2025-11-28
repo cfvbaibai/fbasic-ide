@@ -70,6 +70,36 @@ describe('String Functions', () => {
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('X')?.value).toBe(10)
     })
+
+    it('should count spaces as characters per manual', async () => {
+      const code = '10 LET X = LEN("Hello World")'
+      const result = await interpreter.execute(code)
+      
+      expect(result.success).toBe(true)
+      expect(result.errors).toHaveLength(0)
+      // "Hello World" = 11 characters (including space)
+      expect(result.variables.get('X')?.value).toBe(11)
+    })
+
+    it('should count multiple spaces', async () => {
+      const code = '10 LET X = LEN("A  B")'
+      const result = await interpreter.execute(code)
+      
+      expect(result.success).toBe(true)
+      expect(result.errors).toHaveLength(0)
+      // "A  B" = 4 characters (A, space, space, B)
+      expect(result.variables.get('X')?.value).toBe(4)
+    })
+
+    it('should handle string with leading and trailing spaces', async () => {
+      const code = '10 LET X = LEN("  Hello  ")'
+      const result = await interpreter.execute(code)
+      
+      expect(result.success).toBe(true)
+      expect(result.errors).toHaveLength(0)
+      // "  Hello  " = 9 characters (2 spaces + Hello + 2 spaces)
+      expect(result.variables.get('X')?.value).toBe(9)
+    })
   })
 
   describe('LEFT$ function', () => {
@@ -80,6 +110,24 @@ describe('String Functions', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('A$')?.value).toBe('Hello')
+    })
+
+    it('should match manual example: LEFT$("HELLO", I) for I=1 to 5', async () => {
+      const code = `10 LET A$ = "HELLO"
+20 FOR I=1 TO 5
+30 LET B$ = LEFT$(A$, I)
+40 NEXT
+50 LET X$ = LEFT$(A$, 1)
+60 LET Y$ = LEFT$(A$, 2)
+70 LET Z$ = LEFT$(A$, 5)`
+      const result = await interpreter.execute(code)
+      
+      expect(result.success).toBe(true)
+      expect(result.errors).toHaveLength(0)
+      // Per manual page 84: LEFT$("HELLO", 1) = "H", LEFT$("HELLO", 2) = "HE", LEFT$("HELLO", 5) = "HELLO"
+      expect(result.variables.get('X$')?.value).toBe('H')
+      expect(result.variables.get('Y$')?.value).toBe('HE')
+      expect(result.variables.get('Z$')?.value).toBe('HELLO')
     })
 
     it('should return entire string if n is greater than string length', async () => {
@@ -140,6 +188,21 @@ describe('String Functions', () => {
       expect(result.variables.get('A$')?.value).toBe('World')
     })
 
+    it('should match manual example: RIGHT$("HELLO", I) for I=1 to 5', async () => {
+      const code = `10 LET A$ = "HELLO"
+20 LET X$ = RIGHT$(A$, 1)
+30 LET Y$ = RIGHT$(A$, 2)
+40 LET Z$ = RIGHT$(A$, 5)`
+      const result = await interpreter.execute(code)
+      
+      expect(result.success).toBe(true)
+      expect(result.errors).toHaveLength(0)
+      // Per manual page 84: RIGHT$("HELLO", 1) = "O", RIGHT$("HELLO", 2) = "LO", RIGHT$("HELLO", 5) = "HELLO"
+      expect(result.variables.get('X$')?.value).toBe('O')
+      expect(result.variables.get('Y$')?.value).toBe('LO')
+      expect(result.variables.get('Z$')?.value).toBe('HELLO')
+    })
+
     it('should return entire string if n is greater than string length', async () => {
       const code = '10 LET A$ = RIGHT$("Hi", 10)'
       const result = await interpreter.execute(code)
@@ -195,6 +258,21 @@ describe('String Functions', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('A$')?.value).toBe('World')
+    })
+
+    it('should match manual example: MID$("HIYA ", I, 1) for I=1 to 4', async () => {
+      const code = `10 LET A$ = "HIYA "
+20 LET X$ = MID$(A$, 1, 1)
+30 LET Y$ = MID$(A$, 2, 1)
+40 LET Z$ = MID$(A$, 4, 1)`
+      const result = await interpreter.execute(code)
+      
+      expect(result.success).toBe(true)
+      expect(result.errors).toHaveLength(0)
+      // Per manual page 85: MID$("HIYA ", 1, 1) = "H", MID$("HIYA ", 2, 1) = "I", MID$("HIYA ", 4, 1) = "A"
+      expect(result.variables.get('X$')?.value).toBe('H')
+      expect(result.variables.get('Y$')?.value).toBe('I')
+      expect(result.variables.get('Z$')?.value).toBe('A')
     })
 
     it('should use 1-based indexing', async () => {

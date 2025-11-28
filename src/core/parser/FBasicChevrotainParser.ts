@@ -23,7 +23,7 @@ import {
   // Keywords
   Let, Print, For, To, Step, Next, End, Pause, If, Then, Goto, Gosub, Return, On, Dim, Data, Read, Restore,
   // String functions
-  Len, Left, Right, Mid, Str, Hex,
+  Len, Left, Right, Mid, Str, Hex, Chr, Asc,
   // Arithmetic functions
   Abs, Sgn, Rnd, Val,
   // Controller input functions
@@ -108,7 +108,7 @@ class FBasicChevrotainParser extends CstParser {
 
     // FunctionCall = (StringFunction | ArithmeticFunction) LParen ExpressionList? RParen
     // Family BASIC arithmetic functions: ABS, SGN, RND, VAL
-    // String functions: LEN, LEFT$, RIGHT$, MID$, STR$, HEX$
+    // String functions: LEN, LEFT$, RIGHT$, MID$, STR$, HEX$, CHR$, ASC
     this.functionCall = this.RULE('functionCall', () => {
       this.OR([
         // String functions
@@ -118,6 +118,8 @@ class FBasicChevrotainParser extends CstParser {
         { ALT: () => this.CONSUME(Mid) },
         { ALT: () => this.CONSUME(Str) },
         { ALT: () => this.CONSUME(Hex) },
+        { ALT: () => this.CONSUME(Chr) },
+        { ALT: () => this.CONSUME(Asc) },
         // Arithmetic functions (Family BASIC only supports these)
         { ALT: () => this.CONSUME(Abs) },
         { ALT: () => this.CONSUME(Sgn) },
@@ -154,7 +156,7 @@ class FBasicChevrotainParser extends CstParser {
         {
           // Function call: String functions and arithmetic functions
           // Family BASIC arithmetic functions: ABS, SGN, RND, VAL
-          // String functions: LEN, LEFT$, RIGHT$, MID$, STR$, HEX$
+          // String functions: LEN, LEFT$, RIGHT$, MID$, STR$, HEX$, CHR$, ASC
           GATE: () => 
             this.LA(1).tokenType === Len ||
             this.LA(1).tokenType === Left ||
@@ -162,6 +164,8 @@ class FBasicChevrotainParser extends CstParser {
             this.LA(1).tokenType === Mid ||
             this.LA(1).tokenType === Str ||
             this.LA(1).tokenType === Hex ||
+            this.LA(1).tokenType === Chr ||
+            this.LA(1).tokenType === Asc ||
             this.LA(1).tokenType === Abs ||
             this.LA(1).tokenType === Sgn ||
             this.LA(1).tokenType === Rnd ||

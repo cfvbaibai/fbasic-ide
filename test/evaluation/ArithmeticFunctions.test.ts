@@ -47,6 +47,15 @@ describe('Arithmetic Functions', () => {
       // Numbers get leading space
       expect(deviceAdapter.getAllOutputs()).toEqual(' 0')
     })
+
+    it('should handle ABS with expression as per manual example', async () => {
+      const source = '10 LET X = ABS(10-34)\n20 PRINT X\n30 END'
+      const result = await interpreter.execute(source)
+      expect(result.success).toBe(true)
+      // ABS(10-34) = ABS(-24) = 24 per manual page 82
+      // Numbers get leading space
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 24')
+    })
   })
 
 

@@ -31,6 +31,9 @@ function toNumber(value: number | string | boolean | undefined): number {
  * Function Evaluator
  * 
  * Evaluates all BASIC functions: string functions, arithmetic functions, and controller input functions
+ * String functions: LEN, LEFT$, RIGHT$, MID$, STR$, HEX$, CHR$, ASC
+ * Arithmetic functions: ABS, SGN, RND, VAL
+ * Controller input functions: STICK, STRIG
  */
 export class FunctionEvaluator {
   constructor(
@@ -41,7 +44,7 @@ export class FunctionEvaluator {
   /**
    * Evaluate function call: String functions, arithmetic functions, and controller input functions
    * Family BASIC arithmetic functions: ABS, SGN, RND, VAL
-   * String functions: LEN, LEFT$, RIGHT$, MID$, STR$, HEX$
+   * String functions: LEN, LEFT$, RIGHT$, MID$, STR$, HEX$, CHR$, ASC
    * Controller input functions: STICK, STRIG
    */
   evaluateFunctionCall(cst: CstNode): number | string {
@@ -52,6 +55,8 @@ export class FunctionEvaluator {
     const midToken = getFirstToken(cst.children.Mid)
     const strToken = getFirstToken(cst.children.Str)
     const hexToken = getFirstToken(cst.children.Hex)
+    const chrToken = getFirstToken(cst.children.Chr)
+    const ascToken = getFirstToken(cst.children.Asc)
     const absToken = getFirstToken(cst.children.Abs)
     const sgnToken = getFirstToken(cst.children.Sgn)
     const rndToken = getFirstToken(cst.children.Rnd)
@@ -88,6 +93,12 @@ export class FunctionEvaluator {
     }
     if (hexToken) {
       return this.evaluateHex(args)
+    }
+    if (chrToken) {
+      return this.evaluateChr(args)
+    }
+    if (ascToken) {
+      return this.evaluateAsc(args)
     }
 
     // Arithmetic functions
@@ -227,6 +238,54 @@ export class FunctionEvaluator {
     
     // Convert to hexadecimal string (uppercase, no prefix)
     return value.toString(16).toUpperCase()
+  }
+
+  /**
+   * CHR$(x) - converts character code to character
+   * Input range: 0 to 255
+   * Returns single character string
+   * Per manual page 83: "Yields a character as a character code from a numerical value"
+   */
+  private evaluateChr(args: Array<number | string>): string {
+    if (args.length !== 1) {
+      throw new Error('CHR$ function requires exactly 1 argument')
+    }
+    const num = toNumber(args[0] ?? 0)
+    
+    // Clamp to valid range (0 to 255)
+    let charCode = Math.trunc(num)
+    if (charCode < 0) charCode = 0
+    if (charCode > 255) charCode = 255
+    
+    // Convert character code to character
+    return String.fromCharCode(charCode)
+  }
+
+  /**
+   * ASC(string) - converts first character of string to character code
+   * Returns integer from 0 to 255
+   * Per manual page 83: "The character code of the first character of the character string becomes the value of this function"
+   * "Also, when the character string is a null string, 0 becomes the value of this function"
+   */
+  private evaluateAsc(args: Array<number | string>): number {
+    if (args.length !== 1) {
+      throw new Error('ASC function requires exactly 1 argument')
+    }
+    const str = String(args[0] ?? '')
+    
+    // If empty string, return 0
+    if (str.length === 0) {
+      return 0
+    }
+    
+    // Get character code of first character
+    const charCode = str.charCodeAt(0)
+    
+    // Clamp to valid range (0 to 255)
+    if (charCode < 0) return 0
+    if (charCode > 255) return 255
+    
+    return charCode
   }
 
   // ============================================================================

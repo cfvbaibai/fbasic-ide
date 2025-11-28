@@ -9291,6 +9291,8 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
   var Mid = createToken({ name: "Mid", pattern: /\bMID\$/i });
   var Str = createToken({ name: "Str", pattern: /\bSTR\$/i });
   var Hex = createToken({ name: "Hex", pattern: /\bHEX\$/i });
+  var Chr = createToken({ name: "Chr", pattern: /\bCHR\$/i });
+  var Asc = createToken({ name: "Asc", pattern: /\bASC\b/i });
   var Abs = createToken({ name: "Abs", pattern: /\bABS\b/i });
   var Sgn = createToken({ name: "Sgn", pattern: /\bSGN\b/i });
   var Rnd = createToken({ name: "Rnd", pattern: /\bRND\b/i });
@@ -9379,6 +9381,8 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     Mid,
     Str,
     Hex,
+    Chr,
+    Asc,
     // Arithmetic functions (must come before Identifier)
     // Family BASIC only supports: ABS, SGN, RND, VAL
     Abs,
@@ -9460,6 +9464,8 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           { ALT: () => this.CONSUME(Mid) },
           { ALT: () => this.CONSUME(Str) },
           { ALT: () => this.CONSUME(Hex) },
+          { ALT: () => this.CONSUME(Chr) },
+          { ALT: () => this.CONSUME(Asc) },
           // Arithmetic functions (Family BASIC only supports these)
           { ALT: () => this.CONSUME(Abs) },
           { ALT: () => this.CONSUME(Sgn) },
@@ -12476,7 +12482,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     /**
      * Evaluate function call: String functions, arithmetic functions, and controller input functions
      * Family BASIC arithmetic functions: ABS, SGN, RND, VAL
-     * String functions: LEN, LEFT$, RIGHT$, MID$, STR$, HEX$
+     * String functions: LEN, LEFT$, RIGHT$, MID$, STR$, HEX$, CHR$, ASC
      * Controller input functions: STICK, STRIG
      */
     evaluateFunctionCall(cst) {
@@ -12486,6 +12492,8 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       const midToken = getFirstToken(cst.children.Mid);
       const strToken = getFirstToken(cst.children.Str);
       const hexToken = getFirstToken(cst.children.Hex);
+      const chrToken = getFirstToken(cst.children.Chr);
+      const ascToken = getFirstToken(cst.children.Asc);
       const absToken = getFirstToken(cst.children.Abs);
       const sgnToken = getFirstToken(cst.children.Sgn);
       const rndToken = getFirstToken(cst.children.Rnd);
@@ -12517,6 +12525,12 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       }
       if (hexToken) {
         return this.evaluateHex(args);
+      }
+      if (chrToken) {
+        return this.evaluateChr(args);
+      }
+      if (ascToken) {
+        return this.evaluateAsc(args);
       }
       if (absToken) {
         return this.evaluateAbs(args);
@@ -12632,6 +12646,41 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       if (value < 0) value = 0;
       if (value > 65535) value = 65535;
       return value.toString(16).toUpperCase();
+    }
+    /**
+     * CHR$(x) - converts character code to character
+     * Input range: 0 to 255
+     * Returns single character string
+     * Per manual page 83: "Yields a character as a character code from a numerical value"
+     */
+    evaluateChr(args) {
+      if (args.length !== 1) {
+        throw new Error("CHR$ function requires exactly 1 argument");
+      }
+      const num = toNumber2(args[0] ?? 0);
+      let charCode = Math.trunc(num);
+      if (charCode < 0) charCode = 0;
+      if (charCode > 255) charCode = 255;
+      return String.fromCharCode(charCode);
+    }
+    /**
+     * ASC(string) - converts first character of string to character code
+     * Returns integer from 0 to 255
+     * Per manual page 83: "The character code of the first character of the character string becomes the value of this function"
+     * "Also, when the character string is a null string, 0 becomes the value of this function"
+     */
+    evaluateAsc(args) {
+      if (args.length !== 1) {
+        throw new Error("ASC function requires exactly 1 argument");
+      }
+      const str = String(args[0] ?? "");
+      if (str.length === 0) {
+        return 0;
+      }
+      const charCode = str.charCodeAt(0);
+      if (charCode < 0) return 0;
+      if (charCode > 255) return 255;
+      return charCode;
     }
     // ============================================================================
     // Arithmetic Functions
