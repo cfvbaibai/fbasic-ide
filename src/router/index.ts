@@ -11,6 +11,16 @@ const routes: RouteRecordRaw[] = [
     path: '/monaco',
     name: 'MonacoEditor',
     component: () => import('../views/MonacoEditorPage.vue')
+  },
+  {
+    path: '/image-analyzer',
+    name: 'ImageAnalyzer',
+    component: () => import('../views/ImageAnalyzerPage.vue')
+  },
+  {
+    path: '/character-sprite-viewer',
+    name: 'CharacterSpriteViewer',
+    component: () => import('../views/CharacterSpriteViewerPage.vue')
   }
 ];
 
