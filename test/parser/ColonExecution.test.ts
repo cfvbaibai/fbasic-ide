@@ -92,7 +92,8 @@ describe('Colon-Separated Statement Execution', () => {
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('A')?.value).toBe(5)
       expect(printOutputMock).toHaveBeenCalledTimes(1)
-      expect(printOutputMock).toHaveBeenCalledWith('5')
+      // Numbers always have a leading space (sign position) regardless of separator
+      expect(printOutputMock).toHaveBeenCalledWith(' 5')
     })
 
     it('should execute multiple mixed statements', async () => {
@@ -104,8 +105,9 @@ describe('Colon-Separated Statement Execution', () => {
       expect(result.variables.get('A')?.value).toBe(5)
       expect(result.variables.get('B')?.value).toBe(10)
       expect(printOutputMock).toHaveBeenCalledTimes(2)
-      expect(printOutputMock).toHaveBeenNthCalledWith(1, '5')
-      expect(printOutputMock).toHaveBeenNthCalledWith(2, '10')
+      // Numbers always have a leading space (sign position) regardless of separator
+      expect(printOutputMock).toHaveBeenNthCalledWith(1, ' 5')
+      expect(printOutputMock).toHaveBeenNthCalledWith(2, ' 10')
     })
 
     it('should use variables set earlier in the same line', async () => {
@@ -117,7 +119,8 @@ describe('Colon-Separated Statement Execution', () => {
       expect(result.variables.get('X')?.value).toBe(10)
       expect(result.variables.get('Y')?.value).toBe(15)
       expect(printOutputMock).toHaveBeenCalledTimes(1)
-      expect(printOutputMock).toHaveBeenCalledWith('15')
+      // Numbers always have a leading space (sign position) regardless of separator
+      expect(printOutputMock).toHaveBeenCalledWith(' 15')
     })
   })
 

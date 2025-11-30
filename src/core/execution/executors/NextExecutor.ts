@@ -5,9 +5,7 @@
  */
 
 import type { CstNode } from 'chevrotain'
-import type { LoopState } from '../../state/ExecutionContext'
 import { VariableService } from '../../services/VariableService'
-import { getFirstToken } from '../../parser/cst-helpers'
 import { ERROR_TYPES } from '../../constants'
 
 import { ExecutionContext } from '../../state/ExecutionContext'

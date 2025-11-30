@@ -18,11 +18,6 @@ export class LetExecutor {
    * Supports: LET X = 5, LET A(0) = 10, LET A$(I, J) = "Hello"
    */
   execute(letStmtCst: CstNode): void {
-    const expressionCst = getFirstCstNode(letStmtCst.children.expression)
-    if (!expressionCst) {
-      throw new Error('Invalid LET statement: missing expression')
-    }
-
     // Check if this is an array assignment or simple variable assignment
     const arrayAccessCst = getFirstCstNode(letStmtCst.children.arrayAccess)
     
@@ -33,6 +28,11 @@ export class LetExecutor {
       
       if (!identifierToken || !expressionListCst) {
         throw new Error('Invalid LET statement: invalid array access')
+      }
+
+      const expressionCst = getFirstCstNode(letStmtCst.children.expression)
+      if (!expressionCst) {
+        throw new Error('Invalid LET statement: missing expression')
       }
 
       const arrayName = identifierToken.image.toUpperCase()
@@ -60,9 +60,18 @@ export class LetExecutor {
       }
     } else {
       // Simple variable assignment: LET X = value
+      // Check for both identifier and expression to provide better error messages
       const identifierToken = getFirstToken(letStmtCst.children.Identifier)
+      const expressionCst = getFirstCstNode(letStmtCst.children.expression)
+      
+      if (!identifierToken && !expressionCst) {
+        throw new Error('Invalid LET statement: missing identifier or expression')
+      }
       if (!identifierToken) {
-        throw new Error('Invalid LET statement: missing identifier')
+        throw new Error('Invalid LET statement: missing identifier or expression')
+      }
+      if (!expressionCst) {
+        throw new Error('Invalid LET statement: missing identifier or expression')
       }
 
       const varName = identifierToken.image.toUpperCase()

@@ -150,11 +150,11 @@ The grid contains various alphanumeric codes arranged in patterns:
 - **Row 18:** Bottom border with K50 (solid wall)
 - **Rows 19-20:** Empty (below visible area)
 
-**Note:** The flags (A01, A11, A21, A31) are visual indicators. In the program, collectible flags use character code CHR$(199) which is placed at specific locations and detected using the `SCR$` function.
+**Note:** The flags (A01, A11, A21, A31) are visual indicators. In the program, collectible flags use character code ``CHR$(199)``, which is placed at specific locations and detected using the `SCR$` function.
 
 **Data Entry:**
 
-Enter the character codes in BG GRAPHIC mode to create the background screen for the SCR$ sample program. The grid shows a maze-like structure with brick walls (K50), open paths (A00), and flag markers (A01, A11, A21, A31) indicating where collectible flags should be placed using CHR$(199) in the program.
+Enter the character codes in BG GRAPHIC mode to create the background screen for the ``SCR$`` sample program. The grid shows a maze-like structure with brick walls (K50), open paths (A00), and flag markers (A01, A11, A21, A31) indicating where collectible flags should be placed using ``CHR$(199)`` in the program.
 
 ---
 

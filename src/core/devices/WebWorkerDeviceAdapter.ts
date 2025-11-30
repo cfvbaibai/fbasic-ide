@@ -5,8 +5,6 @@
  * Merges WebWorkerManager functionality for unified web worker communication.
  */
 
-/* global Worker, NodeJS, navigator, self, clearTimeout */
-
 import type { 
   BasicDeviceAdapter,
   InterpreterConfig, 
@@ -241,7 +239,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   /**
    * Send a message to the web worker
    */
-  sendMessage(message: any): void {
+  sendMessage(message: AnyServiceWorkerMessage): void {
     if (this.worker) {
       this.worker.postMessage(message)
     }

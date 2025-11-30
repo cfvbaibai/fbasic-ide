@@ -27,7 +27,7 @@ Selects which characters from character table A (back cover) and B (p. 113) such
 - **Character table A:** Mario and other animated characters
 - **Character table B:** Background patterns including alphanumerics, symbols and kana
 
-*Please refer to the character code list from p. 106 to 109.*
+*Please refer to the character code list from p. [106](page-106.md) to [109](page-109.md).*
 
 **Allocation Table**
 

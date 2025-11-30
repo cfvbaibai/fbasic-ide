@@ -26,7 +26,7 @@
 import { ref, onUnmounted } from 'vue'
 import { FBasicParser } from '../../../core/parser/FBasicParser'
 import { getSampleCode } from '../../../core/samples/sampleCodes'
-import type { ExecutionResult, ParserInfo, HighlighterInfo, BasicVariable, AnyServiceWorkerMessage, ResultMessage, ErrorMessage } from '../../../core/interfaces'
+import type { ExecutionResult, ParserInfo, HighlighterInfo, BasicVariable, AnyServiceWorkerMessage, ResultMessage, ErrorMessage, OutputMessage, ProgressMessage } from '../../../core/interfaces'
 import { EXECUTION_LIMITS } from '../../../core/constants'
 
 /**
@@ -213,7 +213,8 @@ export function useBasicIde() {
   }
 
   const handleOutputMessage = (message: AnyServiceWorkerMessage): void => {
-    const { output: outputText, outputType } = (message as any).data
+    if (message.type !== 'OUTPUT') return
+    const { output: outputText, outputType } = (message as OutputMessage).data
     console.log('📤 [COMPOSABLE] Handling output:', outputType, outputText)
     
     if (outputType === 'print') {
@@ -261,7 +262,8 @@ export function useBasicIde() {
   }
 
   const handleProgressMessage = (message: AnyServiceWorkerMessage): void => {
-    const { iterationCount, currentStatement } = (message as any).data
+    if (message.type !== 'PROGRESS') return
+    const { iterationCount, currentStatement } = (message as ProgressMessage).data
     console.log('🔄 [COMPOSABLE] Progress:', iterationCount, currentStatement)
     // Could emit progress events here if needed
   }

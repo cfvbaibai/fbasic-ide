@@ -47,6 +47,14 @@ export default [
         },
     },
     {
-        ignores: ['dist', 'node_modules', '*.config.js', '**/*.vue'],
+        ignores: [
+            'dist',
+            'node_modules',
+            '*.config.js',
+            '**/*.vue',
+            'public/**/*.js',
+            'scripts/**/*.ts',
+            'vite.config.ts'
+        ],
     },
 ]

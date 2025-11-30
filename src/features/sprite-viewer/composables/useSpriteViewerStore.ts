@@ -1,4 +1,4 @@
-import { ref, computed, provide, inject, reactive, type InjectionKey } from 'vue'
+import { ref, computed, provide, inject, type InjectionKey } from 'vue'
 import { CHARACTER_SPRITES, type SpriteDefinition } from '../../../shared/data/sprites'
 import { useSpriteAnimation } from './useSpriteAnimation'
 import { useSpriteDisplay } from './useSpriteDisplay'

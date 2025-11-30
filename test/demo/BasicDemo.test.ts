@@ -69,8 +69,9 @@ describe('Family Basic IDE Demo Program', () => {
     expect(calls[0]).toBe('Basic F-Basic Program')
     
     // Second PRINT statement with semicolon separator
-    // PRINT "A + B ="; C where C=30 outputs "A + B = 30" (semicolon concatenates, number gets leading space)
-    expect(calls[1]).toEqual('A + B = 30')
+    // PRINT "A + B = "; C where C=30 outputs "A + B =  30" 
+    // (string has trailing space, number has leading space for sign position)
+    expect(calls[1]).toEqual('A + B =  30')
     
     // Verify variable values
     expect(result.variables.get('A')?.value).toBe(10)
@@ -89,7 +90,8 @@ describe('Family Basic IDE Demo Program', () => {
     expect(printOutputMock).toHaveBeenCalledTimes(2)
     
     // Verify semicolon concatenation (no space/newline between items)
-    // PRINT "I="; I where I=1 outputs "I= 1" (semicolon concatenates, number gets leading space)
+    // PRINT "I="; I where I=1 outputs "I= 1" 
+    // (semicolon concatenates immediately, number has leading space for sign position)
     const calls = printOutputMock.mock.calls.map(call => call[0])
     expect(calls[0]).toEqual('I= 1')
     expect(calls[1]).toEqual('I= 2')
