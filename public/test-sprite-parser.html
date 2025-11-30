@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Character Table Parser POC Test</title>
+  <style>
+    body {
+      font-family: monospace;
+      padding: 20px;
+      background: #1e1e1e;
+      color: #d4d4d4;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: #4ec9b0;
+    }
+    .controls {
+      margin: 20px 0;
+    }
+    button {
+      background: #007acc;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin: 5px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    button:hover {
+      background: #005a9e;
+    }
+    button:disabled {
+      background: #555;
+      cursor: not-allowed;
+    }
+    .output {
+      background: #252526;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 20px 0;
+      white-space: pre-wrap;
+      font-size: 12px;
+      max-height: 600px;
+      overflow-y: auto;
+    }
+    .tile-visualization {
+      display: inline-block;
+      margin: 10px;
+      padding: 10px;
+      background: #2d2d30;
+      border: 1px solid #3e3e42;
+    }
+    .tile-title {
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #4ec9b0;
+    }
+    .tile-content {
+      font-family: 'Courier New', monospace;
+      line-height: 1;
+      font-size: 14px;
+    }
+    .error {
+      color: #f48771;
+    }
+    .success {
+      color: #4ec9b0;
+    }
+    input[type="file"] {
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Character Table Sprite Parser - POC Test</h1>
+    
+    <div class="controls">
+      <input type="file" id="imageInput" accept="image/png,image/jpeg">
+      <button id="testBtn" disabled>Extract Sprites</button>
+      <button id="clearBtn">Clear Output</button>
+    </div>
+    
+    <div id="output" class="output">Select an image file to begin...</div>
+  </div>
+
+  <script type="module">
+    // Import the parser functions
+    // Note: In a real setup, these would be imported from the built modules
+    // For POC, we'll load them dynamically
+    
+    const output = document.getElementById('output');
+    const imageInput = document.getElementById('imageInput');
+    const testBtn = document.getElementById('testBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    
+    function log(message, type = 'info') {
+      const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : 'ℹ️';
+      output.textContent += `${prefix} ${message}\n`;
+      output.scrollTop = output.scrollHeight;
+    }
+    
+    function clearOutput() {
+      output.textContent = '';
+    }
+    
+    clearBtn.addEventListener('click', clearOutput);
+    
+    imageInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files.length > 0) {
+        testBtn.disabled = false;
+        log(`Image selected: ${e.target.files[0].name}`);
+      } else {
+        testBtn.disabled = true;
+      }
+    });
+    
+    testBtn.addEventListener('click', async () => {
+      const file = imageInput.files[0];
+      if (!file) {
+        log('Please select an image file first', 'error');
+        return;
+      }
+      
+      clearOutput();
+      log('Starting sprite extraction...');
+      log(`Image: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`);
+      
+      try {
+        // Load the parser module
+        // For now, we'll use a simplified inline version for testing
+        log('Loading parser module...');
+        
+        // Create image element
+        const img = new Image();
+        const imageUrl = URL.createObjectURL(file);
+        
+        img.onload = async () => {
+          try {
+            log(`Image loaded: ${img.width}x${img.height} pixels`);
+            
+            // Create canvas
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            log('Image data extracted');
+            
+            // For POC, we'll extract a simple test region
+            log('\n--- Testing Sprite Extraction ---');
+            log('Note: Full parser implementation requires module imports');
+            log('This is a simplified browser test');
+            
+            // Show sample pixel data
+            const sampleX = 0;
+            const sampleY = 0;
+            const sampleSize = 16;
+            
+            log(`\nSample region (${sampleX}, ${sampleY}) - ${sampleSize}x${sampleSize} pixels:`);
+            
+            // Extract sample region
+            const sampleData = ctx.getImageData(sampleX, sampleY, sampleSize, sampleSize);
+            log(`Sample region extracted: ${sampleData.width}x${sampleData.height}`);
+            
+            // Show pixel statistics
+            let transparent = 0;
+            let opaque = 0;
+            const colors = new Set();
+            
+            for (let i = 0; i < sampleData.data.length; i += 4) {
+              const r = sampleData.data[i];
+              const g = sampleData.data[i + 1];
+              const b = sampleData.data[i + 2];
+              const a = sampleData.data[i + 3];
+              
+              if (a < 128) {
+                transparent++;
+              } else {
+                opaque++;
+                colors.add(`${r},${g},${b}`);
+              }
+            }
+            
+            log(`\nPixel Statistics:`);
+            log(`  Transparent pixels: ${transparent}`);
+            log(`  Opaque pixels: ${opaque}`);
+            log(`  Unique colors: ${colors.size}`);
+            
+            log('\n✅ Basic image processing test completed!');
+            log('\nNext: Import full parser module to extract sprites');
+            
+            URL.revokeObjectURL(imageUrl);
+          } catch (error) {
+            log(`Error: ${error.message}`, 'error');
+            console.error(error);
+          }
+        };
+        
+        img.onerror = () => {
+          log('Failed to load image', 'error');
+          URL.revokeObjectURL(imageUrl);
+        };
+        
+        img.src = imageUrl;
+        
+      } catch (error) {
+        log(`Error: ${error.message}`, 'error');
+        console.error(error);
+      }
+    });
+  </script>
+</body>
+</html>
+

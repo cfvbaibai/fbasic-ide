@@ -5,22 +5,22 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/',
     name: 'Home',
-    component: () => import('../views/HomePage.vue')
+    component: () => import('../features/ide/HomePage.vue')
   },
   {
     path: '/monaco',
     name: 'MonacoEditor',
-    component: () => import('../views/MonacoEditorPage.vue')
+    component: () => import('../features/ide/MonacoEditorPage.vue')
   },
   {
     path: '/image-analyzer',
     name: 'ImageAnalyzer',
-    component: () => import('../views/ImageAnalyzerPage.vue')
+    component: () => import('../features/image-analyzer/ImageAnalyzerPage.vue')
   },
   {
     path: '/character-sprite-viewer',
     name: 'CharacterSpriteViewer',
-    component: () => import('../views/CharacterSpriteViewerPage.vue')
+    component: () => import('../features/sprite-viewer/CharacterSpriteViewerPage.vue')
   }
 ];
 

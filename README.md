@@ -256,7 +256,6 @@ When working with this codebase, follow these AI-specific instructions:
 #### File Size Management
 - **Never exceed 300 lines** in any `.ts` file
 - If approaching limit, extract functionality to focused modules
-- Use CST-based patterns for parsing and execution
 
 #### Constant Usage
 - **Always use constants** from `constants.ts` instead of magic values
@@ -318,13 +317,14 @@ When working with this codebase, follow these AI-specific instructions:
 - **Test coverage** - run `pnpm test:run` to ensure all tests pass
 
 ### Development Workflow
-1. **Read existing code** to understand CST-based patterns and structure
-2. **Check constants.ts** for existing constants before adding new ones
-3. **Follow CST patterns** - use parser and CST nodes directly for execution
-4. **Write tests first** for new functionality
-5. **Run quality checks** before submitting changes
-6. **Maintain file size limits** by extracting to focused modules when needed
-7. **Keep core DOM-free** - place UI integrations in `integrations/` folder
+- **Read Family BASIC Manual** - Read the manual under `docs/FamilyBasicManual` folder
+- **Read existing code** to understand CST-based patterns and structure
+- **Check constants.ts** for existing constants before adding new ones
+- **Follow CST patterns** - use parser and CST nodes directly for execution
+- **Write tests first** for new functionality
+- **Run quality checks** before submitting changes
+- **Maintain file size limits** by extracting to focused modules when needed
+- **Keep core DOM-free** - place UI integrations in `integrations/` folder
 
 ### Common Patterns
 - **Interpreter Methods**: Use CST-based execution with executor pattern
@@ -366,7 +366,6 @@ The project uses a **Concrete Syntax Tree (CST)** based approach for parsing and
 #### Execution Flow
 1. **Source Code** → Chevrotain parser generates CST
 2. **CST** → Executors process CST nodes directly
-3. **No Conversion** → Execution happens directly on CST structure
 
 ### Benefits
 - **Simplicity**: No AST conversion step - direct execution from parser output
@@ -417,40 +416,6 @@ pnpm type-check   # Run TypeScript compiler
 3. **Write BASIC code**: Use the code editor on the left
 4. **Run code**: Click the "Run" button to execute
 5. **View output**: See results in the runtime output panel
-
----
-
-## 📚 Supported F-BASIC Features
-
-### Current Implementation
-- ✅ **PRINT** - Output text and variables
-- ✅ **LET** - Variable assignment (numbers and strings)
-- ✅ **Variables** - Numeric and string variables
-- ✅ **Expressions** - Basic arithmetic operations (+, -, *, /)
-- ✅ **Error Handling** - Comprehensive error reporting with line numbers
-- ✅ **CST-Based Parser** - TypeScript-native parser using Chevrotain
-- ✅ **Monaco Editor Integration** - Syntax highlighting and live error checking
-- ✅ **Line-by-Line Parsing** - Leverages F-BASIC's strict line structure
-
-### In Progress (Parser Migration)
-The parser is being migrated from PEG.js to Chevrotain. Currently implemented:
-- **LET** and **PRINT** statements with basic arithmetic expressions
-
-### Planned Features (To be re-implemented with Chevrotain)
-- 🔄 **FOR/NEXT** - Loop structures with STEP support
-- 🔄 **IF/THEN** - Conditional statements with all comparison operators
-- 🔄 **GOTO** - Jump statements with line number support
-- 🔄 **END** - Program termination
-- 🔄 **Mathematical Functions** - ABS, SQR, SIN, COS, TAN, ATN, LOG, EXP, INT, FIX, SGN, RND
-- 🔄 **String Operations** - Concatenation and comparison
-- 🔄 **Arrays** - Multi-dimensional arrays
-- 🔄 **Subroutines** - GOSUB/RETURN
-- 🔄 **Input** - User input statements
-- 🔄 **Data/Read** - Data storage and retrieval
-
-### Future Enhancements
-- 🔄 **Graphics** - Sprite and background rendering
-- 🔄 **File I/O** - Save and load programs
 
 ---
 
