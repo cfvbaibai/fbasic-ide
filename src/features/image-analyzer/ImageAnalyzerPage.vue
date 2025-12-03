@@ -13,6 +13,7 @@ const adjustedCellSize = ref<number>(0)
 const gridOffsetX = ref<number>(0)
 const gridOffsetY = ref<number>(0)
 const hasAnalyzed = ref<boolean>(false)
+const generatedArray = ref<string>('')
 
 // Calculate display dimensions - scale up if image is less than 800px wide
 const displayWidth = computed(() => {
@@ -150,6 +151,150 @@ const getGridLineColor = (i: number): string => {
     return isDark ? '#ff6666' : '#ff0000'
   }
 }
+
+// Color mapping: black=0, white=1, red=2, blue=3
+const classifyColor = (r: number, g: number, b: number): number => {
+  // Calculate luminance for black/white detection
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+  
+  // Check if it's blue FIRST (before black/white check, as blue can have low luminance)
+  // Blue: high blue component relative to red and green
+  if (b > r * 1.3 && b > g * 1.3 && b > 80) {
+    return 3 // blue
+  }
+  
+  // Check if it's red (high red, low green and blue)
+  if (r > g * 1.5 && r > b * 1.5 && r > 100) {
+    return 2 // red
+  }
+  
+  // Check if it's white (high luminance, low saturation)
+  if (luminance > 0.7) {
+    const max = Math.max(r, g, b)
+    const min = Math.min(r, g, b)
+    const saturation = max === 0 ? 0 : (max - min) / max
+    if (saturation < 0.3) {
+      return 1 // white
+    }
+  }
+  
+  // Check if it's black (low luminance, and not blue/red)
+  if (luminance < 0.3) {
+    return 0 // black
+  }
+  
+  // Default: classify by dominant color
+  if (b > r && b > g && b > 50) return 3 // blue
+  if (r > g && r > b && r > 50) return 2 // red
+  if (luminance > 0.5) return 1 // white
+  return 0 // black
+}
+
+const generateArray = async () => {
+  if (!imageUrl.value || !hasAnalyzed.value) return
+  
+  try {
+    const img = new Image()
+    img.src = imageUrl.value
+    
+    await new Promise<void>((resolve, reject) => {
+      img.onload = () => resolve()
+      img.onerror = reject
+    })
+    
+    // Create canvas to sample pixels
+    const canvas = document.createElement('canvas')
+    canvas.width = img.width
+    canvas.height = img.height
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    
+    ctx.drawImage(img, 0, 0)
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+    
+    // Generate 4 separate 8x8 arrays (one for each quadrant of the 16x16 grid)
+    const gridSize = 8
+    const arrays: number[][][] = [[], [], [], []]
+    
+    // Generate array for each quadrant
+    for (let quadrant = 0; quadrant < 4; quadrant++) {
+      const quadrantRow = Math.floor(quadrant / 2) // 0 or 1
+      const quadrantCol = quadrant % 2 // 0 or 1
+      
+      for (let row = 0; row < gridSize; row++) {
+        const rowArray: number[] = []
+        for (let col = 0; col < gridSize; col++) {
+          // Calculate cell position in the 16x16 grid
+          const globalRow = quadrantRow * gridSize + row
+          const globalCol = quadrantCol * gridSize + col
+          
+          // Calculate cell boundaries in original image coordinates
+          const cellStartX = gridOffsetX.value + globalCol * adjustedCellSize.value
+          const cellStartY = gridOffsetY.value + globalRow * adjustedCellSize.value
+          
+          // Sample pixels in the cell (sample center and corners)
+          const samplePoints = [
+            [cellStartX + adjustedCellSize.value / 2, cellStartY + adjustedCellSize.value / 2], // center
+            [cellStartX + adjustedCellSize.value * 0.25, cellStartY + adjustedCellSize.value * 0.25], // top-left
+            [cellStartX + adjustedCellSize.value * 0.75, cellStartY + adjustedCellSize.value * 0.25], // top-right
+            [cellStartX + adjustedCellSize.value * 0.25, cellStartY + adjustedCellSize.value * 0.75], // bottom-left
+            [cellStartX + adjustedCellSize.value * 0.75, cellStartY + adjustedCellSize.value * 0.75], // bottom-right
+          ]
+          
+          const colors: number[] = []
+          for (const point of samplePoints) {
+            const x = point[0] ?? 0
+            const y = point[1] ?? 0
+            const pixelX = Math.floor(Math.max(0, Math.min(x, imageWidth.value - 1)))
+            const pixelY = Math.floor(Math.max(0, Math.min(y, imageHeight.value - 1)))
+            const index = (pixelY * imageWidth.value + pixelX) * 4
+            
+            if (index + 2 >= imageData.data.length) continue
+            
+            const r = imageData.data[index] ?? 0
+            const g = imageData.data[index + 1] ?? 0
+            const b = imageData.data[index + 2] ?? 0
+            
+            colors.push(classifyColor(r, g, b))
+          }
+          
+          // Use most common color in the cell, default to 0 if no samples
+          if (colors.length === 0) {
+            rowArray.push(0)
+          } else {
+            const colorCounts = [0, 0, 0, 0]
+            colors.forEach(color => {
+              const colorIndex = typeof color === 'number' && color >= 0 && color <= 3 ? color : 0
+              if (colorCounts[colorIndex] !== undefined) {
+                colorCounts[colorIndex]++
+              }
+            })
+            const maxCount = Math.max(...colorCounts)
+            const dominantColor = colorCounts.indexOf(maxCount)
+            rowArray.push(dominantColor >= 0 ? dominantColor : 0)
+          }
+        }
+        const quadrantArray = arrays[quadrant]
+        if (quadrantArray) {
+          quadrantArray.push(rowArray)
+        }
+      }
+    }
+    
+    // Format as 4 separate const declarations
+    const arrayStrings = arrays.map((array, index) => {
+      if (!array) return ''
+      const arrayString = array.map(row => `  [${row?.join(',') ?? ''}]`).join(',\n')
+      const tileNames = ['_0', '_1', '_2', '_3']
+      return `const SPRITE_ARRAY${tileNames[index]} = [\n${arrayString}\n]`
+    }).filter(str => str !== '')
+    
+    generatedArray.value = arrayStrings.join('\n\n')
+  } catch (error) {
+    console.error('Error generating array:', error)
+    generatedArray.value = 'Error generating array'
+  }
+}
 </script>
 
 <template>
@@ -217,6 +362,9 @@ const getGridLineColor = (i: number): string => {
               <el-button :icon="ArrowLeft" @click="moveGridLeft" title="Move grid left" />
               <el-button :icon="ArrowRight" @click="moveGridRight" title="Move grid right" />
             </el-button-group>
+            <el-button size="small" @click="generateArray" title="Generate 8x8 array">
+              G
+            </el-button>
           </div>
         </div>
         <div class="grid-overlay-container">
@@ -269,6 +417,16 @@ const getGridLineColor = (i: number): string => {
               />
             </svg>
           </div>
+        </div>
+        <div v-if="generatedArray" class="generated-array-section">
+          <h3 class="array-title">Generated 8x8 Array</h3>
+          <el-input
+            v-model="generatedArray"
+            type="textarea"
+            :rows="12"
+            readonly
+            class="array-textarea"
+          />
         </div>
       </div>
     </div>
@@ -405,6 +563,33 @@ const getGridLineColor = (i: number): string => {
   --grid-color-middle: #66ff66;
   --grid-color-semi-middle: #6666ff;
   --grid-color-regular: #ff6666;
+}
+
+.generated-array-section {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--app-border-color-light);
+}
+
+.array-title {
+  margin: 0 0 1rem 0;
+  color: var(--app-text-color-primary);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.array-textarea {
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+}
+
+.array-textarea :deep(.el-textarea__inner) {
+  background: var(--app-bg-color);
+  color: var(--app-text-color-primary);
+  border: 1px solid var(--app-border-color-light);
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  line-height: 1.5;
 }
 </style>
 
