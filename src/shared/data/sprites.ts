@@ -18,7 +18,7 @@ import { SMILEY_SPRITES } from "./characters/smiley"
 import { SPINNER_SPRITES } from "./characters/spinner"
 import { STARKILLER_SPRITES } from "./characters/star-killer"
 import { STARSHIP_SPRITES } from "./characters/starship"
-import type { SpriteDefinition } from "./characters/types"
+import type { SpriteDefinition, Tile } from "./characters/types"
 
 export const CHARACTER_SPRITES: SpriteDefinition[] = [
   ...MARIO_SPRITES,
@@ -43,3 +43,5 @@ export const CHARACTER_SPRITES: SpriteDefinition[] = [
   ...NUMBER_SPRITES,
   ...COMPUTEROPERATOR_SPRITES,
 ]
+
+export const TILE_LIST: Tile[] = CHARACTER_SPRITES.flatMap(sprite => sprite.tiles as Tile[])

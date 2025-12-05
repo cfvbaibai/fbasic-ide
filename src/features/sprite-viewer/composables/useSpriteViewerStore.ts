@@ -4,11 +4,12 @@ import type { SpriteDefinition } from '@/shared/data/characters/types'
 import { useSpriteAnimation } from './useSpriteAnimation'
 import { useSpriteDisplay } from './useSpriteDisplay'
 import { usePaletteSelection } from './usePaletteSelection'
+import { useDefSpriteStatement } from './useDefSpriteStatement'
 
 export interface SpriteViewerStore {
   // State (reactive refs/computed)
   selectedIndex: { value: number }
-  displayOptions: { value: { showValues: boolean; showGridLines: boolean } }
+  displayOptions: { value: { showValues: boolean; showGridLines: boolean; reverseX: boolean; reverseY: boolean } }
   isAnimating: { value: boolean }
   selectedSprite: { value: SpriteDefinition | null }
   selectedPaletteCode: { value: number }
@@ -18,10 +19,11 @@ export interface SpriteViewerStore {
   spriteGrid: { value: number[][] }
   spriteSize: { value: { width: number; height: number } }
   getCellColor: (value: number) => string
+  defSpriteStatement: { value: string }
   // Actions
   toggleAnimation: () => void
   setSelectedIndex: (index: number) => void
-  setDisplayOptions: (options: Partial<{ showValues: boolean; showGridLines: boolean }>) => void
+  setDisplayOptions: (options: Partial<{ showValues: boolean; showGridLines: boolean; reverseX: boolean; reverseY: boolean }>) => void
   setPaletteCode: (code: number) => void
   setColorCombination: (combination: number) => void
 }
@@ -33,7 +35,9 @@ export function createSpriteViewerStore(): SpriteViewerStore {
   const selectedIndex = ref<number>(0)
   const displayOptions = ref({
     showValues: false,
-    showGridLines: false
+    showGridLines: false,
+    reverseX: false,
+    reverseY: false
   })
 
   // Get the selected sprite definition
@@ -47,7 +51,8 @@ export function createSpriteViewerStore(): SpriteViewerStore {
   // Use composables
   const { isAnimating, toggleAnimation } = useSpriteAnimation(selectedIndex)
   const { selectedPaletteCode, selectedColorCombination, selectedColorCombinationColors } = usePaletteSelection(selectedSprite)
-  const { sprite16x16, spriteGrid, spriteSize, getCellColor } = useSpriteDisplay(selectedSprite, selectedPaletteCode, selectedColorCombination)
+  const { sprite16x16, spriteGrid, spriteSize, getCellColor } = useSpriteDisplay(selectedSprite, selectedPaletteCode, selectedColorCombination, displayOptions)
+  const { defSpriteStatement } = useDefSpriteStatement(selectedSprite, selectedColorCombination, () => displayOptions.value.reverseX, () => displayOptions.value.reverseY)
 
   // Actions
   const setSelectedIndex = (index: number) => {
@@ -78,6 +83,7 @@ export function createSpriteViewerStore(): SpriteViewerStore {
     spriteGrid,
     spriteSize,
     getCellColor,
+    defSpriteStatement,
     toggleAnimation,
     setSelectedIndex,
     setDisplayOptions,

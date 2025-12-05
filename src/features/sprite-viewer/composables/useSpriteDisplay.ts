@@ -5,7 +5,8 @@ import { COLORS, SPRITE_PALETTES } from '@/shared/data/palette'
 export function useSpriteDisplay(
   selectedSprite: { value: SpriteDefinition | null },
   selectedPaletteCode: { value: number },
-  selectedColorCombination: { value: number }
+  selectedColorCombination: { value: number },
+  displayOptions: { value: { reverseX: boolean; reverseY: boolean } }
 ) {
   // Determine sprite size (8x8, 16x16, 16x32, or 48x8)
   const spriteSize = computed(() => {
@@ -181,8 +182,30 @@ export function useSpriteDisplay(
     }
   })
 
+  // Apply X and Y inversions if needed
+  const spriteGridWithInversions = computed(() => {
+    const grid = spriteGrid.value
+    if (!grid || grid.length === 0) {
+      return grid
+    }
+
+    let result = grid.map(row => [...row]) // Deep copy
+
+    // Apply Y inversion (reverse rows)
+    if (displayOptions.value.reverseY) {
+      result = result.reverse()
+    }
+
+    // Apply X inversion (reverse columns in each row)
+    if (displayOptions.value.reverseX) {
+      result = result.map(row => row.reverse())
+    }
+
+    return result
+  })
+
   // Legacy alias for backward compatibility
-  const sprite16x16 = computed(() => spriteGrid.value)
+  const sprite16x16 = computed(() => spriteGridWithInversions.value)
 
   // Get background color based on sprite value using selected palette and color combination
   const getCellColor = (value: number): string => {
@@ -218,7 +241,7 @@ export function useSpriteDisplay(
 
   return {
     sprite16x16, // Legacy alias
-    spriteGrid,
+    spriteGrid: spriteGridWithInversions,
     spriteSize,
     getCellColor
   }

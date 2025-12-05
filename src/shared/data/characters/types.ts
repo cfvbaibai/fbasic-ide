@@ -4,24 +4,26 @@ interface BaseSprite {
   defaultColorCombination: 0 | 1 | 2 | 3
 }
 
+export type Tile = number[][]
+
 export interface EightTileSpriteDefinition extends BaseSprite {
   charCodes: [number, number, number, number, number, number, number, number]
-  tiles: [number[][], number[][], number[][], number[][], number[][], number[][], number[][], number[][]]
+  tiles: [Tile, Tile, Tile, Tile, Tile, Tile, Tile, Tile]
 }
 
 export interface SixTileSpriteDefinition extends BaseSprite {
   charCodes: [number, number, number, number, number, number]
-  tiles: [number[][], number[][], number[][], number[][], number[][], number[][]]
+  tiles: [Tile, Tile, Tile, Tile, Tile, Tile]
 }
 
 export interface FourTileSpriteDefinition extends BaseSprite {
   charCodes: [number, number, number, number]
-  tiles: [number[][], number[][], number[][], number[][]]
+  tiles: [Tile, Tile, Tile, Tile]
 }
 
 export interface OneTileSpriteDefinition extends BaseSprite {
   charCodes: number
-  tiles: number[][]
+  tiles: Tile
 }
 
 export type SpriteDefinition = EightTileSpriteDefinition | SixTileSpriteDefinition | FourTileSpriteDefinition | OneTileSpriteDefinition

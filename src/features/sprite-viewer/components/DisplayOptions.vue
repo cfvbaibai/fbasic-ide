@@ -10,6 +10,14 @@ const updateShowValues = (value: boolean | string | number) => {
 const updateShowGridLines = (value: boolean | string | number) => {
   store.setDisplayOptions({ showGridLines: Boolean(value) })
 }
+
+const updateReverseX = (value: boolean | string | number) => {
+  store.setDisplayOptions({ reverseX: Boolean(value) })
+}
+
+const updateReverseY = (value: boolean | string | number) => {
+  store.setDisplayOptions({ reverseY: Boolean(value) })
+}
 </script>
 
 <template>
@@ -27,6 +35,22 @@ const updateShowGridLines = (value: boolean | string | number) => {
       id="show-grid-lines"
       :model-value="store.displayOptions.value.showGridLines"
       @update:model-value="updateShowGridLines"
+    />
+  </div>
+  <div class="control-group">
+    <label for="reverse-x">Reverse X (Horizontal):</label>
+    <el-switch
+      id="reverse-x"
+      :model-value="store.displayOptions.value.reverseX"
+      @update:model-value="updateReverseX"
+    />
+  </div>
+  <div class="control-group">
+    <label for="reverse-y">Reverse Y (Vertical):</label>
+    <el-switch
+      id="reverse-y"
+      :model-value="store.displayOptions.value.reverseY"
+      @update:model-value="updateReverseY"
     />
   </div>
 </template>
