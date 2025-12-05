@@ -8,15 +8,22 @@ const store = useSpriteViewerStore()
   <div class="sprite-display-section">
     <h2 class="section-title">
       <span v-if="store.selectedSprite.value">
-        {{ store.selectedSprite.value.name }} - 16×16 Sprite
+        {{ store.selectedSprite.value.name }} - {{ store.spriteSize.value.width }}×{{ store.spriteSize.value.height }} Sprite
       </span>
       <span v-else>
-        16×16 Sprite
+        Sprite
       </span>
     </h2>
-    <div class="grid-container">
+    <div 
+      class="grid-container" 
+      :class="{ 
+        'grid-container-8x8': store.spriteSize.value.width === 8,
+        'grid-container-16x32': store.spriteSize.value.width === 16 && store.spriteSize.value.height === 32,
+        'grid-container-48x8': store.spriteSize.value.width === 48 && store.spriteSize.value.height === 8
+      }"
+    >
       <div
-        v-for="(row, rowIndex) in store.sprite16x16.value"
+        v-for="(row, rowIndex) in store.spriteGrid.value"
         :key="rowIndex"
         class="grid-row"
       >
@@ -62,6 +69,18 @@ const store = useSpriteViewerStore()
   border: 8px solid #222222;
   width: fit-content;
   margin: 0 auto;
+}
+
+.grid-container-8x8 {
+  border: 4px solid #222222;
+}
+
+.grid-container-16x32 {
+  border: 8px solid #222222;
+}
+
+.grid-container-48x8 {
+  border: 8px solid #222222;
 }
 
 .grid-row {

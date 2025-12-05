@@ -1,6 +1,6 @@
 import { ref, computed, watch } from 'vue'
-import type { SpriteDefinition } from '../../../shared/data/sprites'
-import { SPRITE_PALETTES } from '../../../shared/data/palette'
+import type { SpriteDefinition } from '@/shared/data/characters/types'
+import { SPRITE_PALETTES } from '@/shared/data/palette'
 
 export function usePaletteSelection(
   selectedSprite: { value: SpriteDefinition | null }

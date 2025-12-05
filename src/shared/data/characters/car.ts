@@ -296,14 +296,14 @@ export const CAR_SPRITES: SpriteDefinition[] = [
   {
     name: "Car (UP1)",
     defaultPaletteCode: 1,
-    defaultColorCombination: 0,
+    defaultColorCombination: 2,
     charCodes: [136, 137, 138, 139],
     tiles: [SPRITE_CAR_UP1_136, SPRITE_CAR_UP1_137, SPRITE_CAR_UP1_138, SPRITE_CAR_UP1_139],
   },
   {
     name: "Car (UP2)",
     defaultPaletteCode: 1,
-    defaultColorCombination: 0,
+    defaultColorCombination: 2,
     charCodes: [140, 141, 142, 143],
     tiles: [SPRITE_CAR_UP2_140, SPRITE_CAR_UP2_141, SPRITE_CAR_UP2_142, SPRITE_CAR_UP2_143],
   },

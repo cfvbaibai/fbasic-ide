@@ -1,5 +1,6 @@
 import { ref, computed, provide, inject, type InjectionKey } from 'vue'
-import { CHARACTER_SPRITES, type SpriteDefinition } from '../../../shared/data/sprites'
+import { CHARACTER_SPRITES } from '../../../shared/data/sprites'
+import type { SpriteDefinition } from '@/shared/data/characters/types'
 import { useSpriteAnimation } from './useSpriteAnimation'
 import { useSpriteDisplay } from './useSpriteDisplay'
 import { usePaletteSelection } from './usePaletteSelection'
@@ -13,7 +14,9 @@ export interface SpriteViewerStore {
   selectedPaletteCode: { value: number }
   selectedColorCombination: { value: number }
   selectedColorCombinationColors: { value: number[] }
-  sprite16x16: { value: number[][] }
+  sprite16x16: { value: number[][] } // Legacy alias
+  spriteGrid: { value: number[][] }
+  spriteSize: { value: { width: number; height: number } }
   getCellColor: (value: number) => string
   // Actions
   toggleAnimation: () => void
@@ -44,7 +47,7 @@ export function createSpriteViewerStore(): SpriteViewerStore {
   // Use composables
   const { isAnimating, toggleAnimation } = useSpriteAnimation(selectedIndex)
   const { selectedPaletteCode, selectedColorCombination, selectedColorCombinationColors } = usePaletteSelection(selectedSprite)
-  const { sprite16x16, getCellColor } = useSpriteDisplay(selectedSprite, selectedPaletteCode, selectedColorCombination)
+  const { sprite16x16, spriteGrid, spriteSize, getCellColor } = useSpriteDisplay(selectedSprite, selectedPaletteCode, selectedColorCombination)
 
   // Actions
   const setSelectedIndex = (index: number) => {
@@ -71,7 +74,9 @@ export function createSpriteViewerStore(): SpriteViewerStore {
     selectedPaletteCode,
     selectedColorCombination,
     selectedColorCombinationColors,
-    sprite16x16,
+    sprite16x16, // Legacy alias
+    spriteGrid,
+    spriteSize,
     getCellColor,
     toggleAnimation,
     setSelectedIndex,

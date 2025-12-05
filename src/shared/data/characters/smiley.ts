@@ -99,7 +99,7 @@ export const SMILEY_SPRITES: SpriteDefinition[] = [
   {
     name: "Smiley (2)",
     defaultPaletteCode: 2,
-    defaultColorCombination: 1,
+    defaultColorCombination: 2,
     charCodes: [92, 93, 94, 95],
     tiles: [SPRITE_SMILEY_2_92, SPRITE_SMILEY_2_93, SPRITE_SMILEY_2_94, SPRITE_SMILEY_2_95],
   },

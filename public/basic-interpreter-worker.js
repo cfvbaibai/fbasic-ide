@@ -13623,16 +13623,16 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
      * Supports: LET X = 5, LET A(0) = 10, LET A$(I, J) = "Hello"
      */
     execute(letStmtCst) {
-      const expressionCst = getFirstCstNode(letStmtCst.children.expression);
-      if (!expressionCst) {
-        throw new Error("Invalid LET statement: missing expression");
-      }
       const arrayAccessCst = getFirstCstNode(letStmtCst.children.arrayAccess);
       if (arrayAccessCst) {
         const identifierToken = getFirstToken(arrayAccessCst.children.Identifier);
         const expressionListCst = getFirstCstNode(arrayAccessCst.children.expressionList);
         if (!identifierToken || !expressionListCst) {
           throw new Error("Invalid LET statement: invalid array access");
+        }
+        const expressionCst = getFirstCstNode(letStmtCst.children.expression);
+        if (!expressionCst) {
+          throw new Error("Invalid LET statement: missing expression");
         }
         const arrayName = identifierToken.image.toUpperCase();
         const indexExpressions = getCstNodes(expressionListCst.children.expression);
@@ -13651,8 +13651,15 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         }
       } else {
         const identifierToken = getFirstToken(letStmtCst.children.Identifier);
+        const expressionCst = getFirstCstNode(letStmtCst.children.expression);
+        if (!identifierToken && !expressionCst) {
+          throw new Error("Invalid LET statement: missing identifier or expression");
+        }
         if (!identifierToken) {
-          throw new Error("Invalid LET statement: missing identifier");
+          throw new Error("Invalid LET statement: missing identifier or expression");
+        }
+        if (!expressionCst) {
+          throw new Error("Invalid LET statement: missing identifier or expression");
         }
         const varName = identifierToken.image.toUpperCase();
         const value = this.variableService.evaluator.evaluateExpression(expressionCst);
