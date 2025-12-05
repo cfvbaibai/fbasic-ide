@@ -1,4 +1,4 @@
-import type { SpriteDefinition } from "./types"
+import { MoveCharacterCode, type SpriteDefinition } from "./types"
 
 const SPRITE_STARSHIP_LEFT_164 = [
   [0,0,0,0,0,0,1,1],
@@ -135,6 +135,7 @@ const SPRITE_STARSHIP_UP_175 = [
 export const STARSHIP_SPRITES: SpriteDefinition[] = [
   {
     name: "Starship (LEFT)",
+    moveCharacterCode: MoveCharacterCode.STARSHIP,
     defaultPaletteCode: 1,
     defaultColorCombination: 0,
     charCodes: [164, 165, 166, 167],
@@ -142,6 +143,7 @@ export const STARSHIP_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Starship (LEFTUP)",
+    moveCharacterCode: MoveCharacterCode.STARSHIP,
     defaultPaletteCode: 1,
     defaultColorCombination: 0,
     charCodes: [168, 169, 170, 171],
@@ -149,6 +151,7 @@ export const STARSHIP_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Starship (UP)",
+    moveCharacterCode: MoveCharacterCode.STARSHIP,
     defaultPaletteCode: 1,
     defaultColorCombination: 0, 
     charCodes: [172, 173, 174, 175],

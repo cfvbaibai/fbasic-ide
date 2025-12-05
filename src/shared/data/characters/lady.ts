@@ -1,4 +1,4 @@
-import type { SpriteDefinition } from "./types"
+import { MoveCharacterCode, type SpriteDefinition } from "./types"
 
 const SPRITE_LADY_WALK1_28 = [
   [0,0,0,0,0,0,3,3],
@@ -311,6 +311,7 @@ const SPRITE_LADY_DOWN_55 = [
 export const LADY_SPRITES: SpriteDefinition[] = [
   {
     name: "Lady (WALK1)",
+    moveCharacterCode: MoveCharacterCode.LADY,
     defaultPaletteCode: 0,
     defaultColorCombination: 2,
     charCodes: [28, 29, 30, 31],
@@ -318,6 +319,7 @@ export const LADY_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Lady (WALK2)",
+    moveCharacterCode: MoveCharacterCode.LADY,
     defaultPaletteCode: 0,
     defaultColorCombination: 2,
     charCodes: [32, 33, 34, 35],
@@ -325,6 +327,7 @@ export const LADY_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Lady (WALK3)",
+    moveCharacterCode: MoveCharacterCode.LADY,
     defaultPaletteCode: 0,
     defaultColorCombination: 2,
     charCodes: [36, 37, 38, 39],
@@ -332,6 +335,7 @@ export const LADY_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Lady (JUMP)",
+    moveCharacterCode: MoveCharacterCode.LADY,
     defaultPaletteCode: 0,
     defaultColorCombination: 2,
     charCodes: [40, 41, 42, 43],
@@ -339,6 +343,7 @@ export const LADY_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Lady (SLIP)",
+    moveCharacterCode: MoveCharacterCode.LADY,
     defaultPaletteCode: 0,
     defaultColorCombination: 2,
     charCodes: [44, 45, 46, 47],
@@ -346,6 +351,7 @@ export const LADY_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Lady (LADDER)",
+    moveCharacterCode: MoveCharacterCode.LADY,
     defaultPaletteCode: 0,
     defaultColorCombination: 2,
     charCodes: [48, 49, 50, 51],
@@ -353,6 +359,7 @@ export const LADY_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Lady (DOWN)",
+    moveCharacterCode: MoveCharacterCode.LADY,
     defaultPaletteCode: 0,
     defaultColorCombination: 2,
     charCodes: [52, 53, 54, 55],

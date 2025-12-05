@@ -1,4 +1,4 @@
-import type { SpriteDefinition } from "./types"
+import { MoveCharacterCode, type SpriteDefinition } from "./types"
 
 const SPRITE_MARIO_WALK1_0 = [
   [0,0,0,0,0,0,2,2],
@@ -310,6 +310,7 @@ const SPRITE_MARIO_DOWN_27 = [
 export const MARIO_SPRITES: SpriteDefinition[] = [
   {
     name: "Mario (WALK1)",
+    moveCharacterCode: MoveCharacterCode.MARIO,
     defaultPaletteCode: 0,
     defaultColorCombination: 0,
     charCodes: [0, 1, 2, 3],
@@ -317,6 +318,7 @@ export const MARIO_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Mario (WALK2)",
+    moveCharacterCode: MoveCharacterCode.MARIO,
     defaultPaletteCode: 0,
     defaultColorCombination: 0,
     charCodes: [4, 5, 6, 7],
@@ -324,6 +326,7 @@ export const MARIO_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Mario (WALK3)",
+    moveCharacterCode: MoveCharacterCode.MARIO,
     defaultPaletteCode: 0,
     defaultColorCombination: 0,
     charCodes: [8, 9, 10, 11],
@@ -331,6 +334,7 @@ export const MARIO_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Mario (JUMP)",
+    moveCharacterCode: MoveCharacterCode.MARIO,
     defaultPaletteCode: 0,
     defaultColorCombination: 0,
     charCodes: [12, 13, 14, 15],
@@ -338,6 +342,7 @@ export const MARIO_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Mario (SLIP)",
+    moveCharacterCode: MoveCharacterCode.MARIO,
     defaultPaletteCode: 0,
     defaultColorCombination: 0,
     charCodes: [16, 17, 18, 19],
@@ -345,6 +350,7 @@ export const MARIO_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Mario (LADDER)",
+    moveCharacterCode: MoveCharacterCode.MARIO,
     defaultPaletteCode: 0,
     defaultColorCombination: 0,
     charCodes: [20, 21, 22, 23],
@@ -352,6 +358,7 @@ export const MARIO_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Mario (DOWN)",
+    moveCharacterCode: MoveCharacterCode.MARIO,
     defaultPaletteCode: 0,
     defaultColorCombination: 0,
     charCodes: [24, 25, 26, 27],

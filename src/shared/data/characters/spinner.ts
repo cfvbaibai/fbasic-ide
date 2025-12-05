@@ -1,4 +1,4 @@
-import type { SpriteDefinition } from "./types"
+import { MoveCharacterCode, type SpriteDefinition } from "./types"
 
 const SPRITE_SPINNER_1_144 = [
   [0,0,0,0,0,3,3,3],
@@ -91,6 +91,7 @@ const SPRITE_SPINNER_2_151 = [
 export const SPINNER_SPRITES: SpriteDefinition[] = [
   {
     name: "Spinner (1)",
+    moveCharacterCode: MoveCharacterCode.SPINNER,
     defaultPaletteCode: 1,
     defaultColorCombination: 1,
     charCodes: [144, 145, 146, 147],
@@ -98,6 +99,7 @@ export const SPINNER_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Spinner (2)",
+    moveCharacterCode: MoveCharacterCode.SPINNER,
     defaultPaletteCode: 1,
     defaultColorCombination: 1,
     charCodes: [148, 149, 150, 151],

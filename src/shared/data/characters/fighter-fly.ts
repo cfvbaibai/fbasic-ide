@@ -1,4 +1,4 @@
-import type { SpriteDefinition } from "./types"
+import { MoveCharacterCode, type SpriteDefinition } from "./types"
 
 const SPRITE_FIGHTERFLY_1_56 = [
   [0,0,0,0,0,0,0,0],
@@ -91,6 +91,7 @@ const SPRITE_FIGHTERFLY_2_63 = [
 export const FIGHTERFLY_SPRITES: SpriteDefinition[] = [
   {
     name: "Fighter Fly (1)",
+    moveCharacterCode: MoveCharacterCode.FIGHTER_FLY,
     defaultPaletteCode: 2,
     defaultColorCombination: 1,
     charCodes: [56, 57, 58, 59],
@@ -98,6 +99,7 @@ export const FIGHTERFLY_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Fighter Fly (2)",
+    moveCharacterCode: MoveCharacterCode.FIGHTER_FLY,
     defaultPaletteCode: 2,
     defaultColorCombination: 1,
     charCodes: [60, 61, 62, 63],

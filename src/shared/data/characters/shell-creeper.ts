@@ -1,4 +1,4 @@
-import type { SpriteDefinition } from "./types"
+import { MoveCharacterCode, type SpriteDefinition } from "./types"
 
 const SPRITE_SHELLCREEPER_1_184 = [
   [0,0,0,0,1,0,0,0],
@@ -91,6 +91,7 @@ const SPRITE_SHELLCREEPER_2_191 = [
 export const SHELLCREEPER_SPRITES: SpriteDefinition[] = [
   {
     name: "Shell Creeper (1)",
+    moveCharacterCode: MoveCharacterCode.SHELL_CREEPER,
     defaultPaletteCode: 2,
     defaultColorCombination: 3,
     charCodes: [184, 185, 186, 187],
@@ -98,6 +99,7 @@ export const SHELLCREEPER_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Shell Creeper (2)",
+    moveCharacterCode: MoveCharacterCode.SHELL_CREEPER,
     defaultPaletteCode: 0,
     defaultColorCombination: 3,
     charCodes: [188, 189, 190, 191],

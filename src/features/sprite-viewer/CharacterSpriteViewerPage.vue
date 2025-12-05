@@ -4,7 +4,7 @@ import SpriteControls from './components/SpriteControls.vue'
 import SpriteGrid from './components/SpriteGrid.vue'
 import ColorPaletteDisplay from './components/ColorPaletteDisplay.vue'
 import PaletteCombinations from './components/PaletteCombinations.vue'
-import DefSpriteStatement from './components/DefSpriteStatement.vue'
+import DefStatements from './components/DefStatements.vue'
 
 // Provide the store to all child components
 provideSpriteViewerStore()
@@ -21,7 +21,7 @@ provideSpriteViewerStore()
 
       <SpriteGrid />
 
-      <DefSpriteStatement />
+      <DefStatements />
 
       <ColorPaletteDisplay />
 

@@ -1,4 +1,4 @@
-import type { SpriteDefinition } from "./types"
+import { MoveCharacterCode, type SpriteDefinition } from "./types"
 
 const SPRITE_PENGUIN_LEFTSTEP1_96 = [
   [0,0,0,0,3,3,3,3],
@@ -179,6 +179,7 @@ const SPRITE_PENGUIN_BACK_111 = [
 export const PENGUIN_SPRITES: SpriteDefinition[] = [
   {
     name: "Penguin (LEFTSTEP1)",
+    moveCharacterCode: MoveCharacterCode.PENGUIN,
     defaultPaletteCode: 2,
     defaultColorCombination: 0,
     charCodes: [96, 97, 98, 99],
@@ -186,6 +187,7 @@ export const PENGUIN_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Penguin (LEFTSTEP2)",
+    moveCharacterCode: MoveCharacterCode.PENGUIN,
     defaultPaletteCode: 2,
     defaultColorCombination: 0,
     charCodes: [100, 101, 102, 103],
@@ -193,6 +195,7 @@ export const PENGUIN_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Penguin (FRONT)",
+    moveCharacterCode: MoveCharacterCode.PENGUIN,
     defaultPaletteCode: 2,
     defaultColorCombination: 0,
     charCodes: [104, 105, 106, 107],
@@ -200,6 +203,7 @@ export const PENGUIN_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Penguin (BACK)",
+    moveCharacterCode: MoveCharacterCode.PENGUIN,
     defaultPaletteCode: 2,
     defaultColorCombination: 0,
     charCodes: [108, 109, 110, 111],

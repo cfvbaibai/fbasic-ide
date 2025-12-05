@@ -1,4 +1,4 @@
-import type { SpriteDefinition } from "./types"
+import { MoveCharacterCode, type SpriteDefinition } from "./types"
 
 const SPRITE_ACHILLES_LEFT1_64 = [
   [0,0,0,0,0,0,0,0],
@@ -267,6 +267,7 @@ const SPRITE_ACHILLES_TOP2_87 = [
 export const ACHILLES_SPRITES: SpriteDefinition[] = [
   {
     name: "Achilles (LEFT1)",
+    moveCharacterCode: MoveCharacterCode.ACHILLES,
     defaultPaletteCode: 2,
     defaultColorCombination: 1,
     charCodes: [64, 65, 66, 67],
@@ -274,6 +275,7 @@ export const ACHILLES_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Achilles (LEFT2)",
+    moveCharacterCode: MoveCharacterCode.ACHILLES,
     defaultPaletteCode: 2,
     defaultColorCombination: 1,
     charCodes: [68, 69, 70, 71],
@@ -281,6 +283,7 @@ export const ACHILLES_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Achilles (LEFTUP1)",
+    moveCharacterCode: MoveCharacterCode.ACHILLES,
     defaultPaletteCode: 2,
     defaultColorCombination: 1,
     charCodes: [72, 73, 74, 75],
@@ -288,6 +291,7 @@ export const ACHILLES_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Achilles (LEFTUP2)",
+    moveCharacterCode: MoveCharacterCode.ACHILLES,
     defaultPaletteCode: 2,
     defaultColorCombination: 1,
     charCodes: [76, 77, 78, 79],
@@ -295,6 +299,7 @@ export const ACHILLES_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Achilles (TOP1)",
+    moveCharacterCode: MoveCharacterCode.ACHILLES,
     defaultPaletteCode: 2,
     defaultColorCombination: 1,
     charCodes: [80, 81, 82, 83],
@@ -302,6 +307,7 @@ export const ACHILLES_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Achilles (TOP2)",
+    moveCharacterCode: MoveCharacterCode.ACHILLES,
     defaultPaletteCode: 2,
     defaultColorCombination: 1,
     charCodes: [84, 85, 86, 87],

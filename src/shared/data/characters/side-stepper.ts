@@ -1,4 +1,4 @@
-import type { SpriteDefinition } from "./types"
+import { MoveCharacterCode, type SpriteDefinition } from "./types"
 
 const SPRITE_SIDESTEPPER_1_192 = [
   [0,0,3,3,0,0,0,0],
@@ -91,6 +91,7 @@ const SPRITE_SIDESTEPPER_2_199 = [
 export const SIDESTEPPER_SPRITES: SpriteDefinition[] = [
   {
     name: "Side Stepper (1)",
+    moveCharacterCode: MoveCharacterCode.SIDE_STEPPER,
     defaultPaletteCode: 2,
     defaultColorCombination: 2,
     charCodes: [192, 193, 194, 195],
@@ -98,6 +99,7 @@ export const SIDESTEPPER_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Side Stepper (2)",
+    moveCharacterCode: MoveCharacterCode.SIDE_STEPPER,
     defaultPaletteCode: 2,
     defaultColorCombination: 2,
     charCodes: [188, 189, 190, 191],

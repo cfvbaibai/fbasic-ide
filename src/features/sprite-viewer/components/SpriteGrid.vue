@@ -50,6 +50,7 @@ const store = useSpriteViewerStore()
   padding: 1.5rem;
   border-radius: 8px;
   box-shadow: var(--app-box-shadow-base);
+  margin-bottom: 2rem;
 }
 
 .section-title {

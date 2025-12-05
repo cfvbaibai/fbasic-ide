@@ -65,7 +65,7 @@ export function useDefSpriteStatement(
       for (let i = 0; i < 6; i++) {
         const charCode = orderedCodes[i]
         const yInv = yInversion ? 1 : 0 // Y inversion applies to each individual tile
-        statements.push(`DEF SPRITE ${i}, (${colorCombination}, 0, ${displayPriority}, 0, ${yInv}) = CHR$(${charCode})`)
+        statements.push(`DEF SPRITE ${i},(${colorCombination},0,${displayPriority},0,${yInv})=CHR$(${charCode})`)
       }
       
       // Generate SPRITE commands to position them side-by-side
@@ -74,10 +74,15 @@ export function useDefSpriteStatement(
       const baseX = 100 // Example X coordinate
       const baseY = 100 // Example Y coordinate
       for (let i = 0; i < 6; i++) {
-        spriteCommands.push(`SPRITE ${i}, ${baseX + i * 8}, ${baseY}`)
+        spriteCommands.push(`SPRITE ${i},${baseX + i * 8},${baseY}`)
       }
       
-      return `REM 6-tile sprite (48x8): Requires 6 separate DEF SPRITE statements\n${statements.join('\n')}\nREM Position sprites side-by-side:\n${spriteCommands.join('\n')}`
+      return (
+        `REM 6-tile sprite (48x8): Requires 6 separate DEF SPRITE statements\n` +
+        `${statements.join('\n')}\n` +
+        `REM Position sprites side-by-side:\n` +
+        `${spriteCommands.join('\n')}`
+      )
     } else if (isEightTileSprite(sprite)) {
       // 8-tile sprites (16x32): Use 2 DEF SPRITE statements with B=1 (each 16x16)
       // Layout: 2 columns × 4 rows
@@ -115,13 +120,20 @@ export function useDefSpriteStatement(
       const baseX = 100 // Example X coordinate
       const baseY = 100 // Example Y coordinate
       
-      return `REM 8-tile sprite (16x32): Requires 2 DEF SPRITE statements with B=1\nDEF SPRITE 0, (${colorCombination}, 1, ${displayPriority}, ${xInversion}, 0) = ${topCharSet}\nDEF SPRITE 1, (${colorCombination}, 1, ${displayPriority}, ${xInversion}, 0) = ${bottomCharSet}\nREM Position sprites vertically:\nSPRITE 0, ${baseX}, ${baseY}\nSPRITE 1, ${baseX}, ${baseY + 16}`
+      return (
+        `REM 8-tile sprite (16x32): Requires 2 DEF SPRITE statements with B=1\n` +
+        `DEF SPRITE 0,(${colorCombination},1,${displayPriority},${xInversion},0)=${topCharSet}\n` + 
+        `DEF SPRITE 1,(${colorCombination},1,${displayPriority},${xInversion},0)=${bottomCharSet}\n` + 
+        `REM Position sprites vertically:\n` + 
+        `SPRITE 0,${baseX},${baseY}\n` + 
+        `SPRITE 1,${baseX},${baseY + 16}`
+      )
     }
 
     // Determine B parameter (character construction pattern)
     const constructionPattern = isOneTileSprite(sprite) ? 0 : 1
 
-    return `DEF SPRITE 0, (${colorCombination}, ${constructionPattern}, ${displayPriority}, ${xInversion}, ${yInversion}) = ${charSet}`
+    return `DEF SPRITE 0,(${colorCombination},${constructionPattern},${displayPriority},${xInversion},${yInversion})=${charSet}`
   })
 
   return {

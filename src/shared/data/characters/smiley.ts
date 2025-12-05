@@ -1,4 +1,4 @@
-import type { SpriteDefinition } from "./types"
+import { MoveCharacterCode, type SpriteDefinition } from "./types"
 
 const SPRITE_SMILEY_1_88 = [
   [0,0,0,0,0,0,0,0],
@@ -91,6 +91,7 @@ const SPRITE_SMILEY_2_95 = [
 export const SMILEY_SPRITES: SpriteDefinition[] = [
   {
     name: "Smiley (1)",
+    moveCharacterCode: MoveCharacterCode.SMILEY,
     defaultPaletteCode: 2,
     defaultColorCombination: 1,
     charCodes: [88, 89, 90, 91],
@@ -98,6 +99,7 @@ export const SMILEY_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Smiley (2)",
+    moveCharacterCode: MoveCharacterCode.SMILEY,
     defaultPaletteCode: 2,
     defaultColorCombination: 2,
     charCodes: [92, 93, 94, 95],

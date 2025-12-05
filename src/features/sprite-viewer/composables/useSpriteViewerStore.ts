@@ -1,16 +1,15 @@
 import { ref, computed, provide, inject, type InjectionKey } from 'vue'
 import { CHARACTER_SPRITES } from '../../../shared/data/sprites'
 import type { SpriteDefinition } from '@/shared/data/characters/types'
-import { useSpriteAnimation } from './useSpriteAnimation'
 import { useSpriteDisplay } from './useSpriteDisplay'
 import { usePaletteSelection } from './usePaletteSelection'
 import { useDefSpriteStatement } from './useDefSpriteStatement'
+import { useDefMoveStatement } from './useDefMoveStatement'
 
 export interface SpriteViewerStore {
   // State (reactive refs/computed)
   selectedIndex: { value: number }
   displayOptions: { value: { showValues: boolean; showGridLines: boolean; reverseX: boolean; reverseY: boolean } }
-  isAnimating: { value: boolean }
   selectedSprite: { value: SpriteDefinition | null }
   selectedPaletteCode: { value: number }
   selectedColorCombination: { value: number }
@@ -20,8 +19,8 @@ export interface SpriteViewerStore {
   spriteSize: { value: { width: number; height: number } }
   getCellColor: (value: number) => string
   defSpriteStatement: { value: string }
+  defMoveStatement: { value: string }
   // Actions
-  toggleAnimation: () => void
   setSelectedIndex: (index: number) => void
   setDisplayOptions: (options: Partial<{ showValues: boolean; showGridLines: boolean; reverseX: boolean; reverseY: boolean }>) => void
   setPaletteCode: (code: number) => void
@@ -49,10 +48,10 @@ export function createSpriteViewerStore(): SpriteViewerStore {
   })
 
   // Use composables
-  const { isAnimating, toggleAnimation } = useSpriteAnimation(selectedIndex)
   const { selectedPaletteCode, selectedColorCombination, selectedColorCombinationColors } = usePaletteSelection(selectedSprite)
   const { sprite16x16, spriteGrid, spriteSize, getCellColor } = useSpriteDisplay(selectedSprite, selectedPaletteCode, selectedColorCombination, displayOptions)
   const { defSpriteStatement } = useDefSpriteStatement(selectedSprite, selectedColorCombination, () => displayOptions.value.reverseX, () => displayOptions.value.reverseY)
+  const { defMoveStatement } = useDefMoveStatement(selectedSprite, selectedColorCombination)
 
   // Actions
   const setSelectedIndex = (index: number) => {
@@ -74,7 +73,6 @@ export function createSpriteViewerStore(): SpriteViewerStore {
   return {
     selectedIndex,
     displayOptions,
-    isAnimating,
     selectedSprite,
     selectedPaletteCode,
     selectedColorCombination,
@@ -84,7 +82,7 @@ export function createSpriteViewerStore(): SpriteViewerStore {
     spriteSize,
     getCellColor,
     defSpriteStatement,
-    toggleAnimation,
+    defMoveStatement,
     setSelectedIndex,
     setDisplayOptions,
     setPaletteCode,

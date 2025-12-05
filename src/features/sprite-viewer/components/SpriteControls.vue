@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import SpriteSelector from './SpriteSelector.vue'
 import DisplayOptions from './DisplayOptions.vue'
-import AnimationControl from './AnimationControl.vue'
 import PaletteSelector from './PaletteSelector.vue'
 </script>
 
@@ -9,7 +8,6 @@ import PaletteSelector from './PaletteSelector.vue'
   <div class="controls-section">
     <SpriteSelector />
     <DisplayOptions />
-    <AnimationControl />
     <PaletteSelector />
   </div>
 </template>

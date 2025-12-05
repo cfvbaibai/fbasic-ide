@@ -1,4 +1,4 @@
-import type { SpriteDefinition } from "./types"
+import { MoveCharacterCode, type SpriteDefinition } from "./types"
 
 const SPRITE_LASER_HORIZONTAL1_208 = [
   [0,0,0,0,0,0,0,0],
@@ -69,6 +69,7 @@ const SPRITE_LASER_VERTICAL2_213 = [
 export const LASER_SPRITES: SpriteDefinition[] = [
   {
     name: "Laser (HORIZONTAL1)",
+    moveCharacterCode: MoveCharacterCode.LASER,
     defaultPaletteCode: 1,
     defaultColorCombination: 0,
     charCodes: 208,
@@ -76,6 +77,7 @@ export const LASER_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Laser (HORIZONTAL2)",
+    moveCharacterCode: MoveCharacterCode.LASER,
     defaultPaletteCode: 1,
     defaultColorCombination: 0,
     charCodes: 209,
@@ -83,6 +85,7 @@ export const LASER_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Laser (DIAGONAL1)",
+    moveCharacterCode: MoveCharacterCode.LASER,
     defaultPaletteCode: 1,
     defaultColorCombination: 0,
     charCodes: 210,
@@ -90,6 +93,7 @@ export const LASER_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Laser (DIAGONAL2)",
+    moveCharacterCode: MoveCharacterCode.LASER,
     defaultPaletteCode: 1,
     defaultColorCombination: 0,
     charCodes: 211,
@@ -97,6 +101,7 @@ export const LASER_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Laser (VERTICAL1)",
+    moveCharacterCode: MoveCharacterCode.LASER,
     defaultPaletteCode: 1,
     defaultColorCombination: 0,
     charCodes: 212,
@@ -104,6 +109,7 @@ export const LASER_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Laser (VERTICAL2)",
+    moveCharacterCode: MoveCharacterCode.LASER,
     defaultPaletteCode: 1,
     defaultColorCombination: 0,
     charCodes: 213,

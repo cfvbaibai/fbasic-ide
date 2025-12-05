@@ -1,4 +1,4 @@
-import type { SpriteDefinition } from "./types"
+import { MoveCharacterCode, type SpriteDefinition } from "./types"
 
 const SPRITE_CAR_LEFT1_120 = [
   [0,0,0,0,0,0,0,0],
@@ -267,6 +267,7 @@ const SPRITE_CAR_UP2_143 = [
 export const CAR_SPRITES: SpriteDefinition[] = [
   {
     name: "Car (LEFT1)",
+    moveCharacterCode: MoveCharacterCode.CAR,
     defaultPaletteCode: 1,
     defaultColorCombination: 0,
     charCodes: [120, 121, 122, 123],
@@ -274,6 +275,7 @@ export const CAR_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Car (LEFT2)",
+    moveCharacterCode: MoveCharacterCode.CAR,
     defaultPaletteCode: 1,
     defaultColorCombination: 0,
     charCodes: [124, 125, 126, 127],
@@ -281,6 +283,7 @@ export const CAR_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Car (LEFTUP1)",
+    moveCharacterCode: MoveCharacterCode.CAR,
     defaultPaletteCode: 1,
     defaultColorCombination: 0,
     charCodes: [128, 129, 130, 131],
@@ -288,6 +291,7 @@ export const CAR_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Car (LEFTUP2)",
+    moveCharacterCode: MoveCharacterCode.CAR,
     defaultPaletteCode: 1,
     defaultColorCombination: 0,
     charCodes: [132, 133, 134, 135],
@@ -295,6 +299,7 @@ export const CAR_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Car (UP1)",
+    moveCharacterCode: MoveCharacterCode.CAR,
     defaultPaletteCode: 1,
     defaultColorCombination: 2,
     charCodes: [136, 137, 138, 139],
@@ -302,6 +307,7 @@ export const CAR_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Car (UP2)",
+    moveCharacterCode: MoveCharacterCode.CAR,
     defaultPaletteCode: 1,
     defaultColorCombination: 2,
     charCodes: [140, 141, 142, 143],

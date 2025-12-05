@@ -1,4 +1,4 @@
-import type { SpriteDefinition } from "./types"
+import { MoveCharacterCode, type SpriteDefinition } from "./types"
 
 const SPRITE_NITPICKER_1_200 = [
   [0,0,0,0,0,0,0,0],
@@ -91,6 +91,7 @@ const SPRITE_NITPICKER_2_207 = [
 export const NITPICKER_SPRITES: SpriteDefinition[] = [
   {
     name: "Nit Picker (1)",
+    moveCharacterCode: MoveCharacterCode.NITPICKER,
     defaultPaletteCode: 2,
     defaultColorCombination: 0,
     charCodes: [200, 201, 202, 203],
@@ -98,6 +99,7 @@ export const NITPICKER_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Nit Picker (2)",
+    moveCharacterCode: MoveCharacterCode.NITPICKER,
     defaultPaletteCode: 2,
     defaultColorCombination: 0,
     charCodes: [204, 205, 206, 207],

@@ -1,4 +1,4 @@
-import type { SpriteDefinition } from "./types"
+import { MoveCharacterCode, type SpriteDefinition } from "./types"
 
 const SPRITE_STARKILLER_LEFT_152 = [
   [0,0,0,0,0,0,1,3],
@@ -135,6 +135,7 @@ const SPRITE_STARKILLER_UP_163 = [
 export const STARKILLER_SPRITES: SpriteDefinition[] = [
   {
     name: "Star Killer (LEFT)",
+    moveCharacterCode: MoveCharacterCode.STAR_KILLER,
     defaultPaletteCode: 1,
     defaultColorCombination: 1,
     charCodes: [152, 153, 154, 155],
@@ -142,6 +143,7 @@ export const STARKILLER_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Star Killer (LEFTUP)",
+    moveCharacterCode: MoveCharacterCode.STAR_KILLER,
     defaultPaletteCode: 1,
     defaultColorCombination: 1,
     charCodes: [156, 157, 158, 159],
@@ -149,6 +151,7 @@ export const STARKILLER_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Star Killer (UP)",
+    moveCharacterCode: MoveCharacterCode.STAR_KILLER,
     defaultPaletteCode: 1,
     defaultColorCombination: 2,
     charCodes: [160, 161, 162, 163],

@@ -1,4 +1,4 @@
-import type { SpriteDefinition } from "./types"
+import { MoveCharacterCode, type SpriteDefinition } from "./types"
 
 const SPRITE_FIREBALL_1_112 = [
   [0,0,0,0,0,0,0,0],
@@ -91,6 +91,7 @@ const SPRITE_FIREBALL_2_119 = [
 export const FIREBALL_SPRITES: SpriteDefinition[] = [
   {
     name: "Fireball (1)",
+    moveCharacterCode: MoveCharacterCode.FIREBALL,
     defaultPaletteCode: 0,
     defaultColorCombination: 3,
     charCodes: [112, 113, 114, 115],
@@ -98,6 +99,7 @@ export const FIREBALL_SPRITES: SpriteDefinition[] = [
   },
   {
     name: "Fireball (2)",
+    moveCharacterCode: MoveCharacterCode.FIREBALL,
     defaultPaletteCode: 0,
     defaultColorCombination: 3,
     charCodes: [116, 117, 118, 119],

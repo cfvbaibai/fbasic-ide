@@ -1,5 +1,6 @@
 interface BaseSprite {
   name: string
+  moveCharacterCode?: MoveCharacterCode
   defaultPaletteCode: 0 | 1 | 2
   defaultColorCombination: 0 | 1 | 2 | 3
 }
@@ -42,4 +43,23 @@ export function isFourTileSprite(spriteDef: SpriteDefinition): spriteDef is Four
 
 export function isOneTileSprite(spriteDef: SpriteDefinition): spriteDef is OneTileSpriteDefinition {
   return typeof spriteDef.charCodes === 'number'
+}
+
+export enum MoveCharacterCode {
+  MARIO = 0,
+  LADY = 1,
+  FIGHTER_FLY = 2,
+  ACHILLES = 3,
+  PENGUIN = 4,
+  FIREBALL = 5,
+  CAR = 6,
+  SPINNER = 7,
+  STAR_KILLER = 8,
+  STARSHIP = 9,
+  EXPLOSION = 10,
+  SMILEY = 11,
+  LASER = 12,
+  SHELL_CREEPER = 13,
+  SIDE_STEPPER = 14,
+  NITPICKER = 15,
 }
