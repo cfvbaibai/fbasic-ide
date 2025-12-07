@@ -29,49 +29,49 @@ describe('HEX$ Function', () => {
       const source = '10 LET H$ = HEX$(0)\n20 PRINT H$\n30 END'
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('0')
+      expect(deviceAdapter.getAllOutputs()).toEqual('0\n')
     })
 
     it('should convert 10 to "A"', async () => {
       const source = '10 LET H$ = HEX$(10)\n20 PRINT H$\n30 END'
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('A')
+      expect(deviceAdapter.getAllOutputs()).toEqual('A\n')
     })
 
     it('should convert 15 to "F"', async () => {
       const source = '10 LET H$ = HEX$(15)\n20 PRINT H$\n30 END'
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('F')
+      expect(deviceAdapter.getAllOutputs()).toEqual('F\n')
     })
 
     it('should convert 16 to "10"', async () => {
       const source = '10 LET H$ = HEX$(16)\n20 PRINT H$\n30 END'
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('10')
+      expect(deviceAdapter.getAllOutputs()).toEqual('10\n')
     })
 
     it('should convert 173 to "AD"', async () => {
       const source = '10 LET H$ = HEX$(173)\n20 PRINT H$\n30 END'
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('AD')
+      expect(deviceAdapter.getAllOutputs()).toEqual('AD\n')
     })
 
     it('should convert 255 to "FF"', async () => {
       const source = '10 LET H$ = HEX$(255)\n20 PRINT H$\n30 END'
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('FF')
+      expect(deviceAdapter.getAllOutputs()).toEqual('FF\n')
     })
 
     it('should convert 32767 to "7FFF"', async () => {
       const source = '10 LET H$ = HEX$(32767)\n20 PRINT H$\n30 END'
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('7FFF')
+      expect(deviceAdapter.getAllOutputs()).toEqual('7FFF\n')
     })
   })
 
@@ -81,7 +81,7 @@ describe('HEX$ Function', () => {
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
       // -1 in two's complement 16-bit = 65535 = FFFF
-      expect(deviceAdapter.getAllOutputs()).toEqual('FFFF')
+      expect(deviceAdapter.getAllOutputs()).toEqual('FFFF\n')
     })
 
     it('should convert -32768 to "8000" (two\'s complement)', async () => {
@@ -89,7 +89,7 @@ describe('HEX$ Function', () => {
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
       // -32768 in two's complement 16-bit = 32768 = 8000
-      expect(deviceAdapter.getAllOutputs()).toEqual('8000')
+      expect(deviceAdapter.getAllOutputs()).toEqual('8000\n')
     })
 
     it('should convert -173 to "FF53" (two\'s complement)', async () => {
@@ -97,7 +97,7 @@ describe('HEX$ Function', () => {
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
       // -173 in two's complement 16-bit = 65363 = FF53
-      expect(deviceAdapter.getAllOutputs()).toEqual('FF53')
+      expect(deviceAdapter.getAllOutputs()).toEqual('FF53\n')
     })
   })
 
@@ -107,7 +107,7 @@ describe('HEX$ Function', () => {
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
       // 42 decimal = 2A hex
-      expect(deviceAdapter.getAllOutputs()).toEqual('2A')
+      expect(deviceAdapter.getAllOutputs()).toEqual('2A\n')
     })
 
     it('should handle HEX$ in expressions', async () => {
@@ -115,7 +115,7 @@ describe('HEX$ Function', () => {
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
       // 15 decimal = F hex
-      expect(deviceAdapter.getAllOutputs()).toEqual('F')
+      expect(deviceAdapter.getAllOutputs()).toEqual('F\n')
     })
   })
 
@@ -151,7 +151,7 @@ describe('HEX$ Function', () => {
       expect(result.success).toBe(true)
       // HEX$(173) = "AD", VAL("&HAD") = 173
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 173')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 173\n')
     })
 
     it('should handle roundtrip for negative numbers', async () => {

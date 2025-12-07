@@ -1,4 +1,4 @@
-import { MoveCharacterCode, type SpriteDefinition } from "./types"
+import { MoveCharacterCode, type SpriteDefinition } from "../types"
 
 const SPRITE_ACHILLES_LEFT1_64 = [
   [0,0,0,0,0,0,0,0],

@@ -1,4 +1,4 @@
-import { MoveCharacterCode, type SpriteDefinition } from "./types"
+import { MoveCharacterCode, type SpriteDefinition } from "../types"
 
 const SPRITE_SMILEY_1_88 = [
   [0,0,0,0,0,0,0,0],

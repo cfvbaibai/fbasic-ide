@@ -66,12 +66,13 @@ describe('Family Basic IDE Demo Program', () => {
     const calls = printOutputMock.mock.calls.map(call => call[0])
     
     // First PRINT statement
-    expect(calls[0]).toBe('Basic F-Basic Program')
+    expect(calls[0]).toBe('Basic F-Basic Program\n')
     
     // Second PRINT statement with semicolon separator
     // PRINT "A + B = "; C where C=30 outputs "A + B =  30" 
     // (string has trailing space, number has leading space for sign position)
-    expect(calls[1]).toEqual('A + B =  30')
+    // But PRINT doesn't end with semicolon (last item is C, not a semicolon), so adds newline
+    expect(calls[1]).toEqual('A + B =  30\n')
     
     // Verify variable values
     expect(result.variables.get('A')?.value).toBe(10)
@@ -92,9 +93,10 @@ describe('Family Basic IDE Demo Program', () => {
     // Verify semicolon concatenation (no space/newline between items)
     // PRINT "I="; I where I=1 outputs "I= 1" 
     // (semicolon concatenates immediately, number has leading space for sign position)
+    // But PRINT doesn't end with semicolon (last item is I, not a semicolon), so adds newline
     const calls = printOutputMock.mock.calls.map(call => call[0])
-    expect(calls[0]).toEqual('I= 1')
-    expect(calls[1]).toEqual('I= 2')
+    expect(calls[0]).toEqual('I= 1\n')
+    expect(calls[1]).toEqual('I= 2\n')
   })
 
   it('should parse the program correctly', async () => {

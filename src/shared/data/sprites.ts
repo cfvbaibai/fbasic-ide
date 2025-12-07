@@ -18,7 +18,7 @@ import { SMILEY_SPRITES } from "./characters/smiley"
 import { SPINNER_SPRITES } from "./characters/spinner"
 import { STARKILLER_SPRITES } from "./characters/star-killer"
 import { STARSHIP_SPRITES } from "./characters/starship"
-import type { SpriteDefinition, Tile } from "./characters/types"
+import type { SpriteDefinition, Tile } from "./types"
 
 export const CHARACTER_SPRITES: SpriteDefinition[] = [
   ...MARIO_SPRITES,

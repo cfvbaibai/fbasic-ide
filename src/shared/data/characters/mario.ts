@@ -1,4 +1,4 @@
-import { MoveCharacterCode, type SpriteDefinition } from "./types"
+import { MoveCharacterCode, type SpriteDefinition } from "../types"
 
 const SPRITE_MARIO_WALK1_0 = [
   [0,0,0,0,0,0,2,2],

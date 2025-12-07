@@ -15,7 +15,9 @@ import type {
   ErrorMessage,
   ProgressMessage,
   StopMessage,
-  OutputMessage
+  OutputMessage,
+  ScreenUpdateMessage,
+  ScreenCell
 } from '../interfaces'
 import { DEFAULTS } from '../constants'
 
@@ -31,6 +33,31 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   private stickStates: Map<number, number> = new Map()
   private isEnabled = true
   private currentExecutionId: string | null = null
+  
+  // === SCREEN STATE ===
+  private screenBuffer: ScreenCell[][] = []
+  private cursorX = 0
+  private cursorY = 0
+  
+  constructor() {
+    console.log('🔌 [WEB_WORKER_DEVICE] WebWorkerDeviceAdapter created')
+    this.initializeScreen()
+    this.setupMessageListener()
+  }
+  
+  private initializeScreen(): void {
+    // Initialize empty 28×24 grid
+    this.screenBuffer = []
+    for (let y = 0; y < 24; y++) {
+      const row: ScreenCell[] = []
+      for (let x = 0; x < 28; x++) {
+        row.push({ character: ' ', colorPattern: 0, x, y })
+      }
+      this.screenBuffer.push(row)
+    }
+    this.cursorX = 0
+    this.cursorY = 0
+  }
 
   // === WEB WORKER MANAGEMENT ===
   private worker: Worker | null = null
@@ -41,10 +68,6 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     timeout: NodeJS.Timeout
   }>()
 
-  constructor() {
-    console.log('🔌 [WEB_WORKER_DEVICE] WebWorkerDeviceAdapter created')
-    this.setupMessageListener()
-  }
 
   // === WEB WORKER MANAGEMENT METHODS ===
 
@@ -324,7 +347,8 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
 
   printOutput(output: string): void {
     console.log('🔌 [WEB_WORKER_DEVICE] Print output:', output)
-    // Send print output to main thread
+    
+    // Send to STDOUT (original textarea output)
     self.postMessage({
       type: 'OUTPUT',
       id: `output-${Date.now()}`,
@@ -336,6 +360,89 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
         timestamp: Date.now()
       }
     })
+    
+    // Also send to SCREEN character by character
+    for (const char of output) {
+      this.writeCharacterToScreen(char)
+    }
+  }
+  
+  private writeCharacterToScreen(char: string): void {
+    // Handle newline
+    if (char === '\n') {
+      this.cursorX = 0
+      this.cursorY++
+      if (this.cursorY >= 24) {
+        // Scroll screen up (simple implementation: reset to top)
+        this.cursorY = 0
+      }
+      this.sendCursorUpdate()
+      return
+    }
+    
+    // Write character at cursor position
+    if (this.cursorY < 24 && this.cursorX < 28) {
+      if (!this.screenBuffer[this.cursorY]) {
+        this.screenBuffer[this.cursorY] = []
+      }
+      if (!this.screenBuffer[this.cursorY][this.cursorX]) {
+        this.screenBuffer[this.cursorY][this.cursorX] = {
+          character: ' ',
+          colorPattern: 0,
+          x: this.cursorX,
+          y: this.cursorY
+        }
+      }
+      this.screenBuffer[this.cursorY][this.cursorX].character = char
+      
+      // Send character update
+      this.sendCharacterUpdate(this.cursorX, this.cursorY, char)
+      
+      // Advance cursor
+      this.cursorX++
+      if (this.cursorX >= 28) {
+        this.cursorX = 0
+        this.cursorY++
+        if (this.cursorY >= 24) {
+          // Scroll screen up (simple implementation: reset to top)
+          this.cursorY = 0
+        }
+        this.sendCursorUpdate()
+      } else {
+        this.sendCursorUpdate()
+      }
+    }
+  }
+  
+  private sendCharacterUpdate(x: number, y: number, character: string): void {
+    self.postMessage({
+      type: 'SCREEN_UPDATE',
+      id: `screen-char-${Date.now()}`,
+      timestamp: Date.now(),
+      data: {
+        executionId: this.currentExecutionId || 'unknown',
+        updateType: 'character',
+        x,
+        y,
+        character,
+        timestamp: Date.now()
+      }
+    } as ScreenUpdateMessage)
+  }
+  
+  private sendCursorUpdate(): void {
+    self.postMessage({
+      type: 'SCREEN_UPDATE',
+      id: `screen-cursor-${Date.now()}`,
+      timestamp: Date.now(),
+      data: {
+        executionId: this.currentExecutionId || 'unknown',
+        updateType: 'cursor',
+        cursorX: this.cursorX,
+        cursorY: this.cursorY,
+        timestamp: Date.now()
+      }
+    } as ScreenUpdateMessage)
   }
 
   debugOutput(output: string): void {
@@ -372,13 +479,20 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
 
   clearScreen(): void {
     console.log('🔌 [WEB_WORKER_DEVICE] Clear screen')
-    // Send clear screen command to main thread
+    // Clear screen buffer
+    this.initializeScreen()
+    
+    // Send clear update
     self.postMessage({
-      type: 'CLEAR_SCREEN',
-      id: `clear-${Date.now()}`,
+      type: 'SCREEN_UPDATE',
+      id: `screen-clear-${Date.now()}`,
       timestamp: Date.now(),
-      data: { executionId: this.currentExecutionId || 'unknown' }
-    })
+      data: {
+        executionId: this.currentExecutionId || 'unknown',
+        updateType: 'clear',
+        timestamp: Date.now()
+      }
+    } as ScreenUpdateMessage)
   }
 
   /**
@@ -386,6 +500,24 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
    */
   setCurrentExecutionId(executionId: string | null): void {
     this.currentExecutionId = executionId
+    // Clear screen when starting new execution
+    if (executionId) {
+      this.initializeScreen()
+      this.sendScreenClear()
+    }
+  }
+  
+  private sendScreenClear(): void {
+    self.postMessage({
+      type: 'SCREEN_UPDATE',
+      id: `screen-clear-${Date.now()}`,
+      timestamp: Date.now(),
+      data: {
+        executionId: this.currentExecutionId || 'unknown',
+        updateType: 'clear',
+        timestamp: Date.now()
+      }
+    } as ScreenUpdateMessage)
   }
   // === PRIVATE METHODS ===
 
@@ -420,13 +552,22 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       timestamp: message.timestamp
     })
     
-    // Handle OUTPUT messages separately as they don't have pending message IDs
+    // Handle OUTPUT and SCREEN_UPDATE messages separately as they don't have pending message IDs
     if (message.type === 'OUTPUT') {
       console.log('📤 [MAIN] Handling OUTPUT message:', {
         outputType: (message as OutputMessage).data.outputType,
         outputLength: (message as OutputMessage).data.output.length
       })
       this.handleOutputMessage(message as OutputMessage)
+      return
+    }
+    
+    // SCREEN_UPDATE messages are handled by the composable directly via worker.onmessage
+    // They don't need to be processed here, just pass through
+    if (message.type === 'SCREEN_UPDATE') {
+      console.log('🖥️ [MAIN] SCREEN_UPDATE message received (handled by composable):', {
+        updateType: (message as ScreenUpdateMessage).data.updateType
+      })
       return
     }
     

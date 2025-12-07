@@ -54,8 +54,8 @@ describe('PrintExecutor', () => {
 
       executor.execute(printStmtCst!)
 
-      // Empty PRINT should call printOutput with empty string
-      expect(printOutputMock).toHaveBeenCalledWith('')
+      // Empty PRINT should call printOutput with newline
+      expect(printOutputMock).toHaveBeenCalledWith('\n')
     })
   })
 
@@ -66,7 +66,7 @@ describe('PrintExecutor', () => {
 
       executor.execute(printStmtCst!)
 
-      expect(printOutputMock).toHaveBeenCalledWith('Hello World')
+      expect(printOutputMock).toHaveBeenCalledWith('Hello World\n')
     })
 
     it('should execute PRINT statement with multiple string literals', async () => {
@@ -78,7 +78,8 @@ describe('PrintExecutor', () => {
       expect(printOutputMock).toHaveBeenCalledTimes(1)
       const output = printOutputMock.mock.calls[0]?.[0]
       // Comma separator: A at 0, B at 8, C at 16 (tab characters)
-      expect(output).toEqual('A\tB\tC')
+      // Does not end with comma, so should have newline
+      expect(output).toEqual('A\tB\tC\n')
     })
   })
 
@@ -92,7 +93,7 @@ describe('PrintExecutor', () => {
       expect(printOutputMock).toHaveBeenCalled()
       const output = printOutputMock.mock.calls[0]?.[0]
       // Numbers always get a space BEFORE them
-      expect(output).toEqual(' 42')
+      expect(output).toEqual(' 42\n')
     })
 
     it('should reject floating point number literals', async () => {
@@ -119,7 +120,7 @@ describe('PrintExecutor', () => {
       expect(printOutputMock).toHaveBeenCalled()
       const output = printOutputMock.mock.calls[0]?.[0]
       // Numbers always get a space BEFORE them
-      expect(output).toEqual(' 100')
+      expect(output).toEqual(' 100\n')
     })
 
     it('should execute PRINT statement with string variable', async () => {
@@ -133,7 +134,7 @@ describe('PrintExecutor', () => {
 
       expect(printOutputMock).toHaveBeenCalled()
       const output = printOutputMock.mock.calls[0]?.[0]
-      expect(output).toEqual('Test Message')
+      expect(output).toEqual('Test Message\n')
     })
   })
 
@@ -147,7 +148,7 @@ describe('PrintExecutor', () => {
       expect(printOutputMock).toHaveBeenCalled()
       const output = printOutputMock.mock.calls[0]?.[0]
       // Numbers always get a space BEFORE them
-      expect(output).toEqual(' 30')
+      expect(output).toEqual(' 30\n')
     })
 
     it('should execute PRINT statement with subtraction expression', async () => {
@@ -159,7 +160,7 @@ describe('PrintExecutor', () => {
       expect(printOutputMock).toHaveBeenCalled()
       const output = printOutputMock.mock.calls[0]?.[0]
       // Numbers always get a space BEFORE them
-      expect(output).toEqual(' 30')
+      expect(output).toEqual(' 30\n')
     })
 
     it('should execute PRINT statement with multiplication expression', async () => {
@@ -171,7 +172,7 @@ describe('PrintExecutor', () => {
       expect(printOutputMock).toHaveBeenCalled()
       const output = printOutputMock.mock.calls[0]?.[0]
       // Numbers always get a space BEFORE them
-      expect(output).toEqual(' 30')
+      expect(output).toEqual(' 30\n')
     })
 
     it('should execute PRINT statement with division expression', async () => {
@@ -183,7 +184,7 @@ describe('PrintExecutor', () => {
       expect(printOutputMock).toHaveBeenCalled()
       const output = printOutputMock.mock.calls[0]?.[0]
       // Numbers always get a space BEFORE them
-      expect(output).toEqual(' 5')
+      expect(output).toEqual(' 5\n')
     })
 
     it('should execute PRINT statement with complex expression', async () => {
@@ -195,7 +196,7 @@ describe('PrintExecutor', () => {
       expect(printOutputMock).toHaveBeenCalled()
       const output = printOutputMock.mock.calls[0]?.[0]
       // Numbers always get a space BEFORE them
-      expect(output).toEqual(' 60')
+      expect(output).toEqual(' 60\n')
     })
   })
 
@@ -210,7 +211,7 @@ describe('PrintExecutor', () => {
       const output = printOutputMock.mock.calls[0]?.[0]
       // Comma separator: "Value:" at 0, 42 at 8 (tab character)
       // Numbers always get a space BEFORE them
-      expect(output).toEqual('Value:\t 42')
+      expect(output).toEqual('Value:\t 42\n')
     })
 
     it('should execute PRINT statement with string and expression', async () => {
@@ -223,7 +224,7 @@ describe('PrintExecutor', () => {
       const output = printOutputMock.mock.calls[0]?.[0]
       // Comma separator: "Result:" at 0, 30 at 8 (tab character)
       // Numbers always get a space BEFORE them
-      expect(output).toEqual('Result:\t 30')
+      expect(output).toEqual('Result:\t 30\n')
     })
   })
 
@@ -237,7 +238,8 @@ describe('PrintExecutor', () => {
       expect(printOutputMock).toHaveBeenCalledTimes(1)
       const output = printOutputMock.mock.calls[0]?.[0]
       // Comma separator: A at 0, B at 8, C at 16 (tab characters)
-      expect(output).toEqual('A\tB\tC')
+      // Does not end with comma, so should have newline
+      expect(output).toEqual('A\tB\tC\n')
     })
 
     it('should handle comma separator with numbers - tabbed columns', async () => {
@@ -249,7 +251,7 @@ describe('PrintExecutor', () => {
       expect(printOutputMock).toHaveBeenCalledTimes(1)
       const output = printOutputMock.mock.calls[0]?.[0]
       // Numbers always get a space BEFORE them, comma separator uses tabs
-      expect(output).toEqual(' 1\t 2\t 3')
+      expect(output).toEqual(' 1\t 2\t 3\n')
     })
 
     it('should handle comma separator with mixed types', async () => {
@@ -262,7 +264,7 @@ describe('PrintExecutor', () => {
       const output = printOutputMock.mock.calls[0]?.[0]
       // Comma separator: A at 0, 1 at 8, B at 16, 2 at 24 (tab characters)
       // Numbers always get a space BEFORE them
-      expect(output).toEqual('A\t 1\tB\t 2')
+      expect(output).toEqual('A\t 1\tB\t 2\n')
     })
 
     it('should handle trailing comma separator', async () => {
@@ -290,7 +292,7 @@ describe('PrintExecutor', () => {
       expect(output).toBeDefined()
       
       // Semicolon separator should print immediately (no space between strings)
-      expect(output).toBe('ABC')
+      expect(output).toBe('ABC\n')
     })
 
     it('should handle semicolon separator with numbers - space between numbers', async () => {
@@ -304,7 +306,7 @@ describe('PrintExecutor', () => {
       expect(output).toBeDefined()
       
       // Numbers always get a space BEFORE them (even the first one)
-      expect(output).toBe(' 1 2 3')
+      expect(output).toBe(' 1 2 3\n')
     })
 
     it('should handle semicolon separator with string and number - no space', async () => {
@@ -318,7 +320,8 @@ describe('PrintExecutor', () => {
       expect(output).toBeDefined()
       
       // Numbers always get a space BEFORE them
-      expect(output).toBe('A 1')
+      // Does not end with semicolon (semicolon is between items), so should have newline
+      expect(output).toBe('A 1\n')
     })
 
     it('should handle semicolon separator with number and string - no space', async () => {
@@ -332,7 +335,8 @@ describe('PrintExecutor', () => {
       expect(output).toBeDefined()
       
       // Numbers always get a space BEFORE them, strings follow immediately after numbers
-      expect(output).toBe(' 1A')
+      // Does not end with semicolon (semicolon is between items), so should have newline
+      expect(output).toBe(' 1A\n')
     })
 
     it('should handle semicolon separator with mixed types', async () => {
@@ -348,7 +352,8 @@ describe('PrintExecutor', () => {
       // 1; "B" -> " 1B" (space before 1, B follows immediately)
       // "B"; 2 -> "B 2" (space before number)
       // So: A 1B 2
-      expect(output).toEqual('A 1B 2')
+      // Does not end with semicolon (semicolons are between items), so should have newline
+      expect(output).toEqual('A 1B 2\n')
     })
 
     it('should handle trailing semicolon separator', async () => {
@@ -374,7 +379,8 @@ describe('PrintExecutor', () => {
       const output = printOutputMock.mock.calls[0]?.[0]
       expect(output).toBeDefined()
       // Numbers always get a space BEFORE them
-      expect(output).toBe('X= 10')
+      // Does not end with semicolon (semicolon is between items), so should have newline
+      expect(output).toBe('X= 10\n')
     })
   })
 
@@ -389,7 +395,8 @@ describe('PrintExecutor', () => {
       const output = printOutputMock.mock.calls[0]?.[0]
       // A and B separated by comma (tab), B and C separated by semicolon (no space)
       // A at 0, B at 8, C immediately after B
-      expect(output).toEqual('A\tBC')
+      // Does not end with semicolon (semicolon is between items), so should have newline
+      expect(output).toEqual('A\tBC\n')
     })
 
     it('should handle multiple commas and semicolons', async () => {
@@ -401,7 +408,8 @@ describe('PrintExecutor', () => {
       expect(printOutputMock).toHaveBeenCalledTimes(1)
       const output = printOutputMock.mock.calls[0]?.[0]
       // A at 0 (comma/tab), B at 8 (semicolon), C immediately after B (comma/tab), D at 16 (semicolon), E immediately after D
-      expect(output).toEqual('A\tBC\tDE')
+      // Does not end with semicolon (semicolons are between items), so should have newline
+      expect(output).toEqual('A\tBC\tDE\n')
     })
   })
 })

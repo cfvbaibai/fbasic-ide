@@ -1,4 +1,4 @@
-import { MoveCharacterCode, type SpriteDefinition } from "./types"
+import { MoveCharacterCode, type SpriteDefinition } from "../types"
 
 const SPRITE_PENGUIN_LEFTSTEP1_96 = [
   [0,0,0,0,3,3,3,3],

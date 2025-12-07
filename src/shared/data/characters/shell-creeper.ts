@@ -1,4 +1,4 @@
-import { MoveCharacterCode, type SpriteDefinition } from "./types"
+import { MoveCharacterCode, type SpriteDefinition } from "../types"
 
 const SPRITE_SHELLCREEPER_1_184 = [
   [0,0,0,0,1,0,0,0],

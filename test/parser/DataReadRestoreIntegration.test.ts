@@ -94,8 +94,9 @@ describe('DATA/READ/RESTORE Integration', () => {
       const outputs = printOutputMock.mock.calls.map(call => call[0])
       // PRINT A$; " "; B$; "." creates: "GOOD" + " " + "MORNING" + "." = "GOOD MORNING."
       // Semicolon doesn't add spaces - strings print immediately, string literal " " adds a space
-      expect(outputs[0]).toBe('GOOD MORNING.')
-      expect(outputs[1]).toBe('GOOD EVENING.')
+      // PRINT doesn't end with semicolon, so adds newline
+      expect(outputs[0]).toBe('GOOD MORNING.\n')
+      expect(outputs[1]).toBe('GOOD EVENING.\n')
     })
   })
 
@@ -165,13 +166,15 @@ describe('DATA/READ/RESTORE Integration', () => {
       
       // First 6 outputs should be from line 1010
       // According to spec, positive numbers have a leading space (sign position)
+      // PRINT A; ends with semicolon, so no newline
       const firstSet = outputs.slice(0, 6)
       expect(firstSet).toEqual([' 12', ' 56', ' 34', ' 68', ' 53', ' 2'])
       
-      // 7th output should be empty (PRINT with no arguments)
-      expect(outputs[6]).toBe('')
+      // 7th output should be empty (PRINT with no arguments) - adds newline
+      expect(outputs[6]).toBe('\n')
       
       // Last 6 outputs should be from line 1000
+      // PRINT A; ends with semicolon, so no newline
       const secondSet = outputs.slice(7, 13)
       expect(secondSet).toEqual([' 23', ' 43', ' 55', ' 65', ' 42', ' 9'])
     })
@@ -202,7 +205,8 @@ describe('DATA/READ/RESTORE Integration', () => {
       expect(output).toBeDefined()
       // PRINT A; B; C; D creates: " 10" + " 20" + " 10" + " 20" = " 10 20 10 20"
       // Each positive number has a leading space (sign position), semicolon doesn't add extra spaces
-      expect(output).toBe(' 10 20 10 20')
+      // PRINT doesn't end with semicolon, so adds newline
+      expect(output).toBe(' 10 20 10 20\n')
     })
   })
 
@@ -230,7 +234,8 @@ describe('DATA/READ/RESTORE Integration', () => {
       expect(output).toBeDefined()
       // PRINT A$; B$; C$; D$ creates: "ABC" + "DE" + ", " + "F" = "ABCDE, F"
       // Semicolon doesn't add spaces - strings print immediately after each other
-      expect(output).toBe('ABCDE, F')
+      // PRINT doesn't end with semicolon, so adds newline
+      expect(output).toBe('ABCDE, F\n')
     })
   })
 
@@ -280,7 +285,8 @@ describe('DATA/READ/RESTORE Integration', () => {
       expect(output).toBeDefined()
       // PRINT A; B; C; D creates: " 10" + " 20" + " 30" + " 40" = " 10 20 30 40"
       // Each positive number has a leading space (sign position), semicolon doesn't add extra spaces
-      expect(output).toBe(' 10 20 30 40')
+      // PRINT doesn't end with semicolon, so adds newline
+      expect(output).toBe(' 10 20 30 40\n')
     })
   })
 })

@@ -23,10 +23,10 @@
  */
 
 /* global NodeJS */
-import { ref, onUnmounted } from 'vue'
+import { ref, onUnmounted, nextTick } from 'vue'
 import { FBasicParser } from '../../../core/parser/FBasicParser'
 import { getSampleCode } from '../../../core/samples/sampleCodes'
-import type { ExecutionResult, ParserInfo, HighlighterInfo, BasicVariable, AnyServiceWorkerMessage, ResultMessage, ErrorMessage, OutputMessage, ProgressMessage } from '../../../core/interfaces'
+import type { ExecutionResult, ParserInfo, HighlighterInfo, BasicVariable, AnyServiceWorkerMessage, ResultMessage, ErrorMessage, OutputMessage, ProgressMessage, ScreenUpdateMessage, ScreenCell } from '../../../core/interfaces'
 import { EXECUTION_LIMITS } from '../../../core/constants'
 
 /**
@@ -62,6 +62,22 @@ export function useBasicIde() {
   const highlightedCode = ref('')
   const debugOutput = ref<string>('')
   const debugMode = ref(false)
+  
+  // Screen state - initialize as full grid for proper reactivity
+  const initializeScreenBuffer = (): ScreenCell[][] => {
+    const grid: ScreenCell[][] = []
+    for (let y = 0; y < 24; y++) {
+      const row: ScreenCell[] = []
+      for (let x = 0; x < 28; x++) {
+        row.push({ character: ' ', colorPattern: 0, x, y })
+      }
+      grid.push(row)
+    }
+    return grid
+  }
+  const screenBuffer = ref<ScreenCell[][]>(initializeScreenBuffer())
+  const cursorX = ref(0)
+  const cursorY = ref(0)
 
   // Parser instance
   const parser = new FBasicParser()
@@ -198,6 +214,9 @@ export function useBasicIde() {
       case 'OUTPUT':
         handleOutputMessage(message)
         break
+      case 'SCREEN_UPDATE':
+        handleScreenUpdateMessage(message)
+        break
       case 'RESULT':
         handleResultMessage(message)
         break
@@ -227,6 +246,69 @@ export function useBasicIde() {
         message: outputText,
         type: 'runtime'
       })
+    }
+  }
+
+  const handleScreenUpdateMessage = (message: AnyServiceWorkerMessage): void => {
+    if (message.type !== 'SCREEN_UPDATE') return
+    const update = (message as ScreenUpdateMessage).data
+    console.log('🖥️ [COMPOSABLE] Handling screen update:', update.updateType, update)
+    
+    switch (update.updateType) {
+      case 'character':
+        if (update.x !== undefined && update.y !== undefined && update.character !== undefined) {
+          console.log('🖥️ [COMPOSABLE] Updating character:', {
+            x: update.x,
+            y: update.y,
+            char: update.character,
+            currentBuffer: screenBuffer.value[update.y]?.[update.x]
+          })
+          // Ensure row exists
+          if (!screenBuffer.value[update.y]) {
+            screenBuffer.value[update.y] = []
+          }
+          // Ensure cell exists
+          if (!screenBuffer.value[update.y][update.x]) {
+            screenBuffer.value[update.y][update.x] = {
+              character: ' ',
+              colorPattern: 0,
+              x: update.x,
+              y: update.y
+            }
+          }
+          // Update character - force reactivity by creating new object
+          const newCell = {
+            ...screenBuffer.value[update.y][update.x],
+            character: update.character
+          }
+          screenBuffer.value[update.y][update.x] = newCell
+          // Also trigger reactivity by reassigning the row
+          screenBuffer.value[update.y] = [...screenBuffer.value[update.y]]
+        }
+        break
+      case 'cursor':
+        if (update.cursorX !== undefined) cursorX.value = update.cursorX
+        if (update.cursorY !== undefined) cursorY.value = update.cursorY
+        break
+      case 'clear':
+        // Clear screen buffer
+        for (let y = 0; y < 24; y++) {
+          for (let x = 0; x < 28; x++) {
+            if (screenBuffer.value[y] && screenBuffer.value[y][x]) {
+              screenBuffer.value[y][x].character = ' '
+            }
+          }
+        }
+        cursorX.value = 0
+        cursorY.value = 0
+        break
+      case 'full':
+        if (update.screenBuffer) {
+          screenBuffer.value = update.screenBuffer
+        }
+        if (update.cursorX !== undefined) cursorX.value = update.cursorX
+        if (update.cursorY !== undefined) cursorY.value = update.cursorY
+        break
     }
   }
 
@@ -375,10 +457,21 @@ export function useBasicIde() {
         return
       }
 
-      // Clear previous output
-      output.value = []
-      errors.value = []
-      debugOutput.value = ''
+    // Clear previous output
+    output.value = []
+    errors.value = []
+    debugOutput.value = ''
+    
+    // Clear screen
+    for (let y = 0; y < 24; y++) {
+      for (let x = 0; x < 28; x++) {
+        if (screenBuffer.value[y] && screenBuffer.value[y][x]) {
+          screenBuffer.value[y][x].character = ' '
+        }
+      }
+    }
+    cursorX.value = 0
+    cursorY.value = 0
 
       // Send execution message to web worker
       const result = await sendMessageToWorker({
@@ -457,6 +550,11 @@ export function useBasicIde() {
     errors.value = []
     variables.value = {}
     debugOutput.value = ''
+    
+    // Clear screen - reassign to force reactivity
+    screenBuffer.value = initializeScreenBuffer()
+    cursorX.value = 0
+    cursorY.value = 0
   }
 
   /**
@@ -580,6 +678,9 @@ export function useBasicIde() {
     highlightedCode,
     debugOutput,
     debugMode,
+    screenBuffer,
+    cursorX,
+    cursorY,
 
     // Methods
     runCode,

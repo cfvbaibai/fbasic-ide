@@ -30,11 +30,8 @@ export class PrintExecutor {
     const printListCst = getFirstCstNode(printStmtCst.children.printList)
     
     if (!printListCst) {
-      // Empty PRINT statement - print newline
-      // Empty PRINT always adds newline and resets semicolon state
-      const shouldAppend = this.context.lastPrintEndedWithSemicolon
-      this.printOutput('', shouldAppend)
-      this.context.lastPrintEndedWithSemicolon = false
+      // Empty PRINT statement - print newline immediately
+      this.printOutput('\n')
       return
     }
 
@@ -139,24 +136,21 @@ export class PrintExecutor {
     // Process PRINT items and convert to output string
     let output = this.buildOutputString(items)
     
-    // Check if PRINT ends with semicolon
-    const lastItem = items[items.length - 1]
-    const endsWithSemicolon = lastItem?.separator === ';'
+    // Check if PRINT ends with semicolon or comma by checking the last element
+    // The last element in the elements array tells us if there's a trailing separator
+    const lastElement = elements[elements.length - 1]
+    const endsWithSemicolon = lastElement?.type === 'separator' && lastElement.separator === ';'
+    const endsWithComma = lastElement?.type === 'separator' && lastElement.separator === ','
+    const endsWithSeparator = endsWithSemicolon || endsWithComma
     
-    // Determine if we should append to previous output
-    // Only append if previous PRINT ended with semicolon
-    const shouldAppendToPrevious = this.context.lastPrintEndedWithSemicolon
+    // In BASIC, PRINT statements automatically add a newline at the end
+    // unless they end with a semicolon or comma. Add newline immediately if needed.
+    if (!endsWithSeparator && output.length > 0) {
+      output += '\n'
+    }
     
-    // Note: buildOutputString already handles spacing correctly:
-    // - First item: adds space before if positive, no space if negative
-    // - Subsequent items with semicolon: adds space before if positive, no space if negative
-    // So when appending, we don't need to add extra spacing - buildOutputString already did it
-    
-    // Output the string
-    this.printOutput(output, shouldAppendToPrevious)
-    
-    // Update state for next PRINT statement
-    this.context.lastPrintEndedWithSemicolon = endsWithSemicolon
+    // Output the string immediately (newline is already included if needed)
+    this.printOutput(output)
   }
 
   /**

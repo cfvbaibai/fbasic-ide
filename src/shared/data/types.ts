@@ -63,3 +63,10 @@ export enum MoveCharacterCode {
   SIDE_STEPPER = 14,
   NITPICKER = 15,
 }
+
+export interface BackgroundItem {
+  code: number
+  char?: string
+  altChars?: string[]
+  tile: Tile
+}

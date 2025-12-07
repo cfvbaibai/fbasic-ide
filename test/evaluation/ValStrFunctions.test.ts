@@ -31,7 +31,7 @@ describe('VAL and STR$ Functions', () => {
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
       // STR$(5) should return " 5" (with leading space)
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 5')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 5\n')
     })
 
     it('should convert negative number to string without leading space', async () => {
@@ -39,7 +39,7 @@ describe('VAL and STR$ Functions', () => {
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
       // STR$(-5) should return "-5" (no leading space for negative)
-      expect(deviceAdapter.getAllOutputs()).toEqual('-5')
+      expect(deviceAdapter.getAllOutputs()).toEqual('-5\n')
     })
 
     it('should convert zero to string with leading space', async () => {
@@ -47,14 +47,14 @@ describe('VAL and STR$ Functions', () => {
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
       // STR$(0) should return " 0" (with leading space)
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 0')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 0\n')
     })
 
     it('should convert variable to string', async () => {
       const source = '10 LET A = 42\n20 LET A$ = STR$(A)\n30 PRINT A$\n40 END'
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 42')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 42\n')
     })
 
     it('should handle STR$ in expressions', async () => {
@@ -62,7 +62,7 @@ describe('VAL and STR$ Functions', () => {
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
       // STR$(10) + STR$(20) = " 10" + " 20" = " 10 20"
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 10 20')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 10 20\n')
     })
   })
 
@@ -72,7 +72,7 @@ describe('VAL and STR$ Functions', () => {
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 123')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 123\n')
     })
 
     it('should convert positive decimal string to number', async () => {
@@ -80,7 +80,7 @@ describe('VAL and STR$ Functions', () => {
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 456')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 456\n')
     })
 
     it('should convert negative decimal string to number', async () => {
@@ -88,7 +88,7 @@ describe('VAL and STR$ Functions', () => {
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
       // Negative numbers don't get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual('-789')
+      expect(deviceAdapter.getAllOutputs()).toEqual('-789\n')
     })
 
     it('should return 0 for invalid first character', async () => {
@@ -96,7 +96,7 @@ describe('VAL and STR$ Functions', () => {
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 0')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 0\n')
     })
 
     it('should ignore characters after non-numeric', async () => {
@@ -105,7 +105,7 @@ describe('VAL and STR$ Functions', () => {
       expect(result.success).toBe(true)
       // Should parse "123" and ignore "ABC"
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 123')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 123\n')
     })
 
     it('should handle empty string', async () => {
@@ -113,7 +113,7 @@ describe('VAL and STR$ Functions', () => {
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 0')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 0\n')
     })
 
     it('should convert hexadecimal string to number', async () => {
@@ -122,7 +122,7 @@ describe('VAL and STR$ Functions', () => {
       expect(result.success).toBe(true)
       // &HAD = 173 decimal
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 173')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 173\n')
     })
 
     it('should convert hexadecimal with lowercase', async () => {
@@ -131,7 +131,7 @@ describe('VAL and STR$ Functions', () => {
       expect(result.success).toBe(true)
       // &Had = 173 decimal
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 173')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 173\n')
     })
 
     it('should handle hexadecimal with invalid characters', async () => {
@@ -140,7 +140,7 @@ describe('VAL and STR$ Functions', () => {
       expect(result.success).toBe(true)
       // Should parse "AD" and ignore "XYZ"
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 173')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 173\n')
     })
 
     it('should clamp hexadecimal to 32767', async () => {
@@ -149,7 +149,7 @@ describe('VAL and STR$ Functions', () => {
       expect(result.success).toBe(true)
       // &HFFFF = 65535, but should clamp to 32767
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 32767')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 32767\n')
     })
 
     it('should clamp decimal to 32767', async () => {
@@ -158,7 +158,7 @@ describe('VAL and STR$ Functions', () => {
       expect(result.success).toBe(true)
       // Should clamp to 32767
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 32767')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 32767\n')
     })
 
     it('should clamp negative decimal to -32768', async () => {
@@ -167,7 +167,7 @@ describe('VAL and STR$ Functions', () => {
       expect(result.success).toBe(true)
       // Should clamp to -32768
       // Negative numbers don't get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual('-32768')
+      expect(deviceAdapter.getAllOutputs()).toEqual('-32768\n')
     })
 
     it('should handle VAL with variable', async () => {
@@ -175,7 +175,7 @@ describe('VAL and STR$ Functions', () => {
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 42')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 42\n')
     })
 
     it('should handle VAL with STR$ roundtrip', async () => {
@@ -184,7 +184,7 @@ describe('VAL and STR$ Functions', () => {
       expect(result.success).toBe(true)
       // STR$(123) = " 123", VAL(" 123") = 123
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 123')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 123\n')
     })
   })
 
@@ -194,7 +194,7 @@ describe('VAL and STR$ Functions', () => {
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
       // STR$(8) = " 8"
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 8')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 8\n')
     })
 
     it('should handle VAL with string concatenation', async () => {
@@ -203,7 +203,7 @@ describe('VAL and STR$ Functions', () => {
       expect(result.success).toBe(true)
       // VAL("1234") = 1234
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 1234')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 1234\n')
     })
   })
 })

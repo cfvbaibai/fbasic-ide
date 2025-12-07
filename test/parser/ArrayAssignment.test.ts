@@ -83,7 +83,8 @@ describe('Array Assignment', () => {
       // Verify PRINT output
       // Comma separator uses tab stops, numbers get leading space
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual(' 10\t 20\t 30')
+      // PRINT doesn't end with semicolon, so adds newline
+      expect(outputs).toEqual(' 10\t 20\t 30\n')
     })
 
     it('should assign value using expression index', async () => {
@@ -107,7 +108,8 @@ describe('Array Assignment', () => {
       
       // Verify PRINT output
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual(' 100\t 200')
+      // PRINT doesn't end with semicolon, so adds newline
+      expect(outputs).toEqual(' 100\t 200\n')
     })
 
     it('should assign value using expression as value', async () => {
@@ -131,7 +133,8 @@ describe('Array Assignment', () => {
       
       // Verify PRINT output
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual(' 6\t 8')
+      // PRINT doesn't end with semicolon, so adds newline
+      expect(outputs).toEqual(' 6\t 8\n')
     })
 
     it('should assign values in a loop', async () => {
@@ -157,8 +160,9 @@ describe('Array Assignment', () => {
       expect(array[4]).toBe(40)
       
       // Verify PRINT output (semicolon separator, numbers get leading space)
+      // PRINT doesn't end with semicolon (last item is A(4), not a semicolon), so adds newline
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual(' 0 10 20 30 40')
+      expect(outputs).toEqual(' 0 10 20 30 40\n')
     })
 
     it('should overwrite array element values', async () => {
@@ -178,8 +182,9 @@ describe('Array Assignment', () => {
       expect(array[0]).toBe(99)
       
       // Verify PRINT output
+      // PRINT doesn't end with semicolon, so adds newline
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual(' 99')
+      expect(outputs).toEqual(' 99\n')
     })
   })
 
@@ -209,8 +214,9 @@ describe('Array Assignment', () => {
       expect(row1[1]).toBe(4)
       
       // Verify PRINT output
+      // PRINT doesn't end with comma (last item is A(1,1), not a comma), so adds newline
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual(' 1\t 2\t 3\t 4')
+      expect(outputs).toEqual(' 1\t 2\t 3\t 4\n')
     })
 
     it('should assign values to 2D array using expressions', async () => {
@@ -235,8 +241,9 @@ describe('Array Assignment', () => {
       expect(row1[0]).toBe(99)
       
       // Verify PRINT output
+      // PRINT doesn't end with comma (last item is A(1,0), not a comma), so adds newline
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual(' 42\t 99')
+      expect(outputs).toEqual(' 42\t 99\n')
     })
   })
 
@@ -261,7 +268,7 @@ describe('Array Assignment', () => {
       
       // Verify PRINT output (comma separator uses tab stops)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual('Hello\tWorld')
+      expect(outputs).toEqual('Hello\tWorld\n')
     })
 
     it('should assign string values using expressions', async () => {
@@ -284,7 +291,7 @@ describe('Array Assignment', () => {
       
       // Verify PRINT output
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual('Test\tValue')
+      expect(outputs).toEqual('Test\tValue\n')
     })
 
     it('should assign empty string to array element', async () => {
@@ -324,7 +331,7 @@ describe('Array Assignment', () => {
       expect(array[0]).toBe(42)
       
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual(' 42')
+      expect(outputs).toEqual(' 42\n')
     })
 
     it('should handle array assignment at maximum index', async () => {
@@ -342,7 +349,7 @@ describe('Array Assignment', () => {
       expect(array[5]).toBe(100)
       
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual(' 100')
+      expect(outputs).toEqual(' 100\n')
     })
 
     it('should handle negative number assignment', async () => {
@@ -361,7 +368,7 @@ describe('Array Assignment', () => {
       
       // Negative numbers don't get leading space
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual('-10')
+      expect(outputs).toEqual('-10\n')
     })
 
     it('should handle zero assignment', async () => {
@@ -380,7 +387,7 @@ describe('Array Assignment', () => {
       
       // Zero gets leading space
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual(' 0')
+      expect(outputs).toEqual(' 0\n')
     })
   })
 })

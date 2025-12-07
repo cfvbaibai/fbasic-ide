@@ -166,8 +166,9 @@ describe('FOR/NEXT Executor', () => {
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
       // PRINT I; ends with semicolon, so "Done" continues on same line
+      // But PRINT "Done" doesn't end with semicolon, so adds newline
       // Numbers always get a space BEFORE them, strings don't get spaces
-      expect(outputs).toEqual(' 10Done')
+      expect(outputs).toEqual(' 10Done\n')
     })
 
     it('should execute loop once then exit when start < end with negative step', async () => {
@@ -187,8 +188,9 @@ describe('FOR/NEXT Executor', () => {
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
       // PRINT I; ends with semicolon, so "Done" continues on same line
+      // But PRINT "Done" doesn't end with semicolon, so adds newline
       // Numbers always get a space BEFORE them, strings don't get spaces
-      expect(outputs).toEqual(' 1Done')
+      expect(outputs).toEqual(' 1Done\n')
     })
 
     it('should execute loop exactly once when start equals end', async () => {
@@ -473,8 +475,9 @@ describe('FOR/NEXT Executor', () => {
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
       // PRINT I; ends with semicolon, so PRINT X continues on same line
+      // But PRINT X doesn't end with semicolon, so adds newline at end
       // Numbers always get a space BEFORE them
-      expect(outputs).toEqual(' 1 2 5')
+      expect(outputs).toEqual(' 1 2 5\n')
     })
   })
 

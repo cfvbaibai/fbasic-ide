@@ -48,7 +48,7 @@ describe('Logical Operators', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
     })
 
     it('should work with comparison expressions', async () => {
@@ -59,7 +59,7 @@ describe('Logical Operators', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
     })
   })
 
@@ -72,7 +72,7 @@ describe('Logical Operators', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('Both True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('Both True\n')
     })
 
     it('should return 0 (false) when first operand is false', async () => {
@@ -116,7 +116,7 @@ describe('Logical Operators', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('All True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('All True\n')
     })
   })
 
@@ -129,7 +129,7 @@ describe('Logical Operators', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
     })
 
     it('should return -1 (true) when second operand is true', async () => {
@@ -140,7 +140,7 @@ describe('Logical Operators', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
     })
 
     it('should return -1 (true) when both operands are true', async () => {
@@ -151,7 +151,7 @@ describe('Logical Operators', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
     })
 
     it('should return 0 (false) when both operands are false', async () => {
@@ -173,7 +173,7 @@ describe('Logical Operators', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('At Least One True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('At Least One True\n')
     })
   })
 
@@ -197,7 +197,7 @@ describe('Logical Operators', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
     })
 
     it('should return -1 (true) when first operand is false and second is true', async () => {
@@ -208,7 +208,7 @@ describe('Logical Operators', () => {
       const result = await interpreter.execute(code)
       
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
     })
 
     it('should return 0 (false) when both operands are false', async () => {
@@ -246,7 +246,7 @@ describe('Logical Operators', () => {
       
       expect(result.success).toBe(true)
       // (NOT false) AND true = true AND true = true
-      expect(deviceAdapter.getAllOutputs()).toEqual('True')
+      expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
     })
 
     it('should evaluate OR before XOR', async () => {

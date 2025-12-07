@@ -44,7 +44,7 @@ describe('RestoreExecutor', () => {
       const outputs = deviceAdapter.getAllOutputs()
       // Should read: 10, 20, 30, 40, 50, then after RESTORE: 10, 20
       // Comma separator uses tabs, numbers have leading spaces
-      expect(outputs).toEqual(' 10\t 20\t 30\t 40\t 50\t 10\t 20')
+      expect(outputs).toEqual(' 10\t 20\t 30\t 40\t 50\t 10\t 20\n')
     })
 
     it('should allow reading same DATA multiple times', async () => {
@@ -64,7 +64,7 @@ describe('RestoreExecutor', () => {
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
       // All should read 1, 2 (three times)
-      expect(outputs).toEqual(' 1\t 2\t 1\t 2\t 1\t 2')
+      expect(outputs).toEqual(' 1\t 2\t 1\t 2\t 1\t 2\n')
     })
   })
 
@@ -112,7 +112,7 @@ describe('RestoreExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual(' 10\t 20\t 30')
+      expect(outputs).toEqual(' 10\t 20\t 30\n')
     })
 
     it('should restore to specific DATA line in sequence', async () => {
@@ -131,7 +131,7 @@ describe('RestoreExecutor', () => {
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
       // Should read from line 20: 3, 4
-      expect(outputs).toEqual(' 3\t 4')
+      expect(outputs).toEqual(' 3\t 4\n')
     })
   })
 
@@ -154,7 +154,7 @@ describe('RestoreExecutor', () => {
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
       // A=10, B=30, C=10
-      expect(outputs).toEqual(' 10\t 30\t 10')
+      expect(outputs).toEqual(' 10\t 30\t 10\n')
     })
 
     it('should work with string DATA', async () => {
@@ -171,7 +171,7 @@ describe('RestoreExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual('FOO\tBAR')
+      expect(outputs).toEqual('FOO\tBAR\n')
     })
 
     it('should work with mixed numeric and string DATA', async () => {
@@ -187,7 +187,7 @@ describe('RestoreExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual(' 10\tTEN\t 20\tTWENTY')
+      expect(outputs).toEqual(' 10\tTEN\t 20\tTWENTY\n')
     })
   })
 
@@ -221,7 +221,7 @@ describe('RestoreExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual(' 10')
+      expect(outputs).toEqual(' 10\n')
     })
   })
 

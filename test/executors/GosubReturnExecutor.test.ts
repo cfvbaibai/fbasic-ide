@@ -47,7 +47,8 @@ describe('GOSUB/RETURN Executor', () => {
       // Should print stars for I=1,2,3 and then "END"
       // I=1: J=0,1 -> ** (2 stars), I=2: J=0,1,2 -> *** (3 stars), I=3: J=0,1,2,3 -> **** (4 stars)
       // Each PRINT "*"; outputs on same line, then PRINT adds newline
-      expect(outputs).toEqual('**\n***\n****\nEND')
+      // PRINT "END" doesn't end with semicolon, so adds newline
+      expect(outputs).toEqual('**\n***\n****\nEND\n')
     })
 
     it('should handle nested GOSUB calls', async () => {
@@ -66,7 +67,8 @@ describe('GOSUB/RETURN Executor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual('Sub1\nSub2\nMain')
+      // PRINT "Main" doesn't end with semicolon, so adds newline
+      expect(outputs).toEqual('Sub1\nSub2\nMain\n')
     })
 
     it('should error on GOSUB to non-existent line number', async () => {
@@ -104,7 +106,8 @@ describe('GOSUB/RETURN Executor', () => {
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
       // Should execute: Before, Subroutine, After
-      expect(outputs).toEqual('Before\nSubroutine\nAfter')
+      // PRINT "After" doesn't end with semicolon, so adds newline
+      expect(outputs).toEqual('Before\nSubroutine\nAfter\n')
     })
 
     it('should return to specific line number when specified', async () => {
@@ -122,7 +125,8 @@ describe('GOSUB/RETURN Executor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual('Start\nSubroutine\nTarget')
+      // PRINT "Target" doesn't end with semicolon, so adds newline
+      expect(outputs).toEqual('Start\nSubroutine\nTarget\n')
     })
 
     it('should error on RETURN without GOSUB', async () => {
@@ -198,7 +202,8 @@ describe('GOSUB/RETURN Executor', () => {
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
       // Numbers always get a space BEFORE them
-      expect(outputs).toEqual(' 1\n 2\n 3')
+      // PRINT I doesn't end with semicolon, so each adds newline
+      expect(outputs).toEqual(' 1\n 2\n 3\n')
     })
   })
 })

@@ -1,4 +1,4 @@
-import { MoveCharacterCode, type SpriteDefinition } from "./types"
+import { MoveCharacterCode, type SpriteDefinition } from "../types"
 
 const SPRITE_LASER_HORIZONTAL1_208 = [
   [0,0,0,0,0,0,0,0],

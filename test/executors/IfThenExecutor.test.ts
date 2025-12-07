@@ -32,7 +32,7 @@ describe('IfThenExecutor', () => {
     const result = await interpreter.execute(source)
     
     expect(result.success).toBe(true)
-    expect(deviceAdapter.getAllOutputs()).toEqual('Equal')
+    expect(deviceAdapter.getAllOutputs()).toEqual('Equal\n')
   })
 
   it('should not execute THEN clause when condition is false', async () => {
@@ -57,7 +57,7 @@ describe('IfThenExecutor', () => {
     const result = await interpreter.execute(source)
     
     expect(result.success).toBe(true)
-    expect(deviceAdapter.getAllOutputs()).toEqual(' 10')
+    expect(deviceAdapter.getAllOutputs()).toEqual(' 10\n')
   })
 
   it('should handle greater than comparison', async () => {
@@ -69,7 +69,7 @@ describe('IfThenExecutor', () => {
     const result = await interpreter.execute(source)
     
     expect(result.success).toBe(true)
-    expect(deviceAdapter.getAllOutputs()).toEqual('Greater')
+    expect(deviceAdapter.getAllOutputs()).toEqual('Greater\n')
   })
 
   it('should handle less than comparison', async () => {
@@ -81,7 +81,7 @@ describe('IfThenExecutor', () => {
     const result = await interpreter.execute(source)
     
     expect(result.success).toBe(true)
-    expect(deviceAdapter.getAllOutputs()).toEqual('Less')
+    expect(deviceAdapter.getAllOutputs()).toEqual('Less\n')
   })
 
   it('should handle not equal comparison', async () => {
@@ -93,7 +93,7 @@ describe('IfThenExecutor', () => {
     const result = await interpreter.execute(source)
     
     expect(result.success).toBe(true)
-    expect(deviceAdapter.getAllOutputs()).toEqual('Not Equal')
+    expect(deviceAdapter.getAllOutputs()).toEqual('Not Equal\n')
   })
 
   it('should handle single expression condition (non-zero = true)', async () => {
@@ -105,7 +105,7 @@ describe('IfThenExecutor', () => {
     const result = await interpreter.execute(source)
     
     expect(result.success).toBe(true)
-    expect(deviceAdapter.getAllOutputs()).toEqual('True')
+    expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
   })
 
   it('should handle single expression condition (zero = false)', async () => {
@@ -129,7 +129,7 @@ describe('IfThenExecutor', () => {
     const result = await interpreter.execute(source)
     
     expect(result.success).toBe(true)
-    expect(deviceAdapter.getAllOutputs()).toEqual('Match')
+    expect(deviceAdapter.getAllOutputs()).toEqual('Match\n')
   })
 
   it('should handle nested IF-THEN', async () => {
@@ -142,7 +142,7 @@ describe('IfThenExecutor', () => {
     const result = await interpreter.execute(source)
     
     expect(result.success).toBe(true)
-    expect(deviceAdapter.getAllOutputs()).toEqual('Both')
+    expect(deviceAdapter.getAllOutputs()).toEqual('Both\n')
   })
 
   it('should handle IF-THEN with FOR loop in THEN clause', async () => {
@@ -155,7 +155,8 @@ describe('IfThenExecutor', () => {
     
     expect(result.success).toBe(true)
     // Colon is just statement separator - PRINT I doesn't end with semicolon, so each adds newline
-    expect(deviceAdapter.getAllOutputs()).toEqual(' 1\n 2\n 3')
+    // Last PRINT I doesn't end with semicolon, so adds newline
+    expect(deviceAdapter.getAllOutputs()).toEqual(' 1\n 2\n 3\n')
   })
 
   it('should handle IF-THEN with line number jump', async () => {
@@ -172,7 +173,7 @@ describe('IfThenExecutor', () => {
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
-    expect(outputs).toEqual('Jumped here')
+    expect(outputs).toEqual('Jumped here\n')
   })
 
   it('should handle IF-THEN with line number when condition is false', async () => {
@@ -189,7 +190,7 @@ describe('IfThenExecutor', () => {
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
-    expect(outputs).toEqual('Not jumped')
+    expect(outputs).toEqual('Not jumped\n')
   })
 
   it('should handle IF-GOTO with line number jump', async () => {
@@ -206,7 +207,7 @@ describe('IfThenExecutor', () => {
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
-    expect(outputs).toEqual('Jumped here')
+    expect(outputs).toEqual('Jumped here\n')
   })
 
   it('should handle IF-GOTO with line number when condition is false', async () => {
@@ -223,7 +224,7 @@ describe('IfThenExecutor', () => {
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
-    expect(outputs).toEqual('Not jumped')
+    expect(outputs).toEqual('Not jumped\n')
   })
 
   it('should handle IF-THEN line number with backward jump', async () => {
@@ -241,8 +242,8 @@ describe('IfThenExecutor', () => {
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
       // PRINT I doesn't end with semicolon, so each adds newline
-      // PRINT "Done" adds newline
-      expect(outputs).toEqual(' 1\n 2\n 3\nDone')
+      // PRINT "Done" doesn't end with semicolon, so adds newline
+      expect(outputs).toEqual(' 1\n 2\n 3\nDone\n')
   })
 
   it('should error on IF-THEN with non-existent line number', async () => {
@@ -279,7 +280,8 @@ describe('IfThenExecutor', () => {
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
     // Colon is just statement separator - PRINT "Before" doesn't end with semicolon, so adds newline
-    expect(outputs).toEqual('Before\nAfter')
+    // PRINT "After" doesn't end with semicolon, so adds newline
+    expect(outputs).toEqual('Before\nAfter\n')
   })
 
   it('should handle IF-THEN with FOR loop in THEN clause', async () => {
@@ -294,7 +296,8 @@ describe('IfThenExecutor', () => {
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
     // Colon is just statement separator - PRINT statements without semicolons add newlines
-    expect(outputs).toEqual('X is 0\n 1\nDone')
+    // PRINT "Done" doesn't end with semicolon, so adds newline
+    expect(outputs).toEqual('X is 0\n 1\nDone\n')
   })
 
   describe('IF-THEN with Multiple Statements in THEN', () => {
@@ -314,7 +317,8 @@ describe('IfThenExecutor', () => {
       // When condition is true: executes THEN statements, then continues to next line
       // Colon is just statement separator - it does NOT affect newlines
       // Only semicolon suppresses newlines. Each PRINT without semicolon adds a newline.
-      expect(outputs).toEqual('First\nSecond\nAfter')
+      // PRINT "After" doesn't end with semicolon, so adds newline
+      expect(outputs).toEqual('First\nSecond\nAfter\n')
     })
 
     it('should skip multiple statements in THEN clause when condition is false', async () => {
@@ -330,7 +334,7 @@ describe('IfThenExecutor', () => {
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
       // When condition is false: bypasses THEN, goes directly to next line
-      expect(outputs).toEqual('After')
+      expect(outputs).toEqual('After\n')
     })
   })
 
@@ -347,7 +351,7 @@ describe('IfThenExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual('Between')
+      expect(outputs).toEqual('Between\n')
     })
 
     it('should handle IF-THEN with AND operator (false case)', async () => {
@@ -362,7 +366,7 @@ describe('IfThenExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual('After')
+      expect(outputs).toEqual('After\n')
     })
 
     it('should handle IF-THEN with OR operator', async () => {
@@ -377,7 +381,7 @@ describe('IfThenExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual('Outside')
+      expect(outputs).toEqual('Outside\n')
     })
 
     it('should handle IF-THEN with OR operator (false case)', async () => {
@@ -392,7 +396,7 @@ describe('IfThenExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual('After')
+      expect(outputs).toEqual('After\n')
     })
 
     it('should handle IF-THEN with complex AND/OR expression', async () => {
@@ -406,7 +410,7 @@ describe('IfThenExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual('Valid')
+      expect(outputs).toEqual('Valid\n')
     })
   })
 
@@ -427,7 +431,8 @@ describe('IfThenExecutor', () => {
       const outputs = deviceAdapter.getAllOutputs()
       // Should execute THEN, then continue to next line
       // PRINT "Then" doesn't end with semicolon, so adds newline
-      expect(outputs).toEqual('Then\nNext')
+      // PRINT "Next" doesn't end with semicolon, so adds newline
+      expect(outputs).toEqual('Then\nNext\n')
     })
 
     it('should go directly to next line when condition is false', async () => {
@@ -445,7 +450,7 @@ describe('IfThenExecutor', () => {
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
       // Should bypass THEN, go directly to next line
-      expect(outputs).toEqual('Next')
+      expect(outputs).toEqual('Next\n')
     })
   })
 
@@ -461,7 +466,7 @@ describe('IfThenExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual('Greater or Equal')
+      expect(outputs).toEqual('Greater or Equal\n')
     })
 
     it('should handle less than or equal comparison', async () => {
@@ -475,7 +480,7 @@ describe('IfThenExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual('Less or Equal')
+      expect(outputs).toEqual('Less or Equal\n')
     })
 
     it('should handle string not equal comparison', async () => {
@@ -490,7 +495,7 @@ describe('IfThenExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual('Not Y')
+      expect(outputs).toEqual('Not Y\n')
     })
   })
 })

@@ -178,6 +178,7 @@ export type ServiceWorkerMessageType =
   | 'ERROR'
   | 'PROGRESS'
   | 'OUTPUT'
+  | 'SCREEN_UPDATE'
   | 'STOP'
   | 'INIT'
   | 'READY'
@@ -231,6 +232,30 @@ export interface OutputMessage extends ServiceWorkerMessage {
     outputType: 'print' | 'debug' | 'error'
     timestamp: number
   }
+}
+
+// Screen update message - sent from service worker to UI for screen updates
+export interface ScreenUpdateMessage extends ServiceWorkerMessage {
+  type: 'SCREEN_UPDATE'
+  data: {
+    executionId: string
+    updateType: 'character' | 'cursor' | 'clear' | 'full'
+    x?: number
+    y?: number
+    character?: string
+    cursorX?: number
+    cursorY?: number
+    screenBuffer?: ScreenCell[][]
+    timestamp: number
+  }
+}
+
+// Screen cell interface for screen buffer
+export interface ScreenCell {
+  character: string
+  colorPattern: number
+  x: number
+  y: number
 }
 
 // Stop message - sent from UI to service worker
@@ -299,6 +324,7 @@ export type AnyServiceWorkerMessage =
   | ResultMessage
   | ProgressMessage
   | OutputMessage
+  | ScreenUpdateMessage
   | StopMessage
   | StrigEventMessage
   | StickEventMessage

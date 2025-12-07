@@ -13323,6 +13323,9 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       const lastItem = items[items.length - 1];
       const endsWithSemicolon = lastItem?.separator === ";";
       const shouldAppendToPrevious = this.context.lastPrintEndedWithSemicolon;
+      if (!endsWithSemicolon && output.length > 0) {
+        output += "\n";
+      }
       this.printOutput(output, shouldAppendToPrevious);
       this.context.lastPrintEndedWithSemicolon = endsWithSemicolon;
     }
@@ -15080,12 +15083,29 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       __publicField(this, "stickStates", /* @__PURE__ */ new Map());
       __publicField(this, "isEnabled", true);
       __publicField(this, "currentExecutionId", null);
+      // === SCREEN STATE ===
+      __publicField(this, "screenBuffer", []);
+      __publicField(this, "cursorX", 0);
+      __publicField(this, "cursorY", 0);
       // === WEB WORKER MANAGEMENT ===
       __publicField(this, "worker", null);
       __publicField(this, "messageId", 0);
       __publicField(this, "pendingMessages", /* @__PURE__ */ new Map());
       console.log("\u{1F50C} [WEB_WORKER_DEVICE] WebWorkerDeviceAdapter created");
+      this.initializeScreen();
       this.setupMessageListener();
+    }
+    initializeScreen() {
+      this.screenBuffer = [];
+      for (let y = 0; y < 24; y++) {
+        const row = [];
+        for (let x = 0; x < 28; x++) {
+          row.push({ character: " ", colorPattern: 0, x, y });
+        }
+        this.screenBuffer.push(row);
+      }
+      this.cursorX = 0;
+      this.cursorY = 0;
     }
     // === WEB WORKER MANAGEMENT METHODS ===
     /**
@@ -15324,6 +15344,75 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           timestamp: Date.now()
         }
       });
+      for (const char of output) {
+        this.writeCharacterToScreen(char);
+      }
+    }
+    writeCharacterToScreen(char) {
+      if (char === "\n") {
+        this.cursorX = 0;
+        this.cursorY++;
+        if (this.cursorY >= 24) {
+          this.cursorY = 0;
+        }
+        this.sendCursorUpdate();
+        return;
+      }
+      if (this.cursorY < 24 && this.cursorX < 28) {
+        if (!this.screenBuffer[this.cursorY]) {
+          this.screenBuffer[this.cursorY] = [];
+        }
+        if (!this.screenBuffer[this.cursorY][this.cursorX]) {
+          this.screenBuffer[this.cursorY][this.cursorX] = {
+            character: " ",
+            colorPattern: 0,
+            x: this.cursorX,
+            y: this.cursorY
+          };
+        }
+        this.screenBuffer[this.cursorY][this.cursorX].character = char;
+        this.sendCharacterUpdate(this.cursorX, this.cursorY, char);
+        this.cursorX++;
+        if (this.cursorX >= 28) {
+          this.cursorX = 0;
+          this.cursorY++;
+          if (this.cursorY >= 24) {
+            this.cursorY = 0;
+          }
+          this.sendCursorUpdate();
+        } else {
+          this.sendCursorUpdate();
+        }
+      }
+    }
+    sendCharacterUpdate(x, y, character) {
+      self.postMessage({
+        type: "SCREEN_UPDATE",
+        id: `screen-char-${Date.now()}`,
+        timestamp: Date.now(),
+        data: {
+          executionId: this.currentExecutionId || "unknown",
+          updateType: "character",
+          x,
+          y,
+          character,
+          timestamp: Date.now()
+        }
+      });
+    }
+    sendCursorUpdate() {
+      self.postMessage({
+        type: "SCREEN_UPDATE",
+        id: `screen-cursor-${Date.now()}`,
+        timestamp: Date.now(),
+        data: {
+          executionId: this.currentExecutionId || "unknown",
+          updateType: "cursor",
+          cursorX: this.cursorX,
+          cursorY: this.cursorY,
+          timestamp: Date.now()
+        }
+      });
     }
     debugOutput(output) {
       console.log("\u{1F50C} [WEB_WORKER_DEVICE] Debug output:", output);
@@ -15355,11 +15444,16 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     }
     clearScreen() {
       console.log("\u{1F50C} [WEB_WORKER_DEVICE] Clear screen");
+      this.initializeScreen();
       self.postMessage({
-        type: "CLEAR_SCREEN",
-        id: `clear-${Date.now()}`,
+        type: "SCREEN_UPDATE",
+        id: `screen-clear-${Date.now()}`,
         timestamp: Date.now(),
-        data: { executionId: this.currentExecutionId || "unknown" }
+        data: {
+          executionId: this.currentExecutionId || "unknown",
+          updateType: "clear",
+          timestamp: Date.now()
+        }
       });
     }
     /**
@@ -15367,6 +15461,22 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
      */
     setCurrentExecutionId(executionId) {
       this.currentExecutionId = executionId;
+      if (executionId) {
+        this.initializeScreen();
+        this.sendScreenClear();
+      }
+    }
+    sendScreenClear() {
+      self.postMessage({
+        type: "SCREEN_UPDATE",
+        id: `screen-clear-${Date.now()}`,
+        timestamp: Date.now(),
+        data: {
+          executionId: this.currentExecutionId || "unknown",
+          updateType: "clear",
+          timestamp: Date.now()
+        }
+      });
     }
     // === PRIVATE METHODS ===
     /**
@@ -15402,6 +15512,12 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           outputLength: message.data.output.length
         });
         this.handleOutputMessage(message);
+        return;
+      }
+      if (message.type === "SCREEN_UPDATE") {
+        console.log("\u{1F5A5}\uFE0F [MAIN] SCREEN_UPDATE message received (handled by composable):", {
+          updateType: message.data.updateType
+        });
         return;
       }
       const pending = this.pendingMessages.get(message.id);

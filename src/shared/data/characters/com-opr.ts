@@ -1,4 +1,4 @@
-import type { SpriteDefinition } from "./types"
+import type { SpriteDefinition } from "../types"
 
 const SPRITE_COMPUTER_1_244 = [
   [2,2,2,2,2,2,2,2],

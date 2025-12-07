@@ -1,6 +1,6 @@
 import { ref, computed, provide, inject, type InjectionKey } from 'vue'
 import { CHARACTER_SPRITES } from '../../../shared/data/sprites'
-import type { SpriteDefinition } from '@/shared/data/characters/types'
+import type { SpriteDefinition } from '@/shared/data/types'
 import { useSpriteDisplay } from './useSpriteDisplay'
 import { usePaletteSelection } from './usePaletteSelection'
 import { useDefSpriteStatement } from './useDefSpriteStatement'

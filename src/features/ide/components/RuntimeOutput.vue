@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, watch, nextTick, computed } from 'vue'
-import { Tools, Document, Warning, Loading, DataBoard, Picture } from '@element-plus/icons-vue'
-import type { BasicVariable } from '../../../core/interfaces'
+import { Tools, Document, Warning, Loading, DataBoard, Picture, Monitor } from '@element-plus/icons-vue'
+import type { BasicVariable, ScreenCell } from '../../../core/interfaces'
+import Screen from './Screen.vue'
 
 interface Props {
   output: string[]
@@ -10,17 +11,33 @@ interface Props {
   variables?: Record<string, BasicVariable>
   debugOutput?: string
   debugMode?: boolean
+  screenBuffer?: ScreenCell[][]
+  cursorX?: number
+  cursorY?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
   errors: () => [],
   variables: () => ({}),
   debugOutput: '',
-  debugMode: false
+  debugMode: false,
+  screenBuffer: () => {
+    const grid: ScreenCell[][] = []
+    for (let y = 0; y < 24; y++) {
+      const row: ScreenCell[] = []
+      for (let x = 0; x < 28; x++) {
+        row.push({ character: ' ', colorPattern: 0, x, y })
+      }
+      grid.push(row)
+    }
+    return grid
+  },
+  cursorX: 0,
+  cursorY: 0
 })
 
 const outputRef = ref<HTMLDivElement>()
-const activeTab = ref('output')
+const activeTab = ref('screen')
 
 // Maximum number of lines to keep in the output buffer
 const MAX_OUTPUT_LINES = 1000
@@ -48,11 +65,31 @@ watch(() => props.output.length, scrollToBottom)
 <template>
   <div class="runtime-output">
     <el-tabs v-model="activeTab" class="output-tabs" type="border-card">
-      <!-- Text Output Tab -->
-      <el-tab-pane label="Output" name="output">
+      <!-- SCREEN Tab -->
+      <el-tab-pane label="SCREEN" name="screen">
+        <template #label>
+          <el-icon><Monitor /></el-icon>
+          <span>SCREEN</span>
+          <el-tag v-if="isRunning" type="success" size="small" effect="dark">
+            <el-icon class="rotating"><Loading /></el-icon>
+            Live
+          </el-tag>
+        </template>
+        
+        <div class="tab-content">
+          <Screen 
+            :screen-buffer="screenBuffer"
+            :cursor-x="cursorX"
+            :cursor-y="cursorY"
+          />
+        </div>
+      </el-tab-pane>
+
+      <!-- STDOUT Tab (renamed from Output) -->
+      <el-tab-pane label="STDOUT" name="stdout">
         <template #label>
           <el-icon><Document /></el-icon>
-          <span>Output</span>
+          <span>STDOUT</span>
           <el-tag v-if="isRunning" type="success" size="small" effect="dark">
             <el-icon class="rotating"><Loading /></el-icon>
             Live

@@ -1,6 +1,6 @@
 import { computed } from 'vue'
-import type { SpriteDefinition } from '@/shared/data/characters/types'
-import { isEightTileSprite, isFourTileSprite, isSixTileSprite, isOneTileSprite } from '@/shared/data/characters/types'
+import type { SpriteDefinition } from '@/shared/data/types'
+import { isEightTileSprite, isFourTileSprite, isSixTileSprite, isOneTileSprite } from '@/shared/data/types'
 
 export function useDefSpriteStatement(
   selectedSprite: { value: SpriteDefinition | null },

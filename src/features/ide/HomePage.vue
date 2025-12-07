@@ -17,6 +17,9 @@ const {
   highlightedCode,
   debugOutput,
   debugMode,
+  screenBuffer,
+  cursorX,
+  cursorY,
   runCode,
   stopCode,
   clearOutput,
@@ -118,6 +121,9 @@ onMounted(() => {
           :variables="variables"
           :debug-output="debugOutput"
           :debug-mode="debugMode"
+          :screen-buffer="screenBuffer"
+          :cursor-x="cursorX"
+          :cursor-y="cursorY"
         />
       </div>
     </div>

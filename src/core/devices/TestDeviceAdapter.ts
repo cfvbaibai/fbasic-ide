@@ -142,13 +142,34 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
   /**
    * Get all captured outputs as a single string
    * Error outputs are formatted as "RUNTIME: {message}" to match IDE format
+   * Note: Each output may already contain a newline (from PRINT statements that don't end with semicolon/comma)
+   * Outputs that don't end with newline (from PRINT statements ending with semicolon/comma) should be concatenated
    */
   getAllOutputs(): string {
-    return [
+    const allOutputs = [
       ...this.printOutputs,
       ...this.debugOutputs.map(o => `DEBUG: ${o}`),
       ...this.errorOutputs.map(o => `RUNTIME: ${o}`)
-    ].join('\n')
+    ]
+    
+    if (allOutputs.length === 0) return ''
+    
+    // Concatenate outputs:
+    // - Outputs ending with newline are kept as-is (they already have their newline)
+    // - Outputs not ending with newline are concatenated directly (no separator)
+    // - Only add newline separator when transitioning from newline-ending to non-newline-starting output
+    let result = ''
+    for (let i = 0; i < allOutputs.length; i++) {
+      const output = allOutputs[i]
+      if (output.endsWith('\n')) {
+        // Output ends with newline - add it as-is
+        result += output
+      } else {
+        // Output doesn't end with newline - concatenate directly
+        result += output
+      }
+    }
+    return result
   }
 
   /**

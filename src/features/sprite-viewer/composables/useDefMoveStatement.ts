@@ -1,5 +1,5 @@
 import { computed } from 'vue'
-import type { SpriteDefinition } from '@/shared/data/characters/types'
+import type { SpriteDefinition } from '@/shared/data/types'
 
 export function useDefMoveStatement(
   selectedSprite: { value: SpriteDefinition | null },

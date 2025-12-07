@@ -47,8 +47,6 @@ export class ExecutionContext {
   public dataIndex = 0 // Current position in DATA
   public arrays: Map<string, BasicArrayValue> = new Map() // Array storage
   
-  // PRINT state tracking
-  public lastPrintEndedWithSemicolon = false // Track if last PRINT statement ended with semicolon
   
   // Device integration
   public deviceAdapter?: BasicDeviceAdapter
@@ -75,7 +73,6 @@ export class ExecutionContext {
     this.dataValues = []
     this.dataIndex = 0
     this.arrays.clear()
-    this.lastPrintEndedWithSemicolon = false
     this.currentLineNumber = 0
     this.errors = []
   }

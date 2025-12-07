@@ -42,7 +42,7 @@ describe('OnExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual('First')
+      expect(outputs).toEqual('First\n')
     })
 
     it('should jump to second line when expression is 2', async () => {
@@ -63,7 +63,7 @@ describe('OnExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual('Second')
+      expect(outputs).toEqual('Second\n')
     })
 
     it('should jump to third line when expression is 3', async () => {
@@ -84,7 +84,7 @@ describe('OnExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual('Third')
+      expect(outputs).toEqual('Third\n')
     })
 
     it('should proceed to next line when expression is 0', async () => {
@@ -106,7 +106,7 @@ describe('OnExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual('Next')
+      expect(outputs).toEqual('Next\n')
     })
 
     it('should proceed to next line when expression exceeds number of lines', async () => {
@@ -128,7 +128,7 @@ describe('OnExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual('Next')
+      expect(outputs).toEqual('Next\n')
     })
 
     it('should handle ON with expression', async () => {
@@ -149,7 +149,7 @@ describe('OnExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual('Second')
+      expect(outputs).toEqual('Second\n')
     })
 
     it('should handle negative expression value', async () => {
@@ -170,7 +170,7 @@ describe('OnExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual('Next')
+      expect(outputs).toEqual('Next\n')
     })
 
     it('should handle fractional expression value (truncated to integer)', async () => {
@@ -193,7 +193,7 @@ describe('OnExecutor', () => {
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
       // 5 / 2 = 2.5 truncated to 2, so should jump to second line
-      expect(outputs).toEqual('Second')
+      expect(outputs).toEqual('Second\n')
     })
   })
 
@@ -217,7 +217,8 @@ describe('OnExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual('First\nAfter')
+      // PRINT "After" doesn't end with semicolon, so adds newline
+      expect(outputs).toEqual('First\nAfter\n')
     })
 
     it('should handle ON-GOSUB matching manual example structure', async () => {
@@ -243,7 +244,8 @@ describe('OnExecutor', () => {
       const outputs = deviceAdapter.getAllOutputs()
       // Manual example: N=2, so ON N GOSUB calls line 200 which sets X$="HOPE"
       // Then prints: " 2 IS THE SYMBOL OF HOPE."
-      expect(outputs).toEqual(' 2 IS THE SYMBOL OF HOPE.')
+      // PRINT doesn't end with semicolon, so adds newline
+      expect(outputs).toEqual(' 2 IS THE SYMBOL OF HOPE.\n')
     })
   })
 
@@ -268,7 +270,8 @@ describe('OnExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual('First\nAfter')
+      // PRINT "After" doesn't end with semicolon, so adds newline
+      expect(outputs).toEqual('First\nAfter\n')
     })
 
     it('should return to second line when expression is 2', async () => {
@@ -291,7 +294,8 @@ describe('OnExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual('Second\nAfter')
+      // PRINT "After" doesn't end with semicolon, so adds newline
+      expect(outputs).toEqual('Second\nAfter\n')
     })
   })
 
@@ -314,7 +318,8 @@ describe('OnExecutor', () => {
       const outputs = deviceAdapter.getAllOutputs()
       // Should read from line 10: 10, 20, 30
       // Numbers get leading space, comma separator uses tab stops
-      expect(outputs).toEqual(' 10\t 20\t 30')
+      // PRINT doesn't end with semicolon, so adds newline
+      expect(outputs).toEqual(' 10\t 20\t 30\n')
     })
 
     it('should restore data pointer to second line when expression is 2', async () => {
@@ -335,7 +340,7 @@ describe('OnExecutor', () => {
       const outputs = deviceAdapter.getAllOutputs()
       // Should read from line 20: 40, 50, 60
       // Numbers get leading space, comma separator uses tab stops
-      expect(outputs).toEqual(' 40\t 50\t 60')
+      expect(outputs).toEqual(' 40\t 50\t 60\n')
     })
 
     it('should proceed to next line when expression is 0 or out of range', async () => {
@@ -355,7 +360,7 @@ describe('OnExecutor', () => {
       // Should read from default position (beginning): 10
       const outputs = deviceAdapter.getAllOutputs()
       // Numbers get leading space
-      expect(outputs).toEqual(' 10')
+      expect(outputs).toEqual(' 10\n')
     })
   })
 
@@ -433,7 +438,8 @@ describe('OnExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual('Three')
+      // PRINT "Three" doesn't end with semicolon, so adds newline
+      expect(outputs).toEqual('Three\n')
     })
   })
 })
