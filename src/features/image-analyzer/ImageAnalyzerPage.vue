@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { Upload, Search, Plus, Minus, ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from '@element-plus/icons-vue'
+import GameNavigation from '../../shared/components/GameNavigation.vue'
+import { GameButton, GameButtonGroup, GameUpload, GameIcon } from '../../shared/components/ui'
 
 const imageFile = ref<File | null>(null)
 const imageUrl = ref<string>('')
@@ -35,10 +37,10 @@ const overlayDisplaySize = computed(() => {
   return Math.min(maxDimension, 800)
 })
 
-const handleFileChange = (uploadFile: { raw?: File } | unknown) => {
-  const file = (uploadFile as { raw?: File }).raw
-  if (!file) return
-  imageFile.value = file
+const handleFileChange = (file: File | File[]) => {
+  const selectedFile = Array.isArray(file) ? file[0] : file
+  if (!selectedFile) return
+  imageFile.value = selectedFile
   const reader = new FileReader()
   reader.onload = (e) => {
     imageUrl.value = e.target?.result as string
@@ -50,7 +52,7 @@ const handleFileChange = (uploadFile: { raw?: File } | unknown) => {
     }
     img.src = imageUrl.value
   }
-  reader.readAsDataURL(file)
+  reader.readAsDataURL(selectedFile)
   hasAnalyzed.value = false
 }
 
@@ -299,30 +301,26 @@ const generateArray = async () => {
 
 <template>
   <div class="image-analyzer-container">
+    <GameNavigation />
     <div class="analyzer-header">
       <h1 class="analyzer-title">
-        <el-icon><Search /></el-icon>
+        <GameIcon :icon="Search" />
         Image Analyzer
       </h1>
     </div>
 
     <div class="analyzer-content">
       <div class="upload-section">
-        <el-upload
-          :auto-upload="false"
-          :on-change="handleFileChange"
-          :show-file-list="false"
+        <GameUpload
           accept="image/*"
-          class="upload-area"
+          @change="handleFileChange"
         >
-          <template #trigger>
-            <el-button type="primary" :icon="Upload">
-              Upload Image
-            </el-button>
-          </template>
-        </el-upload>
+          <GameButton type="primary" :icon="Upload">
+            Upload Image
+          </GameButton>
+        </GameUpload>
 
-        <el-button
+        <GameButton
           type="success"
           :icon="Search"
           :disabled="!imageFile || isAnalyzing"
@@ -331,7 +329,7 @@ const generateArray = async () => {
           class="analyze-button"
         >
           {{ isAnalyzing ? 'Analyzing...' : 'Analyze' }}
-        </el-button>
+        </GameButton>
       </div>
 
       <div v-if="imageUrl" class="image-preview">
@@ -352,19 +350,19 @@ const generateArray = async () => {
         <div class="grid-controls-header">
           <h2 class="results-title">Image with Grid Overlay</h2>
           <div class="grid-controls">
-            <el-button-group size="small">
-              <el-button :icon="Plus" @click="increaseCellSize" title="Increase cell size" />
-              <el-button :icon="Minus" @click="decreaseCellSize" title="Decrease cell size" />
-            </el-button-group>
-            <el-button-group size="small">
-              <el-button :icon="ArrowUp" @click="moveGridUp" title="Move grid up" />
-              <el-button :icon="ArrowDown" @click="moveGridDown" title="Move grid down" />
-              <el-button :icon="ArrowLeft" @click="moveGridLeft" title="Move grid left" />
-              <el-button :icon="ArrowRight" @click="moveGridRight" title="Move grid right" />
-            </el-button-group>
-            <el-button size="small" @click="generateArray" title="Generate 8x8 array">
+            <GameButtonGroup>
+              <GameButton size="small" :icon="Plus" @click="increaseCellSize" title="Increase cell size" />
+              <GameButton size="small" :icon="Minus" @click="decreaseCellSize" title="Decrease cell size" />
+            </GameButtonGroup>
+            <GameButtonGroup>
+              <GameButton size="small" :icon="ArrowUp" @click="moveGridUp" title="Move grid up" />
+              <GameButton size="small" :icon="ArrowDown" @click="moveGridDown" title="Move grid down" />
+              <GameButton size="small" :icon="ArrowLeft" @click="moveGridLeft" title="Move grid left" />
+              <GameButton size="small" :icon="ArrowRight" @click="moveGridRight" title="Move grid right" />
+            </GameButtonGroup>
+            <GameButton size="small" @click="generateArray" title="Generate 8x8 array">
               G
-            </el-button>
+            </GameButton>
           </div>
         </div>
         <div class="grid-overlay-container">
@@ -420,11 +418,10 @@ const generateArray = async () => {
         </div>
         <div v-if="generatedArray" class="generated-array-section">
           <h3 class="array-title">Generated 8x8 Array</h3>
-          <el-input
-            v-model="generatedArray"
-            type="textarea"
+          <GameTextarea
+            :model-value="generatedArray"
             :rows="12"
-            readonly
+            :readonly="true"
             class="array-textarea"
           />
         </div>

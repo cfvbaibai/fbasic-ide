@@ -1,9 +1,15 @@
 <script setup lang="ts">
 import ColorBox from './ColorBox.vue'
+import GameCard from '../../../shared/components/ui/GameCard.vue'
 </script>
 
 <template>
-  <div class="palette-section">
+  <GameCard 
+    class="palette-section"
+    title=""
+    :float-on-hover="false"
+    :clickable="false"
+  >
     <h2 class="section-title">64 Color Palette (4×16 Grid)</h2>
     <div class="palette-container">
       <div
@@ -20,23 +26,22 @@ import ColorBox from './ColorBox.vue'
         </div>
       </div>
     </div>
-  </div>
+  </GameCard>
 </template>
 
 <style scoped>
 .palette-section {
-  background: var(--app-bg-color-page);
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: var(--app-box-shadow-base);
-  margin-top: 2rem;
+  margin-bottom: 2rem;
+  padding: 2rem;
 }
 
 .section-title {
   margin: 0 0 1.5rem 0;
-  color: var(--app-text-color-primary);
-  font-size: 1.25rem;
-  font-weight: 600;
+  color: var(--game-text-primary);
+  font-family: var(--game-font-family-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .palette-container {

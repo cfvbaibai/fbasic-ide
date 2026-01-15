@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { provideSpriteViewerStore } from './composables/useSpriteViewerStore'
+import GameNavigation from '../../shared/components/GameNavigation.vue'
+import GamePageContainer from '../../shared/components/ui/GamePageContainer.vue'
+import GameSection from '../../shared/components/ui/GameSection.vue'
 import SpriteControls from './components/SpriteControls.vue'
 import SpriteGrid from './components/SpriteGrid.vue'
 import ColorPaletteDisplay from './components/ColorPaletteDisplay.vue'
@@ -11,50 +14,29 @@ provideSpriteViewerStore()
 </script>
 
 <template>
-  <div class="sprite-viewer-container">
-    <div class="viewer-header">
-      <h1 class="viewer-title">Character Sprite Viewer</h1>
+  <GamePageContainer>
+    <GameNavigation />
+    <div class="sprite-viewer-content">
+      <GameSection title="Character Sprite Viewer">
+        <SpriteControls />
+
+        <SpriteGrid />
+
+        <DefStatements />
+
+        <ColorPaletteDisplay />
+
+        <PaletteCombinations />
+      </GameSection>
     </div>
-
-    <div class="viewer-content">
-      <SpriteControls />
-
-      <SpriteGrid />
-
-      <DefStatements />
-
-      <ColorPaletteDisplay />
-
-      <PaletteCombinations />
-    </div>
-  </div>
+  </GamePageContainer>
 </template>
 
 <style scoped>
-.sprite-viewer-container {
-  min-height: 100vh;
-  background: var(--app-bg-color);
+.sprite-viewer-content {
   padding: 2rem;
-}
-
-.viewer-header {
-  background: var(--app-bg-color-page);
-  border-bottom: 1px solid var(--app-border-color-light);
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-  border-radius: 8px;
-  box-shadow: var(--app-box-shadow-base);
-}
-
-.viewer-title {
-  margin: 0;
-  color: var(--app-text-color-primary);
-  font-size: 1.5rem;
-  font-weight: 600;
-}
-
-.viewer-content {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
+  width: 100%;
 }
 </style>

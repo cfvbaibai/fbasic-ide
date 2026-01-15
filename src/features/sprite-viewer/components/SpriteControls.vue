@@ -2,23 +2,26 @@
 import SpriteSelector from './SpriteSelector.vue'
 import DisplayOptions from './DisplayOptions.vue'
 import PaletteSelector from './PaletteSelector.vue'
+import GameCard from '../../../shared/components/ui/GameCard.vue'
 </script>
 
 <template>
-  <div class="controls-section">
+  <GameCard 
+    class="controls-section"
+    title=""
+    :float-on-hover="false"
+    :clickable="false"
+  >
     <SpriteSelector />
     <DisplayOptions />
     <PaletteSelector />
-  </div>
+  </GameCard>
 </template>
 
 <style scoped>
 .controls-section {
-  background: var(--app-bg-color-page);
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: var(--app-box-shadow-base);
   margin-bottom: 2rem;
+  padding: 2rem;
 }
 </style>
 

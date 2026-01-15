@@ -1,27 +1,30 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { CHARACTER_SPRITES } from '../../../shared/data/sprites'
 import { useSpriteViewerStore } from '../composables/useSpriteViewerStore'
+import { GameSelect } from '../../../shared/components/ui'
 
 const store = useSpriteViewerStore()
+
+const selectOptions = computed(() => {
+  return CHARACTER_SPRITES.map((sprite, index) => ({
+    label: sprite.name,
+    value: index
+  }))
+})
 </script>
 
 <template>
   <div class="control-group">
     <label for="sprite-selection">Sprite Selection:</label>
-    <el-select
+    <GameSelect
       id="sprite-selection"
       :model-value="store.selectedIndex.value"
       @update:model-value="store.setSelectedIndex($event)"
+      :options="selectOptions"
       placeholder="Select a sprite"
       style="width: 300px"
-    >
-      <el-option
-        v-for="(sprite, index) in CHARACTER_SPRITES"
-        :key="index"
-        :label="sprite.name"
-        :value="index"
-      />
-    </el-select>
+    />
   </div>
 </template>
 
@@ -31,11 +34,16 @@ const store = useSpriteViewerStore()
   align-items: center;
   gap: 1rem;
   flex-wrap: wrap;
+  margin-bottom: 1.5rem;
 }
 
 .control-group label {
-  font-weight: 500;
-  color: var(--app-text-color-regular);
+  font-weight: 600;
+  font-family: var(--game-font-family);
+  color: var(--game-text-secondary);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 </style>
 

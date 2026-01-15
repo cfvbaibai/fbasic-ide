@@ -3,6 +3,7 @@ import { ref, watch, nextTick, computed } from 'vue'
 import { Tools, Document, Warning, Loading, DataBoard, Picture, Monitor } from '@element-plus/icons-vue'
 import type { BasicVariable, ScreenCell } from '../../../core/interfaces'
 import Screen from './Screen.vue'
+import { GameTabs, GameTabPane, GameTag, GameIcon } from '../../../shared/components/ui'
 
 interface Props {
   output: string[]
@@ -64,16 +65,16 @@ watch(() => props.output.length, scrollToBottom)
 
 <template>
   <div class="runtime-output">
-    <el-tabs v-model="activeTab" class="output-tabs" type="border-card">
+    <GameTabs v-model="activeTab" type="border-card" class="output-tabs">
       <!-- SCREEN Tab -->
-      <el-tab-pane label="SCREEN" name="screen">
+      <GameTabPane name="screen">
         <template #label>
-          <el-icon><Monitor /></el-icon>
+          <GameIcon :icon="Monitor" size="small" />
           <span>SCREEN</span>
-          <el-tag v-if="isRunning" type="success" size="small" effect="dark">
-            <el-icon class="rotating"><Loading /></el-icon>
+          <GameTag v-if="isRunning" type="success" size="small" effect="dark">
+            <GameIcon :icon="Loading" size="small" rotate />
             Live
-          </el-tag>
+          </GameTag>
         </template>
         
         <div class="tab-content">
@@ -83,23 +84,23 @@ watch(() => props.output.length, scrollToBottom)
             :cursor-y="cursorY"
           />
         </div>
-      </el-tab-pane>
+      </GameTabPane>
 
-      <!-- STDOUT Tab (renamed from Output) -->
-      <el-tab-pane label="STDOUT" name="stdout">
+      <!-- STDOUT Tab -->
+      <GameTabPane name="stdout">
         <template #label>
-          <el-icon><Document /></el-icon>
+          <GameIcon :icon="Document" size="small" />
           <span>STDOUT</span>
-          <el-tag v-if="isRunning" type="success" size="small" effect="dark">
-            <el-icon class="rotating"><Loading /></el-icon>
+          <GameTag v-if="isRunning" type="success" size="small" effect="dark">
+            <GameIcon :icon="Loading" size="small" rotate />
             Live
-          </el-tag>
-          <el-tag v-if="errors.length > 0" type="danger" size="small">
+          </GameTag>
+          <GameTag v-if="errors.length > 0" type="danger" size="small">
             {{ errors.length }} Error{{ errors.length > 1 ? 's' : '' }}
-          </el-tag>
-          <el-tag v-if="output.length > MAX_OUTPUT_LINES" type="info" size="small">
+          </GameTag>
+          <GameTag v-if="output.length > MAX_OUTPUT_LINES" type="info" size="small">
             Rolling Buffer
-          </el-tag>
+          </GameTag>
         </template>
         
         <div class="tab-content">
@@ -108,7 +109,7 @@ watch(() => props.output.length, scrollToBottom)
             class="output-content"
           >
             <div v-if="rollingOutput.length === 0 && !isRunning && errors.length === 0" class="empty-output">
-              <el-icon><Document /></el-icon>
+              <GameIcon :icon="Document" size="large" />
               <p>No output yet. Run your BASIC program to see results here.</p>
             </div>
             <div v-else>
@@ -123,7 +124,7 @@ watch(() => props.output.length, scrollToBottom)
               </div>
               <div v-if="errors.length > 0" class="error-output">
                 <div v-for="(error, index) in errors" :key="index" class="error-line">
-                  <el-icon><Warning /></el-icon>
+                  <GameIcon :icon="Warning" size="small" />
                   <span class="error-type">{{ error.type }}:</span>
                   <span class="error-message">{{ error.message }}</span>
                   <span v-if="error.line > 0" class="error-line-number">(Line {{ error.line }})</span>
@@ -132,16 +133,16 @@ watch(() => props.output.length, scrollToBottom)
             </div>
           </div>
         </div>
-      </el-tab-pane>
+      </GameTabPane>
 
       <!-- Debug Output Tab -->
-      <el-tab-pane label="Debug" name="debug" :disabled="!debugMode || !debugOutput">
+      <GameTabPane name="debug" :disabled="!debugMode || !debugOutput">
         <template #label>
-          <el-icon><Tools /></el-icon>
-          <span>Debug</span>
-          <el-tag v-if="debugMode" type="warning" size="small">
+          <GameIcon :icon="Tools" size="small" />
+          <span>DEBUG</span>
+          <GameTag v-if="debugMode" type="warning" size="small">
             Debug Mode
-          </el-tag>
+          </GameTag>
         </template>
         
         <div class="tab-content">
@@ -149,16 +150,16 @@ watch(() => props.output.length, scrollToBottom)
             <pre class="debug-text">{{ debugOutput }}</pre>
           </div>
         </div>
-      </el-tab-pane>
+      </GameTabPane>
 
       <!-- Variables Tab -->
-      <el-tab-pane label="Variables" name="variables" :disabled="Object.keys(variables).length === 0">
+      <GameTabPane name="variables" :disabled="Object.keys(variables).length === 0">
         <template #label>
-          <el-icon><DataBoard /></el-icon>
-          <span>Variables</span>
-          <el-tag v-if="Object.keys(variables).length > 0" type="success" size="small">
+          <GameIcon :icon="DataBoard" size="small" />
+          <span>VARIABLES</span>
+          <GameTag v-if="Object.keys(variables).length > 0" type="success" size="small">
             {{ Object.keys(variables).length }}
-          </el-tag>
+          </GameTag>
         </template>
         
         <div class="tab-content">
@@ -175,8 +176,8 @@ watch(() => props.output.length, scrollToBottom)
             </div>
           </div>
         </div>
-      </el-tab-pane>
-    </el-tabs>
+      </GameTabPane>
+    </GameTabs>
   </div>
 </template>
 
@@ -185,9 +186,10 @@ watch(() => props.output.length, scrollToBottom)
   flex: 1 1 0;
   display: flex;
   flex-direction: column;
-  background: var(--app-bg-color-page);
+  background: transparent;
   min-height: 0; /* Allow component to shrink */
   overflow: hidden; /* Prevent overflow */
+  position: relative;
 }
 
 .output-tabs {
@@ -195,18 +197,8 @@ watch(() => props.output.length, scrollToBottom)
   display: flex;
   flex-direction: column;
   min-height: 0;
-}
-
-.output-tabs :deep(.el-tabs__content) {
-  flex: 1 1 0;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.output-tabs :deep(.el-tab-pane) {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
+  position: relative;
+  z-index: 1;
 }
 
 .tab-content {
@@ -228,22 +220,68 @@ watch(() => props.output.length, scrollToBottom)
   line-height: 1.4;
   scroll-behavior: smooth;
   min-height: 0;
+  position: relative;
+  box-shadow: 
+    inset 0 0 30px rgba(0, 255, 0, 0.1),
+    inset 0 0 60px rgba(0, 255, 0, 0.05);
+  animation: terminalGlow 3s ease-in-out infinite;
+}
+
+.output-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    linear-gradient(180deg, rgba(0, 255, 0, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at top, rgba(0, 255, 0, 0.1) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  animation: terminalShimmer 5s ease-in-out infinite;
+}
+
+@keyframes terminalGlow {
+  0%, 100% {
+    box-shadow: 
+      inset 0 0 30px rgba(0, 255, 0, 0.1),
+      inset 0 0 60px rgba(0, 255, 0, 0.05);
+  }
+  50% {
+    box-shadow: 
+      inset 0 0 40px rgba(0, 255, 0, 0.15),
+      inset 0 0 80px rgba(0, 255, 0, 0.08),
+      0 0 20px rgba(0, 255, 0, 0.1);
+  }
+}
+
+@keyframes terminalShimmer {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 .debug-content {
   flex: 1 1 0;
   padding: 1rem;
   overflow-y: auto;
-  background: var(--app-fill-color-light);
+  background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
   min-height: 0;
+  border: 1px solid var(--game-card-border);
+  border-radius: 6px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .debug-text {
   margin: 0;
-  font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+  font-family: var(--game-font-family-mono);
   font-size: 12px;
   line-height: 1.4;
-  color: var(--app-text-color-primary);
+  color: var(--game-text-primary);
   white-space: pre-wrap;
   word-wrap: break-word;
 }
@@ -259,7 +297,7 @@ watch(() => props.output.length, scrollToBottom)
   text-align: center;
 }
 
-.empty-output .el-icon {
+.empty-output :deep(.game-icon) {
   font-size: 3rem;
   margin-bottom: 1rem;
   opacity: 0.5;
@@ -279,6 +317,19 @@ watch(() => props.output.length, scrollToBottom)
   font-size: 14px;
   line-height: 1.4;
   min-height: 1.4em; /* Ensure consistent line height */
+  position: relative;
+  z-index: 1;
+  text-shadow: 
+    0 0 4px rgba(0, 255, 0, 0.8),
+    0 0 8px rgba(0, 255, 0, 0.4);
+  transition: text-shadow 0.3s ease;
+}
+
+.output-line:hover {
+  text-shadow: 
+    0 0 6px rgba(0, 255, 0, 1),
+    0 0 12px rgba(0, 255, 0, 0.6),
+    0 0 20px rgba(0, 255, 0, 0.3);
 }
 
 .rotating {
@@ -354,7 +405,7 @@ watch(() => props.output.length, scrollToBottom)
 .variables-content {
   flex: 1;
   padding: 1rem;
-  background: var(--app-fill-color-light);
+  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
   overflow-y: auto;
 }
 
@@ -369,42 +420,36 @@ watch(() => props.output.length, scrollToBottom)
   justify-content: space-between;
   align-items: center;
   padding: 0.5rem;
-  background: var(--app-bg-color-page);
-  border: 1px solid var(--app-border-color-light);
-  border-radius: 4px;
-  font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
+  border: 1px solid var(--game-card-border);
+  border-radius: 6px;
+  font-family: var(--game-font-family-mono);
   font-size: 0.9rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.variable-item:hover {
+  border-color: var(--game-accent-color);
+  box-shadow: 0 0 8px var(--game-accent-glow);
 }
 
 .variable-name {
   font-weight: bold;
-  color: var(--el-color-primary);
+  color: var(--game-accent-color);
+  text-shadow: 0 0 4px var(--game-accent-glow);
 }
 
 .variable-value {
-  color: var(--app-text-color-primary);
-  background: var(--app-fill-color);
+  color: var(--game-text-primary);
+  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
+  border: 1px solid var(--game-card-border);
   padding: 0.2rem 0.4rem;
-  border-radius: 3px;
+  border-radius: 4px;
   font-weight: 500;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-.debug-content {
-  flex: 1;
-  padding: 1rem;
-  background: #1a1a1a;
-  overflow-y: auto;
-}
-
-.debug-text {
-  margin: 0;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  color: #ffa500;
-  font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
-  font-size: 12px;
-  line-height: 1.4;
-}
 
 /* Scrollbar styling */
 .output-content::-webkit-scrollbar,

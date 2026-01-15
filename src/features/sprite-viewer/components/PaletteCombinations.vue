@@ -1,11 +1,17 @@
 <script setup lang="ts">
 import { SPRITE_PALETTES, BACKGROUND_PALETTES } from '../../../shared/data/palette'
 import ColorBox from './ColorBox.vue'
+import GameCard from '../../../shared/components/ui/GameCard.vue'
 </script>
 
 <template>
   <div>
-    <div class="palette-section">
+    <GameCard 
+      class="palette-section"
+      title=""
+      :float-on-hover="false"
+      :clickable="false"
+    >
       <h2 class="section-title">Sprite Palettes</h2>
       <div class="palettes-container palettes-container-sprite">
         <div
@@ -37,9 +43,14 @@ import ColorBox from './ColorBox.vue'
           </div>
         </div>
       </div>
-    </div>
+    </GameCard>
 
-    <div class="palette-section">
+    <GameCard 
+      class="palette-section"
+      title=""
+      :float-on-hover="false"
+      :clickable="false"
+    >
       <h2 class="section-title">Background Palettes</h2>
       <div class="palettes-container palettes-container-bg">
         <div
@@ -71,24 +82,23 @@ import ColorBox from './ColorBox.vue'
           </div>
         </div>
       </div>
-    </div>
+    </GameCard>
   </div>
 </template>
 
 <style scoped>
 .palette-section {
-  background: var(--app-bg-color-page);
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: var(--app-box-shadow-base);
-  margin-top: 2rem;
+  margin-bottom: 2rem;
+  padding: 2rem;
 }
 
 .section-title {
   margin: 0 0 1.5rem 0;
-  color: var(--app-text-color-primary);
-  font-size: 1.25rem;
-  font-weight: 600;
+  color: var(--game-text-primary);
+  font-family: var(--game-font-family-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .palettes-container {
@@ -105,17 +115,20 @@ import ColorBox from './ColorBox.vue'
 }
 
 .palette-group {
-  background: var(--app-fill-color-light);
+  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
   padding: 1.5rem;
   border-radius: 8px;
-  border: 1px solid var(--app-border-color-light);
+  border: 2px solid var(--game-card-border);
+  box-shadow: var(--game-shadow-base);
 }
 
 .palette-group-title {
   margin: 0 0 1rem 0;
-  color: var(--app-text-color-primary);
+  color: var(--game-text-primary);
+  font-family: var(--game-font-family-heading);
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .color-combinations {
@@ -125,10 +138,17 @@ import ColorBox from './ColorBox.vue'
 }
 
 .color-combination {
-  background: var(--app-bg-color-page);
+  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
   padding: 1rem;
   border-radius: 6px;
-  border: 1px solid var(--app-border-color-light);
+  border: 2px solid var(--game-card-border);
+  box-shadow: var(--game-shadow-base);
+  transition: all 0.2s ease;
+}
+
+.color-combination:hover {
+  border-color: var(--game-accent-color);
+  box-shadow: var(--game-shadow-hover);
 }
 
 .combination-colors {

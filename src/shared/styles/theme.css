@@ -53,6 +53,29 @@
     --screen-header-title: #ffffff;
     --screen-cursor-bg: rgba(0, 255, 0, 0.2);
     --screen-cursor-border: #00ff00;
+    /* Game UI Colors */
+    --game-bg-gradient-start: #0f0f1e;
+    --game-bg-gradient-mid: #1a1a2e;
+    --game-bg-gradient-end: #16213e;
+    --game-nav-bg-start: #1a1a2e;
+    --game-nav-bg-end: #16213e;
+    --game-nav-border: #0f3460;
+    --game-accent-color: #00ff88;
+    --game-accent-glow: rgba(0, 255, 136, 0.5);
+    --game-card-bg-start: #2a2a3e;
+    --game-card-bg-end: #1e1e2e;
+    --game-card-border: #3a3a4e;
+    --game-card-border-hover: #00ff88;
+    --game-text-primary: #ffffff;
+    --game-text-secondary: #b0b0c0;
+    --game-text-tertiary: #9090a0;
+    --game-shadow-base: 0 4px 12px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    --game-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 255, 136, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    --game-shadow-glow: 0 0 20px rgba(0, 255, 136, 0.6);
+    /* Game UI Fonts */
+    --game-font-family: 'Rajdhani', 'Orbitron', system-ui, sans-serif;
+    --game-font-family-heading: 'Orbitron', 'Rajdhani', system-ui, sans-serif;
+    --game-font-family-mono: 'Courier New', 'Monaco', 'Menlo', monospace;
 }
 
 
@@ -104,6 +127,29 @@
     --screen-header-title: #ffffff;
     --screen-cursor-bg: rgba(0, 255, 0, 0.2);
     --screen-cursor-border: #00ff00;
+    /* Game UI Colors (Dark Theme - same as light for consistency) */
+    --game-bg-gradient-start: #0f0f1e;
+    --game-bg-gradient-mid: #1a1a2e;
+    --game-bg-gradient-end: #16213e;
+    --game-nav-bg-start: #1a1a2e;
+    --game-nav-bg-end: #16213e;
+    --game-nav-border: #0f3460;
+    --game-accent-color: #00ff88;
+    --game-accent-glow: rgba(0, 255, 136, 0.5);
+    --game-card-bg-start: #2a2a3e;
+    --game-card-bg-end: #1e1e2e;
+    --game-card-border: #3a3a4e;
+    --game-card-border-hover: #00ff88;
+    --game-text-primary: #ffffff;
+    --game-text-secondary: #b0b0c0;
+    --game-text-tertiary: #9090a0;
+    --game-shadow-base: 0 4px 12px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    --game-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 255, 136, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    --game-shadow-glow: 0 0 20px rgba(0, 255, 136, 0.6);
+    /* Game UI Fonts (Dark Theme - same as light) */
+    --game-font-family: 'Rajdhani', 'Orbitron', system-ui, sans-serif;
+    --game-font-family-heading: 'Orbitron', 'Rajdhani', system-ui, sans-serif;
+    --game-font-family-mono: 'Courier New', 'Monaco', 'Menlo', monospace;
 }
 
 

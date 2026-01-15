@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useSpriteViewerStore } from '../composables/useSpriteViewerStore'
 import ColorBox from './ColorBox.vue'
+import { GameButton, GameButtonGroup } from '../../../shared/components/ui'
 
 const store = useSpriteViewerStore()
 </script>
@@ -8,27 +9,29 @@ const store = useSpriteViewerStore()
 <template>
   <div class="control-group" v-if="store.selectedSprite.value">
     <label for="palette-code">Palette Code:</label>
-    <el-button-group>
-      <el-button
+    <GameButtonGroup>
+      <GameButton
         v-for="paletteIdx in 3"
         :key="paletteIdx - 1"
-        :type="store.selectedPaletteCode.value === paletteIdx - 1 ? 'primary' : 'default'"
+        variant="toggle"
+        :selected="store.selectedPaletteCode.value === paletteIdx - 1"
         @click="store.setPaletteCode(paletteIdx - 1)"
       >
         {{ paletteIdx - 1 }}
-      </el-button>
-    </el-button-group>
+      </GameButton>
+    </GameButtonGroup>
     <label for="color-combination">Color Combination:</label>
-    <el-button-group>
-      <el-button
+    <GameButtonGroup>
+      <GameButton
         v-for="combIdx in 4"
         :key="combIdx - 1"
-        :type="store.selectedColorCombination.value === combIdx - 1 ? 'primary' : 'default'"
+        variant="toggle"
+        :selected="store.selectedColorCombination.value === combIdx - 1"
         @click="store.setColorCombination(combIdx - 1)"
       >
         {{ combIdx - 1 }}
-      </el-button>
-    </el-button-group>
+      </GameButton>
+    </GameButtonGroup>
     <div class="selected-colors-preview">
       <div
         v-for="(colorCode, idx) in store.selectedColorCombinationColors.value"
@@ -45,25 +48,38 @@ const store = useSpriteViewerStore()
 .control-group {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.5rem;
   flex-wrap: wrap;
+  margin-bottom: 1.5rem;
 }
 
 .control-group label {
-  font-weight: 500;
-  color: var(--app-text-color-regular);
+  font-weight: 600;
+  font-family: var(--game-font-family);
+  color: var(--game-text-secondary);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .selected-colors-preview {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.75rem;
   align-items: center;
   margin-left: 1rem;
+  padding: 0.5rem;
+  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
+  border: 2px solid var(--game-card-border);
+  border-radius: 8px;
+  box-shadow: var(--game-shadow-base);
 }
 
 .preview-color-wrapper {
   width: 50px;
   height: 50px;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 </style>
 

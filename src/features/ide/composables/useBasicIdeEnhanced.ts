@@ -55,6 +55,8 @@ export function useBasicIde() {
 40 FOR I=1 TO 3: PRINT "I="; I: NEXT
 50 END`)
 
+  const currentSampleType = ref<'basic' | 'gaming' | 'complex' | 'comprehensive' | 'pause' | null>(null)
+
   const isRunning = ref(false)
   const output = ref<string[]>([])
   const errors = ref<Array<{ line: number; message: string; type: string }>>([])
@@ -580,6 +582,7 @@ export function useBasicIde() {
     const sample = getSampleCode(sampleType)
     if (sample) {
       code.value = sample.code
+      currentSampleType.value = sampleType
       updateHighlighting()
     }
   }
@@ -687,6 +690,7 @@ export function useBasicIde() {
     stopCode,
     clearOutput,
     clearAll,
+    currentSampleType,
     loadSampleCode,
     updateHighlighting,
     validateCode,

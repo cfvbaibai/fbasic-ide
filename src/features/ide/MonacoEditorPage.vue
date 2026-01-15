@@ -1,14 +1,14 @@
 <template>
   <div class="monaco-editor-page">
+    <GameNavigation />
     <div class="page-header">
       <h1>
-        <el-icon><Edit /></el-icon>
+        <GameIcon :icon="Edit" />
         Monaco Editor Demo
       </h1>
-      <el-button @click="goHome" type="primary" plain>
-        <el-icon><ArrowLeft /></el-icon>
+      <GameButton @click="goHome" type="primary" :icon="ArrowLeft">
         Back to IDE
-      </el-button>
+      </GameButton>
     </div>
     
     <div class="editor-wrapper">
@@ -16,17 +16,14 @@
     </div>
     
     <div class="info-panel">
-      <el-card>
-        <template #header>
-          <span>Editor Info</span>
-        </template>
+      <InfoCard title="Editor Info">
         <p><strong>Language:</strong> F-BASIC</p>
         <p><strong>Editor:</strong> Monaco Editor</p>
         <p><strong>Features:</strong> Syntax Highlighting, Live Error Checking</p>
-        <el-divider />
+        <GameDivider />
         <p><strong>Sample Code:</strong></p>
         <pre>{{ sampleCode }}</pre>
-      </el-card>
+      </InfoCard>
     </div>
   </div>
 </template>
@@ -34,7 +31,10 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { Edit, ArrowLeft } from '@element-plus/icons-vue';
 import MonacoCodeEditor from './components/MonacoCodeEditor.vue';
+import GameNavigation from '../../shared/components/GameNavigation.vue';
+import { GameButton, GameIcon, GameDivider, InfoCard } from '../../shared/components/ui';
 
 const router = useRouter();
 const code = ref(`10 PRINT "Hello, World!"

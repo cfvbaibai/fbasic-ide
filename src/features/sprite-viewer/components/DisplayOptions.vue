@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useSpriteViewerStore } from '../composables/useSpriteViewerStore'
+import { GameSwitch } from '../../../shared/components/ui'
 
 const store = useSpriteViewerStore()
 
@@ -24,7 +25,7 @@ const updateReverseY = (value: boolean | string | number) => {
   <div class="switches-container">
     <div class="control-group">
       <label for="show-values">Show Value Numbers:</label>
-      <el-switch
+      <GameSwitch
         id="show-values"
         :model-value="store.displayOptions.value.showValues"
         @update:model-value="updateShowValues"
@@ -32,7 +33,7 @@ const updateReverseY = (value: boolean | string | number) => {
     </div>
     <div class="control-group">
       <label for="show-grid-lines">Show Grid Lines:</label>
-      <el-switch
+      <GameSwitch
         id="show-grid-lines"
         :model-value="store.displayOptions.value.showGridLines"
         @update:model-value="updateShowGridLines"
@@ -40,7 +41,7 @@ const updateReverseY = (value: boolean | string | number) => {
     </div>
     <div class="control-group">
       <label for="reverse-x">Reverse X (Horizontal):</label>
-      <el-switch
+      <GameSwitch
         id="reverse-x"
         :model-value="store.displayOptions.value.reverseX"
         @update:model-value="updateReverseX"
@@ -48,7 +49,7 @@ const updateReverseY = (value: boolean | string | number) => {
     </div>
     <div class="control-group">
       <label for="reverse-y">Reverse Y (Vertical):</label>
-      <el-switch
+      <GameSwitch
         id="reverse-y"
         :model-value="store.displayOptions.value.reverseY"
         @update:model-value="updateReverseY"
@@ -63,17 +64,22 @@ const updateReverseY = (value: boolean | string | number) => {
   flex-wrap: wrap;
   gap: 2rem;
   align-items: center;
+  margin-bottom: 1.5rem;
 }
 
 .control-group {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
 .control-group label {
-  font-weight: 500;
-  color: var(--app-text-color-regular);
+  font-weight: 600;
+  font-family: var(--game-font-family);
+  color: var(--game-text-secondary);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   white-space: nowrap;
 }
 </style>

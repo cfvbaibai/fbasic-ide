@@ -10108,9 +10108,6 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       // Current position in DATA
       __publicField(this, "arrays", /* @__PURE__ */ new Map());
       // Array storage
-      // PRINT state tracking
-      __publicField(this, "lastPrintEndedWithSemicolon", false);
-      // Track if last PRINT statement ended with semicolon
       // Device integration
       __publicField(this, "deviceAdapter");
       __publicField(this, "errors", []);
@@ -10132,7 +10129,6 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       this.dataValues = [];
       this.dataIndex = 0;
       this.arrays.clear();
-      this.lastPrintEndedWithSemicolon = false;
       this.currentLineNumber = 0;
       this.errors = [];
     }
@@ -13250,9 +13246,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     execute(printStmtCst) {
       const printListCst = getFirstCstNode(printStmtCst.children.printList);
       if (!printListCst) {
-        const shouldAppend = this.context.lastPrintEndedWithSemicolon;
-        this.printOutput("", shouldAppend);
-        this.context.lastPrintEndedWithSemicolon = false;
+        this.printOutput("\n");
         return;
       }
       const printItems = getCstNodes(printListCst.children.printItem);
@@ -13320,14 +13314,14 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         }
       }
       let output = this.buildOutputString(items);
-      const lastItem = items[items.length - 1];
-      const endsWithSemicolon = lastItem?.separator === ";";
-      const shouldAppendToPrevious = this.context.lastPrintEndedWithSemicolon;
-      if (!endsWithSemicolon && output.length > 0) {
+      const lastElement = elements[elements.length - 1];
+      const endsWithSemicolon = lastElement?.type === "separator" && lastElement.separator === ";";
+      const endsWithComma = lastElement?.type === "separator" && lastElement.separator === ",";
+      const endsWithSeparator = endsWithSemicolon || endsWithComma;
+      if (!endsWithSeparator && output.length > 0) {
         output += "\n";
       }
-      this.printOutput(output, shouldAppendToPrevious);
-      this.context.lastPrintEndedWithSemicolon = endsWithSemicolon;
+      this.printOutput(output);
     }
     /**
      * Build output string from PRINT items, handling all PRINT semantics.

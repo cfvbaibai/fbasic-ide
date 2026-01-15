@@ -98,6 +98,44 @@ onBeforeUnmount(() => {
   width: 100%;
   height: 100%;
   min-height: 400px;
+  position: relative;
+}
+
+.monaco-editor-container::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(135deg, 
+    rgba(0, 255, 136, 0.1) 0%,
+    transparent 30%,
+    transparent 70%,
+    rgba(0, 255, 136, 0.1) 100%
+  );
+  border-radius: 8px;
+  opacity: 0;
+  z-index: -1;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  animation: editorGlow 4s ease-in-out infinite;
+  filter: blur(4px);
+}
+
+.monaco-editor-container:hover::before {
+  opacity: 0.6;
+}
+
+@keyframes editorGlow {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(1.01);
+  }
 }
 </style>
 

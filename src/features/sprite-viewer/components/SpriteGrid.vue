@@ -46,18 +46,21 @@ const store = useSpriteViewerStore()
 
 <style scoped>
 .sprite-display-section {
-  background: var(--app-bg-color-page);
-  padding: 1.5rem;
+  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
+  border: 2px solid var(--game-card-border);
   border-radius: 8px;
-  box-shadow: var(--app-box-shadow-base);
+  padding: 2rem;
   margin-bottom: 2rem;
+  box-shadow: var(--game-shadow-base);
 }
 
 .section-title {
   margin: 0 0 1.5rem 0;
-  color: var(--app-text-color-primary);
-  font-size: 1.25rem;
-  font-weight: 600;
+  color: var(--game-text-primary);
+  font-family: var(--game-font-family-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .grid-container {
@@ -67,21 +70,24 @@ const store = useSpriteViewerStore()
   background: #000000;
   padding: 0;
   border-radius: 4px;
-  border: 8px solid #222222;
+  border: 8px solid var(--game-card-border);
   width: fit-content;
   margin: 0 auto;
+  box-shadow: 
+    0 0 20px rgba(0, 0, 0, 0.8),
+    inset 0 0 20px rgba(0, 255, 136, 0.1);
 }
 
 .grid-container-8x8 {
-  border: 4px solid #222222;
+  border: 4px solid var(--game-card-border);
 }
 
 .grid-container-16x32 {
-  border: 8px solid #222222;
+  border: 8px solid var(--game-card-border);
 }
 
 .grid-container-48x8 {
-  border: 8px solid #222222;
+  border: 8px solid var(--game-card-border);
 }
 
 .grid-row {
@@ -97,25 +103,29 @@ const store = useSpriteViewerStore()
   justify-content: center;
   border: none;
   border-radius: 0;
-  background-color: var(--app-bg-color-page);
-  transition: transform 0.1s;
+  background-color: transparent;
+  transition: all 0.2s ease;
 }
 
 .grid-cell-bordered {
-  border: 1px solid var(--app-border-color);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .grid-cell:hover {
   transform: scale(1.1);
   z-index: 1;
   position: relative;
-  box-shadow: var(--app-box-shadow-dark);
+  box-shadow: 0 0 12px var(--game-accent-glow);
 }
 
 .cell-value {
   font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--app-text-color-regular);
+  font-weight: 700;
+  font-family: var(--game-font-family-mono);
+  color: var(--game-text-primary);
+  text-shadow: 
+    1px 1px 2px rgba(0, 0, 0, 0.8),
+    0 0 4px rgba(0, 255, 136, 0.5);
   user-select: none;
 }
 </style>

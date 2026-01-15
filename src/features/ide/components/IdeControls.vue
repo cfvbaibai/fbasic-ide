@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { Tools } from '@element-plus/icons-vue'
+import { VideoPlay, VideoPause, Delete, Loading, CircleCheck } from '@element-plus/icons-vue'
+import { GameButton, GameSwitch, GameTag, GameIcon } from '../../../shared/components/ui'
+
 interface Props {
   isRunning: boolean
   canRun?: boolean
@@ -24,55 +26,67 @@ const emit = defineEmits<Emits>()
 const handleRun = () => {
   emit('run')
 }
+
+const handleDebugToggle = (value: boolean) => {
+  // Only emit if the value actually changed (toggle behavior)
+  if (value !== props.debugMode) {
+    emit('toggle-debug')
+  }
+}
 </script>
 
 <template>
   <div class="ide-controls">
-    <el-button-group>
-      <el-button 
-        type="primary" 
-        :disabled="!canRun"
-        @click="handleRun"
-      >
-        <el-icon><VideoPlay /></el-icon>
-        Run
-      </el-button>
-      
-      <el-button 
-        type="danger" 
-        :disabled="!canStop"
-        @click="$emit('stop')"
-      >
-        <el-icon><VideoPause /></el-icon>
-        Stop
-      </el-button>
-      
-      <el-button 
-        type="warning"
-        @click="$emit('clear')"
-      >
-        <el-icon><Delete /></el-icon>
-        Clear
-      </el-button>
-      
-      <el-button 
-        :type="debugMode ? 'success' : 'default'"
-        @click="$emit('toggle-debug')"
-      >
-        <el-icon><Tools /></el-icon>
-        Debug
-      </el-button>
-    </el-button-group>
+    <GameButton 
+      type="primary" 
+      :disabled="!canRun"
+      :icon="VideoPlay"
+      @click="handleRun"
+    >
+      Run
+    </GameButton>
+    
+    <GameButton 
+      type="danger" 
+      :disabled="!canStop"
+      :icon="VideoPause"
+      @click="$emit('stop')"
+    >
+      Stop
+    </GameButton>
+    
+    <GameButton 
+      type="warning"
+      :icon="Delete"
+      @click="$emit('clear')"
+    >
+      Clear
+    </GameButton>
+    
+    <div class="debug-control">
+      <span class="debug-label">Debug</span>
+      <GameSwitch 
+        :model-value="debugMode"
+        @update:model-value="handleDebugToggle"
+      />
+    </div>
     
     <div class="status-indicator">
-      <el-tag 
+      <GameTag 
         :type="isRunning ? 'success' : 'info'"
         :effect="isRunning ? 'dark' : 'light'"
       >
-        <el-icon v-if="isRunning" class="rotating"><Loading /></el-icon>
-        <el-icon v-else><CircleCheck /></el-icon>
+        <GameIcon 
+          v-if="isRunning" 
+          :icon="Loading" 
+          rotate
+        />
+        <GameIcon 
+          v-else
+          :icon="CircleCheck" 
+        />
         {{ isRunning ? 'Running' : 'Ready' }}
-      </el-tag>
+      </GameTag>
     </div>
   </div>
 </template>
@@ -82,6 +96,11 @@ const handleRun = () => {
   display: flex;
   align-items: center;
   gap: 1rem;
+  padding: 0.5rem;
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.05) 0%, rgba(0, 255, 136, 0.02) 100%);
+  border: 1px solid var(--game-card-border);
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.1);
 }
 
 .status-indicator {
@@ -89,12 +108,21 @@ const handleRun = () => {
   align-items: center;
 }
 
-.rotating {
-  animation: rotate 1s linear infinite;
+.debug-control {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.05) 0%, rgba(0, 255, 136, 0.02) 100%);
+  border: 1px solid var(--game-card-border);
+  border-radius: 6px;
 }
 
-@keyframes rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.debug-label {
+  font-size: 0.9rem;
+  color: var(--game-text-primary);
+  font-weight: 600;
+  font-family: var(--game-font-family);
+  text-shadow: 0 0 4px var(--game-accent-glow);
 }
 </style>
