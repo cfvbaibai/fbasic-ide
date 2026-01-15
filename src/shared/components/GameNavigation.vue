@@ -86,8 +86,7 @@ const navigate = (path: string) => {
   background: linear-gradient(135deg, var(--game-nav-bg-start) 0%, var(--game-nav-bg-end) 100%);
   border-bottom: 3px solid var(--game-nav-border);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  position: sticky;
-  top: 0;
+  flex-shrink: 0;
   z-index: 1000;
 }
 

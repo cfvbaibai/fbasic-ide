@@ -1,11 +1,6 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import GameNavigation from '../../shared/components/GameNavigation.vue'
-import GamePageContainer from '../../shared/components/ui/GamePageContainer.vue'
-import HeroSection from '../../shared/components/ui/HeroSection.vue'
-import GameSection from '../../shared/components/ui/GameSection.vue'
-import GameCard from '../../shared/components/ui/GameCard.vue'
-import InfoCard from '../../shared/components/ui/InfoCard.vue'
+import { GameLayout, HeroSection, GameSection, GameCard, InfoCard } from '../../shared/components/ui'
 import { Monitor, Edit, Picture, Grid } from '@element-plus/icons-vue'
 
 const router = useRouter()
@@ -55,9 +50,7 @@ const navigateTo = (path: string) => {
 </script>
 
 <template>
-  <GamePageContainer>
-    <GameNavigation />
-    
+  <GameLayout>
     <div class="home-content">
       <HeroSection
         :title="'F-BASIC Emulator'"
@@ -97,12 +90,11 @@ const navigateTo = (path: string) => {
         </InfoCard>
       </div>
     </div>
-  </GamePageContainer>
+  </GameLayout>
 </template>
 
 <style scoped>
 .home-content {
-  flex: 1;
   max-width: 1400px;
   margin: 0 auto;
   width: 100%;

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { Upload, Search, Plus, Minus, ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from '@element-plus/icons-vue'
-import GameNavigation from '../../shared/components/GameNavigation.vue'
-import { GameButton, GameButtonGroup, GameUpload, GameIcon } from '../../shared/components/ui'
+import { GameLayout } from '../../shared/components/ui'
+import { GameButton, GameButtonGroup, GameUpload, GameIcon, GameTextarea } from '../../shared/components/ui'
 
 const imageFile = ref<File | null>(null)
 const imageUrl = ref<string>('')
@@ -300,9 +300,9 @@ const generateArray = async () => {
 </script>
 
 <template>
-  <div class="image-analyzer-container">
-    <GameNavigation />
-    <div class="analyzer-header">
+  <GameLayout>
+    <div class="image-analyzer-container">
+      <div class="analyzer-header">
       <h1 class="analyzer-title">
         <GameIcon :icon="Search" />
         Image Analyzer
@@ -416,7 +416,7 @@ const generateArray = async () => {
             </svg>
           </div>
         </div>
-        <div v-if="generatedArray" class="generated-array-section">
+        <div v-if="generatedArray && generatedArray.length > 0" class="generated-array-section">
           <h3 class="array-title">Generated 8x8 Array</h3>
           <GameTextarea
             :model-value="generatedArray"
@@ -427,23 +427,43 @@ const generateArray = async () => {
         </div>
       </div>
     </div>
-  </div>
+    </div>
+  </GameLayout>
 </template>
 
 <style scoped>
 .image-analyzer-container {
-  min-height: 100vh;
-  background: var(--app-bg-color);
-  padding: 2rem;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
 }
 
 .analyzer-header {
-  background: var(--app-bg-color-page);
-  border-bottom: 1px solid var(--app-border-color-light);
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-  border-radius: 8px;
-  box-shadow: var(--app-box-shadow-base);
+  flex: 0 0 auto;
+  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
+  border-bottom: 2px solid var(--game-card-border);
+  padding: 1rem 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--game-shadow-base);
+  position: relative;
+}
+
+.analyzer-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    var(--game-accent-glow) 50%, 
+    transparent 100%
+  );
+  opacity: 0.5;
+  border-radius: 12px 12px 0 0;
 }
 
 .analyzer-title {
@@ -451,25 +471,50 @@ const generateArray = async () => {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--app-text-color-primary);
+  color: var(--game-text-primary);
   font-size: 1.5rem;
-  font-weight: 600;
+  font-weight: 700;
+  font-family: var(--game-font-family-heading);
+  text-shadow: 0 0 10px var(--game-accent-glow);
 }
 
 .analyzer-content {
+  flex: 1 1 0;
   max-width: 1400px;
   margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0 1rem;
 }
 
 .upload-section {
-  background: var(--app-bg-color-page);
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: var(--app-box-shadow-base);
-  margin-bottom: 2rem;
+  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
+  border: 2px solid var(--game-card-border);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  box-shadow: var(--game-shadow-base);
   display: flex;
   gap: 1rem;
   align-items: center;
+  position: relative;
+}
+
+.upload-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    var(--game-accent-glow) 50%, 
+    transparent 100%
+  );
+  opacity: 0.5;
+  border-radius: 12px 12px 0 0;
 }
 
 .analyze-button {
@@ -477,26 +522,60 @@ const generateArray = async () => {
 }
 
 .image-preview {
-  background: var(--app-bg-color-page);
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: var(--app-box-shadow-base);
-  margin-bottom: 2rem;
+  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
+  border: 2px solid var(--game-card-border);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: var(--game-shadow-base);
   text-align: center;
+  position: relative;
+}
+
+.image-preview::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    var(--game-accent-glow) 50%, 
+    transparent 100%
+  );
+  opacity: 0.5;
+  border-radius: 12px 12px 0 0;
 }
 
 .preview-image {
-  border-radius: 4px;
-  box-shadow: var(--app-box-shadow-light);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   object-fit: contain;
 }
 
 .grid-overlay-section {
-  margin-bottom: 2rem;
-  background: var(--app-bg-color-page);
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: var(--app-box-shadow-base);
+  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
+  border: 2px solid var(--game-card-border);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  box-shadow: var(--game-shadow-base);
+  position: relative;
+}
+
+.grid-overlay-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    var(--game-accent-glow) 50%, 
+    transparent 100%
+  );
+  opacity: 0.5;
+  border-radius: 12px 12px 0 0;
 }
 
 .grid-controls-header {
@@ -541,10 +620,12 @@ const generateArray = async () => {
 }
 
 .results-title {
-  margin: 0 0 1.5rem 0;
-  color: var(--app-text-color-primary);
-  font-size: 1.25rem;
-  font-weight: 600;
+  margin: 0;
+  color: var(--game-text-primary);
+  font-size: 1.1rem;
+  font-weight: 700;
+  font-family: var(--game-font-family-heading);
+  text-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
 }
 
 /* Grid line colors - theme-aware */
@@ -563,30 +644,60 @@ const generateArray = async () => {
 }
 
 .generated-array-section {
-  margin-top: 2rem;
-  padding-top: 2rem;
-  border-top: 1px solid var(--app-border-color-light);
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid var(--game-card-border);
+  position: relative;
+}
+
+.generated-array-section::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    var(--game-accent-glow) 50%, 
+    transparent 100%
+  );
+  opacity: 0.5;
 }
 
 .array-title {
   margin: 0 0 1rem 0;
-  color: var(--app-text-color-primary);
-  font-size: 1.1rem;
-  font-weight: 600;
+  color: var(--game-text-primary);
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: var(--game-font-family-heading);
+  text-shadow: 0 0 6px rgba(0, 255, 136, 0.3);
 }
 
 .array-textarea {
-  font-family: 'Courier New', monospace;
+  font-family: var(--game-font-family-mono);
   font-size: 0.9rem;
 }
 
 .array-textarea :deep(.el-textarea__inner) {
-  background: var(--app-bg-color);
-  color: var(--app-text-color-primary);
-  border: 1px solid var(--app-border-color-light);
-  font-family: 'Courier New', monospace;
+  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
+  color: var(--game-text-primary);
+  border: 2px solid var(--game-card-border);
+  border-radius: 8px;
+  font-family: var(--game-font-family-mono);
   font-size: 0.9rem;
   line-height: 1.5;
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.array-textarea :deep(.el-textarea__inner):focus {
+  border-color: var(--game-accent-color);
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.3),
+    0 0 12px var(--game-accent-glow);
 }
 </style>
 

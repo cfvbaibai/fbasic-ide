@@ -1,8 +1,8 @@
 <template>
-  <div class="monaco-editor-page">
-    <GameNavigation />
-    <div class="page-header">
-      <h1>
+  <GameLayout>
+    <div class="monaco-editor-page">
+      <div class="monaco-editor-header">
+      <h1 class="monaco-editor-title">
         <GameIcon :icon="Edit" />
         Monaco Editor Demo
       </h1>
@@ -25,7 +25,8 @@
         <pre>{{ sampleCode }}</pre>
       </InfoCard>
     </div>
-  </div>
+    </div>
+  </GameLayout>
 </template>
 
 <script setup lang="ts">
@@ -33,8 +34,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { Edit, ArrowLeft } from '@element-plus/icons-vue';
 import MonacoCodeEditor from './components/MonacoCodeEditor.vue';
-import GameNavigation from '../../shared/components/GameNavigation.vue';
-import { GameButton, GameIcon, GameDivider, InfoCard } from '../../shared/components/ui';
+import { GameLayout, GameButton, GameIcon, GameDivider, InfoCard } from '../../shared/components/ui';
 
 const router = useRouter();
 const code = ref(`10 PRINT "Hello, World!"
@@ -56,30 +56,52 @@ const goHome = () => {
 
 <style scoped>
 .monaco-editor-page {
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  background: var(--app-bg-color);
+  overflow-x: hidden;
 }
 
-.page-header {
-  background: var(--app-bg-color-page);
-  border-bottom: 1px solid var(--app-border-color-light);
+.monaco-editor-header {
+  flex: 0 0 auto;
+  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
+  border-bottom: 2px solid var(--game-card-border);
   padding: 1rem 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--game-shadow-base);
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: var(--app-box-shadow-base);
 }
 
-.page-header h1 {
+.monaco-editor-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    var(--game-accent-glow) 50%, 
+    transparent 100%
+  );
+  opacity: 0.5;
+  border-radius: 12px 12px 0 0;
+}
+
+.monaco-editor-title {
   margin: 0;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--app-text-color-primary);
+  color: var(--game-text-primary);
   font-size: 1.5rem;
-  font-weight: 600;
+  font-weight: 700;
+  font-family: var(--game-font-family-heading);
+  text-shadow: 0 0 10px var(--game-accent-glow);
 }
 
 .editor-wrapper {

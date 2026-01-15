@@ -5,8 +5,7 @@ import MonacoCodeEditor from './components/MonacoCodeEditor.vue'
 import RuntimeOutput from './components/RuntimeOutput.vue'
 import IdeControls from './components/IdeControls.vue'
 import JoystickControl from './components/JoystickControl.vue'
-import GameNavigation from '../../shared/components/GameNavigation.vue'
-import { GameIcon, GameTag, GameButton, GameButtonGroup } from '../../shared/components/ui'
+import { GameLayout, GameIcon, GameTag, GameButton, GameButtonGroup } from '../../shared/components/ui'
 import { useBasicIde as useBasicIdeEnhanced } from './composables/useBasicIdeEnhanced'
 import type { ParserInfo, HighlighterInfo } from '../../core/interfaces'
 
@@ -52,17 +51,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="ide-container">
-    <GameNavigation />
-    <!-- IDE Header -->
+  <GameLayout>
+    <div class="ide-container">
+      <!-- IDE Header -->
     <div class="ide-header">
       <div class="header-left">
         <h1 class="ide-title">
           <GameIcon :icon="Monitor" />
           Family Basic IDE
-          <GameTag type="success" size="small" class="parser-status">
-            AST Parser
-          </GameTag>
         </h1>
         <div class="sample-programs">
           <GameButtonGroup>
@@ -155,17 +151,17 @@ onMounted(() => {
         :send-strig-event="sendStrigEvent"
       />
     </div>
-  </div>
+    </div>
+  </GameLayout>
 </template>
 
 <style scoped>
 .ide-container {
-  min-height: 100vh;
-  width: 100vw;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(135deg, var(--game-bg-gradient-start) 0%, var(--game-bg-gradient-mid) 50%, var(--game-bg-gradient-end) 100%);
-  overflow: hidden; /* Prevent outer scrollbar */
+  overflow-x: hidden; /* Prevent horizontal scrollbar */
 }
 
 .ide-header {
