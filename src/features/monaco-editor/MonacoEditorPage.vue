@@ -16,7 +16,7 @@
         <p><strong>Features:</strong> Syntax Highlighting, Live Error Checking</p>
         <GameDivider />
         <p><strong>Sample Code:</strong></p>
-        <pre>{{ sampleCode }}</pre>
+        <GameCodeQuote :code="sampleCode" />
       </GameBlock>
     </div>
     </div>
@@ -27,7 +27,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import MonacoCodeEditor from '../ide/components/MonacoCodeEditor.vue';
-import { GameLayout, GameButton, GameDivider, GameBlock } from '../../shared/components/ui';
+import { GameLayout, GameButton, GameDivider, GameBlock, GameCodeQuote } from '../../shared/components/ui';
 
 const router = useRouter();
 const code = ref(`10 PRINT "Hello, World!"
@@ -71,14 +71,7 @@ const goHome = () => {
 
 .info-panel {
   flex: 1;
+  padding: 0 1rem;
   min-width: 300px;
-}
-
-.info-panel pre {
-  background: linear-gradient(135deg, var(--game-bg-gradient-start) 0%, var(--game-bg-gradient-end) 100%);
-  padding: 0.75rem;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  overflow-x: auto;
 }
 </style>

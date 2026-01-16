@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { GameLayout, GameBlock } from '../../shared/components/ui'
-import { GameButton, GameButtonGroup, GameUpload, GameTextarea } from '../../shared/components/ui'
+import { GameButton, GameButtonGroup, GameUpload, GameCodeQuote } from '../../shared/components/ui'
 
 const imageFile = ref<File | null>(null)
 const imageUrl = ref<string>('')
@@ -415,15 +415,18 @@ const generateArray = async () => {
             </svg>
           </div>
         </div>
-        <div v-if="generatedArray && generatedArray.length > 0" class="generated-array-section">
-          <h3 class="array-title">Generated 8x8 Array</h3>
-          <GameTextarea
-            :model-value="generatedArray"
-            :rows="12"
-            :readonly="true"
-            class="array-textarea"
-          />
-        </div>
+      </GameBlock>
+
+      <GameBlock
+        v-if="generatedArray && generatedArray.length > 0"
+        title="Generated 8x8 Array"
+        title-icon="mdi:code-array"
+        class="generated-array-block"
+      >
+        <GameCodeQuote
+          :code="generatedArray"
+          copy-success-message="Array code copied to clipboard!"
+        />
       </GameBlock>
     </div>
     </div>
@@ -557,49 +560,7 @@ const generateArray = async () => {
   --grid-color-regular: #ff0000;
 }
 
-.dark {
-  --grid-color-outer: #999900;
-  --grid-color-middle: #66ff66;
-  --grid-color-semi-middle: #6666ff;
-  --grid-color-regular: #ff6666;
+.generated-array-block {
+  margin-top: 1rem;
 }
-
-.generated-array-section {
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 2px solid var(--game-surface-border);
-  position: relative;
-}
-
-.generated-array-section::before {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    var(--game-accent-glow) 50%, 
-    transparent 100%
-  );
-  opacity: 0.5;
-}
-
-.array-title {
-  margin: 0 0 1rem 0;
-  color: var(--game-text-primary);
-  font-size: 1rem;
-  font-weight: 700;
-  font-family: var(--game-font-family-heading);
-  text-shadow: 0 0 6px rgba(0, 255, 136, 0.3);
-}
-
-.array-textarea {
-  font-family: var(--game-font-family-mono);
-  font-size: 0.9rem;
-}
-
-/* GameTextarea styles are handled by the component itself */
 </style>
-
