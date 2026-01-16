@@ -70,10 +70,6 @@ watch(() => props.output.length, scrollToBottom)
         <template #label>
           <GameIcon icon="mdi:monitor" size="small" />
           <span>SCREEN</span>
-          <GameTag v-if="isRunning" type="success" size="small" effect="dark">
-            <GameIcon icon="mdi:loading" size="small" rotate />
-            Live
-          </GameTag>
         </template>
         
         <div class="tab-content">
@@ -90,16 +86,6 @@ watch(() => props.output.length, scrollToBottom)
         <template #label>
           <GameIcon icon="mdi:file-document" size="small" />
           <span>STDOUT</span>
-          <GameTag v-if="isRunning" type="success" size="small" effect="dark">
-            <GameIcon icon="mdi:loading" size="small" rotate />
-            Live
-          </GameTag>
-          <GameTag v-if="errors.length > 0" type="danger" size="small">
-            {{ errors.length }} Error{{ errors.length > 1 ? 's' : '' }}
-          </GameTag>
-          <GameTag v-if="output.length > MAX_OUTPUT_LINES" type="info" size="small">
-            Rolling Buffer
-          </GameTag>
         </template>
         
         <div class="tab-content">
@@ -139,9 +125,6 @@ watch(() => props.output.length, scrollToBottom)
         <template #label>
           <GameIcon icon="mdi:tools" size="small" />
           <span>DEBUG</span>
-          <GameTag v-if="debugMode" type="warning" size="small">
-            Debug Mode
-          </GameTag>
         </template>
         
         <div class="tab-content">
@@ -156,9 +139,11 @@ watch(() => props.output.length, scrollToBottom)
         <template #label>
           <GameIcon icon="mdi:view-dashboard" size="small" />
           <span>VARIABLES</span>
-          <GameTag v-if="Object.keys(variables).length > 0" type="success" size="small">
-            {{ Object.keys(variables).length }}
-          </GameTag>
+          <span class="tab-status-tag">
+            <GameTag :class="{ 'tag-hidden': Object.keys(variables).length === 0 }" type="success" size="small">
+              {{ Object.keys(variables).length }}
+            </GameTag>
+          </span>
         </template>
         
         <div class="tab-content">
@@ -206,6 +191,30 @@ watch(() => props.output.length, scrollToBottom)
   flex-direction: column;
   min-height: 0;
   overflow: hidden;
+}
+
+.tab-status-tag {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.25rem;
+  vertical-align: middle;
+  min-height: 1.5rem; /* Reserve vertical space */
+  /* Reserve horizontal space - adjust based on typical tag width */
+  min-width: 3rem;
+  justify-content: flex-start;
+}
+
+.tab-status-tag :deep(.game-tag) {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.tab-status-tag :deep(.game-tag.tag-hidden) {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  /* Keep dimensions to prevent layout shift */
 }
 
 .output-content {

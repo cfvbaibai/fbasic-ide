@@ -144,7 +144,13 @@ When working with this codebase, follow these AI-specific instructions:
 
 #### File Size Management
 - **Never exceed 300 lines** in any `.ts` file
+- **Never exceed 500 lines** in any `.vue` file
 - If approaching limit, extract functionality to focused modules
+
+#### Styling Guidelines
+- **Use utility classes and global CSS variables** to style UI as much as possible
+- Prefer existing utility classes and CSS variables over inline styles or component-scoped styles
+- This ensures consistency across the application and makes styling easier to maintain
 
 #### Constant Usage
 - **Always use constants** from `constants.ts` instead of magic values
