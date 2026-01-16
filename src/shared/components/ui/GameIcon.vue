@@ -1,32 +1,33 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed } from 'vue'
+import { Icon } from '@iconify/vue'
 
 interface Props {
-  icon?: any // Icon component from Element Plus or custom
+  icon?: string // Icon name in format "prefix:name" (e.g., "mdi:play")
   size?: 'small' | 'medium' | 'large' | number
   color?: string
-  rotate?: boolean
+  rotate?: boolean | number | string
   pulse?: boolean
+  inline?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  icon: null,
+  icon: undefined,
   size: 'medium',
   color: 'currentColor',
   rotate: false,
-  pulse: false
+  pulse: false,
+  inline: false
 })
-
-const iconContainer = ref<HTMLElement>()
 
 const iconSize = computed(() => {
   if (typeof props.size === 'number') {
-    return `${props.size}px`
+    return props.size
   }
   const sizeMap = {
-    small: '16px',
-    medium: '20px',
-    large: '24px'
+    small: 16,
+    medium: 20,
+    large: 24
   }
   return sizeMap[props.size]
 })
@@ -34,41 +35,38 @@ const iconSize = computed(() => {
 const iconClasses = computed(() => {
   return {
     'game-icon': true,
-    'game-icon-rotate': props.rotate,
+    'game-icon-rotate': props.rotate === true,
     'game-icon-pulse': props.pulse
   }
 })
 
-// Remove width/height attributes from SVG elements (Element Plus sets them to 96px)
-onMounted(() => {
-  if (iconContainer.value) {
-    const svg = iconContainer.value.querySelector('svg')
-    if (svg) {
-      svg.removeAttribute('width')
-      svg.removeAttribute('height')
-    }
+const rotateValue = computed((): number | undefined => {
+  if (props.rotate === true) {
+    return 1 // Continuous rotation for Iconify
   }
+  if (typeof props.rotate === 'number') {
+    return props.rotate
+  }
+  if (typeof props.rotate === 'string') {
+    // Parse string like "90deg" or "90" to number
+    const num = parseFloat(props.rotate)
+    return isNaN(num) ? undefined : num
+  }
+  return undefined
 })
 </script>
 
 <template>
-  <span
-    v-if="icon"
-    ref="iconContainer"
-    :class="iconClasses"
-    :style="{
-      fontSize: iconSize,
-      color: color,
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      width: iconSize,
-      height: iconSize
-    }"
-  >
-    <component :is="icon" />
+  <span v-if="icon" :class="iconClasses" :style="{
+    color: color,
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  }">
+    <Icon :icon="icon" :width="iconSize" :height="iconSize" :color="color" :inline="inline" :rotate="rotateValue" />
   </span>
-  <span v-else class="game-icon-placeholder" :style="{ fontSize: iconSize }">
+  <span v-else class="game-icon-placeholder"
+    :style="{ fontSize: typeof iconSize === 'number' ? `${iconSize}px` : iconSize }">
     <slot />
   </span>
 </template>
@@ -80,25 +78,6 @@ onMounted(() => {
   justify-content: center;
   flex-shrink: 0;
   transition: all 0.2s ease;
-}
-
-/* Override SVG width and height attributes - target SVG elements directly */
-/* Element Plus icons render as SVG with game-icon class */
-svg.game-icon {
-  width: 1em !important;
-  height: 1em !important;
-  font-size: inherit !important;
-  max-width: 100% !important;
-  max-height: 100% !important;
-}
-
-/* Also handle nested SVG case */
-.game-icon svg {
-  width: 1em !important;
-  height: 1em !important;
-  font-size: inherit !important;
-  max-width: 100% !important;
-  max-height: 100% !important;
 }
 
 .game-icon-rotate {
@@ -113,17 +92,20 @@ svg.game-icon {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
 }
 
 @keyframes icon-pulse {
+
   0%,
   100% {
     opacity: 1;
     transform: scale(1);
   }
+
   50% {
     opacity: 0.6;
     transform: scale(1.1);

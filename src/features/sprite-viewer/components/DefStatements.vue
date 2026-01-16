@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useSpriteViewerStore } from '../composables/useSpriteViewerStore'
 import { message } from '../../../shared/utils/message'
-import { GameButton, GameCard } from '../../../shared/components/ui'
+import { GameButton, GameBlock } from '../../../shared/components/ui'
 
 const store = useSpriteViewerStore()
 
@@ -41,14 +41,11 @@ const copyAllStatements = async () => {
 </script>
 
 <template>
-  <GameCard 
+  <GameBlock 
+    title="DEF Statements"
     class="def-statements-section"
-    title=""
-    :float-on-hover="false"
-    :clickable="false"
   >
-    <div class="section-header">
-      <h2 class="section-title">DEF Statements</h2>
+    <template #right>
       <GameButton
         type="primary"
         size="small"
@@ -57,12 +54,12 @@ const copyAllStatements = async () => {
       >
         Copy All
       </GameButton>
-    </div>
+    </template>
 
     <div class="statements-container">
       <div class="statement-block">
         <div class="statement-header">
-          <h3 class="statement-title">DEF SPRITE</h3>
+          <h3 class="statement-title text-game-heading">DEF SPRITE</h3>
           <GameButton
             type="primary"
             size="small"
@@ -80,7 +77,7 @@ const copyAllStatements = async () => {
 
       <div class="statement-block">
         <div class="statement-header">
-          <h3 class="statement-title">DEF MOVE</h3>
+          <h3 class="statement-title text-game-heading">DEF MOVE</h3>
           <GameButton
             type="primary"
             size="small"
@@ -90,35 +87,18 @@ const copyAllStatements = async () => {
             Copy
           </GameButton>
         </div>
-        <div class="statement-container">
+        <div class="statement-container bg-game-surface border-game-surface-2 shadow-game-base">
           <pre v-if="store.defMoveStatement.value" class="statement-code">{{ store.defMoveStatement.value }}</pre>
           <p v-else class="no-statement">No sprite selected</p>
         </div>
       </div>
     </div>
-  </GameCard>
+  </GameBlock>
 </template>
 
 <style scoped>
 .def-statements-section {
   margin-bottom: 2rem;
-  padding: 2rem;
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-}
-
-.section-title {
-  margin: 0;
-  color: var(--game-text-primary);
-  font-family: var(--game-font-family-heading);
-  font-size: 1.5rem;
-  font-weight: 700;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .statements-container {
@@ -141,15 +121,12 @@ const copyAllStatements = async () => {
 
 .statement-title {
   margin: 0;
-  color: var(--game-text-primary);
-  font-family: var(--game-font-family-heading);
   font-size: 1rem;
-  font-weight: 700;
 }
 
 .statement-container {
-  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
-  border: 2px solid var(--game-card-border);
+  background: var(--game-surface-bg-gradient);
+  border: 2px solid var(--game-surface-border);
   border-radius: 8px;
   padding: 1rem;
   min-height: 60px;
@@ -169,7 +146,6 @@ const copyAllStatements = async () => {
 .no-statement {
   margin: 0;
   color: var(--game-text-secondary);
-  font-family: var(--game-font-family);
   font-style: italic;
   text-align: center;
   padding: 1rem 0;

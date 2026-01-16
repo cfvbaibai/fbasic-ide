@@ -5,13 +5,13 @@ interface Props {
   title: string
   subtitle?: string
   description?: string
-  icon?: any
+  icon?: string // Icon name in format "prefix:name" (e.g., "mdi:play")
 }
 
 withDefaults(defineProps<Props>(), {
   subtitle: '',
   description: '',
-  icon: null
+  icon: undefined
 })
 </script>
 
@@ -19,7 +19,7 @@ withDefaults(defineProps<Props>(), {
   <div class="hero-section">
     <div class="hero-content">
       <h1 class="hero-title">
-        <GameIcon v-if="icon" :icon="icon" size="large" class="hero-icon" />
+        <GameIcon v-if="icon" :icon="icon" :size="80" class="hero-icon" />
         {{ title }}
       </h1>
       <p v-if="subtitle" class="hero-subtitle">{{ subtitle }}</p>
@@ -58,13 +58,11 @@ withDefaults(defineProps<Props>(), {
 }
 
 .hero-icon {
-  font-size: 4rem;
   filter: drop-shadow(0 0 12px var(--game-accent-glow));
 }
 
 .hero-subtitle {
   font-size: 1.5rem;
-  font-family: var(--game-font-family);
   color: var(--game-text-secondary);
   margin: 0 0 1rem 0;
   font-weight: 500;
@@ -72,7 +70,6 @@ withDefaults(defineProps<Props>(), {
 
 .hero-description {
   font-size: 1.1rem;
-  font-family: var(--game-font-family);
   color: var(--game-text-tertiary);
   line-height: 1.6;
   margin: 0;
@@ -85,7 +82,7 @@ withDefaults(defineProps<Props>(), {
   }
 
   .hero-icon {
-    font-size: 3rem;
+    /* Icon size handled by GameIcon size prop */
   }
 
   .hero-subtitle {
@@ -101,7 +98,7 @@ withDefaults(defineProps<Props>(), {
   }
 
   .hero-icon {
-    font-size: 2.5rem;
+    /* Icon size handled by GameIcon size prop - adjust via size prop if needed */
   }
 }
 </style>

@@ -46,8 +46,8 @@ const store = useSpriteViewerStore()
 
 <style scoped>
 .sprite-display-section {
-  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
-  border: 2px solid var(--game-card-border);
+  background: var(--game-surface-bg-gradient);
+  border: 2px solid var(--game-surface-border);
   border-radius: 8px;
   padding: 2rem;
   margin-bottom: 2rem;
@@ -70,7 +70,7 @@ const store = useSpriteViewerStore()
   background: #000000;
   padding: 0;
   border-radius: 4px;
-  border: 8px solid var(--game-card-border);
+  border: 8px solid var(--game-surface-border);
   width: fit-content;
   margin: 0 auto;
   box-shadow: 
@@ -79,15 +79,15 @@ const store = useSpriteViewerStore()
 }
 
 .grid-container-8x8 {
-  border: 4px solid var(--game-card-border);
+  border: 4px solid var(--game-surface-border);
 }
 
 .grid-container-16x32 {
-  border: 8px solid var(--game-card-border);
+  border: 8px solid var(--game-surface-border);
 }
 
 .grid-container-48x8 {
-  border: 8px solid var(--game-card-border);
+  border: 8px solid var(--game-surface-border);
 }
 
 .grid-row {

@@ -6,7 +6,7 @@ interface Props {
   type?: 'success' | 'warning' | 'danger' | 'info' | 'default'
   size?: 'small' | 'medium' | 'large'
   effect?: 'light' | 'dark' | 'plain'
-  icon?: any
+  icon?: string // Icon name in format "prefix:name" (e.g., "mdi:play")
   closable?: boolean
 }
 
@@ -14,7 +14,7 @@ const props = withDefaults(defineProps<Props>(), {
   type: 'default',
   size: 'medium',
   effect: 'light',
-  icon: null,
+  icon: undefined,
   closable: false
 })
 
@@ -23,12 +23,23 @@ const emit = defineEmits<{
 }>()
 
 const tagClasses = computed(() => {
-  return {
+  const baseClasses = {
     'game-tag': true,
     [`game-tag-${props.type}`]: true,
     [`game-tag-${props.size}`]: true,
     [`game-tag-${props.effect}`]: true
   }
+  
+  // Add utility classes for variants that use card background
+  if ((props.type === 'default' || props.type === 'info') && props.effect === 'light') {
+    baseClasses['bg-game-surface'] = true
+    baseClasses['text-game-secondary'] = true
+  }
+  if (props.type === 'default' && props.effect === 'dark') {
+    baseClasses['bg-game-surface'] = true
+  }
+  
+  return baseClasses
 })
 
 const handleClose = () => {
@@ -65,7 +76,6 @@ const handleClose = () => {
   align-items: center;
   gap: 0.375rem;
   padding: 0.25rem 0.75rem;
-  font-family: var(--game-font-family);
   font-weight: 600;
   font-size: 0.75rem;
   line-height: 1.5;
@@ -77,9 +87,7 @@ const handleClose = () => {
 
 /* Type variants - Light effect */
 .game-tag-default.game-tag-light {
-  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
-  border-color: var(--game-card-border);
-  color: var(--game-text-secondary);
+  border-color: var(--game-surface-border);
 }
 
 .game-tag-success.game-tag-light {
@@ -91,84 +99,80 @@ const handleClose = () => {
 
 .game-tag-warning.game-tag-light {
   background: linear-gradient(135deg, rgba(230, 162, 60, 0.15) 0%, rgba(230, 162, 60, 0.05) 100%);
-  border-color: var(--el-color-warning);
-  color: var(--el-color-warning);
+  border-color: var(--semantic-warning);
+  color: var(--semantic-warning);
   box-shadow: 0 0 8px rgba(230, 162, 60, 0.2);
 }
 
 .game-tag-danger.game-tag-light {
   background: linear-gradient(135deg, rgba(245, 108, 108, 0.15) 0%, rgba(245, 108, 108, 0.05) 100%);
-  border-color: var(--el-color-danger);
-  color: var(--el-color-danger);
+  border-color: var(--semantic-danger);
+  color: var(--semantic-danger);
   box-shadow: 0 0 8px rgba(245, 108, 108, 0.2);
 }
 
 .game-tag-info.game-tag-light {
-  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
-  border-color: var(--game-card-border);
-  color: var(--game-text-secondary);
+  border-color: var(--game-surface-border);
 }
 
 /* Type variants - Dark effect */
 .game-tag-default.game-tag-dark {
-  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
-  border-color: var(--game-card-border);
-  color: var(--game-text-primary);
+  border-color: var(--game-surface-border);
 }
 
 .game-tag-success.game-tag-dark {
-  background: var(--el-color-success);
-  border-color: var(--el-color-success);
+  background: var(--semantic-success);
+  border-color: var(--semantic-success);
   color: #ffffff;
 }
 
 .game-tag-warning.game-tag-dark {
-  background: var(--el-color-warning);
-  border-color: var(--el-color-warning);
+  background: var(--semantic-warning);
+  border-color: var(--semantic-warning);
   color: #ffffff;
 }
 
 .game-tag-danger.game-tag-dark {
-  background: var(--el-color-danger);
-  border-color: var(--el-color-danger);
+  background: var(--semantic-danger);
+  border-color: var(--semantic-danger);
   color: #ffffff;
 }
 
 .game-tag-info.game-tag-dark {
-  background: var(--el-color-info);
-  border-color: var(--el-color-info);
+  background: var(--semantic-info);
+  border-color: var(--semantic-info);
   color: #ffffff;
 }
 
 /* Type variants - Plain effect */
 .game-tag-default.game-tag-plain {
   background: transparent;
-  border-color: var(--game-card-border);
+  border-color: var(--game-surface-border);
   color: var(--game-text-secondary);
 }
 
 .game-tag-success.game-tag-plain {
   background: transparent;
-  border-color: var(--el-color-success);
-  color: var(--el-color-success);
+  border-color: var(--semantic-success);
+  color: var(--semantic-success);
 }
 
 .game-tag-warning.game-tag-plain {
   background: transparent;
-  border-color: var(--el-color-warning);
-  color: var(--el-color-warning);
+  border-color: var(--semantic-warning);
+  color: var(--semantic-warning);
 }
 
 .game-tag-danger.game-tag-plain {
   background: transparent;
-  border-color: var(--el-color-danger);
-  color: var(--el-color-danger);
+  border-color: var(--semantic-danger);
+  color: var(--semantic-danger);
 }
 
 .game-tag-info.game-tag-plain {
   background: transparent;
-  border-color: var(--el-color-info);
-  color: var(--el-color-info);
+  border-color: var(--semantic-info);
+  color: var(--semantic-info);
 }
 
 /* Size variants */
@@ -227,7 +231,7 @@ const handleClose = () => {
     background: linear-gradient(135deg, rgba(245, 108, 108, 0.15) 0%, rgba(245, 108, 108, 0.05) 100%);
   }
   .game-tag-info.game-tag-light {
-    background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
+    /* Background handled by utility class */
   }
 }
 </style>

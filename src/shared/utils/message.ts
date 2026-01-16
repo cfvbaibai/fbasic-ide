@@ -5,12 +5,6 @@
 
 export type MessageType = 'success' | 'warning' | 'error' | 'info'
 
-interface MessageOptions {
-  type?: MessageType
-  duration?: number
-  showClose?: boolean
-}
-
 let messageContainer: HTMLDivElement | null = null
 
 const createMessageContainer = () => {
@@ -76,7 +70,7 @@ if (typeof document !== 'undefined') {
       border-radius: 8px;
       border: 2px solid;
       box-shadow: var(--game-shadow-base);
-      background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
+      background: var(--game-surface-bg-gradient);
       color: var(--game-text-primary);
       opacity: 0;
       transform: translateX(100%);
@@ -92,23 +86,23 @@ if (typeof document !== 'undefined') {
     }
     
     .game-message-success {
-      border-color: var(--el-color-success);
-      background: linear-gradient(135deg, color-mix(in srgb, var(--el-color-success) 20%, var(--game-card-bg-start)) 0%, var(--game-card-bg-end) 100%);
+      border-color: var(--semantic-success);
+      background: linear-gradient(135deg, color-mix(in srgb, var(--semantic-success) 20%, var(--game-surface-bg-start)) 0%, var(--game-surface-bg-end) 100%);
     }
     
     .game-message-warning {
-      border-color: var(--el-color-warning);
-      background: linear-gradient(135deg, color-mix(in srgb, var(--el-color-warning) 20%, var(--game-card-bg-start)) 0%, var(--game-card-bg-end) 100%);
+      border-color: var(--semantic-warning);
+      background: linear-gradient(135deg, color-mix(in srgb, var(--semantic-warning) 20%, var(--game-surface-bg-start)) 0%, var(--game-surface-bg-end) 100%);
     }
     
     .game-message-error {
-      border-color: var(--el-color-danger);
-      background: linear-gradient(135deg, color-mix(in srgb, var(--el-color-danger) 20%, var(--game-card-bg-start)) 0%, var(--game-card-bg-end) 100%);
+      border-color: var(--semantic-danger);
+      background: linear-gradient(135deg, color-mix(in srgb, var(--semantic-danger) 20%, var(--game-surface-bg-start)) 0%, var(--game-surface-bg-end) 100%);
     }
     
     .game-message-info {
-      border-color: var(--el-color-info);
-      background: linear-gradient(135deg, color-mix(in srgb, var(--el-color-info) 20%, var(--game-card-bg-start)) 0%, var(--game-card-bg-end) 100%);
+      border-color: var(--semantic-info);
+      background: linear-gradient(135deg, color-mix(in srgb, var(--semantic-info) 20%, var(--game-surface-bg-start)) 0%, var(--game-surface-bg-end) 100%);
     }
   `
   document.head.appendChild(style)

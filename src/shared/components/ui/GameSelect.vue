@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { ArrowDown } from '@element-plus/icons-vue'
 import GameIcon from './GameIcon.vue'
 
 interface Option {
@@ -74,14 +73,14 @@ const selectClasses = computed(() => {
   <div ref="selectRef" :class="selectClasses">
     <button
       type="button"
-      class="game-select-trigger"
+      class="game-select-trigger bg-game-surface border-game-surface"
       :disabled="disabled"
       @click="isOpen = !isOpen"
     >
       <span class="game-select-text" :class="{ placeholder: !selectedOption }">
         {{ displayText }}
       </span>
-      <GameIcon :icon="ArrowDown" size="small" class="game-select-arrow" />
+      <GameIcon icon="mdi:chevron-down" size="small" class="game-select-arrow" />
     </button>
     
     <Transition name="game-select-dropdown">
@@ -113,13 +112,12 @@ const selectClasses = computed(() => {
   width: 100%;
   padding: 0.625rem 1rem;
   padding-right: 2.5rem;
-  font-family: var(--game-font-family);
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--game-text-primary);
   text-align: left;
-  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
-  border: 2px solid var(--game-card-border);
+  background: var(--game-surface-bg-gradient);
+  border: 2px solid var(--game-surface-border);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -188,8 +186,8 @@ const selectClasses = computed(() => {
   left: 0;
   right: 0;
   z-index: 1000;
-  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
-  border: 2px solid var(--game-card-border);
+  background: var(--game-surface-bg-gradient);
+  border: 2px solid var(--game-surface-border);
   border-radius: 8px;
   box-shadow: 
     0 4px 12px rgba(0, 0, 0, 0.4),
@@ -202,12 +200,11 @@ const selectClasses = computed(() => {
 
 .game-select-option {
   padding: 0.75rem 1rem;
-  font-family: var(--game-font-family);
   font-size: 0.875rem;
   color: var(--game-text-primary);
   cursor: pointer;
   transition: all 0.2s ease;
-  border-bottom: 1px solid var(--game-card-border);
+  border-bottom: 1px solid var(--game-surface-border);
 }
 
 .game-select-option:last-child {
@@ -253,7 +250,7 @@ const selectClasses = computed(() => {
 }
 
 .game-select-dropdown::-webkit-scrollbar-thumb {
-  background: var(--game-card-border);
+  background: var(--game-surface-border);
   border-radius: 4px;
 }
 

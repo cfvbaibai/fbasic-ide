@@ -8,7 +8,7 @@ interface Props {
   variant?: 'action' | 'toggle'
   disabled?: boolean
   loading?: boolean
-  icon?: any
+  icon?: string // Icon name in format "prefix:name" (e.g., "mdi:play")
   iconPosition?: 'left' | 'right'
   selected?: boolean
 }
@@ -19,7 +19,7 @@ const props = withDefaults(defineProps<Props>(), {
   variant: 'action',
   disabled: false,
   loading: false,
-  icon: null,
+  icon: undefined,
   iconPosition: 'left',
   selected: false
 })
@@ -60,7 +60,7 @@ const getIconSize = computed(() => {
 
 <template>
   <button
-    :class="buttonClasses"
+    :class="['bg-game-surface', 'border-game-surface', 'text-game-secondary', buttonClasses]"
     :disabled="disabled || loading"
     @click="handleClick"
     type="button"
@@ -94,7 +94,6 @@ const getIconSize = computed(() => {
   justify-content: center;
   gap: 0.75rem;
   padding: 0.75rem 1.25rem;
-  font-family: var(--game-font-family);
   font-weight: 600;
   font-size: 0.9rem;
   line-height: 1.2;
@@ -102,12 +101,8 @@ const getIconSize = computed(() => {
   white-space: nowrap;
   cursor: pointer;
   user-select: none;
-  border: 2px solid;
   border-radius: 8px;
   transition: all 0.2s ease;
-  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
-  border-color: var(--game-card-border);
-  color: var(--game-text-secondary);
   min-width: 140px;
   box-shadow: 
     0 2px 4px rgba(0, 0, 0, 0.3),
@@ -116,7 +111,7 @@ const getIconSize = computed(() => {
 
 .game-button:hover:not(.game-button-disabled) {
   background: linear-gradient(135deg, #3a3a4e 0%, #2a2a3e 100%);
-  border-color: var(--game-card-border);
+  border-color: var(--game-surface-border);
   color: var(--game-text-primary);
   transform: translateY(-2px);
   box-shadow: 
@@ -134,7 +129,7 @@ const getIconSize = computed(() => {
 
 /* Type variants - All buttons use the same base style, type affects hover/active states */
 .game-button-primary:hover:not(.game-button-disabled) {
-  border-color: var(--game-card-border);
+  border-color: var(--game-surface-border);
   box-shadow: 
     0 4px 8px rgba(0, 0, 0, 0.4),
     0 2px 4px rgba(0, 0, 0, 0.4),
@@ -143,7 +138,7 @@ const getIconSize = computed(() => {
 
 .game-button-primary:active:not(.game-button-disabled) {
   background: linear-gradient(135deg, var(--game-accent-color) 0%, #00cc6a 100%);
-  border-color: var(--game-card-border);
+  border-color: var(--game-surface-border);
   color: #000000;
   box-shadow: 
     0 0 20px var(--game-accent-glow),
@@ -152,7 +147,7 @@ const getIconSize = computed(() => {
 }
 
 .game-button-success:hover:not(.game-button-disabled) {
-  border-color: var(--el-color-success);
+  border-color: var(--semantic-success);
   box-shadow: 
     0 4px 8px rgba(103, 194, 58, 0.4),
     0 2px 4px rgba(0, 0, 0, 0.4),
@@ -160,8 +155,8 @@ const getIconSize = computed(() => {
 }
 
 .game-button-success:active:not(.game-button-disabled) {
-  background: linear-gradient(135deg, var(--el-color-success) 0%, #52a028 100%);
-  border-color: var(--el-color-success);
+  background: linear-gradient(135deg, var(--semantic-success) 0%, var(--semantic-success-dark) 100%);
+  border-color: var(--semantic-success);
   color: #ffffff;
   box-shadow: 
     0 0 12px rgba(103, 194, 58, 0.5),
@@ -170,7 +165,7 @@ const getIconSize = computed(() => {
 }
 
 .game-button-warning:hover:not(.game-button-disabled) {
-  border-color: var(--el-color-warning);
+  border-color: var(--semantic-warning);
   box-shadow: 
     0 4px 8px rgba(230, 162, 60, 0.4),
     0 2px 4px rgba(0, 0, 0, 0.4),
@@ -178,8 +173,8 @@ const getIconSize = computed(() => {
 }
 
 .game-button-warning:active:not(.game-button-disabled) {
-  background: linear-gradient(135deg, var(--el-color-warning) 0%, #c88a2e 100%);
-  border-color: var(--el-color-warning);
+  background: linear-gradient(135deg, var(--semantic-warning) 0%, #c88a2e 100%);
+  border-color: var(--semantic-warning);
   color: #ffffff;
   box-shadow: 
     0 0 12px rgba(230, 162, 60, 0.5),
@@ -188,7 +183,7 @@ const getIconSize = computed(() => {
 }
 
 .game-button-danger:hover:not(.game-button-disabled) {
-  border-color: var(--el-color-danger);
+  border-color: var(--semantic-danger);
   box-shadow: 
     0 4px 8px rgba(245, 108, 108, 0.4),
     0 2px 4px rgba(0, 0, 0, 0.4),
@@ -196,8 +191,8 @@ const getIconSize = computed(() => {
 }
 
 .game-button-danger:active:not(.game-button-disabled) {
-  background: linear-gradient(135deg, var(--el-color-danger) 0%, #d44a4a 100%);
-  border-color: var(--el-color-danger);
+  background: linear-gradient(135deg, var(--semantic-danger) 0%, #d44a4a 100%);
+  border-color: var(--semantic-danger);
   color: #ffffff;
   box-shadow: 
     0 0 12px rgba(245, 108, 108, 0.5),
@@ -206,7 +201,7 @@ const getIconSize = computed(() => {
 }
 
 .game-button-info:hover:not(.game-button-disabled) {
-  border-color: var(--el-color-info);
+  border-color: var(--semantic-info);
   box-shadow: 
     0 4px 8px rgba(144, 147, 153, 0.4),
     0 2px 4px rgba(0, 0, 0, 0.4),
@@ -214,8 +209,8 @@ const getIconSize = computed(() => {
 }
 
 .game-button-info:active:not(.game-button-disabled) {
-  background: linear-gradient(135deg, var(--el-color-info) 0%, #6d7075 100%);
-  border-color: var(--el-color-info);
+  background: linear-gradient(135deg, var(--semantic-info) 0%, #6d7075 100%);
+  border-color: var(--semantic-info);
   color: #ffffff;
   box-shadow: 
     0 0 12px rgba(144, 147, 153, 0.5),
@@ -243,7 +238,7 @@ const getIconSize = computed(() => {
 /* Selected state - persistent highlight for toggle buttons */
 .game-button-toggle.game-button-selected {
   background: linear-gradient(135deg, var(--game-accent-color) 0%, #00cc6a 100%);
-  border-color: var(--game-card-border);
+  border-color: var(--game-surface-border);
   color: #000000;
   box-shadow: 
     0 0 20px var(--game-accent-glow),
@@ -253,7 +248,7 @@ const getIconSize = computed(() => {
 
 .game-button-toggle.game-button-selected:hover:not(.game-button-disabled) {
   background: linear-gradient(135deg, var(--game-accent-color) 0%, #00cc6a 100%);
-  border-color: var(--game-card-border);
+  border-color: var(--game-surface-border);
   transform: translateY(-2px);
   box-shadow: 
     0 0 24px var(--game-accent-glow),
@@ -272,7 +267,7 @@ const getIconSize = computed(() => {
 /* Action buttons with selected state (for backward compatibility) */
 .game-button-action.game-button-selected {
   background: linear-gradient(135deg, var(--game-accent-color) 0%, #00cc6a 100%);
-  border-color: var(--game-card-border);
+  border-color: var(--game-surface-border);
   color: #000000;
   box-shadow: 
     0 0 20px var(--game-accent-glow),
@@ -282,7 +277,7 @@ const getIconSize = computed(() => {
 
 .game-button-action.game-button-selected:hover:not(.game-button-disabled) {
   background: linear-gradient(135deg, var(--game-accent-color) 0%, #00cc6a 100%);
-  border-color: var(--game-card-border);
+  border-color: var(--game-surface-border);
   transform: translateY(-2px);
   box-shadow: 
     0 0 24px var(--game-accent-glow),
@@ -360,7 +355,7 @@ const getIconSize = computed(() => {
 
 /* Focus styles for accessibility */
 .game-button:focus-visible {
-  outline: 2px solid var(--game-card-border);
+  outline: 2px solid var(--game-surface-border);
   outline-offset: 2px;
 }
 </style>

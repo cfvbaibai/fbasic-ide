@@ -1,17 +1,23 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
 import { DEFAULTS } from '../../../core/constants'
+import { GameBlock } from '../../../shared/components/ui'
 
 interface Props {
   modelValue: string
   highlightedCode?: string
+  title?: string
+  titleIcon?: string
 }
 
 interface Emits {
   (e: 'update:modelValue', value: string): void
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  title: 'Code Editor',
+  titleIcon: 'mdi:pencil'
+})
 const emit = defineEmits<Emits>()
 
 const textareaRef = ref<HTMLTextAreaElement>()
@@ -54,10 +60,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="code-editor">
+  <GameBlock 
+    :title="props.title || 'Code Editor'"
+    :title-icon="props.titleIcon"
+    class="code-editor"
+  >
     <div class="editor-container">
       <!-- Line Numbers -->
-      <div class="line-numbers">
+      <div class="line-numbers bg-game-surface border-game-surface-right">
         <div 
           v-for="line in lineNumbers" 
           :key="line" 
@@ -85,7 +95,7 @@ onMounted(() => {
         v-html="highlightedCode"
       />
     </div>
-  </div>
+  </GameBlock>
 </template>
 
 <style scoped>
@@ -94,9 +104,16 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
-  background: var(--app-bg-color-page);
   min-height: 0; /* Allow component to shrink */
   overflow: hidden; /* Prevent overflow */
+}
+
+.code-editor :deep(.game-block-content) {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .editor-container {
@@ -108,12 +125,10 @@ onMounted(() => {
 }
 
 .line-numbers {
-  background: var(--app-fill-color-light);
-  border-right: 1px solid var(--app-border-color-light);
   padding: 1rem 0.5rem;
   min-width: 3rem;
   text-align: right;
-  color: var(--app-text-color-secondary);
+  color: var(--game-text-secondary);
   font-size: 14px;
   line-height: 1.5;
   user-select: none;
@@ -133,39 +148,34 @@ onMounted(() => {
   border: none;
   outline: none;
   padding: 1rem;
-  font-family: inherit;
   font-size: 14px;
   line-height: 1.5;
   resize: none;
   background: transparent;
-  color: var(--app-text-color-primary);
+  color: var(--game-text-primary);
   tab-size: 2;
+  font-family: var(--game-font-family-mono);
 }
 
 .code-textarea::placeholder {
-  color: var(--app-text-color-placeholder);
+  color: var(--game-text-tertiary);
 }
 
 .code-textarea:focus {
   outline: none;
 }
 
-/* Scrollbar styling */
-.code-textarea::-webkit-scrollbar {
-  width: 8px;
-}
-
 .code-textarea::-webkit-scrollbar-track {
-  background: var(--app-fill-color);
+  background: var(--game-surface-bg-gradient);
 }
 
 .code-textarea::-webkit-scrollbar-thumb {
-  background: var(--app-border-color);
+  background: var(--game-surface-border);
   border-radius: 4px;
 }
 
 .code-textarea::-webkit-scrollbar-thumb:hover {
-  background: var(--app-border-color-light);
+  background: var(--game-accent-color);
 }
 
 .syntax-highlighted {
@@ -175,7 +185,6 @@ onMounted(() => {
   right: 0;
   bottom: 0;
   padding: 1rem;
-  font-family: inherit;
   font-size: 14px;
   line-height: 1.5;
   color: transparent;

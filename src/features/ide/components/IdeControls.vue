@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { VideoPlay, VideoPause, Delete, Loading, CircleCheck } from '@element-plus/icons-vue'
-import { GameButton, GameSwitch, GameTag, GameIcon } from '../../../shared/components/ui'
+import { GameButton, GameSwitch } from '../../../shared/components/ui'
 
 interface Props {
   isRunning: boolean
@@ -27,66 +26,32 @@ const handleRun = () => {
   emit('run')
 }
 
-const handleDebugToggle = (value: boolean) => {
+const handleDebugToggle = (value: boolean | string | number) => {
   // Only emit if the value actually changed (toggle behavior)
-  if (value !== props.debugMode) {
+  const boolValue = Boolean(value)
+  if (boolValue !== props.debugMode) {
     emit('toggle-debug')
   }
 }
 </script>
 
 <template>
-  <div class="ide-controls">
-    <GameButton 
-      type="primary" 
-      :disabled="!canRun"
-      :icon="VideoPlay"
-      @click="handleRun"
-    >
+  <div class="ide-controls bg-game-surface border-game-surface">
+    <GameButton type="primary" :disabled="!canRun" icon="mdi:play" @click="handleRun">
       Run
     </GameButton>
-    
-    <GameButton 
-      type="danger" 
-      :disabled="!canStop"
-      :icon="VideoPause"
-      @click="$emit('stop')"
-    >
+
+    <GameButton type="danger" :disabled="!canStop" icon="mdi:pause" @click="$emit('stop')">
       Stop
     </GameButton>
-    
-    <GameButton 
-      type="warning"
-      :icon="Delete"
-      @click="$emit('clear')"
-    >
+
+    <GameButton type="warning" icon="mdi:delete" @click="$emit('clear')">
       Clear
     </GameButton>
-    
+
     <div class="debug-control">
-      <span class="debug-label">Debug</span>
-      <GameSwitch 
-        :model-value="debugMode"
-        @update:model-value="handleDebugToggle"
-      />
-    </div>
-    
-    <div class="status-indicator">
-      <GameTag 
-        :type="isRunning ? 'success' : 'info'"
-        :effect="isRunning ? 'dark' : 'light'"
-      >
-        <GameIcon 
-          v-if="isRunning" 
-          :icon="Loading" 
-          rotate
-        />
-        <GameIcon 
-          v-else
-          :icon="CircleCheck" 
-        />
-        {{ isRunning ? 'Running' : 'Ready' }}
-      </GameTag>
+      <span class="debug-label text-game-secondary">Debug</span>
+      <GameSwitch :model-value="debugMode" @update:model-value="handleDebugToggle" />
     </div>
   </div>
 </template>
@@ -97,15 +62,6 @@ const handleDebugToggle = (value: boolean) => {
   align-items: center;
   gap: 1rem;
   padding: 0.5rem;
-  background: linear-gradient(135deg, rgba(0, 255, 136, 0.05) 0%, rgba(0, 255, 136, 0.02) 100%);
-  border: 1px solid var(--game-card-border);
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 255, 136, 0.1);
-}
-
-.status-indicator {
-  display: flex;
-  align-items: center;
 }
 
 .debug-control {
@@ -113,16 +69,5 @@ const handleDebugToggle = (value: boolean) => {
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem;
-  background: linear-gradient(135deg, rgba(0, 255, 136, 0.05) 0%, rgba(0, 255, 136, 0.02) 100%);
-  border: 1px solid var(--game-card-border);
-  border-radius: 6px;
-}
-
-.debug-label {
-  font-size: 0.9rem;
-  color: var(--game-text-primary);
-  font-weight: 600;
-  font-family: var(--game-font-family);
-  text-shadow: 0 0 4px var(--game-accent-glow);
 }
 </style>

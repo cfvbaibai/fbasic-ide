@@ -82,6 +82,7 @@ const tableSize = computed(() => {
 .game-table-wrapper {
   width: 100%;
   overflow-x: auto;
+  overflow-y: hidden;
   border-radius: 6px;
 }
 
@@ -90,7 +91,6 @@ const tableSize = computed(() => {
   border-collapse: collapse;
   background: transparent;
   font-size: v-bind(tableSize);
-  font-family: var(--game-font-family);
 }
 
 .game-table-header {
@@ -98,7 +98,7 @@ const tableSize = computed(() => {
 }
 
 .game-table-header-row {
-  border-bottom: 2px solid var(--game-card-border);
+  border-bottom: 2px solid var(--game-surface-border);
 }
 
 .game-table-header-cell {
@@ -127,7 +127,7 @@ const tableSize = computed(() => {
 }
 
 .game-table-row {
-  border-bottom: 1px solid var(--game-card-border);
+  border-bottom: 1px solid var(--game-surface-border);
   transition: all 0.2s ease;
 }
 
@@ -167,12 +167,12 @@ const tableSize = computed(() => {
 }
 
 .game-table-border {
-  border: 1px solid var(--game-card-border);
+  border: 1px solid var(--game-surface-border);
 }
 
 .game-table-border .game-table-header-cell,
 .game-table-border .game-table-cell {
-  border-right: 1px solid var(--game-card-border);
+  border-right: 1px solid var(--game-surface-border);
 }
 
 .game-table-border .game-table-header-cell:last-child,

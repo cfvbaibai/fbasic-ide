@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import GameIcon from './GameIcon.vue'
+import GameBlock from './GameBlock.vue'
 
 interface Props {
   title: string
   description?: string
-  icon?: any
+  icon?: string // Icon name in format "prefix:name" (e.g., "mdi:play")
   iconColor?: string
   actionText?: string
   clickable?: boolean
@@ -13,7 +14,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   description: '',
-  icon: null,
+  icon: undefined,
   iconColor: 'var(--game-accent-color)',
   actionText: '',
   clickable: true,
@@ -32,14 +33,18 @@ const handleClick = () => {
 </script>
 
 <template>
-  <div
-    :class="['game-card', { clickable, 'float-on-hover': floatOnHover }]"
+  <GameBlock
+    :title="title"
+    :hide-header="true"
+    :float-on-hover="floatOnHover"
+    :clickable="clickable"
+    class="game-card"
+    :style="{ '--icon-color': iconColor, padding: '2rem' }"
     @click="handleClick"
   >
     <div
       v-if="icon"
       class="game-card-icon-wrapper"
-      :style="{ '--icon-color': iconColor }"
     >
       <GameIcon :icon="icon" size="large" class="game-card-icon" />
     </div>
@@ -49,57 +54,15 @@ const handleClick = () => {
       <span>{{ actionText }}</span>
     </div>
     <slot />
-  </div>
+  </GameBlock>
 </template>
 
 <style scoped>
-.game-card {
-  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
-  border: 2px solid var(--game-card-border);
-  border-radius: 12px;
-  padding: 2rem;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  box-shadow: var(--game-shadow-base);
-}
-
-.game-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: var(--icon-color, var(--game-accent-color));
-  transform: scaleX(0);
-  transition: transform 0.3s ease;
-}
-
-.game-card.clickable {
-  cursor: pointer;
-}
-
-/* Glowing effects on hover for all cards (regardless of clickable or floatOnHover) */
-.game-card:hover {
-  border-color: var(--icon-color, var(--game-card-border-hover));
-  box-shadow: var(--game-shadow-hover);
-}
-
-.game-card:hover::before {
-  transform: scaleX(1);
-}
-
-/* Floating effect only when floatOnHover is true */
-.game-card.float-on-hover:hover {
-  transform: translateY(-8px);
-}
-
 .game-card-icon-wrapper {
   width: 80px;
   height: 80px;
   border-radius: 12px;
-  background: linear-gradient(135deg, var(--game-card-bg-start), var(--game-card-bg-end));
+  background: var(--game-surface-bg-gradient);
   border: 2px solid var(--icon-color);
   display: flex;
   align-items: center;
@@ -143,7 +106,6 @@ const handleClick = () => {
 
 .game-card-description {
   font-size: 1rem;
-  font-family: var(--game-font-family);
   color: var(--game-text-secondary);
   line-height: 1.6;
   margin: 0 0 1.5rem 0;
@@ -157,10 +119,5 @@ const handleClick = () => {
   font-size: 0.9rem;
   opacity: 0.8;
   transition: all 0.3s ease;
-}
-
-.game-card:hover .game-card-action {
-  opacity: 1;
-  transform: translateX(4px);
 }
 </style>

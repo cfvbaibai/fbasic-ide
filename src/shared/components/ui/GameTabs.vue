@@ -76,8 +76,8 @@ provide('unregisterTab', unregisterTab)
   display: flex;
   gap: 0.5rem;
   padding: 0.5rem;
-  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
-  border-bottom: 2px solid var(--game-card-border);
+  background: var(--game-surface-bg-gradient);
+  border-bottom: 2px solid var(--game-surface-border);
   overflow-x: auto;
   flex-shrink: 0;
   position: relative;
@@ -112,8 +112,8 @@ provide('unregisterTab', unregisterTab)
 
 /* Border card tab button styles - buttons are rendered here */
 .game-tabs-border-card :deep(.game-tab-button) {
-  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
-  border: 2px solid var(--game-card-border);
+  background: var(--game-surface-bg-gradient);
+  border: 2px solid var(--game-surface-border);
   border-bottom: none;
   border-radius: 8px 8px 0 0;
   margin-right: 0.25rem;
@@ -158,7 +158,7 @@ provide('unregisterTab', unregisterTab)
 }
 
 .game-tabs-border-card :deep(.game-tab-button:hover:not(.disabled)) {
-  border-color: var(--game-card-border-hover);
+  border-color: var(--game-surface-border-hover);
   box-shadow: 
     0 4px 8px rgba(0, 0, 0, 0.4),
     0 0 16px var(--game-accent-glow),
@@ -179,7 +179,7 @@ provide('unregisterTab', unregisterTab)
 }
 
 .game-tabs-border-card :deep(.game-tab-button.active) {
-  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
+  background: var(--game-surface-bg-gradient);
   border-color: var(--game-accent-color);
   border-bottom-color: transparent;
   box-shadow: 
@@ -437,7 +437,7 @@ provide('unregisterTab', unregisterTab)
 }
 
 .game-tabs-header::-webkit-scrollbar-thumb {
-  background: var(--game-card-border);
+  background: var(--game-surface-border);
   border-radius: 2px;
 }
 

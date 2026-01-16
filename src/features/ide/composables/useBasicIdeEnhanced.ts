@@ -23,7 +23,7 @@
  */
 
 /* global NodeJS */
-import { ref, onUnmounted, nextTick } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import { FBasicParser } from '../../../core/parser/FBasicParser'
 import { getSampleCode } from '../../../core/samples/sampleCodes'
 import type { ExecutionResult, ParserInfo, HighlighterInfo, BasicVariable, AnyServiceWorkerMessage, ResultMessage, ErrorMessage, OutputMessage, ProgressMessage, ScreenUpdateMessage, ScreenCell } from '../../../core/interfaces'
@@ -259,33 +259,45 @@ export function useBasicIde() {
     switch (update.updateType) {
       case 'character':
         if (update.x !== undefined && update.y !== undefined && update.character !== undefined) {
+          const x = update.x
+          const y = update.y
+          const character = update.character
+          
           console.log('🖥️ [COMPOSABLE] Updating character:', {
-            x: update.x,
-            y: update.y,
-            char: update.character,
-            currentBuffer: screenBuffer.value[update.y]?.[update.x]
+            x,
+            y,
+            char: character,
+            currentBuffer: screenBuffer.value[y]?.[x]
           })
+          
           // Ensure row exists
-          if (!screenBuffer.value[update.y]) {
-            screenBuffer.value[update.y] = []
+          if (!screenBuffer.value[y]) {
+            screenBuffer.value[y] = []
           }
+          
           // Ensure cell exists
-          if (!screenBuffer.value[update.y][update.x]) {
-            screenBuffer.value[update.y][update.x] = {
+          const currentRow = screenBuffer.value[y]
+          if (!currentRow[x]) {
+            currentRow[x] = {
               character: ' ',
               colorPattern: 0,
-              x: update.x,
-              y: update.y
+              x,
+              y
             }
           }
+          
           // Update character - force reactivity by creating new object
-          const newCell = {
-            ...screenBuffer.value[update.y][update.x],
-            character: update.character
+          const currentCell = currentRow[x]
+          const newCell: ScreenCell = {
+            character,
+            colorPattern: currentCell.colorPattern,
+            x: currentCell.x,
+            y: currentCell.y
           }
-          screenBuffer.value[update.y][update.x] = newCell
+          currentRow[x] = newCell
+          
           // Also trigger reactivity by reassigning the row
-          screenBuffer.value[update.y] = [...screenBuffer.value[update.y]]
+          screenBuffer.value[y] = [...currentRow]
         }
         break
       case 'cursor':
@@ -295,9 +307,13 @@ export function useBasicIde() {
       case 'clear':
         // Clear screen buffer
         for (let y = 0; y < 24; y++) {
-          for (let x = 0; x < 28; x++) {
-            if (screenBuffer.value[y] && screenBuffer.value[y][x]) {
-              screenBuffer.value[y][x].character = ' '
+          const row = screenBuffer.value[y]
+          if (row) {
+            for (let x = 0; x < 28; x++) {
+              const cell = row[x]
+              if (cell) {
+                cell.character = ' '
+              }
             }
           }
         }
@@ -466,9 +482,13 @@ export function useBasicIde() {
     
     // Clear screen
     for (let y = 0; y < 24; y++) {
-      for (let x = 0; x < 28; x++) {
-        if (screenBuffer.value[y] && screenBuffer.value[y][x]) {
-          screenBuffer.value[y][x].character = ' '
+      const row = screenBuffer.value[y]
+      if (row) {
+        for (let x = 0; x < 28; x++) {
+          const cell = row[x]
+          if (cell) {
+            cell.character = ' '
+          }
         }
       }
     }

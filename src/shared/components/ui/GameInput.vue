@@ -64,7 +64,7 @@ const inputClasses = computed(() => {
       @input="handleInput"
       @focus="emit('focus', $event)"
       @blur="emit('blur', $event)"
-      class="game-input-inner"
+      class="game-input-inner bg-game-surface border-game-surface"
     />
     <button
       v-if="clearable && modelValue && !disabled"
@@ -89,12 +89,9 @@ const inputClasses = computed(() => {
 .game-input-inner {
   width: 100%;
   padding: 0.625rem 1rem;
-  font-family: var(--game-font-family);
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--game-text-primary);
-  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
-  border: 2px solid var(--game-card-border);
   border-radius: 8px;
   outline: none;
   transition: all 0.2s ease;
@@ -119,7 +116,7 @@ const inputClasses = computed(() => {
 .game-input-inner:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  background: var(--game-card-bg-end);
+  background: var(--game-surface-bg-end);
 }
 
 /* Size variants */

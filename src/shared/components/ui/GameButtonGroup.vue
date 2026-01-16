@@ -11,8 +11,8 @@
 .game-button-group {
   display: inline-flex;
   align-items: stretch;
-  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
-  border: 2px solid var(--game-card-border);
+  background: var(--game-surface-bg-gradient);
+  border: 2px solid var(--game-surface-border);
   border-radius: 8px;
   padding: 2px;
   box-shadow: var(--game-shadow-base);
@@ -53,14 +53,14 @@
   top: 15%;
   bottom: 15%;
   width: 1px;
-  background: var(--game-card-border);
+  background: var(--game-surface-border);
   opacity: 0.7;
   z-index: 1;
 }
 
 /* Selected button divider - keep subtle, no accent color since button is already highlighted */
 .game-button-group :deep(.game-button-selected:not(:last-child))::after {
-  background: var(--game-card-border);
+  background: var(--game-surface-border);
   opacity: 0.5;
   width: 1px;
 }

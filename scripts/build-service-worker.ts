@@ -26,7 +26,7 @@ async function buildWebWorker() {
       target: 'es2020',
       minify: false, // Keep readable for debugging
       sourcemap: false,
-      external: ['vue', 'element-plus'], // Exclude main app dependencies (lodash-es must be bundled for Chevrotain)
+      external: ['vue'], // Exclude main app dependencies (lodash-es must be bundled for Chevrotain)
       define: {
         'process.env.NODE_ENV': '"production"', // Ensure production environment
       },

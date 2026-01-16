@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router'
-import { Monitor, Edit, Picture, Grid } from '@element-plus/icons-vue'
 import GameIcon from './ui/GameIcon.vue'
 
 const route = useRoute()
@@ -9,7 +8,7 @@ const router = useRouter()
 interface NavItem {
   name: string
   path: string
-  icon: any
+  icon: string
   description: string
 }
 
@@ -17,31 +16,31 @@ const navItems: NavItem[] = [
   {
     name: 'Home',
     path: '/',
-    icon: Monitor,
+    icon: 'mdi:monitor',
     description: 'Main Menu'
   },
   {
     name: 'IDE',
     path: '/ide',
-    icon: Edit,
+    icon: 'mdi:pencil',
     description: 'Family Basic IDE'
   },
   {
     name: 'Monaco Editor',
     path: '/monaco',
-    icon: Edit,
+    icon: 'mdi:pencil',
     description: 'Advanced Code Editor'
   },
   {
     name: 'Image Analyzer',
     path: '/image-analyzer',
-    icon: Picture,
+    icon: 'mdi:image',
     description: 'Analyze Images'
   },
   {
     name: 'Sprite Viewer',
     path: '/character-sprite-viewer',
-    icon: Grid,
+    icon: 'mdi:grid',
     description: 'View Character Sprites'
   }
 ]
@@ -59,7 +58,7 @@ const navigate = (path: string) => {
   <nav class="game-navigation">
     <div class="nav-container">
       <div class="nav-title">
-        <GameIcon :icon="Monitor" size="medium" class="title-icon" />
+        <GameIcon icon="mdi:monitor" :size="28" class="title-icon" />
         <span>F-BASIC EMU</span>
       </div>
       <div class="nav-items">
@@ -129,8 +128,8 @@ const navigate = (path: string) => {
 
 .nav-button {
   position: relative;
-  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
-  border: 2px solid var(--game-card-border);
+  background: var(--game-surface-bg-gradient);
+  border: 2px solid var(--game-surface-border);
   border-radius: 8px;
   padding: 0.75rem 1.25rem;
   color: var(--game-text-secondary);
@@ -139,7 +138,6 @@ const navigate = (path: string) => {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  font-family: var(--game-font-family);
   min-width: 140px;
   box-shadow: 
     0 2px 4px rgba(0, 0, 0, 0.3),

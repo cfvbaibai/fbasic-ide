@@ -91,8 +91,8 @@ const isCursorCell = (x: number, y: number): boolean => {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  background: var(--screen-bg-color);
-  border: 2px solid var(--screen-border-color);
+  background: var(--game-screen-bg-color);
+  border: 2px solid var(--game-screen-border-color);
   border-radius: 4px;
   overflow: hidden;
 }
@@ -102,25 +102,25 @@ const isCursorCell = (x: number, y: number): boolean => {
   align-items: center;
   gap: 1rem;
   padding: 0.5rem 1rem;
-  background: var(--screen-header-bg);
-  border-bottom: 1px solid var(--screen-border-color);
+  background: var(--game-screen-header-bg);
+  border-bottom: 1px solid var(--game-screen-border-color);
   font-size: 0.875rem;
-  color: var(--screen-header-text);
+  color: var(--game-screen-header-text);
 }
 
 .screen-title {
   font-weight: 600;
-  color: var(--screen-header-title);
+  color: var(--game-screen-header-title);
 }
 
 .screen-dimensions {
-  color: var(--screen-header-text);
+  color: var(--game-screen-header-text);
 }
 
 .cursor-info {
   margin-left: auto;
   font-family: 'Courier New', monospace;
-  color: var(--screen-text-color);
+  color: var(--game-screen-text-color);
 }
 
 .screen-display {
@@ -135,8 +135,8 @@ const isCursorCell = (x: number, y: number): boolean => {
 
 .screen-grid {
   display: inline-block;
-  background: var(--screen-bg-color);
-  border: 1px solid var(--screen-border-color);
+  background: var(--game-screen-bg-color);
+  border: 1px solid var(--game-screen-border-color);
 }
 
 .screen-row {
@@ -150,10 +150,10 @@ const isCursorCell = (x: number, y: number): boolean => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
-  font-size: 0.875rem;
-  color: var(--screen-text-color);
-  background: var(--screen-bg-color);
+  font-family: var(--game-font-family-mono);
+  font-size: var(--game-font-size-mono);
+  color: var(--game-screen-text-color);
+  background: var(--game-screen-bg-color);
   border: 0;
   padding: 0;
   margin: 0;
@@ -162,8 +162,8 @@ const isCursorCell = (x: number, y: number): boolean => {
 }
 
 .screen-cell.cursor-cell {
-  background: var(--screen-cursor-bg);
-  box-shadow: inset 0 0 0 1px var(--screen-cursor-border);
+  background: var(--game-screen-cursor-bg);
+  box-shadow: inset 0 0 0 1px var(--game-screen-cursor-border);
 }
 
 /* Ensure monospace rendering */

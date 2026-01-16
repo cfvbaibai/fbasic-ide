@@ -49,7 +49,7 @@ const switchClasses = computed(() => {
     :disabled="disabled"
     @click="handleToggle"
   >
-    <span class="game-switch-core">
+    <span class="game-switch-core bg-game-surface border-game-surface">
       <span class="game-switch-button" />
     </span>
   </button>
@@ -73,8 +73,6 @@ const switchClasses = computed(() => {
   position: relative;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
-  border: 2px solid var(--game-card-border);
   border-radius: 11px;
   transition: all 0.2s ease;
   box-shadow: 

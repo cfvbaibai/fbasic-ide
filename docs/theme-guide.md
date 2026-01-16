@@ -1,6 +1,6 @@
 # Theme System Guide
 
-This guide explains how to use the standardized color system with Element Plus, including dark/light theme support.
+This guide explains how to use the standardized color system with custom Game* components, including dark/light theme support.
 
 ## Overview
 
@@ -15,32 +15,9 @@ The theme system is automatically initialized when the app starts. The theme CSS
 
 ```typescript
 import './shared/styles/theme.css'
-import 'element-plus/theme-chalk/dark/css-vars.css'
 ```
 
 ## Using CSS Variables
-
-### Element Plus Colors
-
-Element Plus provides semantic color variables that automatically adapt to the theme:
-
-```css
-/* Primary colors */
---el-color-primary
---el-color-primary-light-3
---el-color-primary-light-5
---el-color-primary-light-7
---el-color-primary-light-8
---el-color-primary-light-9
---el-color-primary-dark-2
-
-/* Semantic colors */
---el-color-success
---el-color-warning
---el-color-danger
---el-color-error
---el-color-info
-```
 
 ### Application Colors
 
@@ -198,7 +175,7 @@ Find and replace hard-coded color values with CSS variables:
 | `#606266` | `var(--app-text-color-regular)` |
 | `#909399` | `var(--app-text-color-secondary)` |
 | `#e4e7ed` | `var(--app-border-color-light)` |
-| `#409eff` | `var(--el-color-primary)` |
+| `#409eff` | `var(--game-accent-color)` |
 
 ### Step 2: Update Component Styles
 
@@ -242,7 +219,7 @@ Add a theme toggle to your app header or settings:
 1. **Always use CSS variables** instead of hard-coded colors
 2. **Use semantic color names** (e.g., `--app-text-color-primary` instead of `--app-color-gray-1`)
 3. **Test in both themes** to ensure proper contrast and readability
-4. **Use Element Plus colors** for component-specific styling when appropriate
+4. **Use Game* component colors** for component-specific styling when appropriate
 5. **Leverage utility classes** for common patterns
 
 ## Customization
@@ -251,11 +228,9 @@ To customize theme colors, edit `src/shared/styles/theme.css`:
 
 ```css
 :root {
-  /* Override Element Plus primary color */
-  --el-color-primary: #your-color;
-  
   /* Override application colors */
   --app-bg-color: #your-bg-color;
+  --game-accent-color: #your-accent-color;
 }
 ```
 
@@ -263,7 +238,7 @@ To customize theme colors, edit `src/shared/styles/theme.css`:
 
 ### Colors not updating in dark mode
 
-1. Ensure `element-plus/theme-chalk/dark/css-vars.css` is imported in `main.ts`
+1. Ensure `./shared/styles/theme.css` is imported in `main.ts`
 2. Check that the `.dark` class is applied to the `<html>` element
 3. Verify CSS variables are defined in both `:root` and `.dark` selectors
 

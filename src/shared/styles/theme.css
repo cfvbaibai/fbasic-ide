@@ -1,58 +1,50 @@
 /**
- * Element Plus Theme Configuration
+ * Theme Configuration
  * Standardized color system using CSS variables
- * Supports both light and dark themes
+ * Dark theme only - game-themed UI
  */
 
-
-/* Light Theme (Default) */
-
 :root {
-    /* Element Plus Primary Colors */
-    --el-color-primary: #409eff;
-    --el-color-primary-light-3: #79bbff;
-    --el-color-primary-light-5: #a0cfff;
-    --el-color-primary-light-7: #c6e2ff;
-    --el-color-primary-light-8: #d9ecff;
-    --el-color-primary-light-9: #ecf5ff;
-    --el-color-primary-dark-2: #337ecc;
-    /* Element Plus Semantic Colors */
-    --el-color-success: #67c23a;
-    --el-color-warning: #e6a23c;
-    --el-color-danger: #f56c6c;
-    --el-color-error: #f56c6c;
-    --el-color-info: #909399;
-    /* Custom Application Colors */
-    --app-bg-color: #f5f5f5;
-    --app-bg-color-page: #ffffff;
-    --app-text-color-primary: #303133;
-    --app-text-color-regular: #606266;
-    --app-text-color-secondary: #909399;
-    --app-text-color-placeholder: #c0c4cc;
-    --app-border-color: #dcdfe6;
-    --app-border-color-light: #e4e7ed;
-    --app-border-color-lighter: #ebeef5;
-    --app-border-color-extra-light: #f2f6fc;
-    --app-fill-color: #f0f2f5;
-    --app-fill-color-light: #f5f7fa;
-    --app-fill-color-lighter: #fafafa;
-    --app-fill-color-extra-light: #fafcff;
-    --app-fill-color-dark: #ebedf0;
-    --app-fill-color-darker: #e6e8eb;
-    --app-fill-color-blank: #ffffff;
-    /* Shadow Colors */
-    --app-box-shadow-base: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
-    --app-box-shadow-dark: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.12);
-    --app-box-shadow-light: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-    /* Screen-Specific Colors (Family BASIC Screen) */
-    --screen-bg-color: #000000;
-    --screen-text-color: #00ff00;
-    --screen-border-color: #333333;
-    --screen-header-bg: #1a1a1a;
-    --screen-header-text: #aaaaaa;
-    --screen-header-title: #ffffff;
-    --screen-cursor-bg: rgba(0, 255, 0, 0.2);
-    --screen-cursor-border: #00ff00;
+    /* Semantic Colors */
+    --semantic-success: #85ce61;
+    --semantic-success-dark: #67c23a;
+    --semantic-success-40: rgba(103, 194, 58, 0.4);
+    --semantic-success-50: rgba(103, 194, 58, 0.5);
+    --semantic-success-60: rgba(103, 194, 58, 0.6);
+    --semantic-warning: #ebb563;
+    --semantic-warning-40: rgba(230, 162, 60, 0.4);
+    --semantic-warning-50: rgba(230, 162, 60, 0.5);
+    --semantic-warning-60: rgba(230, 162, 60, 0.6);
+    --semantic-danger: #f78989;
+    --semantic-danger-40: rgba(247, 137, 137, 0.4);
+    --semantic-danger-50: rgba(247, 137, 137, 0.5);
+    --semantic-danger-60: rgba(247, 137, 137, 0.6);
+    --semantic-info: #a6a9ad;
+    --semantic-info-40: rgba(166, 169, 173, 0.4);
+    --semantic-info-50: rgba(166, 169, 173, 0.5);
+    --semantic-info-60: rgba(166, 169, 173, 0.6);
+    --semantic-neutral: #808080;
+    --semantic-neutral-40: rgba(128, 128, 128, 0.4);
+    --semantic-neutral-50: rgba(128, 128, 128, 0.5);
+    --semantic-neutral-60: rgba(128, 128, 128, 0.6);
+    /* Game Screen Colors (Family BASIC Screen Emulator) */
+    --game-screen-bg-color: #000000;
+    --game-screen-text-color: #00ff00;
+    --game-screen-text-color-5: rgba(0, 255, 0, 0.05);
+    --game-screen-text-color-8: rgba(0, 255, 0, 0.08);
+    --game-screen-text-color-10: rgba(0, 255, 0, 0.1);
+    --game-screen-text-color-15: rgba(0, 255, 0, 0.15);
+    --game-screen-text-color-20: rgba(0, 255, 0, 0.2);
+    --game-screen-text-color-30: rgba(0, 255, 0, 0.3);
+    --game-screen-text-color-40: rgba(0, 255, 0, 0.4);
+    --game-screen-text-color-60: rgba(0, 255, 0, 0.6);
+    --game-screen-text-color-80: rgba(0, 255, 0, 0.8);
+    --game-screen-border-color: #333333;
+    --game-screen-header-bg: #1a1a1a;
+    --game-screen-header-text: #aaaaaa;
+    --game-screen-header-title: #ffffff;
+    --game-screen-cursor-bg: rgba(0, 255, 0, 0.2);
+    --game-screen-cursor-border: #00ff00;
     /* Game UI Colors */
     --game-bg-gradient-start: #0f0f1e;
     --game-bg-gradient-mid: #1a1a2e;
@@ -62,139 +54,47 @@
     --game-nav-border: #0f3460;
     --game-accent-color: #00ff88;
     --game-accent-glow: rgba(0, 255, 136, 0.5);
-    --game-card-bg-start: #2a2a3e;
-    --game-card-bg-end: #1e1e2e;
-    --game-card-border: #3a3a4e;
-    --game-card-border-hover: #00ff88;
+    --game-surface-accent-gradient: linear-gradient(135deg, rgba(0, 255, 136, 0.05) 0%, rgba(0, 255, 136, 0.02) 100%);
+    --game-surface-bg-start: #2a2a3e;
+    --game-surface-bg-end: #1e1e2e;
+    --game-surface-bg-gradient: linear-gradient(135deg, var(--game-surface-bg-start) 0%, var(--game-surface-bg-end) 100%);
+    --game-surface-border: #3a3a4e;
+    --game-surface-border-hover: #00ff88;
     --game-text-primary: #ffffff;
     --game-text-secondary: #b0b0c0;
     --game-text-tertiary: #9090a0;
+    /* Game UI Base Colors (Gray/Black/White) */
+    --game-color-black: #000000;
+    --game-color-white: #ffffff;
+    --game-color-black-10: rgba(0, 0, 0, 0.1);
+    --game-color-black-15: rgba(0, 0, 0, 0.15);
+    --game-color-black-20: rgba(0, 0, 0, 0.2);
+    --game-color-black-30: rgba(0, 0, 0, 0.3);
+    --game-color-black-40: rgba(0, 0, 0, 0.4);
+    --game-color-black-50: rgba(0, 0, 0, 0.5);
+    --game-color-white-10: rgba(255, 255, 255, 0.1);
+    --game-color-white-15: rgba(255, 255, 255, 0.15);
+    --game-color-white-20: rgba(255, 255, 255, 0.2);
+    --game-color-white-30: rgba(255, 255, 255, 0.3);
+    --game-color-white-40: rgba(255, 255, 255, 0.4);
+    --game-color-white-50: rgba(255, 255, 255, 0.5);
     --game-shadow-base: 0 4px 12px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
     --game-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 255, 136, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
     --game-shadow-glow: 0 0 20px rgba(0, 255, 136, 0.6);
+    --game-shadow-glow-sm: 0 0 10px rgba(0, 255, 136, 0.1);
+    /* Game UI Border Radius */
+    --game-radius-sm: 4px;
+    --game-radius-md: 6px;
+    --game-radius-lg: 8px;
     /* Game UI Fonts */
     --game-font-family: 'Rajdhani', 'Orbitron', system-ui, sans-serif;
     --game-font-family-heading: 'Orbitron', 'Rajdhani', system-ui, sans-serif;
     --game-font-family-mono: 'Courier New', 'Monaco', 'Menlo', monospace;
-}
-
-
-/* Dark Theme */
-
-.dark {
-    /* Element Plus Primary Colors (Dark) */
-    --el-color-primary: #409eff;
-    --el-color-primary-light-3: #3375b9;
-    --el-color-primary-light-5: #2a598a;
-    --el-color-primary-light-7: #213d5b;
-    --el-color-primary-light-8: #1d2e40;
-    --el-color-primary-light-9: #18222c;
-    --el-color-primary-dark-2: #66b1ff;
-    /* Element Plus Semantic Colors (Dark) */
-    --el-color-success: #85ce61;
-    --el-color-warning: #ebb563;
-    --el-color-danger: #f78989;
-    --el-color-error: #f78989;
-    --el-color-info: #a6a9ad;
-    /* Custom Application Colors (Dark) */
-    --app-bg-color: #141414;
-    --app-bg-color-page: #0d1117;
-    --app-text-color-primary: #e5eaf3;
-    --app-text-color-regular: #cfd3dc;
-    --app-text-color-secondary: #a3a6ad;
-    --app-text-color-placeholder: #6d7075;
-    --app-border-color: #4c4d4f;
-    --app-border-color-light: #414243;
-    --app-border-color-lighter: #363637;
-    --app-border-color-extra-light: #2b2b2c;
-    --app-fill-color: #2b2b2c;
-    --app-fill-color-light: #262727;
-    --app-fill-color-lighter: #1d1d1d;
-    --app-fill-color-extra-light: #191919;
-    --app-fill-color-dark: #39393a;
-    --app-fill-color-darker: #424243;
-    --app-fill-color-blank: #141414;
-    /* Shadow Colors (Dark) */
-    --app-box-shadow-base: 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 6px rgba(0, 0, 0, 0.2);
-    --app-box-shadow-dark: 0 2px 4px rgba(0, 0, 0, 0.4), 0 0 6px rgba(0, 0, 0, 0.3);
-    --app-box-shadow-light: 0 2px 12px 0 rgba(0, 0, 0, 0.3);
-    /* Screen-Specific Colors (Dark Theme - same retro terminal look) */
-    --screen-bg-color: #000000;
-    --screen-text-color: #00ff00;
-    --screen-border-color: #333333;
-    --screen-header-bg: #1a1a1a;
-    --screen-header-text: #aaaaaa;
-    --screen-header-title: #ffffff;
-    --screen-cursor-bg: rgba(0, 255, 0, 0.2);
-    --screen-cursor-border: #00ff00;
-    /* Game UI Colors (Dark Theme - same as light for consistency) */
-    --game-bg-gradient-start: #0f0f1e;
-    --game-bg-gradient-mid: #1a1a2e;
-    --game-bg-gradient-end: #16213e;
-    --game-nav-bg-start: #1a1a2e;
-    --game-nav-bg-end: #16213e;
-    --game-nav-border: #0f3460;
-    --game-accent-color: #00ff88;
-    --game-accent-glow: rgba(0, 255, 136, 0.5);
-    --game-card-bg-start: #2a2a3e;
-    --game-card-bg-end: #1e1e2e;
-    --game-card-border: #3a3a4e;
-    --game-card-border-hover: #00ff88;
-    --game-text-primary: #ffffff;
-    --game-text-secondary: #b0b0c0;
-    --game-text-tertiary: #9090a0;
-    --game-shadow-base: 0 4px 12px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    --game-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 255, 136, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    --game-shadow-glow: 0 0 20px rgba(0, 255, 136, 0.6);
-    /* Game UI Fonts (Dark Theme - same as light) */
-    --game-font-family: 'Rajdhani', 'Orbitron', system-ui, sans-serif;
-    --game-font-family-heading: 'Orbitron', 'Rajdhani', system-ui, sans-serif;
-    --game-font-family-mono: 'Courier New', 'Monaco', 'Menlo', monospace;
-}
-
-
-/* Utility Classes for Common Color Usage */
-
-.bg-primary {
-    background-color: var(--el-color-primary);
-}
-
-.bg-success {
-    background-color: var(--el-color-success);
-}
-
-.bg-warning {
-    background-color: var(--el-color-warning);
-}
-
-.bg-danger {
-    background-color: var(--el-color-danger);
-}
-
-.bg-info {
-    background-color: var(--el-color-info);
-}
-
-.text-primary {
-    color: var(--app-text-color-primary);
-}
-
-.text-regular {
-    color: var(--app-text-color-regular);
-}
-
-.text-secondary {
-    color: var(--app-text-color-secondary);
-}
-
-.text-placeholder {
-    color: var(--app-text-color-placeholder);
-}
-
-.border-base {
-    border-color: var(--app-border-color);
-}
-
-.border-light {
-    border-color: var(--app-border-color-light);
+    --game-font-size-sm: 0.875rem;
+    --game-font-size-base: 0.9rem;
+    --game-font-size-mono: 14px;
+    --game-font-weight-medium: 500;
+    --game-font-weight-semibold: 600;
+    --game-font-weight-bold: 700;
+    --game-line-height-mono: 1.4;
 }

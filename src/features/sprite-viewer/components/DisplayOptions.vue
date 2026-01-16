@@ -75,7 +75,6 @@ const updateReverseY = (value: boolean | string | number) => {
 
 .control-group label {
   font-weight: 600;
-  font-family: var(--game-font-family);
   color: var(--game-text-secondary);
   font-size: 0.875rem;
   text-transform: uppercase;

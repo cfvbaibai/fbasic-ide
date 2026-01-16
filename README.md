@@ -16,7 +16,7 @@ To preserve and modernize the Family Basic programming language by providing an 
 ### Key Features
 - **Authentic F-BASIC Syntax** - Faithful implementation of Family Basic language features
 - **Real-time Execution** - Immediate feedback with syntax highlighting and error reporting
-- **Modern Web Interface** - Clean, responsive UI built with Vue 3 and Element Plus
+- **Modern Web Interface** - Clean, responsive UI built with Vue 3
 - **Cross-platform** - Runs in any modern web browser
 - **Educational Focus** - Designed for learning and teaching programming concepts
 
@@ -28,7 +28,6 @@ To preserve and modernize the Family Basic programming language by providing an 
 - **Language**: TypeScript for type safety and better developer experience
 - **Parser**: Chevrotain for TypeScript-native parsing (no build step)
 - **Editor**: Monaco Editor for advanced code editing features
-- **UI Components**: Element Plus for professional interface components
 - **Testing**: Vitest for unit testing with Vue Test Utils
 - **Code Quality**: ESLint + Prettier for consistent code formatting
 - **Utilities**: Lodash-es for optimized utility functions
@@ -64,116 +63,6 @@ To preserve and modernize the Family Basic programming language by providing an 
 4. **Maintainability** - Clean code with consistent patterns and separation of concerns
 5. **Performance** - Optimized with tree-shaking and native methods
 6. **Framework Agnostic Core** - Core interpreter has no DOM dependencies
-
-### UI Component Library (Element Plus)
-
-#### Overview
-Element Plus is the Vue 3 implementation of Element UI, providing a comprehensive set of professional UI components. It's chosen for its:
-- **Vue 3 Compatibility** - Built specifically for Vue 3 with Composition API support
-- **Professional Design** - Clean, modern interface components
-- **TypeScript Support** - Full TypeScript definitions included
-- **Accessibility** - WCAG compliant components
-- **Customization** - Extensive theming and styling options
-
-#### Components Used
-```typescript
-// Main IDE Components
-<el-button>          // Run/Stop/Clear buttons in IdeControls
-<el-tag>             // Error status indicators in RuntimeOutput
-<el-textarea>        // Code input in CodeEditor
-<el-scrollbar>       // Scrollable output areas
-<el-divider>         // Visual separators
-<el-icon>            // Action icons (Play, Stop, Clear)
-```
-
-#### Implementation Examples
-
-**IdeControls Component:**
-```vue
-<template>
-  <div class="ide-controls">
-    <el-button 
-      type="primary" 
-      :disabled="!canRun"
-      @click="runCode"
-      :icon="VideoPlay"
-    >
-      Run
-    </el-button>
-    <el-button 
-      type="danger" 
-      :disabled="!canStop"
-      @click="stopCode"
-      :icon="VideoPause"
-    >
-      Stop
-    </el-button>
-    <el-button 
-      @click="clearCode"
-      :icon="Delete"
-    >
-      Clear
-    </el-button>
-  </div>
-</template>
-```
-
-**RuntimeOutput Component:**
-```vue
-<template>
-  <div class="runtime-output">
-    <el-tag v-if="errors.length > 0" type="danger" size="small">
-      {{ errors.length }} Error(s)
-    </el-tag>
-    
-    <el-scrollbar class="output-scrollbar">
-      <div class="output-content">
-        <pre>{{ output }}</pre>
-      </div>
-    </el-scrollbar>
-    
-    <div v-if="errors.length > 0" class="error-output">
-      <el-divider />
-      <div v-for="error in errors" :key="error" class="error-item">
-        {{ error }}
-      </div>
-    </div>
-  </div>
-</template>
-```
-
-#### Configuration
-Element Plus is configured in `src/main.ts`:
-```typescript
-import { createApp } from 'vue'
-import ElementPlus from 'element-plus'
-import 'element-plus/dist/index.css'
-import App from './App.vue'
-
-const app = createApp(App)
-app.use(ElementPlus)
-app.mount('#app')
-```
-
-#### Theming & Customization
-- **CSS Variables**: Element Plus uses CSS custom properties for theming
-- **Component Props**: Extensive prop system for customization
-- **Size Variants**: Small, default, large size options
-- **Type Variants**: Primary, success, warning, danger, info types
-
-#### Best Practices
-1. **Consistent Sizing**: Use `size="small"` for compact interfaces
-2. **Semantic Colors**: Use appropriate `type` props (primary, danger, etc.)
-3. **Icon Integration**: Use Element Plus icons with `:icon` prop
-4. **Accessibility**: Leverage built-in ARIA attributes
-5. **Responsive Design**: Use Element Plus responsive utilities
-
-#### Component Guidelines
-- **Buttons**: Use semantic types (primary for main actions, danger for destructive)
-- **Tags**: Use for status indicators and labels
-- **Scrollbars**: Wrap long content areas for better UX
-- **Dividers**: Separate logical sections visually
-- **Icons**: Use consistent icon set throughout the application
 
 ## 📁 Folder Structure
 
@@ -289,14 +178,6 @@ When working with this codebase, follow these AI-specific instructions:
 - **Use lodash** only for complex utilities: `isEmpty()`, `isNumber()`, `includes()`
 - Import specific functions: `import { isEmpty } from 'lodash-es'`
 
-#### Element Plus Component Guidelines
-- **Use semantic components**: `<el-button>`, `<el-tag>`, `<el-scrollbar>`, etc.
-- **Follow naming conventions**: Use kebab-case for component names (`el-button`)
-- **Use appropriate props**: `type="primary"` for main actions, `type="danger"` for destructive
-- **Icon integration**: Use Element Plus icons with `:icon` prop
-- **Size consistency**: Use `size="small"` for compact interfaces
-- **Accessibility**: Leverage built-in ARIA attributes and semantic HTML
-
 #### Error Handling
 - **Always handle errors gracefully**
 - Use `ERROR_TYPES` enum for error classification
@@ -333,10 +214,6 @@ When working with this codebase, follow these AI-specific instructions:
 - **Statement Parsing**: Use `FBasicParser.parse()` to get CST directly
 - **Expression Evaluation**: Use `evaluateExpression()` with CST nodes
 - **CST Navigation**: Use `cst-helpers.ts` utilities for navigating CST nodes
-- **UI Components**: Use Element Plus components with semantic props and consistent sizing
-- **Button Patterns**: `<el-button type="primary" :disabled="!canRun" @click="action">`
-- **Status Indicators**: `<el-tag type="danger" size="small">Error Count</el-tag>`
-- **Scrollable Content**: Wrap long content in `<el-scrollbar>` for better UX
 
 ---
 
@@ -443,6 +320,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 - Family Basic language specification
 - Vue.js and Vite teams for excellent tooling
-- Element Plus for UI components
 - Lodash team for utility functions
 - All contributors and testers

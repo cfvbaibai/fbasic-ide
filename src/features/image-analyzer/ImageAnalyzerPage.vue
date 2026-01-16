@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Upload, Search, Plus, Minus, ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from '@element-plus/icons-vue'
-import { GameLayout } from '../../shared/components/ui'
-import { GameButton, GameButtonGroup, GameUpload, GameIcon, GameTextarea } from '../../shared/components/ui'
+import { GameLayout, GameBlock } from '../../shared/components/ui'
+import { GameButton, GameButtonGroup, GameUpload, GameTextarea } from '../../shared/components/ui'
 
 const imageFile = ref<File | null>(null)
 const imageUrl = ref<string>('')
@@ -300,14 +299,11 @@ const generateArray = async () => {
 </script>
 
 <template>
-  <GameLayout>
+  <GameLayout
+    title="Image Analyzer"
+    icon="mdi:magnify"
+  >
     <div class="image-analyzer-container">
-      <div class="analyzer-header">
-      <h1 class="analyzer-title">
-        <GameIcon :icon="Search" />
-        Image Analyzer
-      </h1>
-    </div>
 
     <div class="analyzer-content">
       <div class="upload-section">
@@ -315,14 +311,14 @@ const generateArray = async () => {
           accept="image/*"
           @change="handleFileChange"
         >
-          <GameButton type="primary" :icon="Upload">
+          <GameButton type="primary" icon="mdi:upload">
             Upload Image
           </GameButton>
         </GameUpload>
 
         <GameButton
           type="success"
-          :icon="Search"
+          icon="mdi:magnify"
           :disabled="!imageFile || isAnalyzing"
           :loading="isAnalyzing"
           @click="analyzeImage"
@@ -346,25 +342,28 @@ const generateArray = async () => {
         />
       </div>
 
-      <div v-if="hasAnalyzed" class="grid-overlay-section">
-        <div class="grid-controls-header">
-          <h2 class="results-title">Image with Grid Overlay</h2>
+      <GameBlock 
+        v-if="hasAnalyzed"
+        title="Image with Grid Overlay"
+        class="grid-overlay-section"
+      >
+        <template #right>
           <div class="grid-controls">
             <GameButtonGroup>
-              <GameButton size="small" :icon="Plus" @click="increaseCellSize" title="Increase cell size" />
-              <GameButton size="small" :icon="Minus" @click="decreaseCellSize" title="Decrease cell size" />
+              <GameButton size="small" icon="mdi:plus" @click="increaseCellSize" title="Increase cell size" />
+              <GameButton size="small" icon="mdi:minus" @click="decreaseCellSize" title="Decrease cell size" />
             </GameButtonGroup>
             <GameButtonGroup>
-              <GameButton size="small" :icon="ArrowUp" @click="moveGridUp" title="Move grid up" />
-              <GameButton size="small" :icon="ArrowDown" @click="moveGridDown" title="Move grid down" />
-              <GameButton size="small" :icon="ArrowLeft" @click="moveGridLeft" title="Move grid left" />
-              <GameButton size="small" :icon="ArrowRight" @click="moveGridRight" title="Move grid right" />
+              <GameButton size="small" icon="mdi:chevron-up" @click="moveGridUp" title="Move grid up" />
+              <GameButton size="small" icon="mdi:chevron-down" @click="moveGridDown" title="Move grid down" />
+              <GameButton size="small" icon="mdi:chevron-left" @click="moveGridLeft" title="Move grid left" />
+              <GameButton size="small" icon="mdi:chevron-right" @click="moveGridRight" title="Move grid right" />
             </GameButtonGroup>
             <GameButton size="small" @click="generateArray" title="Generate 8x8 array">
               G
             </GameButton>
           </div>
-        </div>
+        </template>
         <div class="grid-overlay-container">
           <div
             class="image-wrapper"
@@ -425,7 +424,7 @@ const generateArray = async () => {
             class="array-textarea"
           />
         </div>
-      </div>
+      </GameBlock>
     </div>
     </div>
   </GameLayout>
@@ -440,44 +439,6 @@ const generateArray = async () => {
   overflow-x: hidden;
 }
 
-.analyzer-header {
-  flex: 0 0 auto;
-  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
-  border-bottom: 2px solid var(--game-card-border);
-  padding: 1rem 1.5rem;
-  margin-bottom: 1rem;
-  box-shadow: var(--game-shadow-base);
-  position: relative;
-}
-
-.analyzer-header::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    var(--game-accent-glow) 50%, 
-    transparent 100%
-  );
-  opacity: 0.5;
-  border-radius: 12px 12px 0 0;
-}
-
-.analyzer-title {
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: var(--game-text-primary);
-  font-size: 1.5rem;
-  font-weight: 700;
-  font-family: var(--game-font-family-heading);
-  text-shadow: 0 0 10px var(--game-accent-glow);
-}
-
 .analyzer-content {
   flex: 1 1 0;
   max-width: 1400px;
@@ -490,8 +451,8 @@ const generateArray = async () => {
 }
 
 .upload-section {
-  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
-  border: 2px solid var(--game-card-border);
+  background: var(--game-surface-bg-gradient);
+  border: 2px solid var(--game-surface-border);
   border-radius: 12px;
   padding: 1rem 1.5rem;
   box-shadow: var(--game-shadow-base);
@@ -522,8 +483,8 @@ const generateArray = async () => {
 }
 
 .image-preview {
-  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
-  border: 2px solid var(--game-card-border);
+  background: var(--game-surface-bg-gradient);
+  border: 2px solid var(--game-surface-border);
   border-radius: 12px;
   padding: 1rem;
   box-shadow: var(--game-shadow-base);
@@ -551,38 +512,6 @@ const generateArray = async () => {
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   object-fit: contain;
-}
-
-.grid-overlay-section {
-  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
-  border: 2px solid var(--game-card-border);
-  border-radius: 12px;
-  padding: 1rem 1.5rem;
-  box-shadow: var(--game-shadow-base);
-  position: relative;
-}
-
-.grid-overlay-section::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    var(--game-accent-glow) 50%, 
-    transparent 100%
-  );
-  opacity: 0.5;
-  border-radius: 12px 12px 0 0;
-}
-
-.grid-controls-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
 }
 
 .grid-controls {
@@ -619,14 +548,6 @@ const generateArray = async () => {
   pointer-events: none;
 }
 
-.results-title {
-  margin: 0;
-  color: var(--game-text-primary);
-  font-size: 1.1rem;
-  font-weight: 700;
-  font-family: var(--game-font-family-heading);
-  text-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
-}
 
 /* Grid line colors - theme-aware */
 :root {
@@ -646,7 +567,7 @@ const generateArray = async () => {
 .generated-array-section {
   margin-top: 1.5rem;
   padding-top: 1.5rem;
-  border-top: 2px solid var(--game-card-border);
+  border-top: 2px solid var(--game-surface-border);
   position: relative;
 }
 
@@ -679,25 +600,6 @@ const generateArray = async () => {
   font-size: 0.9rem;
 }
 
-.array-textarea :deep(.el-textarea__inner) {
-  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
-  color: var(--game-text-primary);
-  border: 2px solid var(--game-card-border);
-  border-radius: 8px;
-  font-family: var(--game-font-family-mono);
-  font-size: 0.9rem;
-  line-height: 1.5;
-  box-shadow: 
-    inset 0 2px 4px rgba(0, 0, 0, 0.3),
-    0 1px 2px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
-}
-
-.array-textarea :deep(.el-textarea__inner):focus {
-  border-color: var(--game-accent-color);
-  box-shadow: 
-    inset 0 2px 4px rgba(0, 0, 0, 0.3),
-    0 0 12px var(--game-accent-glow);
-}
+/* GameTextarea styles are handled by the component itself */
 </style>
 

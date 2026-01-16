@@ -32,7 +32,7 @@ const store = useSpriteViewerStore()
         {{ combIdx - 1 }}
       </GameButton>
     </GameButtonGroup>
-    <div class="selected-colors-preview">
+    <div class="selected-colors-preview bg-game-surface border-game-surface-2 shadow-game-base">
       <div
         v-for="(colorCode, idx) in store.selectedColorCombinationColors.value"
         :key="idx"
@@ -55,7 +55,6 @@ const store = useSpriteViewerStore()
 
 .control-group label {
   font-weight: 600;
-  font-family: var(--game-font-family);
   color: var(--game-text-secondary);
   font-size: 0.875rem;
   text-transform: uppercase;
@@ -68,8 +67,8 @@ const store = useSpriteViewerStore()
   align-items: center;
   margin-left: 1rem;
   padding: 0.5rem;
-  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
-  border: 2px solid var(--game-card-border);
+  background: var(--game-surface-bg-gradient);
+  border: 2px solid var(--game-surface-border);
   border-radius: 8px;
   box-shadow: var(--game-shadow-base);
 }

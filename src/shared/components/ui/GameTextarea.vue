@@ -52,7 +52,7 @@ const textareaClasses = computed(() => {
     @input="textareaValue = ($event.target as HTMLTextAreaElement).value"
     @focus="emit('focus', $event)"
     @blur="emit('blur', $event)"
-    class="game-textarea-inner"
+    class="game-textarea-inner bg-game-surface border-game-surface"
   />
 </template>
 
@@ -60,12 +60,11 @@ const textareaClasses = computed(() => {
 .game-textarea-inner {
   width: 100%;
   padding: 0.625rem 1rem;
-  font-family: var(--game-font-family);
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--game-text-primary);
-  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
-  border: 2px solid var(--game-card-border);
+  background: var(--game-surface-bg-gradient);
+  border: 2px solid var(--game-surface-border);
   border-radius: 8px;
   outline: none;
   transition: all 0.2s ease;
@@ -93,7 +92,7 @@ const textareaClasses = computed(() => {
 .game-textarea-inner[readonly] {
   opacity: 0.7;
   cursor: default;
-  background: var(--game-card-bg-end);
+  background: var(--game-surface-bg-end);
 }
 
 .game-textarea-inner[readonly] {
@@ -122,7 +121,7 @@ const textareaClasses = computed(() => {
 }
 
 .game-textarea-inner::-webkit-scrollbar-thumb {
-  background: var(--game-card-border);
+  background: var(--game-surface-border);
   border-radius: 4px;
 }
 

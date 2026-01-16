@@ -73,18 +73,18 @@ const tooltipTitle = computed(() => {
   justify-content: center;
   width: 100%;
   height: 100%;
-  border: 1px solid var(--app-border-color);
+  border: 1px solid var(--game-surface-border);
   border-radius: 4px;
   transition: transform 0.1s;
   cursor: pointer;
-  box-shadow: var(--app-box-shadow-base);
+  box-shadow: var(--game-shadow-base);
 }
 
 .color-box:hover {
   transform: scale(1.1);
   z-index: 1;
   position: relative;
-  box-shadow: var(--app-box-shadow-dark);
+  box-shadow: var(--game-shadow-base);
 }
 
 .color-box-code {

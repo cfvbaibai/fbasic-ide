@@ -1,0 +1,74 @@
+/**
+ * CSS Utility Classes
+ * Commonly used background, text, shadow, and border styles
+ */
+
+
+/* Background Gradients */
+
+.bg-game-surface {
+    background: var(--game-surface-bg-gradient);
+}
+
+
+/* Text Styles */
+
+.text-game-heading {
+    font-family: var(--game-font-family-heading);
+    font-weight: 700;
+    color: var(--game-text-primary);
+}
+
+.text-game-accent {
+    color: var(--game-accent-color);
+    text-shadow: 0 0 8px var(--game-accent-glow);
+}
+
+.text-game-secondary {
+    color: var(--game-text-secondary);
+}
+
+
+/* Text Shadows */
+
+.text-shadow-glow-sm {
+    text-shadow: 0 0 4px var(--game-accent-glow);
+}
+
+.text-shadow-glow-md {
+    text-shadow: 0 0 8px var(--game-accent-glow);
+}
+
+
+/* Box Shadows */
+
+.shadow-game-base {
+    box-shadow: var(--game-shadow-base);
+}
+
+
+/* Borders */
+
+.border-game-surface {
+    border: 1px solid var(--game-surface-border);
+}
+
+.border-game-surface-2 {
+    border: 2px solid var(--game-surface-border);
+}
+
+.border-game-surface-top {
+    border-top: 1px solid var(--game-surface-border);
+}
+
+.border-game-surface-bottom {
+    border-bottom: 1px solid var(--game-surface-border);
+}
+
+.border-game-surface-right {
+    border-right: 1px solid var(--game-surface-border);
+}
+
+.border-game-surface-left {
+    border-left: 1px solid var(--game-surface-border);
+}

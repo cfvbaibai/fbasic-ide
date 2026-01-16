@@ -28,7 +28,7 @@ withDefaults(defineProps<Props>(), {
 .game-divider {
   margin: 1rem 0;
   border: none;
-  border-top: 1px solid var(--app-border-color-light);
+  border-top: 1px solid var(--game-surface-border);
   position: relative;
 }
 
@@ -39,7 +39,7 @@ withDefaults(defineProps<Props>(), {
   margin: 0 0.5rem;
   vertical-align: middle;
   border-top: none;
-  border-left: 1px solid var(--app-border-color-light);
+  border-left: 1px solid var(--game-surface-border);
 }
 
 .game-divider-with-text {
@@ -52,12 +52,12 @@ withDefaults(defineProps<Props>(), {
 .game-divider-with-text::after {
   content: '';
   flex: 1;
-  border-top: 1px solid var(--app-border-color-light);
+  border-top: 1px solid var(--game-surface-border);
 }
 
 .game-divider-text {
   padding: 0 1rem;
-  color: var(--app-text-color-secondary);
+  color: var(--game-text-secondary);
   font-size: 0.875rem;
   white-space: nowrap;
 }

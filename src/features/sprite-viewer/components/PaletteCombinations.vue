@@ -115,10 +115,10 @@ import GameCard from '../../../shared/components/ui/GameCard.vue'
 }
 
 .palette-group {
-  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
+  background: var(--game-surface-bg-gradient);
   padding: 1.5rem;
   border-radius: 8px;
-  border: 2px solid var(--game-card-border);
+  border: 2px solid var(--game-surface-border);
   box-shadow: var(--game-shadow-base);
 }
 
@@ -138,10 +138,10 @@ import GameCard from '../../../shared/components/ui/GameCard.vue'
 }
 
 .color-combination {
-  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
+  background: var(--game-surface-bg-gradient);
   padding: 1rem;
   border-radius: 6px;
-  border: 2px solid var(--game-card-border);
+  border: 2px solid var(--game-surface-border);
   box-shadow: var(--game-shadow-base);
   transition: all 0.2s ease;
 }

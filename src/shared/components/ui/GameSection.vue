@@ -11,9 +11,7 @@ withDefaults(defineProps<Props>(), {
 <template>
   <div class="game-section">
     <h2 v-if="title" class="game-section-title">{{ title }}</h2>
-    <div class="game-section-content">
-      <slot />
-    </div>
+    <slot />
   </div>
 </template>
 
@@ -30,9 +28,5 @@ withDefaults(defineProps<Props>(), {
   text-align: center;
   margin: 0 0 2.5rem 0;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-.game-section-content {
-  /* Content styling handled by children */
 }
 </style>

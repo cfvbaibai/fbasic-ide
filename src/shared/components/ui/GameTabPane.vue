@@ -81,7 +81,6 @@ onUnmounted(() => {
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  font-family: var(--game-font-family);
   font-weight: 600;
   font-size: 0.875rem;
   color: var(--game-text-secondary);
@@ -109,7 +108,6 @@ onUnmounted(() => {
 
 .game-tab-button :deep(span:not(.game-tag-content)) {
   font-weight: 600;
-  font-family: var(--game-font-family);
   letter-spacing: 0.05em;
 }
 
@@ -223,8 +221,8 @@ onUnmounted(() => {
 
 /* Border card style */
 .game-tabs-border-card .game-tab-button {
-  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
-  border: 2px solid var(--game-card-border);
+  background: var(--game-surface-bg-gradient);
+  border: 2px solid var(--game-surface-border);
   border-bottom: none;
   border-radius: 8px 8px 0 0;
   margin-right: 0.25rem;
@@ -267,7 +265,7 @@ onUnmounted(() => {
 }
 
 .game-tabs-border-card .game-tab-button:hover:not(.disabled) {
-  border-color: var(--game-card-border-hover);
+  border-color: var(--game-surface-border-hover);
   box-shadow: 
     0 4px 8px rgba(0, 0, 0, 0.4),
     0 0 16px var(--game-accent-glow),
@@ -288,7 +286,7 @@ onUnmounted(() => {
 }
 
 .game-tabs-border-card .game-tab-button.active {
-  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
+  background: var(--game-surface-bg-gradient);
   border-color: var(--game-accent-color);
   border-bottom-color: transparent;
   box-shadow: 
@@ -539,8 +537,8 @@ onUnmounted(() => {
 }
 
 .game-tabs-border-card .game-tab-pane {
-  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
-  border: 2px solid var(--game-card-border);
+  background: var(--game-surface-bg-gradient);
+  border: 2px solid var(--game-surface-border);
   border-radius: 0 8px 8px 8px;
   padding: 1rem;
   margin-top: -2px;

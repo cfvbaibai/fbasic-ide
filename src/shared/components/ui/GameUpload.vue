@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Upload } from '@element-plus/icons-vue'
 import GameButton from './GameButton.vue'
 import GameIcon from './GameIcon.vue'
 
@@ -93,8 +92,8 @@ const handleDrop = (event: DragEvent) => {
       style="display: none"
     />
     
-    <div v-if="drag" class="game-upload-drag-area" @click="handleClick">
-      <GameIcon :icon="Upload" size="large" />
+    <div v-if="drag" class="game-upload-drag-area bg-game-surface shadow-game-base" @click="handleClick">
+      <GameIcon icon="mdi:upload" size="large" />
       <p class="game-upload-text">
         Drag and drop files here, or <span class="game-upload-link">click to browse</span>
       </p>
@@ -104,7 +103,7 @@ const handleDrop = (event: DragEvent) => {
       <slot>
         <GameButton
           :disabled="disabled"
-          :icon="Upload"
+          icon="mdi:upload"
         >
           Upload File
         </GameButton>
@@ -125,9 +124,8 @@ const handleDrop = (event: DragEvent) => {
   justify-content: center;
   gap: 1rem;
   padding: 3rem 2rem;
-  border: 2px dashed var(--game-card-border);
+  border: 2px dashed var(--game-surface-border);
   border-radius: 8px;
-  background: linear-gradient(135deg, var(--game-card-bg-start) 0%, var(--game-card-bg-end) 100%);
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: center;
@@ -147,7 +145,6 @@ const handleDrop = (event: DragEvent) => {
 .game-upload-text {
   margin: 0;
   color: var(--game-text-secondary);
-  font-family: var(--game-font-family);
   font-size: 0.875rem;
 }
 
