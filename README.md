@@ -70,27 +70,44 @@ To preserve and modernize the Family Basic programming language by providing an 
 fbasic-emu/
 ├── public/                          # Static assets
 ├── src/
-│   ├── components/                  # Vue components
-│   ├── composables/                 # Vue composables
+│   ├── features/                    # Feature-based organization
+│   │   ├── ide/                     # IDE feature (code editor, runtime)
+│   │   │   ├── components/          # IDE-specific components
+│   │   │   ├── composables/         # IDE-specific composables
+│   │   │   └── integrations/        # Monaco Editor integration
+│   │   ├── sprite-viewer/           # Character Sprite Viewer feature
+│   │   │   ├── components/          # Sprite viewer components
+│   │   │   └── composables/         # Sprite viewer composables
+│   │   ├── image-analyzer/          # Image Analyzer feature
+│   │   ├── monaco-editor/           # Monaco Editor feature
+│   │   └── home/                    # Home page feature
+│   ├── shared/                      # Shared across features
+│   │   ├── components/              # Shared Vue components (Game* UI components)
+│   │   ├── data/                    # Shared data (palette, sprites, bg items)
+│   │   ├── styles/                  # Global styles (theme.css, utilities.css)
+│   │   └── utils/                   # Shared utilities
 │   ├── core/                        # Core interpreter logic (DOM-free)
 │   │   ├── parser/                  # Chevrotain parser (CST-based)
 │   │   ├── execution/               # Execution engine and executors
 │   │   ├── evaluation/              # Expression evaluator
 │   │   ├── services/                # Variable, I/O, Data services
-│   │   └── state/                   # Execution context
-│   ├── integrations/                # UI/framework integrations
-│   │   └── monaco-integration.ts    # Monaco Editor integration
-│   ├── test/                        # Unit tests
-│   │   ├── parser/                  # Parser tests
-│   │   └── executors/               # Executor tests
-│   ├── views/                       # Vue views/pages
+│   │   ├── state/                   # Execution context
+│   │   ├── devices/                 # Device adapters
+│   │   └── workers/                 # Web Worker interpreter
+│   ├── router/                      # Vue Router configuration
 │   ├── App.vue                      # Main application component
 │   ├── main.ts                      # Application entry point
 │   └── style.css                    # Global styles
+├── test/                            # Unit tests
+│   ├── parser/                      # Parser tests
+│   ├── executors/                   # Executor tests
+│   └── evaluation/                  # Expression evaluation tests
+├── scripts/                          # Build and utility scripts
+├── docs/                             # Documentation
 ├── .vscode/                         # VS Code configuration
 ├── .gitignore                       # Git ignore rules
 ├── .cursorignore                    # Cursor IDE ignore rules
-├── eslint.config.js                 # ESLint configuration
+├── eslint.config.ts                 # ESLint configuration
 ├── index.html                       # HTML entry point
 ├── package.json                     # Dependencies and scripts
 ├── tsconfig.json                    # TypeScript configuration
@@ -212,7 +229,7 @@ When working with this codebase, follow these AI-specific instructions:
 - **Test coverage** - run `pnpm test:run` to ensure all tests pass
 
 ### Development Workflow
-- **Read Family BASIC Manual** - Read the manual under `docs/FamilyBasicManual` folder
+- **Read Family BASIC Manual** - Read the manual under `docs/reference/family-basic-manual` folder
 - **Read existing code** to understand CST-based patterns and structure
 - **Check constants.ts** for existing constants before adding new ones
 - **Follow CST patterns** - use parser and CST nodes directly for execution

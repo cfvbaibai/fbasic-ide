@@ -1,5 +1,9 @@
 # Game Surface Background Gradient Replacement Analysis
 
+**Status:** Analysis/Recommendation Document
+
+> **Note**: This is an analysis document with recommendations. Some recommendations may not have been implemented yet.
+
 ## Summary
 
 This document identifies all locations in the codebase where hardcoded `linear-gradient(135deg, var(--game-surface-bg-start) 0%, var(--game-surface-bg-end) 100%)` can be replaced with the CSS variable `--game-surface-bg-gradient`.

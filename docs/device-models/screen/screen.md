@@ -226,56 +226,26 @@ interface ScreenState {
 }
 ```
 
-### Layer Implementation
-
-**DOM Structure:**
-```html
-<div class="screen-container">
-  <!-- Backdrop Screen -->
-  <div class="backdrop-layer"></div>
-  
-  <!-- Sprite Screen (Back) -->
-  <div class="sprite-back-layer">
-    <!-- Sprites with E=1 -->
-  </div>
-  
-  <!-- Background Screen -->
-  <div class="background-layer">
-    <!-- 28×24 character grid -->
-    <!-- PRINT content rendered here -->
-  </div>
-  
-  <!-- Sprite Screen (Front) -->
-  <div class="sprite-front-layer">
-    <!-- Sprites with E=0 -->
-  </div>
-</div>
-```
-
-**CSS Z-Index:**
-```css
-.backdrop-layer { z-index: 1; }
-.sprite-back-layer { z-index: 50; }  /* E=1 sprites: 50-99 */
-.background-layer { z-index: 100; }
-.sprite-front-layer { z-index: 200; } /* E=0 sprites: 200-299 */
-```
-
 ### Background Screen Implementation
 
-**Character Grid:**
-- 28 columns × 24 rows = 672 character cells
-- Each cell: 8×8 dots (character size)
-- Total screen: 224×192 dots (28×8 × 24×8)
+**Canvas Rendering:**
+- Uses HTML5 Canvas API for pixel-perfect rendering
+- Single canvas element renders the entire 28×24 character grid
+- Canvas dimensions: 240×208 pixels (224×192 content area + 8px padding on each side)
+- Each character cell: 8×8 pixels
+- Content area: 224×192 pixels (28×8 × 24×8)
 
 **Screen Buffer:**
 - 2D array: `ScreenCell[24][28]`
-- Each cell stores: character, color pattern, position
+- Each cell stores: character (string), colorPattern (number 0-3), x, y coordinates
 - Cursor position tracked separately
 
 **Character Rendering:**
-- Characters rendered as text or pre-rendered character images
-- Font: Family BASIC character set (alphanumeric, Kana, symbols)
-- Character size: 8×8 dots
+- Characters rendered using pixel-perfect tile data from `BACKGROUND_ITEMS`
+- Each character is rendered as an 8×8 pixel tile using canvas ImageData
+- Tile data lookup: Characters mapped to background items via `getBackgroundItemByChar()`
+- Color patterns applied using `BACKGROUND_PALETTES` and color combinations
+- Rendering implementation: `src/features/ide/composables/canvasRenderer.ts`
 
 ### Coordinate System Implementation
 
@@ -283,11 +253,12 @@ interface ScreenState {
 - Character-based: (0-27, 0-23)
 - Origin: Top-left corner
 - X increases right, Y increases down
+- Canvas pixel coordinates: Each character rendered at (x * 8 + 8, y * 8 + 8) due to 8px padding on all sides
 
 **Sprite Screen Coordinates:**
 - Pixel-based: (0-255, 0-239)
 - Origin: Top-left corner
-- Conversion formula:
+- Conversion formula (for reference, sprite system not yet implemented):
   ```typescript
   function bgToSprite(bgX: number, bgY: number): { x: number; y: number } {
     return {
@@ -407,7 +378,7 @@ class WebScreenDevice implements ScreenDevice {
       y
     }
     
-    // Send update to main thread for DOM rendering
+    // Send update to main thread for canvas rendering
     this.sendScreenUpdate({ type: 'CHARACTER_UPDATE', x, y, char })
   }
   
@@ -421,6 +392,6 @@ class WebScreenDevice implements ScreenDevice {
 
 **Main Thread Rendering:**
 - Receives screen update messages from web worker
-- Updates DOM elements for character display
-- Applies color patterns and palettes via CSS
-- Maintains visual representation of screen buffer
+- Updates canvas element using `renderScreenBuffer()` function
+- Applies color patterns and palettes using canvas pixel rendering
+- Maintains visual representation of screen buffer via canvas ImageData

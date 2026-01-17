@@ -1,13 +1,10 @@
 # Theme System Guide
 
-This guide explains how to use the standardized color system with custom Game* components, including dark/light theme support.
+This guide explains how to use the standardized color system with custom Game* components.
 
 ## Overview
 
-The theme system uses CSS variables to provide consistent colors across the application. It supports:
-- **Light theme** (default)
-- **Dark theme**
-- **Auto mode** (follows system preference)
+The theme system uses CSS variables to provide consistent colors across the application. The application uses a **single dark theme** optimized for the retro game aesthetic.
 
 ## Setup
 
@@ -21,7 +18,7 @@ import './shared/styles/theme.css'
 
 ### Application Colors
 
-Custom application colors that work in both themes:
+Application colors for the dark theme:
 
 ```css
 /* Background colors */
@@ -84,16 +81,23 @@ Custom application colors that work in both themes:
 
 ```vue
 <template>
-  <div class="bg-primary text-primary">
-    Primary colored background and text
+  <div class="bg-game-surface text-game-heading">
+    Game-themed background and heading text
+  </div>
+  <div class="text-game-accent">
+    Accent colored text
   </div>
 </template>
 ```
 
-Available utility classes:
-- `.bg-primary`, `.bg-success`, `.bg-warning`, `.bg-danger`, `.bg-info`
-- `.text-primary`, `.text-regular`, `.text-secondary`, `.text-placeholder`
-- `.border-base`, `.border-light`
+Available utility classes (from `src/shared/styles/utilities.css`):
+- **Background**: `.bg-game-surface`
+- **Text**: `.text-game-heading`, `.text-game-accent`, `.text-game-secondary`
+- **Text Shadows**: `.text-shadow-glow-sm`, `.text-shadow-glow-md`
+- **Box Shadows**: `.shadow-game-base`
+- **Borders**: `.border-game-surface`, `.border-game-surface-2`, `.border-game-surface-top`, `.border-game-surface-bottom`, `.border-game-surface-left`, `.border-game-surface-right`
+
+**Note**: For semantic colors (success, warning, danger, info), use CSS variables directly rather than utility classes.
 
 ### In Inline Styles
 
@@ -125,41 +129,6 @@ Available utility classes:
 }
 ```
 
-## Theme Management
-
-### Using the `useTheme` Composable
-
-```vue
-<script setup lang="ts">
-import { useTheme } from '@/shared/composables/useTheme'
-
-const { themeMode, isDark, setThemeMode, toggleTheme } = useTheme()
-
-// Set specific theme
-setThemeMode('dark')  // 'light' | 'dark' | 'auto'
-
-// Toggle between light and dark
-toggleTheme()
-
-// Check current state
-console.log(isDark.value)  // true or false
-console.log(themeMode.value)  // 'light' | 'dark' | 'auto'
-</script>
-```
-
-### Theme Toggle Component
-
-A ready-to-use theme toggle component is available:
-
-```vue
-<template>
-  <ThemeToggle />
-</template>
-
-<script setup lang="ts">
-import ThemeToggle from '@/shared/components/ThemeToggle.vue'
-</script>
-```
 
 ## Migration Guide
 
@@ -169,13 +138,13 @@ Find and replace hard-coded color values with CSS variables:
 
 | Old Value | New Variable |
 |-----------|-------------|
-| `#ffffff` | `var(--app-bg-color-page)` or `var(--app-fill-color-blank)` |
-| `#f5f5f5` | `var(--app-bg-color)` |
-| `#303133` | `var(--app-text-color-primary)` |
-| `#606266` | `var(--app-text-color-regular)` |
-| `#909399` | `var(--app-text-color-secondary)` |
+| `#ffffff` | `var(--game-text-primary)` (for text) or `var(--game-color-white)` |
+| `#000000` | `var(--game-color-black)` or `var(--game-screen-bg-color)` |
+| `#303133` | `var(--app-text-color-primary)` (app text) or `var(--game-text-primary)` (game text) |
+| `#909399` | `var(--app-text-color-secondary)` (app text) or `var(--game-text-secondary)` (game text) |
 | `#e4e7ed` | `var(--app-border-color-light)` |
 | `#409eff` | `var(--game-accent-color)` |
+| `#00ff88` | `var(--game-accent-color)` (game accent color) |
 
 ### Step 2: Update Component Styles
 
@@ -201,26 +170,14 @@ Replace hard-coded colors in component `<style>` blocks:
 </style>
 ```
 
-### Step 3: Add Theme Toggle (Optional)
-
-Add a theme toggle to your app header or settings:
-
-```vue
-<template>
-  <div class="app-header">
-    <h1>My App</h1>
-    <ThemeToggle />
-  </div>
-</template>
-```
 
 ## Best Practices
 
 1. **Always use CSS variables** instead of hard-coded colors
 2. **Use semantic color names** (e.g., `--app-text-color-primary` instead of `--app-color-gray-1`)
-3. **Test in both themes** to ensure proper contrast and readability
-4. **Use Game* component colors** for component-specific styling when appropriate
-5. **Leverage utility classes** for common patterns
+3. **Use Game* component colors** for component-specific styling when appropriate
+4. **Leverage utility classes** for common patterns
+5. **Maintain dark theme consistency** - all colors are designed for the dark theme
 
 ## Customization
 
@@ -236,15 +193,10 @@ To customize theme colors, edit `src/shared/styles/theme.css`:
 
 ## Troubleshooting
 
-### Colors not updating in dark mode
+### Colors not displaying correctly
 
 1. Ensure `./shared/styles/theme.css` is imported in `main.ts`
-2. Check that the `.dark` class is applied to the `<html>` element
-3. Verify CSS variables are defined in both `:root` and `.dark` selectors
-
-### Theme toggle not working
-
-1. Ensure `useTheme` composable is called in a component that's mounted
-2. Check browser console for errors
-3. Verify localStorage is available (for theme persistence)
+2. Verify CSS variables are defined in `:root` selector in `theme.css`
+3. Check that you're using the correct CSS variable names (see CSS Variables section above)
+4. Use browser DevTools to inspect computed CSS variable values
 
