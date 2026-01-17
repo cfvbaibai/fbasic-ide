@@ -42,6 +42,12 @@ const navItems: NavItem[] = [
     path: '/character-sprite-viewer',
     icon: 'mdi:grid',
     description: 'View Character Sprites'
+  },
+  {
+    name: 'Canvas Performance',
+    path: '/canvas-test',
+    icon: 'mdi:speedometer',
+    description: 'Canvas Performance Test'
   }
 ]
 

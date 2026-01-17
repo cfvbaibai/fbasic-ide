@@ -1,12 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-
-interface ScreenCell {
-  character: string
-  colorPattern: number
-  x: number
-  y: number
-}
+import { ref, watch, watchEffect } from 'vue'
+import type { ScreenCell } from '@/core/interfaces'
+import { renderScreenBuffer } from '../composables/canvasRenderer'
 
 interface Props {
   screenBuffer: ScreenCell[][]
@@ -31,29 +26,39 @@ const props = withDefaults(defineProps<Props>(), {
   cursorY: 0
 })
 
-// Ensure screenBuffer is always 24 rows × 28 columns
-const normalizedBuffer = computed(() => {
-  const buffer: ScreenCell[][] = []
-  for (let y = 0; y < 24; y++) {
-    const row: ScreenCell[] = []
-    const sourceRow = props.screenBuffer[y]
-    for (let x = 0; x < 28; x++) {
-      const cell = sourceRow?.[x]
-      if (cell !== undefined && cell !== null) {
-        row.push(cell)
-      } else {
-        row.push({ character: ' ', colorPattern: 0, x, y })
-      }
-    }
-    buffer.push(row)
-  }
-  return buffer
-})
+// Canvas reference
+const screenCanvas = ref<HTMLCanvasElement | null>(null)
+const paletteCode = ref(1) // Default background palette code is 1
 
-// Check if a cell is at cursor position
-const isCursorCell = (x: number, y: number): boolean => {
-  return x === props.cursorX && y === props.cursorY
+
+// Direct rendering function (no Vue reactivity overhead)
+function render(): void {
+  if (!screenCanvas.value) return
+  renderScreenBuffer(screenCanvas.value, props.screenBuffer, paletteCode.value)
 }
+
+// Use requestAnimationFrame for batching
+let pendingRender = false
+function scheduleRender(): void {
+  if (pendingRender) return
+  pendingRender = true
+  requestAnimationFrame(() => {
+    pendingRender = false
+    render()
+  })
+}
+
+// Watch screenBuffer and render when it changes (shallow watch to reduce overhead)
+watch(() => props.screenBuffer, () => {
+  scheduleRender()
+}, { immediate: true })
+
+// Initial render when canvas becomes available
+watchEffect(() => {
+  if (screenCanvas.value) {
+    render()
+  }
+})
 </script>
 
 <template>
@@ -64,21 +69,16 @@ const isCursorCell = (x: number, y: number): boolean => {
       <span class="cursor-info">Cursor: ({{ cursorX }}, {{ cursorY }})</span>
     </div>
     <div class="screen-display">
-      <div class="screen-grid">
-        <div
-          v-for="(row, y) in normalizedBuffer"
-          :key="y"
-          class="screen-row"
-        >
-          <div
-            v-for="(cell, x) in row"
-            :key="`${x}-${y}`"
-            :class="['screen-cell', { 'cursor-cell': isCursorCell(x, y) }]"
-            :data-x="x"
-            :data-y="y"
-          >
-            {{ cell.character || ' ' }}
-          </div>
+      <div class="crt-bezel">
+        <div class="crt-screen">
+          <div class="crt-scanlines"></div>
+          <canvas
+            ref="screenCanvas"
+            class="screen-canvas"
+            :width="240"
+            :height="208"
+          />
+          <div class="crt-reflection"></div>
         </div>
       </div>
     </div>
@@ -128,51 +128,93 @@ const isCursorCell = (x: number, y: number): boolean => {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
+  padding: 2rem;
   overflow: auto;
   min-height: 0;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
 }
 
-.screen-grid {
-  display: inline-block;
-  background: var(--game-screen-bg-color);
-  border: 1px solid var(--game-screen-border-color);
+/* CRT Bezel - outer frame */
+.crt-bezel {
+  background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 50%, #1a1a1a 100%);
+  border: 8px solid #000000;
+  border-radius: 12px;
+  box-shadow: 
+    inset 0 2px 4px rgba(255, 255, 255, 0.05),
+    0 8px 32px rgba(0, 0, 0, 0.8),
+    0 0 0 2px rgba(0, 0, 0, 0.5);
+  padding: 16px;
 }
 
-.screen-row {
-  display: flex;
-  line-height: 1;
+/* CRT Screen - inner screen area */
+.crt-screen {
+  position: relative;
+  border: 4px solid #0a0a0a;
+  border-radius: 16px;
+  box-shadow: 
+    inset 0 0 80px rgba(0, 0, 0, 0.9),
+    0 4px 20px rgba(0, 0, 0, 0.6),
+    inset 0 -2px 10px rgba(0, 0, 0, 0.8);
+  overflow: hidden;
+  background: radial-gradient(
+    ellipse 150% 110% at 85% 8%,
+    rgba(255, 255, 255, 0.22) 0%,
+    rgba(255, 255, 255, 0.14) 18%,
+    rgba(255, 255, 255, 0.08) 35%,
+    transparent 60%,
+    rgba(0, 0, 0, 0.3) 100%
+  );
 }
 
-.screen-cell {
-  width: 0.75rem;
-  height: 1rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--game-font-family-mono);
-  font-size: var(--game-font-size-mono);
-  color: var(--game-screen-text-color);
-  background: var(--game-screen-bg-color);
-  border: 0;
-  padding: 0;
-  margin: 0;
-  white-space: pre;
-  user-select: none;
+/* Scanlines overlay */
+.crt-scanlines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.15) 2px,
+    rgba(0, 0, 0, 0.15) 4px
+  );
+  pointer-events: none;
+  z-index: 2;
+  mix-blend-mode: multiply;
 }
 
-.screen-cell.cursor-cell {
-  background: var(--game-screen-cursor-bg);
-  box-shadow: inset 0 0 0 1px var(--game-screen-cursor-border);
+/* Screen reflection/glow effect - point light from top right */
+.crt-reflection {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    ellipse 140% 100% at 85% 5%,
+    rgba(255, 255, 255, 0.4) 0%,
+    rgba(255, 255, 255, 0.2) 15%,
+    rgba(255, 255, 255, 0.12) 30%,
+    transparent 55%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+  border-radius: 16px;
 }
 
-/* Ensure monospace rendering */
-.screen-cell::before {
-  content: '';
-  display: inline-block;
-  width: 0;
-  height: 1rem;
-  vertical-align: top;
+.screen-canvas {
+  display: block;
+  position: relative;
+  z-index: 0;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  width: 480px; /* 240px * 2x scale (224 + 16 padding) */
+  height: 416px; /* 208px * 2x scale (192 + 16 padding) */
+  filter: brightness(1.05) contrast(1.1);
 }
 </style>
 

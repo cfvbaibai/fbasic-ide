@@ -3,7 +3,7 @@ import './style.css'
 import './shared/styles/theme.css'
 import './shared/styles/utilities.css'
 import App from './App.vue'
-import router from './router'
+import router from './router/index'
 
 // Configure Monaco Editor workers before Monaco is imported
 // This must be set up before any Monaco Editor code is loaded

@@ -10080,181 +10080,6 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     }
   };
 
-  // src/core/state/ExecutionContext.ts
-  var ExecutionContext = class {
-    constructor(config2) {
-      // Core state
-      __publicField(this, "variables", /* @__PURE__ */ new Map());
-      __publicField(this, "isRunning", false);
-      __publicField(this, "shouldStop", false);
-      __publicField(this, "currentStatementIndex", 0);
-      __publicField(this, "statements", []);
-      // Expanded statements (flat list)
-      __publicField(this, "labelMap", /* @__PURE__ */ new Map());
-      // Line number -> statement indices
-      __publicField(this, "iterationCount", 0);
-      __publicField(this, "currentLineNumber", 0);
-      // Current line number being executed
-      // Configuration
-      __publicField(this, "config");
-      // Control flow
-      __publicField(this, "loopStack", []);
-      __publicField(this, "gosubStack", []);
-      // Stack for GOSUB/RETURN
-      // Data management
-      __publicField(this, "dataValues", []);
-      // Storage for DATA values
-      __publicField(this, "dataIndex", 0);
-      // Current position in DATA
-      __publicField(this, "arrays", /* @__PURE__ */ new Map());
-      // Array storage
-      // Device integration
-      __publicField(this, "deviceAdapter");
-      __publicField(this, "errors", []);
-      this.config = config2;
-    }
-    /**
-     * Reset the execution context to initial state
-     */
-    reset() {
-      this.variables.clear();
-      this.isRunning = false;
-      this.shouldStop = false;
-      this.currentStatementIndex = 0;
-      this.statements = [];
-      this.labelMap.clear();
-      this.iterationCount = 0;
-      this.loopStack = [];
-      this.gosubStack = [];
-      this.dataValues = [];
-      this.dataIndex = 0;
-      this.arrays.clear();
-      this.currentLineNumber = 0;
-      this.errors = [];
-    }
-    /**
-     * Add output to the context
-     */
-    addOutput(value) {
-      this.deviceAdapter?.printOutput(value);
-    }
-    /**
-     * Add error to the context
-     * Runtime errors are fatal and halt execution immediately
-     */
-    addError(error) {
-      this.deviceAdapter?.errorOutput(error.message);
-      this.errors.push(error);
-      if (error.type === ERROR_TYPES.RUNTIME) {
-        this.shouldStop = true;
-        this.isRunning = false;
-      }
-    }
-    /**
-     * Get errors
-     */
-    getErrors() {
-      return this.errors;
-    }
-    /**
-     * Add debug output
-     */
-    addDebugOutput(message) {
-      if (this.config.enableDebugMode) {
-        this.deviceAdapter?.debugOutput(message);
-      }
-    }
-    /**
-     * Check if execution should continue
-     */
-    shouldContinue() {
-      return this.isRunning && !this.shouldStop && this.iterationCount < this.config.maxIterations && this.currentStatementIndex < this.statements.length;
-    }
-    /**
-     * Increment iteration count and check limits
-     */
-    incrementIteration() {
-      this.iterationCount++;
-      if (this.iterationCount >= this.config.maxIterations) {
-        this.addError({
-          line: 0,
-          message: "Maximum iterations exceeded",
-          type: ERROR_TYPES.RUNTIME
-        });
-        this.shouldStop = true;
-      }
-    }
-    /**
-     * Get current statement
-     */
-    getCurrentStatement() {
-      return this.statements[this.currentStatementIndex];
-    }
-    /**
-     * Move to next statement
-     */
-    nextStatement() {
-      this.currentStatementIndex++;
-    }
-    /**
-     * Jump to statement by index
-     */
-    jumpToStatement(index) {
-      this.currentStatementIndex = index;
-    }
-    /**
-     * Find statement indices by line number
-     */
-    findStatementIndicesByLine(lineNumber) {
-      return this.labelMap.get(lineNumber) || [];
-    }
-    /**
-     * Find first statement index by line number (for GOTO/GOSUB)
-     */
-    findStatementIndexByLine(lineNumber) {
-      const indices = this.labelMap.get(lineNumber);
-      if (indices && indices.length > 0) {
-        const firstIndex = indices[0];
-        return firstIndex !== void 0 ? firstIndex : -1;
-      }
-      return -1;
-    }
-    /**
-     * Get the current line number being executed
-     */
-    getCurrentLineNumber() {
-      return this.currentLineNumber;
-    }
-    /**
-     * Set the current line number being executed
-     */
-    setCurrentLineNumber(lineNumber) {
-      this.currentLineNumber = lineNumber;
-    }
-    /**
-     * Get joystick state (cross buttons)
-     */
-    getStickState(joystickId) {
-      if (this.deviceAdapter) {
-        return this.deviceAdapter.getStickState(joystickId);
-      }
-      return 0;
-    }
-    /**
-     * Get trigger state (action buttons)
-     */
-    consumeStrigState(joystickId) {
-      if (this.deviceAdapter) {
-        const consumedValue = this.deviceAdapter.consumeStrigState(joystickId);
-        if (consumedValue > 0) {
-          console.log(`\u{1F3AE} [EXECUTION] STRIG event consumed: joystickId=${joystickId}, value=${consumedValue}`);
-          return consumedValue;
-        }
-      }
-      return 0;
-    }
-  };
-
   // node_modules/.pnpm/decimal.js@10.6.0/node_modules/decimal.js/decimal.mjs
   var EXP_LIMIT = 9e15;
   var MAX_DIGITS = 1e9;
@@ -13436,180 +13261,6 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     }
   };
 
-  // src/core/services/VariableService.ts
-  var VariableService = class {
-    constructor(context, evaluator) {
-      this.context = context;
-      this.evaluator = evaluator;
-    }
-    /**
-     * Get a variable value
-     */
-    getVariable(name) {
-      return this.context.variables.get(name);
-    }
-    /**
-     * Set a simple variable value
-     */
-    setVariable(name, value) {
-      const variable = {
-        value,
-        type: typeof value === "string" ? "string" : "number"
-      };
-      this.context.variables.set(name, variable);
-    }
-    /**
-     * Set a variable from a CST expression node
-     */
-    setVariableFromExpressionCst(name, expressionCst) {
-      const value = this.evaluator.evaluateExpression(expressionCst);
-      const basicValue = typeof value === "boolean" ? value ? 1 : 0 : value;
-      this.setVariable(name, basicValue);
-    }
-    /**
-     * Set an array element
-     */
-    setArrayElement(name, indices, value) {
-      let array = this.context.arrays.get(name);
-      if (!array) {
-        array = [];
-        this.context.arrays.set(name, array);
-      }
-      let current = array;
-      for (let i = 0; i < indices.length - 1; i++) {
-        const index = Math.floor(indices[i] ?? 0);
-        if (!Array.isArray(current)) {
-          current = [];
-        }
-        if (!current[index]) {
-          current[index] = [];
-        }
-        current = current[index];
-      }
-      if (Array.isArray(current)) {
-        const finalIndex = Math.floor(indices[indices.length - 1] ?? 0);
-        current[finalIndex] = value;
-      }
-    }
-    /**
-     * Set an array element from CST expression nodes
-     */
-    setArrayElementFromExpressionsCst(name, indexExpressionsCst, valueExpressionCst) {
-      const indices = indexExpressionsCst.map((exprCst) => this.toNumber(this.evaluator.evaluateExpression(exprCst)));
-      const value = this.evaluator.evaluateExpression(valueExpressionCst);
-      const basicValue = typeof value === "boolean" ? value ? 1 : 0 : value;
-      this.setArrayElement(name, indices, basicValue);
-    }
-    /**
-     * Get an array element
-     */
-    getArrayElement(name, indices) {
-      const array = this.context.arrays.get(name);
-      if (!array) return 0;
-      let value = array;
-      for (const index of indices) {
-        const numIndex = Math.floor(index);
-        if (Array.isArray(value)) {
-          const element = value[numIndex];
-          if (element !== void 0) {
-            value = element;
-          } else {
-            return 0;
-          }
-        } else {
-          return 0;
-        }
-      }
-      return typeof value !== "object" ? value : 0;
-    }
-    /**
-     * Create an array with specified dimensions
-     * According to Family BASIC spec:
-     * - Numerical arrays are initialized to 0
-     * - String arrays (name ends with $) are initialized to empty strings
-     */
-    createArray(name, dimensions) {
-      const isStringArray = name.endsWith("$");
-      const defaultValue = isStringArray ? "" : 0;
-      const array = this.createArrayRecursive(dimensions, 0, defaultValue);
-      this.context.arrays.set(name, array);
-    }
-    /**
-     * Recursively create array structure
-     * @param dimensions Array of dimension sizes (highest index + 1)
-     * @param currentDim Current dimension index
-     * @param defaultValue Default value for leaf elements (0 for numeric, '' for string)
-     */
-    createArrayRecursive(dimensions, currentDim, defaultValue) {
-      if (currentDim >= dimensions.length) {
-        return [];
-      }
-      const highestIndex = Math.floor(dimensions[currentDim] ?? 0);
-      const size = highestIndex + 1;
-      const array = [];
-      for (let i = 0; i < size; i++) {
-        if (currentDim === dimensions.length - 1) {
-          array[i] = defaultValue;
-        } else {
-          array[i] = this.createArrayRecursive(dimensions, currentDim + 1, defaultValue);
-        }
-      }
-      return array;
-    }
-    /**
-     * Check if a variable exists
-     */
-    hasVariable(name) {
-      return this.context.variables.has(name);
-    }
-    /**
-     * Check if an array exists
-     */
-    hasArray(name) {
-      return this.context.arrays.has(name);
-    }
-    /**
-     * Get all variable names
-     */
-    getVariableNames() {
-      return Array.from(this.context.variables.keys());
-    }
-    /**
-     * Get all array names
-     */
-    getArrayNames() {
-      return Array.from(this.context.arrays.keys());
-    }
-    /**
-     * Clear all variables
-     */
-    clearVariables() {
-      this.context.variables.clear();
-    }
-    /**
-     * Clear all arrays
-     */
-    clearArrays() {
-      this.context.arrays.clear();
-    }
-    /**
-     * Convert a value to an integer
-     * Family Basic only supports integer numerical values
-     * Uses Decimal.js for precise conversion
-     */
-    toNumber(value) {
-      if (typeof value === "number") {
-        return new decimal_default(value).truncated().toNumber();
-      }
-      if (typeof value === "boolean") return value ? 1 : 0;
-      if (typeof value === "string") {
-        const parsed = parseFloat(value);
-        return isNaN(parsed) ? 0 : new decimal_default(parsed).truncated().toNumber();
-      }
-      return 0;
-    }
-  };
-
   // src/core/execution/executors/LetExecutor.ts
   var LetExecutor = class {
     constructor(variableService) {
@@ -14082,174 +13733,6 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         this.context.addDebugOutput(`RETURN: returning to statement index ${returnStatementIndex}`);
       }
       this.context.jumpToStatement(returnStatementIndex);
-    }
-  };
-
-  // src/core/services/DataService.ts
-  var DataService = class {
-    constructor(context, evaluator) {
-      this.context = context;
-      this.evaluator = evaluator;
-    }
-    /**
-     * Add data values from a DATA statement (CST version)
-     * DATA statements only contain constants:
-     * - NumberLiteral: numeric constants
-     * - StringLiteral: quoted strings (may contain commas/colons)
-     * - Identifier: unquoted strings (treated as string constants, not variables)
-     */
-    addDataValuesCst(constantCsts) {
-      for (const constantCst of constantCsts) {
-        const value = this.evaluateDataConstant(constantCst);
-        this.context.dataValues.push(value);
-      }
-      if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(`DATA: Added ${constantCsts.length} values`);
-      }
-    }
-    /**
-     * Evaluate a DATA constant (NumberLiteral, StringLiteral, or Identifier)
-     * Identifiers in DATA are treated as string constants, not variable references
-     */
-    evaluateDataConstant(constantCst) {
-      const numberToken = getFirstToken(constantCst.children.NumberLiteral);
-      if (numberToken) {
-        return parseInt(numberToken.image, 10);
-      }
-      const stringToken = getFirstToken(constantCst.children.StringLiteral);
-      if (stringToken) {
-        return stringToken.image.slice(1, -1);
-      }
-      const identifierToken = getFirstToken(constantCst.children.Identifier);
-      if (identifierToken) {
-        return identifierToken.image;
-      }
-      throw new Error("Invalid DATA constant: must be NumberLiteral, StringLiteral, or Identifier");
-    }
-    /**
-     * Add data values from a DATA statement (AST version - deprecated)
-     */
-    addDataValues(_expressions) {
-      console.warn("addDataValues called with AST - use addDataValuesCst instead");
-    }
-    /**
-     * Read the next data value
-     */
-    readNextDataValue() {
-      if (this.context.dataIndex >= this.context.dataValues.length) {
-        this.context.addError({
-          line: 0,
-          message: "OD ERROR",
-          type: ERROR_TYPES.RUNTIME
-        });
-        return 0;
-      }
-      const value = this.context.dataValues[this.context.dataIndex];
-      this.context.dataIndex++;
-      if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(`READ: ${value}`);
-      }
-      return value ?? 0;
-    }
-    /**
-     * Restore data pointer to beginning or specific line
-     */
-    restoreData(lineNumber) {
-      if (lineNumber !== void 0) {
-        const targetIndex = this.findDataStatementIndex(lineNumber);
-        if (targetIndex !== -1) {
-          this.context.dataIndex = targetIndex;
-        } else {
-          this.context.addError({
-            line: 0,
-            message: `RESTORE target line ${lineNumber} not found`,
-            type: ERROR_TYPES.RUNTIME
-          });
-        }
-      } else {
-        this.context.dataIndex = 0;
-      }
-      if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(`RESTORE: Data index set to ${this.context.dataIndex}`);
-      }
-    }
-    /**
-     * Get current data index
-     */
-    getCurrentDataIndex() {
-      return this.context.dataIndex;
-    }
-    /**
-     * Get total number of data values
-     */
-    getDataValueCount() {
-      return this.context.dataValues.length;
-    }
-    /**
-     * Get all data values
-     */
-    getAllDataValues() {
-      return [...this.context.dataValues];
-    }
-    /**
-     * Clear all data values
-     */
-    clearDataValues() {
-      this.context.dataValues = [];
-      this.context.dataIndex = 0;
-    }
-    /**
-     * Check if there are more data values to read
-     */
-    hasMoreData() {
-      return this.context.dataIndex < this.context.dataValues.length;
-    }
-    /**
-     * Find the index of the first DATA statement at or after the specified line
-     */
-    findDataStatementIndex(lineNumber) {
-      let dataIndex = 0;
-      for (const statement of this.context.statements) {
-        const commandCst = statement.command;
-        const singleCommandCst = getFirstCstNode(commandCst.children.singleCommand);
-        if (singleCommandCst?.children.dataStatement) {
-          if (statement.lineNumber >= lineNumber) {
-            return dataIndex;
-          }
-          const dataStmtCst = getFirstCstNode(singleCommandCst.children.dataStatement);
-          if (dataStmtCst) {
-            const dataConstantListCst = getFirstCstNode(dataStmtCst.children.dataConstantList);
-            if (dataConstantListCst) {
-              const constants = getCstNodes(dataConstantListCst.children.dataConstant);
-              dataIndex += constants.length;
-            }
-          }
-        }
-      }
-      return -1;
-    }
-    /**
-     * Preprocess all DATA statements to build the data array
-     */
-    preprocessDataStatements() {
-      this.context.dataValues = [];
-      for (const statement of this.context.statements) {
-        const commandCst = statement.command;
-        const singleCommandCst = getFirstCstNode(commandCst.children.singleCommand);
-        if (singleCommandCst?.children.dataStatement) {
-          const dataStmtCst = getFirstCstNode(singleCommandCst.children.dataStatement);
-          if (dataStmtCst) {
-            const dataConstantListCst = getFirstCstNode(dataStmtCst.children.dataConstantList);
-            if (dataConstantListCst) {
-              const constants = getCstNodes(dataConstantListCst.children.dataConstant);
-              this.addDataValuesCst(constants);
-            }
-          }
-        }
-      }
-      if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(`Preprocessed ${this.context.dataValues.length} data values`);
-      }
     }
   };
 
@@ -14776,6 +14259,348 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     }
   };
 
+  // src/core/services/VariableService.ts
+  var VariableService = class {
+    constructor(context, evaluator) {
+      this.context = context;
+      this.evaluator = evaluator;
+    }
+    /**
+     * Get a variable value
+     */
+    getVariable(name) {
+      return this.context.variables.get(name);
+    }
+    /**
+     * Set a simple variable value
+     */
+    setVariable(name, value) {
+      const variable = {
+        value,
+        type: typeof value === "string" ? "string" : "number"
+      };
+      this.context.variables.set(name, variable);
+    }
+    /**
+     * Set a variable from a CST expression node
+     */
+    setVariableFromExpressionCst(name, expressionCst) {
+      const value = this.evaluator.evaluateExpression(expressionCst);
+      const basicValue = typeof value === "boolean" ? value ? 1 : 0 : value;
+      this.setVariable(name, basicValue);
+    }
+    /**
+     * Set an array element
+     */
+    setArrayElement(name, indices, value) {
+      let array = this.context.arrays.get(name);
+      if (!array) {
+        array = [];
+        this.context.arrays.set(name, array);
+      }
+      let current = array;
+      for (let i = 0; i < indices.length - 1; i++) {
+        const index = Math.floor(indices[i] ?? 0);
+        if (!Array.isArray(current)) {
+          current = [];
+        }
+        if (!current[index]) {
+          current[index] = [];
+        }
+        current = current[index];
+      }
+      if (Array.isArray(current)) {
+        const finalIndex = Math.floor(indices[indices.length - 1] ?? 0);
+        current[finalIndex] = value;
+      }
+    }
+    /**
+     * Set an array element from CST expression nodes
+     */
+    setArrayElementFromExpressionsCst(name, indexExpressionsCst, valueExpressionCst) {
+      const indices = indexExpressionsCst.map((exprCst) => this.toNumber(this.evaluator.evaluateExpression(exprCst)));
+      const value = this.evaluator.evaluateExpression(valueExpressionCst);
+      const basicValue = typeof value === "boolean" ? value ? 1 : 0 : value;
+      this.setArrayElement(name, indices, basicValue);
+    }
+    /**
+     * Get an array element
+     */
+    getArrayElement(name, indices) {
+      const array = this.context.arrays.get(name);
+      if (!array) return 0;
+      let value = array;
+      for (const index of indices) {
+        const numIndex = Math.floor(index);
+        if (Array.isArray(value)) {
+          const element = value[numIndex];
+          if (element !== void 0) {
+            value = element;
+          } else {
+            return 0;
+          }
+        } else {
+          return 0;
+        }
+      }
+      return typeof value !== "object" ? value : 0;
+    }
+    /**
+     * Create an array with specified dimensions
+     * According to Family BASIC spec:
+     * - Numerical arrays are initialized to 0
+     * - String arrays (name ends with $) are initialized to empty strings
+     */
+    createArray(name, dimensions) {
+      const isStringArray = name.endsWith("$");
+      const defaultValue = isStringArray ? "" : 0;
+      const array = this.createArrayRecursive(dimensions, 0, defaultValue);
+      this.context.arrays.set(name, array);
+    }
+    /**
+     * Recursively create array structure
+     * @param dimensions Array of dimension sizes (highest index + 1)
+     * @param currentDim Current dimension index
+     * @param defaultValue Default value for leaf elements (0 for numeric, '' for string)
+     */
+    createArrayRecursive(dimensions, currentDim, defaultValue) {
+      if (currentDim >= dimensions.length) {
+        return [];
+      }
+      const highestIndex = Math.floor(dimensions[currentDim] ?? 0);
+      const size = highestIndex + 1;
+      const array = [];
+      for (let i = 0; i < size; i++) {
+        if (currentDim === dimensions.length - 1) {
+          array[i] = defaultValue;
+        } else {
+          array[i] = this.createArrayRecursive(dimensions, currentDim + 1, defaultValue);
+        }
+      }
+      return array;
+    }
+    /**
+     * Check if a variable exists
+     */
+    hasVariable(name) {
+      return this.context.variables.has(name);
+    }
+    /**
+     * Check if an array exists
+     */
+    hasArray(name) {
+      return this.context.arrays.has(name);
+    }
+    /**
+     * Get all variable names
+     */
+    getVariableNames() {
+      return Array.from(this.context.variables.keys());
+    }
+    /**
+     * Get all array names
+     */
+    getArrayNames() {
+      return Array.from(this.context.arrays.keys());
+    }
+    /**
+     * Clear all variables
+     */
+    clearVariables() {
+      this.context.variables.clear();
+    }
+    /**
+     * Clear all arrays
+     */
+    clearArrays() {
+      this.context.arrays.clear();
+    }
+    /**
+     * Convert a value to an integer
+     * Family Basic only supports integer numerical values
+     * Uses Decimal.js for precise conversion
+     */
+    toNumber(value) {
+      if (typeof value === "number") {
+        return new decimal_default(value).truncated().toNumber();
+      }
+      if (typeof value === "boolean") return value ? 1 : 0;
+      if (typeof value === "string") {
+        const parsed = parseFloat(value);
+        return isNaN(parsed) ? 0 : new decimal_default(parsed).truncated().toNumber();
+      }
+      return 0;
+    }
+  };
+
+  // src/core/services/DataService.ts
+  var DataService = class {
+    constructor(context, evaluator) {
+      this.context = context;
+      this.evaluator = evaluator;
+    }
+    /**
+     * Add data values from a DATA statement (CST version)
+     * DATA statements only contain constants:
+     * - NumberLiteral: numeric constants
+     * - StringLiteral: quoted strings (may contain commas/colons)
+     * - Identifier: unquoted strings (treated as string constants, not variables)
+     */
+    addDataValuesCst(constantCsts) {
+      for (const constantCst of constantCsts) {
+        const value = this.evaluateDataConstant(constantCst);
+        this.context.dataValues.push(value);
+      }
+      if (this.context.config.enableDebugMode) {
+        this.context.addDebugOutput(`DATA: Added ${constantCsts.length} values`);
+      }
+    }
+    /**
+     * Evaluate a DATA constant (NumberLiteral, StringLiteral, or Identifier)
+     * Identifiers in DATA are treated as string constants, not variable references
+     */
+    evaluateDataConstant(constantCst) {
+      const numberToken = getFirstToken(constantCst.children.NumberLiteral);
+      if (numberToken) {
+        return parseInt(numberToken.image, 10);
+      }
+      const stringToken = getFirstToken(constantCst.children.StringLiteral);
+      if (stringToken) {
+        return stringToken.image.slice(1, -1);
+      }
+      const identifierToken = getFirstToken(constantCst.children.Identifier);
+      if (identifierToken) {
+        return identifierToken.image;
+      }
+      throw new Error("Invalid DATA constant: must be NumberLiteral, StringLiteral, or Identifier");
+    }
+    /**
+     * Add data values from a DATA statement (AST version - deprecated)
+     */
+    addDataValues(_expressions) {
+      console.warn("addDataValues called with AST - use addDataValuesCst instead");
+    }
+    /**
+     * Read the next data value
+     */
+    readNextDataValue() {
+      if (this.context.dataIndex >= this.context.dataValues.length) {
+        this.context.addError({
+          line: 0,
+          message: "OD ERROR",
+          type: ERROR_TYPES.RUNTIME
+        });
+        return 0;
+      }
+      const value = this.context.dataValues[this.context.dataIndex];
+      this.context.dataIndex++;
+      if (this.context.config.enableDebugMode) {
+        this.context.addDebugOutput(`READ: ${value}`);
+      }
+      return value ?? 0;
+    }
+    /**
+     * Restore data pointer to beginning or specific line
+     */
+    restoreData(lineNumber) {
+      if (lineNumber !== void 0) {
+        const targetIndex = this.findDataStatementIndex(lineNumber);
+        if (targetIndex !== -1) {
+          this.context.dataIndex = targetIndex;
+        } else {
+          this.context.addError({
+            line: 0,
+            message: `RESTORE target line ${lineNumber} not found`,
+            type: ERROR_TYPES.RUNTIME
+          });
+        }
+      } else {
+        this.context.dataIndex = 0;
+      }
+      if (this.context.config.enableDebugMode) {
+        this.context.addDebugOutput(`RESTORE: Data index set to ${this.context.dataIndex}`);
+      }
+    }
+    /**
+     * Get current data index
+     */
+    getCurrentDataIndex() {
+      return this.context.dataIndex;
+    }
+    /**
+     * Get total number of data values
+     */
+    getDataValueCount() {
+      return this.context.dataValues.length;
+    }
+    /**
+     * Get all data values
+     */
+    getAllDataValues() {
+      return [...this.context.dataValues];
+    }
+    /**
+     * Clear all data values
+     */
+    clearDataValues() {
+      this.context.dataValues = [];
+      this.context.dataIndex = 0;
+    }
+    /**
+     * Check if there are more data values to read
+     */
+    hasMoreData() {
+      return this.context.dataIndex < this.context.dataValues.length;
+    }
+    /**
+     * Find the index of the first DATA statement at or after the specified line
+     */
+    findDataStatementIndex(lineNumber) {
+      let dataIndex = 0;
+      for (const statement of this.context.statements) {
+        const commandCst = statement.command;
+        const singleCommandCst = getFirstCstNode(commandCst.children.singleCommand);
+        if (singleCommandCst?.children.dataStatement) {
+          if (statement.lineNumber >= lineNumber) {
+            return dataIndex;
+          }
+          const dataStmtCst = getFirstCstNode(singleCommandCst.children.dataStatement);
+          if (dataStmtCst) {
+            const dataConstantListCst = getFirstCstNode(dataStmtCst.children.dataConstantList);
+            if (dataConstantListCst) {
+              const constants = getCstNodes(dataConstantListCst.children.dataConstant);
+              dataIndex += constants.length;
+            }
+          }
+        }
+      }
+      return -1;
+    }
+    /**
+     * Preprocess all DATA statements to build the data array
+     */
+    preprocessDataStatements() {
+      this.context.dataValues = [];
+      for (const statement of this.context.statements) {
+        const commandCst = statement.command;
+        const singleCommandCst = getFirstCstNode(commandCst.children.singleCommand);
+        if (singleCommandCst?.children.dataStatement) {
+          const dataStmtCst = getFirstCstNode(singleCommandCst.children.dataStatement);
+          if (dataStmtCst) {
+            const dataConstantListCst = getFirstCstNode(dataStmtCst.children.dataConstantList);
+            if (dataConstantListCst) {
+              const constants = getCstNodes(dataConstantListCst.children.dataConstant);
+              this.addDataValuesCst(constants);
+            }
+          }
+        }
+      }
+      if (this.context.config.enableDebugMode) {
+        this.context.addDebugOutput(`Preprocessed ${this.context.dataValues.length} data values`);
+      }
+    }
+  };
+
   // src/core/execution/ExecutionEngine.ts
   var ExecutionEngine = class {
     constructor(context, _deviceAdapter) {
@@ -14896,6 +14721,181 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         ...this.context.config,
         ...newConfig
       };
+    }
+  };
+
+  // src/core/state/ExecutionContext.ts
+  var ExecutionContext = class {
+    constructor(config2) {
+      // Core state
+      __publicField(this, "variables", /* @__PURE__ */ new Map());
+      __publicField(this, "isRunning", false);
+      __publicField(this, "shouldStop", false);
+      __publicField(this, "currentStatementIndex", 0);
+      __publicField(this, "statements", []);
+      // Expanded statements (flat list)
+      __publicField(this, "labelMap", /* @__PURE__ */ new Map());
+      // Line number -> statement indices
+      __publicField(this, "iterationCount", 0);
+      __publicField(this, "currentLineNumber", 0);
+      // Current line number being executed
+      // Configuration
+      __publicField(this, "config");
+      // Control flow
+      __publicField(this, "loopStack", []);
+      __publicField(this, "gosubStack", []);
+      // Stack for GOSUB/RETURN
+      // Data management
+      __publicField(this, "dataValues", []);
+      // Storage for DATA values
+      __publicField(this, "dataIndex", 0);
+      // Current position in DATA
+      __publicField(this, "arrays", /* @__PURE__ */ new Map());
+      // Array storage
+      // Device integration
+      __publicField(this, "deviceAdapter");
+      __publicField(this, "errors", []);
+      this.config = config2;
+    }
+    /**
+     * Reset the execution context to initial state
+     */
+    reset() {
+      this.variables.clear();
+      this.isRunning = false;
+      this.shouldStop = false;
+      this.currentStatementIndex = 0;
+      this.statements = [];
+      this.labelMap.clear();
+      this.iterationCount = 0;
+      this.loopStack = [];
+      this.gosubStack = [];
+      this.dataValues = [];
+      this.dataIndex = 0;
+      this.arrays.clear();
+      this.currentLineNumber = 0;
+      this.errors = [];
+    }
+    /**
+     * Add output to the context
+     */
+    addOutput(value) {
+      this.deviceAdapter?.printOutput(value);
+    }
+    /**
+     * Add error to the context
+     * Runtime errors are fatal and halt execution immediately
+     */
+    addError(error) {
+      this.deviceAdapter?.errorOutput(error.message);
+      this.errors.push(error);
+      if (error.type === ERROR_TYPES.RUNTIME) {
+        this.shouldStop = true;
+        this.isRunning = false;
+      }
+    }
+    /**
+     * Get errors
+     */
+    getErrors() {
+      return this.errors;
+    }
+    /**
+     * Add debug output
+     */
+    addDebugOutput(message) {
+      if (this.config.enableDebugMode) {
+        this.deviceAdapter?.debugOutput(message);
+      }
+    }
+    /**
+     * Check if execution should continue
+     */
+    shouldContinue() {
+      return this.isRunning && !this.shouldStop && this.iterationCount < this.config.maxIterations && this.currentStatementIndex < this.statements.length;
+    }
+    /**
+     * Increment iteration count and check limits
+     */
+    incrementIteration() {
+      this.iterationCount++;
+      if (this.iterationCount >= this.config.maxIterations) {
+        this.addError({
+          line: 0,
+          message: "Maximum iterations exceeded",
+          type: ERROR_TYPES.RUNTIME
+        });
+        this.shouldStop = true;
+      }
+    }
+    /**
+     * Get current statement
+     */
+    getCurrentStatement() {
+      return this.statements[this.currentStatementIndex];
+    }
+    /**
+     * Move to next statement
+     */
+    nextStatement() {
+      this.currentStatementIndex++;
+    }
+    /**
+     * Jump to statement by index
+     */
+    jumpToStatement(index) {
+      this.currentStatementIndex = index;
+    }
+    /**
+     * Find statement indices by line number
+     */
+    findStatementIndicesByLine(lineNumber) {
+      return this.labelMap.get(lineNumber) || [];
+    }
+    /**
+     * Find first statement index by line number (for GOTO/GOSUB)
+     */
+    findStatementIndexByLine(lineNumber) {
+      const indices = this.labelMap.get(lineNumber);
+      if (indices && indices.length > 0) {
+        const firstIndex = indices[0];
+        return firstIndex !== void 0 ? firstIndex : -1;
+      }
+      return -1;
+    }
+    /**
+     * Get the current line number being executed
+     */
+    getCurrentLineNumber() {
+      return this.currentLineNumber;
+    }
+    /**
+     * Set the current line number being executed
+     */
+    setCurrentLineNumber(lineNumber) {
+      this.currentLineNumber = lineNumber;
+    }
+    /**
+     * Get joystick state (cross buttons)
+     */
+    getStickState(joystickId) {
+      if (this.deviceAdapter) {
+        return this.deviceAdapter.getStickState(joystickId);
+      }
+      return 0;
+    }
+    /**
+     * Get trigger state (action buttons)
+     */
+    consumeStrigState(joystickId) {
+      if (this.deviceAdapter) {
+        const consumedValue = this.deviceAdapter.consumeStrigState(joystickId);
+        if (consumedValue > 0) {
+          console.log(`\u{1F3AE} [EXECUTION] STRIG event consumed: joystickId=${joystickId}, value=${consumedValue}`);
+          return consumedValue;
+        }
+      }
+      return 0;
     }
   };
 
@@ -15341,6 +15341,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       for (const char of output) {
         this.writeCharacterToScreen(char);
       }
+      this.sendFullScreenUpdate();
     }
     writeCharacterToScreen(char) {
       if (char === "\n") {
@@ -15349,23 +15350,24 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         if (this.cursorY >= 24) {
           this.cursorY = 0;
         }
-        this.sendCursorUpdate();
         return;
       }
       if (this.cursorY < 24 && this.cursorX < 28) {
         if (!this.screenBuffer[this.cursorY]) {
           this.screenBuffer[this.cursorY] = [];
         }
-        if (!this.screenBuffer[this.cursorY][this.cursorX]) {
-          this.screenBuffer[this.cursorY][this.cursorX] = {
+        const row = this.screenBuffer[this.cursorY];
+        let cell = row[this.cursorX];
+        if (!cell) {
+          cell = {
             character: " ",
             colorPattern: 0,
             x: this.cursorX,
             y: this.cursorY
           };
+          row[this.cursorX] = cell;
         }
-        this.screenBuffer[this.cursorY][this.cursorX].character = char;
-        this.sendCharacterUpdate(this.cursorX, this.cursorY, char);
+        cell.character = char;
         this.cursorX++;
         if (this.cursorX >= 28) {
           this.cursorX = 0;
@@ -15373,11 +15375,26 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           if (this.cursorY >= 24) {
             this.cursorY = 0;
           }
-          this.sendCursorUpdate();
-        } else {
-          this.sendCursorUpdate();
         }
       }
+    }
+    sendFullScreenUpdate() {
+      const clonedBuffer = this.screenBuffer.map(
+        (row) => row.map((cell) => ({ ...cell }))
+      );
+      self.postMessage({
+        type: "SCREEN_UPDATE",
+        id: `screen-full-${Date.now()}`,
+        timestamp: Date.now(),
+        data: {
+          executionId: this.currentExecutionId || "unknown",
+          updateType: "full",
+          screenBuffer: clonedBuffer,
+          cursorX: this.cursorX,
+          cursorY: this.cursorY,
+          timestamp: Date.now()
+        }
+      });
     }
     sendCharacterUpdate(x, y, character) {
       self.postMessage({

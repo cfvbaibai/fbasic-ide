@@ -5,27 +5,32 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/',
     name: 'Home',
-    component: () => import('../features/home/HomePage.vue')
+    component: () => import('@/features/home/HomePage.vue')
   },
   {
     path: '/ide',
     name: 'Ide',
-    component: () => import('../features/ide/IdePage.vue')
+    component: () => import('@/features/ide/IdePage.vue')
   },
   {
     path: '/monaco',
     name: 'MonacoEditor',
-    component: () => import('../features/monaco-editor/MonacoEditorPage.vue')
+    component: () => import('@/features/monaco-editor/MonacoEditorPage.vue')
   },
   {
     path: '/image-analyzer',
     name: 'ImageAnalyzer',
-    component: () => import('../features/image-analyzer/ImageAnalyzerPage.vue')
+    component: () => import('@/features/image-analyzer/ImageAnalyzerPage.vue')
   },
   {
     path: '/character-sprite-viewer',
     name: 'CharacterSpriteViewer',
-    component: () => import('../features/sprite-viewer/CharacterSpriteViewerPage.vue')
+    component: () => import('@/features/sprite-viewer/CharacterSpriteViewerPage.vue')
+  },
+  {
+    path: '/canvas-test',
+    name: 'CanvasPerformanceTest',
+    component: () => import('@/features/canvas-perf/CanvasPerformanceTest.vue')
   }
 ];
 

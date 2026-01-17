@@ -41,6 +41,7 @@ const handleCopy = async () => {
 <template>
   <div class="game-code-quote">
     <div class="game-code-quote-content">
+      <div class="game-code-quote-crt-overlay"></div>
       <div class="game-code-quote-header" v-if="showCopyButton">
         <GameIconButton
           type="primary"
@@ -70,19 +71,10 @@ const handleCopy = async () => {
   border: 2px solid var(--game-surface-border);
   border-radius: 8px;
   padding: 1rem;
-  box-shadow: var(--game-shadow-base);
+  box-shadow: var(--game-shadow-inset);
   overflow: auto;
   position: relative;
-}
-
-.game-code-quote-header {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  z-index: 10;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
+  transition: all 0.3s ease;
 }
 
 .game-code-quote-content::before {
@@ -94,11 +86,74 @@ const handleCopy = async () => {
   height: 2px;
   background: linear-gradient(90deg, 
     transparent 0%, 
-    var(--game-accent-glow) 50%, 
+    var(--game-accent-color) 50%, 
     transparent 100%
   );
-  opacity: 0.5;
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: opacity 0.3s ease, transform 0.3s ease;
   border-radius: 8px 8px 0 0;
+  z-index: 1;
+}
+
+.game-code-quote-content::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border: 1px solid var(--game-accent-color);
+  border-radius: 6px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.game-code-quote:hover .game-code-quote-content {
+  border-color: var(--game-surface-border-hover);
+  filter: sepia(0.5) saturate(0.2) hue-rotate(90deg) contrast(1.1) brightness(0.95);
+}
+
+.game-code-quote:hover .game-code-quote-content::before {
+  opacity: 0.8;
+  transform: scaleX(1);
+}
+
+.game-code-quote:hover .game-code-quote-content::after {
+  opacity: 0.2;
+}
+
+.game-code-quote-crt-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 2;
+  background: 
+    repeating-linear-gradient(
+      0deg,
+      var(--game-screen-text-color-8) 0px,
+      transparent 0px,
+      transparent 2px,
+      var(--game-screen-text-color-8) 2px
+    );
+  mix-blend-mode: screen;
+  border-radius: 8px;
+}
+
+.game-code-quote:hover .game-code-quote-crt-overlay {
+  opacity: 1;
+}
+
+.game-code-quote-header {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 10;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
 
 .game-code-quote-code {

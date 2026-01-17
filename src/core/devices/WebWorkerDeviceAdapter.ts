@@ -361,10 +361,13 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       }
     })
     
-    // Also send to SCREEN character by character
+    // Process all characters and update screen buffer (no individual messages)
     for (const char of output) {
       this.writeCharacterToScreen(char)
     }
+    
+    // Send a single 'full' screen buffer update after processing all characters
+    this.sendFullScreenUpdate()
   }
   
   private writeCharacterToScreen(char: string): void {
@@ -376,7 +379,6 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
         // Scroll screen up (simple implementation: reset to top)
         this.cursorY = 0
       }
-      this.sendCursorUpdate()
       return
     }
     
@@ -398,9 +400,6 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       }
       cell.character = char
       
-      // Send character update
-      this.sendCharacterUpdate(this.cursorX, this.cursorY, char)
-      
       // Advance cursor
       this.cursorX++
       if (this.cursorX >= 28) {
@@ -410,37 +409,19 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
           // Scroll screen up (simple implementation: reset to top)
           this.cursorY = 0
         }
-        this.sendCursorUpdate()
-      } else {
-        this.sendCursorUpdate()
       }
     }
   }
   
-  private sendCharacterUpdate(x: number, y: number, character: string): void {
+  private sendFullScreenUpdate(): void {
     self.postMessage({
       type: 'SCREEN_UPDATE',
-      id: `screen-char-${Date.now()}`,
+      id: `screen-full-${Date.now()}`,
       timestamp: Date.now(),
       data: {
         executionId: this.currentExecutionId || 'unknown',
-        updateType: 'character',
-        x,
-        y,
-        character,
-        timestamp: Date.now()
-      }
-    } as ScreenUpdateMessage)
-  }
-  
-  private sendCursorUpdate(): void {
-    self.postMessage({
-      type: 'SCREEN_UPDATE',
-      id: `screen-cursor-${Date.now()}`,
-      timestamp: Date.now(),
-      data: {
-        executionId: this.currentExecutionId || 'unknown',
-        updateType: 'cursor',
+        updateType: 'full',
+        screenBuffer: this.screenBuffer,
         cursorX: this.cursorX,
         cursorY: this.cursorY,
         timestamp: Date.now()
