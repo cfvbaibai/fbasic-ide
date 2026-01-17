@@ -2,7 +2,7 @@
  * Core interfaces for the Family Basic Interpreter
  */
 
-import { VARIABLE_TYPES, ERROR_TYPES } from './constants'
+import type { VARIABLE_TYPES, ERROR_TYPES } from './constants'
 import type { ExecutionContext } from './state/ExecutionContext'
 import type { BasicArrayValue } from './types/BasicTypes'
 

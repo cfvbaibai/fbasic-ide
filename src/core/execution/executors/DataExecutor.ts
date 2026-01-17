@@ -7,7 +7,7 @@
  */
 
 import type { CstNode } from 'chevrotain'
-import { DataService } from '../../services/DataService'
+import type { DataService } from '../../services/DataService'
 import { getFirstCstNode, getCstNodes } from '../../parser/cst-helpers'
 
 export class DataExecutor {

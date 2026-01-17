@@ -10,7 +10,7 @@ import Decimal from 'decimal.js'
 import type { BasicScalarValue, BasicArrayValue } from '../types/BasicTypes'
 import { getFirstCstNode, getCstNodes, getFirstToken, getTokens } from '../parser/cst-helpers'
 import { FunctionEvaluator } from './FunctionEvaluator'
-import { ExecutionContext } from '../state/ExecutionContext'
+import type { ExecutionContext } from '../state/ExecutionContext'
 import { ERROR_TYPES } from '../constants'
 
 export class ExpressionEvaluator {

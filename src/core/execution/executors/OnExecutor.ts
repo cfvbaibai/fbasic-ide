@@ -7,10 +7,10 @@
  */
 
 import type { CstNode } from 'chevrotain'
-import { ExecutionContext } from '../../state/ExecutionContext'
-import { ExpressionEvaluator } from '../../evaluation/ExpressionEvaluator'
+import type { ExecutionContext } from '../../state/ExecutionContext'
+import type { ExpressionEvaluator } from '../../evaluation/ExpressionEvaluator'
 import { getFirstToken, getTokens, getFirstCstNode } from '../../parser/cst-helpers'
-import { DataService } from '../../services/DataService'
+import type { DataService } from '../../services/DataService'
 import { ERROR_TYPES } from '../../constants'
 
 export class OnExecutor {

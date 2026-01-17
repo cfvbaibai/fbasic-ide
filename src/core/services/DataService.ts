@@ -5,8 +5,8 @@
  */
 
 import type { CstNode } from 'chevrotain'
-import { ExpressionEvaluator } from '../evaluation/ExpressionEvaluator'
-import { ExecutionContext } from '../state/ExecutionContext'
+import type { ExpressionEvaluator } from '../evaluation/ExpressionEvaluator'
+import type { ExecutionContext } from '../state/ExecutionContext'
 import { ERROR_TYPES } from '../constants'
 import type { BasicScalarValue } from '../types/BasicTypes'
 import { getFirstCstNode, getCstNodes, getFirstToken } from '../parser/cst-helpers'

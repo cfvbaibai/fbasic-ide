@@ -6,7 +6,7 @@
  */
 
 import type { CstNode } from 'chevrotain'
-import { VariableService } from '../../services/VariableService'
+import type { VariableService } from '../../services/VariableService'
 import { getFirstToken, getFirstCstNode, getCstNodes } from '../../parser/cst-helpers'
 import type { BasicScalarValue } from '../../types/BasicTypes'
 

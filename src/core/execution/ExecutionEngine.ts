@@ -6,7 +6,7 @@
 
 import type { ExecutionResult, BasicDeviceAdapter } from '../interfaces'
 import { ERROR_TYPES } from '../constants'
-import { ExecutionContext } from '../state/ExecutionContext'
+import type { ExecutionContext } from '../state/ExecutionContext'
 import { ExpressionEvaluator } from '../evaluation/ExpressionEvaluator'
 import { StatementRouter } from './StatementRouter'
 import { VariableService } from '../services/VariableService'

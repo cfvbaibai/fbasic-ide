@@ -4,7 +4,7 @@ import MonacoCodeEditor from './components/MonacoCodeEditor.vue'
 import RuntimeOutput from './components/RuntimeOutput.vue'
 import IdeControls from './components/IdeControls.vue'
 import JoystickControl from './components/JoystickControl.vue'
-import { GameLayout, GameTag, GameButton, GameButtonGroup, GameBlock } from '../../shared/components/ui'
+import { GameLayout, GameButton, GameButtonGroup, GameBlock } from '../../shared/components/ui'
 import { useBasicIde as useBasicIdeEnhanced } from './composables/useBasicIdeEnhanced'
 import type { ParserInfo, HighlighterInfo } from '../../core/interfaces'
 

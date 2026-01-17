@@ -7,7 +7,7 @@
 
 import type { CstNode } from 'chevrotain'
 import { getFirstCstNode, getCstNodes, getFirstToken } from '../parser/cst-helpers'
-import { ExecutionContext } from '../state/ExecutionContext'
+import type { ExecutionContext } from '../state/ExecutionContext'
 
 /**
  * Helper to convert a value to an integer

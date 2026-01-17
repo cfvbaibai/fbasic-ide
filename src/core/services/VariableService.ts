@@ -7,8 +7,8 @@
 import Decimal from 'decimal.js'
 import type { BasicVariable } from '../interfaces'
 import type { CstNode } from 'chevrotain'
-import { ExpressionEvaluator } from '../evaluation/ExpressionEvaluator'
-import { ExecutionContext } from '../state/ExecutionContext'
+import type { ExpressionEvaluator } from '../evaluation/ExpressionEvaluator'
+import type { ExecutionContext } from '../state/ExecutionContext'
 import type { BasicScalarValue, BasicArrayValue } from '../types/BasicTypes'
 
 export class VariableService {

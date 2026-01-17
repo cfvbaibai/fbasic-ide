@@ -6,8 +6,8 @@
 
 import type { CstNode } from 'chevrotain'
 import type { LoopState } from '../../state/ExecutionContext'
-import { ExpressionEvaluator } from '../../evaluation/ExpressionEvaluator'
-import { VariableService } from '../../services/VariableService'
+import type { ExpressionEvaluator } from '../../evaluation/ExpressionEvaluator'
+import type { VariableService } from '../../services/VariableService'
 import { getFirstToken, getCstNodes } from '../../parser/cst-helpers'
 import { ERROR_TYPES } from '../../constants'
 

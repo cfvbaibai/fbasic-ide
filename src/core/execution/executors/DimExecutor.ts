@@ -11,9 +11,9 @@
  */
 
 import type { CstNode } from 'chevrotain'
-import { VariableService } from '../../services/VariableService'
-import { ExpressionEvaluator } from '../../evaluation/ExpressionEvaluator'
-import { ExecutionContext } from '../../state/ExecutionContext'
+import type { VariableService } from '../../services/VariableService'
+import type { ExpressionEvaluator } from '../../evaluation/ExpressionEvaluator'
+import type { ExecutionContext } from '../../state/ExecutionContext'
 import { ERROR_TYPES } from '../../constants'
 import { getFirstCstNode, getCstNodes, getFirstToken } from '../../parser/cst-helpers'
 

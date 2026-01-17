@@ -6,9 +6,9 @@
  */
 
 import type { CstNode } from 'chevrotain'
-import { DataService } from '../../services/DataService'
-import { VariableService } from '../../services/VariableService'
-import { ExpressionEvaluator } from '../../evaluation/ExpressionEvaluator'
+import type { DataService } from '../../services/DataService'
+import type { VariableService } from '../../services/VariableService'
+import type { ExpressionEvaluator } from '../../evaluation/ExpressionEvaluator'
 import { getTokens, getFirstToken, getFirstCstNode, getCstNodes } from '../../parser/cst-helpers'
 
 export class ReadExecutor {

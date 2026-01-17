@@ -5,10 +5,10 @@
  */
 
 import type { CstNode } from 'chevrotain'
-import { VariableService } from '../../services/VariableService'
+import type { VariableService } from '../../services/VariableService'
 import { ERROR_TYPES } from '../../constants'
 
-import { ExecutionContext } from '../../state/ExecutionContext'
+import type { ExecutionContext } from '../../state/ExecutionContext'
 
 export class NextExecutor {
   constructor(

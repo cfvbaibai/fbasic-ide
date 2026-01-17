@@ -27,7 +27,7 @@ export interface SpriteViewerStore {
   setColorCombination: (combination: number) => void
 }
 
-const SpriteViewerStoreKey: InjectionKey<SpriteViewerStore> = Symbol('SpriteViewerStore')
+export const SpriteViewerStoreKey: InjectionKey<SpriteViewerStore> = Symbol('SpriteViewerStore')
 
 export function createSpriteViewerStore(): SpriteViewerStore {
   // State
