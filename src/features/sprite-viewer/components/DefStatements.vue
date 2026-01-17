@@ -15,7 +15,7 @@ const copyAllStatements = async () => {
     try {
       await navigator.clipboard.writeText(combined)
       message.success('All statements copied to clipboard!')
-    } catch (err) {
+    } catch {
       message.error('Failed to copy to clipboard')
     }
   }

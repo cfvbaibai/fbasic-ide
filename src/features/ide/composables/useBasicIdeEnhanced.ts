@@ -22,25 +22,22 @@
  * @returns Object containing reactive state and methods for IDE functionality
  */
 
-/* global NodeJS */
 import { ref, onUnmounted } from 'vue'
 import { FBasicParser } from '../../../core/parser/FBasicParser'
 import { getSampleCode } from '../../../core/samples/sampleCodes'
-import type { ExecutionResult, ParserInfo, HighlighterInfo, BasicVariable, AnyServiceWorkerMessage, ResultMessage, ErrorMessage, OutputMessage, ProgressMessage, ScreenUpdateMessage, ScreenCell } from '../../../core/interfaces'
+import type { ExecutionResult, ParserInfo, HighlighterInfo, BasicVariable, AnyServiceWorkerMessage } from '../../../core/interfaces'
 import { EXECUTION_LIMITS } from '../../../core/constants'
-
-/**
- * Web Worker Manager for direct communication
- */
-interface WebWorkerManager {
-  worker: Worker | null
-  messageId: number
-  pendingMessages: Map<string, {
-    resolve: (result: ExecutionResult) => void
-    reject: (error: Error) => void
-    timeout: NodeJS.Timeout
-  }>
-}
+import { initializeScreenBuffer, clearScreenBuffer } from './useBasicIdeScreenUtils'
+import { handleWorkerMessage, type MessageHandlerContext } from './useBasicIdeMessageHandlers'
+import type { WebWorkerManager } from './useBasicIdeWebWorkerUtils'
+import {
+  initializeWebWorker,
+  restartWebWorker,
+  checkWebWorkerHealth,
+  sendMessageToWorker as sendMessageToWorkerUtil,
+  rejectAllPendingMessages
+} from './useBasicIdeWebWorkerUtils'
+import { formatArrayForDisplay } from './useBasicIdeFormatting'
 
 /**
  * Enhanced composable function for BASIC IDE functionality with AST-based parsing
@@ -66,18 +63,7 @@ export function useBasicIde() {
   const debugMode = ref(false)
   
   // Screen state - initialize as full grid for proper reactivity
-  const initializeScreenBuffer = (): ScreenCell[][] => {
-    const grid: ScreenCell[][] = []
-    for (let y = 0; y < 24; y++) {
-      const row: ScreenCell[] = []
-      for (let x = 0; x < 28; x++) {
-        row.push({ character: ' ', colorPattern: 0, x, y })
-      }
-      grid.push(row)
-    }
-    return grid
-  }
-  const screenBuffer = ref<ScreenCell[][]>(initializeScreenBuffer())
+  const screenBuffer = ref(initializeScreenBuffer())
   const cursorX = ref(0)
   const cursorY = ref(0)
 
@@ -120,291 +106,36 @@ export function useBasicIde() {
     return joystickKeywords.some(keyword => code.includes(keyword))
   }
 
+  // Message handler context
+  const messageHandlerContext: MessageHandlerContext = {
+    output,
+    errors,
+    debugOutput,
+    screenBuffer,
+    cursorX,
+    cursorY,
+    webWorkerManager
+  }
+
   // Web Worker Management Functions
-  const initializeWebWorker = async (): Promise<void> => {
-    if (webWorkerManager.worker) {
-      console.log('✅ [COMPOSABLE] Web worker already initialized')
-      return
-    }
-
-    try {
-      console.log('🔧 [COMPOSABLE] Initializing web worker...')
-      webWorkerManager.worker = new Worker('/basic-interpreter-worker.js')
-      
-      // Set up message handling
-      webWorkerManager.worker.onmessage = (event) => {
-        handleWorkerMessage(event.data)
-      }
-      
-      webWorkerManager.worker.onerror = (error) => {
-        console.error('❌ [COMPOSABLE] Web worker error:', error)
-        rejectAllPendingMessages('Web worker error: ' + error.message)
-        // Restart web worker on error
-        restartWebWorker()
-      }
-      
-      webWorkerManager.worker.onmessageerror = (error) => {
-        console.error('❌ [COMPOSABLE] Web worker message error:', error)
-        rejectAllPendingMessages('Web worker message error')
-        // Restart web worker on message error
-        restartWebWorker()
-      }
-      
-      console.log('✅ [COMPOSABLE] Web worker initialized successfully')
-    } catch (error) {
-      console.error('❌ [COMPOSABLE] Failed to initialize web worker:', error)
-      throw error
-    }
-  }
-
-  const restartWebWorker = async (): Promise<void> => {
-    console.log('🔄 [COMPOSABLE] Restarting web worker...')
-    
-    // Terminate existing worker
-    if (webWorkerManager.worker) {
-      webWorkerManager.worker.terminate()
-      webWorkerManager.worker = null
-    }
-    
-    // Clear pending messages
-    rejectAllPendingMessages('Web worker restarted')
-    
-    // Wait a bit before restarting
-    await new Promise(resolve => setTimeout(resolve, 100))
-    
-    // Reinitialize
-    await initializeWebWorker()
-  }
-
-  const checkWebWorkerHealth = async (): Promise<boolean> => {
-    if (!webWorkerManager.worker) {
-      return false
-    }
-
-    try {
-      // Send a ping message to check if worker is responsive
-      const _pingResult = await sendMessageToWorker({
-        type: 'EXECUTE',
-        id: `ping-${Date.now()}`,
-        timestamp: Date.now(),
-        data: {
-          code: '10 PRINT "PING"',
-          config: {
-            maxIterations: 100,
-            maxOutputLines: 10,
-            enableDebugMode: false,
-            strictMode: false,
-            deviceAdapter: undefined
-          },
-          options: {
-            timeout: 5000
-          }
-        }
-      })
-      
-      return true
-    } catch (error) {
-      console.warn('⚠️ [COMPOSABLE] Web worker health check failed:', error)
-      return false
-    }
-  }
-
-  const handleWorkerMessage = (message: AnyServiceWorkerMessage): void => {
-    console.log('📨 [COMPOSABLE] Received message from worker:', message.type)
-    
-    switch (message.type) {
-      case 'OUTPUT':
-        handleOutputMessage(message)
-        break
-      case 'SCREEN_UPDATE':
-        handleScreenUpdateMessage(message)
-        break
-      case 'RESULT':
-        handleResultMessage(message)
-        break
-      case 'ERROR':
-        handleErrorMessage(message)
-        break
-      case 'PROGRESS':
-        handleProgressMessage(message)
-        break
-      default:
-        console.warn('⚠️ [COMPOSABLE] Unknown message type:', message.type)
-    }
-  }
-
-  const handleOutputMessage = (message: AnyServiceWorkerMessage): void => {
-    if (message.type !== 'OUTPUT') return
-    const { output: outputText, outputType } = (message as OutputMessage).data
-    console.log('📤 [COMPOSABLE] Handling output:', outputType, outputText)
-    
-    if (outputType === 'print') {
-      output.value.push(outputText)
-    } else if (outputType === 'debug') {
-      debugOutput.value += outputText + '\n'
-    } else if (outputType === 'error') {
-      errors.value.push({
-        line: 0,
-        message: outputText,
-        type: 'runtime'
-      })
-    }
-  }
-
-  const handleScreenUpdateMessage = (message: AnyServiceWorkerMessage): void => {
-    if (message.type !== 'SCREEN_UPDATE') return
-    const update = (message as ScreenUpdateMessage).data
-    console.log('🖥️ [COMPOSABLE] Handling screen update:', update.updateType, update)
-    
-    switch (update.updateType) {
-      case 'character':
-        if (update.x !== undefined && update.y !== undefined && update.character !== undefined) {
-          const x = update.x
-          const y = update.y
-          const character = update.character
-          
-          console.log('🖥️ [COMPOSABLE] Updating character:', {
-            x,
-            y,
-            char: character,
-            currentBuffer: screenBuffer.value[y]?.[x]
-          })
-          
-          // Ensure row exists
-          if (!screenBuffer.value[y]) {
-            screenBuffer.value[y] = []
-          }
-          
-          // Ensure cell exists
-          const currentRow = screenBuffer.value[y]
-          if (!currentRow[x]) {
-            currentRow[x] = {
-              character: ' ',
-              colorPattern: 0,
-              x,
-              y
-            }
-          }
-          
-          // Update character - force reactivity by creating new object
-          const currentCell = currentRow[x]
-          const newCell: ScreenCell = {
-            character,
-            colorPattern: currentCell.colorPattern,
-            x: currentCell.x,
-            y: currentCell.y
-          }
-          currentRow[x] = newCell
-          
-          // Also trigger reactivity by reassigning the row
-          screenBuffer.value[y] = [...currentRow]
-        }
-        break
-      case 'cursor':
-        if (update.cursorX !== undefined) cursorX.value = update.cursorX
-        if (update.cursorY !== undefined) cursorY.value = update.cursorY
-        break
-      case 'clear':
-        // Clear screen buffer
-        for (let y = 0; y < 24; y++) {
-          const row = screenBuffer.value[y]
-          if (row) {
-            for (let x = 0; x < 28; x++) {
-              const cell = row[x]
-              if (cell) {
-                cell.character = ' '
-              }
-            }
-          }
-        }
-        cursorX.value = 0
-        cursorY.value = 0
-        break
-      case 'full':
-        if (update.screenBuffer) {
-          screenBuffer.value = update.screenBuffer
-        }
-        if (update.cursorX !== undefined) cursorX.value = update.cursorX
-        if (update.cursorY !== undefined) cursorY.value = update.cursorY
-        break
-    }
-  }
-
-  const handleResultMessage = (message: AnyServiceWorkerMessage): void => {
-    const resultMessage = message as ResultMessage
-    const result = resultMessage.data // message.data IS the ExecutionResult
-    console.log('✅ [COMPOSABLE] Execution completed:', result.executionId, 'result:', result)
-    
-    // Use message.id to look up the pending message (not executionId from data)
-    const pending = webWorkerManager.pendingMessages.get(message.id)
-    if (pending) {
-      clearTimeout(pending.timeout)
-      webWorkerManager.pendingMessages.delete(message.id)
-      pending.resolve(result)
-    } else {
-      console.warn('⚠️ [COMPOSABLE] No pending message found for messageId:', message.id)
-    }
-  }
-
-  const handleErrorMessage = (message: AnyServiceWorkerMessage): void => {
-    const errorMessage = message as ErrorMessage
-    console.error('❌ [COMPOSABLE] Execution error:', errorMessage.data.executionId, errorMessage.data.message)
-    
-    // Use message.id to look up the pending message (not executionId from data)
-    const pending = webWorkerManager.pendingMessages.get(message.id)
-    if (pending) {
-      clearTimeout(pending.timeout)
-      webWorkerManager.pendingMessages.delete(message.id)
-      pending.reject(new Error(errorMessage.data.message))
-    } else {
-      console.warn('⚠️ [COMPOSABLE] No pending message found for error messageId:', message.id)
-    }
-  }
-
-  const handleProgressMessage = (message: AnyServiceWorkerMessage): void => {
-    if (message.type !== 'PROGRESS') return
-    const { iterationCount, currentStatement } = (message as ProgressMessage).data
-    console.log('🔄 [COMPOSABLE] Progress:', iterationCount, currentStatement)
-    // Could emit progress events here if needed
-  }
-
-  const rejectAllPendingMessages = (reason: string): void => {
-    console.log('🚫 [COMPOSABLE] Rejecting all pending messages:', reason)
-    for (const [_messageId, pending] of webWorkerManager.pendingMessages) {
-      clearTimeout(pending.timeout)
-      pending.reject(new Error(reason))
-    }
-    webWorkerManager.pendingMessages.clear()
-  }
-
-  const sendMessageToWorker = (message: AnyServiceWorkerMessage): Promise<ExecutionResult> => {
-    return new Promise((resolve, reject) => {
-      if (!webWorkerManager.worker) {
-        reject(new Error('Web worker not initialized'))
-        return
-      }
-
-      const _messageId = (++webWorkerManager.messageId).toString()
-      const messageWithId = { ...message, id: _messageId }
-      
-      // Set up timeout
-      const timeout = setTimeout(() => {
-        console.log('⏰ [COMPOSABLE] Message timeout:', _messageId)
-        webWorkerManager.pendingMessages.delete(_messageId)
-        reject(new Error('Web worker message timeout'))
-      }, 30000) // 30 second timeout
-      
-      // Store pending message
-      webWorkerManager.pendingMessages.set(_messageId, {
-        resolve,
-        reject,
-        timeout
-      })
-      
-      console.log('📤 [COMPOSABLE] Sending message to worker:', messageWithId.type, _messageId)
-      console.log('📤 [COMPOSABLE] Pending messages count:', webWorkerManager.pendingMessages.size)
-      webWorkerManager.worker.postMessage(messageWithId)
+  const initializeWebWorkerWrapper = async (): Promise<void> => {
+    await initializeWebWorker(webWorkerManager, (message) => {
+      handleWorkerMessage(message, messageHandlerContext)
     })
+  }
+
+  const restartWebWorkerWrapper = async (): Promise<void> => {
+    await restartWebWorker(webWorkerManager, (message) => {
+      handleWorkerMessage(message, messageHandlerContext)
+    })
+  }
+
+  const checkWebWorkerHealthWrapper = async (): Promise<boolean> => {
+    return checkWebWorkerHealth(webWorkerManager, (message) => sendMessageToWorkerWrapper(message))
+  }
+
+  const sendMessageToWorkerWrapper = (message: AnyServiceWorkerMessage): Promise<ExecutionResult> => {
+    return sendMessageToWorkerUtil(message, webWorkerManager)
   }
 
   /**
@@ -459,13 +190,13 @@ export function useBasicIde() {
 
     try {
       // Initialize web worker if not already done
-      await initializeWebWorker()
+      await initializeWebWorkerWrapper()
 
       // Check web worker health before execution
-      const isHealthy = await checkWebWorkerHealth()
+      const isHealthy = await checkWebWorkerHealthWrapper()
       if (!isHealthy) {
         console.log('🔄 [COMPOSABLE] Web worker unhealthy, restarting...')
-        await restartWebWorker()
+        await restartWebWorkerWrapper()
       }
 
       // Parse the code
@@ -481,22 +212,10 @@ export function useBasicIde() {
     debugOutput.value = ''
     
     // Clear screen
-    for (let y = 0; y < 24; y++) {
-      const row = screenBuffer.value[y]
-      if (row) {
-        for (let x = 0; x < 28; x++) {
-          const cell = row[x]
-          if (cell) {
-            cell.character = ' '
-          }
-        }
-      }
-    }
-    cursorX.value = 0
-    cursorY.value = 0
+    clearScreenBuffer(screenBuffer, cursorX, cursorY)
 
       // Send execution message to web worker
-      const result = await sendMessageToWorker({
+      const result = await sendMessageToWorkerWrapper({
         type: 'EXECUTE',
         id: `execute-${Date.now()}`,
         timestamp: Date.now(),
@@ -633,50 +352,6 @@ export function useBasicIde() {
     return cst !== null
   }
 
-  /**
-   * Format a single value for display
-   */
-  function formatValue(value: unknown): string {
-    if (typeof value === 'string') {
-      return `"${value}"`
-    }
-    if (typeof value === 'number') {
-      return String(value)
-    }
-    if (value === undefined || value === null) {
-      return '0'
-    }
-    return String(value)
-  }
-
-  /**
-   * Format array for display in Variables panel
-   * Shows actual array values in a readable format
-   */
-  function formatArrayForDisplay(array: unknown): string {
-    if (!Array.isArray(array)) {
-      return 'Array'
-    }
-    
-    // Check if it's a 2D array (nested arrays)
-    const is2D = array.length > 0 && Array.isArray(array[0])
-    
-    if (is2D) {
-      // 2D array: show matrix representation
-      const rows: string[] = []
-      for (let i = 0; i < array.length; i++) {
-        const row = array[i]
-        if (Array.isArray(row)) {
-          rows.push(`[${row.map(v => formatValue(v)).join(', ')}]`)
-        }
-      }
-      return `[${rows.join(', ')}]`
-    } else {
-      // 1D array: show all values
-      const values = array.map(v => formatValue(v))
-      return `[${values.join(', ')}]`
-    }
-  }
 
   // Initialize highlighting
   updateHighlighting()
@@ -688,7 +363,7 @@ export function useBasicIde() {
       webWorkerManager.worker.terminate()
       webWorkerManager.worker = null
     }
-    rejectAllPendingMessages('Component unmounted')
+    rejectAllPendingMessages(webWorkerManager, 'Component unmounted')
   })
 
   return {

@@ -52,7 +52,7 @@ interface Props {
   flashingCells: Record<string, boolean>
 }
 
-const props = defineProps<Props>()
+defineProps<Props>()
 
 const tableColumns: Column[] = [
   {

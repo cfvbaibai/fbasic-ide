@@ -27,7 +27,7 @@ const handleCopy = async () => {
   try {
     await navigator.clipboard.writeText(props.code)
     message.success(props.copySuccessMessage)
-  } catch (err) {
+  } catch {
     message.error('Failed to copy to clipboard')
   } finally {
     // Small delay to prevent rapid clicking

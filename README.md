@@ -147,6 +147,14 @@ When working with this codebase, follow these AI-specific instructions:
 - **Never exceed 500 lines** in any `.vue` file
 - If approaching limit, extract functionality to focused modules
 
+#### Vue Component Styling
+- **Do not use `<style src="...">`** to import CSS files in Vue Single File Components
+- **Do not use `import 'xxx.css'`** statements in Vue Single File Components
+- **Exception**: Only CSS files from `/src/shared/styles/*.css` are allowed (for shared theme/utilities)
+- ESLint rule `no-restricted-imports` enforces this restriction
+- If a component exceeds the line limit, split it into smaller sub-components instead of extracting CSS
+- Keep styles co-located with components using `<style scoped>` blocks
+
 #### Styling Guidelines
 - **Use utility classes and global CSS variables** to style UI as much as possible
 - Prefer existing utility classes and CSS variables over inline styles or component-scoped styles

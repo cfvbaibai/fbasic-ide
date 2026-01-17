@@ -55,7 +55,7 @@ interface Emits {
   (e: 'action-button', button: 'select' | 'start' | 'a' | 'b'): void
 }
 
-const props = defineProps<Props>()
+defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const handleDpadStart = (direction: 'up' | 'down' | 'left' | 'right') => {

@@ -29,13 +29,6 @@ const displayHeight = computed(() => {
   return imageHeight.value * scale
 })
 
-// Calculate square overlay size, max 800x800 (for backward compatibility)
-const overlayDisplaySize = computed(() => {
-  if (imageWidth.value === 0 || imageHeight.value === 0) return 800
-  const maxDimension = Math.max(displayWidth.value, displayHeight.value)
-  return Math.min(maxDimension, 800)
-})
-
 const handleFileChange = (file: File | File[]) => {
   const selectedFile = Array.isArray(file) ? file[0] : file
   if (!selectedFile) return

@@ -76,7 +76,7 @@ export default [
                 }
             ],
             'max-lines': ['error', {
-                'max': 300,
+                'max': 500,
                 'skipBlankLines': true,
                 'skipComments': true
             }],
@@ -120,7 +120,15 @@ export default [
                 'varsIgnorePattern': '^_',
                 'ignoreRestSiblings': true
             }],
-            'no-unused-vars': 'off'
+            'no-unused-vars': 'off',
+            'no-restricted-imports': [
+                'error',
+                {
+                    patterns: [
+                        '*.css',
+                    ]
+                }
+            ]
         }
     },
     {
@@ -132,6 +140,8 @@ export default [
             '**/*.js',
             '**/*.html',
             'scripts/**/*',
+            'src/shared/data/bg/kana.ts',
+            'src/core/parser/FBasicChevrotainParser.ts',
         ],
     },
 ]

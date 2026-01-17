@@ -10,7 +10,7 @@ interface Emits {
   (e: 'toggle'): void
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   expanded: false,
   size: 'small'
 })

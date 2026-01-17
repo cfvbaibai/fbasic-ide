@@ -25,11 +25,9 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
 import MonacoCodeEditor from '../ide/components/MonacoCodeEditor.vue';
-import { GameLayout, GameButton, GameDivider, GameBlock, GameCodeQuote } from '../../shared/components/ui';
+import { GameLayout, GameDivider, GameBlock, GameCodeQuote } from '../../shared/components/ui';
 
-const router = useRouter();
 const code = ref(`10 PRINT "Hello, World!"
 20 LET A = 10
 30 LET B = 20
@@ -41,10 +39,6 @@ const sampleCode = `10 PRINT "Hello, World!"
 30 LET B = 20
 40 PRINT A + B
 50 END`;
-
-const goHome = () => {
-  router.push('/');
-};
 </script>
 
 <style scoped>
