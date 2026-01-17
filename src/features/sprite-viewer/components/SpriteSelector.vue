@@ -20,7 +20,7 @@ const selectOptions = computed(() => {
     <GameSelect
       id="sprite-selection"
       :model-value="store.selectedIndex.value"
-      @update:model-value="store.setSelectedIndex($event)"
+      @update:model-value="store.setSelectedIndex(Number($event))"
       :options="selectOptions"
       placeholder="Select a sprite"
       style="width: 300px"

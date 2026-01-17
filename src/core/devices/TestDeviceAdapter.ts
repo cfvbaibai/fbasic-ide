@@ -159,8 +159,7 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
     // - Outputs not ending with newline are concatenated directly (no separator)
     // - Only add newline separator when transitioning from newline-ending to non-newline-starting output
     let result = ''
-    for (let i = 0; i < allOutputs.length; i++) {
-      const output = allOutputs[i]
+    for (const output of allOutputs) {
       if (output.endsWith('\n')) {
         // Output ends with newline - add it as-is
         result += output

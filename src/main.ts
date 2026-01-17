@@ -4,7 +4,6 @@ import './shared/styles/theme.css'
 import './shared/styles/utilities.css'
 import App from './App.vue'
 import router from './router'
-import { initTheme } from './shared/composables/useTheme'
 
 // Configure Monaco Editor workers before Monaco is imported
 // This must be set up before any Monaco Editor code is loaded
@@ -42,9 +41,6 @@ if (typeof window !== 'undefined') {
     }
   }
 }
-
-// Initialize theme system
-initTheme()
 
 const app = createApp(App)
 

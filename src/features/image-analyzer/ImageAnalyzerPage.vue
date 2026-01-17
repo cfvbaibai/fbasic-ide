@@ -122,27 +122,16 @@ const moveGridRight = () => {
   gridOffsetX.value += 0.5
 }
 
-// Get computed grid line colors from CSS variables
+// Get computed grid line colors (always use dark theme colors)
 const getGridLineColor = (i: number): string => {
-  if (typeof window === 'undefined') {
-    // Fallback colors for SSR
-    if (i === 1 || i === 17) return '#666600'
-    if (i === 9) return '#00ff00'
-    if (i === 5 || i === 13) return '#0000ff'
-    return '#ff0000'
-  }
-  
-  const root = document.documentElement
-  const isDark = root.classList.contains('dark')
-  
   if (i === 1 || i === 17) {
-    return isDark ? '#999900' : '#666600'
+    return '#999900'
   } else if (i === 9) {
-    return isDark ? '#66ff66' : '#00ff00'
+    return '#66ff66'
   } else if (i === 5 || i === 13) {
-    return isDark ? '#6666ff' : '#0000ff'
+    return '#6666ff'
   } else {
-    return isDark ? '#ff6666' : '#ff0000'
+    return '#ff6666'
   }
 }
 

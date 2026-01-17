@@ -3,10 +3,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue';
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
 import * as monaco from 'monaco-editor';
 import { setupMonacoLanguage, setupLiveErrorChecking } from '../integrations/monaco-integration';
-import { useTheme } from '../../../shared/composables/useTheme';
 
 interface Props {
   modelValue: string;
@@ -22,21 +21,6 @@ const emit = defineEmits<Emits>();
 const editorContainer = ref<HTMLElement>();
 let editor: monaco.editor.IStandaloneCodeEditor | null = null;
 
-// Get theme state
-const { isDark } = useTheme();
-
-// Compute Monaco theme name based on current theme
-const monacoTheme = computed(() => {
-  return isDark.value ? 'fbasic-theme-dark' : 'fbasic-theme';
-});
-
-// Function to update Monaco editor theme
-const updateMonacoTheme = () => {
-  if (editor) {
-    monaco.editor.setTheme(monacoTheme.value);
-  }
-};
-
 onMounted(() => {
   if (!editorContainer.value) return;
 
@@ -47,7 +31,7 @@ onMounted(() => {
   editor = monaco.editor.create(editorContainer.value, {
     value: props.modelValue,
     language: 'fbasic',
-    theme: monacoTheme.value, // Use theme-aware F-BASIC theme
+    theme: 'fbasic-theme', // Use dark F-BASIC theme
     automaticLayout: true,
     minimap: { enabled: true },
     scrollBeyondLastLine: false,
@@ -69,11 +53,6 @@ onMounted(() => {
     const value = editor?.getValue() || '';
     emit('update:modelValue', value);
   });
-});
-
-// Watch for theme changes and update Monaco editor
-watch(isDark, () => {
-  updateMonacoTheme();
 });
 
 // Watch for external value changes

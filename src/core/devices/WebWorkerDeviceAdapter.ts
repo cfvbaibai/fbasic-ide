@@ -385,15 +385,18 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       if (!this.screenBuffer[this.cursorY]) {
         this.screenBuffer[this.cursorY] = []
       }
-      if (!this.screenBuffer[this.cursorY][this.cursorX]) {
-        this.screenBuffer[this.cursorY][this.cursorX] = {
+      const row = this.screenBuffer[this.cursorY]!
+      let cell = row[this.cursorX]
+      if (!cell) {
+        cell = {
           character: ' ',
           colorPattern: 0,
           x: this.cursorX,
           y: this.cursorY
         }
+        row[this.cursorX] = cell
       }
-      this.screenBuffer[this.cursorY][this.cursorX].character = char
+      cell.character = char
       
       // Send character update
       this.sendCharacterUpdate(this.cursorX, this.cursorY, char)

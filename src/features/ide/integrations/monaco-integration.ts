@@ -115,26 +115,8 @@ export function setupMonacoLanguage(): void {
   // Set Monarch tokenizer for syntax highlighting
   monaco.languages.setMonarchTokensProvider('fbasic', monarchLanguage);
 
-  // Define custom light theme for F-BASIC with operator and function highlighting
-  monaco.editor.defineTheme('fbasic-theme', {
-    base: 'vs', // Base on VS light theme
-    inherit: true,
-    rules: [
-      { token: 'line-number', foreground: '008000', fontStyle: 'bold' },
-      { token: 'keyword', foreground: '0000FF', fontStyle: 'bold' },
-      { token: 'function', foreground: '795E26', fontStyle: 'bold' }, // Brown/orange for functions
-      { token: 'operator', foreground: 'FF0000', fontStyle: 'bold' }, // Red for operators
-      { token: 'string', foreground: 'A31515' }, // Dark red for strings
-      { token: 'number', foreground: '098658' }, // Green for numbers
-      { token: 'comment', foreground: '008000', fontStyle: 'italic' },
-      { token: 'identifier', foreground: '001080' }, // Blue for identifiers
-      { token: 'delimiter', foreground: '000000' } // Black for punctuation
-    ],
-    colors: {}
-  });
-
   // Define custom dark theme for F-BASIC with operator and function highlighting
-  monaco.editor.defineTheme('fbasic-theme-dark', {
+  monaco.editor.defineTheme('fbasic-theme', {
     base: 'vs-dark', // Base on VS dark theme
     inherit: true,
     rules: [
