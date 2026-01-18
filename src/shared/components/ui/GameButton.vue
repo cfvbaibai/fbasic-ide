@@ -105,8 +105,8 @@ const getIconSize = computed(() => {
   transition: all 0.2s ease;
   min-width: 140px;
   box-shadow: 
-    0 2px 4px var(--game-color-black-30),
-    inset 0 1px 0 var(--game-color-white-10);
+    0 2px 4px var(--base-color-black-30),
+    inset 0 1px 0 var(--base-color-white-10);
 }
 
 /* Focus styles for accessibility */
@@ -121,107 +121,107 @@ const getIconSize = computed(() => {
   color: var(--game-text-primary);
   transform: translateY(-2px);
   box-shadow: 
-    0 4px 8px var(--game-color-black-40),
-    0 2px 4px var(--game-color-black-40),
-    inset 0 1px 0 var(--game-color-white-10);
+    0 4px 8px var(--base-color-black-40),
+    0 2px 4px var(--base-color-black-40),
+    inset 0 1px 0 var(--base-color-white-10);
 }
 
 .game-button:active:not(.game-button-disabled) {
   transform: translateY(0);
   box-shadow: 
-    0 2px 4px var(--game-color-black-30),
-    inset 0 1px 0 var(--game-color-white-10);
+    0 2px 4px var(--base-color-black-30),
+    inset 0 1px 0 var(--base-color-white-10);
 }
 
 /* Type variants - All buttons use the same base style, type affects hover/active states */
 .game-button-primary:hover:not(.game-button-disabled) {
   border-color: var(--game-surface-border);
   box-shadow: 
-    0 4px 8px var(--game-color-black-40),
-    0 2px 4px var(--game-color-black-40),
-    inset 0 1px 0 var(--game-color-white-10);
+    0 4px 8px var(--base-color-black-40),
+    0 2px 4px var(--base-color-black-40),
+    inset 0 1px 0 var(--base-color-white-10);
 }
 
 .game-button-primary:active:not(.game-button-disabled) {
-  background: linear-gradient(135deg, var(--game-accent-color) 0%, var(--game-accent-color-dark) 100%);
+  background: linear-gradient(135deg, var(--game-accent-color) 0%, var(--game-accent-color) 100%);
   border-color: var(--game-surface-border);
-  color: var(--game-color-black);
+  color: var(--base-color-black);
   box-shadow: 
     0 0 20px var(--game-accent-glow),
-    0 4px 8px var(--game-color-black-40),
-    inset 0 1px 0 var(--game-color-white-30);
+    0 4px 8px var(--base-color-black-40),
+    inset 0 1px 0 var(--base-color-white-30);
 }
 
 .game-button-success:hover:not(.game-button-disabled) {
   border-color: var(--semantic-success);
   box-shadow: 
     0 4px 8px var(--semantic-success-40),
-    0 2px 4px var(--game-color-black-40),
-    inset 0 1px 0 var(--game-color-white-10);
+    0 2px 4px var(--base-color-black-40),
+    inset 0 1px 0 var(--base-color-white-10);
 }
 
 .game-button-success:active:not(.game-button-disabled) {
-  background: linear-gradient(135deg, var(--semantic-success) 0%, var(--semantic-success-dark) 100%);
+  background: linear-gradient(135deg, var(--semantic-success) 0%, var(--semantic-success) 100%);
   border-color: var(--semantic-success);
-  color: var(--game-color-white);
+  color: var(--base-color-white);
   box-shadow: 
     0 0 12px var(--semantic-success-50),
-    0 2px 4px var(--game-color-black-30),
-    inset 0 1px 0 var(--game-color-white-20);
+    0 2px 4px var(--base-color-black-30),
+    inset 0 1px 0 var(--base-color-white-20);
 }
 
 .game-button-warning:hover:not(.game-button-disabled) {
   border-color: var(--semantic-warning);
   box-shadow: 
-    0 4px 8px rgb(230 162 60 / 40%),
-    0 2px 4px var(--game-color-black-40),
-    inset 0 1px 0 var(--game-color-white-10);
+    0 4px 8px var(--semantic-warning-40),
+    0 2px 4px var(--base-color-black-40),
+    inset 0 1px 0 var(--base-color-white-10);
 }
 
 .game-button-warning:active:not(.game-button-disabled) {
-  background: linear-gradient(135deg, var(--semantic-warning) 0%, var(--semantic-warning-dark) 100%);
+  background: linear-gradient(135deg, var(--semantic-warning) 0%, var(--semantic-warning) 100%);
   border-color: var(--semantic-warning);
-  color: var(--game-color-white);
+  color: var(--base-color-white);
   box-shadow: 
     0 0 12px var(--semantic-warning-50),
-    0 2px 4px var(--game-color-black-30),
-    inset 0 1px 0 var(--game-color-white-20);
+    0 2px 4px var(--base-color-black-30),
+    inset 0 1px 0 var(--base-color-white-20);
 }
 
 .game-button-danger:hover:not(.game-button-disabled) {
   border-color: var(--semantic-danger);
   box-shadow: 
     0 4px 8px var(--semantic-danger-40),
-    0 2px 4px var(--game-color-black-40),
-    inset 0 1px 0 var(--game-color-white-10);
+    0 2px 4px var(--base-color-black-40),
+    inset 0 1px 0 var(--base-color-white-10);
 }
 
 .game-button-danger:active:not(.game-button-disabled) {
-  background: linear-gradient(135deg, var(--semantic-danger) 0%, var(--semantic-danger-dark) 100%);
+  background: linear-gradient(135deg, var(--semantic-danger) 0%, var(--semantic-danger) 100%);
   border-color: var(--semantic-danger);
-  color: var(--game-color-white);
+  color: var(--base-color-white);
   box-shadow: 
     0 0 12px var(--semantic-danger-50),
-    0 2px 4px var(--game-color-black-30),
-    inset 0 1px 0 var(--game-color-white-20);
+    0 2px 4px var(--base-color-black-30),
+    inset 0 1px 0 var(--base-color-white-20);
 }
 
 .game-button-info:hover:not(.game-button-disabled) {
   border-color: var(--semantic-info);
   box-shadow: 
-    0 4px 8px rgb(144 147 153 / 40%),
-    0 2px 4px var(--game-color-black-40),
-    inset 0 1px 0 var(--game-color-white-10);
+    0 4px 8px var(--semantic-info-40),
+    0 2px 4px var(--base-color-black-40),
+    inset 0 1px 0 var(--base-color-white-10);
 }
 
 .game-button-info:active:not(.game-button-disabled) {
-  background: linear-gradient(135deg, var(--semantic-info) 0%, var(--semantic-info-dark) 100%);
+  background: linear-gradient(135deg, var(--semantic-info) 0%, var(--semantic-info) 100%);
   border-color: var(--semantic-info);
-  color: var(--game-color-white);
+  color: var(--base-color-white);
   box-shadow: 
     0 0 12px var(--semantic-info-50),
-    0 2px 4px var(--game-color-black-30),
-    inset 0 1px 0 var(--game-color-white-20);
+    0 2px 4px var(--base-color-black-30),
+    inset 0 1px 0 var(--base-color-white-20);
 }
 
 /* Toggle variant - more compact, designed for selection groups */
@@ -243,60 +243,60 @@ const getIconSize = computed(() => {
 
 /* Selected state - persistent highlight for toggle buttons */
 .game-button-toggle.game-button-selected {
-  background: linear-gradient(135deg, var(--game-accent-color) 0%, var(--game-accent-color-dark) 100%);
+  background: linear-gradient(135deg, var(--game-accent-color) 0%, var(--game-accent-color) 100%);
   border-color: var(--game-surface-border);
-  color: var(--game-color-black);
+  color: var(--base-color-black);
   box-shadow: 
     0 0 20px var(--game-accent-glow),
-    0 4px 8px var(--game-color-black-40),
-    inset 0 1px 0 var(--game-color-white-30);
+    0 4px 8px var(--base-color-black-40),
+    inset 0 1px 0 var(--base-color-white-30);
 }
 
 .game-button-toggle.game-button-selected:hover:not(.game-button-disabled) {
-  background: linear-gradient(135deg, var(--game-accent-color) 0%, var(--game-accent-color-dark) 100%);
+  background: linear-gradient(135deg, var(--game-accent-color) 0%, var(--game-accent-color) 100%);
   border-color: var(--game-surface-border);
   transform: translateY(-2px);
   box-shadow: 
     0 0 24px var(--game-accent-glow),
-    0 6px 12px var(--game-color-black-50),
-    inset 0 1px 0 var(--game-color-white-30);
+    0 6px 12px var(--base-color-black-50),
+    inset 0 1px 0 var(--base-color-white-30);
 }
 
 .game-button-toggle.game-button-selected:active:not(.game-button-disabled) {
   transform: translateY(0);
   box-shadow: 
     0 0 20px var(--game-accent-glow),
-    0 4px 8px var(--game-color-black-40),
-    inset 0 1px 0 var(--game-color-white-30);
+    0 4px 8px var(--base-color-black-40),
+    inset 0 1px 0 var(--base-color-white-30);
 }
 
 /* Action buttons with selected state (for backward compatibility) */
 .game-button-action.game-button-selected {
-  background: linear-gradient(135deg, var(--game-accent-color) 0%, var(--game-accent-color-dark) 100%);
+  background: linear-gradient(135deg, var(--game-accent-color) 0%, var(--game-accent-color) 100%);
   border-color: var(--game-surface-border);
-  color: var(--game-color-black);
+  color: var(--base-color-black);
   box-shadow: 
     0 0 20px var(--game-accent-glow),
-    0 4px 8px var(--game-color-black-40),
-    inset 0 1px 0 var(--game-color-white-30);
+    0 4px 8px var(--base-color-black-40),
+    inset 0 1px 0 var(--base-color-white-30);
 }
 
 .game-button-action.game-button-selected:hover:not(.game-button-disabled) {
-  background: linear-gradient(135deg, var(--game-accent-color) 0%, var(--game-accent-color-dark) 100%);
+  background: linear-gradient(135deg, var(--game-accent-color) 0%, var(--game-accent-color) 100%);
   border-color: var(--game-surface-border);
   transform: translateY(-2px);
   box-shadow: 
     0 0 24px var(--game-accent-glow),
-    0 6px 12px var(--game-color-black-50),
-    inset 0 1px 0 var(--game-color-white-30);
+    0 6px 12px var(--base-color-black-50),
+    inset 0 1px 0 var(--base-color-white-30);
 }
 
 .game-button-action.game-button-selected:active:not(.game-button-disabled) {
   transform: translateY(0);
   box-shadow: 
     0 0 20px var(--game-accent-glow),
-    0 4px 8px var(--game-color-black-40),
-    inset 0 1px 0 var(--game-color-white-30);
+    0 4px 8px var(--base-color-black-40),
+    inset 0 1px 0 var(--base-color-white-30);
 }
 
 /* Size variants */
@@ -323,8 +323,8 @@ const getIconSize = computed(() => {
 
 .game-button-disabled:hover {
   box-shadow: 
-    0 2px 4px var(--game-color-black-30),
-    inset 0 1px 0 var(--game-color-white-10) !important;
+    0 2px 4px var(--base-color-black-30),
+    inset 0 1px 0 var(--base-color-white-10) !important;
 }
 
 /* Loading state */

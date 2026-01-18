@@ -122,8 +122,8 @@ const selectClasses = computed(() => {
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: 
-    0 2px 4px var(--game-color-black-30),
-    inset 0 1px 0 var(--game-color-white-10);
+    0 2px 4px var(--base-color-black-30),
+    inset 0 1px 0 var(--base-color-white-10);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -134,8 +134,8 @@ const selectClasses = computed(() => {
   border-color: var(--game-accent-color);
   box-shadow: 
     0 0 12px var(--game-accent-glow),
-    0 2px 4px var(--game-color-black-30),
-    inset 0 1px 0 var(--game-color-white-10);
+    0 2px 4px var(--base-color-black-30),
+    inset 0 1px 0 var(--base-color-white-10);
   outline: none;
 }
 
@@ -175,9 +175,9 @@ const selectClasses = computed(() => {
   border: 2px solid var(--game-surface-border);
   border-radius: 8px;
   box-shadow: 
-    0 4px 12px rgb(0 0 0 / 40%),
+    0 4px 12px var(--base-color-black-40),
     0 0 20px var(--game-accent-color-20),
-    inset 0 1px 0 var(--game-color-white-10);
+    inset 0 1px 0 var(--base-color-white-10);
   max-height: 200px;
   overflow-y: auto;
   margin-top: 4px;

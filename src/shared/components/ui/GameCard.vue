@@ -48,7 +48,7 @@ const handleClick = () => {
     >
       <GameIcon :icon="icon" size="large" class="game-card-icon" />
     </div>
-    <h3 v-if="title" class="game-card-title">{{ title }}</h3>
+    <h3 v-if="title" class="game-card-title text-game-heading">{{ title }}</h3>
     <p v-if="description" class="game-card-description">{{ description }}</p>
     <div v-if="actionText && clickable" class="game-card-action">
       <span>{{ actionText }}</span>
@@ -58,6 +58,10 @@ const handleClick = () => {
 </template>
 
 <style scoped>
+.game-card {
+  --icon-color: var(--game-accent-color);
+}
+
 .game-card-icon-wrapper {
   width: 80px;
   height: 80px;
@@ -68,7 +72,7 @@ const handleClick = () => {
   align-items: center;
   justify-content: center;
   margin: 0 auto 1.5rem;
-  box-shadow: 0 0 20px var(--game-accent-glow);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--icon-color) 50%, transparent);
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -99,9 +103,15 @@ const handleClick = () => {
   font-size: 1.5rem;
   font-weight: 700;
   font-family: var(--game-font-family-heading);
-  color: var(--game-text-primary);
   margin: 0 0 1rem;
   text-align: center;
+  text-shadow: 0 0 8px var(--game-accent-glow);
+}
+
+/* Light theme: use accent color, no glow */
+.light-theme .game-card-title {
+  color: var(--game-accent-color);
+  text-shadow: none;
 }
 
 .game-card-description {

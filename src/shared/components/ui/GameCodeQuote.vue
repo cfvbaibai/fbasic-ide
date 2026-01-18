@@ -133,10 +133,10 @@ const handleCopy = async () => {
   background: 
     repeating-linear-gradient(
       0deg,
-      var(--game-screen-text-color-8) 0,
+      var(--game-screen-text-color-10) 0,
       transparent 0,
       transparent 2px,
-      var(--game-screen-text-color-8) 2px
+      var(--game-screen-text-color-10) 2px
     );
   mix-blend-mode: screen;
   border-radius: 8px;

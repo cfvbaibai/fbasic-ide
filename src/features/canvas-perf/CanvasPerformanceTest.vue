@@ -178,7 +178,7 @@ onUnmounted(() => {
 .test-controls button {
   padding: 0.5rem 1rem;
   background: var(--game-accent-color);
-  color: var(--game-color-black);
+  color: var(--base-color-black);
   border: 1px solid var(--game-accent-color);
   border-radius: 4px;
   cursor: pointer;
@@ -194,7 +194,6 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--game-text-color);
 }
 
 .test-controls input {
@@ -203,7 +202,6 @@ onUnmounted(() => {
   background: var(--game-surface-bg-start);
   border: 1px solid var(--game-surface-border);
   border-radius: 2px;
-  color: var(--game-text-color);
 }
 
 .test-stats {
@@ -215,7 +213,6 @@ onUnmounted(() => {
   border: 1px solid var(--game-surface-border);
   border-radius: 4px;
   font-family: monospace;
-  color: var(--game-text-color);
 }
 
 .test-stats div {

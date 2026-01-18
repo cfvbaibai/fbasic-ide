@@ -131,38 +131,38 @@ watchEffect(() => {
   padding: 2rem;
   overflow: auto;
   min-height: 0;
-  background: linear-gradient(135deg, var(--game-color-black) 0%, var(--game-screen-header-bg) 100%);
+  background: linear-gradient(135deg, var(--base-color-black) 0%, var(--game-screen-header-bg) 100%);
 }
 
 /* CRT Bezel - outer frame */
 .crt-bezel {
-  background: linear-gradient(135deg, var(--game-screen-header-bg) 0%, var(--game-color-black) 50%, var(--game-screen-header-bg) 100%);
-  border: 8px solid var(--game-color-black);
+  background: linear-gradient(135deg, var(--game-screen-header-bg) 0%, var(--base-color-black) 50%, var(--game-screen-header-bg) 100%);
+  border: 8px solid var(--base-color-black);
   border-radius: 12px;
   box-shadow: 
-    inset 0 2px 4px var(--game-color-white-10),
-    0 8px 32px rgb(0 0 0 / 80%),
-    0 0 0 2px var(--game-color-black-50);
+    inset 0 2px 4px var(--base-color-white-10),
+    0 8px 32px var(--base-color-black-80),
+    0 0 0 2px var(--base-color-black-50);
   padding: 16px;
 }
 
 /* CRT Screen - inner screen area */
 .crt-screen {
   position: relative;
-  border: 4px solid var(--game-color-black);
+  border: 4px solid var(--base-color-black);
   border-radius: 16px;
   box-shadow: 
-    inset 0 0 80px rgb(0 0 0 / 90%),
-    0 4px 20px rgb(0 0 0 / 60%),
-    inset 0 -2px 10px rgb(0 0 0 / 80%);
+    inset 0 0 80px var(--base-color-white-80),
+    0 4px 20px var(--base-color-black-60),
+    inset 0 -2px 10px var(--base-color-black-80);
   overflow: hidden;
   background: radial-gradient(
     ellipse 150% 110% at 85% 8%,
-    rgb(255 255 255 / 22%) 0%,
-    rgb(255 255 255 / 14%) 18%,
-    rgb(255 255 255 / 8%) 35%,
+    var(--base-color-white-20) 0%,
+    var(--base-color-white-10) 18%,
+    var(--base-color-white-10) 35%,
     transparent 60%,
-    var(--game-color-black-30) 100%
+    var(--base-color-black-30) 100%
   );
 }
 
@@ -174,8 +174,8 @@ watchEffect(() => {
     0deg,
     transparent,
     transparent 2px,
-    var(--game-color-black-15) 2px,
-    var(--game-color-black-15) 4px
+    var(--base-color-black-10) 2px,
+    var(--base-color-black-10) 4px
   );
   pointer-events: none;
   z-index: 2;
@@ -188,11 +188,11 @@ watchEffect(() => {
   inset: 0;
   background: radial-gradient(
     ellipse 140% 100% at 85% 5%,
-    var(--game-color-white-40) 0%,
-    var(--game-color-white-20) 15%,
-    rgb(255 255 255 / 12%) 30%,
+    var(--base-color-white-40) 0%,
+    var(--base-color-white-20) 15%,
+    var(--base-color-white-10) 30%,
     transparent 55%,
-    var(--game-color-black-40) 100%
+    var(--base-color-black-40) 100%
   );
   pointer-events: none;
   z-index: 1;

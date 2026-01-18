@@ -76,8 +76,8 @@ const switchClasses = computed(() => {
   border-radius: 11px;
   transition: all 0.2s ease;
   box-shadow: 
-    0 2px 4px var(--game-color-black-30),
-    inset 0 1px 0 var(--game-color-white-10);
+    0 2px 4px var(--base-color-black-30),
+    inset 0 1px 0 var(--base-color-white-10);
 }
 
 .game-switch-button {
@@ -89,22 +89,22 @@ const switchClasses = computed(() => {
   background: var(--game-text-secondary);
   border-radius: 50%;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px var(--game-color-black-30);
+  box-shadow: 0 2px 4px var(--base-color-black-30);
 }
 
 .game-switch-checked .game-switch-core {
-  background: linear-gradient(135deg, var(--game-accent-color) 0%, var(--game-accent-color-dark) 100%);
+  background: linear-gradient(135deg, var(--game-accent-color) 0%, var(--game-accent-color) 100%);
   border-color: var(--game-accent-color);
   box-shadow: 
     0 0 12px var(--game-accent-glow),
-    0 2px 4px var(--game-color-black-30),
-    inset 0 1px 0 var(--game-color-white-20);
+    0 2px 4px var(--base-color-black-30),
+    inset 0 1px 0 var(--base-color-white-20);
 }
 
 .game-switch-checked .game-switch-button {
   left: calc(100% - 16px);
-  background: var(--game-color-black);
-  box-shadow: 0 2px 4px rgb(0 0 0 / 50%);
+  background: var(--base-color-black);
+  box-shadow: 0 2px 4px var(--base-color-black-50);
 }
 
 .game-switch:focus-visible .game-switch-core {
@@ -116,8 +116,8 @@ const switchClasses = computed(() => {
   border-color: var(--game-accent-color);
   box-shadow: 
     0 0 8px var(--game-accent-glow),
-    0 2px 4px var(--game-color-black-30),
-    inset 0 1px 0 var(--game-color-white-10);
+    0 2px 4px var(--base-color-black-30),
+    inset 0 1px 0 var(--base-color-white-10);
 }
 
 .game-switch-disabled {

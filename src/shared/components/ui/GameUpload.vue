@@ -143,7 +143,7 @@ const handleDrop = (event: DragEvent) => {
 
 .game-upload-drag-area:hover:not(.game-upload-disabled) {
   border-color: var(--game-accent-color);
-  background: var(--game-accent-color-05);
+  background: var(--game-accent-color-10);
 }
 
 .game-upload-text {

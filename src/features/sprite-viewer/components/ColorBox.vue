@@ -77,27 +77,27 @@ const tooltipTitle = computed(() => {
   border-radius: 4px;
   transition: transform 0.1s;
   cursor: pointer;
-  box-shadow: var(--game-shadow-base);
+  box-shadow: none;
 }
 
 .color-box:hover {
   transform: scale(1.1);
   z-index: 1;
   position: relative;
-  box-shadow: var(--game-shadow-base);
+  box-shadow: none;
 }
 
 .color-box-code {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   font-weight: 600;
-  color: var(--game-color-white);
-  text-shadow: 1px 1px 2px rgb(0 0 0 / 80%);
+  color: var(--base-color-white);
+  text-shadow: 1px 1px 2px var(--base-color-black-80);
   user-select: none;
 }
 
 .color-box-code-light {
-  color: var(--game-color-black);
-  text-shadow: 1px 1px 2px rgb(255 255 255 / 80%);
+  color: var(--base-color-black);
+  text-shadow: 1px 1px 2px var(--base-color-white-80);
 }
 </style>
 

@@ -78,7 +78,7 @@ const store = useSpriteViewerStore()
   height: 50px;
   border-radius: 4px;
   overflow: hidden;
-  box-shadow: 0 2px 4px var(--game-color-black-30);
+  box-shadow: 0 2px 4px var(--base-color-black-30);
 }
 </style>
 

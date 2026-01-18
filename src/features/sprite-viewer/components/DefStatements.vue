@@ -23,10 +23,7 @@ const copyAllStatements = async () => {
 </script>
 
 <template>
-  <GameBlock 
-    title="DEF Statements"
-    class="def-statements-section"
-  >
+  <GameBlock title="DEF Statements">
     <template #right>
       <GameButton
         type="primary"
@@ -59,10 +56,6 @@ const copyAllStatements = async () => {
 </template>
 
 <style scoped>
-.def-statements-section {
-  margin-bottom: 2rem;
-}
-
 .statements-container {
   display: flex;
   flex-direction: column;

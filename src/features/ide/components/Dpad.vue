@@ -103,8 +103,8 @@ const handleDpadStop = (direction: 'up' | 'down' | 'left' | 'right') => {
   border-radius: var(--game-radius-lg);
   padding: 0.5rem;
   box-shadow: 
-    inset 0 2px 4px var(--game-color-black-40),
-    0 1px 2px var(--game-color-black-20);
+    inset 0 2px 4px var(--base-color-black-40),
+    0 1px 2px var(--base-color-black-20);
   border: 1px solid var(--game-surface-border);
   width: 100%;
   min-width: 70px;
@@ -127,23 +127,23 @@ const handleDpadStop = (direction: 'up' | 'down' | 'left' | 'right') => {
 .dpad-center {
   border-radius: var(--game-radius-sm);
   border: 1px solid var(--game-surface-border);
-  box-shadow: inset 0 1px 2px var(--game-color-black-30);
+  box-shadow: inset 0 1px 2px var(--base-color-black-30);
   opacity: 0.6;
 }
 
 /* D-Pad button base styles */
 .manual-button {
   border: 2px solid var(--game-surface-border);
-  background: var(--game-surface-bg-gradient);
+  background: var(--base-color-white-30);
   cursor: pointer;
   font-weight: var(--game-font-weight-bold);
-  color: var(--game-text-primary);
+  color: var(--base-color-black);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 
-    0 2px 4px var(--game-color-black-30),
-    inset 0 1px 2px var(--game-color-white-10);
+    0 2px 4px var(--base-color-black-30),
+    inset 0 1px 2px var(--base-color-white-10);
   outline: none;
-  text-shadow: 0 0 4px var(--game-accent-glow);
+  text-shadow: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -154,6 +154,12 @@ const handleDpadStop = (direction: 'up' | 'down' | 'left' | 'right') => {
   border-radius: var(--game-radius-md);
   font-size: 18px;
   padding: 0;
+}
+
+/* Light theme: use inset gradient background and primary text color */
+.light-theme .manual-button {
+  background: var(--game-surface-inset-gradient);
+  color: var(--game-text-primary);
 }
 
 .manual-button.up {
@@ -181,11 +187,15 @@ const handleDpadStop = (direction: 'up' | 'down' | 'left' | 'right') => {
   transform: translateY(-2px) scale(1.05);
   border-color: var(--game-surface-border-hover);
   box-shadow: 
-    0 4px 8px var(--game-color-black-40),
+    0 4px 8px var(--base-color-black-40),
     0 0 12px var(--game-accent-glow),
-    inset 0 1px 2px var(--game-color-white-15);
+    inset 0 1px 2px var(--base-color-white-10);
   color: var(--game-accent-color);
-  text-shadow: 0 0 8px var(--game-accent-glow);
+  text-shadow: none;
+}
+
+.light-theme .manual-button:hover {
+  color: var(--game-text-primary);
 }
 
 /* Active state */
@@ -193,8 +203,13 @@ const handleDpadStop = (direction: 'up' | 'down' | 'left' | 'right') => {
   transform: translateY(0) scale(0.98);
   border-color: var(--game-surface-border-hover);
   box-shadow: 
-    0 1px 2px var(--game-color-black-40),
-    inset 0 2px 4px var(--game-color-black-30),
+    0 1px 2px var(--base-color-black-40),
+    inset 0 2px 4px var(--base-color-black-30),
     var(--game-shadow-glow);
+  color: var(--game-accent-color);
+}
+
+.light-theme .manual-button:active {
+  color: var(--game-text-primary);
 }
 </style>

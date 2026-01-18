@@ -52,7 +52,7 @@ const handleClick = () => {
       :class="{ 'clickable': clickableHeader }"
       @click.stop="handleHeaderClick"
     >
-      <h3 class="game-block-title text-game-heading text-shadow-glow-md">
+      <h3 class="game-block-title text-game-heading">
         <GameIcon v-if="titleIcon" :icon="titleIcon" size="small" />
         {{ title }}
       </h3>
@@ -126,6 +126,13 @@ const handleClick = () => {
   align-items: center;
   gap: 0.5rem;
   transition: all 0.3s ease;
+  text-shadow: 0 0 8px var(--game-accent-glow);
+}
+
+/* Light theme: use accent color, no glow */
+.light-theme .game-block-title {
+  color: var(--game-accent-color);
+  text-shadow: none;
 }
 
 

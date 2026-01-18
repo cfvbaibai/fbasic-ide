@@ -8,7 +8,7 @@ defineProps<Props>()
 
 <template>
   <div class="game-sub-block bg-game-surface border-game-surface">
-    <div class="game-sub-block-title text-game-heading text-shadow-glow-md text-game-accent border-game-surface-bottom">
+    <div class="game-sub-block-title text-game-heading border-game-surface-bottom">
       {{ title }}
     </div>
     <slot />
@@ -20,8 +20,8 @@ defineProps<Props>()
   border-radius: 10px;
   padding: 0.75rem;
   box-shadow: 
-    inset 0 2px 4px var(--game-color-black-30),
-    0 2px 6px var(--game-color-black-20);
+    inset 0 2px 4px var(--base-color-black-30),
+    0 2px 6px var(--base-color-black-20);
   position: relative;
   transition: all 0.3s ease;
   width: 100%;
@@ -33,7 +33,7 @@ defineProps<Props>()
 .game-sub-block:hover {
   border-color: var(--game-accent-color);
   box-shadow: 
-    inset 0 2px 4px var(--game-color-black-30),
+    inset 0 2px 4px var(--base-color-black-30),
     0 0 12px var(--game-accent-color-20);
 }
 
@@ -44,5 +44,12 @@ defineProps<Props>()
   letter-spacing: 0.1em;
   margin-bottom: 0.5rem;
   padding-bottom: 0.5rem;
+  text-shadow: 0 0 8px var(--game-accent-glow);
+}
+
+/* Light theme: use accent color, no glow */
+.light-theme .game-sub-block-title {
+  color: var(--game-accent-color);
+  text-shadow: none;
 }
 </style>

@@ -47,8 +47,8 @@ Document that these are known exceptions and accept that `pnpm lint:style` will 
 
 Consider adding CSS variables for these gradient design patterns to `theme.css`:
 - `--game-accent-color-dark: #00cc6a`
-- `--semantic-warning-dark: #c88a2e`
-- `--semantic-danger-dark: #d44a4a`
-- `--semantic-info-dark: #6d7075`
+- `--semantic-warning: #c88a2e`
+- `--semantic-danger: #d44a4a`
+- `--semantic-info: #6d7075`
 
 Then replace all hardcoded instances with these variables.

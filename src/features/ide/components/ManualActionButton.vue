@@ -42,16 +42,16 @@ const handleClick = () => {
 /* Action button base styles */
 .manual-action-button {
   border: 2px solid var(--game-surface-border);
-  background: var(--game-surface-bg-gradient);
+  background: var(--base-color-white-30);
   cursor: pointer;
   font-weight: var(--game-font-weight-bold);
-  color: var(--game-text-primary);
+  color: var(--base-color-black);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 
-    0 2px 4px var(--game-color-black-30),
-    inset 0 1px 2px var(--game-color-white-10);
+    0 2px 4px var(--base-color-black-30),
+    inset 0 1px 2px var(--base-color-white-10);
   outline: none;
-  text-shadow: 0 0 4px var(--game-accent-glow);
+  text-shadow: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -60,6 +60,12 @@ const handleClick = () => {
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+/* Light theme: use inset gradient background and primary text color */
+.light-theme .manual-action-button {
+  background: var(--game-surface-inset-gradient);
+  color: var(--game-text-primary);
 }
 
 .manual-action-button.select,
@@ -81,38 +87,49 @@ const handleClick = () => {
 
 /* Hover state */
 .manual-action-button:hover {
-  background: var(--game-surface-bg-gradient);
+  background: var(--base-color-white-30);
   transform: translateY(-2px) scale(1.05);
-  border-color: var(--semantic-warning);
+  border-color: var(--game-accent-color);
   box-shadow: 
-    0 4px 8px var(--game-color-black-40),
-    0 0 12px var(--semantic-warning-40),
-    inset 0 1px 2px var(--game-color-white-15);
-  color: var(--semantic-warning);
-  text-shadow: 0 0 8px var(--semantic-warning-60);
+    0 4px 8px var(--base-color-black-40),
+    0 0 12px var(--game-accent-glow),
+    inset 0 1px 2px var(--base-color-white-10);
+  color: var(--game-accent-color);
+  text-shadow: none;
+}
+
+.light-theme .manual-action-button:hover {
+  background: var(--game-surface-inset-gradient);
+  color: var(--game-text-primary);
 }
 
 /* Active state */
 .manual-action-button:active {
-  background: linear-gradient(135deg, var(--game-surface-bg-end) 0%, var(--game-surface-bg-start) 100%);
+  background: var(--base-color-white-30);
   transform: translateY(0) scale(0.98);
   box-shadow: 
-    0 1px 2px var(--game-color-black-40),
-    inset 0 2px 4px var(--game-color-black-30),
-    0 0 20px var(--semantic-warning-50);
-  border-color: var(--semantic-warning);
+    0 1px 2px var(--base-color-black-40),
+    inset 0 2px 4px var(--base-color-black-30),
+    0 0 20px var(--game-accent-glow);
+  border-color: var(--game-accent-color);
+  color: var(--game-accent-color);
+}
+
+.light-theme .manual-action-button:active {
+  background: var(--game-surface-inset-gradient);
+  color: var(--game-text-primary);
 }
 
 /* Active state for held buttons */
 .manual-action-button.active {
-  background: linear-gradient(135deg, var(--semantic-success) 0%, var(--semantic-success-dark) 100%);
-  color: var(--game-color-white);
+  background: linear-gradient(135deg, var(--semantic-success) 0%, var(--semantic-success) 100%);
+  color: var(--base-color-white);
   border-color: var(--semantic-success);
   box-shadow: 
     0 0 16px var(--semantic-success-60),
-    0 2px 6px var(--game-color-black-30),
-    inset 0 1px 2px var(--game-color-white-20);
-  text-shadow: 0 0 8px var(--game-color-white-50);
+    0 2px 6px var(--base-color-black-30),
+    inset 0 1px 2px var(--base-color-white-20);
+  text-shadow: 0 0 8px var(--base-color-white-50);
   transform: scale(1.05);
 }
 </style>

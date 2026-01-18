@@ -179,8 +179,8 @@ In `package.json`:
 <style scoped>
 .good {
   color: var(--game-text-primary);
-  background: var(--game-color-black);
-  border: 1px solid var(--game-color-white-50);
+  background: var(--base-color-black);
+  border: 1px solid var(--base-color-white-50);
 }
 </style>
 ```
@@ -192,7 +192,7 @@ In `package.json`:
 <div :style="{ color: '#fff', background: 'rgb(0,0,0)' }">
 
 <!-- Good - use CSS variables -->
-<div :style="{ color: 'var(--game-text-primary)', background: 'var(--game-color-black)' }">
+<div :style="{ color: 'var(--game-text-primary)', background: 'var(--base-color-black)' }">
 ```
 
 ## Known Exceptions

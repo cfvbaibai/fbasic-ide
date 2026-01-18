@@ -73,8 +73,8 @@ const isActive = computed(() => activeTab.value === props.name)
   padding: 1rem;
   margin-top: -2px;
   box-shadow: 
-    0 4px 12px var(--game-color-black-30),
-    inset 0 1px 0 var(--game-color-white-10);
+    0 4px 12px var(--base-color-black-30),
+    inset 0 1px 0 var(--base-color-white-10);
   position: relative;
   overflow: hidden;
 }
@@ -88,25 +88,9 @@ const isActive = computed(() => activeTab.value === props.name)
   height: 3px;
   background: linear-gradient(90deg, 
     var(--game-accent-color) 0%, 
-    var(--game-accent-color-dark) 50%,
+    var(--game-accent-color) 50%,
     var(--game-accent-color) 100%
   );
   opacity: 0.8;
-  box-shadow: 
-    0 0 12px var(--game-accent-glow),
-    0 0 20px var(--game-accent-glow);
-}
-
-.game-tabs-border-card .game-tab-pane::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, 
-    var(--game-accent-color-03) 0%, 
-    transparent 50%,
-    var(--game-accent-color-01) 100%
-  );
-  pointer-events: none;
-  z-index: 0;
 }
 </style>

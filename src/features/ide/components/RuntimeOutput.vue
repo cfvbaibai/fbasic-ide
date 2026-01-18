@@ -233,7 +233,7 @@ watch(() => props.output.length, scrollToBottom)
   position: relative;
   box-shadow: 
     inset 0 0 30px var(--game-screen-text-color-10),
-    inset 0 0 60px var(--game-screen-text-color-5);
+    inset 0 0 60px var(--game-screen-text-color-10);
   animation: terminal-glow 3s ease-in-out infinite;
 }
 
@@ -251,13 +251,13 @@ watch(() => props.output.length, scrollToBottom)
   0%, 100% {
     box-shadow: 
       inset 0 0 30px var(--game-screen-text-color-10),
-      inset 0 0 60px var(--game-screen-text-color-5);
+      inset 0 0 60px var(--game-screen-text-color-10);
   }
 
   50% {
     box-shadow: 
-      inset 0 0 40px var(--game-screen-text-color-15),
-      inset 0 0 80px var(--game-screen-text-color-8),
+      inset 0 0 40px var(--game-screen-text-color-20),
+      inset 0 0 80px var(--game-screen-text-color-10),
       0 0 20px var(--game-screen-text-color-10);
   }
 }
@@ -279,7 +279,7 @@ watch(() => props.output.length, scrollToBottom)
   background: var(--game-surface-bg-gradient);
   min-height: 0;
   border-radius: 6px;
-  box-shadow: inset 0 2px 4px var(--game-color-black-50);
+  box-shadow: inset 0 2px 4px var(--base-color-black-50);
 }
 
 .debug-text {
@@ -410,7 +410,7 @@ watch(() => props.output.length, scrollToBottom)
   border-radius: 6px;
   font-family: var(--game-font-family-mono);
   font-size: 0.9rem;
-  box-shadow: 0 2px 4px var(--game-color-black-20);
+  box-shadow: 0 2px 4px var(--base-color-black-20);
   transition: all 0.2s ease;
 }
 
@@ -427,6 +427,6 @@ watch(() => props.output.length, scrollToBottom)
   padding: 0.2rem 0.4rem;
   border-radius: 4px;
   font-weight: 500;
-  box-shadow: inset 0 1px 2px var(--game-color-black-30);
+  box-shadow: inset 0 1px 2px var(--base-color-black-30);
 }
 </style>

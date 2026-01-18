@@ -24,7 +24,7 @@ const hasHeader = computed(() => {
       <div v-if="hasHeader" class="game-layout-header">
         <div class="game-layout-header-main">
           <div class="game-layout-header-left">
-            <h1 v-if="title || icon" class="game-layout-title">
+            <h1 v-if="title || icon" class="game-layout-title text-game-heading">
               <GameIcon v-if="icon" :icon="icon" class="game-layout-icon" />
               <span v-if="title">{{ title }}</span>
             </h1>
@@ -95,11 +95,14 @@ const hasHeader = computed(() => {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--game-text-primary);
   font-size: var(--game-font-size-lg);
-  font-weight: var(--game-font-weight-bold);
-  font-family: var(--game-font-family-heading);
-  text-shadow: 0 0 10px var(--game-text-shadow-glow);
+  text-shadow: 0 0 8px var(--game-accent-glow);
+}
+
+/* Light theme: use accent color, no glow */
+.light-theme .game-layout-title {
+  color: var(--game-accent-color);
+  text-shadow: none;
 }
 
 .game-layout-icon {

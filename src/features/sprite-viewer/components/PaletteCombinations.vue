@@ -1,18 +1,12 @@
 <script setup lang="ts">
 import { SPRITE_PALETTES, BACKGROUND_PALETTES } from '../../../shared/data/palette'
 import ColorBox from './ColorBox.vue'
-import GameCard from '../../../shared/components/ui/GameCard.vue'
+import { GameBlock } from '../../../shared/components/ui'
 </script>
 
 <template>
-  <div>
-    <GameCard 
-      class="palette-section"
-      title=""
-      :float-on-hover="false"
-      :clickable="false"
-    >
-      <h2 class="section-title">Sprite Palettes</h2>
+  <div class="palette-combinations-wrapper">
+    <GameBlock title="Sprite Palettes">
       <div class="palettes-container palettes-container-sprite">
         <div
           v-for="(palette, paletteIndex) in SPRITE_PALETTES"
@@ -43,15 +37,9 @@ import GameCard from '../../../shared/components/ui/GameCard.vue'
           </div>
         </div>
       </div>
-    </GameCard>
+    </GameBlock>
 
-    <GameCard 
-      class="palette-section"
-      title=""
-      :float-on-hover="false"
-      :clickable="false"
-    >
-      <h2 class="section-title">Background Palettes</h2>
+    <GameBlock title="Background Palettes">
       <div class="palettes-container palettes-container-bg">
         <div
           v-for="(palette, paletteIndex) in BACKGROUND_PALETTES"
@@ -82,23 +70,15 @@ import GameCard from '../../../shared/components/ui/GameCard.vue'
           </div>
         </div>
       </div>
-    </GameCard>
+    </GameBlock>
   </div>
 </template>
 
 <style scoped>
-.palette-section {
-  margin-bottom: 2rem;
-  padding: 2rem;
-}
-
-.section-title {
-  margin: 0 0 1.5rem;
-  color: var(--game-text-primary);
-  font-family: var(--game-font-family-heading);
-  font-size: 1.5rem;
-  font-weight: 700;
-  text-shadow: 0 2px 4px var(--game-color-black-50);
+.palette-combinations-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .palettes-container {
@@ -115,11 +95,11 @@ import GameCard from '../../../shared/components/ui/GameCard.vue'
 }
 
 .palette-group {
-  background: var(--game-surface-bg-gradient);
+  background: var(--game-surface-inset-gradient);
   padding: 1.5rem;
   border-radius: 8px;
   border: 2px solid var(--game-surface-border);
-  box-shadow: var(--game-shadow-base);
+  box-shadow: var(--game-shadow-inset);
 }
 
 .palette-group-title {
@@ -128,7 +108,7 @@ import GameCard from '../../../shared/components/ui/GameCard.vue'
   font-family: var(--game-font-family-heading);
   font-size: 1.1rem;
   font-weight: 700;
-  text-shadow: 0 2px 4px var(--game-color-black-50);
+  text-shadow: none;
 }
 
 .color-combinations {
@@ -142,13 +122,13 @@ import GameCard from '../../../shared/components/ui/GameCard.vue'
   padding: 1rem;
   border-radius: 6px;
   border: 2px solid var(--game-surface-border);
-  box-shadow: var(--game-shadow-base);
+  box-shadow: none;
   transition: all 0.2s ease;
 }
 
 .color-combination:hover {
   border-color: var(--game-accent-color);
-  box-shadow: var(--game-shadow-hover);
+  box-shadow: none;
 }
 
 .combination-colors {

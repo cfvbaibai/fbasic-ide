@@ -91,24 +91,24 @@ const handleClose = () => {
 }
 
 .game-tag-success.game-tag-light {
-  background: linear-gradient(135deg, var(--game-accent-color-15) 0%, var(--game-accent-color-05) 100%);
+  background: linear-gradient(135deg, var(--game-accent-color-10) 0%, var(--game-accent-color-10) 100%);
   border-color: var(--game-accent-color);
   color: var(--game-accent-color);
   box-shadow: 0 0 8px var(--game-accent-color-20);
 }
 
 .game-tag-warning.game-tag-light {
-  background: linear-gradient(135deg, rgb(230 162 60 / 15%) 0%, rgb(230 162 60 / 5%) 100%);
+  background: linear-gradient(135deg, var(--semantic-warning-20) 0%, var(--semantic-warning-10) 100%);
   border-color: var(--semantic-warning);
   color: var(--semantic-warning);
-  box-shadow: 0 0 8px rgb(230 162 60 / 20%);
+  box-shadow: 0 0 8px var(--semantic-warning-20);
 }
 
 .game-tag-danger.game-tag-light {
-  background: linear-gradient(135deg, rgb(245 108 108 / 15%) 0%, rgb(245 108 108 / 5%) 100%);
+  background: linear-gradient(135deg, var(--semantic-danger-20) 0%, var(--semantic-danger-10) 100%);
   border-color: var(--semantic-danger);
   color: var(--semantic-danger);
-  box-shadow: 0 0 8px rgb(245 108 108 / 20%);
+  box-shadow: 0 0 8px var(--semantic-danger-20);
 }
 
 .game-tag-info.game-tag-light {
@@ -123,25 +123,25 @@ const handleClose = () => {
 .game-tag-success.game-tag-dark {
   background: var(--semantic-success);
   border-color: var(--semantic-success);
-  color: var(--game-color-white);
+  color: var(--base-color-white);
 }
 
 .game-tag-warning.game-tag-dark {
   background: var(--semantic-warning);
   border-color: var(--semantic-warning);
-  color: var(--game-color-white);
+  color: var(--base-color-white);
 }
 
 .game-tag-danger.game-tag-dark {
   background: var(--semantic-danger);
   border-color: var(--semantic-danger);
-  color: var(--game-color-white);
+  color: var(--base-color-white);
 }
 
 .game-tag-info.game-tag-dark {
   background: var(--semantic-info);
   border-color: var(--semantic-info);
-  color: var(--game-color-white);
+  color: var(--base-color-white);
 }
 
 /* Type variants - Plain effect */
@@ -222,15 +222,15 @@ const handleClose = () => {
 /* Fallback for browsers that don't support color-mix */
 @supports not (background: color-mix(in srgb, red 20%, transparent)) {
   .game-tag-success.game-tag-light {
-    background: linear-gradient(135deg, var(--game-accent-color-15) 0%, var(--game-accent-color-05) 100%);
+    background: linear-gradient(135deg, var(--game-accent-color-10) 0%, var(--game-accent-color-10) 100%);
   }
 
   .game-tag-warning.game-tag-light {
-    background: linear-gradient(135deg, rgb(230 162 60 / 15%) 0%, rgb(230 162 60 / 5%) 100%);
+    background: linear-gradient(135deg, var(--semantic-warning-20) 0%, var(--semantic-warning-10) 100%);
   }
 
   .game-tag-danger.game-tag-light {
-    background: linear-gradient(135deg, rgb(245 108 108 / 15%) 0%, rgb(245 108 108 / 5%) 100%);
+    background: linear-gradient(135deg, var(--semantic-danger-20) 0%, var(--semantic-danger-10) 100%);
   }
 
   .game-tag-info.game-tag-light {

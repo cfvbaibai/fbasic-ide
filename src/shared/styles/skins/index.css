@@ -1,0 +1,15 @@
+/**
+ * Skin System Index
+ * 
+ * This file can be imported to include all available skins.
+ * 
+ * Usage:
+ *   1. Import this file in main.ts: import './shared/styles/skins/index.css'
+ *   2. Set data-skin attribute on <html>: <html data-skin="retro-blue">
+ * 
+ * Note: In CSS, @import must come first. For better performance,
+ * consider importing individual skin files as needed, or use
+ * the useSkin composable for dynamic loading.
+ * 
+ * Default skin (current theme) is defined in theme.css :root
+ */

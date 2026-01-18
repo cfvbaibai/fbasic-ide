@@ -1,0 +1,16 @@
+/**
+ * Default Skin (Current Theme)
+ * 
+ * This is the default skin - the original retro game-themed dark theme.
+ * It's defined in :root in theme.css, but documented here for clarity.
+ * 
+ * This skin uses:
+ * - Primary: Cyan-green (#00ff88)
+ * - Base: Dark grays
+ * - Semantic: Green success, Orange warning, Red danger, Gray info
+ */
+
+/* 
+ * Note: Default skin colors are defined in theme.css under :root
+ * This file exists for documentation and future skin comparison.
+ */

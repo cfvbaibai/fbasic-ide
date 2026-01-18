@@ -122,16 +122,23 @@ const moveGridRight = () => {
   gridOffsetX.value += 0.5
 }
 
-// Get computed grid line colors (always use dark theme colors)
+// Helper function to read CSS custom property
+const getCssVariable = (variableName: string): string => {
+  return getComputedStyle(document.documentElement)
+    .getPropertyValue(variableName)
+    .trim()
+}
+
+// Get computed grid line colors using semantic colors from theme
 const getGridLineColor = (i: number): string => {
   if (i === 1 || i === 17) {
-    return '#999900'
+    return getCssVariable('--semantic-warning')
   } else if (i === 9) {
-    return '#66ff66'
+    return getCssVariable('--semantic-success')
   } else if (i === 5 || i === 13) {
-    return '#6666ff'
+    return getCssVariable('--semantic-info')
   } else {
-    return '#ff6666'
+    return getCssVariable('--semantic-danger')
   }
 }
 
@@ -495,7 +502,7 @@ const generateArray = async () => {
 
 .preview-image {
   border-radius: 6px;
-  box-shadow: 0 4px 12px var(--game-color-black-30);
+  box-shadow: 0 4px 12px var(--base-color-black-30);
   object-fit: contain;
 }
 
@@ -531,15 +538,6 @@ const generateArray = async () => {
   width: 100%;
   height: 100%;
   pointer-events: none;
-}
-
-
-/* Grid line colors - theme-aware */
-:root {
-  --grid-color-outer: #666600;
-  --grid-color-middle: #00ff00;
-  --grid-color-semi-middle: #0000ff;
-  --grid-color-regular: #ff0000;
 }
 
 .generated-array-block {

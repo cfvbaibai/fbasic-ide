@@ -1,19 +1,20 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useSpriteViewerStore } from '../composables/useSpriteViewerStore'
+import { GameBlock } from '../../../shared/components/ui'
 
 const store = useSpriteViewerStore()
+
+const title = computed(() => {
+  if (store.selectedSprite.value) {
+    return `${store.selectedSprite.value.name} - ${store.spriteSize.value.width}×${store.spriteSize.value.height} Sprite`
+  }
+  return 'Sprite'
+})
 </script>
 
 <template>
-  <div class="sprite-display-section">
-    <h2 class="section-title">
-      <span v-if="store.selectedSprite.value">
-        {{ store.selectedSprite.value.name }} - {{ store.spriteSize.value.width }}×{{ store.spriteSize.value.height }} Sprite
-      </span>
-      <span v-else>
-        Sprite
-      </span>
-    </h2>
+  <GameBlock :title="title">
     <div 
       class="grid-container" 
       :class="{ 
@@ -41,40 +42,23 @@ const store = useSpriteViewerStore()
         </div>
       </div>
     </div>
-  </div>
+  </GameBlock>
 </template>
 
 <style scoped>
-.sprite-display-section {
-  background: var(--game-surface-bg-gradient);
-  border: 2px solid var(--game-surface-border);
-  border-radius: 8px;
-  padding: 2rem;
-  margin-bottom: 2rem;
-  box-shadow: var(--game-shadow-base);
-}
-
-.section-title {
-  margin: 0 0 1.5rem;
-  color: var(--game-text-primary);
-  font-family: var(--game-font-family-heading);
-  font-size: 1.5rem;
-  font-weight: 700;
-  text-shadow: 0 2px 4px var(--game-color-black-50);
-}
 
 .grid-container {
   display: flex;
   flex-direction: column;
   gap: 0;
-  background: var(--game-color-black);
+  background: var(--base-color-black);
   padding: 0;
   border-radius: 4px;
   border: 8px solid var(--game-surface-border);
   width: fit-content;
   margin: 0 auto;
   box-shadow: 
-    0 0 20px rgb(0 0 0 / 80%),
+    0 0 20px var(--base-color-black-80),
     inset 0 0 20px var(--game-accent-color-10);
 }
 
@@ -108,7 +92,7 @@ const store = useSpriteViewerStore()
 }
 
 .grid-cell-bordered {
-  border: 1px solid var(--game-color-white-15);
+  border: 1px solid var(--base-color-white-10);
 }
 
 .grid-cell:hover {
@@ -124,7 +108,7 @@ const store = useSpriteViewerStore()
   font-family: var(--game-font-family-mono);
   color: var(--game-text-primary);
   text-shadow: 
-    1px 1px 2px rgb(0 0 0 / 80%),
+    1px 1px 2px var(--base-color-black-80),
     0 0 4px var(--game-accent-glow);
   user-select: none;
 }

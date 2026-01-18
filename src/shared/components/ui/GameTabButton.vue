@@ -63,21 +63,12 @@ const handleClick = () => {
 /* Style content within tab button */
 .game-tab-button :deep(.game-icon) {
   flex-shrink: 0;
-  filter: drop-shadow(0 0 4px currentcolor);
   transition: filter 0.3s ease;
-}
-
-.game-tab-button.active :deep(.game-icon) {
-  filter: drop-shadow(0 0 8px var(--game-accent-color));
 }
 
 .game-tab-button :deep(span:not(.game-tag-content)) {
   font-weight: 600;
   letter-spacing: 0.05em;
-}
-
-.game-tab-button.active :deep(span:not(.game-tag-content)) {
-  text-shadow: 0 0 8px var(--game-accent-glow);
 }
 
 /* Style tags within tab button */
@@ -86,11 +77,11 @@ const handleClick = () => {
   font-size: 0.625rem;
   padding: 0.125rem 0.5rem;
   border-radius: 4px;
-  box-shadow: 0 0 4px var(--game-color-black-30);
+  box-shadow: 0 0 4px var(--base-color-black-30);
 }
 
 .game-tab-button.active :deep(.game-tag) {
-  box-shadow: 0 0 8px var(--game-accent-glow);
+  box-shadow: 0 0 4px var(--base-color-black-30);
 }
 
 .game-tab-button::before {
@@ -110,64 +101,27 @@ const handleClick = () => {
   transition: transform 0.3s ease;
 }
 
-.game-tab-button::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, 
-    var(--game-accent-color-05) 0%, 
-    var(--game-accent-color-02) 100%
-  );
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
-}
-
 /* Focus styles for accessibility */
 .game-tab-button:focus-visible {
   outline: 2px solid var(--game-accent-color);
   outline-offset: 2px;
-  box-shadow: 
-    0 0 0 2px var(--game-accent-color),
-    0 0 12px var(--game-accent-glow);
+  box-shadow: 0 0 0 2px var(--game-accent-color);
 }
 
 .game-tab-button:hover:not(.disabled) {
   color: var(--game-text-primary);
 }
 
-.game-tab-button:hover:not(.disabled)::after {
-  opacity: 1;
-}
-
 .game-tab-button:hover:not(.disabled)::before {
   transform: scaleX(0.5);
-  box-shadow: 0 0 8px var(--game-accent-glow);
 }
 
 .game-tab-button.active {
   color: var(--game-accent-color);
-  text-shadow: 0 0 8px var(--game-accent-glow);
 }
 
 .game-tab-button.active::before {
   transform: scaleX(1);
-  background: linear-gradient(90deg, 
-    var(--game-accent-color) 0%, 
-    var(--game-accent-color-dark) 50%, 
-    var(--game-accent-color) 100%
-  );
-  box-shadow: 
-    0 0 12px var(--game-accent-glow),
-    0 0 20px var(--game-accent-glow);
-}
-
-.game-tab-button.active::after {
-  opacity: 1;
-  background: linear-gradient(135deg, 
-    var(--game-accent-color-15) 0%, 
-    var(--game-accent-color-05) 100%
-  );
 }
 
 .game-tab-button.disabled {
@@ -177,12 +131,7 @@ const handleClick = () => {
 
 .game-tab-icon {
   flex-shrink: 0;
-  filter: drop-shadow(0 0 4px currentcolor);
   transition: filter 0.3s ease;
-}
-
-.game-tab-button.active .game-tab-icon {
-  filter: drop-shadow(0 0 8px var(--game-accent-color));
 }
 
 </style>

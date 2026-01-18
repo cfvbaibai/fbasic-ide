@@ -71,9 +71,9 @@ const handleClick = (event: Event) => {
 .game-collapse-toggle:hover {
   border-color: var(--game-accent-color);
   box-shadow: 
-    0 4px 8px var(--game-color-black-40),
+    0 4px 8px var(--base-color-black-40),
     0 0 12px var(--game-accent-glow),
-    inset 0 1px 2px var(--game-color-white-15);
+    inset 0 1px 2px var(--base-color-white-10);
   transform: scale(1.1);
 }
 
@@ -92,7 +92,7 @@ const handleClick = (event: Event) => {
   border-color: var(--game-accent-color);
   box-shadow: 
     0 0 16px var(--game-accent-glow),
-    0 2px 6px var(--game-color-black-30);
+    0 2px 6px var(--base-color-black-30);
 }
 
 .game-collapse-toggle :deep(.game-icon) {

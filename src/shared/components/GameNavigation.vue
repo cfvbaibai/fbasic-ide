@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router'
+import { computed } from 'vue'
 import GameIcon from './ui/GameIcon.vue'
+import GameSelect from './ui/GameSelect.vue'
+import { useSkin } from '../composables/useSkin'
+
+const { currentSkin, setSkin, availableSkins } = useSkin()
 
 const route = useRoute()
 const router = useRouter()
@@ -58,6 +63,17 @@ const isActive = (path: string) => {
 const navigate = (path: string) => {
   router.push(path)
 }
+
+const skinOptions = computed(() => {
+  return availableSkins.map(skin => ({
+    label: skin.label,
+    value: skin.name
+  }))
+})
+
+const handleSkinChange = (skinValue: string | number) => {
+  setSkin(skinValue as typeof currentSkin.value)
+}
 </script>
 
 <template>
@@ -79,8 +95,15 @@ const navigate = (path: string) => {
             <span class="nav-button-name">{{ item.name }}</span>
             <span class="nav-button-desc">{{ item.description }}</span>
           </div>
-          <div v-if="isActive(item.path)" class="nav-indicator">▶</div>
         </button>
+      </div>
+      <div class="nav-skin-toggle">
+        <GameSelect
+          :model-value="currentSkin"
+          :options="skinOptions"
+          size="small"
+          @update:model-value="handleSkinChange"
+        />
       </div>
     </div>
   </nav>
@@ -90,7 +113,7 @@ const navigate = (path: string) => {
 .game-navigation {
   background: linear-gradient(135deg, var(--game-nav-bg-start) 0%, var(--game-nav-bg-end) 100%);
   border-bottom: 3px solid var(--game-nav-border);
-  box-shadow: 0 4px 12px var(--game-color-black-40), inset 0 1px 0 var(--game-color-white-10);
+  box-shadow: 0 4px 12px var(--base-color-black-40), inset 0 1px 0 var(--base-color-white-10);
   flex-shrink: 0;
   z-index: 1000;
 }
@@ -98,10 +121,10 @@ const navigate = (path: string) => {
 .nav-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 1rem 2rem;
+  padding: 0.75rem 1.5rem;
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 .nav-title {
@@ -114,7 +137,7 @@ const navigate = (path: string) => {
   color: var(--game-accent-color);
   text-shadow: 
     0 0 10px var(--game-accent-glow),
-    0 2px 4px rgb(0 0 0 / 80%);
+    0 2px 4px var(--base-color-black-80);
   letter-spacing: 2px;
   white-space: nowrap;
 }
@@ -126,10 +149,18 @@ const navigate = (path: string) => {
 
 .nav-items {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.375rem;
   flex: 1;
   justify-content: flex-end;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+}
+
+.nav-skin-toggle {
+  display: flex;
+  align-items: center;
+  margin-left: 1rem;
+  min-width: 120px;
+  flex-shrink: 0;
 }
 
 .nav-button {
@@ -137,17 +168,17 @@ const navigate = (path: string) => {
   background: var(--game-surface-bg-gradient);
   border: 2px solid var(--game-surface-border);
   border-radius: 8px;
-  padding: 0.75rem 1.25rem;
+  padding: 0.5rem 0.875rem;
   color: var(--game-text-secondary);
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  min-width: 140px;
+  gap: 0.5rem;
+  white-space: nowrap;
   box-shadow: 
-    0 2px 4px var(--game-color-black-30),
-    inset 0 1px 0 var(--game-color-white-10);
+    0 2px 4px var(--base-color-black-30),
+    inset 0 1px 0 var(--base-color-white-10);
 }
 
 .nav-button:hover {
@@ -157,30 +188,42 @@ const navigate = (path: string) => {
   transform: translateY(-2px);
   box-shadow: 
     0 4px 8px var(--game-accent-glow),
-    0 2px 4px var(--game-color-black-40),
-    inset 0 1px 0 var(--game-color-white-10);
+    0 2px 4px var(--base-color-black-40),
+    inset 0 1px 0 var(--base-color-white-10);
 }
 
 .nav-button.active {
-  background: linear-gradient(135deg, var(--game-accent-color) 0%, var(--game-accent-color-dark) 100%);
+  background: linear-gradient(135deg, var(--game-accent-color) 0%, var(--game-accent-color) 100%);
   border-color: var(--game-accent-color);
-  color: var(--game-color-black);
+  color: var(--base-color-black);
   font-weight: 700;
   box-shadow: 
     var(--game-shadow-glow),
-    0 4px 8px var(--game-color-black-40),
-    inset 0 1px 0 var(--game-color-white-30);
+    0 4px 8px var(--base-color-black-40),
+    inset 0 1px 0 var(--base-color-white-30);
+}
+
+.nav-button.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--base-color-black);
+  border-radius: 8px 0 0 8px;
+  box-shadow: 0 0 8px var(--base-color-black-50);
 }
 
 .nav-icon {
-  font-size: 1.25rem;
+  font-size: 1rem;
   flex-shrink: 0;
   transition: all 0.2s ease;
 }
 
 .nav-button.active .nav-icon {
-  color: var(--game-color-black);
-  filter: drop-shadow(0 0 4px var(--game-color-black-30));
+  color: var(--base-color-black);
+  filter: drop-shadow(0 0 4px var(--base-color-black-30));
 }
 
 .nav-button:hover .nav-icon {
@@ -189,46 +232,19 @@ const navigate = (path: string) => {
 
 .nav-button-content {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.125rem;
+  align-items: center;
   flex: 1;
   min-width: 0;
 }
 
 .nav-button-name {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
   line-height: 1.2;
 }
 
 .nav-button-desc {
-  font-size: 0.7rem;
-  opacity: 0.7;
-  line-height: 1;
-}
-
-.nav-button.active .nav-button-desc {
-  opacity: 0.8;
-}
-
-.nav-indicator {
-  position: absolute;
-  right: 0.5rem;
-  font-size: 0.9rem;
-  animation: pulse 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-
-  50% {
-    opacity: 0.6;
-    transform: translateX(3px);
-  }
+  display: none;
 }
 
 /* Responsive design */
@@ -250,13 +266,20 @@ const navigate = (path: string) => {
 
   .nav-button {
     flex: 1;
-    min-width: 120px;
-    padding: 0.625rem 1rem;
+    min-width: auto;
+    padding: 0.5rem 0.875rem;
   }
 
   .nav-button-content {
     align-items: center;
     text-align: center;
+  }
+
+  .nav-skin-toggle {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 0.5rem;
+    min-width: unset;
   }
 }
 
