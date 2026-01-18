@@ -103,7 +103,7 @@ onMounted(() => {
   flex: 1 1 0;
   display: flex;
   flex-direction: column;
-  font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+  font-family: 'Courier New', Monaco, Menlo, monospace;
   min-height: 0; /* Allow component to shrink */
   overflow: hidden; /* Prevent overflow */
 }
@@ -180,17 +180,14 @@ onMounted(() => {
 
 .syntax-highlighted {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   padding: 1rem;
   font-size: 14px;
   line-height: 1.5;
   color: transparent;
   pointer-events: none;
   white-space: pre-wrap;
-  word-wrap: break-word;
+  overflow-wrap: break-word;
   overflow: hidden;
   z-index: 1;
 }

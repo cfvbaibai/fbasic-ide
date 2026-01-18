@@ -130,7 +130,7 @@ const joystickStatusData = computed(() => {
 
 
 /* Glowing border animations */
-@keyframes borderShimmer {
+@keyframes border-shimmer {
   0%,
   100% {
     background-position: -200% center;

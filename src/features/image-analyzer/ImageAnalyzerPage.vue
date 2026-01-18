@@ -495,7 +495,7 @@ const generateArray = async () => {
 
 .preview-image {
   border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 12px var(--game-color-black-30);
   object-fit: contain;
 }
 

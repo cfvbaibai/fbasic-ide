@@ -133,8 +133,8 @@ const handleCopy = async () => {
   background: 
     repeating-linear-gradient(
       0deg,
-      var(--game-screen-text-color-8) 0px,
-      transparent 0px,
+      var(--game-screen-text-color-8) 0,
+      transparent 0,
       transparent 2px,
       var(--game-screen-text-color-8) 2px
     );
@@ -164,7 +164,7 @@ const handleCopy = async () => {
   font-size: 0.875rem;
   line-height: 1.6;
   white-space: pre-wrap;
-  word-wrap: break-word;
+  overflow-wrap: break-word;
   overflow-x: auto;
   background: transparent;
   border: none;

@@ -55,27 +55,27 @@ const store = useSpriteViewerStore()
 }
 
 .section-title {
-  margin: 0 0 1.5rem 0;
+  margin: 0 0 1.5rem;
   color: var(--game-text-primary);
   font-family: var(--game-font-family-heading);
   font-size: 1.5rem;
   font-weight: 700;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 2px 4px var(--game-color-black-50);
 }
 
 .grid-container {
   display: flex;
   flex-direction: column;
   gap: 0;
-  background: #000000;
+  background: var(--game-color-black);
   padding: 0;
   border-radius: 4px;
   border: 8px solid var(--game-surface-border);
   width: fit-content;
   margin: 0 auto;
   box-shadow: 
-    0 0 20px rgba(0, 0, 0, 0.8),
-    inset 0 0 20px rgba(0, 255, 136, 0.1);
+    0 0 20px rgb(0 0 0 / 80%),
+    inset 0 0 20px var(--game-accent-color-10);
 }
 
 .grid-container-8x8 {
@@ -108,7 +108,7 @@ const store = useSpriteViewerStore()
 }
 
 .grid-cell-bordered {
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid var(--game-color-white-15);
 }
 
 .grid-cell:hover {
@@ -124,8 +124,8 @@ const store = useSpriteViewerStore()
   font-family: var(--game-font-family-mono);
   color: var(--game-text-primary);
   text-shadow: 
-    1px 1px 2px rgba(0, 0, 0, 0.8),
-    0 0 4px rgba(0, 255, 136, 0.5);
+    1px 1px 2px rgb(0 0 0 / 80%),
+    0 0 4px var(--game-accent-glow);
   user-select: none;
 }
 </style>

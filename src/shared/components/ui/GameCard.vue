@@ -100,7 +100,7 @@ const handleClick = () => {
   font-weight: 700;
   font-family: var(--game-font-family-heading);
   color: var(--game-text-primary);
-  margin: 0 0 1rem 0;
+  margin: 0 0 1rem;
   text-align: center;
 }
 
@@ -108,7 +108,7 @@ const handleClick = () => {
   font-size: 1rem;
   color: var(--game-text-secondary);
   line-height: 1.6;
-  margin: 0 0 1.5rem 0;
+  margin: 0 0 1.5rem;
   text-align: center;
 }
 

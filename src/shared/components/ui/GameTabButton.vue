@@ -42,7 +42,6 @@ const handleClick = () => {
 
 <style scoped>
 .game-tab-button {
-  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -64,7 +63,7 @@ const handleClick = () => {
 /* Style content within tab button */
 .game-tab-button :deep(.game-icon) {
   flex-shrink: 0;
-  filter: drop-shadow(0 0 4px currentColor);
+  filter: drop-shadow(0 0 4px currentcolor);
   transition: filter 0.3s ease;
 }
 
@@ -87,7 +86,7 @@ const handleClick = () => {
   font-size: 0.625rem;
   padding: 0.125rem 0.5rem;
   border-radius: 4px;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 4px var(--game-color-black-30);
 }
 
 .game-tab-button.active :deep(.game-tag) {
@@ -116,12 +115,21 @@ const handleClick = () => {
   position: absolute;
   inset: 0;
   background: linear-gradient(135deg, 
-    rgba(0, 255, 136, 0.05) 0%, 
-    rgba(0, 255, 136, 0.02) 100%
+    var(--game-accent-color-05) 0%, 
+    var(--game-accent-color-02) 100%
   );
   opacity: 0;
   transition: opacity 0.3s ease;
   pointer-events: none;
+}
+
+/* Focus styles for accessibility */
+.game-tab-button:focus-visible {
+  outline: 2px solid var(--game-accent-color);
+  outline-offset: 2px;
+  box-shadow: 
+    0 0 0 2px var(--game-accent-color),
+    0 0 12px var(--game-accent-glow);
 }
 
 .game-tab-button:hover:not(.disabled) {
@@ -146,7 +154,7 @@ const handleClick = () => {
   transform: scaleX(1);
   background: linear-gradient(90deg, 
     var(--game-accent-color) 0%, 
-    #00cc6a 50%, 
+    var(--game-accent-color-dark) 50%, 
     var(--game-accent-color) 100%
   );
   box-shadow: 
@@ -157,8 +165,8 @@ const handleClick = () => {
 .game-tab-button.active::after {
   opacity: 1;
   background: linear-gradient(135deg, 
-    rgba(0, 255, 136, 0.15) 0%, 
-    rgba(0, 255, 136, 0.05) 100%
+    var(--game-accent-color-15) 0%, 
+    var(--game-accent-color-05) 100%
   );
 }
 
@@ -169,7 +177,7 @@ const handleClick = () => {
 
 .game-tab-icon {
   flex-shrink: 0;
-  filter: drop-shadow(0 0 4px currentColor);
+  filter: drop-shadow(0 0 4px currentcolor);
   transition: filter 0.3s ease;
 }
 
@@ -177,12 +185,4 @@ const handleClick = () => {
   filter: drop-shadow(0 0 8px var(--game-accent-color));
 }
 
-/* Focus styles for accessibility */
-.game-tab-button:focus-visible {
-  outline: 2px solid var(--game-accent-color);
-  outline-offset: 2px;
-  box-shadow: 
-    0 0 0 2px var(--game-accent-color),
-    0 0 12px var(--game-accent-glow);
-}
 </style>

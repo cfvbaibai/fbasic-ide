@@ -131,54 +131,51 @@ watchEffect(() => {
   padding: 2rem;
   overflow: auto;
   min-height: 0;
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+  background: linear-gradient(135deg, var(--game-color-black) 0%, var(--game-screen-header-bg) 100%);
 }
 
 /* CRT Bezel - outer frame */
 .crt-bezel {
-  background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 50%, #1a1a1a 100%);
-  border: 8px solid #000000;
+  background: linear-gradient(135deg, var(--game-screen-header-bg) 0%, var(--game-color-black) 50%, var(--game-screen-header-bg) 100%);
+  border: 8px solid var(--game-color-black);
   border-radius: 12px;
   box-shadow: 
-    inset 0 2px 4px rgba(255, 255, 255, 0.05),
-    0 8px 32px rgba(0, 0, 0, 0.8),
-    0 0 0 2px rgba(0, 0, 0, 0.5);
+    inset 0 2px 4px var(--game-color-white-10),
+    0 8px 32px rgb(0 0 0 / 80%),
+    0 0 0 2px var(--game-color-black-50);
   padding: 16px;
 }
 
 /* CRT Screen - inner screen area */
 .crt-screen {
   position: relative;
-  border: 4px solid #0a0a0a;
+  border: 4px solid var(--game-color-black);
   border-radius: 16px;
   box-shadow: 
-    inset 0 0 80px rgba(0, 0, 0, 0.9),
-    0 4px 20px rgba(0, 0, 0, 0.6),
-    inset 0 -2px 10px rgba(0, 0, 0, 0.8);
+    inset 0 0 80px rgb(0 0 0 / 90%),
+    0 4px 20px rgb(0 0 0 / 60%),
+    inset 0 -2px 10px rgb(0 0 0 / 80%);
   overflow: hidden;
   background: radial-gradient(
     ellipse 150% 110% at 85% 8%,
-    rgba(255, 255, 255, 0.22) 0%,
-    rgba(255, 255, 255, 0.14) 18%,
-    rgba(255, 255, 255, 0.08) 35%,
+    rgb(255 255 255 / 22%) 0%,
+    rgb(255 255 255 / 14%) 18%,
+    rgb(255 255 255 / 8%) 35%,
     transparent 60%,
-    rgba(0, 0, 0, 0.3) 100%
+    var(--game-color-black-30) 100%
   );
 }
 
 /* Scanlines overlay */
 .crt-scanlines {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: repeating-linear-gradient(
     0deg,
     transparent,
     transparent 2px,
-    rgba(0, 0, 0, 0.15) 2px,
-    rgba(0, 0, 0, 0.15) 4px
+    var(--game-color-black-15) 2px,
+    var(--game-color-black-15) 4px
   );
   pointer-events: none;
   z-index: 2;
@@ -188,17 +185,14 @@ watchEffect(() => {
 /* Screen reflection/glow effect - point light from top right */
 .crt-reflection {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: radial-gradient(
     ellipse 140% 100% at 85% 5%,
-    rgba(255, 255, 255, 0.4) 0%,
-    rgba(255, 255, 255, 0.2) 15%,
-    rgba(255, 255, 255, 0.12) 30%,
+    var(--game-color-white-40) 0%,
+    var(--game-color-white-20) 15%,
+    rgb(255 255 255 / 12%) 30%,
     transparent 55%,
-    rgba(0, 0, 0, 0.4) 100%
+    var(--game-color-black-40) 100%
   );
   pointer-events: none;
   z-index: 1;
@@ -210,7 +204,7 @@ watchEffect(() => {
   position: relative;
   z-index: 0;
   image-rendering: pixelated;
-  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
   image-rendering: crisp-edges;
   width: 480px; /* 240px * 2x scale (224 + 16 padding) */
   height: 416px; /* 208px * 2x scale (192 + 16 padding) */

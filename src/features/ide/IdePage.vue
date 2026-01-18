@@ -218,32 +218,37 @@ onMounted(() => {
 }
 
 /* Glowing animations */
-@keyframes borderShimmer {
+@keyframes border-shimmer {
   0%, 100% {
     background-position: -200% center;
     opacity: 0.6;
   }
+
   50% {
     background-position: 200% center;
     opacity: 0.9;
   }
 }
 
-@keyframes borderRotate {
+@keyframes border-rotate {
   0% {
     transform: rotate(0deg);
     opacity: 0;
   }
+
   25% {
     opacity: 0.2;
   }
+
   50% {
     transform: rotate(180deg);
     opacity: 0.3;
   }
+
   75% {
     opacity: 0.2;
   }
+
   100% {
     transform: rotate(360deg);
     opacity: 0;

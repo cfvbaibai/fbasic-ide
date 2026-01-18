@@ -87,23 +87,25 @@ const tableColumns: Column[] = [
 
 .flashing-cell {
   display: inline-block;
-  animation: cellFlash 0.4s ease-in-out infinite;
+  animation: cell-flash 0.4s ease-in-out infinite;
   transform-origin: center center;
 }
 
-@keyframes cellFlash {
+@keyframes cell-flash {
   0% {
     color: var(--game-accent-color);
     text-shadow: 0 0 8px var(--game-accent-glow);
     transform: scale(1.3);
     font-weight: 700;
   }
+
   50% {
     color: var(--game-accent-color);
     text-shadow: 0 0 16px var(--game-accent-glow);
     transform: scale(4);
     font-weight: 700;
   }
+
   100% {
     color: var(--game-text-primary);
     text-shadow: none;

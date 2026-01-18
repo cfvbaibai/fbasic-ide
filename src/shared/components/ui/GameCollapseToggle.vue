@@ -71,9 +71,9 @@ const handleClick = (event: Event) => {
 .game-collapse-toggle:hover {
   border-color: var(--game-accent-color);
   box-shadow: 
-    0 4px 8px rgba(0, 0, 0, 0.4),
+    0 4px 8px var(--game-color-black-40),
     0 0 12px var(--game-accent-glow),
-    inset 0 1px 2px rgba(255, 255, 255, 0.15);
+    inset 0 1px 2px var(--game-color-white-15);
   transform: scale(1.1);
 }
 
@@ -92,27 +92,27 @@ const handleClick = (event: Event) => {
   border-color: var(--game-accent-color);
   box-shadow: 
     0 0 16px var(--game-accent-glow),
-    0 2px 6px rgba(0, 0, 0, 0.3);
+    0 2px 6px var(--game-color-black-30);
 }
 
 .game-collapse-toggle :deep(.game-icon) {
   color: var(--game-text-primary);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  filter: drop-shadow(0 0 4px rgba(0, 255, 136, 0.3));
+  filter: drop-shadow(0 0 4px var(--game-accent-color-30));
   transform: rotate(0deg) scale(1);
 }
 
 .game-collapse-toggle:hover :deep(.game-icon) {
   color: var(--game-accent-color);
   filter: drop-shadow(0 0 8px var(--game-accent-glow)) 
-          drop-shadow(0 0 16px rgba(0, 255, 136, 0.5));
+          drop-shadow(0 0 16px var(--game-accent-glow));
   transform: rotate(180deg) scale(1.15);
 }
 
 .game-collapse-toggle.expanded :deep(.game-icon) {
   color: var(--game-accent-color);
   filter: drop-shadow(0 0 8px var(--game-accent-glow)) 
-          drop-shadow(0 0 16px rgba(0, 255, 136, 0.5));
+          drop-shadow(0 0 16px var(--game-accent-glow));
   transform: rotate(0deg) scale(1.1);
 }
 

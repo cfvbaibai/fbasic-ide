@@ -81,8 +81,7 @@ const tableSize = computed(() => {
 <style scoped>
 .game-table-wrapper {
   width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow: auto hidden;
   border-radius: 6px;
 }
 
@@ -103,7 +102,7 @@ const tableSize = computed(() => {
 
 .game-table-header-cell {
   padding: 0.75rem 0.5rem;
-  background: linear-gradient(135deg, rgba(0, 255, 136, 0.15) 0%, rgba(0, 255, 136, 0.05) 100%);
+  background: linear-gradient(135deg, var(--game-accent-color-15) 0%, var(--game-accent-color-05) 100%);
   color: var(--game-accent-color);
   font-weight: 700;
   font-family: var(--game-font-family-heading);
@@ -136,12 +135,7 @@ const tableSize = computed(() => {
 }
 
 .game-table-row-highlight:hover {
-  background: rgba(0, 255, 136, 0.08);
-}
-
-.game-table-row-highlight:hover .game-table-cell {
-  color: var(--game-accent-color);
-  text-shadow: 0 0 6px var(--game-accent-glow);
+  background: var(--game-accent-color-08);
 }
 
 .game-table-cell {
@@ -154,6 +148,11 @@ const tableSize = computed(() => {
   transition: all 0.2s ease;
 }
 
+.game-table-row-highlight:hover .game-table-cell {
+  color: var(--game-accent-color);
+  text-shadow: 0 0 6px var(--game-accent-glow);
+}
+
 .game-table-cell.align-center {
   text-align: center;
 }
@@ -163,16 +162,11 @@ const tableSize = computed(() => {
 }
 
 .game-table-stripe .game-table-row:nth-child(even) {
-  background: rgba(0, 255, 136, 0.02);
+  background: var(--game-accent-color-02);
 }
 
 .game-table-border {
   border: 1px solid var(--game-surface-border);
-}
-
-.game-table-border .game-table-header-cell,
-.game-table-border .game-table-cell {
-  border-right: 1px solid var(--game-surface-border);
 }
 
 .game-table-border .game-table-header-cell:last-child,

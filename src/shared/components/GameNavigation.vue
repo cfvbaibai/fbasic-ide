@@ -90,7 +90,7 @@ const navigate = (path: string) => {
 .game-navigation {
   background: linear-gradient(135deg, var(--game-nav-bg-start) 0%, var(--game-nav-bg-end) 100%);
   border-bottom: 3px solid var(--game-nav-border);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px var(--game-color-black-40), inset 0 1px 0 var(--game-color-white-10);
   flex-shrink: 0;
   z-index: 1000;
 }
@@ -114,7 +114,7 @@ const navigate = (path: string) => {
   color: var(--game-accent-color);
   text-shadow: 
     0 0 10px var(--game-accent-glow),
-    0 2px 4px rgba(0, 0, 0, 0.8);
+    0 2px 4px rgb(0 0 0 / 80%);
   letter-spacing: 2px;
   white-space: nowrap;
 }
@@ -146,41 +146,41 @@ const navigate = (path: string) => {
   gap: 0.75rem;
   min-width: 140px;
   box-shadow: 
-    0 2px 4px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    0 2px 4px var(--game-color-black-30),
+    inset 0 1px 0 var(--game-color-white-10);
 }
 
 .nav-button:hover {
-  background: linear-gradient(135deg, #3a3a4e 0%, #2a2a3e 100%);
+  background: var(--game-surface-hover-gradient);
   border-color: var(--game-accent-color);
   color: var(--game-text-primary);
   transform: translateY(-2px);
   box-shadow: 
     0 4px 8px var(--game-accent-glow),
-    0 2px 4px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 2px 4px var(--game-color-black-40),
+    inset 0 1px 0 var(--game-color-white-10);
 }
 
 .nav-button.active {
-  background: linear-gradient(135deg, var(--game-accent-color) 0%, #00cc6a 100%);
+  background: linear-gradient(135deg, var(--game-accent-color) 0%, var(--game-accent-color-dark) 100%);
   border-color: var(--game-accent-color);
-  color: #000000;
+  color: var(--game-color-black);
   font-weight: 700;
   box-shadow: 
     var(--game-shadow-glow),
-    0 4px 8px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
-}
-
-.nav-button.active .nav-icon {
-  color: #000000;
-  filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.3));
+    0 4px 8px var(--game-color-black-40),
+    inset 0 1px 0 var(--game-color-white-30);
 }
 
 .nav-icon {
   font-size: 1.25rem;
   flex-shrink: 0;
   transition: all 0.2s ease;
+}
+
+.nav-button.active .nav-icon {
+  color: var(--game-color-black);
+  filter: drop-shadow(0 0 4px var(--game-color-black-30));
 }
 
 .nav-button:hover .nav-icon {
@@ -224,6 +224,7 @@ const navigate = (path: string) => {
     opacity: 1;
     transform: translateX(0);
   }
+
   50% {
     opacity: 0.6;
     transform: translateX(3px);
@@ -231,7 +232,7 @@ const navigate = (path: string) => {
 }
 
 /* Responsive design */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .nav-container {
     flex-direction: column;
     gap: 1rem;
@@ -259,7 +260,7 @@ const navigate = (path: string) => {
   }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .nav-items {
     flex-direction: column;
   }

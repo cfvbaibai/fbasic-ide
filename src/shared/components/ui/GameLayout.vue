@@ -45,8 +45,7 @@ const hasHeader = computed(() => {
 <style scoped>
 .game-layout-content {
   flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden auto;
   scroll-behavior: smooth;
   display: flex;
   flex-direction: column;

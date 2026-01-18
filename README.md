@@ -314,7 +314,8 @@ pnpm test         # Run tests in watch mode
 pnpm test:run     # Run tests once
 pnpm test:ui      # Run tests with UI
 pnpm test:coverage # Run tests with coverage
-pnpm lint         # Run ESLint
+pnpm lint         # Run ESLint and Stylelint
+pnpm lint:style   # Run Stylelint (CSS color enforcement)
 pnpm type-check   # Run TypeScript compiler
 ```
 

@@ -69,8 +69,8 @@ const textareaClasses = computed(() => {
   outline: none;
   transition: all 0.2s ease;
   box-shadow: 
-    0 2px 4px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    0 2px 4px var(--game-color-black-30),
+    inset 0 1px 0 var(--game-color-white-10);
   line-height: 1.5;
   font-family: var(--game-font-family-mono);
 }
@@ -84,8 +84,8 @@ const textareaClasses = computed(() => {
   border-color: var(--game-accent-color);
   box-shadow: 
     0 0 12px var(--game-accent-glow),
-    0 2px 4px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 2px 4px var(--game-color-black-30),
+    inset 0 1px 0 var(--game-color-white-10);
 }
 
 .game-textarea-inner:disabled,

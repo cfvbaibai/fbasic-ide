@@ -131,15 +131,19 @@ const handleDrop = (event: DragEvent) => {
   text-align: center;
 }
 
-.game-upload-drag-area:hover:not(.game-upload-disabled) {
-  border-color: var(--game-accent-color);
-  background: rgba(0, 255, 136, 0.05);
-}
-
 .game-upload-dragging .game-upload-drag-area {
   border-color: var(--game-accent-color);
-  background: rgba(0, 255, 136, 0.1);
+  background: var(--game-accent-color-10);
   box-shadow: 0 0 20px var(--game-accent-glow);
+}
+
+.game-upload-disabled .game-upload-drag-area {
+  cursor: not-allowed;
+}
+
+.game-upload-drag-area:hover:not(.game-upload-disabled) {
+  border-color: var(--game-accent-color);
+  background: var(--game-accent-color-05);
 }
 
 .game-upload-text {
@@ -156,10 +160,6 @@ const handleDrop = (event: DragEvent) => {
 
 .game-upload-disabled {
   opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.game-upload-disabled .game-upload-drag-area {
   cursor: not-allowed;
 }
 </style>

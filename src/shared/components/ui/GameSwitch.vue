@@ -76,8 +76,8 @@ const switchClasses = computed(() => {
   border-radius: 11px;
   transition: all 0.2s ease;
   box-shadow: 
-    0 2px 4px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    0 2px 4px var(--game-color-black-30),
+    inset 0 1px 0 var(--game-color-white-10);
 }
 
 .game-switch-button {
@@ -89,30 +89,35 @@ const switchClasses = computed(() => {
   background: var(--game-text-secondary);
   border-radius: 50%;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 4px var(--game-color-black-30);
 }
 
 .game-switch-checked .game-switch-core {
-  background: linear-gradient(135deg, var(--game-accent-color) 0%, #00cc6a 100%);
+  background: linear-gradient(135deg, var(--game-accent-color) 0%, var(--game-accent-color-dark) 100%);
   border-color: var(--game-accent-color);
   box-shadow: 
     0 0 12px var(--game-accent-glow),
-    0 2px 4px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    0 2px 4px var(--game-color-black-30),
+    inset 0 1px 0 var(--game-color-white-20);
 }
 
 .game-switch-checked .game-switch-button {
   left: calc(100% - 16px);
-  background: #000000;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  background: var(--game-color-black);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 50%);
+}
+
+.game-switch:focus-visible .game-switch-core {
+  outline: 2px solid var(--game-accent-color);
+  outline-offset: 2px;
 }
 
 .game-switch:hover:not(.game-switch-disabled) .game-switch-core {
   border-color: var(--game-accent-color);
   box-shadow: 
     0 0 8px var(--game-accent-glow),
-    0 2px 4px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 2px 4px var(--game-color-black-30),
+    inset 0 1px 0 var(--game-color-white-10);
 }
 
 .game-switch-disabled {
@@ -137,24 +142,4 @@ const switchClasses = computed(() => {
   left: calc(100% - 13px);
 }
 
-.game-switch-large {
-  width: 52px;
-  height: 26px;
-}
-
-.game-switch-large .game-switch-button {
-  width: 18px;
-  height: 18px;
-  top: 3px;
-  left: 3px;
-}
-
-.game-switch-large.game-switch-checked .game-switch-button {
-  left: calc(100% - 21px);
-}
-
-.game-switch:focus-visible .game-switch-core {
-  outline: 2px solid var(--game-accent-color);
-  outline-offset: 2px;
-}
 </style>

@@ -199,6 +199,7 @@ watch(() => props.output.length, scrollToBottom)
   margin-left: 0.25rem;
   vertical-align: middle;
   min-height: 1.5rem; /* Reserve vertical space */
+
   /* Reserve horizontal space - adjust based on typical tag width */
   min-width: 3rem;
   justify-content: flex-start;
@@ -214,6 +215,7 @@ watch(() => props.output.length, scrollToBottom)
   visibility: hidden;
   opacity: 0;
   pointer-events: none;
+
   /* Keep dimensions to prevent layout shift */
 }
 
@@ -232,28 +234,26 @@ watch(() => props.output.length, scrollToBottom)
   box-shadow: 
     inset 0 0 30px var(--game-screen-text-color-10),
     inset 0 0 60px var(--game-screen-text-color-5);
-  animation: terminalGlow 3s ease-in-out infinite;
+  animation: terminal-glow 3s ease-in-out infinite;
 }
 
 .output-content::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: var(--game-surface-accent-gradient);
   pointer-events: none;
   z-index: 0;
-  animation: terminalShimmer 5s ease-in-out infinite;
+  animation: terminal-shimmer 5s ease-in-out infinite;
 }
 
-@keyframes terminalGlow {
+@keyframes terminal-glow {
   0%, 100% {
     box-shadow: 
       inset 0 0 30px var(--game-screen-text-color-10),
       inset 0 0 60px var(--game-screen-text-color-5);
   }
+
   50% {
     box-shadow: 
       inset 0 0 40px var(--game-screen-text-color-15),
@@ -262,10 +262,11 @@ watch(() => props.output.length, scrollToBottom)
   }
 }
 
-@keyframes terminalShimmer {
+@keyframes terminal-shimmer {
   0%, 100% {
     opacity: 0.5;
   }
+
   50% {
     opacity: 1;
   }
@@ -288,7 +289,7 @@ watch(() => props.output.length, scrollToBottom)
   line-height: var(--game-line-height-mono);
   color: var(--game-text-primary);
   white-space: pre-wrap;
-  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 

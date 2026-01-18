@@ -25,7 +25,6 @@
   margin: 0;
   border: none !important;
   border-width: 0 !important;
-  border-style: none !important;
   border-color: transparent !important;
   border-radius: 0;
   box-shadow: none;
@@ -89,7 +88,6 @@
   z-index: 2;
   border: none !important;
   border-width: 0 !important;
-  border-style: none !important;
   border-color: transparent !important;
 }
 
@@ -100,7 +98,6 @@
 .game-button-group :deep(.game-button-selected:focus-visible) {
   border: none !important;
   border-width: 0 !important;
-  border-style: none !important;
   border-color: transparent !important;
   outline: none !important;
   outline-width: 0 !important;
@@ -114,7 +111,6 @@
 .game-button-group :deep(.game-button-toggle.game-button-selected:focus-visible) {
   border: none !important;
   border-width: 0 !important;
-  border-style: none !important;
   border-color: transparent !important;
   outline: none !important;
   outline-width: 0 !important;
@@ -126,7 +122,6 @@
 .game-button-group :deep(.game-button-action.game-button-selected:active) {
   border: none !important;
   border-width: 0 !important;
-  border-style: none !important;
   border-color: transparent !important;
   outline: none !important;
 }

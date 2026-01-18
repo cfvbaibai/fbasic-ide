@@ -119,7 +119,7 @@ const navigateTo = (path: string) => {
 }
 
 /* Responsive design */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .features-grid {
     grid-template-columns: 1fr;
   }

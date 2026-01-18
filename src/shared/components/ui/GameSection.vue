@@ -26,7 +26,7 @@ withDefaults(defineProps<Props>(), {
   font-family: var(--game-font-family-heading);
   color: var(--game-text-primary);
   text-align: center;
-  margin: 0 0 2.5rem 0;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  margin: 0 0 2.5rem;
+  text-shadow: 0 2px 4px rgb(0 0 0 / 50%);
 }
 </style>

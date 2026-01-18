@@ -144,22 +144,24 @@ const handleClick = () => {
   padding-top: 0;
 }
 
-@keyframes borderShimmer {
+@keyframes border-shimmer {
   0%, 100% {
     background-position: -200% center;
     opacity: 0.6;
   }
+
   50% {
     background-position: 200% center;
     opacity: 0.9;
   }
 }
 
-@keyframes headerShimmer {
+@keyframes header-shimmer {
   0%, 100% {
     background-position: -200% center;
     opacity: 0.6;
   }
+
   50% {
     background-position: 200% center;
     opacity: 0.9;

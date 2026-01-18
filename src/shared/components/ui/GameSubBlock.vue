@@ -20,8 +20,8 @@ defineProps<Props>()
   border-radius: 10px;
   padding: 0.75rem;
   box-shadow: 
-    inset 0 2px 4px rgba(0, 0, 0, 0.3),
-    0 2px 6px rgba(0, 0, 0, 0.2);
+    inset 0 2px 4px var(--game-color-black-30),
+    0 2px 6px var(--game-color-black-20);
   position: relative;
   transition: all 0.3s ease;
   width: 100%;
@@ -33,8 +33,8 @@ defineProps<Props>()
 .game-sub-block:hover {
   border-color: var(--game-accent-color);
   box-shadow: 
-    inset 0 2px 4px rgba(0, 0, 0, 0.3),
-    0 0 12px rgba(0, 255, 136, 0.2);
+    inset 0 2px 4px var(--game-color-black-30),
+    0 0 12px var(--game-accent-color-20);
 }
 
 .game-sub-block-title {

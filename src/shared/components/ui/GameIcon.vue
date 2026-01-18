@@ -99,7 +99,6 @@ const rotateValue = computed((): number | undefined => {
 }
 
 @keyframes icon-pulse {
-
   0%,
   100% {
     opacity: 1;

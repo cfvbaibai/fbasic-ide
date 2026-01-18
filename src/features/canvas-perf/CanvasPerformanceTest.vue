@@ -235,7 +235,7 @@ onUnmounted(() => {
 .test-canvas {
   display: block;
   image-rendering: pixelated;
-  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
   image-rendering: crisp-edges;
   width: 672px; /* 224px * 3x scale */
   height: 576px; /* 192px * 3x scale */

@@ -69,12 +69,12 @@ const isActive = computed(() => activeTab.value === props.name)
 .game-tabs-border-card .game-tab-pane {
   background: var(--game-surface-bg-gradient);
   border: 2px solid var(--game-surface-border);
-  border-radius: 0 8px 8px 8px;
+  border-radius: 0 8px 8px;
   padding: 1rem;
   margin-top: -2px;
   box-shadow: 
-    0 4px 12px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    0 4px 12px var(--game-color-black-30),
+    inset 0 1px 0 var(--game-color-white-10);
   position: relative;
   overflow: hidden;
 }
@@ -88,7 +88,7 @@ const isActive = computed(() => activeTab.value === props.name)
   height: 3px;
   background: linear-gradient(90deg, 
     var(--game-accent-color) 0%, 
-    #00cc6a 50%,
+    var(--game-accent-color-dark) 50%,
     var(--game-accent-color) 100%
   );
   opacity: 0.8;
@@ -100,14 +100,11 @@ const isActive = computed(() => activeTab.value === props.name)
 .game-tabs-border-card .game-tab-pane::after {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: linear-gradient(135deg, 
-    rgba(0, 255, 136, 0.03) 0%, 
+    var(--game-accent-color-03) 0%, 
     transparent 50%,
-    rgba(0, 255, 136, 0.01) 100%
+    var(--game-accent-color-01) 100%
   );
   pointer-events: none;
   z-index: 0;

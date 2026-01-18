@@ -52,9 +52,9 @@ withDefaults(defineProps<Props>(), {
   color: var(--game-accent-color);
   text-shadow: 
     0 0 20px var(--game-accent-glow),
-    0 4px 8px rgba(0, 0, 0, 0.8);
+    0 4px 8px rgb(0 0 0 / 80%);
   letter-spacing: 3px;
-  margin: 0 0 1.5rem 0;
+  margin: 0 0 1.5rem;
 }
 
 .hero-icon {
@@ -64,7 +64,7 @@ withDefaults(defineProps<Props>(), {
 .hero-subtitle {
   font-size: 1.5rem;
   color: var(--game-text-secondary);
-  margin: 0 0 1rem 0;
+  margin: 0 0 1rem;
   font-weight: 500;
 }
 
@@ -76,7 +76,7 @@ withDefaults(defineProps<Props>(), {
 }
 
 /* Responsive design */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .hero-title {
     font-size: 2.5rem;
   }
@@ -90,7 +90,7 @@ withDefaults(defineProps<Props>(), {
   }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .hero-title {
     font-size: 2rem;
     flex-direction: column;

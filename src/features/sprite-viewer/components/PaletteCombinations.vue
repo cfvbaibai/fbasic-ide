@@ -93,12 +93,12 @@ import GameCard from '../../../shared/components/ui/GameCard.vue'
 }
 
 .section-title {
-  margin: 0 0 1.5rem 0;
+  margin: 0 0 1.5rem;
   color: var(--game-text-primary);
   font-family: var(--game-font-family-heading);
   font-size: 1.5rem;
   font-weight: 700;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 2px 4px var(--game-color-black-50);
 }
 
 .palettes-container {
@@ -123,12 +123,12 @@ import GameCard from '../../../shared/components/ui/GameCard.vue'
 }
 
 .palette-group-title {
-  margin: 0 0 1rem 0;
+  margin: 0 0 1rem;
   color: var(--game-text-primary);
   font-family: var(--game-font-family-heading);
   font-size: 1.1rem;
   font-weight: 700;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 2px 4px var(--game-color-black-50);
 }
 
 .color-combinations {
@@ -153,10 +153,9 @@ import GameCard from '../../../shared/components/ui/GameCard.vue'
 
 .combination-colors {
   display: flex;
-  flex-direction: row;
+  flex-flow: row nowrap;
   gap: 0.5rem;
   align-items: stretch;
-  flex-wrap: nowrap;
 }
 
 .combination-color-wrapper {
