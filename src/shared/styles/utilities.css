@@ -20,7 +20,7 @@
 }
 
 .text-game-accent {
-    color: var(--game-accent-color);
+    color: var(--base-solid-primary);
     text-shadow: 0 0 8px var(--game-accent-glow);
 }
 

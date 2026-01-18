@@ -51,15 +51,15 @@ const title = computed(() => {
   display: flex;
   flex-direction: column;
   gap: 0;
-  background: var(--base-color-black);
+  background: var(--base-solid-gray-00);
   padding: 0;
   border-radius: 4px;
   border: 8px solid var(--game-surface-border);
   width: fit-content;
   margin: 0 auto;
   box-shadow: 
-    0 0 20px var(--base-color-black-80),
-    inset 0 0 20px var(--game-accent-color-10);
+    0 0 20px var(--base-alpha-gray-00-80),
+    inset 0 0 20px var(--base-alpha-primary-10);
 }
 
 .grid-container-8x8 {
@@ -92,7 +92,7 @@ const title = computed(() => {
 }
 
 .grid-cell-bordered {
-  border: 1px solid var(--base-color-white-10);
+  border: 1px solid var(--game-surface-border);
 }
 
 .grid-cell:hover {
@@ -108,7 +108,7 @@ const title = computed(() => {
   font-family: var(--game-font-family-mono);
   color: var(--game-text-primary);
   text-shadow: 
-    1px 1px 2px var(--base-color-black-80),
+    1px 1px 2px var(--base-alpha-gray-00-80),
     0 0 4px var(--game-accent-glow);
   user-select: none;
 }

@@ -48,104 +48,58 @@ onMounted(() => {
 </script>
 
 <template>
-  <GameLayout
-    title="Family Basic IDE"
-    icon="mdi:monitor"
-  >
+  <GameLayout title="Family Basic IDE" icon="mdi:monitor">
     <template #sub>
       <div class="sample-programs">
         <GameButtonGroup>
-          <GameButton 
-            variant="toggle"
-            :selected="currentSampleType === 'basic'"
-            @click="loadSampleCode('basic')" 
-            size="small"
-          >
+          <GameButton variant="toggle" :selected="currentSampleType === 'basic'" @click="loadSampleCode('basic')"
+            size="small">
             Basic
           </GameButton>
-          <GameButton 
-            variant="toggle"
-            :selected="currentSampleType === 'pause'"
-            @click="loadSampleCode('pause')" 
-            size="small"
-          >
+          <GameButton variant="toggle" :selected="currentSampleType === 'pause'" @click="loadSampleCode('pause')"
+            size="small">
             Pause Demo
           </GameButton>
-          <GameButton 
-            variant="toggle"
-            :selected="currentSampleType === 'gaming'"
-            @click="loadSampleCode('gaming')" 
-            size="small"
-          >
+          <GameButton variant="toggle" :selected="currentSampleType === 'gaming'" @click="loadSampleCode('gaming')"
+            size="small">
             Joystick Test
           </GameButton>
-          <GameButton 
-            variant="toggle"
-            :selected="currentSampleType === 'complex'"
-            @click="loadSampleCode('complex')" 
-            size="small"
-          >
+          <GameButton variant="toggle" :selected="currentSampleType === 'complex'" @click="loadSampleCode('complex')"
+            size="small">
             Complex
           </GameButton>
-          <GameButton 
-            variant="toggle"
-            :selected="currentSampleType === 'comprehensive'"
-            @click="loadSampleCode('comprehensive')" 
-            size="small"
-          >
+          <GameButton variant="toggle" :selected="currentSampleType === 'comprehensive'"
+            @click="loadSampleCode('comprehensive')" size="small">
             Full Demo
           </GameButton>
         </GameButtonGroup>
       </div>
     </template>
     <template #action>
-      <IdeControls 
-        :is-running="isRunning"
-        :can-run="canRun"
-        :can-stop="canStop"
-        :debug-mode="debugMode"
-        @run="runCode"
-        @stop="stopCode"
-        @clear="clearOutput"
-        @toggle-debug="toggleDebugMode"
-      />
+      <IdeControls :is-running="isRunning" :can-run="canRun" :can-stop="canStop" :debug-mode="debugMode" @run="runCode"
+        @stop="stopCode" @clear="clearOutput" @toggle-debug="toggleDebugMode" />
     </template>
     <div class="ide-container">
 
-    <!-- Main IDE Content -->
-    <div class="ide-content">
-      <!-- Left Panel - Code Editor -->
-      <GameBlock 
-        title="Code Editor"
-        title-icon="mdi:pencil"
-        class="editor-panel"
-      >
-        <MonacoCodeEditor v-model="code" />
-      </GameBlock>
+      <!-- Main IDE Content -->
+      <div class="ide-content">
+        <!-- Left Panel - Code Editor -->
+        <GameBlock title="Code Editor" title-icon="mdi:pencil" class="editor-panel">
+          <MonacoCodeEditor v-model="code" />
+        </GameBlock>
 
-      <!-- Right Panel - Runtime Output -->
-      <div class="output-panel">
-        <RuntimeOutput 
-          :output="output" 
-          :is-running="isRunning" 
-          :errors="errors"
-          :variables="variables"
-          :debug-output="debugOutput"
-          :debug-mode="debugMode"
-          :screen-buffer="screenBuffer"
-          :cursor-x="cursorX"
-          :cursor-y="cursorY"
-        />
+        <!-- Right Panel - Runtime Output -->
+        <div class="output-panel">
+          <RuntimeOutput :output="output" :is-running="isRunning" :errors="errors" :variables="variables"
+            :debug-output="debugOutput" :debug-mode="debugMode" :screen-buffer="screenBuffer" :cursor-x="cursorX"
+            :cursor-y="cursorY" />
+        </div>
       </div>
-    </div>
 
-    <!-- Joystick Control Panel -->
-    <div class="joystick-control-wrapper">
-      <JoystickControl 
-        :send-stick-event="sendStickEvent"
-        :send-strig-event="sendStrigEvent"
-      />
-    </div>
+      <!-- Joystick Control Panel -->
+      <div class="joystick-control-wrapper">
+        <JoystickControl :send-stick-event="sendStickEvent" :send-strig-event="sendStrigEvent" />
+      </div>
     </div>
   </GameLayout>
 </template>
@@ -156,7 +110,7 @@ onMounted(() => {
   height: 100%;
   display: flex;
   flex-direction: column;
-  overflow-x: hidden; /* Prevent horizontal scrollbar */
+  overflow-x: hidden;
 }
 
 .sample-programs {
@@ -169,45 +123,45 @@ onMounted(() => {
 }
 
 .ide-content {
-  flex: 1 1 0; /* Take remaining space */
+  flex: 1 1 0;
   display: flex;
-  min-height: 0; /* Allow flex items to shrink below content size */
-  overflow: hidden; /* Prevent content overflow */
+  min-height: 0;
+  overflow: hidden;
   gap: 1rem;
   padding: 1rem;
 }
 
 .editor-panel {
-  flex: 1 1 0; /* Equal width with output panel */
+  flex: 1 1 0;
   display: flex;
   flex-direction: column;
-  min-width: 0; /* Allow panel to shrink */
-  overflow: hidden; /* Prevent panel overflow */
+  min-width: 0;
+  overflow: hidden;
 }
 
 .editor-panel :deep(.game-block-content) {
   flex: 1 1 0;
-  overflow: hidden; /* Monaco handles its own scrolling */
+  overflow: hidden;
   min-height: 0;
   display: flex;
   flex-direction: column;
 }
 
 .output-panel {
-  flex: 1 1 0; /* Equal width with editor panel */
+  flex: 1 1 0;
   background: var(--game-surface-bg-gradient);
   border: 2px solid var(--game-surface-border);
   border-radius: 12px;
   display: flex;
   flex-direction: column;
-  min-width: 0; /* Allow panel to shrink */
-  overflow: hidden; /* Prevent panel overflow */
+  min-width: 0;
+  overflow: hidden;
   box-shadow: var(--game-shadow-base);
   position: relative;
 }
 
 
-.output-panel > * {
+.output-panel>* {
   flex: 1 1 0;
   overflow: auto;
   min-height: 0;
@@ -219,7 +173,8 @@ onMounted(() => {
 
 /* Glowing animations */
 @keyframes border-shimmer {
-  0%, 100% {
+  0%,
+  100% {
     background-position: -200% center;
     opacity: 0.6;
   }

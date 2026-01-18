@@ -96,8 +96,8 @@ const inputClasses = computed(() => {
   outline: none;
   transition: all 0.2s ease;
   box-shadow: 
-    0 2px 4px var(--base-color-black-30),
-    inset 0 1px 0 var(--base-color-white-10);
+    0 2px 4px var(--base-alpha-gray-00-30),
+    inset 0 1px 0 var(--base-alpha-gray-100-10);
 }
 
 .game-input-inner::placeholder {
@@ -106,11 +106,11 @@ const inputClasses = computed(() => {
 }
 
 .game-input-inner:focus {
-  border-color: var(--game-accent-color);
+  border-color: var(--base-solid-primary);
   box-shadow: 
     0 0 12px var(--game-accent-glow),
-    0 2px 4px var(--base-color-black-30),
-    inset 0 1px 0 var(--base-color-white-10);
+    0 2px 4px var(--base-alpha-gray-00-30),
+    inset 0 1px 0 var(--base-alpha-gray-100-10);
 }
 
 .game-input-inner:disabled {
@@ -151,7 +151,7 @@ const inputClasses = computed(() => {
 
 .game-input-clear:hover {
   color: var(--game-text-primary);
-  background: var(--base-color-white-10);
+  background: var(--base-alpha-gray-100-10);
 }
 
 .game-input-clearable .game-input-inner {

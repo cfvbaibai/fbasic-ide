@@ -90,14 +90,14 @@ const tooltipTitle = computed(() => {
 .color-box-code {
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--base-color-white);
-  text-shadow: 1px 1px 2px var(--base-color-black-80);
+  color: var(--base-solid-gray-100);
+  text-shadow: 1px 1px 2px var(--base-alpha-gray-00-80);
   user-select: none;
 }
 
 .color-box-code-light {
-  color: var(--base-color-black);
-  text-shadow: 1px 1px 2px var(--base-color-white-80);
+  color: var(--base-solid-gray-00);
+  text-shadow: 1px 1px 2px var(--base-alpha-gray-100-80);
 }
 </style>
 

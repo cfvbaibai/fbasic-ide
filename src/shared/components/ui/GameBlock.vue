@@ -82,13 +82,13 @@ const handleClick = () => {
   left: 0;
   right: 0;
   height: 4px;
-  background: var(--game-accent-color);
+  background: var(--base-solid-primary);
   transform: scaleX(0);
   transition: transform 0.3s ease;
 }
 
 .game-block:hover {
-  border-color: var(--game-accent-color);
+  border-color: var(--base-solid-primary);
   box-shadow: var(--game-shadow-hover);
 }
 
@@ -131,7 +131,7 @@ const handleClick = () => {
 
 /* Light theme: use accent color, no glow */
 .light-theme .game-block-title {
-  color: var(--game-accent-color);
+  color: var(--base-solid-primary);
   text-shadow: none;
 }
 

@@ -93,14 +93,14 @@ const tableColumns: Column[] = [
 
 @keyframes cell-flash {
   0% {
-    color: var(--game-accent-color);
+    color: var(--base-solid-primary);
     text-shadow: 0 0 8px var(--game-accent-glow);
     transform: scale(1.3);
     font-weight: 700;
   }
 
   50% {
-    color: var(--game-accent-color);
+    color: var(--base-solid-primary);
     text-shadow: 0 0 16px var(--game-accent-glow);
     transform: scale(4);
     font-weight: 700;

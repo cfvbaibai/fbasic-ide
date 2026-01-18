@@ -67,30 +67,14 @@ const isActive = computed(() => activeTab.value === props.name)
 
 /* Border card pane styles */
 .game-tabs-border-card .game-tab-pane {
-  background: var(--game-surface-bg-gradient);
-  border: 2px solid var(--game-surface-border);
-  border-radius: 0 8px 8px;
+  border-top: 1px solid var(--game-surface-border);
   padding: 1rem;
-  margin-top: -2px;
-  box-shadow: 
-    0 4px 12px var(--base-color-black-30),
-    inset 0 1px 0 var(--base-color-white-10);
+  box-shadow: none;
   position: relative;
   overflow: hidden;
 }
 
 .game-tabs-border-card .game-tab-pane::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, 
-    var(--game-accent-color) 0%, 
-    var(--game-accent-color) 50%,
-    var(--game-accent-color) 100%
-  );
-  opacity: 0.8;
+  display: none;
 }
 </style>

@@ -94,8 +94,8 @@ const getIconSize = computed(() => {
   border-radius: 8px;
   transition: all 0.2s ease;
   box-shadow: 
-    0 2px 4px var(--base-color-black-30),
-    inset 0 1px 0 var(--base-color-white-10);
+    0 2px 4px var(--base-alpha-gray-00-30),
+    inset 0 1px 0 var(--base-alpha-gray-100-10);
   border: 1px solid var(--game-surface-border);
   background: linear-gradient(135deg, var(--game-surface-bg-start) 0%, var(--game-nav-bg-start) 100%);
   color: var(--game-text-secondary);
@@ -115,112 +115,112 @@ const getIconSize = computed(() => {
 }
 
 .game-icon-button:hover:not(.game-icon-button-disabled) {
-  background: var(--game-surface-hover-gradient);
+  background: var(--game-surface-bg-hover-gradient);
   border-color: var(--game-surface-border);
   color: var(--game-text-primary);
   transform: translateY(-2px);
   box-shadow: 
-    0 4px 8px var(--base-color-black-40),
-    0 2px 4px var(--base-color-black-40),
-    inset 0 1px 0 var(--base-color-white-10);
+    0 4px 8px var(--base-alpha-gray-00-40),
+    0 2px 4px var(--base-alpha-gray-00-40),
+    inset 0 1px 0 var(--base-alpha-gray-100-10);
 }
 
 .game-icon-button:active:not(.game-icon-button-disabled) {
   transform: translateY(0);
   box-shadow: 
-    0 2px 4px var(--base-color-black-30),
-    inset 0 1px 0 var(--base-color-white-10);
+    0 2px 4px var(--base-alpha-gray-00-30),
+    inset 0 1px 0 var(--base-alpha-gray-100-10);
 }
 
 /* Type variants - All buttons use the same base style, type affects hover/active states */
 .game-icon-button-primary:hover:not(.game-icon-button-disabled) {
   border-color: var(--game-surface-border);
   box-shadow: 
-    0 4px 8px var(--base-color-black-40),
-    0 2px 4px var(--base-color-black-40),
-    inset 0 1px 0 var(--base-color-white-10);
+    0 4px 8px var(--base-alpha-gray-00-40),
+    0 2px 4px var(--base-alpha-gray-00-40),
+    inset 0 1px 0 var(--base-alpha-gray-100-10);
 }
 
 .game-icon-button-primary:active:not(.game-icon-button-disabled) {
-  background: linear-gradient(135deg, var(--game-accent-color) 0%, var(--game-accent-color) 100%);
+  background: linear-gradient(135deg, var(--base-solid-primary) 0%, var(--base-solid-primary) 100%);
   border-color: var(--game-surface-border);
-  color: var(--base-color-black);
+  color: var(--base-solid-gray-00);
   box-shadow: 
     0 0 20px var(--game-accent-glow),
-    0 4px 8px var(--base-color-black-40),
-    inset 0 1px 0 var(--base-color-white-30);
+    0 4px 8px var(--base-alpha-gray-00-40),
+    inset 0 1px 0 var(--base-alpha-gray-100-30);
 }
 
 .game-icon-button-success:hover:not(.game-icon-button-disabled) {
-  border-color: var(--semantic-success);
+  border-color: var(--semantic-solid-success);
   box-shadow: 
-    0 4px 8px var(--semantic-success-40),
-    0 2px 4px var(--base-color-black-40),
-    inset 0 1px 0 var(--base-color-white-10);
+    0 4px 8px var(--semantic-alpha-success-40),
+    0 2px 4px var(--base-alpha-gray-00-40),
+    inset 0 1px 0 var(--base-alpha-gray-100-10);
 }
 
 .game-icon-button-success:active:not(.game-icon-button-disabled) {
-  background: linear-gradient(135deg, var(--semantic-success) 0%, var(--semantic-success) 100%);
-  border-color: var(--semantic-success);
-  color: var(--base-color-white);
+  background: linear-gradient(135deg, var(--semantic-solid-success) 0%, var(--semantic-solid-success) 100%);
+  border-color: var(--semantic-solid-success);
+  color: var(--base-solid-gray-100);
   box-shadow: 
-    0 0 12px var(--semantic-success-50),
-    0 2px 4px var(--base-color-black-30),
-    inset 0 1px 0 var(--base-color-white-20);
+    0 0 12px var(--semantic-alpha-success-50),
+    0 2px 4px var(--base-alpha-gray-00-30),
+    inset 0 1px 0 var(--base-alpha-gray-100-20);
 }
 
 .game-icon-button-warning:hover:not(.game-icon-button-disabled) {
-  border-color: var(--semantic-warning);
+  border-color: var(--semantic-solid-warning);
   box-shadow: 
-    0 4px 8px var(--semantic-warning-40),
-    0 2px 4px var(--base-color-black-40),
-    inset 0 1px 0 var(--base-color-white-10);
+    0 4px 8px var(--semantic-alpha-warning-40),
+    0 2px 4px var(--base-alpha-gray-00-40),
+    inset 0 1px 0 var(--base-alpha-gray-100-10);
 }
 
 .game-icon-button-warning:active:not(.game-icon-button-disabled) {
-  background: linear-gradient(135deg, var(--semantic-warning) 0%, var(--semantic-warning) 100%);
-  border-color: var(--semantic-warning);
-  color: var(--base-color-white);
+  background: linear-gradient(135deg, var(--semantic-solid-warning) 0%, var(--semantic-solid-warning) 100%);
+  border-color: var(--semantic-solid-warning);
+  color: var(--base-solid-gray-100);
   box-shadow: 
-    0 0 12px var(--semantic-warning-50),
-    0 2px 4px var(--base-color-black-30),
-    inset 0 1px 0 var(--base-color-white-20);
+    0 0 12px var(--semantic-alpha-warning-50),
+    0 2px 4px var(--base-alpha-gray-00-30),
+    inset 0 1px 0 var(--base-alpha-gray-100-20);
 }
 
 .game-icon-button-danger:hover:not(.game-icon-button-disabled) {
-  border-color: var(--semantic-danger);
+  border-color: var(--semantic-solid-danger);
   box-shadow: 
-    0 4px 8px var(--semantic-danger-40),
-    0 2px 4px var(--base-color-black-40),
-    inset 0 1px 0 var(--base-color-white-10);
+    0 4px 8px var(--semantic-alpha-danger-40),
+    0 2px 4px var(--base-alpha-gray-00-40),
+    inset 0 1px 0 var(--base-alpha-gray-100-10);
 }
 
 .game-icon-button-danger:active:not(.game-icon-button-disabled) {
-  background: linear-gradient(135deg, var(--semantic-danger) 0%, var(--semantic-danger) 100%);
-  border-color: var(--semantic-danger);
-  color: var(--base-color-white);
+  background: linear-gradient(135deg, var(--semantic-solid-danger) 0%, var(--semantic-solid-danger) 100%);
+  border-color: var(--semantic-solid-danger);
+  color: var(--base-solid-gray-100);
   box-shadow: 
-    0 0 12px var(--semantic-danger-50),
-    0 2px 4px var(--base-color-black-30),
-    inset 0 1px 0 var(--base-color-white-20);
+    0 0 12px var(--semantic-alpha-danger-50),
+    0 2px 4px var(--base-alpha-gray-00-30),
+    inset 0 1px 0 var(--base-alpha-gray-100-20);
 }
 
 .game-icon-button-info:hover:not(.game-icon-button-disabled) {
-  border-color: var(--semantic-info);
+  border-color: var(--semantic-solid-info);
   box-shadow: 
-    0 4px 8px var(--semantic-info-40),
-    0 2px 4px var(--base-color-black-40),
-    inset 0 1px 0 var(--base-color-white-10);
+    0 4px 8px var(--semantic-alpha-info-40),
+    0 2px 4px var(--base-alpha-gray-00-40),
+    inset 0 1px 0 var(--base-alpha-gray-100-10);
 }
 
 .game-icon-button-info:active:not(.game-icon-button-disabled) {
-  background: linear-gradient(135deg, var(--semantic-info) 0%, var(--semantic-info) 100%);
-  border-color: var(--semantic-info);
-  color: var(--base-color-white);
+  background: linear-gradient(135deg, var(--semantic-solid-info) 0%, var(--semantic-solid-info) 100%);
+  border-color: var(--semantic-solid-info);
+  color: var(--base-solid-gray-100);
   box-shadow: 
-    0 0 12px var(--semantic-info-50),
-    0 2px 4px var(--base-color-black-30),
-    inset 0 1px 0 var(--base-color-white-20);
+    0 0 12px var(--semantic-alpha-info-50),
+    0 2px 4px var(--base-alpha-gray-00-30),
+    inset 0 1px 0 var(--base-alpha-gray-100-20);
 }
 
 /* Toggle variant - more compact */
@@ -231,24 +231,24 @@ const getIconSize = computed(() => {
 /* Selected state - persistent highlight for toggle buttons */
 .game-icon-button-toggle.game-icon-button-selected,
 .game-icon-button-action.game-icon-button-selected {
-  background: linear-gradient(135deg, var(--game-accent-color) 0%, var(--game-accent-color) 100%);
+  background: linear-gradient(135deg, var(--base-solid-primary) 0%, var(--base-solid-primary) 100%);
   border-color: var(--game-surface-border);
-  color: var(--base-color-black);
+  color: var(--base-solid-gray-00);
   box-shadow: 
     0 0 20px var(--game-accent-glow),
-    0 4px 8px var(--base-color-black-40),
-    inset 0 1px 0 var(--base-color-white-30);
+    0 4px 8px var(--base-alpha-gray-00-40),
+    inset 0 1px 0 var(--base-alpha-gray-100-30);
 }
 
 .game-icon-button-toggle.game-icon-button-selected:hover:not(.game-icon-button-disabled),
 .game-icon-button-action.game-icon-button-selected:hover:not(.game-icon-button-disabled) {
-  background: linear-gradient(135deg, var(--game-accent-color) 0%, var(--game-accent-color) 100%);
+  background: linear-gradient(135deg, var(--base-solid-primary) 0%, var(--base-solid-primary) 100%);
   border-color: var(--game-surface-border);
   transform: translateY(-2px);
   box-shadow: 
     0 0 24px var(--game-accent-glow),
-    0 6px 12px var(--base-color-black-50),
-    inset 0 1px 0 var(--base-color-white-30);
+    0 6px 12px var(--base-alpha-gray-00-50),
+    inset 0 1px 0 var(--base-alpha-gray-100-30);
 }
 
 .game-icon-button-toggle.game-icon-button-selected:active:not(.game-icon-button-disabled),
@@ -256,8 +256,8 @@ const getIconSize = computed(() => {
   transform: translateY(0);
   box-shadow: 
     0 0 20px var(--game-accent-glow),
-    0 4px 8px var(--base-color-black-40),
-    inset 0 1px 0 var(--base-color-white-30);
+    0 4px 8px var(--base-alpha-gray-00-40),
+    inset 0 1px 0 var(--base-alpha-gray-100-30);
 }
 
 /* Size variants */
@@ -278,8 +278,8 @@ const getIconSize = computed(() => {
 
 .game-icon-button-disabled:hover {
   box-shadow: 
-    0 2px 4px var(--base-color-black-30),
-    inset 0 1px 0 var(--base-color-white-10) !important;
+    0 2px 4px var(--base-alpha-gray-00-30),
+    inset 0 1px 0 var(--base-alpha-gray-100-10) !important;
 }
 
 /* Loading state */

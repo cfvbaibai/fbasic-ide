@@ -49,10 +49,10 @@ withDefaults(defineProps<Props>(), {
   font-size: 3.5rem;
   font-weight: 700;
   font-family: var(--game-font-family-heading);
-  color: var(--game-accent-color);
+  color: var(--base-solid-primary);
   text-shadow: 
     0 0 20px var(--game-accent-glow),
-    0 4px 8px var(--base-color-black-80);
+    0 4px 8px var(--base-alpha-gray-00-80);
   letter-spacing: 3px;
   margin: 0 0 1.5rem;
 }

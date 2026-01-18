@@ -2,7 +2,7 @@
 </script>
 
 <template>
-  <div class="game-page-container bg-game-surface">
+  <div class="game-page-container">
     <slot />
   </div>
 </template>
@@ -14,5 +14,10 @@
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
+  background: var(--base-solid-gray-10);
+}
+
+.light-theme .game-page-container {
+  background: var(--base-solid-gray-00);
 }
 </style>

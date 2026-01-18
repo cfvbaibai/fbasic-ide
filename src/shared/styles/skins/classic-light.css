@@ -1,0 +1,32 @@
+/**
+ * Classic Light Skin
+ * 
+ * A warm, classic light theme with soft purple accent and warm off-white tones.
+ * Only overrides --base-xxx variables; --game-xxx variables adapt automatically.
+ */
+
+[data-skin="classic-light"] {
+    /* Primary Accent Color - Warm Purple */
+    --base-solid-primary: #6B4C93;
+    --base-solid-gray-00: #faf8f5;
+    --base-solid-gray-100: #2a2a2a;
+    /* Solid - lightest (was white) */
+    /* Light Gray Scale (warm tones for light theme) */
+    --base-solid-gray-10: #f5f3f0;
+    --base-solid-gray-20: #ebe8e3;
+    --base-solid-gray-30: #d8d4cd;
+    --base-solid-gray-40: #c4beb5;
+    --base-solid-gray-50: #a8a19a;
+    --base-solid-gray-60: #8c857d;
+    --base-solid-gray-70: #706961;
+    --base-solid-gray-80: #544d45;
+    --base-solid-gray-90: #38312a;
+    /* Override game-text variables for light theme (text should be dark) */
+    --game-text-contrast: var(--base-solid-gray-00);
+    /* Semantic Colors - Adjusted for light background */
+    --semantic-solid-success: #5a7c4a;
+    --semantic-solid-warning: #b8945a;
+    --semantic-solid-danger: #b85454;
+    --semantic-solid-info: #6b7a8a;
+    --semantic-solid-neutral: #6b6863;
+}

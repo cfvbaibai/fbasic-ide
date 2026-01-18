@@ -53,28 +53,11 @@ const hasHeader = computed(() => {
 
 .game-layout-header {
   flex: 0 0 auto;
-  background: var(--game-surface-bg-gradient);
   border-bottom: 2px solid var(--game-surface-border);
   padding: 1rem 1.5rem;
   margin-bottom: 1rem;
   box-shadow: var(--game-shadow-base);
   position: relative;
-}
-
-.game-layout-header::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    var(--game-accent-glow) 50%, 
-    transparent 100%
-  );
-  opacity: 0.5;
-  border-radius: 12px 12px 0 0;
 }
 
 .game-layout-header-main {
@@ -101,7 +84,7 @@ const hasHeader = computed(() => {
 
 /* Light theme: use accent color, no glow */
 .light-theme .game-layout-title {
-  color: var(--game-accent-color);
+  color: var(--base-solid-primary);
   text-shadow: none;
 }
 

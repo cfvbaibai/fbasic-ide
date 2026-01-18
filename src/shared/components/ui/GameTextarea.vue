@@ -69,8 +69,8 @@ const textareaClasses = computed(() => {
   outline: none;
   transition: all 0.2s ease;
   box-shadow: 
-    0 2px 4px var(--base-color-black-30),
-    inset 0 1px 0 var(--base-color-white-10);
+    0 2px 4px var(--base-alpha-gray-00-30),
+    inset 0 1px 0 var(--base-alpha-gray-100-10);
   line-height: 1.5;
   font-family: var(--game-font-family-mono);
 }
@@ -81,11 +81,11 @@ const textareaClasses = computed(() => {
 }
 
 .game-textarea-inner:focus {
-  border-color: var(--game-accent-color);
+  border-color: var(--base-solid-primary);
   box-shadow: 
     0 0 12px var(--game-accent-glow),
-    0 2px 4px var(--base-color-black-30),
-    inset 0 1px 0 var(--base-color-white-10);
+    0 2px 4px var(--base-alpha-gray-00-30),
+    inset 0 1px 0 var(--base-alpha-gray-100-10);
 }
 
 .game-textarea-inner:disabled,
@@ -126,6 +126,6 @@ const textareaClasses = computed(() => {
 }
 
 .game-textarea-inner::-webkit-scrollbar-thumb:hover {
-  background: var(--game-accent-color);
+  background: var(--base-solid-primary);
 }
 </style>

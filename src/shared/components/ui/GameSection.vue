@@ -31,7 +31,7 @@ withDefaults(defineProps<Props>(), {
 
 /* Light theme: use accent color, no glow */
 .light-theme .game-section-title {
-  color: var(--game-accent-color);
+  color: var(--base-solid-primary);
   text-shadow: none;
 }
 </style>

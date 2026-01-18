@@ -86,23 +86,23 @@ if (typeof document !== 'undefined') {
     }
     
     .game-message-success {
-      border-color: var(--semantic-success);
-      background: linear-gradient(135deg, color-mix(in srgb, var(--semantic-success) 20%, var(--game-surface-bg-start)) 0%, var(--game-surface-bg-end) 100%);
+      border-color: var(--semantic-solid-success);
+      background: linear-gradient(135deg, color-mix(in srgb, var(--semantic-solid-success) 20%, var(--game-surface-bg-start)) 0%, var(--game-surface-bg-end) 100%);
     }
     
     .game-message-warning {
-      border-color: var(--semantic-warning);
-      background: linear-gradient(135deg, color-mix(in srgb, var(--semantic-warning) 20%, var(--game-surface-bg-start)) 0%, var(--game-surface-bg-end) 100%);
+      border-color: var(--semantic-solid-warning);
+      background: linear-gradient(135deg, color-mix(in srgb, var(--semantic-solid-warning) 20%, var(--game-surface-bg-start)) 0%, var(--game-surface-bg-end) 100%);
     }
     
     .game-message-error {
-      border-color: var(--semantic-danger);
-      background: linear-gradient(135deg, color-mix(in srgb, var(--semantic-danger) 20%, var(--game-surface-bg-start)) 0%, var(--game-surface-bg-end) 100%);
+      border-color: var(--semantic-solid-danger);
+      background: linear-gradient(135deg, color-mix(in srgb, var(--semantic-solid-danger) 20%, var(--game-surface-bg-start)) 0%, var(--game-surface-bg-end) 100%);
     }
     
     .game-message-info {
-      border-color: var(--semantic-info);
-      background: linear-gradient(135deg, color-mix(in srgb, var(--semantic-info) 20%, var(--game-surface-bg-start)) 0%, var(--game-surface-bg-end) 100%);
+      border-color: var(--semantic-solid-info);
+      background: linear-gradient(135deg, color-mix(in srgb, var(--semantic-solid-info) 20%, var(--game-surface-bg-start)) 0%, var(--game-surface-bg-end) 100%);
     }
   `
   document.head.appendChild(style)

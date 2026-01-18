@@ -75,37 +75,33 @@ provide('unregisterTab', unregisterTab)
 .game-tabs-header {
   display: flex;
   gap: 0.5rem;
-  padding: 0.5rem;
-  background: var(--game-surface-bg-gradient);
-  border-bottom: 2px solid var(--game-surface-border);
+  padding: 0.375rem;
+  background: transparent;
+  border-bottom: 1px solid var(--game-surface-border);
   overflow-x: auto;
   flex-shrink: 0;
   position: relative;
 }
 
-/* Header glow removed */
-
 .game-tabs-border-card .game-tabs-header {
   background: transparent;
   border-bottom: none;
   padding: 0;
-  gap: 0.25rem;
+  gap: 0.125rem;
 }
 
 /* Border card tab button styles - buttons are rendered here */
 .game-tabs-border-card :deep(.game-tab-button) {
-  background: var(--game-surface-bg-gradient);
-  border: 2px solid var(--game-surface-border);
+  background: transparent;
+  border: 1px solid var(--game-surface-border);
   border-bottom: none;
-  border-radius: 8px 8px 0 0;
-  margin-right: 0.25rem;
-  padding: 0.625rem 1rem;
-  box-shadow: 
-    0 2px 4px var(--base-color-black-30),
-    inset 0 1px 0 var(--base-color-white-10);
+  border-radius: 6px 6px 0 0;
+  margin-right: 0.125rem;
+  padding: 0.875rem 0.875rem 0.75rem;
+  box-shadow: none;
   position: relative;
-  gap: 0.625rem;
-  min-height: 40px;
+  gap: 0.5rem;
+  min-height: auto;
   overflow: hidden;
   display: inline-flex;
   align-items: center;
@@ -114,157 +110,144 @@ provide('unregisterTab', unregisterTab)
 .game-tabs-border-card :deep(.game-tab-button::before) {
   content: '';
   position: absolute;
-  top: 0;
+  bottom: 0;
   left: 0;
   right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    var(--game-accent-color) 50%, 
-    transparent 100%
-  );
+  height: 2px;
+  background: var(--base-solid-primary);
   transform: scaleX(0);
   transform-origin: center;
-  transition: transform 0.3s ease;
+  transition: transform 0.2s ease;
   opacity: 0;
 }
 
-
 .game-tabs-border-card :deep(.game-tab-button:hover:not(.disabled)) {
-  border-color: var(--game-surface-border-hover);
-  box-shadow: 
-    0 4px 8px var(--base-color-black-40),
-    inset 0 1px 0 var(--base-color-white-10);
-  transform: translateY(-2px);
+  border-color: var(--game-surface-border);
+  box-shadow: none;
+  transform: none;
   color: var(--game-text-primary);
-  background: var(--game-surface-hover-gradient);
+  background: var(--game-surface-bg-start);
 }
 
 .game-tabs-border-card :deep(.game-tab-button:hover:not(.disabled)::before) {
-  transform: scaleX(0.6);
-  opacity: 0.6;
-}
-
-.game-tabs-border-card :deep(.game-tab-button:hover:not(.disabled)::after) {
-  opacity: 1;
+  transform: scaleX(0.4);
+  opacity: 0.5;
 }
 
 .game-tabs-border-card :deep(.game-tab-button.active) {
-  background: var(--game-surface-bg-gradient);
-  border-color: var(--game-accent-color);
+  background: transparent;
+  border-color: var(--game-surface-border);
   border-bottom-color: transparent;
-  box-shadow: 
-    0 4px 8px var(--base-color-black-40),
-    inset 0 1px 0 var(--base-color-white-10);
+  box-shadow: none;
   z-index: 1;
   position: relative;
-  transform: translateY(-2px);
-  color: var(--game-accent-color);
+  transform: none;
+  color: var(--base-solid-primary);
 }
 
 .game-tabs-border-card :deep(.game-tab-button.active::before) {
   transform: scaleX(1);
-  height: 3px;
+  opacity: 1;
 }
 
-/* Icon styles */
+/* Icon styles - match text color */
 .game-tabs-border-card :deep(.game-tab-button .game-icon) {
   flex-shrink: 0;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  width: 18px;
-  height: 18px;
+  transition: color 0.2s ease, filter 0.2s ease;
+  width: 16px;
+  height: 16px;
   position: relative;
   z-index: 2;
   color: var(--game-text-secondary);
 }
 
 .game-tabs-border-card :deep(.game-tab-button:hover:not(.disabled) .game-icon) {
-  transform: scale(1.15) rotate(5deg);
-  color: var(--game-accent-color);
+  color: var(--game-text-primary);
 }
 
 .game-tabs-border-card :deep(.game-tab-button.active .game-icon) {
-  color: var(--game-accent-color);
-  transform: scale(1.2) rotate(0deg);
+  color: var(--game-text-primary) !important;
+  filter: drop-shadow(0 0 8px var(--game-accent-glow));
+}
+
+/* Light theme: use accent color, no glow */
+.light-theme .game-tabs-border-card :deep(.game-tab-button.active .game-icon) {
+  color: var(--base-solid-primary) !important;
+  filter: none;
 }
 
 /* Text span styles */
 .game-tabs-border-card :deep(.game-tab-button span:not(.game-tag-content)) {
-  font-weight: 800;
+  font-weight: 600;
   font-family: var(--game-font-family-heading);
-  font-size: 0.875rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 0.8125rem;
+  letter-spacing: 0.05em;
+  transition: color 0.2s ease;
   position: relative;
   z-index: 2;
   color: var(--game-text-secondary);
-  padding: 0.125rem 0.25rem;
-  border-radius: 4px;
 }
 
 .game-tabs-border-card :deep(.game-tab-button:hover:not(.disabled) span:not(.game-tag-content)) {
   color: var(--game-text-primary);
-  transform: translateX(2px);
 }
 
 .game-tabs-border-card :deep(.game-tab-button.active span:not(.game-tag-content)) {
-  color: var(--game-accent-color);
-  font-weight: 800;
-  transform: translateX(0);
+  color: var(--game-text-primary);
+  text-shadow: 0 0 8px var(--game-accent-glow);
+  font-weight: 600;
+}
+
+/* Light theme: use accent color, no glow */
+.light-theme .game-tabs-border-card :deep(.game-tab-button.active span:not(.game-tag-content)) {
+  color: var(--base-solid-primary);
+  text-shadow: none;
 }
 
 /* Tag styles */
 .game-tabs-border-card :deep(.game-tab-button .game-tag) {
-  margin-left: 0.5rem;
+  margin-left: 0.375rem;
   font-size: 0.625rem;
-  padding: 0.25rem 0.625rem;
-  border-radius: 6px;
-  box-shadow: 
-    0 0 6px var(--base-color-black-40),
-    0 2px 6px var(--base-color-black-30),
-    inset 0 1px 0 var(--base-color-white-10);
-  height: 20px;
+  padding: 0.125rem 0.5rem;
+  border-radius: 4px;
+  box-shadow: none;
+  height: 18px;
   line-height: 1.2;
   display: inline-flex;
   align-items: center;
-  gap: 0.375rem;
+  gap: 0.25rem;
   position: relative;
   z-index: 2;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  font-weight: 700;
-  border-width: 1.5px;
-  backdrop-filter: blur(4px);
+  transition: border-color 0.2s ease;
+  font-weight: 600;
+  border-width: 1px;
+  backdrop-filter: none;
 }
 
 .game-tabs-border-card :deep(.game-tab-button .game-tag .game-icon) {
-  width: 14px;
-  height: 14px;
-  transition: all 0.3s ease;
+  width: 12px;
+  height: 12px;
+  transition: none;
 }
 
 .game-tabs-border-card :deep(.game-tab-button:hover:not(.disabled) .game-tag) {
-  box-shadow: 
-    0 2px 6px var(--base-color-black-40),
-    inset 0 1px 0 var(--base-color-white-10);
-  transform: scale(1.08) translateY(-1px);
-  border-color: var(--game-accent-color);
+  box-shadow: none;
+  transform: none;
+  border-color: var(--game-surface-border);
 }
 
 .game-tabs-border-card :deep(.game-tab-button:hover:not(.disabled) .game-tag .game-icon) {
-  transform: scale(1.1) rotate(5deg);
+  transform: none;
 }
 
 .game-tabs-border-card :deep(.game-tab-button.active .game-tag) {
-  box-shadow: 
-    0 2px 8px var(--base-color-black-50),
-    inset 0 1px 0 var(--base-color-white-20);
-  transform: scale(1.12) translateY(-1px);
-  border-color: var(--game-accent-color);
+  box-shadow: none;
+  transform: none;
+  border-color: var(--game-surface-border);
 }
 
 .game-tabs-border-card :deep(.game-tab-button.active .game-tag .game-icon) {
-  transform: scale(1.15) rotate(0deg);
+  transform: none;
 }
 
 .game-tabs-border-card :deep(.game-tab-button.disabled) {
@@ -300,6 +283,6 @@ provide('unregisterTab', unregisterTab)
 }
 
 .game-tabs-header::-webkit-scrollbar-thumb:hover {
-  background: var(--game-accent-color);
+  background: var(--base-solid-primary);
 }
 </style>

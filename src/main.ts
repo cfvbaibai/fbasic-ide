@@ -4,6 +4,7 @@ import './shared/styles/theme.css'
 import './shared/styles/utilities.css'
 import './shared/styles/skins/retro-blue.css'
 import './shared/styles/skins/nintendo.css'
+import './shared/styles/skins/classic-light.css'
 import App from './App.vue'
 import router from './router/index'
 

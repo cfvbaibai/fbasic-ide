@@ -86,7 +86,7 @@ const handleCopy = async () => {
   height: 2px;
   background: linear-gradient(90deg, 
     transparent 0%, 
-    var(--game-accent-color) 50%, 
+    var(--base-solid-primary) 50%, 
     transparent 100%
   );
   opacity: 0;
@@ -101,7 +101,7 @@ const handleCopy = async () => {
   content: '';
   position: absolute;
   inset: 2px;
-  border: 1px solid var(--game-accent-color);
+  border: 1px solid var(--base-solid-primary);
   border-radius: 6px;
   opacity: 0;
   transition: opacity 0.3s ease;
@@ -130,14 +130,6 @@ const handleCopy = async () => {
   opacity: 0;
   transition: opacity 0.3s ease;
   z-index: 2;
-  background: 
-    repeating-linear-gradient(
-      0deg,
-      var(--game-screen-text-color-10) 0,
-      transparent 0,
-      transparent 2px,
-      var(--game-screen-text-color-10) 2px
-    );
   mix-blend-mode: screen;
   border-radius: 8px;
 }
@@ -203,6 +195,6 @@ const handleCopy = async () => {
 }
 
 .game-code-quote-content::-webkit-scrollbar-thumb:hover {
-  background: var(--game-accent-color);
+  background: var(--base-solid-primary);
 }
 </style>

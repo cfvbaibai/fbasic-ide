@@ -133,6 +133,24 @@ export function setupMonacoLanguage(): void {
     colors: {}
   });
 
+  // Define custom light theme for F-BASIC
+  monaco.editor.defineTheme('fbasic-theme-light', {
+    base: 'vs', // Base on VS light theme
+    inherit: true,
+    rules: [
+      { token: 'line-number', foreground: '4A7C2E', fontStyle: 'bold' }, // Dark green for line numbers
+      { token: 'keyword', foreground: '0066CC', fontStyle: 'bold' }, // Blue for keywords
+      { token: 'function', foreground: 'B8945A', fontStyle: 'bold' }, // Brown/orange for functions
+      { token: 'operator', foreground: '333333', fontStyle: 'bold' }, // Dark gray for operators
+      { token: 'string', foreground: 'B85454' }, // Red for strings
+      { token: 'number', foreground: '5A7C4A' }, // Green for numbers
+      { token: 'comment', foreground: '6A9955', fontStyle: 'italic' }, // Green for comments
+      { token: 'identifier', foreground: '1E1E1E' }, // Dark for identifiers
+      { token: 'delimiter', foreground: '333333' } // Dark gray for punctuation
+    ],
+    colors: {}
+  });
+
   // ============================================================================
   // STEP 3: Set up Live Error Diagnostics Provider
   // ============================================================================

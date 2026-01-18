@@ -102,6 +102,7 @@ const handleSkinChange = (skinValue: string | number) => {
           :model-value="currentSkin"
           :options="skinOptions"
           size="small"
+          width="120px"
           @update:model-value="handleSkinChange"
         />
       </div>
@@ -111,9 +112,10 @@ const handleSkinChange = (skinValue: string | number) => {
 
 <style scoped>
 .game-navigation {
-  background: linear-gradient(135deg, var(--game-nav-bg-start) 0%, var(--game-nav-bg-end) 100%);
-  border-bottom: 3px solid var(--game-nav-border);
-  box-shadow: 0 4px 12px var(--base-color-black-40), inset 0 1px 0 var(--base-color-white-10);
+  /* background: linear-gradient(135deg, var(--game-nav-bg-start) 0%, var(--game-nav-bg-end) 100%); */
+  border-bottom: 1px solid var(--game-nav-border);
+
+  /* box-shadow: 0 4px 12px var(--base-alpha-gray-00-40), inset 0 1px 0 var(--base-alpha-gray-100-10); */
   flex-shrink: 0;
   z-index: 1000;
 }
@@ -134,10 +136,10 @@ const handleSkinChange = (skinValue: string | number) => {
   font-size: 1.5rem;
   font-weight: 700;
   font-family: var(--game-font-family-heading);
-  color: var(--game-accent-color);
+  color: var(--base-solid-primary);
   text-shadow: 
     0 0 10px var(--game-accent-glow),
-    0 2px 4px var(--base-color-black-80);
+    0 2px 4px var(--base-alpha-gray-00-80);
   letter-spacing: 2px;
   white-space: nowrap;
 }
@@ -177,30 +179,30 @@ const handleSkinChange = (skinValue: string | number) => {
   gap: 0.5rem;
   white-space: nowrap;
   box-shadow: 
-    0 2px 4px var(--base-color-black-30),
-    inset 0 1px 0 var(--base-color-white-10);
+    0 2px 4px var(--base-alpha-gray-00-30),
+    inset 0 1px 0 var(--base-alpha-gray-100-10);
 }
 
 .nav-button:hover {
-  background: var(--game-surface-hover-gradient);
-  border-color: var(--game-accent-color);
+  background: var(--game-surface-bg-hover-gradient);
+  border-color: var(--base-solid-primary);
   color: var(--game-text-primary);
   transform: translateY(-2px);
   box-shadow: 
     0 4px 8px var(--game-accent-glow),
-    0 2px 4px var(--base-color-black-40),
-    inset 0 1px 0 var(--base-color-white-10);
+    0 2px 4px var(--base-alpha-gray-00-40),
+    inset 0 1px 0 var(--base-alpha-gray-100-10);
 }
 
 .nav-button.active {
-  background: linear-gradient(135deg, var(--game-accent-color) 0%, var(--game-accent-color) 100%);
-  border-color: var(--game-accent-color);
-  color: var(--base-color-black);
+  background: linear-gradient(135deg, var(--base-solid-primary) 0%, var(--base-solid-primary) 100%);
+  border-color: var(--base-solid-primary);
+  color: var(--game-text-contrast);
   font-weight: 700;
   box-shadow: 
     var(--game-shadow-glow),
-    0 4px 8px var(--base-color-black-40),
-    inset 0 1px 0 var(--base-color-white-30);
+    0 4px 8px var(--base-alpha-gray-00-40),
+    inset 0 1px 0 var(--base-alpha-gray-100-30);
 }
 
 .nav-button.active::before {
@@ -210,9 +212,9 @@ const handleSkinChange = (skinValue: string | number) => {
   top: 0;
   bottom: 0;
   width: 3px;
-  background: var(--base-color-black);
+  background: var(--base-solid-gray-00);
   border-radius: 8px 0 0 8px;
-  box-shadow: 0 0 8px var(--base-color-black-50);
+  box-shadow: 0 0 8px var(--base-alpha-gray-00-50);
 }
 
 .nav-icon {
@@ -222,8 +224,8 @@ const handleSkinChange = (skinValue: string | number) => {
 }
 
 .nav-button.active .nav-icon {
-  color: var(--base-color-black);
-  filter: drop-shadow(0 0 4px var(--base-color-black-30));
+  color: var(--game-text-contrast);
+  filter: drop-shadow(0 0 4px var(--base-alpha-gray-00-30));
 }
 
 .nav-button:hover .nav-icon {

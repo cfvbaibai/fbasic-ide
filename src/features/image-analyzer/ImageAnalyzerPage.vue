@@ -132,13 +132,13 @@ const getCssVariable = (variableName: string): string => {
 // Get computed grid line colors using semantic colors from theme
 const getGridLineColor = (i: number): string => {
   if (i === 1 || i === 17) {
-    return getCssVariable('--semantic-warning')
+    return getCssVariable('--semantic-solid-warning')
   } else if (i === 9) {
-    return getCssVariable('--semantic-success')
+    return getCssVariable('--semantic-solid-success')
   } else if (i === 5 || i === 13) {
-    return getCssVariable('--semantic-info')
+    return getCssVariable('--semantic-solid-info')
   } else {
-    return getCssVariable('--semantic-danger')
+    return getCssVariable('--semantic-solid-danger')
   }
 }
 
@@ -502,7 +502,7 @@ const generateArray = async () => {
 
 .preview-image {
   border-radius: 6px;
-  box-shadow: 0 4px 12px var(--base-color-black-30);
+  box-shadow: 0 4px 12px var(--base-alpha-gray-00-30);
   object-fit: contain;
 }
 

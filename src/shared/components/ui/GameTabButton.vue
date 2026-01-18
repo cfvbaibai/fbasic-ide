@@ -77,11 +77,11 @@ const handleClick = () => {
   font-size: 0.625rem;
   padding: 0.125rem 0.5rem;
   border-radius: 4px;
-  box-shadow: 0 0 4px var(--base-color-black-30);
+  box-shadow: 0 0 4px var(--base-alpha-gray-00-30);
 }
 
 .game-tab-button.active :deep(.game-tag) {
-  box-shadow: 0 0 4px var(--base-color-black-30);
+  box-shadow: 0 0 4px var(--base-alpha-gray-00-30);
 }
 
 .game-tab-button::before {
@@ -93,7 +93,7 @@ const handleClick = () => {
   height: 3px;
   background: linear-gradient(90deg, 
     transparent 0%, 
-    var(--game-accent-color) 50%, 
+    var(--base-solid-primary) 50%, 
     transparent 100%
   );
   transform: scaleX(0);
@@ -103,9 +103,8 @@ const handleClick = () => {
 
 /* Focus styles for accessibility */
 .game-tab-button:focus-visible {
-  outline: 2px solid var(--game-accent-color);
+  outline: 2px solid var(--base-solid-primary);
   outline-offset: 2px;
-  box-shadow: 0 0 0 2px var(--game-accent-color);
 }
 
 .game-tab-button:hover:not(.disabled) {
@@ -117,7 +116,7 @@ const handleClick = () => {
 }
 
 .game-tab-button.active {
-  color: var(--game-accent-color);
+  color: var(--base-solid-primary);
 }
 
 .game-tab-button.active::before {

@@ -69,11 +69,11 @@ const handleClick = (event: Event) => {
 }
 
 .game-collapse-toggle:hover {
-  border-color: var(--game-accent-color);
+  border-color: var(--base-solid-primary);
   box-shadow: 
-    0 4px 8px var(--base-color-black-40),
+    0 4px 8px var(--base-alpha-gray-00-40),
     0 0 12px var(--game-accent-glow),
-    inset 0 1px 2px var(--base-color-white-10);
+    inset 0 1px 2px var(--base-alpha-gray-100-10);
   transform: scale(1.1);
 }
 
@@ -88,29 +88,29 @@ const handleClick = (event: Event) => {
 }
 
 .game-collapse-toggle.expanded {
-  background: linear-gradient(135deg, var(--game-accent-color) 0%, var(--game-accent-glow) 100%);
-  border-color: var(--game-accent-color);
+  background: linear-gradient(135deg, var(--base-solid-primary) 0%, var(--game-accent-glow) 100%);
+  border-color: var(--base-solid-primary);
   box-shadow: 
     0 0 16px var(--game-accent-glow),
-    0 2px 6px var(--base-color-black-30);
+    0 2px 6px var(--base-alpha-gray-00-30);
 }
 
 .game-collapse-toggle :deep(.game-icon) {
   color: var(--game-text-primary);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  filter: drop-shadow(0 0 4px var(--game-accent-color-30));
+  filter: drop-shadow(0 0 4px var(--base-alpha-primary-30));
   transform: rotate(0deg) scale(1);
 }
 
 .game-collapse-toggle:hover :deep(.game-icon) {
-  color: var(--game-accent-color);
+  color: var(--base-solid-primary);
   filter: drop-shadow(0 0 8px var(--game-accent-glow)) 
           drop-shadow(0 0 16px var(--game-accent-glow));
   transform: rotate(180deg) scale(1.15);
 }
 
 .game-collapse-toggle.expanded :deep(.game-icon) {
-  color: var(--game-accent-color);
+  color: var(--base-solid-primary);
   filter: drop-shadow(0 0 8px var(--game-accent-glow)) 
           drop-shadow(0 0 16px var(--game-accent-glow));
   transform: rotate(0deg) scale(1.1);

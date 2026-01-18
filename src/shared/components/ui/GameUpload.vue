@@ -132,8 +132,8 @@ const handleDrop = (event: DragEvent) => {
 }
 
 .game-upload-dragging .game-upload-drag-area {
-  border-color: var(--game-accent-color);
-  background: var(--game-accent-color-10);
+  border-color: var(--base-solid-primary);
+  background: var(--base-alpha-primary-10);
   box-shadow: 0 0 20px var(--game-accent-glow);
 }
 
@@ -142,8 +142,8 @@ const handleDrop = (event: DragEvent) => {
 }
 
 .game-upload-drag-area:hover:not(.game-upload-disabled) {
-  border-color: var(--game-accent-color);
-  background: var(--game-accent-color-10);
+  border-color: var(--base-solid-primary);
+  background: var(--base-alpha-primary-10);
 }
 
 .game-upload-text {
@@ -153,7 +153,7 @@ const handleDrop = (event: DragEvent) => {
 }
 
 .game-upload-link {
-  color: var(--game-accent-color);
+  color: var(--base-solid-primary);
   text-decoration: underline;
   cursor: pointer;
 }

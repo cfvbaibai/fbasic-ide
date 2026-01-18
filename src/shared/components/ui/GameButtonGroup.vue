@@ -66,7 +66,7 @@
 
 /* Hover effect for group container */
 .game-button-group:hover {
-  border-color: var(--game-accent-color);
+  border-color: var(--base-solid-primary);
   box-shadow: 
     0 0 12px var(--game-accent-glow),
     var(--game-shadow-base);
@@ -116,6 +116,10 @@
   outline-width: 0 !important;
 }
 
+.game-button-group :deep(.game-button-toggle.game-button-selected:hover:not(.game-button-disabled)) {
+  color: var(--game-text-contrast);
+}
+
 /* Override action variant selected state too */
 .game-button-group :deep(.game-button-action.game-button-selected),
 .game-button-group :deep(.game-button-action.game-button-selected:hover),
@@ -126,6 +130,10 @@
   outline: none !important;
 }
 
+.game-button-group :deep(.game-button-action.game-button-selected:hover:not(.game-button-disabled)) {
+  color: var(--game-text-contrast);
+}
+
 /* Override hover transform for buttons in group to prevent layout shift */
 .game-button-group :deep(.game-button:hover:not(.game-button-disabled)) {
   transform: none;
@@ -133,5 +141,6 @@
 
 .game-button-group :deep(.game-button-selected:hover:not(.game-button-disabled)) {
   transform: none;
+  color: var(--game-text-contrast);
 }
 </style>

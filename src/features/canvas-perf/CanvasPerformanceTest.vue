@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { GameLayout } from '@/shared/components/ui'
+import { GameLayout, GameButton } from '@/shared/components/ui'
 import { renderScreenBuffer, type ScreenCell } from '@/features/ide/composables/canvasRenderer'
 
 // Canvas reference
@@ -126,9 +126,9 @@ onUnmounted(() => {
   >
     <div class="test-page">
       <div class="test-controls">
-      <button @click="startTest">Start Test</button>
-      <button @click="stopTest">Stop Test</button>
-      <button @click="clearScreen">Clear Screen</button>
+      <GameButton type="primary" @click="startTest">Start Test</GameButton>
+      <GameButton type="danger" @click="stopTest">Stop Test</GameButton>
+      <GameButton type="warning" @click="clearScreen">Clear Screen</GameButton>
       <label>
         Characters per frame:
         <input v-model.number="charsPerFrame" type="number" min="1" max="100" />
@@ -175,20 +175,6 @@ onUnmounted(() => {
   border-radius: 4px;
 }
 
-.test-controls button {
-  padding: 0.5rem 1rem;
-  background: var(--game-accent-color);
-  color: var(--base-color-black);
-  border: 1px solid var(--game-accent-color);
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.test-controls button:hover {
-  opacity: 0.9;
-  box-shadow: var(--game-shadow-glow-sm);
-}
 
 .test-controls label {
   display: flex;
@@ -217,7 +203,7 @@ onUnmounted(() => {
 
 .test-stats div {
   font-weight: 600;
-  color: var(--game-accent-color);
+  color: var(--base-solid-primary);
 }
 
 .canvas-container {

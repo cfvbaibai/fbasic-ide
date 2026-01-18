@@ -8,7 +8,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { skinConfigs, type SkinConfig } from './skinConfig'
 
-export type SkinName = 'default' | 'retro-blue' | 'nintendo'
+export type SkinName = 'default' | 'retro-blue' | 'nintendo' | 'classic-light'
 
 const SKIN_STORAGE_KEY = 'fbasic-emu-skin'
 const SKIN_ATTRIBUTE = 'data-skin'
@@ -23,13 +23,13 @@ function getCurrentSkin(): SkinName {
 
   // Check DOM first (takes precedence)
   const domSkin = document.documentElement.getAttribute(SKIN_ATTRIBUTE)
-  if (domSkin && (domSkin === 'default' || domSkin === 'retro-blue' || domSkin === 'nintendo')) {
+  if (domSkin && (domSkin === 'default' || domSkin === 'retro-blue' || domSkin === 'nintendo' || domSkin === 'classic-light')) {
     return domSkin as SkinName
   }
 
   // Check localStorage
   const storedSkin = localStorage.getItem(SKIN_STORAGE_KEY)
-  if (storedSkin && (storedSkin === 'default' || storedSkin === 'retro-blue' || storedSkin === 'nintendo')) {
+  if (storedSkin && (storedSkin === 'default' || storedSkin === 'retro-blue' || storedSkin === 'nintendo' || storedSkin === 'classic-light')) {
     return storedSkin as SkinName
   }
 
@@ -100,6 +100,7 @@ export function useSkin() {
     { name: 'default', label: 'Default', description: 'Original retro game-themed dark skin' },
     { name: 'retro-blue', label: 'Retro Blue', description: 'Blue-tinted retro theme' },
     { name: 'nintendo', label: 'Nintendo', description: 'Nintendo-themed with inverted colors and red accent' },
+    { name: 'classic-light', label: 'Classic Light', description: 'Warm classic light theme with soft purple accent' },
   ]
 
   /**

@@ -62,12 +62,6 @@ watchEffect(() => {
 </script>
 
 <template>
-  <div class="screen-container">
-    <div class="screen-header">
-      <span class="screen-title">Family BASIC Screen</span>
-      <span class="screen-dimensions">28×24</span>
-      <span class="cursor-info">Cursor: ({{ cursorX }}, {{ cursorY }})</span>
-    </div>
     <div class="screen-display">
       <div class="crt-bezel">
         <div class="crt-screen">
@@ -82,48 +76,27 @@ watchEffect(() => {
         </div>
       </div>
     </div>
-  </div>
 </template>
 
 <style scoped>
-.screen-container {
-  flex: 1 1 0;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  background: var(--game-screen-bg-color);
-  border: 2px solid var(--game-screen-border-color);
-  border-radius: 4px;
-  overflow: hidden;
-}
+/* CRT Color Variables - Dark Theme (default) */
 
-.screen-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 0.5rem 1rem;
-  background: var(--game-screen-header-bg);
-  border-bottom: 1px solid var(--game-screen-border-color);
-  font-size: 0.875rem;
-  color: var(--game-screen-header-text);
-}
+/* stylelint-disable function-disallowed-list */
 
-.screen-title {
-  font-weight: 600;
-  color: var(--game-screen-header-title);
-}
-
-.screen-dimensions {
-  color: var(--game-screen-header-text);
-}
-
-.cursor-info {
-  margin-left: auto;
-  font-family: 'Courier New', monospace;
-  color: var(--game-screen-text-color);
-}
-
+/* Using modern CSS relative color syntax (rgb(from ...)) - not hardcoded RGB values */
 .screen-display {
+  --crt-glow-light-10: rgb(from var(--base-solid-gray-100) r g b / 10%);
+  --crt-glow-light-20: rgb(from var(--base-solid-gray-100) r g b / 20%);
+  --crt-glow-light-40: rgb(from var(--base-solid-gray-100) r g b / 40%);
+  --crt-glow-light-80: rgb(from var(--base-solid-gray-100) r g b / 80%);
+  --crt-shadow-dark-10: rgb(from var(--base-solid-gray-00) r g b / 10%);
+  --crt-shadow-dark-30: rgb(from var(--base-solid-gray-00) r g b / 30%);
+  --crt-shadow-dark-40: rgb(from var(--base-solid-gray-00) r g b / 40%);
+  --crt-shadow-dark-50: rgb(from var(--base-solid-gray-00) r g b / 50%);
+  --crt-shadow-dark-60: rgb(from var(--base-solid-gray-00) r g b / 60%);
+  --crt-shadow-dark-80: rgb(from var(--base-solid-gray-00) r g b / 80%);
+  --crt-border-color: var(--base-solid-gray-00);
+
   flex: 1 1 0;
   display: flex;
   align-items: center;
@@ -131,38 +104,63 @@ watchEffect(() => {
   padding: 2rem;
   overflow: auto;
   min-height: 0;
-  background: linear-gradient(135deg, var(--base-color-black) 0%, var(--game-screen-header-bg) 100%);
 }
+
+/* CRT Color Variables - Light Theme */
+.light-theme .screen-display {
+  --crt-glow-light-10: rgb(from var(--base-solid-gray-100) r g b / 10%);
+  --crt-glow-light-20: rgb(from var(--base-solid-gray-100) r g b / 20%);
+  --crt-glow-light-40: rgb(from var(--base-solid-gray-100) r g b / 40%);
+  --crt-glow-light-80: rgb(from var(--base-solid-gray-100) r g b / 80%);
+  --crt-shadow-dark-10: rgb(from var(--base-solid-gray-00) r g b / 10%);
+  --crt-shadow-dark-30: rgb(from var(--base-solid-gray-00) r g b / 30%);
+  --crt-shadow-dark-40: rgb(from var(--base-solid-gray-00) r g b / 40%);
+  --crt-shadow-dark-50: rgb(from var(--base-solid-gray-00) r g b / 50%);
+  --crt-shadow-dark-60: rgb(from var(--base-solid-gray-00) r g b / 60%);
+  --crt-shadow-dark-80: rgb(from var(--base-solid-gray-00) r g b / 80%);
+  --crt-border-color: var(--base-solid-gray-00);
+}
+/* stylelint-enable function-disallowed-list */
 
 /* CRT Bezel - outer frame */
 .crt-bezel {
-  background: linear-gradient(135deg, var(--game-screen-header-bg) 0%, var(--base-color-black) 50%, var(--game-screen-header-bg) 100%);
-  border: 8px solid var(--base-color-black);
+  background: linear-gradient(135deg, var(--game-screen-header-bg) 0%, var(--crt-border-color) 50%, var(--game-screen-header-bg) 100%);
+  border: 8px solid var(--crt-border-color);
   border-radius: 12px;
   box-shadow: 
-    inset 0 2px 4px var(--base-color-white-10),
-    0 8px 32px var(--base-color-black-80),
-    0 0 0 2px var(--base-color-black-50);
+    inset 0 2px 4px var(--crt-glow-light-10),
+    0 8px 32px var(--crt-shadow-dark-80),
+    0 0 0 2px var(--crt-shadow-dark-50);
   padding: 16px;
+}
+
+/* Light theme: darker background, lighter border, subtle shadows */
+.light-theme .crt-bezel {
+  background: linear-gradient(135deg, var(--base-solid-gray-30) 0%, var(--base-solid-gray-50) 50%, var(--base-solid-gray-30) 100%);
+  border-color: var(--base-solid-gray-50);
+  box-shadow: 
+    inset 0 1px 2px var(--crt-shadow-dark-10),
+    0 4px 16px var(--base-alpha-gray-00-20),
+    0 0 0 1px var(--crt-shadow-dark-30);
 }
 
 /* CRT Screen - inner screen area */
 .crt-screen {
   position: relative;
-  border: 4px solid var(--base-color-black);
+  border: 4px solid var(--crt-border-color);
   border-radius: 16px;
   box-shadow: 
-    inset 0 0 80px var(--base-color-white-80),
-    0 4px 20px var(--base-color-black-60),
-    inset 0 -2px 10px var(--base-color-black-80);
+    inset 0 0 80px var(--crt-glow-light-80),
+    0 4px 20px var(--crt-shadow-dark-60),
+    inset 0 -2px 10px var(--crt-shadow-dark-80);
   overflow: hidden;
   background: radial-gradient(
     ellipse 150% 110% at 85% 8%,
-    var(--base-color-white-20) 0%,
-    var(--base-color-white-10) 18%,
-    var(--base-color-white-10) 35%,
+    var(--crt-glow-light-20) 0%,
+    var(--crt-glow-light-10) 18%,
+    var(--crt-glow-light-10) 35%,
     transparent 60%,
-    var(--base-color-black-30) 100%
+    var(--crt-shadow-dark-30) 100%
   );
 }
 
@@ -174,8 +172,8 @@ watchEffect(() => {
     0deg,
     transparent,
     transparent 2px,
-    var(--base-color-black-10) 2px,
-    var(--base-color-black-10) 4px
+    var(--crt-shadow-dark-10) 2px,
+    var(--crt-shadow-dark-10) 4px
   );
   pointer-events: none;
   z-index: 2;
@@ -188,15 +186,27 @@ watchEffect(() => {
   inset: 0;
   background: radial-gradient(
     ellipse 140% 100% at 85% 5%,
-    var(--base-color-white-40) 0%,
-    var(--base-color-white-20) 15%,
-    var(--base-color-white-10) 30%,
+    var(--crt-glow-light-40) 0%,
+    var(--crt-glow-light-20) 15%,
+    var(--crt-glow-light-10) 30%,
     transparent 55%,
-    var(--base-color-black-40) 100%
+    var(--crt-shadow-dark-40) 100%
   );
   pointer-events: none;
   z-index: 1;
   border-radius: 16px;
+}
+
+/* Light theme: reflection uses light colors at top-right (inverted from dark theme) */
+.light-theme .crt-reflection {
+  background: radial-gradient(
+    ellipse 140% 100% at 85% 5%,
+    var(--crt-shadow-dark-40) 0%,
+    var(--crt-shadow-dark-30) 15%,
+    var(--crt-shadow-dark-10) 30%,
+    transparent 55%,
+    var(--crt-glow-light-40) 100%
+  );
 }
 
 .screen-canvas {

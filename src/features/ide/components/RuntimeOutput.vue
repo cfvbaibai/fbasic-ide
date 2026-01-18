@@ -69,7 +69,7 @@ watch(() => props.output.length, scrollToBottom)
       <GameTabPane name="screen">
         <template #label>
           <GameIcon icon="mdi:monitor" size="small" />
-          <span>SCREEN</span>
+          <span>Screen</span>
         </template>
         
         <div class="tab-content">
@@ -85,7 +85,7 @@ watch(() => props.output.length, scrollToBottom)
       <GameTabPane name="stdout">
         <template #label>
           <GameIcon icon="mdi:file-document" size="small" />
-          <span>STDOUT</span>
+          <span>Stdout</span>
         </template>
         
         <div class="tab-content">
@@ -124,7 +124,7 @@ watch(() => props.output.length, scrollToBottom)
       <GameTabPane name="debug" :disabled="!debugMode || !debugOutput">
         <template #label>
           <GameIcon icon="mdi:tools" size="small" />
-          <span>DEBUG</span>
+          <span>Debug</span>
         </template>
         
         <div class="tab-content">
@@ -138,7 +138,7 @@ watch(() => props.output.length, scrollToBottom)
       <GameTabPane name="variables" :disabled="Object.keys(variables).length === 0">
         <template #label>
           <GameIcon icon="mdi:view-dashboard" size="small" />
-          <span>VARIABLES</span>
+          <span>Variables</span>
           <span class="tab-status-tag">
             <GameTag :class="{ 'tag-hidden': Object.keys(variables).length === 0 }" type="success" size="small">
               {{ Object.keys(variables).length }}
@@ -231,46 +231,8 @@ watch(() => props.output.length, scrollToBottom)
   scroll-behavior: smooth;
   min-height: 0;
   position: relative;
-  box-shadow: 
-    inset 0 0 30px var(--game-screen-text-color-10),
-    inset 0 0 60px var(--game-screen-text-color-10);
-  animation: terminal-glow 3s ease-in-out infinite;
 }
 
-.output-content::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--game-surface-accent-gradient);
-  pointer-events: none;
-  z-index: 0;
-  animation: terminal-shimmer 5s ease-in-out infinite;
-}
-
-@keyframes terminal-glow {
-  0%, 100% {
-    box-shadow: 
-      inset 0 0 30px var(--game-screen-text-color-10),
-      inset 0 0 60px var(--game-screen-text-color-10);
-  }
-
-  50% {
-    box-shadow: 
-      inset 0 0 40px var(--game-screen-text-color-20),
-      inset 0 0 80px var(--game-screen-text-color-10),
-      0 0 20px var(--game-screen-text-color-10);
-  }
-}
-
-@keyframes terminal-shimmer {
-  0%, 100% {
-    opacity: 0.5;
-  }
-
-  50% {
-    opacity: 1;
-  }
-}
 
 .debug-content {
   flex: 1 1 0;
@@ -279,7 +241,7 @@ watch(() => props.output.length, scrollToBottom)
   background: var(--game-surface-bg-gradient);
   min-height: 0;
   border-radius: 6px;
-  box-shadow: inset 0 2px 4px var(--base-color-black-50);
+  box-shadow: inset 0 2px 4px var(--base-alpha-gray-00-50);
 }
 
 .debug-text {
@@ -291,7 +253,6 @@ watch(() => props.output.length, scrollToBottom)
   white-space: pre-wrap;
   overflow-wrap: break-word;
 }
-
 
 .empty-output {
   display: flex;
@@ -314,10 +275,7 @@ watch(() => props.output.length, scrollToBottom)
 }
 
 .output-line:hover {
-  text-shadow: 
-    0 0 6px var(--game-screen-text-color),
-    0 0 12px var(--game-screen-text-color-60),
-    0 0 20px var(--game-screen-text-color-30);
+  background: var(--game-surface-bg-gradient);
 }
 
 .rotating {
@@ -332,14 +290,14 @@ watch(() => props.output.length, scrollToBottom)
 .error-output {
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid var(--semantic-danger);
+  border-top: 1px solid var(--semantic-solid-danger);
 }
 
 .error-line {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--semantic-danger);
+  color: var(--semantic-solid-danger);
   margin-bottom: 0.5rem;
   font-size: 0.9rem;
 }
@@ -354,7 +312,7 @@ watch(() => props.output.length, scrollToBottom)
 }
 
 .error-line-number {
-  color: var(--semantic-danger);
+  color: var(--semantic-solid-danger);
   opacity: 0.8;
   font-size: 0.8rem;
   font-style: italic;
@@ -410,12 +368,12 @@ watch(() => props.output.length, scrollToBottom)
   border-radius: 6px;
   font-family: var(--game-font-family-mono);
   font-size: 0.9rem;
-  box-shadow: 0 2px 4px var(--base-color-black-20);
+  box-shadow: 0 2px 4px var(--base-alpha-gray-00-20);
   transition: all 0.2s ease;
 }
 
 .variable-item:hover {
-  border-color: var(--game-accent-color);
+  border-color: var(--base-solid-primary);
   box-shadow: 0 0 8px var(--game-accent-glow);
 }
 
@@ -427,6 +385,6 @@ watch(() => props.output.length, scrollToBottom)
   padding: 0.2rem 0.4rem;
   border-radius: 4px;
   font-weight: 500;
-  box-shadow: inset 0 1px 2px var(--base-color-black-30);
+  box-shadow: inset 0 1px 2px var(--base-alpha-gray-00-30);
 }
 </style>

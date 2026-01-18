@@ -175,7 +175,7 @@ onMounted(() => {
 }
 
 .code-textarea::-webkit-scrollbar-thumb:hover {
-  background: var(--game-accent-color);
+  background: var(--base-solid-primary);
 }
 
 .syntax-highlighted {

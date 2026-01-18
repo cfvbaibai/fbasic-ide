@@ -14,6 +14,7 @@ interface Props {
   placeholder?: string
   disabled?: boolean
   size?: 'small' | 'medium' | 'large'
+  width?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -67,10 +68,14 @@ const selectClasses = computed(() => {
     'game-select-disabled': props.disabled
   }
 })
+
+const selectStyle = computed(() => {
+  return props.width ? { width: props.width } : {}
+})
 </script>
 
 <template>
-  <div ref="selectRef" :class="selectClasses">
+  <div ref="selectRef" :class="selectClasses" :style="selectStyle">
     <button
       type="button"
       class="game-select-trigger bg-game-surface border-game-surface"
@@ -111,7 +116,7 @@ const selectClasses = computed(() => {
 .game-select-trigger {
   width: 100%;
   padding: 0.625rem 1rem;
-  padding-right: 2.5rem;
+  padding-right: 0.75rem;
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--game-text-primary);
@@ -122,8 +127,8 @@ const selectClasses = computed(() => {
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: 
-    0 2px 4px var(--base-color-black-30),
-    inset 0 1px 0 var(--base-color-white-10);
+    0 2px 4px var(--base-alpha-gray-00-30),
+    inset 0 1px 0 var(--base-alpha-gray-100-10);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -131,11 +136,11 @@ const selectClasses = computed(() => {
 }
 
 .game-select-trigger:focus {
-  border-color: var(--game-accent-color);
+  border-color: var(--base-solid-primary);
   box-shadow: 
     0 0 12px var(--game-accent-glow),
-    0 2px 4px var(--base-color-black-30),
-    inset 0 1px 0 var(--base-color-white-10);
+    0 2px 4px var(--base-alpha-gray-00-30),
+    inset 0 1px 0 var(--base-alpha-gray-100-10);
   outline: none;
 }
 
@@ -175,9 +180,9 @@ const selectClasses = computed(() => {
   border: 2px solid var(--game-surface-border);
   border-radius: 8px;
   box-shadow: 
-    0 4px 12px var(--base-color-black-40),
-    0 0 20px var(--game-accent-color-20),
-    inset 0 1px 0 var(--base-color-white-10);
+    0 4px 12px var(--base-alpha-gray-00-40),
+    0 0 20px var(--base-alpha-primary-20),
+    inset 0 1px 0 var(--base-alpha-gray-100-10);
   max-height: 200px;
   overflow-y: auto;
   margin-top: 4px;
@@ -197,13 +202,13 @@ const selectClasses = computed(() => {
 }
 
 .game-select-option:hover:not(.disabled) {
-  background: var(--game-accent-color-10);
-  color: var(--game-accent-color);
+  background: var(--base-alpha-primary-10);
+  color: var(--base-solid-primary);
 }
 
 .game-select-option.selected {
-  background: var(--game-accent-color-20);
-  color: var(--game-accent-color);
+  background: var(--base-alpha-primary-20);
+  color: var(--base-solid-primary);
   font-weight: 600;
 }
 
@@ -215,13 +220,13 @@ const selectClasses = computed(() => {
 /* Size variants */
 .game-select-small .game-select-trigger {
   padding: 0.5rem 0.75rem;
-  padding-right: 2rem;
+  padding-right: 0.625rem;
   font-size: 0.75rem;
 }
 
 .game-select-large .game-select-trigger {
   padding: 0.875rem 1.25rem;
-  padding-right: 3rem;
+  padding-right: 1rem;
   font-size: 1rem;
 }
 
@@ -240,7 +245,7 @@ const selectClasses = computed(() => {
 }
 
 .game-select-dropdown::-webkit-scrollbar-thumb:hover {
-  background: var(--game-accent-color);
+  background: var(--base-solid-primary);
 }
 
 /* Transition */

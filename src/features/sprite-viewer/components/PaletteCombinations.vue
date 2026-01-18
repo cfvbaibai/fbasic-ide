@@ -95,7 +95,7 @@ import { GameBlock } from '../../../shared/components/ui'
 }
 
 .palette-group {
-  background: var(--game-surface-inset-gradient);
+  background: var(--game-surface-bg-inset-gradient);
   padding: 1.5rem;
   border-radius: 8px;
   border: 2px solid var(--game-surface-border);
@@ -127,7 +127,7 @@ import { GameBlock } from '../../../shared/components/ui'
 }
 
 .color-combination:hover {
-  border-color: var(--game-accent-color);
+  border-color: var(--base-solid-primary);
   box-shadow: none;
 }
 

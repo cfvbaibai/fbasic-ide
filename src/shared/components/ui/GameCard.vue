@@ -15,7 +15,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   description: '',
   icon: undefined,
-  iconColor: 'var(--game-accent-color)',
+  iconColor: 'var(--base-solid-primary)',
   actionText: '',
   clickable: true,
   floatOnHover: true
@@ -59,7 +59,7 @@ const handleClick = () => {
 
 <style scoped>
 .game-card {
-  --icon-color: var(--game-accent-color);
+  --icon-color: var(--base-solid-primary);
 }
 
 .game-card-icon-wrapper {
@@ -90,13 +90,13 @@ const handleClick = () => {
 
 .game-card:hover .game-card-icon-wrapper {
   transform: scale(1.1) rotate(5deg);
-  box-shadow: 0 0 30px var(--icon-color, var(--game-accent-color));
+  box-shadow: 0 0 30px color-mix(in srgb, var(--icon-color, var(--base-solid-primary)) 50%, transparent);
 }
 
 .game-card-icon {
   font-size: 2.5rem;
-  color: var(--icon-color, var(--game-accent-color));
-  filter: drop-shadow(0 0 8px var(--icon-color, var(--game-accent-color)));
+  color: var(--icon-color, var(--base-solid-primary));
+  filter: drop-shadow(0 0 8px var(--icon-color, var(--base-solid-primary)));
 }
 
 .game-card-title {
@@ -110,7 +110,7 @@ const handleClick = () => {
 
 /* Light theme: use accent color, no glow */
 .light-theme .game-card-title {
-  color: var(--game-accent-color);
+  color: var(--base-solid-primary);
   text-shadow: none;
 }
 
@@ -124,7 +124,7 @@ const handleClick = () => {
 
 .game-card-action {
   text-align: center;
-  color: var(--icon-color, var(--game-accent-color));
+  color: var(--icon-color, var(--base-solid-primary));
   font-weight: 600;
   font-size: 0.9rem;
   opacity: 0.8;

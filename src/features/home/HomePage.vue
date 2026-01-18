@@ -18,28 +18,28 @@ const features: FeatureCard[] = [
     description: 'Write and execute F-BASIC programs with real-time feedback, syntax highlighting, and debugging tools.',
     path: '/ide',
     icon: 'mdi:pencil',
-    color: 'var(--semantic-success)'
+    color: 'var(--semantic-solid-success)'
   },
   {
     title: 'Monaco Editor',
     description: 'Advanced code editor with IntelliSense, syntax highlighting, and professional development features.',
     path: '/monaco',
     icon: 'mdi:pencil',
-    color: 'var(--semantic-info)'
+    color: 'var(--semantic-solid-info)'
   },
   {
     title: 'Image Analyzer',
     description: 'Analyze and inspect image files with detailed pixel information and color palette extraction.',
     path: '/image-analyzer',
     icon: 'mdi:image',
-    color: 'var(--semantic-warning)'
+    color: 'var(--semantic-solid-warning)'
   },
   {
     title: 'Sprite Viewer',
     description: 'View and explore character sprites with animation controls, palette selection, and display options.',
     path: '/character-sprite-viewer',
     icon: 'mdi:grid',
-    color: 'var(--semantic-danger)'
+    color: 'var(--semantic-solid-danger)'
   }
 ]
 

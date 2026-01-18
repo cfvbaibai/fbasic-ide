@@ -36,7 +36,7 @@ const handleDebugToggle = (value: boolean | string | number) => {
 </script>
 
 <template>
-  <div class="ide-controls bg-game-surface border-game-surface">
+  <div class="ide-controls">
     <GameButton type="primary" :disabled="!canRun" icon="mdi:play" @click="handleRun">
       Run
     </GameButton>

@@ -20,6 +20,32 @@ const emit = defineEmits<Emits>();
 
 const editorContainer = ref<HTMLElement>();
 let editor: monaco.editor.IStandaloneCodeEditor | null = null;
+let mutationObserver: MutationObserver | null = null;
+
+/**
+ * Check if light theme is active
+ */
+function isLightTheme(): boolean {
+  if (typeof document === 'undefined') return false;
+  return document.documentElement.classList.contains('light-theme');
+}
+
+/**
+ * Get the appropriate theme name based on current theme
+ */
+function getThemeName(): string {
+  return isLightTheme() ? 'fbasic-theme-light' : 'fbasic-theme';
+}
+
+/**
+ * Update editor theme based on current theme
+ */
+function updateTheme(): void {
+  if (editor) {
+    const themeName = getThemeName();
+    monaco.editor.setTheme(themeName);
+  }
+}
 
 onMounted(() => {
   if (!editorContainer.value) return;
@@ -27,11 +53,11 @@ onMounted(() => {
   // Setup Monaco language support (this also sets up themes)
   setupMonacoLanguage();
 
-  // Create Monaco editor
+  // Create Monaco editor with initial theme
   editor = monaco.editor.create(editorContainer.value, {
     value: props.modelValue,
     language: 'fbasic',
-    theme: 'fbasic-theme', // Use dark F-BASIC theme
+    theme: getThemeName(),
     automaticLayout: true,
     minimap: { enabled: true },
     scrollBeyondLastLine: false,
@@ -53,6 +79,17 @@ onMounted(() => {
     const value = editor?.getValue() || '';
     emit('update:modelValue', value);
   });
+
+  // Watch for theme changes by observing the document element's class list
+  if (typeof document !== 'undefined') {
+    mutationObserver = new MutationObserver(() => {
+      updateTheme();
+    });
+    mutationObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+  }
 });
 
 // Watch for external value changes
@@ -66,6 +103,10 @@ watch(
 );
 
 onBeforeUnmount(() => {
+  if (mutationObserver) {
+    mutationObserver.disconnect();
+    mutationObserver = null;
+  }
   if (editor) {
     editor.dispose();
   }
@@ -85,10 +126,10 @@ onBeforeUnmount(() => {
   position: absolute;
   inset: -2px;
   background: linear-gradient(135deg, 
-    var(--game-accent-color-10) 0%,
+    var(--base-alpha-primary-10) 0%,
     transparent 30%,
     transparent 70%,
-    var(--game-accent-color-10) 100%
+    var(--base-alpha-primary-10) 100%
   );
   border-radius: 8px;
   opacity: 0;

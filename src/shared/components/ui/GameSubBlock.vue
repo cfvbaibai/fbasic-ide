@@ -20,8 +20,8 @@ defineProps<Props>()
   border-radius: 10px;
   padding: 0.75rem;
   box-shadow: 
-    inset 0 2px 4px var(--base-color-black-30),
-    0 2px 6px var(--base-color-black-20);
+    inset 0 2px 4px var(--base-alpha-gray-00-30),
+    0 2px 6px var(--base-alpha-gray-00-20);
   position: relative;
   transition: all 0.3s ease;
   width: 100%;
@@ -31,10 +31,10 @@ defineProps<Props>()
 }
 
 .game-sub-block:hover {
-  border-color: var(--game-accent-color);
+  border-color: var(--base-solid-primary);
   box-shadow: 
-    inset 0 2px 4px var(--base-color-black-30),
-    0 0 12px var(--game-accent-color-20);
+    inset 0 2px 4px var(--base-alpha-gray-00-30),
+    0 0 12px var(--base-alpha-primary-20);
 }
 
 .game-sub-block-title {
@@ -49,7 +49,7 @@ defineProps<Props>()
 
 /* Light theme: use accent color, no glow */
 .light-theme .game-sub-block-title {
-  color: var(--game-accent-color);
+  color: var(--base-solid-primary);
   text-shadow: none;
 }
 </style>

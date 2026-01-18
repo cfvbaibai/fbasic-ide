@@ -23,6 +23,9 @@ export const skinConfigs: Record<SkinName, SkinConfig> = {
   },
   nintendo: {
     isLightTheme: true
+  },
+  'classic-light': {
+    isLightTheme: true
   }
 }
 

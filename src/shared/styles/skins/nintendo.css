@@ -7,94 +7,31 @@
 
 [data-skin="nintendo"] {
     /* Primary Accent Color - Nintendo Red */
-    --base-color-primary: #E60012;
-    --base-color-primary-10: rgba(230, 0, 18, 0.1);
-    --base-color-primary-20: rgba(230, 0, 18, 0.2);
-    --base-color-primary-30: rgba(230, 0, 18, 0.3);
-    --base-color-primary-40: rgba(230, 0, 18, 0.4);
-    --base-color-primary-50: rgba(230, 0, 18, 0.5);
-    --base-color-primary-60: rgba(230, 0, 18, 0.6);
-    --base-color-primary-70: rgba(230, 0, 18, 0.7);
-    --base-color-primary-80: rgba(230, 0, 18, 0.8);
-    --base-color-primary-90: rgba(230, 0, 18, 0.9);
-    /* Inverted Black/White */
-    --base-color-black: #ffffff;
-    --base-color-white: #000000;
+    --base-solid-primary: #e60012;
     /* Inverted Gray Scale */
-    --base-color-gray-10: #e6e6e6;
-    --base-color-gray-20: #cccccc;
-    --base-color-gray-30: #b3b3b3;
-    --base-color-gray-40: #999999;
-    --base-color-gray-50: #808080;
-    --base-color-gray-60: #666666;
-    --base-color-gray-70: #4d4d4d;
-    --base-color-gray-80: #333333;
-    --base-color-gray-90: #1a1a1a;
-    /* Inverted Black Opacity Variants (now white opacity) */
-    --base-color-black-10: rgba(255, 255, 255, 0.1);
-    --base-color-black-20: rgba(255, 255, 255, 0.2);
-    --base-color-black-30: rgba(255, 255, 255, 0.3);
-    --base-color-black-40: rgba(255, 255, 255, 0.4);
-    --base-color-black-50: rgba(255, 255, 255, 0.5);
-    --base-color-black-60: rgba(255, 255, 255, 0.6);
-    --base-color-black-80: rgba(255, 255, 255, 0.8);
-    /* Inverted White Opacity Variants (now black opacity) */
-    --base-color-white-10: rgba(0, 0, 0, 0.1);
-    --base-color-white-20: rgba(0, 0, 0, 0.2);
-    --base-color-white-30: rgba(0, 0, 0, 0.3);
-    --base-color-white-40: rgba(0, 0, 0, 0.4);
-    --base-color-white-50: rgba(0, 0, 0, 0.5);
-    --base-color-white-60: rgba(0, 0, 0, 0.6);
-    --base-color-white-80: rgba(0, 0, 0, 0.8);
+    --base-solid-gray-00: #ffffff;
+    /* Solid - darkest (inverted, was black/white swap) */
+    --base-solid-gray-100: #000000;
+    /* Solid - lightest (inverted, was white/black swap) */
+    /* Inverted Gray Scale (lighter) */
+    --base-solid-gray-10: #f5f5f5;
+    --base-solid-gray-20: #e8e8e8;
+    --base-solid-gray-30: #d8d8d8;
+    --base-solid-gray-40: #c8c8c8;
+    --base-solid-gray-50: #b8b8b8;
+    --base-solid-gray-60: #a8a8a8;
+    --base-solid-gray-70: #989898;
+    --base-solid-gray-80: #888888;
+    --base-solid-gray-90: #787878;
+    /* Override game-text variables for light theme (text should be dark) */
+    --game-text-primary: #000000;
+    --game-text-secondary: #333333;
+    --game-text-tertiary: #4d4d4d;
+    --game-text-contrast: var(--base-solid-gray-00);
     /* Semantic Colors - Darker for white background */
-    --semantic-success: #4a7c2e;
-    --semantic-success-10: rgba(74, 124, 46, 0.1);
-    --semantic-success-20: rgba(74, 124, 46, 0.2);
-    --semantic-success-30: rgba(74, 124, 46, 0.3);
-    --semantic-success-40: rgba(74, 124, 46, 0.4);
-    --semantic-success-50: rgba(74, 124, 46, 0.5);
-    --semantic-success-60: rgba(74, 124, 46, 0.6);
-    --semantic-success-70: rgba(74, 124, 46, 0.7);
-    --semantic-success-80: rgba(74, 124, 46, 0.8);
-    --semantic-success-90: rgba(74, 124, 46, 0.9);
-    --semantic-warning: #cc8a2e;
-    --semantic-warning-10: rgba(204, 138, 46, 0.1);
-    --semantic-warning-20: rgba(204, 138, 46, 0.2);
-    --semantic-warning-30: rgba(204, 138, 46, 0.3);
-    --semantic-warning-40: rgba(204, 138, 46, 0.4);
-    --semantic-warning-50: rgba(204, 138, 46, 0.5);
-    --semantic-warning-60: rgba(204, 138, 46, 0.6);
-    --semantic-warning-70: rgba(204, 138, 46, 0.7);
-    --semantic-warning-80: rgba(204, 138, 46, 0.8);
-    --semantic-warning-90: rgba(204, 138, 46, 0.9);
-    --semantic-danger: #cc2d2d;
-    --semantic-danger-10: rgba(204, 45, 45, 0.1);
-    --semantic-danger-20: rgba(204, 45, 45, 0.2);
-    --semantic-danger-30: rgba(204, 45, 45, 0.3);
-    --semantic-danger-40: rgba(204, 45, 45, 0.4);
-    --semantic-danger-50: rgba(204, 45, 45, 0.5);
-    --semantic-danger-60: rgba(204, 45, 45, 0.6);
-    --semantic-danger-70: rgba(204, 45, 45, 0.7);
-    --semantic-danger-80: rgba(204, 45, 45, 0.8);
-    --semantic-danger-90: rgba(204, 45, 45, 0.9);
-    --semantic-info: #5a5d61;
-    --semantic-info-10: rgba(90, 93, 97, 0.1);
-    --semantic-info-20: rgba(90, 93, 97, 0.2);
-    --semantic-info-30: rgba(90, 93, 97, 0.3);
-    --semantic-info-40: rgba(90, 93, 97, 0.4);
-    --semantic-info-50: rgba(90, 93, 97, 0.5);
-    --semantic-info-60: rgba(90, 93, 97, 0.6);
-    --semantic-info-70: rgba(90, 93, 97, 0.7);
-    --semantic-info-80: rgba(90, 93, 97, 0.8);
-    --semantic-info-90: rgba(90, 93, 97, 0.9);
-    --semantic-neutral: #4d4d4d;
-    --semantic-neutral-10: rgba(77, 77, 77, 0.1);
-    --semantic-neutral-20: rgba(77, 77, 77, 0.2);
-    --semantic-neutral-30: rgba(77, 77, 77, 0.3);
-    --semantic-neutral-40: rgba(77, 77, 77, 0.4);
-    --semantic-neutral-50: rgba(77, 77, 77, 0.5);
-    --semantic-neutral-60: rgba(77, 77, 77, 0.6);
-    --semantic-neutral-70: rgba(77, 77, 77, 0.7);
-    --semantic-neutral-80: rgba(77, 77, 77, 0.8);
-    --semantic-neutral-90: rgba(77, 77, 77, 0.9);
+    --semantic-solid-success: #4a7c2e;
+    --semantic-solid-warning: #cc8a2e;
+    --semantic-solid-danger: #cc2d2d;
+    --semantic-solid-info: #5a5d61;
+    --semantic-solid-neutral: #4d4d4d;
 }

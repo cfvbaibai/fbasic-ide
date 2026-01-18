@@ -102,8 +102,8 @@ const tableSize = computed(() => {
 
 .game-table-header-cell {
   padding: 0.75rem 0.5rem;
-  background: linear-gradient(135deg, var(--game-accent-color-10) 0%, var(--game-accent-color-10) 100%);
-  color: var(--game-accent-color);
+  background: linear-gradient(135deg, var(--base-alpha-primary-10) 0%, var(--base-alpha-primary-10) 100%);
+  color: var(--base-solid-primary);
   font-weight: 700;
   font-family: var(--game-font-family-heading);
   text-transform: uppercase;
@@ -135,7 +135,7 @@ const tableSize = computed(() => {
 }
 
 .game-table-row-highlight:hover {
-  background: var(--game-accent-color-10);
+  background: var(--base-alpha-primary-10);
 }
 
 .game-table-cell {
@@ -149,7 +149,7 @@ const tableSize = computed(() => {
 }
 
 .game-table-row-highlight:hover .game-table-cell {
-  color: var(--game-accent-color);
+  color: var(--base-solid-primary);
   text-shadow: 0 0 6px var(--game-accent-glow);
 }
 
@@ -162,7 +162,7 @@ const tableSize = computed(() => {
 }
 
 .game-table-stripe .game-table-row:nth-child(even) {
-  background: var(--game-accent-color-10);
+  background: var(--base-alpha-primary-10);
 }
 
 .game-table-border {
