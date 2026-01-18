@@ -126,6 +126,14 @@ describe('ASC and CHR$ Functions', () => {
       expect(deviceAdapter.getAllOutputs()).toEqual('H\n')
     })
 
+    it('should convert character code 96 to "ア" (kana)', async () => {
+      const source = '10 LET A$ = CHR$(96)\n20 PRINT A$\n30 END'
+      const result = await interpreter.execute(source)
+      expect(result.success).toBe(true)
+      // CHR$(96) = "ア" per manual page 108 (Character Code List B)
+      expect(deviceAdapter.getAllOutputs()).toEqual('ア\n')
+    })
+
     it('should convert character code 0 to null character', async () => {
       const source = '10 LET A$ = CHR$(0)\n20 LET L = LEN(A$)\n30 PRINT L\n40 END'
       const result = await interpreter.execute(source)

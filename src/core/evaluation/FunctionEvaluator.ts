@@ -8,6 +8,7 @@
 import type { CstNode } from 'chevrotain'
 import { getFirstCstNode, getCstNodes, getFirstToken } from '../parser/cst-helpers'
 import type { ExecutionContext } from '../state/ExecutionContext'
+import { getCharacterByCode } from '@/shared/utils/backgroundLookup'
 
 /**
  * Helper to convert a value to an integer
@@ -245,6 +246,7 @@ export class FunctionEvaluator {
    * Input range: 0 to 255
    * Returns single character string
    * Per manual page 83: "Yields a character as a character code from a numerical value"
+   * Maps codes to characters using background items data, with fallback to String.fromCharCode
    */
   private evaluateChr(args: Array<number | string>): string {
     if (args.length !== 1) {
@@ -257,7 +259,15 @@ export class FunctionEvaluator {
     if (charCode < 0) charCode = 0
     if (charCode > 255) charCode = 255
     
-    // Convert character code to character
+    // Try to get character from background items mapping first
+    // This ensures kana and other non-ASCII characters are properly mapped
+    const mappedChar = getCharacterByCode(charCode)
+    if (mappedChar !== null) {
+      return mappedChar
+    }
+    
+    // Fallback to String.fromCharCode for codes without background items
+    // (e.g., system codes 0-31, or special graphics 184-255)
     return String.fromCharCode(charCode)
   }
 

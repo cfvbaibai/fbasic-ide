@@ -1,6 +1,6 @@
 import type { BackgroundItem } from "../types"
 
-const BGITEM_KANA_A_97 = [
+const BGITEM_KANA_A_96 = [
   [1,1,1,1,1,1,0,0],
   [0,0,0,0,0,1,0,0],
   [0,0,1,0,0,1,0,0],
@@ -11,7 +11,7 @@ const BGITEM_KANA_A_97 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_I_98 = [
+const BGITEM_KANA_I_97 = [
   [0,0,0,0,0,1,0,0],
   [0,0,0,0,1,1,0,0],
   [0,0,0,1,1,0,0,0],
@@ -22,7 +22,7 @@ const BGITEM_KANA_I_98 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_U_99 = [
+const BGITEM_KANA_U_98 = [
   [0,0,0,1,0,0,0,0],
   [1,1,1,1,1,1,0,0],
   [1,0,0,0,0,1,0,0],
@@ -33,7 +33,7 @@ const BGITEM_KANA_U_99 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_E_100 = [
+const BGITEM_KANA_E_99 = [
   [0,1,1,1,1,1,0,0],
   [0,0,0,1,0,0,0,0],
   [0,0,0,1,0,0,0,0],
@@ -44,7 +44,7 @@ const BGITEM_KANA_E_100 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_O_101 = [
+const BGITEM_KANA_O_100 = [
   [0,0,0,0,1,0,0,0],
   [1,1,1,1,1,1,1,0],
   [0,0,0,1,1,0,0,0],
@@ -55,7 +55,7 @@ const BGITEM_KANA_O_101 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_KA_102 = [
+const BGITEM_KANA_KA_101 = [
   [0,1,0,0,0,0,0,0],
   [1,1,1,1,1,1,0,0],
   [0,1,0,0,0,1,0,0],
@@ -66,7 +66,7 @@ const BGITEM_KANA_KA_102 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_KI_103 = [
+const BGITEM_KANA_KI_102 = [
   [0,0,0,1,0,0,0,0],
   [1,1,1,1,1,1,0,0],
   [0,0,0,1,0,0,0,0],
@@ -77,10 +77,10 @@ const BGITEM_KANA_KI_103 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_KU_104 = [
+const BGITEM_KANA_KU_103 = [
   [0,1,1,1,1,1,0,0],
-  [0,0,0,0,0,1,0,0],
-  [0,0,0,0,0,1,0,0],
+  [0,1,0,0,0,1,0,0],
+  [0,1,0,0,0,1,0,0],
   [1,1,0,0,0,1,0,0],
   [0,0,0,0,0,1,0,0],
   [0,0,0,0,1,1,0,0],
@@ -88,10 +88,10 @@ const BGITEM_KANA_KU_104 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_KE_105 = [
-  [0,0,0,0,0,0,0,0],
+const BGITEM_KANA_KE_104 = [
+  [0,1,0,0,0,0,0,0],
   [0,1,1,1,1,1,1,0],
-  [0,0,0,0,1,0,0,0],
+  [0,1,0,0,1,0,0,0],
   [1,1,0,0,1,0,0,0],
   [0,0,0,0,1,0,0,0],
   [0,0,0,1,1,0,0,0],
@@ -99,7 +99,7 @@ const BGITEM_KANA_KE_105 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_KO_106 = [
+const BGITEM_KANA_KO_105 = [
   [1,1,1,1,1,1,0,0],
   [0,0,0,0,0,1,0,0],
   [0,0,0,0,0,1,0,0],
@@ -110,7 +110,7 @@ const BGITEM_KANA_KO_106 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_SA_107 = [
+const BGITEM_KANA_SA_106 = [
   [0,1,0,0,0,1,0,0],
   [1,1,1,1,1,1,1,0],
   [0,1,0,0,0,1,0,0],
@@ -121,8 +121,8 @@ const BGITEM_KANA_SA_107 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_SHI_108 = [
-  [1,1,1,1,1,1,0,0],
+const BGITEM_KANA_SHI_107 = [
+  [1,1,0,0,0,1,0,0],
   [0,0,0,0,0,1,0,0],
   [1,1,0,0,0,1,0,0],
   [0,0,0,0,1,1,0,0],
@@ -132,7 +132,7 @@ const BGITEM_KANA_SHI_108 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_SU_109 = [
+const BGITEM_KANA_SU_108 = [
   [1,1,1,1,1,1,0,0],
   [0,0,0,0,0,1,0,0],
   [0,0,0,0,1,1,0,0],
@@ -143,7 +143,7 @@ const BGITEM_KANA_SU_109 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_SE_110 = [
+const BGITEM_KANA_SE_109 = [
   [0,1,0,0,0,0,0,0],
   [1,1,1,1,1,1,1,0],
   [0,1,0,0,0,0,1,0],
@@ -154,7 +154,7 @@ const BGITEM_KANA_SE_110 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_SO_111 = [
+const BGITEM_KANA_SO_110 = [
   [1,0,0,0,0,0,1,0],
   [1,0,0,0,0,0,1,0],
   [1,0,0,0,0,1,1,0],
@@ -165,7 +165,7 @@ const BGITEM_KANA_SO_111 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_TA_112 = [
+const BGITEM_KANA_TA_111 = [
   [0,1,1,1,1,1,0,0],
   [0,1,0,0,0,1,0,0],
   [0,1,0,0,0,1,0,0],
@@ -176,7 +176,7 @@ const BGITEM_KANA_TA_112 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_CHI_113 = [
+const BGITEM_KANA_CHI_112 = [
   [0,0,0,1,1,1,0,0],
   [1,1,1,1,0,0,0,0],
   [0,0,0,1,0,0,0,0],
@@ -187,7 +187,7 @@ const BGITEM_KANA_CHI_113 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_TSU_114 = [
+const BGITEM_KANA_TSU_113 = [
   [1,0,1,0,0,1,0,0],
   [1,0,1,0,0,1,0,0],
   [1,0,1,0,0,1,0,0],
@@ -198,7 +198,7 @@ const BGITEM_KANA_TSU_114 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_TE_115 = [
+const BGITEM_KANA_TE_114 = [
   [0,1,1,1,1,1,0,0],
   [0,0,0,0,0,0,0,0],
   [1,1,1,1,1,1,1,0],
@@ -209,7 +209,7 @@ const BGITEM_KANA_TE_115 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_TO_116 = [
+const BGITEM_KANA_TO_115 = [
   [0,1,0,0,0,0,0,0],
   [0,1,0,0,0,0,0,0],
   [0,1,0,0,0,0,0,0],
@@ -220,7 +220,7 @@ const BGITEM_KANA_TO_116 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_NA_117 = [
+const BGITEM_KANA_NA_116 = [
   [0,0,0,0,1,0,0,0],
   [0,0,0,0,1,0,0,0],
   [1,1,1,1,1,1,1,0],
@@ -231,7 +231,7 @@ const BGITEM_KANA_NA_117 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_NI_118 = [
+const BGITEM_KANA_NI_117 = [
   [0,1,1,1,1,0,0,0],
   [0,0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0,0],
@@ -242,7 +242,7 @@ const BGITEM_KANA_NI_118 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_NU_119 = [
+const BGITEM_KANA_NU_118 = [
   [0,1,1,1,1,1,0,0],
   [0,0,0,0,0,1,0,0],
   [0,0,0,0,1,1,0,0],
@@ -253,7 +253,7 @@ const BGITEM_KANA_NU_119 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_NE_120= [
+const BGITEM_KANA_NE_119= [
   [0,0,0,1,0,0,0,0],
   [1,1,1,1,1,1,1,0],
   [0,0,0,0,1,1,0,0],
@@ -264,7 +264,7 @@ const BGITEM_KANA_NE_120= [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_NO_121 = [
+const BGITEM_KANA_NO_120 = [
   [0,0,0,0,0,1,0,0],
   [0,0,0,0,0,1,0,0],
   [0,0,0,0,1,1,0,0],
@@ -275,7 +275,7 @@ const BGITEM_KANA_NO_121 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_HA_122 = [
+const BGITEM_KANA_HA_121 = [
   [0,0,0,1,0,0,0,0],
   [0,0,0,1,1,0,0,0],
   [1,0,0,0,1,0,0,0],
@@ -286,7 +286,7 @@ const BGITEM_KANA_HA_122 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_HI_123 = [
+const BGITEM_KANA_HI_122 = [
   [1,0,0,0,0,0,0,0],
   [1,0,0,0,0,0,0,0],
   [1,1,1,1,1,1,0,0],
@@ -297,7 +297,7 @@ const BGITEM_KANA_HI_123 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_FU_124 = [
+const BGITEM_KANA_FU_123 = [
   [1,1,1,1,1,1,0,0],
   [0,0,0,0,0,1,0,0],
   [0,0,0,0,0,1,0,0],
@@ -308,7 +308,7 @@ const BGITEM_KANA_FU_124 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_HE_125 = [
+const BGITEM_KANA_HE_124 = [
   [0,0,0,0,0,0,0,0],
   [0,0,1,0,0,0,0,0],
   [0,1,1,1,0,0,0,0],
@@ -319,7 +319,7 @@ const BGITEM_KANA_HE_125 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_HO_126 = [
+const BGITEM_KANA_HO_125 = [
   [0,0,0,1,0,0,0,0],
   [1,1,1,1,1,1,1,0],
   [0,0,0,1,0,0,0,0],
@@ -330,7 +330,7 @@ const BGITEM_KANA_HO_126 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_MA_127 = [
+const BGITEM_KANA_MA_126 = [
   [1,1,1,1,1,1,0,0],
   [0,0,0,0,0,1,0,0],
   [0,0,0,0,0,1,0,0],
@@ -341,7 +341,7 @@ const BGITEM_KANA_MA_127 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_MI_128 = [
+const BGITEM_KANA_MI_127 = [
   [0,1,1,1,1,1,0,0],
   [0,0,0,0,0,0,0,0],
   [0,1,1,1,0,0,0,0],
@@ -352,7 +352,7 @@ const BGITEM_KANA_MI_128 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_MU_129 = [
+const BGITEM_KANA_MU_128 = [
   [0,0,0,1,0,0,0,0],
   [0,0,1,1,0,0,0,0],
   [0,1,1,0,0,0,0,0],
@@ -363,7 +363,7 @@ const BGITEM_KANA_MU_129 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_ME_130 = [
+const BGITEM_KANA_ME_129 = [
   [0,0,0,0,0,1,0,0],
   [0,0,0,0,0,1,0,0],
   [0,1,0,0,1,1,0,0],
@@ -374,7 +374,7 @@ const BGITEM_KANA_ME_130 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_MO_131 = [
+const BGITEM_KANA_MO_130 = [
   [1,1,1,1,1,1,0,0],
   [0,0,1,0,0,0,0,0],
   [1,1,1,1,1,1,0,0],
@@ -385,7 +385,7 @@ const BGITEM_KANA_MO_131 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_YA_132 = [
+const BGITEM_KANA_YA_131 = [
   [0,0,1,0,0,0,0,0],
   [1,1,1,1,1,1,0,0],
   [0,0,1,0,0,1,0,0],
@@ -396,7 +396,7 @@ const BGITEM_KANA_YA_132 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_YU_133 = [
+const BGITEM_KANA_YU_132 = [
   [0,1,1,1,1,0,0,0],
   [0,0,0,0,1,0,0,0],
   [0,0,0,0,1,0,0,0],
@@ -407,7 +407,7 @@ const BGITEM_KANA_YU_133 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_YO_134 = [
+const BGITEM_KANA_YO_133 = [
   [1,1,1,1,1,1,0,0],
   [0,0,0,0,0,1,0,0],
   [0,0,0,0,0,1,0,0],
@@ -418,7 +418,7 @@ const BGITEM_KANA_YO_134 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_RA_135 = [
+const BGITEM_KANA_RA_134 = [
   [1,1,1,1,1,1,0,0],
   [0,0,0,0,0,0,0,0],
   [1,1,1,1,1,1,0,0],
@@ -429,7 +429,7 @@ const BGITEM_KANA_RA_135 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_RI_136 = [
+const BGITEM_KANA_RI_135 = [
   [0,1,0,0,0,1,0,0],
   [0,1,0,0,0,1,0,0],
   [0,1,0,0,0,1,0,0],
@@ -440,7 +440,7 @@ const BGITEM_KANA_RI_136 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_RU_137 = [
+const BGITEM_KANA_RU_136 = [
   [0,0,0,1,0,0,0,0],
   [0,1,0,1,0,0,0,0],
   [0,1,0,1,0,0,0,0],
@@ -451,7 +451,7 @@ const BGITEM_KANA_RU_137 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_RE_138 = [
+const BGITEM_KANA_RE_137 = [
   [1,0,0,0,0,0,0,0],
   [1,0,0,0,0,0,0,0],
   [1,0,0,0,0,0,0,0],
@@ -462,7 +462,7 @@ const BGITEM_KANA_RE_138 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_RO_139 = [
+const BGITEM_KANA_RO_138 = [
   [1,1,1,1,1,1,0,0],
   [1,0,0,0,0,1,0,0],
   [1,0,0,0,0,1,0,0],
@@ -473,7 +473,7 @@ const BGITEM_KANA_RO_139 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_WA_140 = [
+const BGITEM_KANA_WA_139 = [
   [1,1,1,1,1,1,0,0],
   [1,0,0,0,0,1,0,0],
   [1,0,0,0,0,1,0,0],
@@ -484,7 +484,7 @@ const BGITEM_KANA_WA_140 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_N_141 = [
+const BGITEM_KANA_N_140 = [
   [1,1,0,0,0,0,0,0],
   [0,0,0,0,0,0,0,0],
   [0,0,0,0,0,1,0,0],
@@ -495,7 +495,7 @@ const BGITEM_KANA_N_141 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_WO_142= [
+const BGITEM_KANA_WO_141= [
   [1,1,1,1,1,1,0,0],
   [0,0,0,0,0,1,0,0],
   [1,1,1,1,1,1,0,0],
@@ -506,7 +506,7 @@ const BGITEM_KANA_WO_142= [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_LITTLEA_143 = [
+const BGITEM_KANA_LITTLEA_142 = [
   [0,0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0,0],
   [0,1,1,1,1,1,0,0],
@@ -517,7 +517,7 @@ const BGITEM_KANA_LITTLEA_143 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_LITTLEI_144 = [
+const BGITEM_KANA_LITTLEI_143 = [
   [0,0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0,0],
   [0,0,0,0,1,1,0,0],
@@ -528,7 +528,7 @@ const BGITEM_KANA_LITTLEI_144 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_LITTLEU_145 = [
+const BGITEM_KANA_LITTLEU_144 = [
   [0,0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0,0],
   [0,0,0,1,0,0,0,0],
@@ -539,7 +539,7 @@ const BGITEM_KANA_LITTLEU_145 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_LITTLEE_146 = [
+const BGITEM_KANA_LITTLEE_145 = [
   [0,0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0,0],
   [0,0,1,1,1,0,0,0],
@@ -550,7 +550,7 @@ const BGITEM_KANA_LITTLEE_146 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_LITTLEO_147= [
+const BGITEM_KANA_LITTLEO_146= [
   [0,0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0,0],
   [0,0,0,0,1,0,0,0],
@@ -561,7 +561,7 @@ const BGITEM_KANA_LITTLEO_147= [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_LITTLEYA_148 = [
+const BGITEM_KANA_LITTLEYA_147 = [
   [0,0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0,0],
   [0,0,1,0,0,0,0,0],
@@ -572,7 +572,7 @@ const BGITEM_KANA_LITTLEYA_148 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_LITTLEYU_149 = [
+const BGITEM_KANA_LITTLEYU_148 = [
   [0,0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0,0],
   [0,0,1,1,1,0,0,0],
@@ -583,7 +583,7 @@ const BGITEM_KANA_LITTLEYU_149 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_LITTLEYO_150 = [
+const BGITEM_KANA_LITTLEYO_149 = [
   [0,0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0,0],
   [0,1,1,1,1,0,0,0],
@@ -594,7 +594,7 @@ const BGITEM_KANA_LITTLEYO_150 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_LITTLETSU_151 = [
+const BGITEM_KANA_LITTLETSU_150 = [
   [0,0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0,0],
   [0,1,0,1,0,1,0,0],
@@ -605,7 +605,7 @@ const BGITEM_KANA_LITTLETSU_151 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_GA_152= [
+const BGITEM_KANA_GA_151= [
   [0,1,0,0,1,0,1,0],
   [0,1,0,0,0,0,0,0],
   [1,1,1,1,1,1,0,0],
@@ -616,7 +616,7 @@ const BGITEM_KANA_GA_152= [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_GI_153 = [
+const BGITEM_KANA_GI_152 = [
   [0,0,0,1,0,1,0,0],
   [1,1,1,1,1,0,1,0],
   [0,0,0,1,0,0,0,0],
@@ -627,7 +627,7 @@ const BGITEM_KANA_GI_153 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_GU_154 = [
+const BGITEM_KANA_GU_153 = [
   [0,0,0,0,0,1,0,0],
   [0,1,1,1,1,0,1,0],
   [0,1,0,0,0,1,0,0],
@@ -638,7 +638,7 @@ const BGITEM_KANA_GU_154 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_GE_155 = [
+const BGITEM_KANA_GE_154 = [
   [0,1,0,0,1,0,1,0],
   [0,1,0,0,0,0,0,0],
   [0,1,1,1,1,1,1,0],
@@ -649,7 +649,7 @@ const BGITEM_KANA_GE_155 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_GO_156 = [
+const BGITEM_KANA_GO_155 = [
   [0,0,0,0,0,1,0,0],
   [1,1,1,1,1,0,1,0],
   [0,0,0,0,0,1,0,0],
@@ -660,7 +660,7 @@ const BGITEM_KANA_GO_156 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_ZA_157 = [
+const BGITEM_KANA_ZA_156 = [
   [0,0,0,0,1,0,1,0],
   [0,1,0,0,0,1,0,0],
   [1,1,1,1,1,1,1,0],
@@ -671,7 +671,7 @@ const BGITEM_KANA_ZA_157 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_JI_158 = [
+const BGITEM_KANA_JI_157 = [
   [1,1,0,0,1,0,1,0],
   [0,0,0,0,0,1,0,0],
   [1,1,0,0,0,1,0,0],
@@ -682,7 +682,7 @@ const BGITEM_KANA_JI_158 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_ZU_159 = [
+const BGITEM_KANA_ZU_158 = [
   [0,0,0,0,0,1,0,0],
   [1,1,1,1,1,0,1,0],
   [0,0,0,0,1,0,0,0],
@@ -693,7 +693,7 @@ const BGITEM_KANA_ZU_159 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_ZE_160 = [
+const BGITEM_KANA_ZE_159 = [
   [0,1,0,0,1,0,1,0],
   [0,1,0,0,0,0,0,0],
   [1,1,1,1,1,1,1,0],
@@ -704,7 +704,7 @@ const BGITEM_KANA_ZE_160 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_ZO_161 = [
+const BGITEM_KANA_ZO_160 = [
   [0,0,0,0,1,0,1,0],
   [1,0,0,0,0,1,0,0],
   [1,0,0,0,0,1,0,0],
@@ -715,7 +715,7 @@ const BGITEM_KANA_ZO_161 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_DA_162 = [
+const BGITEM_KANA_DA_161 = [
   [0,0,0,0,0,1,0,0],
   [0,1,1,1,1,0,1,0],
   [0,1,0,0,0,1,0,0],
@@ -726,7 +726,7 @@ const BGITEM_KANA_DA_162 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_DJI_163 = [
+const BGITEM_KANA_DJI_162 = [
   [0,0,0,0,0,1,0,0],
   [1,1,1,1,1,0,1,0],
   [0,0,0,0,1,0,0,0],
@@ -737,7 +737,7 @@ const BGITEM_KANA_DJI_163 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_DU_164 = [
+const BGITEM_KANA_DU_163 = [
   [0,1,0,0,1,0,1,0],
   [0,1,0,0,0,0,0,0],
   [1,1,1,1,1,1,1,0],
@@ -748,7 +748,7 @@ const BGITEM_KANA_DU_164 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_DE_165 = [
+const BGITEM_KANA_DE_164 = [
   [0,0,0,0,1,0,1,0],
   [1,0,0,0,0,1,0,0],
   [1,0,0,0,0,1,0,0],
@@ -759,7 +759,7 @@ const BGITEM_KANA_DE_165 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_DO_166 = [
+const BGITEM_KANA_DO_165 = [
   [0,0,0,0,0,1,0,0],
   [0,1,1,1,1,0,1,0],
   [0,1,0,0,0,1,0,0],
@@ -770,7 +770,7 @@ const BGITEM_KANA_DO_166 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_BA_167= [
+const BGITEM_KANA_BA_166= [
   [0,0,0,0,1,0,1,0],
   [0,0,0,1,0,0,0,0],
   [1,0,0,1,1,0,0,0],
@@ -781,7 +781,7 @@ const BGITEM_KANA_BA_167= [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_BI_168 = [
+const BGITEM_KANA_BI_167 = [
   [1,0,0,0,1,0,1,0],
   [1,0,0,0,0,0,0,0],
   [1,1,1,1,1,1,0,0],
@@ -792,7 +792,7 @@ const BGITEM_KANA_BI_168 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_BU_169 = [
+const BGITEM_KANA_BU_168 = [
   [0,0,0,0,1,0,1,0],
   [1,1,1,1,0,0,0,0],
   [0,0,0,0,1,1,0,0],
@@ -803,7 +803,7 @@ const BGITEM_KANA_BU_169 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_BE_170 = [
+const BGITEM_KANA_BE_169 = [
   [0,0,0,0,1,0,1,0],
   [0,0,1,0,0,0,0,0],
   [0,1,1,1,0,0,0,0],
@@ -814,7 +814,7 @@ const BGITEM_KANA_BE_170 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_BO_171 = [
+const BGITEM_KANA_BO_170 = [
   [0,0,0,0,1,0,1,0],
   [0,0,0,1,0,0,0,0],
   [1,1,1,1,1,1,1,0],
@@ -825,7 +825,7 @@ const BGITEM_KANA_BO_171 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_PA_172 = [
+const BGITEM_KANA_PA_171 = [
   [0,0,0,1,0,1,1,0],
   [0,0,0,1,1,0,1,0],
   [1,0,0,0,1,1,1,0],
@@ -836,7 +836,7 @@ const BGITEM_KANA_PA_172 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_PI_173 = [
+const BGITEM_KANA_PI_172 = [
   [1,0,0,0,0,1,1,0],
   [1,0,0,0,1,0,1,0],
   [1,1,1,1,1,1,0,0],
@@ -847,7 +847,7 @@ const BGITEM_KANA_PI_173 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_PU_174 = [
+const BGITEM_KANA_PU_173 = [
   [0,0,0,0,0,1,1,0],
   [1,1,1,1,1,0,1,0],
   [0,0,0,0,0,1,1,0],
@@ -858,7 +858,7 @@ const BGITEM_KANA_PU_174 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_PE_175 = [
+const BGITEM_KANA_PE_174 = [
   [0,0,0,0,0,1,1,0],
   [0,0,1,0,1,0,1,0],
   [0,1,1,1,0,1,1,0],
@@ -869,7 +869,7 @@ const BGITEM_KANA_PE_175 = [
   [0,0,0,0,0,0,0,0]
 ]
 
-const BGITEM_KANA_PO_176 = [
+const BGITEM_KANA_PO_175 = [
   [0,0,0,1,0,1,1,0],
   [0,0,0,1,1,0,1,0],
   [1,1,1,1,1,1,1,0],
@@ -892,85 +892,85 @@ const BGITEM_KANA_FA_183 = [
 ]
 
 export const KANA_BG_ITEMS: BackgroundItem[] = [
-  { code: 97, char: 'ア', altChars: ['あ'], tile: BGITEM_KANA_A_97 },
-  { code: 98, char: 'イ', altChars: ['い'], tile: BGITEM_KANA_I_98 },
-  { code: 99, char: 'ウ', altChars: ['う'], tile: BGITEM_KANA_U_99 },
-  { code: 100, char: 'エ', altChars: ['え'], tile: BGITEM_KANA_E_100 },
-  { code: 101, char: 'オ', altChars: ['お'], tile: BGITEM_KANA_O_101 },
-  { code: 102, char: 'カ', altChars: ['か'], tile: BGITEM_KANA_KA_102 },
-  { code: 103, char: 'キ', altChars: ['き'], tile: BGITEM_KANA_KI_103 },
-  { code: 104, char: 'ク', altChars: ['く'], tile: BGITEM_KANA_KU_104 },
-  { code: 105, char: 'ケ', altChars: ['け'], tile: BGITEM_KANA_KE_105 },
-  { code: 106, char: 'コ', altChars: ['こ'], tile: BGITEM_KANA_KO_106 },
-  { code: 107, char: 'サ', altChars: ['さ'], tile: BGITEM_KANA_SA_107 },
-  { code: 108, char: 'シ', altChars: ['し'], tile: BGITEM_KANA_SHI_108 },
-  { code: 109, char: 'ス', altChars: ['す'], tile: BGITEM_KANA_SU_109 },
-  { code: 110, char: 'セ', altChars: ['せ'], tile: BGITEM_KANA_SE_110 },
-  { code: 111, char: 'ソ', altChars: ['そ'], tile: BGITEM_KANA_SO_111 },
-  { code: 112, char: 'タ', altChars: ['た'], tile: BGITEM_KANA_TA_112 },
-  { code: 113, char: 'チ', altChars: ['ち'], tile: BGITEM_KANA_CHI_113 },
-  { code: 114, char: 'ツ', altChars: ['つ'], tile: BGITEM_KANA_TSU_114 },
-  { code: 115, char: 'テ', altChars: ['て'], tile: BGITEM_KANA_TE_115 },
-  { code: 116, char: 'ト', altChars: ['と'], tile: BGITEM_KANA_TO_116 },
-  { code: 117, char: 'ナ', altChars: ['な'], tile: BGITEM_KANA_NA_117 },
-  { code: 118, char: 'ニ', altChars: ['に'], tile: BGITEM_KANA_NI_118 },
-  { code: 119, char: 'ヌ', altChars: ['ぬ'], tile: BGITEM_KANA_NU_119 },
-  { code: 120, char: 'ネ', altChars: ['ね'], tile: BGITEM_KANA_NE_120 },
-  { code: 121, char: 'ノ', altChars: ['の'], tile: BGITEM_KANA_NO_121 },
-  { code: 122, char: 'ハ', altChars: ['は'], tile: BGITEM_KANA_HA_122 },
-  { code: 123, char: 'ヒ', altChars: ['ひ'], tile: BGITEM_KANA_HI_123 },
-  { code: 124, char: 'フ', altChars: ['ふ'], tile: BGITEM_KANA_FU_124 },
-  { code: 125, char: 'ヘ', altChars: ['へ'], tile: BGITEM_KANA_HE_125 },
-  { code: 126, char: 'ホ', altChars: ['ほ'], tile: BGITEM_KANA_HO_126 },
-  { code: 127, char: 'マ', altChars: ['ま'], tile: BGITEM_KANA_MA_127 },
-  { code: 128, char: 'ミ', altChars: ['み'], tile: BGITEM_KANA_MI_128 },
-  { code: 129, char: 'ム', altChars: ['む'], tile: BGITEM_KANA_MU_129 },
-  { code: 130, char: 'メ', altChars: ['め'], tile: BGITEM_KANA_ME_130 },
-  { code: 131, char: 'モ', altChars: ['も'], tile: BGITEM_KANA_MO_131 },
-  { code: 132, char: 'ヤ', altChars: ['や'], tile: BGITEM_KANA_YA_132 },
-  { code: 133, char: 'ユ', altChars: ['ゆ'], tile: BGITEM_KANA_YU_133 },
-  { code: 134, char: 'ヨ', altChars: ['よ'], tile: BGITEM_KANA_YO_134 },
-  { code: 135, char: 'ラ', altChars: ['ら'], tile: BGITEM_KANA_RA_135 },
-  { code: 136, char: 'リ', altChars: ['り'], tile: BGITEM_KANA_RI_136 },
-  { code: 137, char: 'ル', altChars: ['る'], tile: BGITEM_KANA_RU_137 },
-  { code: 138, char: 'レ', altChars: ['れ'], tile: BGITEM_KANA_RE_138 },
-  { code: 139, char: 'ロ', altChars: ['ろ'], tile: BGITEM_KANA_RO_139 },
-  { code: 140, char: 'ワ', altChars: ['わ'], tile: BGITEM_KANA_WA_140 },
-  { code: 141, char: 'ン', altChars: ['ん'], tile: BGITEM_KANA_N_141 },
-  { code: 142, char: 'ヲ', altChars: ['を'], tile: BGITEM_KANA_WO_142 },
-  { code: 143, char: 'ァ', altChars: ['ぁ'], tile: BGITEM_KANA_LITTLEA_143 },
-  { code: 144, char: 'ィ', altChars: ['ぃ'], tile: BGITEM_KANA_LITTLEI_144 },
-  { code: 145, char: 'ゥ', altChars: ['ぅ'], tile: BGITEM_KANA_LITTLEU_145 },
-  { code: 146, char: 'ェ', altChars: ['ぇ'], tile: BGITEM_KANA_LITTLEE_146 },
-  { code: 147, char: 'ォ', altChars: ['ぉ'], tile: BGITEM_KANA_LITTLEO_147 },
-  { code: 148, char: 'ャ', altChars: ['ゃ'], tile: BGITEM_KANA_LITTLEYA_148 },
-  { code: 149, char: 'ュ', altChars: ['ゅ'], tile: BGITEM_KANA_LITTLEYU_149 },
-  { code: 150, char: 'ョ', altChars: ['ょ'], tile: BGITEM_KANA_LITTLEYO_150 },
-  { code: 151, char: 'ッ', altChars: ['っ'], tile: BGITEM_KANA_LITTLETSU_151 },
-  { code: 152, char: 'ガ', altChars: ['が'], tile: BGITEM_KANA_GA_152 },
-  { code: 153, char: 'ギ', altChars: ['ぎ'], tile: BGITEM_KANA_GI_153 },
-  { code: 154, char: 'グ', altChars: ['ぐ'], tile: BGITEM_KANA_GU_154 },
-  { code: 155, char: 'ゲ', altChars: ['げ'], tile: BGITEM_KANA_GE_155 },
-  { code: 156, char: 'ゴ', altChars: ['ご'], tile: BGITEM_KANA_GO_156 },
-  { code: 157, char: 'ザ', altChars: ['ざ'], tile: BGITEM_KANA_ZA_157 },
-  { code: 158, char: 'ジ', altChars: ['じ'], tile: BGITEM_KANA_JI_158 },
-  { code: 159, char: 'ズ', altChars: ['ず'], tile: BGITEM_KANA_ZU_159 },
-  { code: 160, char: 'ゼ', altChars: ['ぜ'], tile: BGITEM_KANA_ZE_160 },
-  { code: 161, char: 'ゾ', altChars: ['ぞ'], tile: BGITEM_KANA_ZO_161 },
-  { code: 162, char: 'ダ', altChars: ['だ'], tile: BGITEM_KANA_DA_162 },
-  { code: 163, char: 'ヂ', altChars: ['ぢ'], tile: BGITEM_KANA_DJI_163 },
-  { code: 164, char: 'ヅ', altChars: ['づ'], tile: BGITEM_KANA_DU_164 },
-  { code: 165, char: 'デ', altChars: ['で'], tile: BGITEM_KANA_DE_165 },
-  { code: 166, char: 'ド', altChars: ['ど'], tile: BGITEM_KANA_DO_166 },
-  { code: 167, char: 'バ', altChars: ['ば'], tile: BGITEM_KANA_BA_167 },
-  { code: 168, char: 'ビ', altChars: ['び'], tile: BGITEM_KANA_BI_168 },
-  { code: 169, char: 'ブ', altChars: ['ぶ'], tile: BGITEM_KANA_BU_169 },
-  { code: 170, char: 'ベ', altChars: ['べ'], tile: BGITEM_KANA_BE_170 },
-  { code: 171, char: 'ボ', altChars: ['ぼ'], tile: BGITEM_KANA_BO_171 },
-  { code: 172, char: 'パ', altChars: ['ぱ'], tile: BGITEM_KANA_PA_172 },
-  { code: 173, char: 'ピ', altChars: ['ぴ'], tile: BGITEM_KANA_PI_173 },
-  { code: 174, char: 'プ', altChars: ['ぷ'], tile: BGITEM_KANA_PU_174 },
-  { code: 175, char: 'ペ', altChars: ['ぺ'], tile: BGITEM_KANA_PE_175 },
-  { code: 176, char: 'ポ', altChars: ['ぽ'], tile: BGITEM_KANA_PO_176 },
-  { code: 183, tile: BGITEM_KANA_FA_183 },
+  { code: 96, char: 'ア', altChars: ['あ'], tile: BGITEM_KANA_A_96 },
+  { code: 97, char: 'イ', altChars: ['い'], tile: BGITEM_KANA_I_97 },
+  { code: 98, char: 'ウ', altChars: ['う'], tile: BGITEM_KANA_U_98 },
+  { code: 99, char: 'エ', altChars: ['え'], tile: BGITEM_KANA_E_99 },
+  { code: 100, char: 'オ', altChars: ['お'], tile: BGITEM_KANA_O_100 },
+  { code: 101, char: 'カ', altChars: ['か'], tile: BGITEM_KANA_KA_101 },
+  { code: 102, char: 'キ', altChars: ['き'], tile: BGITEM_KANA_KI_102 },
+  { code: 103, char: 'ク', altChars: ['く'], tile: BGITEM_KANA_KU_103 },
+  { code: 104, char: 'ケ', altChars: ['け'], tile: BGITEM_KANA_KE_104 },
+  { code: 105, char: 'コ', altChars: ['こ'], tile: BGITEM_KANA_KO_105 },
+  { code: 106, char: 'サ', altChars: ['さ'], tile: BGITEM_KANA_SA_106 },
+  { code: 107, char: 'シ', altChars: ['し'], tile: BGITEM_KANA_SHI_107 },
+  { code: 108, char: 'ス', altChars: ['す'], tile: BGITEM_KANA_SU_108 },
+  { code: 109, char: 'セ', altChars: ['せ'], tile: BGITEM_KANA_SE_109 },
+  { code: 110, char: 'ソ', altChars: ['そ'], tile: BGITEM_KANA_SO_110 },
+  { code: 111, char: 'タ', altChars: ['た'], tile: BGITEM_KANA_TA_111 },
+  { code: 112, char: 'チ', altChars: ['ち'], tile: BGITEM_KANA_CHI_112 },
+  { code: 113, char: 'ツ', altChars: ['つ'], tile: BGITEM_KANA_TSU_113 },
+  { code: 114, char: 'テ', altChars: ['て'], tile: BGITEM_KANA_TE_114 },
+  { code: 115, char: 'ト', altChars: ['と'], tile: BGITEM_KANA_TO_115 },
+  { code: 116, char: 'ナ', altChars: ['な'], tile: BGITEM_KANA_NA_116 },
+  { code: 117, char: 'ニ', altChars: ['に'], tile: BGITEM_KANA_NI_117 },
+  { code: 118, char: 'ヌ', altChars: ['ぬ'], tile: BGITEM_KANA_NU_118 },
+  { code: 119, char: 'ネ', altChars: ['ね'], tile: BGITEM_KANA_NE_119 },
+  { code: 120, char: 'ノ', altChars: ['の'], tile: BGITEM_KANA_NO_120 },
+  { code: 121, char: 'ハ', altChars: ['は'], tile: BGITEM_KANA_HA_121 },
+  { code: 122, char: 'ヒ', altChars: ['ひ'], tile: BGITEM_KANA_HI_122 },
+  { code: 123, char: 'フ', altChars: ['ふ'], tile: BGITEM_KANA_FU_123 },
+  { code: 124, char: 'ヘ', altChars: ['へ'], tile: BGITEM_KANA_HE_124 },
+  { code: 125, char: 'ホ', altChars: ['ほ'], tile: BGITEM_KANA_HO_125 },
+  { code: 126, char: 'マ', altChars: ['ま'], tile: BGITEM_KANA_MA_126 },
+  { code: 127, char: 'ミ', altChars: ['み'], tile: BGITEM_KANA_MI_127 },
+  { code: 128, char: 'ム', altChars: ['む'], tile: BGITEM_KANA_MU_128 },
+  { code: 129, char: 'メ', altChars: ['め'], tile: BGITEM_KANA_ME_129 },
+  { code: 130, char: 'モ', altChars: ['も'], tile: BGITEM_KANA_MO_130 },
+  { code: 131, char: 'ヤ', altChars: ['や'], tile: BGITEM_KANA_YA_131 },
+  { code: 132, char: 'ユ', altChars: ['ゆ'], tile: BGITEM_KANA_YU_132 },
+  { code: 133, char: 'ヨ', altChars: ['よ'], tile: BGITEM_KANA_YO_133 },
+  { code: 134, char: 'ラ', altChars: ['ら'], tile: BGITEM_KANA_RA_134 },
+  { code: 135, char: 'リ', altChars: ['り'], tile: BGITEM_KANA_RI_135 },
+  { code: 136, char: 'ル', altChars: ['る'], tile: BGITEM_KANA_RU_136 },
+  { code: 137, char: 'レ', altChars: ['れ'], tile: BGITEM_KANA_RE_137 },
+  { code: 138, char: 'ロ', altChars: ['ろ'], tile: BGITEM_KANA_RO_138 },
+  { code: 139, char: 'ワ', altChars: ['わ'], tile: BGITEM_KANA_WA_139 },
+  { code: 140, char: 'ン', altChars: ['ん'], tile: BGITEM_KANA_N_140 },
+  { code: 141, char: 'ヲ', altChars: ['を'], tile: BGITEM_KANA_WO_141 },
+  { code: 142, char: 'ァ', altChars: ['ぁ'], tile: BGITEM_KANA_LITTLEA_142 },
+  { code: 143, char: 'ィ', altChars: ['ぃ'], tile: BGITEM_KANA_LITTLEI_143 },
+  { code: 144, char: 'ゥ', altChars: ['ぅ'], tile: BGITEM_KANA_LITTLEU_144 },
+  { code: 145, char: 'ェ', altChars: ['ぇ'], tile: BGITEM_KANA_LITTLEE_145 },
+  { code: 146, char: 'ォ', altChars: ['ぉ'], tile: BGITEM_KANA_LITTLEO_146 },
+  { code: 147, char: 'ャ', altChars: ['ゃ'], tile: BGITEM_KANA_LITTLEYA_147 },
+  { code: 148, char: 'ュ', altChars: ['ゅ'], tile: BGITEM_KANA_LITTLEYU_148 },
+  { code: 149, char: 'ョ', altChars: ['ょ'], tile: BGITEM_KANA_LITTLEYO_149 },
+  { code: 150, char: 'ッ', altChars: ['っ'], tile: BGITEM_KANA_LITTLETSU_150 },
+  { code: 151, char: 'ガ', altChars: ['が'], tile: BGITEM_KANA_GA_151 },
+  { code: 152, char: 'ギ', altChars: ['ぎ'], tile: BGITEM_KANA_GI_152 },
+  { code: 153, char: 'グ', altChars: ['ぐ'], tile: BGITEM_KANA_GU_153 },
+  { code: 154, char: 'ゲ', altChars: ['げ'], tile: BGITEM_KANA_GE_154 },
+  { code: 155, char: 'ゴ', altChars: ['ご'], tile: BGITEM_KANA_GO_155 },
+  { code: 156, char: 'ザ', altChars: ['ざ'], tile: BGITEM_KANA_ZA_156 },
+  { code: 157, char: 'ジ', altChars: ['じ'], tile: BGITEM_KANA_JI_157 },
+  { code: 158, char: 'ズ', altChars: ['ず'], tile: BGITEM_KANA_ZU_158 },
+  { code: 159, char: 'ゼ', altChars: ['ぜ'], tile: BGITEM_KANA_ZE_159 },
+  { code: 160, char: 'ゾ', altChars: ['ぞ'], tile: BGITEM_KANA_ZO_160 },
+  { code: 161, char: 'ダ', altChars: ['だ'], tile: BGITEM_KANA_DA_161 },
+  { code: 162, char: 'ヂ', altChars: ['ぢ'], tile: BGITEM_KANA_DJI_162 },
+  { code: 163, char: 'ヅ', altChars: ['づ'], tile: BGITEM_KANA_DU_163 },
+  { code: 164, char: 'デ', altChars: ['で'], tile: BGITEM_KANA_DE_164 },
+  { code: 165, char: 'ド', altChars: ['ど'], tile: BGITEM_KANA_DO_165 },
+  { code: 166, char: 'バ', altChars: ['ば'], tile: BGITEM_KANA_BA_166 },
+  { code: 167, char: 'ビ', altChars: ['び'], tile: BGITEM_KANA_BI_167 },
+  { code: 168, char: 'ブ', altChars: ['ぶ'], tile: BGITEM_KANA_BU_168 },
+  { code: 169, char: 'ベ', altChars: ['べ'], tile: BGITEM_KANA_BE_169 },
+  { code: 170, char: 'ボ', altChars: ['ぼ'], tile: BGITEM_KANA_BO_170 },
+  { code: 171, char: 'パ', altChars: ['ぱ'], tile: BGITEM_KANA_PA_171 },
+  { code: 172, char: 'ピ', altChars: ['ぴ'], tile: BGITEM_KANA_PI_172 },
+  { code: 173, char: 'プ', altChars: ['ぷ'], tile: BGITEM_KANA_PU_173 },
+  { code: 174, char: 'ペ', altChars: ['ぺ'], tile: BGITEM_KANA_PE_174 },
+  { code: 175, char: 'ポ', altChars: ['ぽ'], tile: BGITEM_KANA_PO_175 },
+  { code: 183, char: 'フ', tile: BGITEM_KANA_FA_183 },
 ]

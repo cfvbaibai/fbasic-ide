@@ -46,3 +46,13 @@ export function getBackgroundItemByCode(code: number): BackgroundItem | null {
 export function getBackgroundItemByChar(char: string): BackgroundItem | null {
   return BY_CHAR.get(char) ?? null
 }
+
+/**
+ * Get character string from character code
+ * Returns the character string associated with the code, or null if not found
+ * Used by CHR$ function to map codes to characters
+ */
+export function getCharacterByCode(code: number): string | null {
+  const bgItem = getBackgroundItemByCode(code)
+  return bgItem?.char ?? null
+}
