@@ -37,6 +37,7 @@ Proof of concept and experimental documentation:
 
 ### 📋 `planning/`
 Planning and refactoring documents:
+- `i18n-refactoring-plan.md` - Plan for adding internationalization (i18n) support
 - `refactoring-plan-sprite-controls.md` - Refactoring plan for sprite controls
 
 ## Quick Links

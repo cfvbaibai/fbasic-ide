@@ -1,10 +1,14 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Project configuration for Claude Code. This file provides essential context, constraints, and workflows for working with this codebase.
 
 ## Project Overview
 
-Family Basic IDE - a web-based emulator/IDE for the F-BASIC programming language (Nintendo Family Computer's BASIC). Built with Vue 3, TypeScript, Vite, and Chevrotain parser.
+Family Basic IDE - a web-based emulator/IDE for the F-BASIC programming language (Nintendo Family Computer's BASIC).
+
+**Tech Stack**: Vue 3, TypeScript, Vite, Chevrotain parser
+
+**Architecture**: Direct CST (Concrete Syntax Tree) execution - parser outputs CST, executors consume CST nodes directly (no AST conversion).
 
 ## Development Commands
 
@@ -41,27 +45,60 @@ pnpm test:run <path>  # Run specific test file (no -- separator needed)
 ### Reference Documentation
 - `docs/reference/family-basic-manual/` - Original F-BASIC manual pages (consult for language behavior)
 
+## Development Guidelines
+
+### Library Selection
+- **ALWAYS** search for existing, well-maintained libraries on GitHub before implementing functionality from scratch
+- Prefer established libraries with active maintenance, good documentation, and compatible licenses
+- Only implement custom solutions when no suitable library exists or when specific project requirements cannot be met by existing libraries
+
 ## Code Constraints
 
 ### File Size Limits
-- `.ts` files: max 500 lines
-- `.vue` files: max 500 lines
-- Extract to focused modules when approaching limits
-
-### Vue Component Styling
-- Use `<style scoped>` blocks, not external CSS imports
-- Exception: Only `@/shared/styles/*.css` imports allowed
-- Prefer utility classes and CSS variables over component-scoped styles
+- `.ts` files: **MAX 500 lines** - extract to focused modules when approaching limit
+- `.vue` files: **MAX 500 lines** - extract to focused modules when approaching limit
 
 ### TypeScript
-- Strict mode enabled
-- Use `import type` for type-only imports
-- No `any` type - use specific types or `unknown`
-- All constants in `src/core/constants.ts`
+- **ALWAYS** use strict mode (enabled)
+- **ALWAYS** use `import type` for type-only imports
+- **NEVER** use `any` type - use specific types or `unknown`
+- **ALL** constants in `src/core/constants.ts`
+
+### Vue Component Styling
+- **ALWAYS** use `<style scoped>` blocks, not external CSS imports
+- **Exception**: Only `@/shared/styles/*.css` imports allowed
+- Prefer utility classes and CSS variables over component-scoped styles
 
 ### Testing
-- Use `.toEqual()` for exact matching, not `.toContain()` for values
+- **ALWAYS** use `.toEqual()` for exact matching, not `.toContain()` for values
 - Test files in `test/` mirror source structure
+
+## Documentation Guidelines
+
+### Directory Structure
+
+**ALL documentation files MUST be organized in the `docs/` directory:**
+
+- `docs/planning/` - Refactoring plans, migration plans, feature proposals
+- `docs/guides/` - How-to guides and integration documentation
+- `docs/analysis/` - Analysis reports and technical reviews
+- `docs/device-models/` - Device specifications and architecture
+- `docs/reference/` - Language references, manuals, specifications
+- `docs/poc/` - Experimental documentation and POCs
+
+### Creating Documentation
+
+- **Refactoring/Migration Plans**: Place in `docs/planning/`
+- **Analysis Reports**: Place in `docs/analysis/`
+- **Developer Guides**: Place in `docs/guides/`
+- Use descriptive, kebab-case filenames (e.g., `i18n-refactoring-plan.md`)
+
+**NEVER create documentation files at the workspace root.** All documentation belongs in `docs/` with appropriate subdirectories.
+
+### File Naming
+- Use kebab-case: `feature-name-plan.md`, `refactoring-guide.md`
+- Be descriptive but concise
+- Include document type when helpful: `*-plan.md`, `*-guide.md`, `*-analysis.md`
 
 ## Commit Convention
 

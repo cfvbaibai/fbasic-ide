@@ -1,0 +1,9 @@
+{
+  "title": "キャラクタースプライトビューア",
+  "palettes": {
+    "sprite": "スプライトパレット",
+    "background": "背景パレット",
+    "spritePalette": "スプライトパレット{index}",
+    "backgroundPalette": "背景パレット{index}"
+  }
+}

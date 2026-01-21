@@ -1,0 +1,37 @@
+{
+  "hero": {
+    "title": "F-BASIC 模拟器",
+    "subtitle": "面向 Family Basic 编程语言的现代 Web IDE",
+    "description": "使用现代 Web 技术体验真正的 F-BASIC 开发环境。在浏览器中编写、执行和调试 Family Basic 程序。"
+  },
+  "features": {
+    "title": "功能",
+    "actionText": "探索 →",
+    "items": {
+      "ide": {
+        "title": "Family Basic IDE",
+        "description": "编写和执行 F-BASIC 程序，具有实时反馈、语法高亮和调试工具。"
+      },
+      "monaco": {
+        "title": "Monaco 编辑器",
+        "description": "具有 IntelliSense、语法高亮和专业开发功能的高级代码编辑器。"
+      },
+      "imageAnalyzer": {
+        "title": "图像分析器",
+        "description": "分析并检查图像文件，提供详细的像素信息和调色板提取。"
+      },
+      "spriteViewer": {
+        "title": "精灵查看器",
+        "description": "查看和探索角色精灵，具有动画控制、调色板选择和显示选项。"
+      }
+    }
+  },
+  "about": {
+    "title": "关于 F-BASIC",
+    "content": "Family Basic (F-BASIC) 是面向 Family Computer (Famicom) 的编程语言。此模拟器提供了一个完整的开发环境，用于编写和执行具有真实语法和行为的 F-BASIC 程序。"
+  },
+  "gettingStarted": {
+    "title": "开始使用",
+    "content": "首先探索 Family Basic IDE 来编写您的第一个程序。使用上方的导航栏访问所有可用工具和功能。"
+  }
+}

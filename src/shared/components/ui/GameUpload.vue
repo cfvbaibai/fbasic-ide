@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import GameButton from './GameButton.vue'
 import GameIcon from './GameIcon.vue'
+
+const { t } = useI18n()
 
 interface Props {
   accept?: string
@@ -95,7 +98,7 @@ const handleDrop = (event: DragEvent) => {
     <div v-if="drag" class="game-upload-drag-area bg-game-surface shadow-game-base" @click="handleClick">
       <GameIcon icon="mdi:upload" size="large" />
       <p class="game-upload-text">
-        Drag and drop files here, or <span class="game-upload-link">click to browse</span>
+        {{ t('common.upload.dragAndDrop') }} <span class="game-upload-link">{{ t('common.upload.clickToBrowse') }}</span>
       </p>
     </div>
     
@@ -105,7 +108,7 @@ const handleDrop = (event: DragEvent) => {
           :disabled="disabled"
           icon="mdi:upload"
         >
-          Upload File
+          {{ t('common.buttons.upload') }}
         </GameButton>
       </slot>
     </div>

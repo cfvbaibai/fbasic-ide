@@ -1,0 +1,9 @@
+{
+  "title": "角色精靈檢視器",
+  "palettes": {
+    "sprite": "精靈調色板",
+    "background": "背景調色板",
+    "spritePalette": "精靈調色板 {index}",
+    "backgroundPalette": "背景調色板 {index}"
+  }
+}

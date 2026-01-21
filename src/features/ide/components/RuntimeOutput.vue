@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { ref, watch, nextTick, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { BasicVariable, ScreenCell } from '../../../core/interfaces'
 import Screen from './Screen.vue'
 import { GameTabs, GameTabPane, GameTag, GameIcon } from '../../../shared/components/ui'
+
+const { t } = useI18n()
 
 interface Props {
   output: string[]
@@ -69,7 +72,7 @@ watch(() => props.output.length, scrollToBottom)
       <GameTabPane name="screen">
         <template #label>
           <GameIcon icon="mdi:monitor" size="small" />
-          <span>Screen</span>
+          <span>{{ t('ide.output.screen') }}</span>
         </template>
         
         <div class="tab-content">
@@ -85,7 +88,7 @@ watch(() => props.output.length, scrollToBottom)
       <GameTabPane name="stdout">
         <template #label>
           <GameIcon icon="mdi:file-document" size="small" />
-          <span>Stdout</span>
+          <span>{{ t('ide.output.stdout') }}</span>
         </template>
         
         <div class="tab-content">
@@ -95,7 +98,7 @@ watch(() => props.output.length, scrollToBottom)
           >
             <div v-if="rollingOutput.length === 0 && !isRunning && errors.length === 0" class="empty-output">
               <GameIcon icon="mdi:file-document" size="large" />
-              <p>No output yet. Run your BASIC program to see results here.</p>
+              <p>{{ t('ide.output.empty') }}</p>
             </div>
             <div v-else>
               <div v-if="rollingOutput.length > 0" class="output-lines">
@@ -124,7 +127,7 @@ watch(() => props.output.length, scrollToBottom)
       <GameTabPane name="debug" :disabled="!debugMode || !debugOutput">
         <template #label>
           <GameIcon icon="mdi:tools" size="small" />
-          <span>Debug</span>
+          <span>{{ t('ide.output.debug') }}</span>
         </template>
         
         <div class="tab-content">
@@ -138,7 +141,7 @@ watch(() => props.output.length, scrollToBottom)
       <GameTabPane name="variables" :disabled="Object.keys(variables).length === 0">
         <template #label>
           <GameIcon icon="mdi:view-dashboard" size="small" />
-          <span>Variables</span>
+          <span>{{ t('ide.output.variables') }}</span>
           <span class="tab-status-tag">
             <GameTag :class="{ 'tag-hidden': Object.keys(variables).length === 0 }" type="success" size="small">
               {{ Object.keys(variables).length }}

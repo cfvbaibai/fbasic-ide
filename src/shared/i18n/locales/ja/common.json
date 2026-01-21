@@ -1,0 +1,12 @@
+{
+  "buttons": {
+    "upload": "ファイルをアップロード",
+    "clear": "クリア",
+    "submit": "送信",
+    "cancel": "キャンセル"
+  },
+  "upload": {
+    "dragAndDrop": "ファイルをここにドラッグ＆ドロップするか、",
+    "clickToBrowse": "クリックして参照"
+  }
+}

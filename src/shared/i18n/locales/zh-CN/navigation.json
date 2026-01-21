@@ -1,0 +1,29 @@
+{
+  "appTitle": "F-BASIC 模拟器",
+  "items": {
+    "home": {
+      "name": "首页",
+      "description": "主菜单"
+    },
+    "ide": {
+      "name": "IDE",
+      "description": "Family Basic IDE"
+    },
+    "monaco": {
+      "name": "Monaco 编辑器",
+      "description": "高级代码编辑器"
+    },
+    "imageAnalyzer": {
+      "name": "图像分析器",
+      "description": "分析图像"
+    },
+    "spriteViewer": {
+      "name": "精灵查看器",
+      "description": "查看角色精灵"
+    },
+    "canvasPerformance": {
+      "name": "Canvas 性能",
+      "description": "Canvas 性能测试"
+    }
+  }
+}

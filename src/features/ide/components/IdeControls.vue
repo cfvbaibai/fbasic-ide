@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { GameButton, GameSwitch } from '../../../shared/components/ui'
+
+const { t } = useI18n()
 
 interface Props {
   isRunning: boolean
@@ -38,19 +41,19 @@ const handleDebugToggle = (value: boolean | string | number) => {
 <template>
   <div class="ide-controls">
     <GameButton type="primary" :disabled="!canRun" icon="mdi:play" @click="handleRun">
-      Run
+      {{ t('ide.controls.run') }}
     </GameButton>
 
     <GameButton type="danger" :disabled="!canStop" icon="mdi:pause" @click="$emit('stop')">
-      Stop
+      {{ t('ide.controls.stop') }}
     </GameButton>
 
     <GameButton type="warning" icon="mdi:delete" @click="$emit('clear')">
-      Clear
+      {{ t('ide.controls.clear') }}
     </GameButton>
 
     <div class="debug-control">
-      <span class="debug-label text-game-secondary">Debug</span>
+      <span class="debug-label text-game-secondary">{{ t('ide.controls.debug') }}</span>
       <GameSwitch :model-value="debugMode" @update:model-value="handleDebugToggle" />
     </div>
   </div>

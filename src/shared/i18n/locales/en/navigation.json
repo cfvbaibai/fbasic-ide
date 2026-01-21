@@ -1,0 +1,29 @@
+{
+  "appTitle": "F-BASIC EMU",
+  "items": {
+    "home": {
+      "name": "Home",
+      "description": "Main Menu"
+    },
+    "ide": {
+      "name": "IDE",
+      "description": "Family Basic IDE"
+    },
+    "monaco": {
+      "name": "Monaco Editor",
+      "description": "Advanced Code Editor"
+    },
+    "imageAnalyzer": {
+      "name": "Image Analyzer",
+      "description": "Analyze Images"
+    },
+    "spriteViewer": {
+      "name": "Sprite Viewer",
+      "description": "View Character Sprites"
+    },
+    "canvasPerformance": {
+      "name": "Canvas Performance",
+      "description": "Canvas Performance Test"
+    }
+  }
+}

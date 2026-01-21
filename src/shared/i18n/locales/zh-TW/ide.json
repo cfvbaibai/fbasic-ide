@@ -1,0 +1,16 @@
+{
+  "controls": {
+    "run": "執行",
+    "stop": "停止",
+    "clear": "清除",
+    "debug": "除錯"
+  },
+  "output": {
+    "title": "執行時輸出",
+    "empty": "尚無輸出。執行您的 BASIC 程式以查看結果。",
+    "screen": "螢幕",
+    "stdout": "標準輸出",
+    "variables": "變數",
+    "debug": "除錯"
+  }
+}

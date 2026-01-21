@@ -1,8 +1,11 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { GameLayout, HeroSection, GameSection, GameCard, GameBlock } from '../../shared/components/ui'
 
 const router = useRouter()
+const { t } = useI18n()
 
 interface FeatureCard {
   title: string
@@ -12,36 +15,36 @@ interface FeatureCard {
   color: string
 }
 
-const features: FeatureCard[] = [
+const features = computed<FeatureCard[]>(() => [
   {
-    title: 'Family Basic IDE',
-    description: 'Write and execute F-BASIC programs with real-time feedback, syntax highlighting, and debugging tools.',
+    title: t('home.features.items.ide.title'),
+    description: t('home.features.items.ide.description'),
     path: '/ide',
     icon: 'mdi:pencil',
     color: 'var(--semantic-solid-success)'
   },
   {
-    title: 'Monaco Editor',
-    description: 'Advanced code editor with IntelliSense, syntax highlighting, and professional development features.',
+    title: t('home.features.items.monaco.title'),
+    description: t('home.features.items.monaco.description'),
     path: '/monaco',
     icon: 'mdi:pencil',
     color: 'var(--semantic-solid-info)'
   },
   {
-    title: 'Image Analyzer',
-    description: 'Analyze and inspect image files with detailed pixel information and color palette extraction.',
+    title: t('home.features.items.imageAnalyzer.title'),
+    description: t('home.features.items.imageAnalyzer.description'),
     path: '/image-analyzer',
     icon: 'mdi:image',
     color: 'var(--semantic-solid-warning)'
   },
   {
-    title: 'Sprite Viewer',
-    description: 'View and explore character sprites with animation controls, palette selection, and display options.',
+    title: t('home.features.items.spriteViewer.title'),
+    description: t('home.features.items.spriteViewer.description'),
     path: '/character-sprite-viewer',
     icon: 'mdi:grid',
     color: 'var(--semantic-solid-danger)'
   }
-]
+])
 
 const navigateTo = (path: string) => {
   router.push(path)
@@ -52,13 +55,13 @@ const navigateTo = (path: string) => {
   <GameLayout>
     <div class="home-content">
       <HeroSection
-        :title="'F-BASIC Emulator'"
-        :subtitle="'A modern web-based IDE for Family Basic programming language'"
-        :description="'Experience the authentic F-BASIC development environment with modern web technologies. Write, execute, and debug Family Basic programs in your browser.'"
+        :title="t('home.hero.title')"
+        :subtitle="t('home.hero.subtitle')"
+        :description="t('home.hero.description')"
         icon="mdi:monitor"
       />
 
-      <GameSection title="Features">
+      <GameSection :title="t('home.features.title')">
         <div class="features-grid">
           <GameCard
             v-for="feature in features"
@@ -67,24 +70,21 @@ const navigateTo = (path: string) => {
             :description="feature.description"
             :icon="feature.icon"
             :icon-color="feature.color"
-            action-text="Explore →"
+            :action-text="t('home.features.actionText')"
             @click="navigateTo(feature.path)"
           />
         </div>
       </GameSection>
 
       <div class="info-section">
-        <GameBlock title="About F-BASIC">
+        <GameBlock :title="t('home.about.title')">
           <span class="content">
-            Family Basic (F-BASIC) is a programming language for the Family Computer (Famicom).
-            This emulator provides a complete development environment to write and execute
-            F-BASIC programs with authentic syntax and behavior.
+            {{ t('home.about.content') }}
           </span>
         </GameBlock>
-        <GameBlock title="Getting Started">
+        <GameBlock :title="t('home.gettingStarted.title')">
           <span class="content">
-            Start by exploring the Family Basic IDE to write your first program.
-            Use the navigation bar above to access all available tools and features.
+            {{ t('home.gettingStarted.content') }}
           </span>
         </GameBlock>
       </div>

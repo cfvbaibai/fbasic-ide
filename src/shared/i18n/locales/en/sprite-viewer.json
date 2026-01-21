@@ -1,0 +1,9 @@
+{
+  "title": "Character Sprite Viewer",
+  "palettes": {
+    "sprite": "Sprite Palettes",
+    "background": "Background Palettes",
+    "spritePalette": "Sprite Palette {index}",
+    "backgroundPalette": "Background Palette {index}"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "controls": {
+    "run": "Run",
+    "stop": "Stop",
+    "clear": "Clear",
+    "debug": "Debug"
+  },
+  "output": {
+    "title": "Runtime Output",
+    "empty": "No output yet. Run your BASIC program to see results here.",
+    "screen": "Screen",
+    "stdout": "Stdout",
+    "variables": "Variables",
+    "debug": "Debug"
+  }
+}

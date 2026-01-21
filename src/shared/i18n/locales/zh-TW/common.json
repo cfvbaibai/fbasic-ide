@@ -1,0 +1,12 @@
+{
+  "buttons": {
+    "upload": "上傳檔案",
+    "clear": "清除",
+    "submit": "提交",
+    "cancel": "取消"
+  },
+  "upload": {
+    "dragAndDrop": "將檔案拖放到此處，或",
+    "clickToBrowse": "點擊瀏覽"
+  }
+}

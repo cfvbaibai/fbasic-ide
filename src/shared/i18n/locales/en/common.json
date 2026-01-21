@@ -1,0 +1,12 @@
+{
+  "buttons": {
+    "upload": "Upload File",
+    "clear": "Clear",
+    "submit": "Submit",
+    "cancel": "Cancel"
+  },
+  "upload": {
+    "dragAndDrop": "Drag and drop files here, or",
+    "clickToBrowse": "click to browse"
+  }
+}

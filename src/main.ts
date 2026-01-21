@@ -7,6 +7,7 @@ import './shared/styles/skins/nintendo.css'
 import './shared/styles/skins/classic-light.css'
 import App from './App.vue'
 import router from './router/index'
+import i18n from './shared/i18n'
 
 // Configure Monaco Editor workers before Monaco is imported
 // This must be set up before any Monaco Editor code is loaded
@@ -48,5 +49,6 @@ if (typeof window !== 'undefined') {
 const app = createApp(App)
 
 app.use(router)
+app.use(i18n)
 
 app.mount('#app')

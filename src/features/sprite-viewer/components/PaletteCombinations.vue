@@ -1,19 +1,31 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { SPRITE_PALETTES, BACKGROUND_PALETTES } from '../../../shared/data/palette'
 import ColorBox from './ColorBox.vue'
 import { GameBlock } from '../../../shared/components/ui'
+
+const { t } = useI18n()
+
+const getSpritePaletteTitle = (index: number) => {
+  return t('spriteViewer.palettes.spritePalette', { index: String(index) })
+}
+
+const getBackgroundPaletteTitle = (index: number) => {
+  return t('spriteViewer.palettes.backgroundPalette', { index: String(index) })
+}
 </script>
 
 <template>
   <div class="palette-combinations-wrapper">
-    <GameBlock title="Sprite Palettes">
+    <GameBlock :title="t('spriteViewer.palettes.sprite')">
       <div class="palettes-container palettes-container-sprite">
         <div
           v-for="(palette, paletteIndex) in SPRITE_PALETTES"
           :key="`sprite-${paletteIndex}`"
           class="palette-group"
         >
-          <h3 class="palette-group-title">Sprite Palette {{ paletteIndex }}</h3>
+          <h3 class="palette-group-title">{{ getSpritePaletteTitle(paletteIndex) }}</h3>
           <div class="color-combinations">
             <div
               v-for="(combination, combIndex) in palette"
@@ -39,14 +51,14 @@ import { GameBlock } from '../../../shared/components/ui'
       </div>
     </GameBlock>
 
-    <GameBlock title="Background Palettes">
+    <GameBlock :title="t('spriteViewer.palettes.background')">
       <div class="palettes-container palettes-container-bg">
         <div
           v-for="(palette, paletteIndex) in BACKGROUND_PALETTES"
           :key="`bg-${paletteIndex}`"
           class="palette-group"
         >
-          <h3 class="palette-group-title">Background Palette {{ paletteIndex }}</h3>
+          <h3 class="palette-group-title">{{ getBackgroundPaletteTitle(paletteIndex) }}</h3>
           <div class="color-combinations">
             <div
               v-for="(combination, combIndex) in palette"

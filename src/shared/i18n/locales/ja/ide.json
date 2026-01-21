@@ -1,0 +1,16 @@
+{
+  "controls": {
+    "run": "実行",
+    "stop": "停止",
+    "clear": "クリア",
+    "debug": "デバッグ"
+  },
+  "output": {
+    "title": "実行出力",
+    "empty": "まだ出力がありません。BASICプログラムを実行すると、ここに結果が表示されます。",
+    "screen": "画面",
+    "stdout": "標準出力",
+    "variables": "変数",
+    "debug": "デバッグ"
+  }
+}

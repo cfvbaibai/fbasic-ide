@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router'
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import GameIcon from './ui/GameIcon.vue'
 import GameSelect from './ui/GameSelect.vue'
 import { useSkin } from '../composables/useSkin'
+import { useLocale } from '../composables/useLocale'
 
+const { t } = useI18n()
 const { currentSkin, setSkin, availableSkins } = useSkin()
+const { currentLocale, setLocale, availableLocales } = useLocale()
 
 const route = useRoute()
 const router = useRouter()
@@ -17,44 +21,44 @@ interface NavItem {
   description: string
 }
 
-const navItems: NavItem[] = [
+const navItems = computed<NavItem[]>(() => [
   {
-    name: 'Home',
+    name: t('navigation.items.home.name'),
     path: '/',
     icon: 'mdi:monitor',
-    description: 'Main Menu'
+    description: t('navigation.items.home.description')
   },
   {
-    name: 'IDE',
+    name: t('navigation.items.ide.name'),
     path: '/ide',
     icon: 'mdi:pencil',
-    description: 'Family Basic IDE'
+    description: t('navigation.items.ide.description')
   },
   {
-    name: 'Monaco Editor',
+    name: t('navigation.items.monaco.name'),
     path: '/monaco',
     icon: 'mdi:pencil',
-    description: 'Advanced Code Editor'
+    description: t('navigation.items.monaco.description')
   },
   {
-    name: 'Image Analyzer',
+    name: t('navigation.items.imageAnalyzer.name'),
     path: '/image-analyzer',
     icon: 'mdi:image',
-    description: 'Analyze Images'
+    description: t('navigation.items.imageAnalyzer.description')
   },
   {
-    name: 'Sprite Viewer',
+    name: t('navigation.items.spriteViewer.name'),
     path: '/character-sprite-viewer',
     icon: 'mdi:grid',
-    description: 'View Character Sprites'
+    description: t('navigation.items.spriteViewer.description')
   },
   {
-    name: 'Canvas Performance',
+    name: t('navigation.items.canvasPerformance.name'),
     path: '/canvas-test',
     icon: 'mdi:speedometer',
-    description: 'Canvas Performance Test'
+    description: t('navigation.items.canvasPerformance.description')
   }
-]
+])
 
 const isActive = (path: string) => {
   return route.path === path
@@ -74,6 +78,17 @@ const skinOptions = computed(() => {
 const handleSkinChange = (skinValue: string | number) => {
   setSkin(skinValue as typeof currentSkin.value)
 }
+
+const localeOptions = computed(() => {
+  return availableLocales.map(locale => ({
+    label: locale.label,
+    value: locale.value
+  }))
+})
+
+const handleLocaleChange = (localeValue: string | number) => {
+  setLocale(localeValue as typeof currentLocale.value)
+}
 </script>
 
 <template>
@@ -81,7 +96,7 @@ const handleSkinChange = (skinValue: string | number) => {
     <div class="nav-container">
       <div class="nav-title">
         <GameIcon icon="mdi:monitor" :size="28" class="title-icon" />
-        <span>F-BASIC EMU</span>
+        <span>{{ t('navigation.appTitle') }}</span>
       </div>
       <div class="nav-items">
         <button
@@ -97,7 +112,14 @@ const handleSkinChange = (skinValue: string | number) => {
           </div>
         </button>
       </div>
-      <div class="nav-skin-toggle">
+      <div class="nav-controls">
+        <GameSelect
+          :model-value="currentLocale"
+          :options="localeOptions"
+          size="small"
+          width="100px"
+          @update:model-value="handleLocaleChange"
+        />
         <GameSelect
           :model-value="currentSkin"
           :options="skinOptions"
@@ -157,11 +179,11 @@ const handleSkinChange = (skinValue: string | number) => {
   flex-wrap: nowrap;
 }
 
-.nav-skin-toggle {
+.nav-controls {
   display: flex;
   align-items: center;
+  gap: 0.75rem;
   margin-left: 1rem;
-  min-width: 120px;
   flex-shrink: 0;
 }
 
@@ -277,11 +299,12 @@ const handleSkinChange = (skinValue: string | number) => {
     text-align: center;
   }
 
-  .nav-skin-toggle {
+  .nav-controls {
     width: 100%;
     margin-left: 0;
     margin-top: 0.5rem;
-    min-width: unset;
+    justify-content: center;
+    gap: 0.5rem;
   }
 }
 

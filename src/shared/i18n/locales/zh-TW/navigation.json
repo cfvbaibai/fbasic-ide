@@ -1,0 +1,29 @@
+{
+  "appTitle": "F-BASIC 模擬器",
+  "items": {
+    "home": {
+      "name": "首頁",
+      "description": "主選單"
+    },
+    "ide": {
+      "name": "IDE",
+      "description": "Family Basic IDE"
+    },
+    "monaco": {
+      "name": "Monaco 編輯器",
+      "description": "進階程式碼編輯器"
+    },
+    "imageAnalyzer": {
+      "name": "影像分析器",
+      "description": "分析影像"
+    },
+    "spriteViewer": {
+      "name": "精靈檢視器",
+      "description": "檢視角色精靈"
+    },
+    "canvasPerformance": {
+      "name": "Canvas 效能",
+      "description": "Canvas 效能測試"
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "appTitle": "F-BASIC EMU",
+  "items": {
+    "home": {
+      "name": "ホーム",
+      "description": "メインメニュー"
+    },
+    "ide": {
+      "name": "IDE",
+      "description": "ファミリーベーシックIDE"
+    },
+    "monaco": {
+      "name": "Monacoエディタ",
+      "description": "高度なコードエディタ"
+    },
+    "imageAnalyzer": {
+      "name": "画像アナライザー",
+      "description": "画像を分析"
+    },
+    "spriteViewer": {
+      "name": "スプライトビューア",
+      "description": "キャラクタースプライトを表示"
+    },
+    "canvasPerformance": {
+      "name": "Canvasパフォーマンス",
+      "description": "Canvasパフォーマンステスト"
+    }
+  }
+}

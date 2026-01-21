@@ -1,0 +1,9 @@
+{
+  "title": "角色精灵查看器",
+  "palettes": {
+    "sprite": "精灵调色板",
+    "background": "背景调色板",
+    "spritePalette": "精灵调色板 {index}",
+    "backgroundPalette": "背景调色板 {index}"
+  }
+}
