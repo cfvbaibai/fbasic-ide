@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { classifyColor, classifyColorWithPalette } from '@/shared/utils/colorClassification'
+import { classifyColorWithPalette } from '@/shared/utils/colorClassification'
 
 /**
  * Composable for image analysis and sprite array generation

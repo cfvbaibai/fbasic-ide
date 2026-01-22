@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useCssVar } from '@vueuse/core'
 import { GameLayout, GameBlock } from '../../shared/components/ui'
 import { GameButton, GameButtonGroup, GameUpload, GameCodeQuote } from '../../shared/components/ui'
 import { useImageAnalysis } from './composables/useImageAnalysis'
 import { useGridManipulation } from './composables/useGridManipulation'
-import { BACKGROUND_PALETTES, SPRITE_PALETTES } from '@/shared/data/palette'
+import { useGridLineColors, useColorCombinationColors } from './composables/useImageAnalyzerColors'
 import ColorBox from '../sprite-viewer/components/ColorBox.vue'
 
 /**
@@ -101,48 +100,13 @@ const analyzeImage = async (): Promise<void> => {
   await analyzeImageComposable(imageUrl.value, adjustedCellSize, gridOffsetX, gridOffsetY)
 }
 
-// Use VueUse's useCssVar for reactive CSS variable access
-const semanticWarning = useCssVar('--semantic-solid-warning', document.documentElement)
-const semanticSuccess = useCssVar('--semantic-solid-success', document.documentElement)
-const semanticInfo = useCssVar('--semantic-solid-info', document.documentElement)
-const semanticDanger = useCssVar('--semantic-solid-danger', document.documentElement)
-
-// Get computed grid line colors using semantic colors from theme
-const getGridLineColor = (i: number): string => {
-  if (i === 1 || i === 17) {
-    return semanticWarning.value || '#ffa500' // fallback to orange
-  } else if (i === 9) {
-    return semanticSuccess.value || '#00ff00' // fallback to green
-  } else if (i === 5 || i === 13) {
-    return semanticInfo.value || '#00ffff' // fallback to cyan
-  } else {
-    return semanticDanger.value || '#ff0000' // fallback to red
-  }
-}
-
-// Get the selected color combination colors
-const selectedColorCombinationColors = computed(() => {
-  const palette = paletteType.value === 'sprite'
-    ? SPRITE_PALETTES[selectedPaletteCode.value]
-    : BACKGROUND_PALETTES[selectedPaletteCode.value]
-  
-  if (!palette) {
-    return []
-  }
-  
-  const colorCombination = palette[selectedColorCombination.value]
-  if (!colorCombination) {
-    return []
-  }
-  
-  // Return all 4 colors (background + 3 foreground colors)
-  return [
-    colorCombination[0],
-    colorCombination[1],
-    colorCombination[2],
-    colorCombination[3]
-  ].filter((code): code is number => code !== undefined)
-})
+// Use color-related composables
+const { getGridLineColor } = useGridLineColors()
+const { selectedColorCombinationColors } = useColorCombinationColors(
+  paletteType,
+  selectedPaletteCode,
+  selectedColorCombination
+)
 
 const generateArray = async (): Promise<void> => {
   if (!imageUrl.value || !hasAnalyzed.value) return

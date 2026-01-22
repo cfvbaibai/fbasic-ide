@@ -100,11 +100,11 @@ This document outlines the remaining work needed to complete the Family Basic ID
 #### 2.1 Screen Control Commands
 
 **CLS** (Clear Screen)
-- [ ] Add `CLS` token to parser (`parser-tokens.ts`)
-- [ ] Add `clsStatement` rule to parser (`FBasicChevrotainParser.ts`)
-- [ ] Create `ClsExecutor.ts`
-- [ ] Implement screen clearing in device adapter
-- [ ] Add tests for CLS command
+- [x] Add `CLS` token to parser (`parser-tokens.ts`)
+- [x] Add `clsStatement` rule to parser (`FBasicChevrotainParser.ts`)
+- [x] Create `ClsExecutor.ts`
+- [x] Implement screen clearing in device adapter (already implemented)
+- [x] Add tests for CLS command
 
 **LOCATE** (Cursor Position)
 - [ ] Add `LOCATE` token to parser
@@ -142,7 +142,7 @@ This document outlines the remaining work needed to complete the Family Basic ID
 - [ ] Add tests for VIEW command
 
 **Files to Create**:
-- `src/core/execution/executors/ClsExecutor.ts`
+- `src/core/execution/executors/ClsExecutor.ts` ✅
 - `src/core/execution/executors/LocateExecutor.ts`
 - `src/core/execution/executors/ColorExecutor.ts`
 - `src/core/execution/executors/CgsetExecutor.ts`

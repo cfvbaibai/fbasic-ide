@@ -21,7 +21,7 @@ import type {
 } from 'chevrotain';
 import {
   // Keywords
-  Let, Print, For, To, Step, Next, End, Pause, If, Then, Goto, Gosub, Return, On, Dim, Data, Read, Restore,
+  Let, Print, For, To, Step, Next, End, Pause, If, Then, Goto, Gosub, Return, On, Dim, Data, Read, Restore, Cls,
   // String functions
   Len, Left, Right, Mid, Str, Hex, Chr, Asc,
   // Arithmetic functions
@@ -78,6 +78,7 @@ class FBasicChevrotainParser extends CstParser {
   declare dataStatement: () => CstNode;
   declare readStatement: () => CstNode;
   declare restoreStatement: () => CstNode;
+  declare clsStatement: () => CstNode;
   declare arrayDeclaration: () => CstNode;
   declare dimensionList: () => CstNode;
   declare expressionList: () => CstNode;
@@ -583,6 +584,13 @@ class FBasicChevrotainParser extends CstParser {
       });
     });
 
+    // CLS
+    // Clears the background screen
+    // Example: CLS
+    this.clsStatement = this.RULE('clsStatement', () => {
+      this.CONSUME(Cls);
+    });
+
     // IF LogicalExpression THEN (CommandList | NumberLiteral)
     // IF LogicalExpression GOTO NumberLiteral
     // Executes the commands after THEN or jumps to line number if condition is true
@@ -683,6 +691,10 @@ class FBasicChevrotainParser extends CstParser {
         {
           GATE: () => this.LA(1).tokenType === Restore,
           ALT: () => this.SUBRULE(this.restoreStatement)
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Cls,
+          ALT: () => this.SUBRULE(this.clsStatement)
         },
         { ALT: () => this.SUBRULE(this.letStatement) } // Must be last since it can start with Identifier
       ]);

@@ -20,6 +20,7 @@ import { DimExecutor } from './executors/DimExecutor'
 import { DataExecutor } from './executors/DataExecutor'
 import { ReadExecutor } from './executors/ReadExecutor'
 import { RestoreExecutor } from './executors/RestoreExecutor'
+import { ClsExecutor } from './executors/ClsExecutor'
 import type { VariableService } from '../services/VariableService'
 import type { DataService } from '../services/DataService'
 import type { ExpressionEvaluator } from '../evaluation/ExpressionEvaluator'
@@ -43,6 +44,7 @@ export class StatementRouter {
   private dataExecutor: DataExecutor
   private readExecutor: ReadExecutor
   private restoreExecutor: RestoreExecutor
+  private clsExecutor: ClsExecutor
 
   constructor(
     private context: ExecutionContext,
@@ -65,6 +67,7 @@ export class StatementRouter {
     this.dataExecutor = new DataExecutor(dataService)
     this.readExecutor = new ReadExecutor(dataService, variableService, evaluator)
     this.restoreExecutor = new RestoreExecutor(dataService)
+    this.clsExecutor = new ClsExecutor(context)
   }
 
   /**
@@ -280,6 +283,11 @@ export class StatementRouter {
       const restoreStmtCst = getFirstCstNode(singleCommandCst.children.restoreStatement)
       if (restoreStmtCst) {
         this.restoreExecutor.execute(restoreStmtCst)
+      }
+    } else if (singleCommandCst.children.clsStatement) {
+      const clsStmtCst = getFirstCstNode(singleCommandCst.children.clsStatement)
+      if (clsStmtCst) {
+        this.clsExecutor.execute(clsStmtCst)
       }
     } else {
       // Other statement types not yet implemented

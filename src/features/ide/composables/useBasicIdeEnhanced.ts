@@ -52,7 +52,7 @@ export function useBasicIde() {
 40 FOR I=1 TO 3: PRINT "I="; I: NEXT
 50 END`)
 
-  const currentSampleType = ref<'basic' | 'gaming' | 'complex' | 'comprehensive' | 'pause' | null>(null)
+  const currentSampleType = ref<'basic' | 'gaming' | 'complex' | 'comprehensive' | 'pause' | 'allChars' | null>(null)
 
   const isRunning = ref(false)
   const output = ref<string[]>([])
@@ -317,7 +317,7 @@ export function useBasicIde() {
   /**
    * Load sample code
    */
-  const loadSampleCode = (sampleType: 'basic' | 'gaming' | 'complex' | 'comprehensive' | 'pause' = 'basic') => {
+  const loadSampleCode = (sampleType: 'basic' | 'gaming' | 'complex' | 'comprehensive' | 'pause' | 'allChars' = 'basic') => {
     const sample = getSampleCode(sampleType)
     if (sample) {
       code.value = sample.code
