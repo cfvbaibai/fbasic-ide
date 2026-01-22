@@ -24,6 +24,7 @@
     },
     "dependencies": {
         "@iconify/vue": "^5.0.0",
+        "@vueuse/core": "^14.1.0",
         "chevrotain": "^11.0.3",
         "decimal.js": "^10.6.0",
         "lodash-es": "^4.17.21",

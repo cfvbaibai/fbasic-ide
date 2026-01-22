@@ -1,7 +1,101 @@
+import { COLORS, BACKGROUND_PALETTES, SPRITE_PALETTES } from '@/shared/data/palette'
+
 /**
  * Color classification utilities for F-BASIC sprite generation.
  * Maps RGB colors to F-BASIC color indices: black=0, white=1, red=2, blue=3
  */
+
+/**
+ * Convert hex color to RGB
+ */
+function hexToRgb(hex: string): [number, number, number] {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+  return result
+    ? [
+        parseInt(result[1] ?? '0', 16),
+        parseInt(result[2] ?? '0', 16),
+        parseInt(result[3] ?? '0', 16)
+      ]
+    : [0, 0, 0]
+}
+
+/**
+ * Calculate color distance using Euclidean distance in RGB space
+ */
+function colorDistance(
+  r1: number,
+  g1: number,
+  b1: number,
+  r2: number,
+  g2: number,
+  b2: number
+): number {
+  const dr = r1 - r2
+  const dg = g1 - g2
+  const db = b1 - b2
+  return Math.sqrt(dr * dr + dg * dg + db * db)
+}
+
+/**
+ * Classify an RGB color to F-BASIC color index using palette colors
+ * @param r Red component (0-255)
+ * @param g Green component (0-255)
+ * @param b Blue component (0-255)
+ * @param paletteType 'background' or 'sprite'
+ * @param paletteCode Palette code (0-1 for background, 0-2 for sprite)
+ * @param colorCombination Color combination index (0-3)
+ * @returns Color index: 0=background, 1=color1, 2=color2, 3=color3
+ */
+export function classifyColorWithPalette(
+  r: number,
+  g: number,
+  b: number,
+  paletteType: 'background' | 'sprite',
+  paletteCode: number,
+  colorCombination: number
+): number {
+  let palette
+  if (paletteType === 'sprite') {
+    palette = SPRITE_PALETTES[paletteCode] ?? SPRITE_PALETTES[0]
+  } else {
+    palette = BACKGROUND_PALETTES[paletteCode] ?? BACKGROUND_PALETTES[1]
+  }
+  
+  const combination = palette[colorCombination] ?? palette[0]
+  
+  if (!combination) {
+    return 0
+  }
+  
+  // Get actual color codes from the combination
+  const colorCodes = [
+    combination[0], // background (index 0)
+    combination[1], // color 1 (index 1)
+    combination[2], // color 2 (index 2)
+    combination[3]  // color 3 (index 3)
+  ]
+  
+  // Convert color codes to RGB
+  const paletteRgbs = colorCodes.map(code => {
+    const hex = COLORS[code] ?? COLORS[0] ?? '#000000'
+    return hexToRgb(hex)
+  })
+  
+  // Find the closest matching color
+  let minDistance = Infinity
+  let closestIndex = 0
+  
+  for (let i = 0; i < paletteRgbs.length; i++) {
+    const [pr, pg, pb] = paletteRgbs[i] ?? [0, 0, 0]
+    const distance = colorDistance(r, g, b, pr, pg, pb)
+    if (distance < minDistance) {
+      minDistance = distance
+      closestIndex = i
+    }
+  }
+  
+  return closestIndex
+}
 
 /**
  * Classify an RGB color to F-BASIC color index

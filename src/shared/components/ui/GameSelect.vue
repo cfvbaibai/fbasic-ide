@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useEventListener } from '@vueuse/core'
 import GameIcon from './GameIcon.vue'
 
 /**
@@ -72,13 +73,7 @@ const handleClickOutside = (event: MouseEvent) => {
   }
 }
 
-onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
-})
-
-onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
-})
+useEventListener(document, 'click', handleClickOutside)
 
 const selectClasses = computed(() => {
   return {

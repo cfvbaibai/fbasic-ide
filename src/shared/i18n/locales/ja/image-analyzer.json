@@ -5,6 +5,14 @@
     "analyze": "分析",
     "analyzing": "分析中..."
   },
+  "colorSettings": {
+    "title": "色抽出設定",
+    "paletteType": "パレットタイプ",
+    "paletteTypeBackground": "背景",
+    "paletteTypeSprite": "スプライト（前景）",
+    "paletteCode": "パレットコード",
+    "colorCombination": "カラー組み合わせ"
+  },
   "grid": {
     "title": "グリッドオーバーレイ付き画像",
     "increaseCellSize": "セルサイズを増やす",

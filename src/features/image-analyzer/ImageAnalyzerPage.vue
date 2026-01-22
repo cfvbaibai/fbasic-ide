@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useCssVar } from '@vueuse/core'
 import { GameLayout, GameBlock } from '../../shared/components/ui'
 import { GameButton, GameButtonGroup, GameUpload, GameCodeQuote } from '../../shared/components/ui'
 import { useImageAnalysis } from './composables/useImageAnalysis'
 import { useGridManipulation } from './composables/useGridManipulation'
+import { BACKGROUND_PALETTES, SPRITE_PALETTES } from '@/shared/data/palette'
+import ColorBox from '../sprite-viewer/components/ColorBox.vue'
 
 /**
  * ImageAnalyzerPage component - Page for analyzing images and generating sprite arrays.
@@ -17,6 +20,26 @@ const { t } = useI18n()
 
 const imageFile = ref<File | null>(null)
 const imageUrl = ref<string>('')
+
+// Color extraction settings
+const paletteType = ref<'background' | 'sprite'>('background')
+const selectedPaletteCode = ref<number>(1) // Default to palette 1
+const selectedColorCombination = ref<number>(0) // Default to combination 0
+
+// Get available palette codes based on palette type
+const availablePaletteCodes = computed(() => {
+  return paletteType.value === 'sprite' ? 3 : 2
+})
+
+// Reset palette code when switching types if current code is out of range
+const updatePaletteType = (type: 'background' | 'sprite') => {
+  paletteType.value = type
+  if (type === 'background' && selectedPaletteCode.value >= 2) {
+    selectedPaletteCode.value = 1
+  } else if (type === 'sprite' && selectedPaletteCode.value >= 3) {
+    selectedPaletteCode.value = 0
+  }
+}
 
 // Use composables
 const {
@@ -78,25 +101,48 @@ const analyzeImage = async (): Promise<void> => {
   await analyzeImageComposable(imageUrl.value, adjustedCellSize, gridOffsetX, gridOffsetY)
 }
 
-// Helper function to read CSS custom property
-const getCssVariable = (variableName: string): string => {
-  return getComputedStyle(document.documentElement)
-    .getPropertyValue(variableName)
-    .trim()
-}
+// Use VueUse's useCssVar for reactive CSS variable access
+const semanticWarning = useCssVar('--semantic-solid-warning', document.documentElement)
+const semanticSuccess = useCssVar('--semantic-solid-success', document.documentElement)
+const semanticInfo = useCssVar('--semantic-solid-info', document.documentElement)
+const semanticDanger = useCssVar('--semantic-solid-danger', document.documentElement)
 
 // Get computed grid line colors using semantic colors from theme
 const getGridLineColor = (i: number): string => {
   if (i === 1 || i === 17) {
-    return getCssVariable('--semantic-solid-warning')
+    return semanticWarning.value || '#ffa500' // fallback to orange
   } else if (i === 9) {
-    return getCssVariable('--semantic-solid-success')
+    return semanticSuccess.value || '#00ff00' // fallback to green
   } else if (i === 5 || i === 13) {
-    return getCssVariable('--semantic-solid-info')
+    return semanticInfo.value || '#00ffff' // fallback to cyan
   } else {
-    return getCssVariable('--semantic-solid-danger')
+    return semanticDanger.value || '#ff0000' // fallback to red
   }
 }
+
+// Get the selected color combination colors
+const selectedColorCombinationColors = computed(() => {
+  const palette = paletteType.value === 'sprite'
+    ? SPRITE_PALETTES[selectedPaletteCode.value]
+    : BACKGROUND_PALETTES[selectedPaletteCode.value]
+  
+  if (!palette) {
+    return []
+  }
+  
+  const colorCombination = palette[selectedColorCombination.value]
+  if (!colorCombination) {
+    return []
+  }
+  
+  // Return all 4 colors (background + 3 foreground colors)
+  return [
+    colorCombination[0],
+    colorCombination[1],
+    colorCombination[2],
+    colorCombination[3]
+  ].filter((code): code is number => code !== undefined)
+})
 
 const generateArray = async (): Promise<void> => {
   if (!imageUrl.value || !hasAnalyzed.value) return
@@ -107,7 +153,10 @@ const generateArray = async (): Promise<void> => {
     adjustedCellSize.value,
     gridOffsetX.value,
     gridOffsetY.value,
-    t('imageAnalyzer.generated.error')
+    t('imageAnalyzer.generated.error'),
+    paletteType.value,
+    selectedPaletteCode.value,
+    selectedColorCombination.value
   )
 }
 </script>
@@ -138,6 +187,71 @@ const generateArray = async (): Promise<void> => {
           {{ isAnalyzing ? t('imageAnalyzer.buttons.analyzing') : t('imageAnalyzer.buttons.analyze') }}
         </GameButton>
       </div>
+
+      <GameBlock
+        v-if="imageFile"
+        :title="t('imageAnalyzer.colorSettings.title')"
+        class="color-settings-block"
+      >
+        <div class="color-settings-controls">
+          <div class="control-group">
+            <label for="palette-type">{{ t('imageAnalyzer.colorSettings.paletteType') }}</label>
+            <GameButtonGroup>
+              <GameButton
+                variant="toggle"
+                :selected="paletteType === 'background'"
+                @click="updatePaletteType('background')"
+              >
+                {{ t('imageAnalyzer.colorSettings.paletteTypeBackground') }}
+              </GameButton>
+              <GameButton
+                variant="toggle"
+                :selected="paletteType === 'sprite'"
+                @click="updatePaletteType('sprite')"
+              >
+                {{ t('imageAnalyzer.colorSettings.paletteTypeSprite') }}
+              </GameButton>
+            </GameButtonGroup>
+          </div>
+          <div class="control-group">
+            <label for="palette-code">{{ t('imageAnalyzer.colorSettings.paletteCode') }}</label>
+            <GameButtonGroup>
+              <GameButton
+                v-for="paletteIdx in availablePaletteCodes"
+                :key="paletteIdx - 1"
+                variant="toggle"
+                :selected="selectedPaletteCode === paletteIdx - 1"
+                @click="selectedPaletteCode = paletteIdx - 1"
+              >
+                {{ paletteIdx - 1 }}
+              </GameButton>
+            </GameButtonGroup>
+          </div>
+          <div class="control-group">
+            <label for="color-combination">{{ t('imageAnalyzer.colorSettings.colorCombination') }}</label>
+            <GameButtonGroup>
+              <GameButton
+                v-for="combIdx in 4"
+                :key="combIdx - 1"
+                variant="toggle"
+                :selected="selectedColorCombination === combIdx - 1"
+                @click="selectedColorCombination = combIdx - 1"
+              >
+                {{ combIdx - 1 }}
+              </GameButton>
+            </GameButtonGroup>
+          </div>
+        </div>
+        <div class="color-preview">
+          <div
+            v-for="(colorCode, idx) in selectedColorCombinationColors"
+            :key="idx"
+            class="preview-color-wrapper"
+          >
+            <ColorBox :color-code="colorCode" />
+          </div>
+        </div>
+      </GameBlock>
 
       <div v-if="imageUrl" class="image-preview">
         <img
@@ -364,5 +478,44 @@ const generateArray = async (): Promise<void> => {
 
 .generated-array-block {
   margin-top: 1rem;
+}
+
+.color-settings-block {
+  margin-top: 1rem;
+}
+
+.color-settings-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.control-group label {
+  font-weight: 600;
+  color: var(--game-text-secondary);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 120px;
+}
+
+.color-preview {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--game-surface-border);
+}
+
+.preview-color-wrapper {
+  width: 60px;
+  height: 60px;
 }
 </style>

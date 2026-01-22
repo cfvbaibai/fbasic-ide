@@ -11,6 +11,7 @@
  */
 
 import * as monaco from 'monaco-editor';
+import { useDebounceFn } from '@vueuse/core';
 import { parseWithChevrotain } from '../../../core/parser/FBasicChevrotainParser';
 
 // ============================================================================
@@ -276,10 +277,6 @@ export function setupLiveErrorChecking(
   const model = editor.getModel();
   if (!model) return;
 
-  // Debounce function to avoid parsing on every keystroke
-  let timeoutId: ReturnType<typeof setTimeout> | null = null;
-  const DEBOUNCE_MS = 300;
-
   // Function to update diagnostics
   const updateDiagnostics = () => {
     const source = model.getValue();
@@ -297,17 +294,12 @@ export function setupLiveErrorChecking(
     }
   };
 
+  // Use VueUse's useDebounceFn for debounced parsing
+  const debouncedUpdateDiagnostics = useDebounceFn(updateDiagnostics, 300);
+
   // Listen for content changes
   model.onDidChangeContent(() => {
-    // Clear previous timeout
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-
-    // Set new timeout for debounced parsing
-    timeoutId = setTimeout(() => {
-      updateDiagnostics();
-    }, DEBOUNCE_MS);
+    debouncedUpdateDiagnostics();
   });
 
   // Initial parse

@@ -1,4 +1,5 @@
 import { ref, onUnmounted } from 'vue'
+import { useTimeoutFn, useIntervalFn } from '@vueuse/core'
 
 interface UseJoystickEventsOptions {
   sendStickEvent?: (joystickId: number, state: number) => void
@@ -21,7 +22,8 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
   const heldButtons = ref<Record<string, boolean>>({})
 
   // Track which D-pad buttons are being held for periodic triggering
-  const heldDpadButtons = ref<Record<string, NodeJS.Timeout | null>>({})
+  // Store the pause function from useIntervalFn (Pausable interface)
+  const heldDpadButtons = ref<Record<string, (() => void) | null>>({})
   const dpadRepeatInterval = 100 // Repeat every 100ms when held
 
   // Track if we're actively using manual controls to prevent polling interference
@@ -31,30 +33,34 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
   // Track flashing state for table cells
   const flashingCells = ref<Record<string, boolean>>({})
 
-  // Track STRIG reset timers
-  const strigResetTimers = ref<Record<number, NodeJS.Timeout | null>>({})
+  // Track STRIG reset timers - store the stop function from useTimeoutFn
+  const strigResetTimers = ref<Record<number, (() => void) | null>>({})
 
   // Helper function to flash a table cell
   const flashCell = (cellKey: string) => {
     flashingCells.value[cellKey] = true
-    setTimeout(() => {
+    const { start } = useTimeoutFn(() => {
       flashingCells.value[cellKey] = false
     }, 200) // Flash for 200ms
+    start()
     onCellFlash?.(cellKey)
   }
 
   // Helper function to reset STRIG value after delay
   const resetStrigValue = (joystickId: number) => {
-    // Clear existing timer if any
+    // Stop existing timer if any
     if (strigResetTimers.value[joystickId]) {
-      clearTimeout(strigResetTimers.value[joystickId]!)
+      strigResetTimers.value[joystickId]!()
+      strigResetTimers.value[joystickId] = null
     }
     
     // Set new timer to reset STRIG value after 300ms
-    strigResetTimers.value[joystickId] = setTimeout(() => {
+    const { start, stop } = useTimeoutFn(() => {
       onStrigStateChange?.(joystickId, 0)
       strigResetTimers.value[joystickId] = null
     }, 300)
+    strigResetTimers.value[joystickId] = stop
+    start()
   }
 
   // D-pad hold and repeat functions
@@ -86,18 +92,21 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
       flashingCells.value[`stick-${joystickId}`] = true
     }
     
-    // Clear any existing interval for this button
+    // Pause existing interval for this button if any
     if (heldDpadButtons.value[buttonKey]) {
-      clearInterval(heldDpadButtons.value[buttonKey]!)
+      heldDpadButtons.value[buttonKey]!()
+      heldDpadButtons.value[buttonKey] = null
     }
     
-    // Set up repeat interval
-    heldDpadButtons.value[buttonKey] = setInterval(() => {
+    // Set up repeat interval using VueUse
+    // useIntervalFn starts immediately by default, so we just need to store pause
+    const { pause } = useIntervalFn(() => {
       if (sendStickEvent && stickValue > 0) {
         console.log('🎮 [JOYSTICK_CONTROL] Repeating STICK event:', { joystickId, direction, stickValue })
         sendStickEvent(joystickId, stickValue)
       }
     }, dpadRepeatInterval)
+    heldDpadButtons.value[buttonKey] = pause
   }
 
   const stopDpadHold = async (joystickId: number, direction: 'up' | 'down' | 'left' | 'right') => {
@@ -106,9 +115,9 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
     // Only process if button was actually being held
     const wasHeld = heldDpadButtons.value[buttonKey] !== null && heldDpadButtons.value[buttonKey] !== undefined
     
-    // Clear the repeat interval
+    // Pause the repeat interval
     if (heldDpadButtons.value[buttonKey]) {
-      clearInterval(heldDpadButtons.value[buttonKey]!)
+      heldDpadButtons.value[buttonKey]!()
       heldDpadButtons.value[buttonKey] = null
     }
     
@@ -181,28 +190,29 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
     }
     
     // Reset button state immediately after sending pressed event
-    setTimeout(async () => {
+    const { start } = useTimeoutFn(() => {
       heldButtons.value[buttonKey] = false
       
       // Allow polling to resume after action button is processed
       actionButtonActive.value = false
     }, 50) // Short delay to ensure pressed event is processed
+    start()
   }
 
   // Cleanup function
   const cleanup = () => {
-    // Clean up all D-pad intervals
-    for (const [_buttonKey, interval] of Object.entries(heldDpadButtons.value)) {
-      if (interval) {
-        clearInterval(interval)
+    // Clean up all D-pad intervals (pause them)
+    for (const [_buttonKey, pauseFn] of Object.entries(heldDpadButtons.value)) {
+      if (pauseFn) {
+        pauseFn()
       }
     }
     heldDpadButtons.value = {}
     
-    // Clean up all STRIG timers
-    for (const [_joystickId, timer] of Object.entries(strigResetTimers.value)) {
-      if (timer) {
-        clearTimeout(timer)
+    // Clean up all STRIG timers (stop them)
+    for (const [_joystickId, stopFn] of Object.entries(strigResetTimers.value)) {
+      if (stopFn) {
+        stopFn()
       }
     }
     strigResetTimers.value = {}

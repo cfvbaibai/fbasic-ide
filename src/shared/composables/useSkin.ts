@@ -5,7 +5,8 @@
  * Uses data-skin attribute on <html> element to switch themes.
  */
 
-import { ref, onMounted, computed } from 'vue'
+import { computed, watch } from 'vue'
+import { useLocalStorage } from '@vueuse/core'
 import { skinConfigs, type SkinConfig } from './skinConfig'
 
 export type SkinName = 'default' | 'retro-blue' | 'nintendo' | 'classic-light'
@@ -13,24 +14,28 @@ export type SkinName = 'default' | 'retro-blue' | 'nintendo' | 'classic-light'
 const SKIN_STORAGE_KEY = 'fbasic-emu-skin'
 const SKIN_ATTRIBUTE = 'data-skin'
 
+const isValidSkinName = (value: unknown): value is SkinName => {
+  return value === 'default' || value === 'retro-blue' || value === 'nintendo' || value === 'classic-light'
+}
+
 /**
- * Get current skin from DOM or storage
+ * Get initial skin from DOM or storage
  */
-function getCurrentSkin(): SkinName {
+function getInitialSkin(): SkinName {
   if (typeof window === 'undefined') {
     return 'default'
   }
 
   // Check DOM first (takes precedence)
   const domSkin = document.documentElement.getAttribute(SKIN_ATTRIBUTE)
-  if (domSkin && (domSkin === 'default' || domSkin === 'retro-blue' || domSkin === 'nintendo' || domSkin === 'classic-light')) {
-    return domSkin as SkinName
+  if (domSkin && isValidSkinName(domSkin)) {
+    return domSkin
   }
 
   // Check localStorage
   const storedSkin = localStorage.getItem(SKIN_STORAGE_KEY)
-  if (storedSkin && (storedSkin === 'default' || storedSkin === 'retro-blue' || storedSkin === 'nintendo' || storedSkin === 'classic-light')) {
-    return storedSkin as SkinName
+  if (storedSkin && isValidSkinName(storedSkin)) {
+    return storedSkin
   }
 
   return 'default'
@@ -64,33 +69,40 @@ function applySkin(skin: SkinName): void {
  * Composable for skin management
  */
 export function useSkin() {
-  const currentSkin = ref<SkinName>(getCurrentSkin())
+  // Use VueUse's useLocalStorage with type safety
+  const currentSkin = useLocalStorage<SkinName>(
+    SKIN_STORAGE_KEY,
+    getInitialSkin(),
+    {
+      serializer: {
+        read: (value: string): SkinName => {
+          if (isValidSkinName(value)) {
+            return value
+          }
+          return 'default'
+        },
+        write: (value: SkinName): string => value
+      }
+    }
+  )
 
-  // Apply skin immediately (works on page load and navigation)
-  if (typeof window !== 'undefined') {
-    applySkin(currentSkin.value)
-  }
-
-  // Also apply on mount (for reactivity when component mounts)
-  onMounted(() => {
-    applySkin(currentSkin.value)
-  })
+  // Apply skin to DOM when it changes
+  watch(
+    currentSkin,
+    (skin) => {
+      if (typeof window !== 'undefined') {
+        applySkin(skin)
+      }
+    },
+    { immediate: true }
+  )
 
   /**
    * Set active skin
    */
   const setSkin = (skin: SkinName) => {
     currentSkin.value = skin
-    applySkin(skin)
-    
-    // Persist to localStorage
-    if (typeof window !== 'undefined') {
-      if (skin === 'default') {
-        localStorage.removeItem(SKIN_STORAGE_KEY)
-      } else {
-        localStorage.setItem(SKIN_STORAGE_KEY, skin)
-      }
-    }
+    // Skin will be applied automatically via watch
   }
 
   /**

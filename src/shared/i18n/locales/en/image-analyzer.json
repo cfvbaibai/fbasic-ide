@@ -5,6 +5,14 @@
     "analyze": "Analyze",
     "analyzing": "Analyzing..."
   },
+  "colorSettings": {
+    "title": "Color Extraction Settings",
+    "paletteType": "Palette Type",
+    "paletteTypeBackground": "Background",
+    "paletteTypeSprite": "Sprite (Foreground)",
+    "paletteCode": "Palette Code",
+    "colorCombination": "Color Combination"
+  },
   "grid": {
     "title": "Image with Grid Overlay",
     "increaseCellSize": "Increase cell size",

@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { classifyColor } from '@/shared/utils/colorClassification'
+import { classifyColor, classifyColorWithPalette } from '@/shared/utils/colorClassification'
 
 /**
  * Composable for image analysis and sprite array generation
@@ -59,7 +59,10 @@ export function useImageAnalysis() {
     adjustedCellSize: number,
     gridOffsetX: number,
     gridOffsetY: number,
-    errorMessage: string
+    errorMessage: string,
+    paletteType: 'background' | 'sprite' = 'background',
+    paletteCode: number = 1,
+    colorCombination: number = 0
   ): Promise<void> => {
     if (!imageUrl || !hasAnalyzed.value) return
     
@@ -125,7 +128,9 @@ export function useImageAnalysis() {
               const g = imageData.data[index + 1] ?? 0
               const b = imageData.data[index + 2] ?? 0
               
-              colors.push(classifyColor(r, g, b))
+              // Use palette-based classification if palette and combination are provided
+              const colorIndex = classifyColorWithPalette(r, g, b, paletteType, paletteCode, colorCombination)
+              colors.push(colorIndex)
             }
             
             // Use most common color in the cell, default to 0 if no samples
