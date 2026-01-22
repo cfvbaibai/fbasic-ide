@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import GameIcon from './GameIcon.vue'
+import type { GameBlockProps, GameBlockEmits } from './GameBlock.types'
 
 /**
  * GameBlock component - A block/section component with title, icon, and clickable options.
@@ -21,16 +22,7 @@ defineOptions({
   name: 'GameBlock'
 })
 
-interface Props {
-  title: string
-  titleIcon?: string // Icon name in format "prefix:name" (e.g., "mdi:play")
-  clickableHeader?: boolean
-  hideHeader?: boolean
-  floatOnHover?: boolean
-  clickable?: boolean
-}
-
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<GameBlockProps>(), {
   titleIcon: undefined,
   clickableHeader: false,
   hideHeader: false,
@@ -38,10 +30,7 @@ const props = withDefaults(defineProps<Props>(), {
   clickable: false
 })
 
-const emit = defineEmits<{
-  'click-header': []
-  click: []
-}>()
+const emit = defineEmits<GameBlockEmits>()
 
 const handleHeaderClick = () => {
   if (props.clickableHeader) {

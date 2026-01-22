@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import GameIcon from './GameIcon.vue'
 import GameBlock from './GameBlock.vue'
+import type { GameCardProps, GameCardEmits } from './GameCard.types'
 
 /**
  * GameCard component - A card component with icon, title, description, and action.
@@ -20,17 +21,7 @@ defineOptions({
   name: 'GameCard'
 })
 
-interface Props {
-  title: string
-  description?: string
-  icon?: string // Icon name in format "prefix:name" (e.g., "mdi:play")
-  iconColor?: string
-  actionText?: string
-  clickable?: boolean
-  floatOnHover?: boolean
-}
-
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<GameCardProps>(), {
   description: '',
   icon: undefined,
   iconColor: 'var(--base-solid-primary)',
@@ -39,9 +30,7 @@ const props = withDefaults(defineProps<Props>(), {
   floatOnHover: true
 })
 
-const emit = defineEmits<{
-  click: []
-}>()
+const emit = defineEmits<GameCardEmits>()
 
 const handleClick = () => {
   if (props.clickable) {

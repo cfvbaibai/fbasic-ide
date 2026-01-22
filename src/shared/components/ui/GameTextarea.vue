@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import type { GameTextareaProps, GameTextareaEmits } from './GameTextarea.types'
 
 /**
  * GameTextarea component - A styled textarea component with size variants and resize options.
@@ -19,17 +20,7 @@ defineOptions({
   name: 'GameTextarea'
 })
 
-interface Props {
-  modelValue: string
-  placeholder?: string
-  disabled?: boolean
-  readonly?: boolean
-  rows?: number
-  resize?: 'none' | 'both' | 'horizontal' | 'vertical'
-  size?: 'small' | 'medium' | 'large'
-}
-
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<GameTextareaProps>(), {
   placeholder: '',
   disabled: false,
   readonly: false,
@@ -38,11 +29,7 @@ const props = withDefaults(defineProps<Props>(), {
   size: 'medium'
 })
 
-const emit = defineEmits<{
-  'update:modelValue': [value: string]
-  focus: [event: FocusEvent]
-  blur: [event: FocusEvent]
-}>()
+const emit = defineEmits<GameTextareaEmits>()
 
 const textareaValue = computed({
   get: () => props.modelValue,

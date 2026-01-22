@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { useTemplateRef, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import GameButton from './GameButton.vue'
 import GameIcon from './GameIcon.vue'
+import type { GameUploadProps, GameUploadEmits } from './GameUpload.types'
 
 /**
  * GameUpload component - A file upload component with drag-and-drop support.
@@ -23,25 +24,16 @@ defineOptions({
 
 const { t } = useI18n()
 
-interface Props {
-  accept?: string
-  multiple?: boolean
-  disabled?: boolean
-  drag?: boolean
-}
-
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<GameUploadProps>(), {
   accept: '*',
   multiple: false,
   disabled: false,
   drag: false
 })
 
-const emit = defineEmits<{
-  change: [file: File | File[]]
-}>()
+const emit = defineEmits<GameUploadEmits>()
 
-const fileInput = ref<HTMLInputElement>()
+const fileInput = useTemplateRef<HTMLInputElement>('fileInput')
 const isDragging = ref(false)
 
 const handleFileSelect = (event: Event) => {

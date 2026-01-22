@@ -1,4 +1,4 @@
-import { ref, onUnmounted } from 'vue'
+import { ref, onUnmounted, onDeactivated } from 'vue'
 import { useTimeoutFn, useIntervalFn } from '@vueuse/core'
 
 interface UseJoystickEventsOptions {
@@ -218,9 +218,9 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
     strigResetTimers.value = {}
   }
 
-  onUnmounted(() => {
-    cleanup()
-  })
+  // Clean up on unmount AND deactivation (keep-alive)
+  onUnmounted(cleanup)
+  onDeactivated(cleanup)
 
   return {
     heldButtons,

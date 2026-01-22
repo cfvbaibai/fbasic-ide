@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import GameIcon from './GameIcon.vue'
+import type { GameIconButtonProps, GameIconButtonEmits } from './GameIconButton.types'
 
 /**
  * GameIconButton component - An icon-only button component with variants and states.
@@ -20,19 +21,7 @@ defineOptions({
   name: 'GameIconButton'
 })
 
-interface Props {
-  type?: 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'default'
-  size?: 'small' | 'medium' | 'large'
-  variant?: 'action' | 'toggle'
-  disabled?: boolean
-  loading?: boolean
-  icon?: string // Icon name in format "prefix:name" (e.g., "mdi:play")
-  selected?: boolean
-  title?: string // Tooltip text
-  circular?: boolean // Whether to use circular shape
-}
-
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<GameIconButtonProps>(), {
   type: 'default',
   size: 'medium',
   variant: 'action',
@@ -44,9 +33,7 @@ const props = withDefaults(defineProps<Props>(), {
   circular: false
 })
 
-const emit = defineEmits<{
-  click: [event: MouseEvent]
-}>()
+const emit = defineEmits<GameIconButtonEmits>()
 
 const buttonClasses = computed(() => {
   return {

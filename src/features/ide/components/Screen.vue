@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, watchEffect, computed } from 'vue'
+import { useTemplateRef, ref, watch, watchEffect, computed } from 'vue'
 import type { ScreenCell } from '@/core/interfaces'
 import { renderScreenBuffer } from '../composables/canvasRenderer'
 import GameButtonGroup from '@/shared/components/ui/GameButtonGroup.vue'
@@ -36,7 +36,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 // Canvas reference
-const screenCanvas = ref<HTMLCanvasElement | null>(null)
+const screenCanvas = useTemplateRef<HTMLCanvasElement>('screenCanvas')
 const paletteCode = ref(1) // Default background palette code is 1
 
 // Zoom state - default to 2x (current scale)

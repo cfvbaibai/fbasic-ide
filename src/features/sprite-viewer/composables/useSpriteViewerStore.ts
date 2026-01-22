@@ -99,7 +99,11 @@ export function provideSpriteViewerStore() {
 export function useSpriteViewerStore(): SpriteViewerStore {
   const store = inject(SpriteViewerStoreKey)
   if (!store) {
-    throw new Error('SpriteViewerStore must be provided. Call provideSpriteViewerStore() in parent component.')
+    throw new Error(
+      'SpriteViewerStore must be provided. ' +
+      'Call provideSpriteViewerStore() in a parent component. ' +
+      'Affected components: CharacterSpriteViewerPage.vue'
+    )
   }
   return store
 }

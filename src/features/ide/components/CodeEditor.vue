@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
+import { useTemplateRef, ref, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { DEFAULTS } from '../../../core/constants'
 import { GameBlock } from '../../../shared/components/ui'
@@ -30,7 +30,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 const emit = defineEmits<Emits>()
 
-const textareaRef = ref<HTMLTextAreaElement>()
+const textareaRef = useTemplateRef<HTMLTextAreaElement>('textareaRef')
 const lineNumbers = ref<string[]>([])
 
 const updateLineNumbers = (text: string) => {

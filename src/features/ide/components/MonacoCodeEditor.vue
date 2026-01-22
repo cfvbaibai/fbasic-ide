@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
+import { useTemplateRef, onMounted, onBeforeUnmount, watch } from 'vue';
 import * as monaco from 'monaco-editor';
 import { setupMonacoLanguage, setupLiveErrorChecking } from '../integrations/monaco-integration';
 
@@ -25,7 +25,7 @@ interface Emits {
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
-const editorContainer = ref<HTMLElement>();
+const editorContainer = useTemplateRef<HTMLElement>('editorContainer');
 let editor: monaco.editor.IStandaloneCodeEditor | null = null;
 let mutationObserver: MutationObserver | null = null;
 

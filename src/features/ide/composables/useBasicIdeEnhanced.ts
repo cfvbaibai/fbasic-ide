@@ -22,7 +22,7 @@
  * @returns Object containing reactive state and methods for IDE functionality
  */
 
-import { ref, onUnmounted } from 'vue'
+import { ref, onUnmounted, onDeactivated } from 'vue'
 import { FBasicParser } from '../../../core/parser/FBasicParser'
 import { getSampleCode } from '../../../core/samples/sampleCodes'
 import type { ExecutionResult, ParserInfo, HighlighterInfo, BasicVariable, AnyServiceWorkerMessage } from '../../../core/interfaces'
@@ -356,15 +356,19 @@ export function useBasicIde() {
   // Initialize highlighting
   updateHighlighting()
 
-  // Cleanup web worker on component unmount
-  onUnmounted(() => {
+  // Cleanup function for web worker
+  const cleanupWebWorker = () => {
     console.log('🧹 [COMPOSABLE] Cleaning up web worker...')
     if (webWorkerManager.worker) {
       webWorkerManager.worker.terminate()
       webWorkerManager.worker = null
     }
     rejectAllPendingMessages(webWorkerManager, 'Component unmounted')
-  })
+  }
+
+  // Clean up on unmount AND deactivation (keep-alive)
+  onUnmounted(cleanupWebWorker)
+  onDeactivated(cleanupWebWorker)
 
   return {
     // State

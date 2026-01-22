@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { useTemplateRef, ref, computed, onDeactivated } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useEventListener } from '@vueuse/core'
 import GameIcon from './GameIcon.vue'
+import type { GameSelectProps, GameSelectEmits, GameSelectOption } from './GameSelect.types'
 
 /**
  * GameSelect component - A styled select dropdown component with options.
@@ -23,34 +24,17 @@ defineOptions({
 
 const { t } = useI18n()
 
-interface Option {
-  label: string
-  value: string | number
-  disabled?: boolean
-}
-
-interface Props {
-  modelValue: string | number
-  options?: Option[]
-  placeholder?: string
-  disabled?: boolean
-  size?: 'small' | 'medium' | 'large'
-  width?: string
-}
-
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<GameSelectProps>(), {
   options: () => [],
   placeholder: '',
   disabled: false,
   size: 'medium'
 })
 
-const emit = defineEmits<{
-  'update:modelValue': [value: string | number]
-}>()
+const emit = defineEmits<GameSelectEmits>()
 
 const isOpen = ref(false)
-const selectRef = ref<HTMLDivElement>()
+const selectRef = useTemplateRef<HTMLDivElement>('selectRef')
 
 const selectedOption = computed(() => {
   return props.options.find(opt => opt.value === props.modelValue)
@@ -60,7 +44,7 @@ const displayText = computed(() => {
   return selectedOption.value?.label || props.placeholder || t('common.select.placeholder')
 })
 
-const handleSelect = (option: Option) => {
+const handleSelect = (option: GameSelectOption) => {
   if (!option.disabled) {
     emit('update:modelValue', option.value)
     isOpen.value = false
@@ -74,6 +58,11 @@ const handleClickOutside = (event: MouseEvent) => {
 }
 
 useEventListener(document, 'click', handleClickOutside)
+
+// Close dropdown on deactivation (keep-alive support)
+onDeactivated(() => {
+  isOpen.value = false
+})
 
 const selectClasses = computed(() => {
   return {

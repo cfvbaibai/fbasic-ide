@@ -12,7 +12,10 @@
       "Bash(git filter-branch:*)",
       "Bash(git for-each-ref:*)",
       "Bash(xargs -r -n 1 git update-ref -d)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Skill(vue-best-practices)",
+      "Skill(vueuse-best-practices)",
+      "Bash(tree:*)"
     ]
   },
   "enabledPlugins": {

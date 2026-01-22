@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import type { GameSwitchProps, GameSwitchEmits } from './GameSwitch.types'
 
 /**
  * GameSwitch component - A toggle switch component with size variants.
@@ -17,20 +18,12 @@ defineOptions({
   name: 'GameSwitch'
 })
 
-interface Props {
-  modelValue: boolean | string | number
-  disabled?: boolean
-  size?: 'small' | 'medium' | 'large'
-}
-
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<GameSwitchProps>(), {
   disabled: false,
   size: 'medium'
 })
 
-const emit = defineEmits<{
-  'update:modelValue': [value: boolean | string | number]
-}>()
+const emit = defineEmits<GameSwitchEmits>()
 
 const isChecked = computed(() => {
   if (typeof props.modelValue === 'boolean') {

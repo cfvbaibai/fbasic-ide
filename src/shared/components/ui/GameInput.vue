@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import type { GameInputProps, GameInputEmits } from './GameInput.types'
 
 /**
  * GameInput component - A styled input field with validation, clearable option, and size variants.
@@ -19,16 +20,7 @@ defineOptions({
   name: 'GameInput'
 })
 
-interface Props {
-  modelValue: string | number
-  type?: 'text' | 'number' | 'password' | 'email' | 'url' | 'search'
-  placeholder?: string
-  disabled?: boolean
-  size?: 'small' | 'medium' | 'large'
-  clearable?: boolean
-}
-
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<GameInputProps>(), {
   type: 'text',
   placeholder: '',
   disabled: false,
@@ -36,12 +28,7 @@ const props = withDefaults(defineProps<Props>(), {
   clearable: false
 })
 
-const emit = defineEmits<{
-  'update:modelValue': [value: string | number]
-  focus: [event: FocusEvent]
-  blur: [event: FocusEvent]
-  clear: []
-}>()
+const emit = defineEmits<GameInputEmits>()
 
 const inputValue = computed({
   get: () => props.modelValue,

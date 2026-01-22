@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import GameIcon from './GameIcon.vue'
+import type { GameTagProps, GameTagEmits } from './GameTag.types'
 
 /**
  * GameTag component - A tag/badge component with type variants, sizes, and effects.
@@ -16,15 +17,7 @@ defineOptions({
   name: 'GameTag'
 })
 
-interface Props {
-  type?: 'success' | 'warning' | 'danger' | 'info' | 'default'
-  size?: 'small' | 'medium' | 'large'
-  effect?: 'light' | 'dark' | 'plain'
-  icon?: string // Icon name in format "prefix:name" (e.g., "mdi:play")
-  closable?: boolean
-}
-
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<GameTagProps>(), {
   type: 'default',
   size: 'medium',
   effect: 'light',
@@ -32,9 +25,7 @@ const props = withDefaults(defineProps<Props>(), {
   closable: false
 })
 
-const emit = defineEmits<{
-  close: []
-}>()
+const emit = defineEmits<GameTagEmits>()
 
 const tagClasses = computed(() => {
   const baseClasses = {

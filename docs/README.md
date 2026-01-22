@@ -7,14 +7,11 @@ This directory contains documentation for the Family Basic IDE (F-BASIC Emulator
 ### 📘 `guides/`
 Developer guides and how-to documentation:
 - `chevrotain-monaco-integration.md` - Guide for integrating Chevrotain parser with Monaco Editor
-- `theme-guide.md` - Theme system usage guide
+- `theme-guide-v2.md` - Theme system usage guide
+- `color-usage-review.md` - Color usage review and guidelines
 
 ### 📊 `analysis/`
-Analysis documents and reports:
-- `background-items-completeness-analysis.md` - Analysis of background item completeness
-- `css-variables-consolidation-analysis.md` - Analysis of CSS variable consolidation options
-- `css-variables-utility-classes-review-report.md` - Review report of CSS variables and utility classes
-- `game-surface-bg-gradient-replacement-analysis.md` - Analysis for replacing hardcoded gradients
+Analysis documents and reports (currently empty - analysis documents are archived after completion)
 
 ### 🎮 `device-models/`
 Device model specifications and architecture:
@@ -30,15 +27,10 @@ Reference material:
 - `family-basic-manual/` - Family BASIC manual pages (markdown)
 - `family-basic-manual.pdf` - Family BASIC manual (PDF)
 
-### 🧪 `poc/`
-Proof of concept and experimental documentation:
-- `sprite-parser-poc.md` - Character table sprite parser proof of concept
-- `test-sprite-parser.md` - Sprite parser testing documentation
 
 ### 📋 `planning/`
 Planning and refactoring documents:
-- `i18n-refactoring-plan.md` - Plan for adding internationalization (i18n) support
-- `refactoring-plan-sprite-controls.md` - Refactoring plan for sprite controls
+- `remaining-work-plan.md` - Comprehensive plan for remaining project work
 
 ## Quick Links
 
