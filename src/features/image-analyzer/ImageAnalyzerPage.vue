@@ -298,10 +298,7 @@ const generateArray = async () => {
 </script>
 
 <template>
-  <GameLayout
-    :title="t('imageAnalyzer.title')"
-    icon="mdi:magnify"
-  >
+  <GameLayout>
     <div class="image-analyzer-container">
 
     <div class="analyzer-content">

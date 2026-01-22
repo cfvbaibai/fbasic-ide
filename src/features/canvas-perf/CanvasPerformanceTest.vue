@@ -130,10 +130,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <GameLayout
-    :title="t('canvasPerf.title')"
-    icon="mdi:speedometer"
-  >
+  <GameLayout>
     <div class="test-page">
       <div class="test-controls">
       <GameButton type="primary" @click="startTest">{{ t('canvasPerf.buttons.startTest') }}</GameButton>

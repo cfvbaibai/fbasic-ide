@@ -5,14 +5,14 @@
  * The types are derived from the English locale files (master schema).
  */
 
-import enNavigation from './locales/en/navigation.json'
-import enIde from './locales/en/ide.json'
-import enCommon from './locales/en/common.json'
-import enHome from './locales/en/home.json'
-import enSpriteViewer from './locales/en/sprite-viewer.json'
-import enImageAnalyzer from './locales/en/image-analyzer.json'
-import enMonacoEditor from './locales/en/monaco-editor.json'
-import enCanvasPerf from './locales/en/canvas-perf.json'
+import type enNavigation from './locales/en/navigation.json'
+import type enIde from './locales/en/ide.json'
+import type enCommon from './locales/en/common.json'
+import type enHome from './locales/en/home.json'
+import type enSpriteViewer from './locales/en/sprite-viewer.json'
+import type enImageAnalyzer from './locales/en/image-analyzer.json'
+import type enMonacoEditor from './locales/en/monaco-editor.json'
+import type enCanvasPerf from './locales/en/canvas-perf.json'
 
 // Define the master schema from English locale
 export type MessageSchema = {

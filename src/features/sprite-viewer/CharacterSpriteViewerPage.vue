@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
 import { provideSpriteViewerStore } from './composables/useSpriteViewerStore'
 import { GameLayout } from '../../shared/components/ui'
 import SpriteControls from './components/SpriteControls.vue'
@@ -16,17 +15,12 @@ defineOptions({
   name: 'CharacterSpriteViewerPage'
 })
 
-const { t } = useI18n()
-
 // Provide the store to all child components
 provideSpriteViewerStore()
 </script>
 
 <template>
-  <GameLayout
-    :title="t('spriteViewer.title')"
-    icon="mdi:eye"
-  >
+  <GameLayout>
     <div class="sprite-viewer-container">
 
     <div class="sprite-viewer-content">

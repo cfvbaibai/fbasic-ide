@@ -105,7 +105,7 @@ const navigateTo = (path: string) => {
   max-width: 1400px;
   margin: 0 auto;
   width: 100%;
-  padding: 2rem;
+  padding: 0 2rem 2rem;
 }
 
 .features-grid {
@@ -133,7 +133,7 @@ const navigateTo = (path: string) => {
   }
 
   .home-content {
-    padding: 1.5rem;
+    padding: 0 1.5rem 1.5rem;
   }
 }
 </style>

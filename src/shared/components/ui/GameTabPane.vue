@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, onMounted, onUnmounted, useSlots, watch, h } from 'vue'
+import { computed, onMounted, onUnmounted, useSlots, watch, h } from 'vue'
 import type { ComputedRef } from 'vue'
 import GameTabButton from './GameTabButton.vue'
 import {

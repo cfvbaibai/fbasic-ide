@@ -1,8 +1,5 @@
 <template>
-  <GameLayout
-    :title="t('monacoEditor.title')"
-    icon="mdi:pencil"
-  >
+  <GameLayout>
     <div class="monaco-editor-page">
     
     <div class="editor-wrapper">
@@ -64,7 +61,7 @@ const sampleCode = `10 PRINT "Hello, World!"
   flex: 1;
   display: flex;
   min-height: 0;
-  padding: 1rem;
+  padding: 0 1rem 1rem;
   gap: 1rem;
 }
 

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { SPRITE_PALETTES, BACKGROUND_PALETTES } from '../../../shared/data/palette'
 import ColorBox from './ColorBox.vue'

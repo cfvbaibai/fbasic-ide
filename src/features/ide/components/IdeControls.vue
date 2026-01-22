@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { GameButton, GameSwitch } from '../../../shared/components/ui'
+import { GameIconButton } from '../../../shared/components/ui'
 
 /**
  * IdeControls component - Control buttons for the IDE (run, stop, clear, debug toggle).
@@ -47,7 +47,7 @@ interface Emits {
   (e: 'toggle-debug'): void
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   canRun: true,
   canStop: false,
   debugMode: false
@@ -66,33 +66,48 @@ const handleClear = () => {
   emit('clear')
 }
 
-const handleDebugToggle = (value: boolean | string | number) => {
-  // Only emit if the value actually changed (toggle behavior)
-  const boolValue = Boolean(value)
-  if (boolValue !== props.debugMode) {
-    emit('toggle-debug')
-  }
+const handleDebugToggle = () => {
+  emit('toggle-debug')
 }
 </script>
 
 <template>
   <div class="ide-controls">
-    <GameButton type="primary" :disabled="!canRun" icon="mdi:play" @click="handleRun">
-      {{ t('ide.controls.run') }}
-    </GameButton>
+    <GameIconButton 
+      type="primary" 
+      :disabled="!canRun" 
+      icon="mdi:play" 
+      size="small"
+      :title="t('ide.controls.run')"
+      @click="handleRun"
+    />
 
-    <GameButton type="danger" :disabled="!canStop" icon="mdi:pause" @click="handleStop">
-      {{ t('ide.controls.stop') }}
-    </GameButton>
+    <GameIconButton 
+      type="danger" 
+      :disabled="!canStop" 
+      icon="mdi:pause" 
+      size="small"
+      :title="t('ide.controls.stop')"
+      @click="handleStop"
+    />
 
-    <GameButton type="warning" icon="mdi:delete" @click="handleClear">
-      {{ t('ide.controls.clear') }}
-    </GameButton>
+    <GameIconButton 
+      type="warning" 
+      icon="mdi:delete" 
+      size="small"
+      :title="t('ide.controls.clear')"
+      @click="handleClear"
+    />
 
-    <div class="debug-control">
-      <span class="debug-label text-game-secondary">{{ t('ide.controls.debug') }}</span>
-      <GameSwitch :model-value="debugMode" @update:model-value="handleDebugToggle" />
-    </div>
+    <GameIconButton 
+      variant="toggle"
+      type="info"
+      icon="mdi:bug"
+      size="small"
+      :selected="debugMode"
+      :title="t('ide.controls.debug')"
+      @click="handleDebugToggle"
+    />
   </div>
 </template>
 
@@ -100,14 +115,7 @@ const handleDebugToggle = (value: boolean | string | number) => {
 .ide-controls {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 0.5rem;
-}
-
-.debug-control {
-  display: flex;
-  align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem;
+  padding: 0;
 }
 </style>

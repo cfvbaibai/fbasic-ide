@@ -59,43 +59,51 @@ onMounted(() => {
 </script>
 
 <template>
-  <GameLayout :title="t('ide.title')" icon="mdi:monitor">
-    <template #sub>
-      <div class="sample-programs">
-        <GameButtonGroup>
-          <GameButton variant="toggle" :selected="currentSampleType === 'basic'" @click="loadSampleCode('basic')"
-            size="small">
-            {{ t('ide.samples.basic') }}
-          </GameButton>
-          <GameButton variant="toggle" :selected="currentSampleType === 'pause'" @click="loadSampleCode('pause')"
-            size="small">
-            {{ t('ide.samples.pause') }}
-          </GameButton>
-          <GameButton variant="toggle" :selected="currentSampleType === 'gaming'" @click="loadSampleCode('gaming')"
-            size="small">
-            {{ t('ide.samples.gaming') }}
-          </GameButton>
-          <GameButton variant="toggle" :selected="currentSampleType === 'complex'" @click="loadSampleCode('complex')"
-            size="small">
-            {{ t('ide.samples.complex') }}
-          </GameButton>
-          <GameButton variant="toggle" :selected="currentSampleType === 'comprehensive'"
-            @click="loadSampleCode('comprehensive')" size="small">
-            {{ t('ide.samples.comprehensive') }}
-          </GameButton>
-        </GameButtonGroup>
-      </div>
-    </template>
-    <template #action>
-      <IdeControls :is-running="isRunning" :can-run="canRun" :can-stop="canStop" :debug-mode="debugMode" @run="runCode"
-        @stop="stopCode" @clear="clearOutput" @toggle-debug="toggleDebugMode" />
-    </template>
+  <GameLayout>
     <div class="ide-container">
 
       <!-- Main IDE Content -->
       <div class="ide-content">
         <!-- Left Panel - Code Editor -->
         <GameBlock :title="t('ide.codeEditor.title')" title-icon="mdi:pencil" class="editor-panel">
+          <template #right>
+            <div class="editor-header-controls">
+              <div class="sample-programs">
+                <GameButtonGroup>
+                  <GameButton variant="toggle" :selected="currentSampleType === 'basic'" @click="loadSampleCode('basic')"
+                    size="small">
+                    {{ t('ide.samples.basic') }}
+                  </GameButton>
+                  <GameButton variant="toggle" :selected="currentSampleType === 'pause'" @click="loadSampleCode('pause')"
+                    size="small">
+                    {{ t('ide.samples.pause') }}
+                  </GameButton>
+                  <GameButton variant="toggle" :selected="currentSampleType === 'gaming'" @click="loadSampleCode('gaming')"
+                    size="small">
+                    {{ t('ide.samples.gaming') }}
+                  </GameButton>
+                  <GameButton variant="toggle" :selected="currentSampleType === 'complex'" @click="loadSampleCode('complex')"
+                    size="small">
+                    {{ t('ide.samples.complex') }}
+                  </GameButton>
+                  <GameButton variant="toggle" :selected="currentSampleType === 'comprehensive'"
+                    @click="loadSampleCode('comprehensive')" size="small">
+                    {{ t('ide.samples.comprehensive') }}
+                  </GameButton>
+                </GameButtonGroup>
+              </div>
+              <IdeControls 
+                :is-running="isRunning" 
+                :can-run="canRun" 
+                :can-stop="canStop" 
+                :debug-mode="debugMode" 
+                @run="runCode"
+                @stop="stopCode" 
+                @clear="clearOutput" 
+                @toggle-debug="toggleDebugMode" 
+              />
+            </div>
+          </template>
           <MonacoCodeEditor v-model="code" />
         </GameBlock>
 
@@ -124,9 +132,27 @@ onMounted(() => {
   overflow-x: hidden;
 }
 
+.editor-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .sample-programs {
   display: flex;
   align-items: center;
+}
+
+/* Make sample program buttons more compact */
+.sample-programs :deep(.game-button-group) {
+  padding: 1px;
+}
+
+.sample-programs :deep(.game-button) {
+  padding: 0.25rem 0.375rem;
+  font-size: 0.75rem;
+  line-height: 1.2;
 }
 
 .parser-status {
@@ -139,7 +165,7 @@ onMounted(() => {
   min-height: 0;
   overflow: hidden;
   gap: 1rem;
-  padding: 1rem;
+  padding: 0 1rem 1rem;
 }
 
 .editor-panel {
@@ -148,6 +174,15 @@ onMounted(() => {
   flex-direction: column;
   min-width: 0;
   overflow: hidden;
+}
+
+.editor-panel :deep(.game-block-header) {
+  padding-bottom: 0.5rem;
+  min-height: auto;
+}
+
+.editor-panel :deep(.game-block-title) {
+  font-size: 0.95rem;
 }
 
 .editor-panel :deep(.game-block-content) {

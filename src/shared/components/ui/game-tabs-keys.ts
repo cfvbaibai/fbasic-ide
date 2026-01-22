@@ -1,4 +1,4 @@
-import { inject, type InjectionKey, type ComputedRef } from 'vue'
+import { inject, type InjectionKey, type ComputedRef, type VNode } from 'vue'
 
 /**
  * Injection keys for GameTabs component provide/inject pattern.
@@ -9,14 +9,14 @@ export interface GameTabsContext {
   activeTab: ComputedRef<string>
   setActiveTab: (name: string) => void
   tabsType: 'default' | 'border-card'
-  registerTab: (name: string, render: () => any) => void
+  registerTab: (name: string, render: () => VNode) => void
   unregisterTab: (name: string) => void
 }
 
 export const ActiveTabKey: InjectionKey<ComputedRef<string>> = Symbol('ActiveTab')
 export const SetActiveTabKey: InjectionKey<(name: string) => void> = Symbol('SetActiveTab')
 export const TabsTypeKey: InjectionKey<'default' | 'border-card'> = Symbol('TabsType')
-export const RegisterTabKey: InjectionKey<(name: string, render: () => any) => void> = Symbol('RegisterTab')
+export const RegisterTabKey: InjectionKey<(name: string, render: () => VNode) => void> = Symbol('RegisterTab')
 export const UnregisterTabKey: InjectionKey<(name: string) => void> = Symbol('UnregisterTab')
 
 /**
