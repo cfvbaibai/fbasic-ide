@@ -1,4 +1,18 @@
 <script setup lang="ts">
+/**
+ * GameButtonGroup component - A container for grouping buttons together.
+ * 
+ * @example
+ * ```vue
+ * <GameButtonGroup>
+ *   <GameButton>Button 1</GameButton>
+ *   <GameButton>Button 2</GameButton>
+ * </GameButtonGroup>
+ * ```
+ */
+defineOptions({
+  name: 'GameButtonGroup'
+})
 </script>
 
 <template>

@@ -3,6 +3,13 @@ import { ref, watch, watchEffect } from 'vue'
 import type { ScreenCell } from '@/core/interfaces'
 import { renderScreenBuffer } from '../composables/canvasRenderer'
 
+/**
+ * Screen component - Renders the F-BASIC screen buffer on a canvas.
+ */
+defineOptions({
+  name: 'Screen'
+})
+
 interface Props {
   screenBuffer: ScreenCell[][]
   cursorX: number

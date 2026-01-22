@@ -1,6 +1,24 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
+/**
+ * GameTable component - A styled table component with columns, data, and various display options.
+ * 
+ * @example
+ * ```vue
+ * <GameTable
+ *   :data="tableData"
+ *   :columns="columns"
+ *   :stripe="true"
+ *   :border="true"
+ *   size="medium"
+ * />
+ * ```
+ */
+defineOptions({
+  name: 'GameTable'
+})
+
 interface Column {
   prop: string
   label: string

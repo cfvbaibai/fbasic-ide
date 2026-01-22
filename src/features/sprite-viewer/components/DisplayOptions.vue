@@ -3,6 +3,13 @@ import { useI18n } from 'vue-i18n'
 import { useSpriteViewerStore } from '../composables/useSpriteViewerStore'
 import { GameSwitch } from '../../../shared/components/ui'
 
+/**
+ * DisplayOptions component - Toggle switches for sprite display options (values, grid lines, reverse).
+ */
+defineOptions({
+  name: 'DisplayOptions'
+})
+
 const { t } = useI18n()
 const store = useSpriteViewerStore()
 
@@ -28,7 +35,6 @@ const updateReverseY = (value: boolean | string | number) => {
     <div class="control-group">
       <label for="show-values">{{ t('spriteViewer.displayOptions.showValues') }}</label>
       <GameSwitch
-        id="show-values"
         :model-value="store.displayOptions.value.showValues"
         @update:model-value="updateShowValues"
       />
@@ -36,7 +42,6 @@ const updateReverseY = (value: boolean | string | number) => {
     <div class="control-group">
       <label for="show-grid-lines">{{ t('spriteViewer.displayOptions.showGridLines') }}</label>
       <GameSwitch
-        id="show-grid-lines"
         :model-value="store.displayOptions.value.showGridLines"
         @update:model-value="updateShowGridLines"
       />
@@ -44,7 +49,6 @@ const updateReverseY = (value: boolean | string | number) => {
     <div class="control-group">
       <label for="reverse-x">{{ t('spriteViewer.displayOptions.reverseX') }}</label>
       <GameSwitch
-        id="reverse-x"
         :model-value="store.displayOptions.value.reverseX"
         @update:model-value="updateReverseX"
       />
@@ -52,7 +56,6 @@ const updateReverseY = (value: boolean | string | number) => {
     <div class="control-group">
       <label for="reverse-y">{{ t('spriteViewer.displayOptions.reverseY') }}</label>
       <GameSwitch
-        id="reverse-y"
         :model-value="store.displayOptions.value.reverseY"
         @update:model-value="updateReverseY"
       />

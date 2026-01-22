@@ -5,6 +5,13 @@ import type { BasicVariable, ScreenCell } from '../../../core/interfaces'
 import Screen from './Screen.vue'
 import { GameTabs, GameTabPane, GameTag, GameIcon } from '../../../shared/components/ui'
 
+/**
+ * RuntimeOutput component - Displays runtime output, errors, variables, debug info, and screen buffer.
+ */
+defineOptions({
+  name: 'RuntimeOutput'
+})
+
 const { t } = useI18n()
 
 interface Props {

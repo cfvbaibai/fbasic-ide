@@ -3,6 +3,23 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import GameIcon from './GameIcon.vue'
 
+/**
+ * GameSelect component - A styled select dropdown component with options.
+ * 
+ * @example
+ * ```vue
+ * <GameSelect
+ *   v-model="selectedValue"
+ *   :options="options"
+ *   placeholder="Select an option"
+ *   size="medium"
+ * />
+ * ```
+ */
+defineOptions({
+  name: 'GameSelect'
+})
+
 const { t } = useI18n()
 
 interface Option {

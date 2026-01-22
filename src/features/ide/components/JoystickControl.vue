@@ -13,9 +13,9 @@
           <GameSubBlock v-for="joystickId in 2" :key="joystickId - 1" :title="t('ide.joystick.joystick', { id: joystickId - 1 })">
             <!-- Nintendo Controller Layout -->
             <NintendoController :joystick-id="joystickId - 1" :held-buttons="heldButtons"
-              @dpad-start="(direction) => startDpadHold(joystickId - 1, direction)"
-              @dpad-stop="(direction) => stopDpadHold(joystickId - 1, direction)"
-              @action-button="(button) => toggleActionButton(joystickId - 1, button)" />
+              @dpad-start="(direction: 'up' | 'down' | 'left' | 'right') => startDpadHold(joystickId - 1, direction)"
+              @dpad-stop="(direction: 'up' | 'down' | 'left' | 'right') => stopDpadHold(joystickId - 1, direction)"
+              @action-button="(button: 'select' | 'start' | 'a' | 'b') => toggleActionButton(joystickId - 1, button)" />
           </GameSubBlock>
 
           <JoystickStatusTable :status-data="joystickStatusData" :flashing-cells="flashingCells" />
@@ -26,6 +26,12 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * JoystickControl component - Control interface for Nintendo controller joysticks.
+ */
+defineOptions({
+  name: 'JoystickControl'
+})
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { GameBlock, GameCollapseToggle, GameSubBlock } from '../../../shared/components/ui'

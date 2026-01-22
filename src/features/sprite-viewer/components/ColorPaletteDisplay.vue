@@ -3,6 +3,13 @@ import { useI18n } from 'vue-i18n'
 import ColorBox from './ColorBox.vue'
 import { GameBlock } from '../../../shared/components/ui'
 
+/**
+ * ColorPaletteDisplay component - Displays the full color palette in a grid.
+ */
+defineOptions({
+  name: 'ColorPaletteDisplay'
+})
+
 const { t } = useI18n()
 </script>
 

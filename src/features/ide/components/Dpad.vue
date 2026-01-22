@@ -49,6 +49,13 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * Dpad component - D-pad (directional pad) component for Nintendo controller.
+ */
+defineOptions({
+  name: 'Dpad'
+})
+
 interface Emits {
   (type: 'dpad-start', direction: 'up' | 'down' | 'left' | 'right'): void
   (type: 'dpad-stop', direction: 'up' | 'down' | 'left' | 'right'): void

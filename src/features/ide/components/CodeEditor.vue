@@ -4,6 +4,13 @@ import { useI18n } from 'vue-i18n'
 import { DEFAULTS } from '../../../core/constants'
 import { GameBlock } from '../../../shared/components/ui'
 
+/**
+ * CodeEditor component - A code editor component with syntax highlighting.
+ */
+defineOptions({
+  name: 'CodeEditor'
+})
+
 const { t } = useI18n()
 
 interface Props {

@@ -4,6 +4,13 @@ import { useI18n } from 'vue-i18n'
 import { useSpriteViewerStore } from '../composables/useSpriteViewerStore'
 import { GameBlock } from '../../../shared/components/ui'
 
+/**
+ * SpriteGrid component - Displays the sprite grid with color visualization.
+ */
+defineOptions({
+  name: 'SpriteGrid'
+})
+
 const { t } = useI18n()
 const store = useSpriteViewerStore()
 

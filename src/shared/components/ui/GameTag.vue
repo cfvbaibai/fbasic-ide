@@ -2,6 +2,20 @@
 import { computed } from 'vue'
 import GameIcon from './GameIcon.vue'
 
+/**
+ * GameTag component - A tag/badge component with type variants, sizes, and effects.
+ * 
+ * @example
+ * ```vue
+ * <GameTag type="success" size="medium" effect="light" icon="mdi:check" :closable="true">
+ *   Tag Label
+ * </GameTag>
+ * ```
+ */
+defineOptions({
+  name: 'GameTag'
+})
+
 interface Props {
   type?: 'success' | 'warning' | 'danger' | 'info' | 'default'
   size?: 'small' | 'medium' | 'large'

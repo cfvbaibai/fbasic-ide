@@ -4,6 +4,14 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { GameLayout, HeroSection, GameSection, GameCard, GameBlock } from '../../shared/components/ui'
 
+/**
+ * HomePage component - The home/landing page of the application.
+ * Displays feature cards and navigation to different sections.
+ */
+defineOptions({
+  name: 'HomePage'
+})
+
 const router = useRouter()
 const { t } = useI18n()
 

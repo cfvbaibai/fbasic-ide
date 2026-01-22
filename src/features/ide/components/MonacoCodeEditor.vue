@@ -7,6 +7,13 @@ import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
 import * as monaco from 'monaco-editor';
 import { setupMonacoLanguage, setupLiveErrorChecking } from '../integrations/monaco-integration';
 
+/**
+ * MonacoCodeEditor component - Monaco Editor integration for F-BASIC code editing.
+ */
+defineOptions({
+  name: 'MonacoCodeEditor'
+})
+
 interface Props {
   modelValue: string;
 }

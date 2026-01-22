@@ -7,12 +7,28 @@ import GameSelect from './ui/GameSelect.vue'
 import { useSkin } from '../composables/useSkin'
 import { useLocale } from '../composables/useLocale'
 
+/**
+ * GameNavigation component - Main navigation component with route navigation, skin switcher, and locale switcher.
+ * 
+ * @example
+ * ```vue
+ * <GameNavigation />
+ * ```
+ */
+defineOptions({
+  name: 'GameNavigation'
+})
+
 const { t } = useI18n()
 const { currentSkin, setSkin, availableSkins } = useSkin()
 const { currentLocale, setLocale, availableLocales } = useLocale()
 
 const route = useRoute()
 const router = useRouter()
+
+// Typed route metadata from vue-best-practices skill
+// route.meta properties (title, icon, showInNav, requiresAuth) are now fully typed
+// with IDE autocomplete support
 
 interface NavItem {
   name: string

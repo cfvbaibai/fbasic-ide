@@ -4,6 +4,13 @@ import { useI18n } from 'vue-i18n'
 import { GameLayout, GameBlock } from '../../shared/components/ui'
 import { GameButton, GameButtonGroup, GameUpload, GameCodeQuote } from '../../shared/components/ui'
 
+/**
+ * ImageAnalyzerPage component - Page for analyzing images and generating sprite arrays.
+ */
+defineOptions({
+  name: 'ImageAnalyzerPage'
+})
+
 const { t } = useI18n()
 
 const imageFile = ref<File | null>(null)
@@ -342,16 +349,16 @@ const generateArray = async () => {
         <template #right>
           <div class="grid-controls">
             <GameButtonGroup>
-              <GameButton size="small" icon="mdi:plus" @click="increaseCellSize" :title="t('imageAnalyzer.grid.increaseCellSize')" />
-              <GameButton size="small" icon="mdi:minus" @click="decreaseCellSize" :title="t('imageAnalyzer.grid.decreaseCellSize')" />
+              <GameButton size="small" icon="mdi:plus" @click="increaseCellSize" />
+              <GameButton size="small" icon="mdi:minus" @click="decreaseCellSize" />
             </GameButtonGroup>
             <GameButtonGroup>
-              <GameButton size="small" icon="mdi:chevron-up" @click="moveGridUp" :title="t('imageAnalyzer.grid.moveUp')" />
-              <GameButton size="small" icon="mdi:chevron-down" @click="moveGridDown" :title="t('imageAnalyzer.grid.moveDown')" />
-              <GameButton size="small" icon="mdi:chevron-left" @click="moveGridLeft" :title="t('imageAnalyzer.grid.moveLeft')" />
-              <GameButton size="small" icon="mdi:chevron-right" @click="moveGridRight" :title="t('imageAnalyzer.grid.moveRight')" />
+              <GameButton size="small" icon="mdi:chevron-up" @click="moveGridUp" />
+              <GameButton size="small" icon="mdi:chevron-down" @click="moveGridDown" />
+              <GameButton size="small" icon="mdi:chevron-left" @click="moveGridLeft" />
+              <GameButton size="small" icon="mdi:chevron-right" @click="moveGridRight" />
             </GameButtonGroup>
-            <GameButton size="small" @click="generateArray" :title="t('imageAnalyzer.grid.generateArray')">
+            <GameButton size="small" @click="generateArray">
               G
             </GameButton>
           </div>

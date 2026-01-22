@@ -8,6 +8,14 @@ import ColorPaletteDisplay from './components/ColorPaletteDisplay.vue'
 import PaletteCombinations from './components/PaletteCombinations.vue'
 import DefStatements from './components/DefStatements.vue'
 
+/**
+ * CharacterSpriteViewerPage component - Main page for viewing and editing character sprites.
+ * Provides sprite selection, grid display, palette management, and DEF SPRITE statement generation.
+ */
+defineOptions({
+  name: 'CharacterSpriteViewerPage'
+})
+
 const { t } = useI18n()
 
 // Provide the store to all child components

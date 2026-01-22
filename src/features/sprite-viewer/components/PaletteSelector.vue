@@ -4,6 +4,13 @@ import { useSpriteViewerStore } from '../composables/useSpriteViewerStore'
 import ColorBox from './ColorBox.vue'
 import { GameButton, GameButtonGroup } from '../../../shared/components/ui'
 
+/**
+ * PaletteSelector component - Selector for choosing sprite palette codes.
+ */
+defineOptions({
+  name: 'PaletteSelector'
+})
+
 const { t } = useI18n()
 const store = useSpriteViewerStore()
 </script>

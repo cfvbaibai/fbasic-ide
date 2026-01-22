@@ -29,6 +29,13 @@ import { useI18n } from 'vue-i18n';
 import MonacoCodeEditor from '../ide/components/MonacoCodeEditor.vue';
 import { GameLayout, GameDivider, GameBlock, GameCodeQuote } from '../../shared/components/ui';
 
+/**
+ * MonacoEditorPage component - Page showcasing Monaco Editor for F-BASIC code editing.
+ */
+defineOptions({
+  name: 'MonacoEditorPage'
+})
+
 const { t } = useI18n();
 
 const code = ref(`10 PRINT "Hello, World!"

@@ -1,8 +1,33 @@
 <script setup lang="ts">
 import { computed, provide, ref } from 'vue'
+import {
+  ActiveTabKey,
+  SetActiveTabKey,
+  TabsTypeKey,
+  RegisterTabKey,
+  UnregisterTabKey
+} from './game-tabs-keys'
+
+/**
+ * GameTabs component - A tabbed interface component with type-safe provide/inject.
+ * 
+ * @example
+ * ```vue
+ * <GameTabs v-model="activeTab" type="border-card">
+ *   <GameTabPane name="tab1" label="Tab 1">
+ *     Content for tab 1
+ *   </GameTabPane>
+ * </GameTabs>
+ * ```
+ */
+defineOptions({
+  name: 'GameTabs'
+})
 
 interface Props {
+  /** The currently active tab name */
   modelValue: string
+  /** Tab style variant */
   type?: 'default' | 'border-card'
 }
 
@@ -39,14 +64,16 @@ const unregisterTab = (name: string) => {
   }
 }
 
-// Provide to children
-provide('activeTab', activeTab)
-provide('setActiveTab', (name: string) => {
+const setActiveTab = (name: string) => {
   activeTab.value = name
-})
-provide('tabsType', props.type)
-provide('registerTab', registerTab)
-provide('unregisterTab', unregisterTab)
+}
+
+// Provide to children with type-safe injection keys
+provide(ActiveTabKey, activeTab)
+provide(SetActiveTabKey, setActiveTab)
+provide(TabsTypeKey, props.type)
+provide(RegisterTabKey, registerTab)
+provide(UnregisterTabKey, unregisterTab)
 </script>
 
 <template>

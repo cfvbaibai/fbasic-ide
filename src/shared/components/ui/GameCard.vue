@@ -2,6 +2,24 @@
 import GameIcon from './GameIcon.vue'
 import GameBlock from './GameBlock.vue'
 
+/**
+ * GameCard component - A card component with icon, title, description, and action.
+ * 
+ * @example
+ * ```vue
+ * <GameCard
+ *   title="Card Title"
+ *   description="Card description"
+ *   icon="mdi:play"
+ *   action-text="Click me"
+ *   @click="handleClick"
+ * />
+ * ```
+ */
+defineOptions({
+  name: 'GameCard'
+})
+
 interface Props {
   title: string
   description?: string

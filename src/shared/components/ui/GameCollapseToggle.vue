@@ -1,6 +1,22 @@
 <script setup lang="ts">
 import GameIcon from './GameIcon.vue'
 
+/**
+ * GameCollapseToggle component - A toggle button for collapsing/expanding content.
+ * 
+ * @example
+ * ```vue
+ * <GameCollapseToggle
+ *   :expanded="isExpanded"
+ *   size="small"
+ *   @toggle="handleToggle"
+ * />
+ * ```
+ */
+defineOptions({
+  name: 'GameCollapseToggle'
+})
+
 interface Props {
   expanded?: boolean
   size?: 'small' | 'medium' | 'large'

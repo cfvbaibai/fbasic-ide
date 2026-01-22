@@ -2,6 +2,20 @@
 import { computed } from 'vue'
 import GameIcon from './GameIcon.vue'
 
+/**
+ * GameButton component - A styled button component with multiple variants, sizes, and states.
+ * 
+ * @example
+ * ```vue
+ * <GameButton type="primary" size="medium" icon="mdi:play" @click="handleClick">
+ *   Click Me
+ * </GameButton>
+ * ```
+ */
+defineOptions({
+  name: 'GameButton'
+})
+
 interface Props {
   type?: 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'default'
   size?: 'small' | 'medium' | 'large'

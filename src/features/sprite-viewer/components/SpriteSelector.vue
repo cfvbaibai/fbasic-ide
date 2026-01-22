@@ -5,6 +5,13 @@ import { CHARACTER_SPRITES } from '../../../shared/data/sprites'
 import { useSpriteViewerStore } from '../composables/useSpriteViewerStore'
 import { GameSelect } from '../../../shared/components/ui'
 
+/**
+ * SpriteSelector component - Dropdown selector for choosing character sprites.
+ */
+defineOptions({
+  name: 'SpriteSelector'
+})
+
 const { t } = useI18n()
 
 const store = useSpriteViewerStore()
@@ -21,7 +28,6 @@ const selectOptions = computed(() => {
   <div class="control-group">
     <label for="sprite-selection">{{ t('spriteViewer.controls.spriteSelection') }}</label>
     <GameSelect
-      id="sprite-selection"
       :model-value="store.selectedIndex.value"
       @update:model-value="store.setSelectedIndex(Number($event))"
       :options="selectOptions"

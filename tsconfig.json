@@ -19,5 +19,9 @@
     },
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "strict": true
+  },
+  "vueCompilerOptions": {
+    "strictTemplates": true,
+    "target": 3
   }
 }

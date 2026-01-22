@@ -1,6 +1,26 @@
 <script setup lang="ts">
 import GameIcon from './GameIcon.vue'
 
+/**
+ * GameBlock component - A block/section component with title, icon, and clickable options.
+ * 
+ * @example
+ * ```vue
+ * <GameBlock
+ *   title="Block Title"
+ *   title-icon="mdi:play"
+ *   :clickable="true"
+ *   :float-on-hover="true"
+ *   @click="handleClick"
+ * >
+ *   Block content
+ * </GameBlock>
+ * ```
+ */
+defineOptions({
+  name: 'GameBlock'
+})
+
 interface Props {
   title: string
   titleIcon?: string // Icon name in format "prefix:name" (e.g., "mdi:play")

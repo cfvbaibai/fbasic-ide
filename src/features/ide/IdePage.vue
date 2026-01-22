@@ -9,6 +9,14 @@ import { GameLayout, GameButton, GameButtonGroup, GameBlock } from '../../shared
 import { useBasicIde as useBasicIdeEnhanced } from './composables/useBasicIdeEnhanced'
 import type { ParserInfo, HighlighterInfo } from '../../core/interfaces'
 
+/**
+ * IdePage component - The main IDE page for F-BASIC code editing and execution.
+ * Provides code editor, runtime output, controls, and joystick interface.
+ */
+defineOptions({
+  name: 'IdePage'
+})
+
 const { t } = useI18n()
 
 // Use the enhanced AST-based parser system

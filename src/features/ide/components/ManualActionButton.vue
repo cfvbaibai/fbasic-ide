@@ -12,6 +12,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
+/**
+ * ManualActionButton component - Action button component for Nintendo controller (Select, Start, A, B).
+ */
+defineOptions({
+  name: 'ManualActionButton'
+})
+
 interface Props {
   button: 'select' | 'start' | 'a' | 'b'
   active?: boolean

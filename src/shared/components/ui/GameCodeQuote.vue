@@ -4,6 +4,22 @@ import { useI18n } from 'vue-i18n'
 import GameIconButton from './GameIconButton.vue'
 import { message } from '../../utils/message'
 
+/**
+ * GameCodeQuote component - A code block component with copy functionality.
+ * 
+ * @example
+ * ```vue
+ * <GameCodeQuote
+ *   code="const x = 1;"
+ *   language="javascript"
+ *   :show-copy-button="true"
+ * />
+ * ```
+ */
+defineOptions({
+  name: 'GameCodeQuote'
+})
+
 const { t } = useI18n()
 
 interface Props {

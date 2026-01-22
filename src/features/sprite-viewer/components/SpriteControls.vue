@@ -5,6 +5,13 @@ import DisplayOptions from './DisplayOptions.vue'
 import PaletteSelector from './PaletteSelector.vue'
 import { GameBlock } from '../../../shared/components/ui'
 
+/**
+ * SpriteControls component - Container for sprite viewer controls (selector, display options, palette).
+ */
+defineOptions({
+  name: 'SpriteControls'
+})
+
 const { t } = useI18n()
 </script>
 

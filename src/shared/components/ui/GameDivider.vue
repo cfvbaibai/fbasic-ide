@@ -1,6 +1,22 @@
 <script setup lang="ts">
+/**
+ * GameDivider component - A divider component for separating content sections.
+ * 
+ * @example
+ * ```vue
+ * <GameDivider direction="horizontal" content-position="center">
+ *   Divider Text
+ * </GameDivider>
+ * ```
+ */
+defineOptions({
+  name: 'GameDivider'
+})
+
 interface Props {
+  /** Divider direction */
   direction?: 'horizontal' | 'vertical'
+  /** Position of content text when provided */
   contentPosition?: 'left' | 'center' | 'right'
 }
 

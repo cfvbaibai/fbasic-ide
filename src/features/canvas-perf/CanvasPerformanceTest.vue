@@ -4,6 +4,13 @@ import { useI18n } from 'vue-i18n'
 import { GameLayout, GameButton } from '@/shared/components/ui'
 import { renderScreenBuffer, type ScreenCell } from '@/features/ide/composables/canvasRenderer'
 
+/**
+ * CanvasPerformanceTest component - Performance testing component for canvas rendering.
+ */
+defineOptions({
+  name: 'CanvasPerformanceTest'
+})
+
 const { t } = useI18n()
 
 // Canvas reference

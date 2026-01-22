@@ -2,6 +2,13 @@
 import { computed } from 'vue'
 import { COLORS } from '../../../shared/data/palette'
 
+/**
+ * ColorBox component - Displays a color box with optional hex code.
+ */
+defineOptions({
+  name: 'ColorBox'
+})
+
 interface Props {
   colorCode: number
   showHex?: boolean

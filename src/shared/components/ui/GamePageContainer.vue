@@ -1,4 +1,18 @@
 <script setup lang="ts">
+/**
+ * GamePageContainer component - Container component for page content.
+ * Provides consistent page background and layout structure.
+ * 
+ * @example
+ * ```vue
+ * <GamePageContainer>
+ *   Page content here
+ * </GamePageContainer>
+ * ```
+ */
+defineOptions({
+  name: 'GamePageContainer'
+})
 </script>
 
 <template>

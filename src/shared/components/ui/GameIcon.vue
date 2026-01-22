@@ -2,6 +2,18 @@
 import { computed } from 'vue'
 import { Icon } from '@iconify/vue'
 
+/**
+ * GameIcon component - An icon component using Iconify with size, color, and animation options.
+ * 
+ * @example
+ * ```vue
+ * <GameIcon icon="mdi:play" size="medium" color="#fff" :rotate="true" />
+ * ```
+ */
+defineOptions({
+  name: 'GameIcon'
+})
+
 interface Props {
   icon?: string // Icon name in format "prefix:name" (e.g., "mdi:play")
   size?: 'small' | 'medium' | 'large' | number

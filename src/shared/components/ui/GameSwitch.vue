@@ -1,6 +1,22 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
+/**
+ * GameSwitch component - A toggle switch component with size variants.
+ * 
+ * @example
+ * ```vue
+ * <GameSwitch
+ *   v-model="enabled"
+ *   :disabled="false"
+ *   size="medium"
+ * />
+ * ```
+ */
+defineOptions({
+  name: 'GameSwitch'
+})
+
 interface Props {
   modelValue: boolean | string | number
   disabled?: boolean

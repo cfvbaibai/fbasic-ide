@@ -5,6 +5,13 @@ import { SPRITE_PALETTES, BACKGROUND_PALETTES } from '../../../shared/data/palet
 import ColorBox from './ColorBox.vue'
 import { GameBlock } from '../../../shared/components/ui'
 
+/**
+ * PaletteCombinations component - Displays sprite and background palette combinations.
+ */
+defineOptions({
+  name: 'PaletteCombinations'
+})
+
 const { t } = useI18n()
 
 const getSpritePaletteTitle = (index: number) => {

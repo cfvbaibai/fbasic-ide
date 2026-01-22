@@ -1,6 +1,24 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
+/**
+ * GameTextarea component - A styled textarea component with size variants and resize options.
+ * 
+ * @example
+ * ```vue
+ * <GameTextarea
+ *   v-model="text"
+ *   placeholder="Enter text"
+ *   :rows="5"
+ *   resize="vertical"
+ *   @focus="handleFocus"
+ * />
+ * ```
+ */
+defineOptions({
+  name: 'GameTextarea'
+})
+
 interface Props {
   modelValue: string
   placeholder?: string
@@ -31,6 +49,19 @@ const textareaValue = computed({
   set: (value: string) => emit('update:modelValue', value)
 })
 
+const handleInput = (event: Event) => {
+  const target = event.target as HTMLTextAreaElement
+  textareaValue.value = target.value
+}
+
+const handleFocus = (event: FocusEvent) => {
+  emit('focus', event)
+}
+
+const handleBlur = (event: FocusEvent) => {
+  emit('blur', event)
+}
+
 const textareaClasses = computed(() => {
   return {
     'game-textarea': true,
@@ -49,9 +80,9 @@ const textareaClasses = computed(() => {
     :readonly="readonly"
     :rows="rows"
     :style="{ resize }"
-    @input="textareaValue = ($event.target as HTMLTextAreaElement).value"
-    @focus="emit('focus', $event)"
-    @blur="emit('blur', $event)"
+    @input="handleInput"
+    @focus="handleFocus"
+    @blur="handleBlur"
     class="game-textarea-inner bg-game-surface border-game-surface"
   />
 </template>

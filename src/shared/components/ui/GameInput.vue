@@ -1,6 +1,24 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
+/**
+ * GameInput component - A styled input field with validation, clearable option, and size variants.
+ * 
+ * @example
+ * ```vue
+ * <GameInput
+ *   v-model="value"
+ *   type="text"
+ *   placeholder="Enter text"
+ *   :clearable="true"
+ *   @focus="handleFocus"
+ * />
+ * ```
+ */
+defineOptions({
+  name: 'GameInput'
+})
+
 interface Props {
   modelValue: string | number
   type?: 'text' | 'number' | 'password' | 'email' | 'url' | 'search'
@@ -44,6 +62,14 @@ const handleClear = () => {
   emit('clear')
 }
 
+const handleFocus = (event: FocusEvent) => {
+  emit('focus', event)
+}
+
+const handleBlur = (event: FocusEvent) => {
+  emit('blur', event)
+}
+
 const inputClasses = computed(() => {
   return {
     'game-input': true,
@@ -62,8 +88,8 @@ const inputClasses = computed(() => {
       :placeholder="placeholder"
       :disabled="disabled"
       @input="handleInput"
-      @focus="emit('focus', $event)"
-      @blur="emit('blur', $event)"
+      @focus="handleFocus"
+      @blur="handleBlur"
       class="game-input-inner bg-game-surface border-game-surface"
     />
     <button

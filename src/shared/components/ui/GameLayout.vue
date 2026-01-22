@@ -4,6 +4,21 @@ import GamePageContainer from './GamePageContainer.vue'
 import GameNavigation from '../GameNavigation.vue'
 import GameIcon from './GameIcon.vue'
 
+/**
+ * GameLayout component - Main layout component with navigation, header, and content areas.
+ * 
+ * @example
+ * ```vue
+ * <GameLayout title="Page Title" icon="mdi:home">
+ *   <template #action>Action Button</template>
+ *   Content here
+ * </GameLayout>
+ * ```
+ */
+defineOptions({
+  name: 'GameLayout'
+})
+
 interface Props {
   title?: string
   icon?: string // Icon name in format "prefix:name" (e.g., "mdi:monitor")

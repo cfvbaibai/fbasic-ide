@@ -44,6 +44,13 @@
 import Dpad from './Dpad.vue'
 import ManualActionButton from './ManualActionButton.vue'
 
+/**
+ * NintendoController component - Full Nintendo controller component with D-pad and action buttons.
+ */
+defineOptions({
+  name: 'NintendoController'
+})
+
 interface Props {
   joystickId: number
   heldButtons: Record<string, boolean>

@@ -1,5 +1,20 @@
 <script setup lang="ts">
+/**
+ * GameSubBlock component - A sub-block component with title for nested content sections.
+ * 
+ * @example
+ * ```vue
+ * <GameSubBlock title="Sub Section">
+ *   Sub content here
+ * </GameSubBlock>
+ * ```
+ */
+defineOptions({
+  name: 'GameSubBlock'
+})
+
 interface Props {
+  /** Title for the sub-block */
   title: string
 }
 

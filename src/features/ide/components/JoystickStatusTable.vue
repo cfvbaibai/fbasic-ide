@@ -34,6 +34,13 @@
 import { useI18n } from 'vue-i18n'
 import { GameTable, GameSubBlock } from '../../../shared/components/ui'
 
+/**
+ * JoystickStatusTable component - Displays joystick status in a table format.
+ */
+defineOptions({
+  name: 'JoystickStatusTable'
+})
+
 const { t } = useI18n()
 
 interface Column {

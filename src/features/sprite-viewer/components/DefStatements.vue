@@ -4,6 +4,13 @@ import { useSpriteViewerStore } from '../composables/useSpriteViewerStore'
 import { GameCodeQuote, GameBlock, GameButton } from '../../../shared/components/ui'
 import { message } from '../../../shared/utils/message'
 
+/**
+ * DefStatements component - Displays and allows copying of DEF SPRITE and DEF MOVE statements.
+ */
+defineOptions({
+  name: 'DefStatements'
+})
+
 const { t } = useI18n()
 
 const store = useSpriteViewerStore()

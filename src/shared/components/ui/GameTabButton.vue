@@ -1,11 +1,34 @@
 <script setup lang="ts">
-import { computed, inject } from 'vue'
+import { computed } from 'vue'
+import type { ComputedRef } from 'vue'
 import GameIcon from './GameIcon.vue'
+import {
+  ActiveTabKey,
+  SetActiveTabKey,
+  injectStrict
+} from './game-tabs-keys'
+
+/**
+ * GameTabButton component - A button for tab navigation.
+ * Must be used within a GameTabs component.
+ * 
+ * @example
+ * ```vue
+ * <GameTabButton name="tab1" label="Tab 1" icon="mdi:home" />
+ * ```
+ */
+defineOptions({
+  name: 'GameTabButton'
+})
 
 interface Props {
+  /** Unique identifier for this tab */
   name: string
+  /** Display label for the tab button */
   label?: string
+  /** Icon to display (from iconify) */
   icon?: any
+  /** Whether the tab button is disabled */
   disabled?: boolean
 }
 
@@ -15,8 +38,9 @@ const props = withDefaults(defineProps<Props>(), {
   disabled: false
 })
 
-const activeTab = inject<{ value: string }>('activeTab', { value: '' })
-const setActiveTab = inject<(name: string) => void>('setActiveTab', () => {})
+// Type-safe injection with runtime error handling
+const activeTab = injectStrict(ActiveTabKey) as ComputedRef<string>
+const setActiveTab = injectStrict(SetActiveTabKey)
 
 const isActive = computed(() => activeTab.value === props.name)
 

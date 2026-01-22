@@ -4,6 +4,23 @@ import { useI18n } from 'vue-i18n'
 import GameButton from './GameButton.vue'
 import GameIcon from './GameIcon.vue'
 
+/**
+ * GameUpload component - A file upload component with drag-and-drop support.
+ * 
+ * @example
+ * ```vue
+ * <GameUpload
+ *   accept=".txt,.json"
+ *   :multiple="false"
+ *   :drag="true"
+ *   @change="handleFileChange"
+ * />
+ * ```
+ */
+defineOptions({
+  name: 'GameUpload'
+})
+
 const { t } = useI18n()
 
 interface Props {
