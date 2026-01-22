@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { useSpriteViewerStore } from '../composables/useSpriteViewerStore'
 import { GameSwitch } from '../../../shared/components/ui'
 
+const { t } = useI18n()
 const store = useSpriteViewerStore()
 
 const updateShowValues = (value: boolean | string | number) => {
@@ -24,7 +26,7 @@ const updateReverseY = (value: boolean | string | number) => {
 <template>
   <div class="switches-container">
     <div class="control-group">
-      <label for="show-values">Show Value Numbers:</label>
+      <label for="show-values">{{ t('spriteViewer.displayOptions.showValues') }}</label>
       <GameSwitch
         id="show-values"
         :model-value="store.displayOptions.value.showValues"
@@ -32,7 +34,7 @@ const updateReverseY = (value: boolean | string | number) => {
       />
     </div>
     <div class="control-group">
-      <label for="show-grid-lines">Show Grid Lines:</label>
+      <label for="show-grid-lines">{{ t('spriteViewer.displayOptions.showGridLines') }}</label>
       <GameSwitch
         id="show-grid-lines"
         :model-value="store.displayOptions.value.showGridLines"
@@ -40,7 +42,7 @@ const updateReverseY = (value: boolean | string | number) => {
       />
     </div>
     <div class="control-group">
-      <label for="reverse-x">Reverse X (Horizontal):</label>
+      <label for="reverse-x">{{ t('spriteViewer.displayOptions.reverseX') }}</label>
       <GameSwitch
         id="reverse-x"
         :model-value="store.displayOptions.value.reverseX"
@@ -48,7 +50,7 @@ const updateReverseY = (value: boolean | string | number) => {
       />
     </div>
     <div class="control-group">
-      <label for="reverse-y">Reverse Y (Vertical):</label>
+      <label for="reverse-y">{{ t('spriteViewer.displayOptions.reverseY') }}</label>
       <GameSwitch
         id="reverse-y"
         :model-value="store.displayOptions.value.reverseY"

@@ -1,5 +1,36 @@
 {
   "title": "角色精灵查看器",
+  "controls": {
+    "title": "控制",
+    "spriteSelection": "精灵选择:",
+    "placeholder": "选择精灵",
+    "paletteCode": "调色板代码:",
+    "colorCombination": "颜色组合:"
+  },
+  "displayOptions": {
+    "showValues": "显示数值:",
+    "showGridLines": "显示网格线:",
+    "reverseX": "反转 X（水平）:",
+    "reverseY": "反转 Y（垂直）:"
+  },
+  "spriteGrid": {
+    "title": "精灵",
+    "titleWithSize": "{name} - {width}×{height} 精灵",
+    "cellTooltip": "行 {row}，列 {col}: 值 {value}"
+  },
+  "colorPalette": {
+    "title": "64 色调色板（4×16 网格）"
+  },
+  "defStatements": {
+    "title": "DEF 语句",
+    "copyAll": "全部复制",
+    "defSprite": "DEF SPRITE",
+    "defMove": "DEF MOVE",
+    "copyAllSuccess": "所有语句已复制到剪贴板！",
+    "copyError": "复制到剪贴板失败",
+    "defSpriteCopySuccess": "DEF SPRITE 语句已复制到剪贴板！",
+    "defMoveCopySuccess": "DEF MOVE 语句已复制到剪贴板！"
+  },
   "palettes": {
     "sprite": "精灵调色板",
     "background": "背景调色板",

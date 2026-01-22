@@ -1,4 +1,9 @@
 {
+  "title": "Family Basic IDE",
+  "codeEditor": {
+    "title": "コードエディター",
+    "placeholder": "Family Basicコードをここに入力..."
+  },
   "controls": {
     "run": "実行",
     "stop": "停止",
@@ -11,6 +16,24 @@
     "screen": "画面",
     "stdout": "標準出力",
     "variables": "変数",
-    "debug": "デバッグ"
+    "debug": "デバッグ",
+    "errorLine": "行 {line}"
+  },
+  "samples": {
+    "basic": "基本",
+    "pause": "一時停止デモ",
+    "gaming": "ジョイスティックテスト",
+    "complex": "複雑",
+    "comprehensive": "完全デモ"
+  },
+  "joystick": {
+    "control": "ジョイスティック制御",
+    "status": "ジョイスティック状態",
+    "joystick": "ジョイスティック{id}",
+    "columns": {
+      "id": "ID",
+      "stick": "STICK",
+      "strig": "STRIG"
+    }
   }
 }

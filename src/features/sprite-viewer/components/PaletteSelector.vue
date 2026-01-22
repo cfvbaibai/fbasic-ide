@@ -1,14 +1,16 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { useSpriteViewerStore } from '../composables/useSpriteViewerStore'
 import ColorBox from './ColorBox.vue'
 import { GameButton, GameButtonGroup } from '../../../shared/components/ui'
 
+const { t } = useI18n()
 const store = useSpriteViewerStore()
 </script>
 
 <template>
   <div class="control-group" v-if="store.selectedSprite.value">
-    <label for="palette-code">Palette Code:</label>
+    <label for="palette-code">{{ t('spriteViewer.controls.paletteCode') }}</label>
     <GameButtonGroup>
       <GameButton
         v-for="paletteIdx in 3"
@@ -20,7 +22,7 @@ const store = useSpriteViewerStore()
         {{ paletteIdx - 1 }}
       </GameButton>
     </GameButtonGroup>
-    <label for="color-combination">Color Combination:</label>
+    <label for="color-combination">{{ t('spriteViewer.controls.colorCombination') }}</label>
     <GameButtonGroup>
       <GameButton
         v-for="combIdx in 4"

@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { GameLayout, GameBlock } from '../../shared/components/ui'
 import { GameButton, GameButtonGroup, GameUpload, GameCodeQuote } from '../../shared/components/ui'
+
+const { t } = useI18n()
 
 const imageFile = ref<File | null>(null)
 const imageUrl = ref<string>('')
@@ -282,14 +285,14 @@ const generateArray = async () => {
     generatedArray.value = arrayStrings.join('\n\n')
   } catch (error) {
     console.error('Error generating array:', error)
-    generatedArray.value = 'Error generating array'
+    generatedArray.value = t('imageAnalyzer.generated.error')
   }
 }
 </script>
 
 <template>
   <GameLayout
-    title="Image Analyzer"
+    :title="t('imageAnalyzer.title')"
     icon="mdi:magnify"
   >
     <div class="image-analyzer-container">
@@ -301,7 +304,7 @@ const generateArray = async () => {
           @change="handleFileChange"
         >
           <GameButton type="primary" icon="mdi:upload">
-            Upload Image
+            {{ t('imageAnalyzer.buttons.uploadImage') }}
           </GameButton>
         </GameUpload>
 
@@ -313,7 +316,7 @@ const generateArray = async () => {
           @click="analyzeImage"
           class="analyze-button"
         >
-          {{ isAnalyzing ? 'Analyzing...' : 'Analyze' }}
+          {{ isAnalyzing ? t('imageAnalyzer.buttons.analyzing') : t('imageAnalyzer.buttons.analyze') }}
         </GameButton>
       </div>
 
@@ -333,22 +336,22 @@ const generateArray = async () => {
 
       <GameBlock 
         v-if="hasAnalyzed"
-        title="Image with Grid Overlay"
+        :title="t('imageAnalyzer.grid.title')"
         class="grid-overlay-section"
       >
         <template #right>
           <div class="grid-controls">
             <GameButtonGroup>
-              <GameButton size="small" icon="mdi:plus" @click="increaseCellSize" title="Increase cell size" />
-              <GameButton size="small" icon="mdi:minus" @click="decreaseCellSize" title="Decrease cell size" />
+              <GameButton size="small" icon="mdi:plus" @click="increaseCellSize" :title="t('imageAnalyzer.grid.increaseCellSize')" />
+              <GameButton size="small" icon="mdi:minus" @click="decreaseCellSize" :title="t('imageAnalyzer.grid.decreaseCellSize')" />
             </GameButtonGroup>
             <GameButtonGroup>
-              <GameButton size="small" icon="mdi:chevron-up" @click="moveGridUp" title="Move grid up" />
-              <GameButton size="small" icon="mdi:chevron-down" @click="moveGridDown" title="Move grid down" />
-              <GameButton size="small" icon="mdi:chevron-left" @click="moveGridLeft" title="Move grid left" />
-              <GameButton size="small" icon="mdi:chevron-right" @click="moveGridRight" title="Move grid right" />
+              <GameButton size="small" icon="mdi:chevron-up" @click="moveGridUp" :title="t('imageAnalyzer.grid.moveUp')" />
+              <GameButton size="small" icon="mdi:chevron-down" @click="moveGridDown" :title="t('imageAnalyzer.grid.moveDown')" />
+              <GameButton size="small" icon="mdi:chevron-left" @click="moveGridLeft" :title="t('imageAnalyzer.grid.moveLeft')" />
+              <GameButton size="small" icon="mdi:chevron-right" @click="moveGridRight" :title="t('imageAnalyzer.grid.moveRight')" />
             </GameButtonGroup>
-            <GameButton size="small" @click="generateArray" title="Generate 8x8 array">
+            <GameButton size="small" @click="generateArray" :title="t('imageAnalyzer.grid.generateArray')">
               G
             </GameButton>
           </div>
@@ -408,13 +411,13 @@ const generateArray = async () => {
 
       <GameBlock
         v-if="generatedArray && generatedArray.length > 0"
-        title="Generated 8x8 Array"
+        :title="t('imageAnalyzer.generated.title')"
         title-icon="mdi:code-array"
         class="generated-array-block"
       >
         <GameCodeQuote
           :code="generatedArray"
-          copy-success-message="Array code copied to clipboard!"
+          :copy-success-message="t('imageAnalyzer.generated.copySuccess')"
         />
       </GameBlock>
     </div>

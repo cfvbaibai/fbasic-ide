@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { CHARACTER_SPRITES } from '../../../shared/data/sprites'
 import { useSpriteViewerStore } from '../composables/useSpriteViewerStore'
 import { GameSelect } from '../../../shared/components/ui'
+
+const { t } = useI18n()
 
 const store = useSpriteViewerStore()
 
@@ -16,13 +19,13 @@ const selectOptions = computed(() => {
 
 <template>
   <div class="control-group">
-    <label for="sprite-selection">Sprite Selection:</label>
+    <label for="sprite-selection">{{ t('spriteViewer.controls.spriteSelection') }}</label>
     <GameSelect
       id="sprite-selection"
       :model-value="store.selectedIndex.value"
       @update:model-value="store.setSelectedIndex(Number($event))"
       :options="selectOptions"
-      placeholder="Select a sprite"
+      :placeholder="t('spriteViewer.controls.placeholder')"
       style="width: 300px"
     />
   </div>

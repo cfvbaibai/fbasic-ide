@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { DEFAULTS } from '../../../core/constants'
 import { GameBlock } from '../../../shared/components/ui'
+
+const { t } = useI18n()
 
 interface Props {
   modelValue: string
@@ -15,7 +18,7 @@ interface Emits {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  title: 'Code Editor',
+  title: '',
   titleIcon: 'mdi:pencil'
 })
 const emit = defineEmits<Emits>()
@@ -61,7 +64,7 @@ onMounted(() => {
 
 <template>
   <GameBlock 
-    :title="props.title || 'Code Editor'"
+    :title="props.title || t('ide.codeEditor.title')"
     :title-icon="props.titleIcon"
     class="code-editor"
   >
@@ -84,7 +87,7 @@ onMounted(() => {
         @input="handleInput"
         @keydown="handleKeyDown"
         class="code-textarea"
-        placeholder="Enter your Family Basic code here..."
+        :placeholder="t('ide.codeEditor.placeholder')"
         spellcheck="false"
       />
       

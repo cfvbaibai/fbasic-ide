@@ -1,5 +1,36 @@
 {
   "title": "Character Sprite Viewer",
+  "controls": {
+    "title": "Controls",
+    "spriteSelection": "Sprite Selection:",
+    "placeholder": "Select a sprite",
+    "paletteCode": "Palette Code:",
+    "colorCombination": "Color Combination:"
+  },
+  "displayOptions": {
+    "showValues": "Show Value Numbers:",
+    "showGridLines": "Show Grid Lines:",
+    "reverseX": "Reverse X (Horizontal):",
+    "reverseY": "Reverse Y (Vertical):"
+  },
+  "spriteGrid": {
+    "title": "Sprite",
+    "titleWithSize": "{name} - {width}×{height} Sprite",
+    "cellTooltip": "Row {row}, Col {col}: Value {value}"
+  },
+  "colorPalette": {
+    "title": "64 Color Palette (4×16 Grid)"
+  },
+  "defStatements": {
+    "title": "DEF Statements",
+    "copyAll": "Copy All",
+    "defSprite": "DEF SPRITE",
+    "defMove": "DEF MOVE",
+    "copyAllSuccess": "All statements copied to clipboard!",
+    "copyError": "Failed to copy to clipboard",
+    "defSpriteCopySuccess": "DEF SPRITE statement copied to clipboard!",
+    "defMoveCopySuccess": "DEF MOVE statement copied to clipboard!"
+  },
   "palettes": {
     "sprite": "Sprite Palettes",
     "background": "Background Palettes",

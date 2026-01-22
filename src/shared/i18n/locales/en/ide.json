@@ -1,4 +1,9 @@
 {
+  "title": "Family Basic IDE",
+  "codeEditor": {
+    "title": "Code Editor",
+    "placeholder": "Enter your Family Basic code here..."
+  },
   "controls": {
     "run": "Run",
     "stop": "Stop",
@@ -11,6 +16,24 @@
     "screen": "Screen",
     "stdout": "Stdout",
     "variables": "Variables",
-    "debug": "Debug"
+    "debug": "Debug",
+    "errorLine": "Line {line}"
+  },
+  "samples": {
+    "basic": "Basic",
+    "pause": "Pause Demo",
+    "gaming": "Joystick Test",
+    "complex": "Complex",
+    "comprehensive": "Full Demo"
+  },
+  "joystick": {
+    "control": "Joystick Control",
+    "status": "Joystick Status",
+    "joystick": "Joystick {id}",
+    "columns": {
+      "id": "ID",
+      "stick": "STICK",
+      "strig": "STRIG"
+    }
   }
 }

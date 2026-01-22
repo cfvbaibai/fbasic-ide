@@ -3,10 +3,30 @@
     "upload": "Upload File",
     "clear": "Clear",
     "submit": "Submit",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "copy": "Copy",
+    "copyAll": "Copy All"
   },
   "upload": {
     "dragAndDrop": "Drag and drop files here, or",
     "clickToBrowse": "click to browse"
+  },
+  "codeQuote": {
+    "copy": "Copy",
+    "copySuccess": "Code copied to clipboard!",
+    "copyError": "Failed to copy to clipboard",
+    "empty": "No code to display"
+  },
+  "select": {
+    "placeholder": "Please select"
+  },
+  "messages": {
+    "copySuccess": "Copied to clipboard!",
+    "copyError": "Failed to copy to clipboard",
+    "allStatementsCopied": "All statements copied to clipboard!"
+  },
+  "labels": {
+    "yes": "Yes",
+    "no": "No"
   }
 }

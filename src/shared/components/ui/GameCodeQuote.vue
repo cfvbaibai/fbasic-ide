@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import GameIconButton from './GameIconButton.vue'
 import { message } from '../../utils/message'
+
+const { t } = useI18n()
 
 interface Props {
   code: string
@@ -14,8 +17,8 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   language: '',
   showCopyButton: true,
-  copyButtonText: 'Copy',
-  copySuccessMessage: 'Code copied to clipboard!'
+  copyButtonText: '',
+  copySuccessMessage: ''
 })
 
 const isCopying = ref(false)
@@ -26,9 +29,9 @@ const handleCopy = async () => {
   isCopying.value = true
   try {
     await navigator.clipboard.writeText(props.code)
-    message.success(props.copySuccessMessage)
+    message.success(props.copySuccessMessage || t('common.codeQuote.copySuccess'))
   } catch {
-    message.error('Failed to copy to clipboard')
+    message.error(t('common.codeQuote.copyError'))
   } finally {
     // Small delay to prevent rapid clicking
     setTimeout(() => {
@@ -49,13 +52,13 @@ const handleCopy = async () => {
           icon="mdi:content-copy"
           :disabled="!code || isCopying"
           :loading="isCopying"
-          :title="copyButtonText"
+          :title="copyButtonText || t('common.codeQuote.copy')"
           @click="handleCopy"
         />
       </div>
       <pre
         :class="['game-code-quote-code', language ? `language-${language}` : '']"
-      ><code v-if="code">{{ code }}</code><span v-else class="game-code-quote-empty">No code to display</span></pre>
+      ><code v-if="code">{{ code }}</code><span v-else class="game-code-quote-empty">{{ t('common.codeQuote.empty') }}</span></pre>
     </div>
   </div>
 </template>

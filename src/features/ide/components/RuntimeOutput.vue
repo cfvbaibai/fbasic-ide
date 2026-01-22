@@ -115,7 +115,7 @@ watch(() => props.output.length, scrollToBottom)
                   <GameIcon icon="mdi:alert" size="small" />
                   <span class="error-type">{{ error.type }}:</span>
                   <span class="error-message">{{ error.message }}</span>
-                  <span v-if="error.line > 0" class="error-line-number">(Line {{ error.line }})</span>
+                  <span v-if="error.line > 0" class="error-line-number">({{ t('ide.output.errorLine', { line: error.line }) }})</span>
                 </div>
               </div>
             </div>

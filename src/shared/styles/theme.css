@@ -145,6 +145,7 @@
     --game-radius-md: 6px;
     --game-radius-lg: 8px;
     /* Game UI Fonts */
+    /* English (default) */
     --game-font-family: 'Rajdhani', 'Orbitron', system-ui, sans-serif;
     --game-font-family-heading: 'Orbitron', 'Rajdhani', system-ui, sans-serif;
     --game-font-family-mono: 'Courier New', 'Monaco', 'Menlo', monospace;
@@ -156,6 +157,55 @@
     --game-font-weight-semibold: 600;
     --game-font-weight-bold: 700;
     --game-line-height-mono: 1.4;
+}
+
+
+/* Multi-language Font Support */
+
+
+/* FZRuiZhengHei (方正锐正黑) Font Face Declaration */
+
+
+/* Note: Font files should be placed in public/fonts/ directory */
+
+@font-face {
+    font-family: 'FZRuiZhengHei';
+    src: url('/fonts/FZRuiZhengHei.woff2') format('woff2'), url('/fonts/FZRuiZhengHei.woff') format('woff'), url('/fonts/FZRuiZhengHei.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FZRuiZhengHei';
+    src: url('/fonts/FZRuiZhengHei-Bold.woff2') format('woff2'), url('/fonts/FZRuiZhengHei-Bold.woff') format('woff'), url('/fonts/FZRuiZhengHei-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+
+/* Japanese */
+
+:lang(ja) {
+    --game-font-family: 'Noto Sans JP', 'Rajdhani', 'Orbitron', system-ui, sans-serif;
+    --game-font-family-heading: 'Noto Sans JP', 'Orbitron', 'Rajdhani', system-ui, sans-serif;
+}
+
+
+/* Simplified Chinese - Using FZRuiZhengHei (方正锐正黑) */
+
+:lang(zh-CN) {
+    --game-font-family: 'FZRuiZhengHei', 'Noto Sans SC', 'Rajdhani', 'Orbitron', system-ui, sans-serif;
+    --game-font-family-heading: 'FZRuiZhengHei', 'Noto Sans SC', 'Orbitron', 'Rajdhani', system-ui, sans-serif;
+}
+
+
+/* Traditional Chinese - Using FZRuiZhengHei (方正锐正黑) */
+
+:lang(zh-TW) {
+    --game-font-family: 'FZRuiZhengHei', 'Noto Sans TC', 'Rajdhani', 'Orbitron', system-ui, sans-serif;
+    --game-font-family-heading: 'FZRuiZhengHei', 'Noto Sans TC', 'Orbitron', 'Rajdhani', system-ui, sans-serif;
 }
 
 

@@ -1,0 +1,17 @@
+{
+  "title": "Canvas 效能測試",
+  "buttons": {
+    "startTest": "開始測試",
+    "stopTest": "停止測試",
+    "clearScreen": "清除螢幕"
+  },
+  "labels": {
+    "charsPerFrame": "每幀字元數:",
+    "fps": "FPS:",
+    "frameTime": "幀時間:",
+    "charsRendered": "已渲染字元數:",
+    "charsPerSec": "字元/秒:",
+    "charsPerFrame": "字元/幀:",
+    "testRunning": "測試執行中:"
+  }
+}

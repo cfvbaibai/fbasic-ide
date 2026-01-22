@@ -1,4 +1,9 @@
 {
+  "title": "Family Basic IDE",
+  "codeEditor": {
+    "title": "程式碼編輯器",
+    "placeholder": "在此輸入您的 Family Basic 程式碼..."
+  },
   "controls": {
     "run": "執行",
     "stop": "停止",
@@ -11,6 +16,24 @@
     "screen": "螢幕",
     "stdout": "標準輸出",
     "variables": "變數",
-    "debug": "除錯"
+    "debug": "除錯",
+    "errorLine": "第 {line} 行"
+  },
+  "samples": {
+    "basic": "基礎",
+    "pause": "暫停示範",
+    "gaming": "搖桿測試",
+    "complex": "複雜",
+    "comprehensive": "完整示範"
+  },
+  "joystick": {
+    "control": "搖桿控制",
+    "status": "搖桿狀態",
+    "joystick": "搖桿 {id}",
+    "columns": {
+      "id": "ID",
+      "stick": "STICK",
+      "strig": "STRIG"
+    }
   }
 }

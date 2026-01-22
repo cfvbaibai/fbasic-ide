@@ -1,15 +1,21 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useSpriteViewerStore } from '../composables/useSpriteViewerStore'
 import { GameBlock } from '../../../shared/components/ui'
 
+const { t } = useI18n()
 const store = useSpriteViewerStore()
 
 const title = computed(() => {
   if (store.selectedSprite.value) {
-    return `${store.selectedSprite.value.name} - ${store.spriteSize.value.width}×${store.spriteSize.value.height} Sprite`
+    return t('spriteViewer.spriteGrid.titleWithSize', {
+      name: store.selectedSprite.value.name,
+      width: store.spriteSize.value.width,
+      height: store.spriteSize.value.height
+    })
   }
-  return 'Sprite'
+  return t('spriteViewer.spriteGrid.title')
 })
 </script>
 
@@ -36,7 +42,7 @@ const title = computed(() => {
           :style="{
             backgroundColor: store.getCellColor(value)
           }"
-          :title="`Row ${rowIndex}, Col ${colIndex}: Value ${value}`"
+          :title="t('spriteViewer.spriteGrid.cellTooltip', { row: rowIndex, col: colIndex, value })"
         >
           <span v-if="store.displayOptions.value.showValues" class="cell-value">{{ value }}</span>
         </div>

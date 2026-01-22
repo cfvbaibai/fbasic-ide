@@ -1,4 +1,9 @@
 {
+  "title": "Family Basic IDE",
+  "codeEditor": {
+    "title": "代码编辑器",
+    "placeholder": "在此输入您的 Family Basic 代码..."
+  },
   "controls": {
     "run": "运行",
     "stop": "停止",
@@ -11,6 +16,24 @@
     "screen": "屏幕",
     "stdout": "标准输出",
     "variables": "变量",
-    "debug": "调试"
+    "debug": "调试",
+    "errorLine": "第 {line} 行"
+  },
+  "samples": {
+    "basic": "基础",
+    "pause": "暂停演示",
+    "gaming": "手柄测试",
+    "complex": "复杂",
+    "comprehensive": "完整演示"
+  },
+  "joystick": {
+    "control": "手柄控制",
+    "status": "手柄状态",
+    "joystick": "手柄 {id}",
+    "columns": {
+      "id": "ID",
+      "stick": "STICK",
+      "strig": "STRIG"
+    }
   }
 }

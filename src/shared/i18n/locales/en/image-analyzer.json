@@ -1,0 +1,23 @@
+{
+  "title": "Image Analyzer",
+  "buttons": {
+    "uploadImage": "Upload Image",
+    "analyze": "Analyze",
+    "analyzing": "Analyzing..."
+  },
+  "grid": {
+    "title": "Image with Grid Overlay",
+    "increaseCellSize": "Increase cell size",
+    "decreaseCellSize": "Decrease cell size",
+    "moveUp": "Move grid up",
+    "moveDown": "Move grid down",
+    "moveLeft": "Move grid left",
+    "moveRight": "Move grid right",
+    "generateArray": "Generate 8x8 array"
+  },
+  "generated": {
+    "title": "Generated 8x8 Array",
+    "copySuccess": "Array code copied to clipboard!",
+    "error": "Error generating array"
+  }
+}

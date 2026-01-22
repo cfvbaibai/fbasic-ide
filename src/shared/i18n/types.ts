@@ -10,6 +10,9 @@ import enIde from './locales/en/ide.json'
 import enCommon from './locales/en/common.json'
 import enHome from './locales/en/home.json'
 import enSpriteViewer from './locales/en/sprite-viewer.json'
+import enImageAnalyzer from './locales/en/image-analyzer.json'
+import enMonacoEditor from './locales/en/monaco-editor.json'
+import enCanvasPerf from './locales/en/canvas-perf.json'
 
 // Define the master schema from English locale
 export type MessageSchema = {
@@ -18,6 +21,9 @@ export type MessageSchema = {
   common: typeof enCommon
   home: typeof enHome
   spriteViewer: typeof enSpriteViewer
+  imageAnalyzer: typeof enImageAnalyzer
+  monacoEditor: typeof enMonacoEditor
+  canvasPerf: typeof enCanvasPerf
 }
 
 // Define available locales

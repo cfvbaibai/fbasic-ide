@@ -1,5 +1,5 @@
 <template>
-  <GameSubBlock title="Joystick Status">
+  <GameSubBlock :title="t('ide.joystick.status')">
     <GameTable 
       :data="statusData" 
       :columns="tableColumns"
@@ -31,7 +31,10 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { GameTable, GameSubBlock } from '../../../shared/components/ui'
+
+const { t } = useI18n()
 
 interface Column {
   prop: string
@@ -57,19 +60,19 @@ defineProps<Props>()
 const tableColumns: Column[] = [
   {
     prop: 'id',
-    label: 'ID',
+    label: t('ide.joystick.columns.id'),
     width: 40,
     align: 'center'
   },
   {
     prop: 'stick',
-    label: 'STICK',
+    label: t('ide.joystick.columns.stick'),
     width: 60,
     align: 'center'
   },
   {
     prop: 'strig',
-    label: 'STRIG',
+    label: t('ide.joystick.columns.strig'),
     width: 60,
     align: 'center'
   }

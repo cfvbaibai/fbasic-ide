@@ -1,5 +1,5 @@
 <template>
-  <GameBlock title="Joystick Control" title-icon="mdi:play" :clickable-header="true" class="joystick-control"
+  <GameBlock :title="t('ide.joystick.control')" title-icon="mdi:play" :clickable-header="true" class="joystick-control"
     :class="{ collapsed: !isExpanded }" @click-header="isExpanded = !isExpanded">
     <template #right>
       <GameCollapseToggle :expanded="isExpanded" @toggle="isExpanded = !isExpanded" />
@@ -10,7 +10,7 @@
       <div class="joystick-panels-row">
         <!-- Joystick Controls -->
         <div class="control-grid">
-          <GameSubBlock v-for="joystickId in 2" :key="joystickId - 1" :title="`Joystick ${joystickId - 1}`">
+          <GameSubBlock v-for="joystickId in 2" :key="joystickId - 1" :title="t('ide.joystick.joystick', { id: joystickId - 1 })">
             <!-- Nintendo Controller Layout -->
             <NintendoController :joystick-id="joystickId - 1" :held-buttons="heldButtons"
               @dpad-start="(direction) => startDpadHold(joystickId - 1, direction)"
@@ -27,10 +27,13 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { GameBlock, GameCollapseToggle, GameSubBlock } from '../../../shared/components/ui'
 import NintendoController from './NintendoController.vue'
 import JoystickStatusTable from './JoystickStatusTable.vue'
 import { useJoystickEvents } from '../composables/useJoystickEvents'
+
+const { t } = useI18n()
 
 // Props
 interface Props {

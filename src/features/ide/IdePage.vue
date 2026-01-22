@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import MonacoCodeEditor from './components/MonacoCodeEditor.vue'
 import RuntimeOutput from './components/RuntimeOutput.vue'
 import IdeControls from './components/IdeControls.vue'
@@ -7,6 +8,8 @@ import JoystickControl from './components/JoystickControl.vue'
 import { GameLayout, GameButton, GameButtonGroup, GameBlock } from '../../shared/components/ui'
 import { useBasicIde as useBasicIdeEnhanced } from './composables/useBasicIdeEnhanced'
 import type { ParserInfo, HighlighterInfo } from '../../core/interfaces'
+
+const { t } = useI18n()
 
 // Use the enhanced AST-based parser system
 const {
@@ -48,29 +51,29 @@ onMounted(() => {
 </script>
 
 <template>
-  <GameLayout title="Family Basic IDE" icon="mdi:monitor">
+  <GameLayout :title="t('ide.title')" icon="mdi:monitor">
     <template #sub>
       <div class="sample-programs">
         <GameButtonGroup>
           <GameButton variant="toggle" :selected="currentSampleType === 'basic'" @click="loadSampleCode('basic')"
             size="small">
-            Basic
+            {{ t('ide.samples.basic') }}
           </GameButton>
           <GameButton variant="toggle" :selected="currentSampleType === 'pause'" @click="loadSampleCode('pause')"
             size="small">
-            Pause Demo
+            {{ t('ide.samples.pause') }}
           </GameButton>
           <GameButton variant="toggle" :selected="currentSampleType === 'gaming'" @click="loadSampleCode('gaming')"
             size="small">
-            Joystick Test
+            {{ t('ide.samples.gaming') }}
           </GameButton>
           <GameButton variant="toggle" :selected="currentSampleType === 'complex'" @click="loadSampleCode('complex')"
             size="small">
-            Complex
+            {{ t('ide.samples.complex') }}
           </GameButton>
           <GameButton variant="toggle" :selected="currentSampleType === 'comprehensive'"
             @click="loadSampleCode('comprehensive')" size="small">
-            Full Demo
+            {{ t('ide.samples.comprehensive') }}
           </GameButton>
         </GameButtonGroup>
       </div>
@@ -84,7 +87,7 @@ onMounted(() => {
       <!-- Main IDE Content -->
       <div class="ide-content">
         <!-- Left Panel - Code Editor -->
-        <GameBlock title="Code Editor" title-icon="mdi:pencil" class="editor-panel">
+        <GameBlock :title="t('ide.codeEditor.title')" title-icon="mdi:pencil" class="editor-panel">
           <MonacoCodeEditor v-model="code" />
         </GameBlock>
 

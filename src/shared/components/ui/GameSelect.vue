@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import GameIcon from './GameIcon.vue'
+
+const { t } = useI18n()
 
 interface Option {
   label: string
@@ -19,7 +22,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   options: () => [],
-  placeholder: 'Please select',
+  placeholder: '',
   disabled: false,
   size: 'medium'
 })
@@ -36,7 +39,7 @@ const selectedOption = computed(() => {
 })
 
 const displayText = computed(() => {
-  return selectedOption.value?.label || props.placeholder
+  return selectedOption.value?.label || props.placeholder || t('common.select.placeholder')
 })
 
 const handleSelect = (option: Option) => {

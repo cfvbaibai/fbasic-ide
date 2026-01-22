@@ -1,5 +1,36 @@
 {
   "title": "角色精靈檢視器",
+  "controls": {
+    "title": "控制",
+    "spriteSelection": "精靈選擇:",
+    "placeholder": "選擇精靈",
+    "paletteCode": "調色板程式碼:",
+    "colorCombination": "顏色組合:"
+  },
+  "displayOptions": {
+    "showValues": "顯示數值:",
+    "showGridLines": "顯示網格線:",
+    "reverseX": "反轉 X（水平）:",
+    "reverseY": "反轉 Y（垂直）:"
+  },
+  "spriteGrid": {
+    "title": "精靈",
+    "titleWithSize": "{name} - {width}×{height} 精靈",
+    "cellTooltip": "行 {row}，列 {col}: 值 {value}"
+  },
+  "colorPalette": {
+    "title": "64 色調色板（4×16 網格）"
+  },
+  "defStatements": {
+    "title": "DEF 語句",
+    "copyAll": "全部複製",
+    "defSprite": "DEF SPRITE",
+    "defMove": "DEF MOVE",
+    "copyAllSuccess": "所有語句已複製到剪貼簿！",
+    "copyError": "複製到剪貼簿失敗",
+    "defSpriteCopySuccess": "DEF SPRITE 語句已複製到剪貼簿！",
+    "defMoveCopySuccess": "DEF MOVE 語句已複製到剪貼簿！"
+  },
   "palettes": {
     "sprite": "精靈調色板",
     "background": "背景調色板",

@@ -3,10 +3,30 @@
     "upload": "ファイルをアップロード",
     "clear": "クリア",
     "submit": "送信",
-    "cancel": "キャンセル"
+    "cancel": "キャンセル",
+    "copy": "コピー",
+    "copyAll": "すべてコピー"
   },
   "upload": {
     "dragAndDrop": "ファイルをここにドラッグ＆ドロップするか、",
     "clickToBrowse": "クリックして参照"
+  },
+  "codeQuote": {
+    "copy": "コピー",
+    "copySuccess": "コードをクリップボードにコピーしました！",
+    "copyError": "クリップボードへのコピーに失敗しました",
+    "empty": "表示するコードがありません"
+  },
+  "select": {
+    "placeholder": "選択してください"
+  },
+  "messages": {
+    "copySuccess": "クリップボードにコピーしました！",
+    "copyError": "クリップボードへのコピーに失敗しました",
+    "allStatementsCopied": "すべてのステートメントをクリップボードにコピーしました！"
+  },
+  "labels": {
+    "yes": "はい",
+    "no": "いいえ"
   }
 }

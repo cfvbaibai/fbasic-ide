@@ -3,10 +3,30 @@
     "upload": "上传文件",
     "clear": "清除",
     "submit": "提交",
-    "cancel": "取消"
+    "cancel": "取消",
+    "copy": "复制",
+    "copyAll": "全部复制"
   },
   "upload": {
     "dragAndDrop": "将文件拖放到此处，或",
     "clickToBrowse": "点击浏览"
+  },
+  "codeQuote": {
+    "copy": "复制",
+    "copySuccess": "代码已复制到剪贴板！",
+    "copyError": "复制到剪贴板失败",
+    "empty": "没有代码可显示"
+  },
+  "select": {
+    "placeholder": "请选择"
+  },
+  "messages": {
+    "copySuccess": "已复制到剪贴板！",
+    "copyError": "复制到剪贴板失败",
+    "allStatementsCopied": "所有语句已复制到剪贴板！"
+  },
+  "labels": {
+    "yes": "是",
+    "no": "否"
   }
 }

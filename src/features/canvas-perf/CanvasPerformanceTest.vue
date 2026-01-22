@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { GameLayout, GameButton } from '@/shared/components/ui'
 import { renderScreenBuffer, type ScreenCell } from '@/features/ide/composables/canvasRenderer'
+
+const { t } = useI18n()
 
 // Canvas reference
 const canvasRef = ref<HTMLCanvasElement | null>(null)
@@ -121,27 +124,27 @@ onUnmounted(() => {
 
 <template>
   <GameLayout
-    title="Canvas Performance Test"
+    :title="t('canvasPerf.title')"
     icon="mdi:speedometer"
   >
     <div class="test-page">
       <div class="test-controls">
-      <GameButton type="primary" @click="startTest">Start Test</GameButton>
-      <GameButton type="danger" @click="stopTest">Stop Test</GameButton>
-      <GameButton type="warning" @click="clearScreen">Clear Screen</GameButton>
+      <GameButton type="primary" @click="startTest">{{ t('canvasPerf.buttons.startTest') }}</GameButton>
+      <GameButton type="danger" @click="stopTest">{{ t('canvasPerf.buttons.stopTest') }}</GameButton>
+      <GameButton type="warning" @click="clearScreen">{{ t('canvasPerf.buttons.clearScreen') }}</GameButton>
       <label>
-        Characters per frame:
+        {{ t('canvasPerf.labels.charsPerFrame') }}
         <input v-model.number="charsPerFrame" type="number" min="1" max="100" />
       </label>
     </div>
 
     <div class="test-stats">
-      <div>FPS: {{ fps.toFixed(1) }}</div>
-      <div>Frame time: {{ frameTime.toFixed(2) }}ms</div>
-      <div>Characters rendered: {{ totalChars }}</div>
-      <div>Chars/sec: {{ charsPerSecond.toFixed(0) }}</div>
-      <div>Chars/frame: {{ charsPerFrame }}</div>
-      <div>Test running: {{ isRunning ? 'Yes' : 'No' }}</div>
+      <div>{{ t('canvasPerf.labels.fps') }} {{ fps.toFixed(1) }}</div>
+      <div>{{ t('canvasPerf.labels.frameTime') }} {{ frameTime.toFixed(2) }}ms</div>
+      <div>{{ t('canvasPerf.labels.charsRendered') }} {{ totalChars }}</div>
+      <div>{{ t('canvasPerf.labels.charsPerSec') }} {{ charsPerSecond.toFixed(0) }}</div>
+      <div>{{ t('canvasPerf.labels.charsPerFrame') }} {{ charsPerFrame }}</div>
+      <div>{{ t('canvasPerf.labels.testRunning') }} {{ isRunning ? t('common.labels.yes') : t('common.labels.no') }}</div>
     </div>
 
     <div class="canvas-container">

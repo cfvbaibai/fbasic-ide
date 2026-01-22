@@ -1,5 +1,36 @@
 {
   "title": "キャラクタースプライトビューア",
+  "controls": {
+    "title": "コントロール",
+    "spriteSelection": "スプライト選択:",
+    "placeholder": "スプライトを選択",
+    "paletteCode": "パレットコード:",
+    "colorCombination": "カラー組み合わせ:"
+  },
+  "displayOptions": {
+    "showValues": "値の数字を表示:",
+    "showGridLines": "グリッド線を表示:",
+    "reverseX": "Xを反転（水平）:",
+    "reverseY": "Yを反転（垂直）:"
+  },
+  "spriteGrid": {
+    "title": "スプライト",
+    "titleWithSize": "{name} - {width}×{height} スプライト",
+    "cellTooltip": "行 {row}、列 {col}: 値 {value}"
+  },
+  "colorPalette": {
+    "title": "64色パレット（4×16グリッド）"
+  },
+  "defStatements": {
+    "title": "DEFステートメント",
+    "copyAll": "すべてコピー",
+    "defSprite": "DEF SPRITE",
+    "defMove": "DEF MOVE",
+    "copyAllSuccess": "すべてのステートメントをクリップボードにコピーしました！",
+    "copyError": "クリップボードへのコピーに失敗しました",
+    "defSpriteCopySuccess": "DEF SPRITEステートメントをクリップボードにコピーしました！",
+    "defMoveCopySuccess": "DEF MOVEステートメントをクリップボードにコピーしました！"
+  },
   "palettes": {
     "sprite": "スプライトパレット",
     "background": "背景パレット",

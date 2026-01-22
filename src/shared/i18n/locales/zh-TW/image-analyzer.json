@@ -1,0 +1,23 @@
+{
+  "title": "圖像分析器",
+  "buttons": {
+    "uploadImage": "上傳圖像",
+    "analyze": "分析",
+    "analyzing": "分析中..."
+  },
+  "grid": {
+    "title": "帶網格疊加的圖像",
+    "increaseCellSize": "增大儲存格大小",
+    "decreaseCellSize": "減小儲存格大小",
+    "moveUp": "向上移動網格",
+    "moveDown": "向下移動網格",
+    "moveLeft": "向左移動網格",
+    "moveRight": "向右移動網格",
+    "generateArray": "生成 8x8 陣列"
+  },
+  "generated": {
+    "title": "生成的 8x8 陣列",
+    "copySuccess": "陣列程式碼已複製到剪貼簿！",
+    "error": "生成陣列時出錯"
+  }
+}

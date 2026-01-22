@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import ColorBox from './ColorBox.vue'
 import { GameBlock } from '../../../shared/components/ui'
+
+const { t } = useI18n()
 </script>
 
 <template>
-  <GameBlock title="64 Color Palette (4×16 Grid)">
+  <GameBlock :title="t('spriteViewer.colorPalette.title')">
     <div class="palette-container">
       <div
         v-for="row in 4"

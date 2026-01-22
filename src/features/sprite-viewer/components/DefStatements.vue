@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { useSpriteViewerStore } from '../composables/useSpriteViewerStore'
 import { GameCodeQuote, GameBlock, GameButton } from '../../../shared/components/ui'
 import { message } from '../../../shared/utils/message'
+
+const { t } = useI18n()
 
 const store = useSpriteViewerStore()
 
@@ -14,16 +17,16 @@ const copyAllStatements = async () => {
   if (combined) {
     try {
       await navigator.clipboard.writeText(combined)
-      message.success('All statements copied to clipboard!')
+      message.success(t('spriteViewer.defStatements.copyAllSuccess'))
     } catch {
-      message.error('Failed to copy to clipboard')
+      message.error(t('spriteViewer.defStatements.copyError'))
     }
   }
 }
 </script>
 
 <template>
-  <GameBlock title="DEF Statements">
+  <GameBlock :title="t('spriteViewer.defStatements.title')">
     <template #right>
       <GameButton
         type="primary"
@@ -31,24 +34,24 @@ const copyAllStatements = async () => {
         :disabled="!store.defSpriteStatement.value && !store.defMoveStatement.value"
         @click="copyAllStatements"
       >
-        Copy All
+        {{ t('spriteViewer.defStatements.copyAll') }}
       </GameButton>
     </template>
 
     <div class="statements-container">
       <div class="statement-block">
-        <h3 class="statement-title text-game-heading">DEF SPRITE</h3>
+        <h3 class="statement-title text-game-heading">{{ t('spriteViewer.defStatements.defSprite') }}</h3>
         <GameCodeQuote
           :code="store.defSpriteStatement.value || ''"
-          copy-success-message="DEF SPRITE statement copied to clipboard!"
+          :copy-success-message="t('spriteViewer.defStatements.defSpriteCopySuccess')"
         />
       </div>
 
       <div class="statement-block">
-        <h3 class="statement-title text-game-heading">DEF MOVE</h3>
+        <h3 class="statement-title text-game-heading">{{ t('spriteViewer.defStatements.defMove') }}</h3>
         <GameCodeQuote
           :code="store.defMoveStatement.value || ''"
-          copy-success-message="DEF MOVE statement copied to clipboard!"
+          :copy-success-message="t('spriteViewer.defStatements.defMoveCopySuccess')"
         />
       </div>
     </div>

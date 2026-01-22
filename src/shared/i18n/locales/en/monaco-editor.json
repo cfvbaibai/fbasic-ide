@@ -1,0 +1,10 @@
+{
+  "title": "Monaco Editor Demo",
+  "info": {
+    "title": "Editor Info",
+    "language": "Language:",
+    "editor": "Editor:",
+    "features": "Features:",
+    "sampleCode": "Sample Code:"
+  }
+}
