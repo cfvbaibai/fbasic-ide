@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { ref, watch, watchEffect } from 'vue'
+import { ref, watch, watchEffect, computed } from 'vue'
 import type { ScreenCell } from '@/core/interfaces'
 import { renderScreenBuffer } from '../composables/canvasRenderer'
+import GameButtonGroup from '@/shared/components/ui/GameButtonGroup.vue'
+import GameButton from '@/shared/components/ui/GameButton.vue'
 
 /**
  * Screen component - Renders the F-BASIC screen buffer on a canvas.
@@ -37,6 +39,29 @@ const props = withDefaults(defineProps<Props>(), {
 const screenCanvas = ref<HTMLCanvasElement | null>(null)
 const paletteCode = ref(1) // Default background palette code is 1
 
+// Zoom state - default to 2x (current scale)
+const zoomLevel = ref<1 | 2 | 3 | 4>(2)
+
+// Base canvas dimensions
+const BASE_WIDTH = 240
+const BASE_HEIGHT = 208
+
+// Computed canvas display dimensions based on zoom
+const canvasWidth = computed(() => BASE_WIDTH * zoomLevel.value)
+const canvasHeight = computed(() => BASE_HEIGHT * zoomLevel.value)
+
+// Zoom level options
+const zoomLevels: Array<{ value: 1 | 2 | 3 | 4; label: string }> = [
+  { value: 1, label: '×1' },
+  { value: 2, label: '×2' },
+  { value: 3, label: '×3' },
+  { value: 4, label: '×4' }
+]
+
+function setZoom(level: 1 | 2 | 3 | 4): void {
+  zoomLevel.value = level
+}
+
 
 // Direct rendering function (no Vue reactivity overhead)
 function render(): void {
@@ -70,6 +95,20 @@ watchEffect(() => {
 
 <template>
     <div class="screen-display">
+      <div class="screen-controls">
+        <GameButtonGroup>
+          <GameButton
+            v-for="level in zoomLevels"
+            :key="level.value"
+            variant="toggle"
+            size="small"
+            :selected="zoomLevel === level.value"
+            @click="setZoom(level.value)"
+          >
+            {{ level.label }}
+          </GameButton>
+        </GameButtonGroup>
+      </div>
       <div class="crt-bezel">
         <div class="crt-screen">
           <div class="crt-scanlines"></div>
@@ -78,6 +117,10 @@ watchEffect(() => {
             class="screen-canvas"
             :width="240"
             :height="208"
+            :style="{
+              width: `${canvasWidth}px`,
+              height: `${canvasHeight}px`
+            }"
           />
           <div class="crt-reflection"></div>
         </div>
@@ -106,11 +149,20 @@ watchEffect(() => {
 
   flex: 1 1 0;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 2rem;
   overflow: auto;
   min-height: 0;
+  gap: 1rem;
+}
+
+.screen-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
 }
 
 /* CRT Color Variables - Light Theme */
@@ -223,8 +275,6 @@ watchEffect(() => {
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   image-rendering: crisp-edges;
-  width: 480px; /* 240px * 2x scale (224 + 16 padding) */
-  height: 416px; /* 208px * 2x scale (192 + 16 padding) */
   filter: brightness(1.05) contrast(1.1);
 }
 </style>

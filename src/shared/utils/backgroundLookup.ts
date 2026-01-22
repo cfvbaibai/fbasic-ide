@@ -1,5 +1,5 @@
 import type { BackgroundItem } from '@/shared/data/types'
-import { LETTER_BG_ITEMS, NUMBER_BG_ITEMS, SYMBOL_BG_ITEMS, KANA_BG_ITEMS } from '@/shared/data/bg'
+import { LETTER_BG_ITEMS, NUMBER_BG_ITEMS, SYMBOL_BG_ITEMS, KANA_BG_ITEMS, PICTURE_BG_ITEMS } from '@/shared/data/bg'
 
 /**
  * Combined array of all background items
@@ -8,7 +8,8 @@ const ALL_BG_ITEMS: BackgroundItem[] = [
   ...LETTER_BG_ITEMS,
   ...NUMBER_BG_ITEMS,
   ...SYMBOL_BG_ITEMS,
-  ...KANA_BG_ITEMS
+  ...KANA_BG_ITEMS,
+  ...PICTURE_BG_ITEMS
 ]
 
 /**

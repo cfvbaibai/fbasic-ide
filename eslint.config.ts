@@ -111,8 +111,8 @@ export default [
         rules: {
             'max-lines': ['error', {
                 'max': 500,
-                'skipBlankLines': true,
-                'skipComments': true
+                'skipBlankLines': false,
+                'skipComments': false
             }],
             'no-undef': 'off',
             '@typescript-eslint/no-unused-vars': ['warn', {
@@ -141,6 +141,7 @@ export default [
             '**/*.html',
             'scripts/**/*',
             'src/shared/data/bg/kana.ts',
+            'src/shared/data/bg/picture.ts',
             'src/core/parser/FBasicChevrotainParser.ts',
         ],
     },
