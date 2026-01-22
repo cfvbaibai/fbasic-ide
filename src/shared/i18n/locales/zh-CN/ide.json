@@ -24,7 +24,8 @@
     "pause": "暂停演示",
     "gaming": "手柄测试",
     "complex": "复杂",
-    "comprehensive": "完整演示"
+    "comprehensive": "完整演示",
+    "allChars": "所有字符"
   },
   "joystick": {
     "control": "手柄控制",

@@ -1,5 +1,357 @@
 import type { BackgroundItem } from "../types"
 
+const BGITEM_PICTURE_0_0 = [
+  [1,1,1,1,1,1,1,0],
+  [1,1,1,1,1,1,0,2],
+  [0,0,0,0,0,0,2,2],
+  [3,3,3,3,3,0,2,2],
+  [3,3,3,3,3,0,2,2],
+  [0,0,0,0,0,0,2,2],
+  [2,2,2,2,2,2,0,2],
+  [2,2,2,2,2,2,2,0]
+]
+
+const BGITEM_PICTURE_1_1 = [
+  [0,1,1,1,1,1,1,1],
+  [1,0,1,1,1,1,1,1],
+  [1,1,0,0,0,0,0,0],
+  [1,1,0,3,3,3,3,3],
+  [1,1,0,3,3,3,3,3],
+  [1,1,0,0,0,0,0,0],
+  [1,0,2,2,2,2,2,2],
+  [0,2,2,2,2,2,2,2]
+]
+
+const BGITEM_PICTURE_2_2 = [
+  [2,2,2,2,2,2,0,1],
+  [2,2,2,2,2,2,0,1],
+  [2,2,2,2,2,2,0,1],
+  [2,2,2,2,2,2,0,1],
+  [2,2,2,2,2,2,0,1],
+  [2,2,2,2,2,2,0,1],
+  [2,2,2,2,2,2,0,1],
+  [2,2,2,2,2,2,0,1]
+]
+
+const BGITEM_PICTURE_3_3 = [
+  [2,1,0,0,0,0,0,0],
+  [1,1,2,0,0,0,0,0],
+  [2,1,2,0,0,0,0,0],
+  [1,1,0,0,0,0,0,0],
+  [2,1,0,0,0,0,0,0],
+  [1,1,2,0,0,0,0,0],
+  [2,1,2,2,0,0,0,0],
+  [1,1,1,2,2,0,0,0]
+]
+
+const BGITEM_PICTURE_4_4 = [
+  [2,1,1,1,2,0,2,2],
+  [1,1,2,1,1,3,2,2],
+  [2,1,2,2,2,3,1,1],
+  [1,1,2,2,2,3,2,2],
+  [2,1,2,2,2,3,2,2],
+  [1,1,2,2,2,3,2,2],
+  [2,1,2,2,2,3,2,2],
+  [1,1,2,2,2,0,2,2]
+]
+
+const BGITEM_PICTURE_5_5 = [
+  [2,1,2,2,2,0,0,0],
+  [1,1,2,2,0,0,0,0],
+  [2,1,2,0,0,0,0,0],
+  [1,1,0,0,0,0,0,0],
+  [2,1,0,0,0,0,0,0],
+  [1,1,2,0,0,0,0,0],
+  [2,1,2,0,0,0,0,0],
+  [1,1,0,0,0,0,0,0]
+]
+
+const BGITEM_PICTURE_6_6 = [
+  [0,2,2,0,2,2,0,2],
+  [3,2,2,3,2,2,3,2],
+  [3,1,1,3,1,1,3,1],
+  [3,2,2,3,2,2,3,2],
+  [3,2,2,3,2,2,3,2],
+  [3,2,2,3,2,2,3,2],
+  [3,2,2,3,2,2,3,2],
+  [0,2,2,0,2,2,0,2]
+]
+
+const BGITEM_PICTURE_7_7 = [
+  [0,0,0,1,2,2,0,1],
+  [0,0,0,1,2,2,0,1],
+  [0,0,0,1,2,2,0,1],
+  [0,0,0,1,2,2,0,1],
+  [0,0,0,1,2,2,0,1],
+  [0,0,0,1,2,2,0,1],
+  [0,0,0,1,2,2,0,1],
+  [0,0,0,1,2,2,0,1]
+]
+
+const BGITEM_PICTURE_8_8 = [
+  [2,0,2,1,2,2,0,1],
+  [2,3,2,1,2,2,0,1],
+  [1,3,1,1,2,2,0,1],
+  [2,3,2,1,2,2,0,1],
+  [2,3,2,1,2,2,0,1],
+  [2,3,2,1,2,2,0,1],
+  [2,3,2,1,2,2,0,1],
+  [2,0,2,1,2,2,0,1]
+]
+
+const BGITEM_PICTURE_9_9 = [
+  [0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,1],
+  [0,0,0,0,0,1,1,1],
+  [0,0,0,0,1,1,2,2],
+  [0,0,0,0,1,2,2,2],
+  [0,0,0,1,1,2,2,2]
+]
+
+const BGITEM_PICTURE_10_10 = [
+  [0,0,0,1,2,2,2,2],
+  [0,0,0,1,2,2,2,2],
+  [0,0,0,1,2,2,2,2],
+  [0,0,0,1,2,2,2,2],
+  [0,0,0,1,2,2,2,2],
+  [0,0,0,1,2,2,2,2],
+  [0,0,0,1,2,2,0,0],
+  [0,0,0,1,2,2,0,1]
+]
+
+const BGITEM_PICTURE_11_11 = [
+  [0,0,0,1,2,2,0,1],
+  [0,0,0,1,2,2,0,0],
+  [0,0,0,1,2,2,2,2],
+  [0,0,0,1,2,2,2,2],
+  [0,0,0,1,2,2,2,2],
+  [0,0,0,1,2,2,2,2],
+  [0,0,0,1,2,2,2,2],
+  [0,0,0,1,2,2,2,2]
+]
+
+const BGITEM_PICTURE_12_12 = [
+  [2,0,0,0,1,1,2,2],
+  [2,0,0,0,0,1,2,2],
+  [2,0,0,0,0,1,1,2],
+  [2,0,0,0,0,0,1,1],
+  [2,0,0,0,0,0,0,0],
+  [2,0,0,0,0,0,0,0],
+  [2,0,0,0,0,0,0,0],
+  [2,0,0,0,0,0,0,0]
+]
+
+const BGITEM_PICTURE_13_13 = [
+  [2,0,0,0,0,0,0,0],
+  [2,0,0,0,0,0,0,0],
+  [2,0,0,0,0,0,0,0],
+  [1,1,1,1,1,1,1,1],
+  [1,2,2,2,2,2,2,2],
+  [0,2,2,2,2,2,2,2],
+  [0,2,2,2,2,2,2,2],
+  [0,2,2,2,2,2,2,2]
+]
+
+const BGITEM_PICTURE_14_14 = [
+  [1,2,2,2,2,2,2,2],
+  [1,2,2,2,2,2,2,2],
+  [1,2,2,2,2,2,2,2],
+  [1,2,2,2,2,2,2,2],
+  [1,2,2,2,2,2,2,2],
+  [1,2,2,2,2,2,2,2],
+  [1,0,0,0,0,0,0,0],
+  [1,1,1,1,1,1,1,1]
+]
+
+const BGITEM_PICTURE_15_15 = [
+  [2,1,1,1,1,1,1,1],
+  [2,0,0,0,0,0,0,0],
+  [2,2,2,2,2,2,2,2],
+  [2,2,2,2,2,2,2,2],
+  [2,2,2,2,2,2,2,2],
+  [2,2,2,2,2,2,2,2],
+  [0,2,2,2,2,2,2,2],
+  [1,2,2,2,2,2,2,2]
+]
+
+const BGITEM_PICTURE_16_16 = [
+  [2,2,2,2,2,2,2,2],
+  [2,2,2,2,2,2,2,2],
+  [2,2,2,2,2,2,2,2],
+  [2,2,2,2,2,2,2,2],
+  [1,1,1,1,1,1,1,1],
+  [0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0]
+]
+
+const BGITEM_PICTURE_17_17 = [
+  [0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0],
+  [1,0,0,0,0,0,0,0],
+  [1,1,1,0,0,0,0,0],
+  [2,2,1,1,0,0,0,0],
+  [2,2,2,1,0,0,0,0],
+  [2,2,2,1,1,0,0,0]
+]
+
+const BGITEM_PICTURE_18_18 = [
+  [2,2,2,2,1,0,0,0],
+  [2,2,2,2,1,0,0,0],
+  [2,2,2,2,1,0,0,0],
+  [2,2,2,2,1,0,0,0],
+  [2,2,2,2,1,0,0,0],
+  [2,2,2,2,1,0,0,0],
+  [0,0,2,2,1,0,0,0],
+  [1,0,2,2,1,0,0,0]
+]
+
+const BGITEM_PICTURE_19_19 = [
+  [1,0,2,2,1,0,0,0],
+  [1,0,2,2,1,0,0,0],
+  [1,0,2,2,1,0,0,0],
+  [1,0,2,2,1,0,0,0],
+  [1,0,2,2,1,0,0,0],
+  [1,0,2,2,1,0,0,0],
+  [1,0,2,2,1,0,0,0],
+  [1,0,2,2,1,0,0,0]
+]
+
+const BGITEM_PICTURE_20_20 = [
+  [1,0,2,2,1,2,0,2],
+  [1,0,2,2,1,2,3,2],
+  [1,0,2,2,1,1,3,1],
+  [1,0,2,2,1,2,3,2],
+  [1,0,2,2,1,2,3,2],
+  [1,0,2,2,1,2,3,2],
+  [1,0,2,2,1,2,3,2],
+  [1,0,2,2,1,2,0,2]
+]
+
+const BGITEM_PICTURE_21_21 = [
+  [1,0,2,2,1,0,0,0],
+  [0,0,2,2,1,0,0,0],
+  [2,2,2,2,1,0,0,0],
+  [2,2,2,2,1,0,0,0],
+  [2,2,2,2,1,0,0,0],
+  [2,2,2,2,1,0,0,0],
+  [2,2,2,2,1,0,0,0],
+  [2,2,2,2,1,0,0,0]
+]
+
+const BGITEM_PICTURE_22_22 = [
+  [1,0,2,2,2,2,2,2],
+  [1,0,2,2,2,2,2,2],
+  [1,0,2,2,2,2,2,2],
+  [1,0,2,2,2,2,2,2],
+  [1,0,2,2,2,2,2,2],
+  [1,0,2,2,2,2,2,2],
+  [1,0,2,2,2,2,2,2],
+  [1,0,2,2,2,2,2,2]
+]
+
+const BGITEM_PICTURE_23_23 = [
+  [2,0,2,2,0,2,2,0],
+  [2,3,2,2,3,2,2,3],
+  [1,3,1,1,3,1,1,3],
+  [2,3,2,2,3,2,2,3],
+  [2,3,2,2,3,2,2,3],
+  [2,3,2,2,3,2,2,3],
+  [2,3,2,2,3,2,2,3],
+  [2,0,2,2,0,2,2,0]
+]
+
+const BGITEM_PICTURE_24_24 = [
+  [2,2,2,1,1,0,0,0],
+  [2,2,2,1,0,0,0,0],
+  [2,2,1,1,0,0,0,0],
+  [1,1,1,0,0,0,0,0],
+  [1,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0]
+]
+
+const BGITEM_PICTURE_25_25 = [
+  [0,0,0,0,0,0,1,2],
+  [0,0,0,0,0,2,1,1],
+  [0,0,0,0,0,2,1,2],
+  [0,0,0,0,0,0,1,1],
+  [0,0,0,0,0,0,1,2],
+  [0,0,0,0,0,2,1,1],
+  [0,0,0,0,2,2,1,2],
+  [0,0,0,2,2,1,1,1]
+]
+
+const BGITEM_PICTURE_26_26 = [
+  [2,2,0,2,1,1,1,2],
+  [2,2,3,1,1,2,1,1],
+  [1,1,3,2,2,2,1,2],
+  [2,2,3,2,2,2,1,1],
+  [2,2,3,2,2,2,1,2],
+  [2,2,3,2,2,2,1,1],
+  [2,2,3,2,2,2,1,2],
+  [2,2,0,2,2,2,1,1]
+]
+
+const BGITEM_PICTURE_27_27 = [
+  [0,0,0,2,2,2,1,2],
+  [0,0,0,0,2,2,1,1],
+  [0,0,0,0,0,2,1,2],
+  [0,0,0,0,0,0,1,1],
+  [0,0,0,0,0,0,1,2],
+  [0,0,0,0,0,2,1,1],
+  [0,0,0,0,0,2,1,2],
+  [0,0,0,0,0,0,1,1]
+]
+
+const BGITEM_PICTURE_28_28 = [
+  [2,2,2,2,2,2,2,2],
+  [2,2,0,0,0,0,2,2],
+  [2,0,0,3,3,0,0,2],
+  [2,0,3,1,3,3,0,2],
+  [2,0,3,3,3,3,0,2],
+  [2,0,0,3,3,0,0,2],
+  [2,2,0,0,0,0,2,2],
+  [2,2,2,2,2,2,2,2]
+]
+
+const BGITEM_PICTURE_29_29 = [
+  [1,0,0,0,0,0,0,0],
+  [1,0,2,2,2,2,2,2],
+  [1,0,2,2,2,2,2,2],
+  [1,0,2,2,2,2,2,2],
+  [1,0,2,2,2,2,2,2],
+  [1,0,2,2,2,2,2,2],
+  [1,0,2,2,2,2,2,2],
+  [1,0,2,2,2,2,2,2]
+]
+
+const BGITEM_PICTURE_30_30 = [
+  [0,2,2,2,2,2,2,2],
+  [0,2,2,2,2,2,2,2],
+  [0,2,2,2,2,2,2,2],
+  [0,2,2,2,2,2,2,2],
+  [0,2,2,2,2,2,2,2],
+  [0,2,2,2,2,2,2,2],
+  [0,2,2,2,2,2,2,2],
+  [0,2,2,2,2,2,2,2]
+]
+
+const BGITEM_PICTURE_31_31 = [
+  [0,0,0,0,0,0,0,1],
+  [2,2,2,2,2,2,0,1],
+  [2,2,2,2,2,2,0,1],
+  [2,2,2,2,2,2,0,1],
+  [2,2,2,2,2,2,0,1],
+  [2,2,2,2,2,2,0,1],
+  [2,2,2,2,2,2,0,1],
+  [2,2,2,2,2,2,0,1]
+]
+
 const BGITEM_PICTURE_184_184 = [
   [0,0,0,0,0,0,0,0],
   [2,2,2,2,2,2,2,0],
@@ -792,78 +1144,136 @@ const BGITEM_PICTURE_255_255 = [
   [3,3,3,3,3,3,3,3]
 ]
 
-const CHARS = '的一是在不了有和人这中大为上个国我以要他时来用们生到作地于出就分对成会可主发年动同工也能下过子说产种面而方后多定行学法所民得经十三之进着等部度家电力里如水化高自二理起小物现实加量都两体制机当使点从业本去把性好应开它合还因由其些然前外天政四日那社义事平形相全表间样与关各重新线内数正心反你明看原又么利比或但质气第向道命此变条只没结解问意建月公无系军很情者最立代想已通并提直题党程展五果料象员革位入常文总次品式活设及管特件长求老头基资边流路级少图山统接知较将组见计别她手角期根论运农指几九区强放决西被干做必战先回则任取据处队南给色光门即保治北造百规热领七海口东导器压志世金增争济阶油思术极交受联什认六共权收证改清己美再采转更单风切打白教速花带安场身车例真务具万每目至达走积示议声报斗完类八离华名确才科张信马节话米整空元况今集温传土许步群广石记需段研界拉林律叫且究观越织装影算低持音众书布复容儿须际商非验连断深难近矿千周委素技备半办青省列习响约支般史感劳便团往酸历市克何除消构府称太准精值号率族维划选标写存候毛亲快效斯院查江型眼王按格养易置派层片始却专状育厂京识适属圆包火住调满县局照参红细引听该铁价严龙飞'
+const CHARS = 
+  '的一是在不了有和人这中大为上个国我以要他' + 
+  '时来用们生到作地于出就分对成会可主发年动' +
+  '同工也能下过子说产种面而方后多定行学法所' +
+  '民得经十三之进着等部度家电力里如水化高自' +
+  '二理起小物现实加量都两体制机当使点从业本' +
+  '去把性好应开它合还因由其些然前外天政四日' +
+  '那社义事平形相全表间样与关各重新线内数正' +
+  '心反你明看原又么利比或但质气第向道命此变' +
+  '条只没结解问意建月公无系军很情者最立代想' +
+  '已通并提直题党程展五果料象员革位入常文总' +
+  '次品式活设及管特件长求老头基资边流路级少' +
+  '图山统接知较将组见计别她手角期根论运农指' +
+  '几九区强放决西被干做必战先回则任取据处队' +
+  '南给色光门即保治北造百规热领七海口东导器' +
+  '压志世金增争济阶油思术极交受联什认六共权' +
+  '收证改清己美再采转更单风切打白教速花带安' +
+  '场身车例真务具万每目至达走积示议声报斗完' +
+  '类八离华名确才科张信马节话米整空元况今集' +
+  '温传土许步群广石记需段研界拉林律叫且究观' +
+  '越织装影算低持音众书布复容儿须际商非验连' +
+  '断深难近矿千周委素技备半办青省列习响约支' +
+  '般史感劳便团往酸历市克何除消构府称太准精' +
+  '值号率族维划选标写存候毛亲快效斯院查江型' +
+  '眼王按格养易置派层片始却专状育厂京识适属' +
+  '圆包火住调满县局照参红细引听该铁价严龙飞'
+
 export const PICTURE_BG_ITEMS: BackgroundItem[] = [
-  { code: 184, char: CHARS[0], tile: BGITEM_PICTURE_184_184 },
-  { code: 185, char: CHARS[1], tile: BGITEM_PICTURE_185_185 },
-  { code: 186, char: CHARS[2], tile: BGITEM_PICTURE_186_186 },
-  { code: 187, char: CHARS[3], tile: BGITEM_PICTURE_187_187 },
-  { code: 188, char: CHARS[4], tile: BGITEM_PICTURE_188_188 },
-  { code: 189, char: CHARS[5], tile: BGITEM_PICTURE_189_189 },
-  { code: 190, char: CHARS[6], tile: BGITEM_PICTURE_190_190 },
-  { code: 191, char: CHARS[7], tile: BGITEM_PICTURE_191_191 },
-  { code: 192, char: CHARS[8], tile: BGITEM_PICTURE_192_192 },
-  { code: 193, char: CHARS[9], tile: BGITEM_PICTURE_193_193 },
-  { code: 194, char: CHARS[10], tile: BGITEM_PICTURE_194_194 },
-  { code: 195, char: CHARS[11], tile: BGITEM_PICTURE_195_195 },
-  { code: 196, char: CHARS[12], tile: BGITEM_PICTURE_196_196 },
-  { code: 197, char: CHARS[13], tile: BGITEM_PICTURE_197_197 },
-  { code: 198, char: CHARS[14], tile: BGITEM_PICTURE_198_198 },
-  { code: 199, char: CHARS[15], tile: BGITEM_PICTURE_199_199 },
-  { code: 200, char: CHARS[16], tile: BGITEM_PICTURE_200_200 },
-  { code: 201, char: CHARS[17], tile: BGITEM_PICTURE_201_201 },
-  { code: 202, char: CHARS[18], tile: BGITEM_PICTURE_202_202 },
-  { code: 203, char: CHARS[19], tile: BGITEM_PICTURE_203_203 },
-  { code: 204, char: CHARS[20], tile: BGITEM_PICTURE_204_204 },
-  { code: 205, char: CHARS[21], tile: BGITEM_PICTURE_205_205 },
-  { code: 206, char: CHARS[22], tile: BGITEM_PICTURE_206_206 },
-  { code: 207, char: CHARS[23], tile: BGITEM_PICTURE_207_207 },
-  { code: 208, char: CHARS[24], tile: BGITEM_PICTURE_208_208 },
-  { code: 209, char: CHARS[25], tile: BGITEM_PICTURE_209_209 },
-  { code: 210, char: CHARS[26], tile: BGITEM_PICTURE_210_210 },
-  { code: 211, char: CHARS[27], tile: BGITEM_PICTURE_211_211 },
-  { code: 212, char: CHARS[28], tile: BGITEM_PICTURE_212_212 },
-  { code: 213, char: CHARS[29], tile: BGITEM_PICTURE_213_213 },
-  { code: 214, char: CHARS[30], tile: BGITEM_PICTURE_214_214 },
-  { code: 215, char: CHARS[31], tile: BGITEM_PICTURE_215_215 },
-  { code: 216, char: CHARS[32], tile: BGITEM_PICTURE_216_216 },
-  { code: 217, char: CHARS[33], tile: BGITEM_PICTURE_217_217 },
-  { code: 218, char: CHARS[34], tile: BGITEM_PICTURE_218_218 },
-  { code: 219, char: CHARS[35], tile: BGITEM_PICTURE_219_219 },
-  { code: 220, char: CHARS[36], tile: BGITEM_PICTURE_220_220 },
-  { code: 221, char: CHARS[37], tile: BGITEM_PICTURE_221_221 },
-  { code: 222, char: CHARS[38], tile: BGITEM_PICTURE_222_222 },
-  { code: 223, char: CHARS[39], tile: BGITEM_PICTURE_223_223 },
-  { code: 224, char: CHARS[40], tile: BGITEM_PICTURE_224_224 },
-  { code: 225, char: CHARS[41], tile: BGITEM_PICTURE_225_225 },
-  { code: 226, char: CHARS[42], tile: BGITEM_PICTURE_226_226 },
-  { code: 227, char: CHARS[43], tile: BGITEM_PICTURE_227_227 },
-  { code: 228, char: CHARS[44], tile: BGITEM_PICTURE_228_228 },
-  { code: 229, char: CHARS[45], tile: BGITEM_PICTURE_229_229 },
-  { code: 230, char: CHARS[46], tile: BGITEM_PICTURE_230_230 },
-  { code: 231, char: CHARS[47], tile: BGITEM_PICTURE_231_231 },
-  { code: 232, char: CHARS[48], tile: BGITEM_PICTURE_232_232 },
-  { code: 233, char: CHARS[49], tile: BGITEM_PICTURE_233_233 },
-  { code: 234, char: CHARS[50], tile: BGITEM_PICTURE_234_234 },
-  { code: 235, char: CHARS[51], tile: BGITEM_PICTURE_235_235 },
-  { code: 236, char: CHARS[52], tile: BGITEM_PICTURE_236_236 },
-  { code: 237, char: CHARS[53], tile: BGITEM_PICTURE_237_237 },
-  { code: 238, char: CHARS[54], tile: BGITEM_PICTURE_238_238 },
-  { code: 239, char: CHARS[55], tile: BGITEM_PICTURE_239_239 },
-  { code: 240, char: CHARS[56], tile: BGITEM_PICTURE_240_240 },
-  { code: 241, char: CHARS[57], tile: BGITEM_PICTURE_241_241 },
-  { code: 242, char: CHARS[58], tile: BGITEM_PICTURE_242_242 },
-  { code: 243, char: CHARS[59], tile: BGITEM_PICTURE_243_243 },
-  { code: 244, char: CHARS[60], tile: BGITEM_PICTURE_244_244 },
-  { code: 245, char: CHARS[61], tile: BGITEM_PICTURE_245_245 },
-  { code: 246, char: CHARS[62], tile: BGITEM_PICTURE_246_246 },
-  { code: 247, char: CHARS[63], tile: BGITEM_PICTURE_247_247 },
-  { code: 248, char: CHARS[64], tile: BGITEM_PICTURE_248_248 },
-  { code: 249, char: CHARS[65], tile: BGITEM_PICTURE_249_249 },
-  { code: 250, char: CHARS[66], tile: BGITEM_PICTURE_250_250 },
-  { code: 251, char: CHARS[67], tile: BGITEM_PICTURE_251_251 },
-  { code: 252, char: CHARS[68], tile: BGITEM_PICTURE_252_252 },
-  { code: 253, char: CHARS[69], tile: BGITEM_PICTURE_253_253 },
-  { code: 254, char: CHARS[70], tile: BGITEM_PICTURE_254_254 },
-  { code: 255, char: CHARS[71], tile: BGITEM_PICTURE_255_255 }
+  { code: 0, char: CHARS[0], tile: BGITEM_PICTURE_0_0 },
+  { code: 1, char: CHARS[1], tile: BGITEM_PICTURE_1_1 },
+  { code: 2, char: CHARS[2], tile: BGITEM_PICTURE_2_2 },
+  { code: 3, char: CHARS[3], tile: BGITEM_PICTURE_3_3 },
+  { code: 4, char: CHARS[4], tile: BGITEM_PICTURE_4_4 },
+  { code: 5, char: CHARS[5], tile: BGITEM_PICTURE_5_5 },
+  { code: 6, char: CHARS[6], tile: BGITEM_PICTURE_6_6 },
+  { code: 7, char: CHARS[7], tile: BGITEM_PICTURE_7_7 },
+  { code: 8, char: CHARS[8], tile: BGITEM_PICTURE_8_8 },
+  { code: 9, char: CHARS[9], tile: BGITEM_PICTURE_9_9 },
+  { code: 10, char: CHARS[10], tile: BGITEM_PICTURE_10_10 },
+  { code: 11, char: CHARS[11], tile: BGITEM_PICTURE_11_11 },
+  { code: 12, char: CHARS[12], tile: BGITEM_PICTURE_12_12 },
+  { code: 13, char: CHARS[13], tile: BGITEM_PICTURE_13_13 },
+  { code: 14, char: CHARS[14], tile: BGITEM_PICTURE_14_14 },
+  { code: 15, char: CHARS[15], tile: BGITEM_PICTURE_15_15 },
+  { code: 16, char: CHARS[16], tile: BGITEM_PICTURE_16_16 },
+  { code: 17, char: CHARS[17], tile: BGITEM_PICTURE_17_17 },
+  { code: 18, char: CHARS[18], tile: BGITEM_PICTURE_18_18 },
+  { code: 19, char: CHARS[19], tile: BGITEM_PICTURE_19_19 },
+  { code: 20, char: CHARS[20], tile: BGITEM_PICTURE_20_20 },
+  { code: 21, char: CHARS[21], tile: BGITEM_PICTURE_21_21 },
+  { code: 22, char: CHARS[22], tile: BGITEM_PICTURE_22_22 },
+  { code: 23, char: CHARS[23], tile: BGITEM_PICTURE_23_23 },
+  { code: 24, char: CHARS[24], tile: BGITEM_PICTURE_24_24 },
+  { code: 25, char: CHARS[25], tile: BGITEM_PICTURE_25_25 },
+  { code: 26, char: CHARS[26], tile: BGITEM_PICTURE_26_26 },
+  { code: 27, char: CHARS[27], tile: BGITEM_PICTURE_27_27 },
+  { code: 28, char: CHARS[28], tile: BGITEM_PICTURE_28_28 },
+  { code: 29, char: CHARS[29], tile: BGITEM_PICTURE_29_29 },
+  { code: 30, char: CHARS[30], tile: BGITEM_PICTURE_30_30 },
+  { code: 31, char: CHARS[31], tile: BGITEM_PICTURE_31_31 },
+  { code: 184, char: CHARS[184], tile: BGITEM_PICTURE_184_184 },
+  { code: 185, char: CHARS[185], tile: BGITEM_PICTURE_185_185 },
+  { code: 186, char: CHARS[186], tile: BGITEM_PICTURE_186_186 },
+  { code: 187, char: CHARS[187], tile: BGITEM_PICTURE_187_187 },
+  { code: 188, char: CHARS[188], tile: BGITEM_PICTURE_188_188 },
+  { code: 189, char: CHARS[189], tile: BGITEM_PICTURE_189_189 },
+  { code: 190, char: CHARS[190], tile: BGITEM_PICTURE_190_190 },
+  { code: 191, char: CHARS[191], tile: BGITEM_PICTURE_191_191 },
+  { code: 192, char: CHARS[192], tile: BGITEM_PICTURE_192_192 },
+  { code: 193, char: CHARS[193], tile: BGITEM_PICTURE_193_193 },
+  { code: 194, char: CHARS[194], tile: BGITEM_PICTURE_194_194 },
+  { code: 195, char: CHARS[195], tile: BGITEM_PICTURE_195_195 },
+  { code: 196, char: CHARS[196], tile: BGITEM_PICTURE_196_196 },
+  { code: 197, char: CHARS[197], tile: BGITEM_PICTURE_197_197 },
+  { code: 198, char: CHARS[198], tile: BGITEM_PICTURE_198_198 },
+  { code: 199, char: CHARS[199], tile: BGITEM_PICTURE_199_199 },
+  { code: 200, char: CHARS[200], tile: BGITEM_PICTURE_200_200 },
+  { code: 201, char: CHARS[201], tile: BGITEM_PICTURE_201_201 },
+  { code: 202, char: CHARS[202], tile: BGITEM_PICTURE_202_202 },
+  { code: 203, char: CHARS[203], tile: BGITEM_PICTURE_203_203 },
+  { code: 204, char: CHARS[204], tile: BGITEM_PICTURE_204_204 },
+  { code: 205, char: CHARS[205], tile: BGITEM_PICTURE_205_205 },
+  { code: 206, char: CHARS[206], tile: BGITEM_PICTURE_206_206 },
+  { code: 207, char: CHARS[207], tile: BGITEM_PICTURE_207_207 },
+  { code: 208, char: CHARS[208], tile: BGITEM_PICTURE_208_208 },
+  { code: 209, char: CHARS[209], tile: BGITEM_PICTURE_209_209 },
+  { code: 210, char: CHARS[210], tile: BGITEM_PICTURE_210_210 },
+  { code: 211, char: CHARS[211], tile: BGITEM_PICTURE_211_211 },
+  { code: 212, char: CHARS[212], tile: BGITEM_PICTURE_212_212 },
+  { code: 213, char: CHARS[213], tile: BGITEM_PICTURE_213_213 },
+  { code: 214, char: CHARS[214], tile: BGITEM_PICTURE_214_214 },
+  { code: 215, char: CHARS[215], tile: BGITEM_PICTURE_215_215 },
+  { code: 216, char: CHARS[216], tile: BGITEM_PICTURE_216_216 },
+  { code: 217, char: CHARS[217], tile: BGITEM_PICTURE_217_217 },
+  { code: 218, char: CHARS[218], tile: BGITEM_PICTURE_218_218 },
+  { code: 219, char: CHARS[219], tile: BGITEM_PICTURE_219_219 },
+  { code: 220, char: CHARS[220], tile: BGITEM_PICTURE_220_220 },
+  { code: 221, char: CHARS[221], tile: BGITEM_PICTURE_221_221 },
+  { code: 222, char: CHARS[222], tile: BGITEM_PICTURE_222_222 },
+  { code: 223, char: CHARS[223], tile: BGITEM_PICTURE_223_223 },
+  { code: 224, char: CHARS[224], tile: BGITEM_PICTURE_224_224 },
+  { code: 225, char: CHARS[225], tile: BGITEM_PICTURE_225_225 },
+  { code: 226, char: CHARS[226], tile: BGITEM_PICTURE_226_226 },
+  { code: 227, char: CHARS[227], tile: BGITEM_PICTURE_227_227 },
+  { code: 228, char: CHARS[228], tile: BGITEM_PICTURE_228_228 },
+  { code: 229, char: CHARS[229], tile: BGITEM_PICTURE_229_229 },
+  { code: 230, char: CHARS[230], tile: BGITEM_PICTURE_230_230 },
+  { code: 231, char: CHARS[231], tile: BGITEM_PICTURE_231_231 },
+  { code: 232, char: CHARS[232], tile: BGITEM_PICTURE_232_232 },
+  { code: 233, char: CHARS[233], tile: BGITEM_PICTURE_233_233 },
+  { code: 234, char: CHARS[234], tile: BGITEM_PICTURE_234_234 },
+  { code: 235, char: CHARS[235], tile: BGITEM_PICTURE_235_235 },
+  { code: 236, char: CHARS[236], tile: BGITEM_PICTURE_236_236 },
+  { code: 237, char: CHARS[237], tile: BGITEM_PICTURE_237_237 },
+  { code: 238, char: CHARS[238], tile: BGITEM_PICTURE_238_238 },
+  { code: 239, char: CHARS[239], tile: BGITEM_PICTURE_239_239 },
+  { code: 240, char: CHARS[240], tile: BGITEM_PICTURE_240_240 },
+  { code: 241, char: CHARS[241], tile: BGITEM_PICTURE_241_241 },
+  { code: 242, char: CHARS[242], tile: BGITEM_PICTURE_242_242 },
+  { code: 243, char: CHARS[243], tile: BGITEM_PICTURE_243_243 },
+  { code: 244, char: CHARS[244], tile: BGITEM_PICTURE_244_244 },
+  { code: 245, char: CHARS[245], tile: BGITEM_PICTURE_245_245 },
+  { code: 246, char: CHARS[246], tile: BGITEM_PICTURE_246_246 },
+  { code: 247, char: CHARS[247], tile: BGITEM_PICTURE_247_247 },
+  { code: 248, char: CHARS[248], tile: BGITEM_PICTURE_248_248 },
+  { code: 249, char: CHARS[249], tile: BGITEM_PICTURE_249_249 },
+  { code: 250, char: CHARS[250], tile: BGITEM_PICTURE_250_250 },
+  { code: 251, char: CHARS[251], tile: BGITEM_PICTURE_251_251 },
+  { code: 252, char: CHARS[252], tile: BGITEM_PICTURE_252_252 },
+  { code: 253, char: CHARS[253], tile: BGITEM_PICTURE_253_253 },
+  { code: 254, char: CHARS[254], tile: BGITEM_PICTURE_254_254 },
+  { code: 255, char: CHARS[255], tile: BGITEM_PICTURE_255_255 }
 ]

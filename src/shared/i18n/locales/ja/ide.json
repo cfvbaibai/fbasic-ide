@@ -24,7 +24,8 @@
     "pause": "一時停止デモ",
     "gaming": "ジョイスティックテスト",
     "complex": "複雑",
-    "comprehensive": "完全デモ"
+    "comprehensive": "完全デモ",
+    "allChars": "全文字"
   },
   "joystick": {
     "control": "ジョイスティック制御",

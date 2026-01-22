@@ -54,6 +54,17 @@ export function classifyColorWithPalette(
   paletteCode: number,
   colorCombination: number
 ): number {
+  // Always treat black color as 0, regardless of palette or color combination
+  // But first check if it's blue (dark blue can have low luminance)
+  // Blue: high blue component relative to red and green
+  const isBlue = b > r * 1.3 && b > g * 1.3 && b > 80
+  
+  // Check if it's truly black (all RGB components very low, and not blue)
+  // Black: all components low and not blue
+  if (!isBlue && r < 30 && g < 30 && b < 30) {
+    return 0 // black
+  }
+  
   let palette
   if (paletteType === 'sprite') {
     palette = SPRITE_PALETTES[paletteCode] ?? SPRITE_PALETTES[0]

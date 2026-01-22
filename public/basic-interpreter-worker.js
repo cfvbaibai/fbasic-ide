@@ -13972,6 +13972,326 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
   ];
 
   // src/shared/data/bg/picture.ts
+  var BGITEM_PICTURE_0_0 = [
+    [1, 1, 1, 1, 1, 1, 1, 0],
+    [1, 1, 1, 1, 1, 1, 0, 2],
+    [0, 0, 0, 0, 0, 0, 2, 2],
+    [3, 3, 3, 3, 3, 0, 2, 2],
+    [3, 3, 3, 3, 3, 0, 2, 2],
+    [0, 0, 0, 0, 0, 0, 2, 2],
+    [2, 2, 2, 2, 2, 2, 0, 2],
+    [2, 2, 2, 2, 2, 2, 2, 0]
+  ];
+  var BGITEM_PICTURE_1_1 = [
+    [0, 1, 1, 1, 1, 1, 1, 1],
+    [1, 0, 1, 1, 1, 1, 1, 1],
+    [1, 1, 0, 0, 0, 0, 0, 0],
+    [1, 1, 0, 3, 3, 3, 3, 3],
+    [1, 1, 0, 3, 3, 3, 3, 3],
+    [1, 1, 0, 0, 0, 0, 0, 0],
+    [1, 0, 2, 2, 2, 2, 2, 2],
+    [0, 2, 2, 2, 2, 2, 2, 2]
+  ];
+  var BGITEM_PICTURE_2_2 = [
+    [2, 2, 2, 2, 2, 2, 0, 1],
+    [2, 2, 2, 2, 2, 2, 0, 1],
+    [2, 2, 2, 2, 2, 2, 0, 1],
+    [2, 2, 2, 2, 2, 2, 0, 1],
+    [2, 2, 2, 2, 2, 2, 0, 1],
+    [2, 2, 2, 2, 2, 2, 0, 1],
+    [2, 2, 2, 2, 2, 2, 0, 1],
+    [2, 2, 2, 2, 2, 2, 0, 1]
+  ];
+  var BGITEM_PICTURE_3_3 = [
+    [2, 1, 0, 0, 0, 0, 0, 0],
+    [1, 1, 2, 0, 0, 0, 0, 0],
+    [2, 1, 2, 0, 0, 0, 0, 0],
+    [1, 1, 0, 0, 0, 0, 0, 0],
+    [2, 1, 0, 0, 0, 0, 0, 0],
+    [1, 1, 2, 0, 0, 0, 0, 0],
+    [2, 1, 2, 2, 0, 0, 0, 0],
+    [1, 1, 1, 2, 2, 0, 0, 0]
+  ];
+  var BGITEM_PICTURE_4_4 = [
+    [2, 1, 1, 1, 2, 0, 2, 2],
+    [1, 1, 2, 1, 1, 3, 2, 2],
+    [2, 1, 2, 2, 2, 3, 1, 1],
+    [1, 1, 2, 2, 2, 3, 2, 2],
+    [2, 1, 2, 2, 2, 3, 2, 2],
+    [1, 1, 2, 2, 2, 3, 2, 2],
+    [2, 1, 2, 2, 2, 3, 2, 2],
+    [1, 1, 2, 2, 2, 0, 2, 2]
+  ];
+  var BGITEM_PICTURE_5_5 = [
+    [2, 1, 2, 2, 2, 0, 0, 0],
+    [1, 1, 2, 2, 0, 0, 0, 0],
+    [2, 1, 2, 0, 0, 0, 0, 0],
+    [1, 1, 0, 0, 0, 0, 0, 0],
+    [2, 1, 0, 0, 0, 0, 0, 0],
+    [1, 1, 2, 0, 0, 0, 0, 0],
+    [2, 1, 2, 0, 0, 0, 0, 0],
+    [1, 1, 0, 0, 0, 0, 0, 0]
+  ];
+  var BGITEM_PICTURE_6_6 = [
+    [0, 2, 2, 0, 2, 2, 0, 2],
+    [3, 2, 2, 3, 2, 2, 3, 2],
+    [3, 1, 1, 3, 1, 1, 3, 1],
+    [3, 2, 2, 3, 2, 2, 3, 2],
+    [3, 2, 2, 3, 2, 2, 3, 2],
+    [3, 2, 2, 3, 2, 2, 3, 2],
+    [3, 2, 2, 3, 2, 2, 3, 2],
+    [0, 2, 2, 0, 2, 2, 0, 2]
+  ];
+  var BGITEM_PICTURE_7_7 = [
+    [0, 0, 0, 1, 2, 2, 0, 1],
+    [0, 0, 0, 1, 2, 2, 0, 1],
+    [0, 0, 0, 1, 2, 2, 0, 1],
+    [0, 0, 0, 1, 2, 2, 0, 1],
+    [0, 0, 0, 1, 2, 2, 0, 1],
+    [0, 0, 0, 1, 2, 2, 0, 1],
+    [0, 0, 0, 1, 2, 2, 0, 1],
+    [0, 0, 0, 1, 2, 2, 0, 1]
+  ];
+  var BGITEM_PICTURE_8_8 = [
+    [2, 0, 2, 1, 2, 2, 0, 1],
+    [2, 3, 2, 1, 2, 2, 0, 1],
+    [1, 3, 1, 1, 2, 2, 0, 1],
+    [2, 3, 2, 1, 2, 2, 0, 1],
+    [2, 3, 2, 1, 2, 2, 0, 1],
+    [2, 3, 2, 1, 2, 2, 0, 1],
+    [2, 3, 2, 1, 2, 2, 0, 1],
+    [2, 0, 2, 1, 2, 2, 0, 1]
+  ];
+  var BGITEM_PICTURE_9_9 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 1],
+    [0, 0, 0, 0, 0, 1, 1, 1],
+    [0, 0, 0, 0, 1, 1, 2, 2],
+    [0, 0, 0, 0, 1, 2, 2, 2],
+    [0, 0, 0, 1, 1, 2, 2, 2]
+  ];
+  var BGITEM_PICTURE_10_10 = [
+    [0, 0, 0, 1, 2, 2, 2, 2],
+    [0, 0, 0, 1, 2, 2, 2, 2],
+    [0, 0, 0, 1, 2, 2, 2, 2],
+    [0, 0, 0, 1, 2, 2, 2, 2],
+    [0, 0, 0, 1, 2, 2, 2, 2],
+    [0, 0, 0, 1, 2, 2, 2, 2],
+    [0, 0, 0, 1, 2, 2, 0, 0],
+    [0, 0, 0, 1, 2, 2, 0, 1]
+  ];
+  var BGITEM_PICTURE_11_11 = [
+    [0, 0, 0, 1, 2, 2, 0, 1],
+    [0, 0, 0, 1, 2, 2, 0, 0],
+    [0, 0, 0, 1, 2, 2, 2, 2],
+    [0, 0, 0, 1, 2, 2, 2, 2],
+    [0, 0, 0, 1, 2, 2, 2, 2],
+    [0, 0, 0, 1, 2, 2, 2, 2],
+    [0, 0, 0, 1, 2, 2, 2, 2],
+    [0, 0, 0, 1, 2, 2, 2, 2]
+  ];
+  var BGITEM_PICTURE_12_12 = [
+    [2, 0, 0, 0, 1, 1, 2, 2],
+    [2, 0, 0, 0, 0, 1, 2, 2],
+    [2, 0, 0, 0, 0, 1, 1, 2],
+    [2, 0, 0, 0, 0, 0, 1, 1],
+    [2, 0, 0, 0, 0, 0, 0, 0],
+    [2, 0, 0, 0, 0, 0, 0, 0],
+    [2, 0, 0, 0, 0, 0, 0, 0],
+    [2, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var BGITEM_PICTURE_13_13 = [
+    [2, 0, 0, 0, 0, 0, 0, 0],
+    [2, 0, 0, 0, 0, 0, 0, 0],
+    [2, 0, 0, 0, 0, 0, 0, 0],
+    [1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 2, 2, 2, 2, 2, 2, 2],
+    [0, 2, 2, 2, 2, 2, 2, 2],
+    [0, 2, 2, 2, 2, 2, 2, 2],
+    [0, 2, 2, 2, 2, 2, 2, 2]
+  ];
+  var BGITEM_PICTURE_14_14 = [
+    [1, 2, 2, 2, 2, 2, 2, 2],
+    [1, 2, 2, 2, 2, 2, 2, 2],
+    [1, 2, 2, 2, 2, 2, 2, 2],
+    [1, 2, 2, 2, 2, 2, 2, 2],
+    [1, 2, 2, 2, 2, 2, 2, 2],
+    [1, 2, 2, 2, 2, 2, 2, 2],
+    [1, 0, 0, 0, 0, 0, 0, 0],
+    [1, 1, 1, 1, 1, 1, 1, 1]
+  ];
+  var BGITEM_PICTURE_15_15 = [
+    [2, 1, 1, 1, 1, 1, 1, 1],
+    [2, 0, 0, 0, 0, 0, 0, 0],
+    [2, 2, 2, 2, 2, 2, 2, 2],
+    [2, 2, 2, 2, 2, 2, 2, 2],
+    [2, 2, 2, 2, 2, 2, 2, 2],
+    [2, 2, 2, 2, 2, 2, 2, 2],
+    [0, 2, 2, 2, 2, 2, 2, 2],
+    [1, 2, 2, 2, 2, 2, 2, 2]
+  ];
+  var BGITEM_PICTURE_16_16 = [
+    [2, 2, 2, 2, 2, 2, 2, 2],
+    [2, 2, 2, 2, 2, 2, 2, 2],
+    [2, 2, 2, 2, 2, 2, 2, 2],
+    [2, 2, 2, 2, 2, 2, 2, 2],
+    [1, 1, 1, 1, 1, 1, 1, 1],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var BGITEM_PICTURE_17_17 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [1, 0, 0, 0, 0, 0, 0, 0],
+    [1, 1, 1, 0, 0, 0, 0, 0],
+    [2, 2, 1, 1, 0, 0, 0, 0],
+    [2, 2, 2, 1, 0, 0, 0, 0],
+    [2, 2, 2, 1, 1, 0, 0, 0]
+  ];
+  var BGITEM_PICTURE_18_18 = [
+    [2, 2, 2, 2, 1, 0, 0, 0],
+    [2, 2, 2, 2, 1, 0, 0, 0],
+    [2, 2, 2, 2, 1, 0, 0, 0],
+    [2, 2, 2, 2, 1, 0, 0, 0],
+    [2, 2, 2, 2, 1, 0, 0, 0],
+    [2, 2, 2, 2, 1, 0, 0, 0],
+    [0, 0, 2, 2, 1, 0, 0, 0],
+    [1, 0, 2, 2, 1, 0, 0, 0]
+  ];
+  var BGITEM_PICTURE_19_19 = [
+    [1, 0, 2, 2, 1, 0, 0, 0],
+    [1, 0, 2, 2, 1, 0, 0, 0],
+    [1, 0, 2, 2, 1, 0, 0, 0],
+    [1, 0, 2, 2, 1, 0, 0, 0],
+    [1, 0, 2, 2, 1, 0, 0, 0],
+    [1, 0, 2, 2, 1, 0, 0, 0],
+    [1, 0, 2, 2, 1, 0, 0, 0],
+    [1, 0, 2, 2, 1, 0, 0, 0]
+  ];
+  var BGITEM_PICTURE_20_20 = [
+    [1, 0, 2, 2, 1, 2, 0, 2],
+    [1, 0, 2, 2, 1, 2, 3, 2],
+    [1, 0, 2, 2, 1, 1, 3, 1],
+    [1, 0, 2, 2, 1, 2, 3, 2],
+    [1, 0, 2, 2, 1, 2, 3, 2],
+    [1, 0, 2, 2, 1, 2, 3, 2],
+    [1, 0, 2, 2, 1, 2, 3, 2],
+    [1, 0, 2, 2, 1, 2, 0, 2]
+  ];
+  var BGITEM_PICTURE_21_21 = [
+    [1, 0, 2, 2, 1, 0, 0, 0],
+    [0, 0, 2, 2, 1, 0, 0, 0],
+    [2, 2, 2, 2, 1, 0, 0, 0],
+    [2, 2, 2, 2, 1, 0, 0, 0],
+    [2, 2, 2, 2, 1, 0, 0, 0],
+    [2, 2, 2, 2, 1, 0, 0, 0],
+    [2, 2, 2, 2, 1, 0, 0, 0],
+    [2, 2, 2, 2, 1, 0, 0, 0]
+  ];
+  var BGITEM_PICTURE_22_22 = [
+    [1, 0, 2, 2, 2, 2, 2, 2],
+    [1, 0, 2, 2, 2, 2, 2, 2],
+    [1, 0, 2, 2, 2, 2, 2, 2],
+    [1, 0, 2, 2, 2, 2, 2, 2],
+    [1, 0, 2, 2, 2, 2, 2, 2],
+    [1, 0, 2, 2, 2, 2, 2, 2],
+    [1, 0, 2, 2, 2, 2, 2, 2],
+    [1, 0, 2, 2, 2, 2, 2, 2]
+  ];
+  var BGITEM_PICTURE_23_23 = [
+    [2, 0, 2, 2, 0, 2, 2, 0],
+    [2, 3, 2, 2, 3, 2, 2, 3],
+    [1, 3, 1, 1, 3, 1, 1, 3],
+    [2, 3, 2, 2, 3, 2, 2, 3],
+    [2, 3, 2, 2, 3, 2, 2, 3],
+    [2, 3, 2, 2, 3, 2, 2, 3],
+    [2, 3, 2, 2, 3, 2, 2, 3],
+    [2, 0, 2, 2, 0, 2, 2, 0]
+  ];
+  var BGITEM_PICTURE_24_24 = [
+    [2, 2, 2, 1, 1, 0, 0, 0],
+    [2, 2, 2, 1, 0, 0, 0, 0],
+    [2, 2, 1, 1, 0, 0, 0, 0],
+    [1, 1, 1, 0, 0, 0, 0, 0],
+    [1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var BGITEM_PICTURE_25_25 = [
+    [0, 0, 0, 0, 0, 0, 1, 2],
+    [0, 0, 0, 0, 0, 2, 1, 1],
+    [0, 0, 0, 0, 0, 2, 1, 2],
+    [0, 0, 0, 0, 0, 0, 1, 1],
+    [0, 0, 0, 0, 0, 0, 1, 2],
+    [0, 0, 0, 0, 0, 2, 1, 1],
+    [0, 0, 0, 0, 2, 2, 1, 2],
+    [0, 0, 0, 2, 2, 1, 1, 1]
+  ];
+  var BGITEM_PICTURE_26_26 = [
+    [2, 2, 0, 2, 1, 1, 1, 2],
+    [2, 2, 3, 1, 1, 2, 1, 1],
+    [1, 1, 3, 2, 2, 2, 1, 2],
+    [2, 2, 3, 2, 2, 2, 1, 1],
+    [2, 2, 3, 2, 2, 2, 1, 2],
+    [2, 2, 3, 2, 2, 2, 1, 1],
+    [2, 2, 3, 2, 2, 2, 1, 2],
+    [2, 2, 0, 2, 2, 2, 1, 1]
+  ];
+  var BGITEM_PICTURE_27_27 = [
+    [0, 0, 0, 2, 2, 2, 1, 2],
+    [0, 0, 0, 0, 2, 2, 1, 1],
+    [0, 0, 0, 0, 0, 2, 1, 2],
+    [0, 0, 0, 0, 0, 0, 1, 1],
+    [0, 0, 0, 0, 0, 0, 1, 2],
+    [0, 0, 0, 0, 0, 2, 1, 1],
+    [0, 0, 0, 0, 0, 2, 1, 2],
+    [0, 0, 0, 0, 0, 0, 1, 1]
+  ];
+  var BGITEM_PICTURE_28_28 = [
+    [2, 2, 2, 2, 2, 2, 2, 2],
+    [2, 2, 0, 0, 0, 0, 2, 2],
+    [2, 0, 0, 3, 3, 0, 0, 2],
+    [2, 0, 3, 1, 3, 3, 0, 2],
+    [2, 0, 3, 3, 3, 3, 0, 2],
+    [2, 0, 0, 3, 3, 0, 0, 2],
+    [2, 2, 0, 0, 0, 0, 2, 2],
+    [2, 2, 2, 2, 2, 2, 2, 2]
+  ];
+  var BGITEM_PICTURE_29_29 = [
+    [1, 0, 0, 0, 0, 0, 0, 0],
+    [1, 0, 2, 2, 2, 2, 2, 2],
+    [1, 0, 2, 2, 2, 2, 2, 2],
+    [1, 0, 2, 2, 2, 2, 2, 2],
+    [1, 0, 2, 2, 2, 2, 2, 2],
+    [1, 0, 2, 2, 2, 2, 2, 2],
+    [1, 0, 2, 2, 2, 2, 2, 2],
+    [1, 0, 2, 2, 2, 2, 2, 2]
+  ];
+  var BGITEM_PICTURE_30_30 = [
+    [0, 2, 2, 2, 2, 2, 2, 2],
+    [0, 2, 2, 2, 2, 2, 2, 2],
+    [0, 2, 2, 2, 2, 2, 2, 2],
+    [0, 2, 2, 2, 2, 2, 2, 2],
+    [0, 2, 2, 2, 2, 2, 2, 2],
+    [0, 2, 2, 2, 2, 2, 2, 2],
+    [0, 2, 2, 2, 2, 2, 2, 2],
+    [0, 2, 2, 2, 2, 2, 2, 2]
+  ];
+  var BGITEM_PICTURE_31_31 = [
+    [0, 0, 0, 0, 0, 0, 0, 1],
+    [2, 2, 2, 2, 2, 2, 0, 1],
+    [2, 2, 2, 2, 2, 2, 0, 1],
+    [2, 2, 2, 2, 2, 2, 0, 1],
+    [2, 2, 2, 2, 2, 2, 0, 1],
+    [2, 2, 2, 2, 2, 2, 0, 1],
+    [2, 2, 2, 2, 2, 2, 0, 1],
+    [2, 2, 2, 2, 2, 2, 0, 1]
+  ];
   var BGITEM_PICTURE_184_184 = [
     [0, 0, 0, 0, 0, 0, 0, 0],
     [2, 2, 2, 2, 2, 2, 2, 0],
@@ -14694,78 +15014,110 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
   ];
   var CHARS = "\u7684\u4E00\u662F\u5728\u4E0D\u4E86\u6709\u548C\u4EBA\u8FD9\u4E2D\u5927\u4E3A\u4E0A\u4E2A\u56FD\u6211\u4EE5\u8981\u4ED6\u65F6\u6765\u7528\u4EEC\u751F\u5230\u4F5C\u5730\u4E8E\u51FA\u5C31\u5206\u5BF9\u6210\u4F1A\u53EF\u4E3B\u53D1\u5E74\u52A8\u540C\u5DE5\u4E5F\u80FD\u4E0B\u8FC7\u5B50\u8BF4\u4EA7\u79CD\u9762\u800C\u65B9\u540E\u591A\u5B9A\u884C\u5B66\u6CD5\u6240\u6C11\u5F97\u7ECF\u5341\u4E09\u4E4B\u8FDB\u7740\u7B49\u90E8\u5EA6\u5BB6\u7535\u529B\u91CC\u5982\u6C34\u5316\u9AD8\u81EA\u4E8C\u7406\u8D77\u5C0F\u7269\u73B0\u5B9E\u52A0\u91CF\u90FD\u4E24\u4F53\u5236\u673A\u5F53\u4F7F\u70B9\u4ECE\u4E1A\u672C\u53BB\u628A\u6027\u597D\u5E94\u5F00\u5B83\u5408\u8FD8\u56E0\u7531\u5176\u4E9B\u7136\u524D\u5916\u5929\u653F\u56DB\u65E5\u90A3\u793E\u4E49\u4E8B\u5E73\u5F62\u76F8\u5168\u8868\u95F4\u6837\u4E0E\u5173\u5404\u91CD\u65B0\u7EBF\u5185\u6570\u6B63\u5FC3\u53CD\u4F60\u660E\u770B\u539F\u53C8\u4E48\u5229\u6BD4\u6216\u4F46\u8D28\u6C14\u7B2C\u5411\u9053\u547D\u6B64\u53D8\u6761\u53EA\u6CA1\u7ED3\u89E3\u95EE\u610F\u5EFA\u6708\u516C\u65E0\u7CFB\u519B\u5F88\u60C5\u8005\u6700\u7ACB\u4EE3\u60F3\u5DF2\u901A\u5E76\u63D0\u76F4\u9898\u515A\u7A0B\u5C55\u4E94\u679C\u6599\u8C61\u5458\u9769\u4F4D\u5165\u5E38\u6587\u603B\u6B21\u54C1\u5F0F\u6D3B\u8BBE\u53CA\u7BA1\u7279\u4EF6\u957F\u6C42\u8001\u5934\u57FA\u8D44\u8FB9\u6D41\u8DEF\u7EA7\u5C11\u56FE\u5C71\u7EDF\u63A5\u77E5\u8F83\u5C06\u7EC4\u89C1\u8BA1\u522B\u5979\u624B\u89D2\u671F\u6839\u8BBA\u8FD0\u519C\u6307\u51E0\u4E5D\u533A\u5F3A\u653E\u51B3\u897F\u88AB\u5E72\u505A\u5FC5\u6218\u5148\u56DE\u5219\u4EFB\u53D6\u636E\u5904\u961F\u5357\u7ED9\u8272\u5149\u95E8\u5373\u4FDD\u6CBB\u5317\u9020\u767E\u89C4\u70ED\u9886\u4E03\u6D77\u53E3\u4E1C\u5BFC\u5668\u538B\u5FD7\u4E16\u91D1\u589E\u4E89\u6D4E\u9636\u6CB9\u601D\u672F\u6781\u4EA4\u53D7\u8054\u4EC0\u8BA4\u516D\u5171\u6743\u6536\u8BC1\u6539\u6E05\u5DF1\u7F8E\u518D\u91C7\u8F6C\u66F4\u5355\u98CE\u5207\u6253\u767D\u6559\u901F\u82B1\u5E26\u5B89\u573A\u8EAB\u8F66\u4F8B\u771F\u52A1\u5177\u4E07\u6BCF\u76EE\u81F3\u8FBE\u8D70\u79EF\u793A\u8BAE\u58F0\u62A5\u6597\u5B8C\u7C7B\u516B\u79BB\u534E\u540D\u786E\u624D\u79D1\u5F20\u4FE1\u9A6C\u8282\u8BDD\u7C73\u6574\u7A7A\u5143\u51B5\u4ECA\u96C6\u6E29\u4F20\u571F\u8BB8\u6B65\u7FA4\u5E7F\u77F3\u8BB0\u9700\u6BB5\u7814\u754C\u62C9\u6797\u5F8B\u53EB\u4E14\u7A76\u89C2\u8D8A\u7EC7\u88C5\u5F71\u7B97\u4F4E\u6301\u97F3\u4F17\u4E66\u5E03\u590D\u5BB9\u513F\u987B\u9645\u5546\u975E\u9A8C\u8FDE\u65AD\u6DF1\u96BE\u8FD1\u77FF\u5343\u5468\u59D4\u7D20\u6280\u5907\u534A\u529E\u9752\u7701\u5217\u4E60\u54CD\u7EA6\u652F\u822C\u53F2\u611F\u52B3\u4FBF\u56E2\u5F80\u9178\u5386\u5E02\u514B\u4F55\u9664\u6D88\u6784\u5E9C\u79F0\u592A\u51C6\u7CBE\u503C\u53F7\u7387\u65CF\u7EF4\u5212\u9009\u6807\u5199\u5B58\u5019\u6BDB\u4EB2\u5FEB\u6548\u65AF\u9662\u67E5\u6C5F\u578B\u773C\u738B\u6309\u683C\u517B\u6613\u7F6E\u6D3E\u5C42\u7247\u59CB\u5374\u4E13\u72B6\u80B2\u5382\u4EAC\u8BC6\u9002\u5C5E\u5706\u5305\u706B\u4F4F\u8C03\u6EE1\u53BF\u5C40\u7167\u53C2\u7EA2\u7EC6\u5F15\u542C\u8BE5\u94C1\u4EF7\u4E25\u9F99\u98DE";
   var PICTURE_BG_ITEMS = [
-    { code: 184, char: CHARS[0], tile: BGITEM_PICTURE_184_184 },
-    { code: 185, char: CHARS[1], tile: BGITEM_PICTURE_185_185 },
-    { code: 186, char: CHARS[2], tile: BGITEM_PICTURE_186_186 },
-    { code: 187, char: CHARS[3], tile: BGITEM_PICTURE_187_187 },
-    { code: 188, char: CHARS[4], tile: BGITEM_PICTURE_188_188 },
-    { code: 189, char: CHARS[5], tile: BGITEM_PICTURE_189_189 },
-    { code: 190, char: CHARS[6], tile: BGITEM_PICTURE_190_190 },
-    { code: 191, char: CHARS[7], tile: BGITEM_PICTURE_191_191 },
-    { code: 192, char: CHARS[8], tile: BGITEM_PICTURE_192_192 },
-    { code: 193, char: CHARS[9], tile: BGITEM_PICTURE_193_193 },
-    { code: 194, char: CHARS[10], tile: BGITEM_PICTURE_194_194 },
-    { code: 195, char: CHARS[11], tile: BGITEM_PICTURE_195_195 },
-    { code: 196, char: CHARS[12], tile: BGITEM_PICTURE_196_196 },
-    { code: 197, char: CHARS[13], tile: BGITEM_PICTURE_197_197 },
-    { code: 198, char: CHARS[14], tile: BGITEM_PICTURE_198_198 },
-    { code: 199, char: CHARS[15], tile: BGITEM_PICTURE_199_199 },
-    { code: 200, char: CHARS[16], tile: BGITEM_PICTURE_200_200 },
-    { code: 201, char: CHARS[17], tile: BGITEM_PICTURE_201_201 },
-    { code: 202, char: CHARS[18], tile: BGITEM_PICTURE_202_202 },
-    { code: 203, char: CHARS[19], tile: BGITEM_PICTURE_203_203 },
-    { code: 204, char: CHARS[20], tile: BGITEM_PICTURE_204_204 },
-    { code: 205, char: CHARS[21], tile: BGITEM_PICTURE_205_205 },
-    { code: 206, char: CHARS[22], tile: BGITEM_PICTURE_206_206 },
-    { code: 207, char: CHARS[23], tile: BGITEM_PICTURE_207_207 },
-    { code: 208, char: CHARS[24], tile: BGITEM_PICTURE_208_208 },
-    { code: 209, char: CHARS[25], tile: BGITEM_PICTURE_209_209 },
-    { code: 210, char: CHARS[26], tile: BGITEM_PICTURE_210_210 },
-    { code: 211, char: CHARS[27], tile: BGITEM_PICTURE_211_211 },
-    { code: 212, char: CHARS[28], tile: BGITEM_PICTURE_212_212 },
-    { code: 213, char: CHARS[29], tile: BGITEM_PICTURE_213_213 },
-    { code: 214, char: CHARS[30], tile: BGITEM_PICTURE_214_214 },
-    { code: 215, char: CHARS[31], tile: BGITEM_PICTURE_215_215 },
-    { code: 216, char: CHARS[32], tile: BGITEM_PICTURE_216_216 },
-    { code: 217, char: CHARS[33], tile: BGITEM_PICTURE_217_217 },
-    { code: 218, char: CHARS[34], tile: BGITEM_PICTURE_218_218 },
-    { code: 219, char: CHARS[35], tile: BGITEM_PICTURE_219_219 },
-    { code: 220, char: CHARS[36], tile: BGITEM_PICTURE_220_220 },
-    { code: 221, char: CHARS[37], tile: BGITEM_PICTURE_221_221 },
-    { code: 222, char: CHARS[38], tile: BGITEM_PICTURE_222_222 },
-    { code: 223, char: CHARS[39], tile: BGITEM_PICTURE_223_223 },
-    { code: 224, char: CHARS[40], tile: BGITEM_PICTURE_224_224 },
-    { code: 225, char: CHARS[41], tile: BGITEM_PICTURE_225_225 },
-    { code: 226, char: CHARS[42], tile: BGITEM_PICTURE_226_226 },
-    { code: 227, char: CHARS[43], tile: BGITEM_PICTURE_227_227 },
-    { code: 228, char: CHARS[44], tile: BGITEM_PICTURE_228_228 },
-    { code: 229, char: CHARS[45], tile: BGITEM_PICTURE_229_229 },
-    { code: 230, char: CHARS[46], tile: BGITEM_PICTURE_230_230 },
-    { code: 231, char: CHARS[47], tile: BGITEM_PICTURE_231_231 },
-    { code: 232, char: CHARS[48], tile: BGITEM_PICTURE_232_232 },
-    { code: 233, char: CHARS[49], tile: BGITEM_PICTURE_233_233 },
-    { code: 234, char: CHARS[50], tile: BGITEM_PICTURE_234_234 },
-    { code: 235, char: CHARS[51], tile: BGITEM_PICTURE_235_235 },
-    { code: 236, char: CHARS[52], tile: BGITEM_PICTURE_236_236 },
-    { code: 237, char: CHARS[53], tile: BGITEM_PICTURE_237_237 },
-    { code: 238, char: CHARS[54], tile: BGITEM_PICTURE_238_238 },
-    { code: 239, char: CHARS[55], tile: BGITEM_PICTURE_239_239 },
-    { code: 240, char: CHARS[56], tile: BGITEM_PICTURE_240_240 },
-    { code: 241, char: CHARS[57], tile: BGITEM_PICTURE_241_241 },
-    { code: 242, char: CHARS[58], tile: BGITEM_PICTURE_242_242 },
-    { code: 243, char: CHARS[59], tile: BGITEM_PICTURE_243_243 },
-    { code: 244, char: CHARS[60], tile: BGITEM_PICTURE_244_244 },
-    { code: 245, char: CHARS[61], tile: BGITEM_PICTURE_245_245 },
-    { code: 246, char: CHARS[62], tile: BGITEM_PICTURE_246_246 },
-    { code: 247, char: CHARS[63], tile: BGITEM_PICTURE_247_247 },
-    { code: 248, char: CHARS[64], tile: BGITEM_PICTURE_248_248 },
-    { code: 249, char: CHARS[65], tile: BGITEM_PICTURE_249_249 },
-    { code: 250, char: CHARS[66], tile: BGITEM_PICTURE_250_250 },
-    { code: 251, char: CHARS[67], tile: BGITEM_PICTURE_251_251 },
-    { code: 252, char: CHARS[68], tile: BGITEM_PICTURE_252_252 },
-    { code: 253, char: CHARS[69], tile: BGITEM_PICTURE_253_253 },
-    { code: 254, char: CHARS[70], tile: BGITEM_PICTURE_254_254 },
-    { code: 255, char: CHARS[71], tile: BGITEM_PICTURE_255_255 }
+    { code: 0, char: CHARS[0], tile: BGITEM_PICTURE_0_0 },
+    { code: 1, char: CHARS[1], tile: BGITEM_PICTURE_1_1 },
+    { code: 2, char: CHARS[2], tile: BGITEM_PICTURE_2_2 },
+    { code: 3, char: CHARS[3], tile: BGITEM_PICTURE_3_3 },
+    { code: 4, char: CHARS[4], tile: BGITEM_PICTURE_4_4 },
+    { code: 5, char: CHARS[5], tile: BGITEM_PICTURE_5_5 },
+    { code: 6, char: CHARS[6], tile: BGITEM_PICTURE_6_6 },
+    { code: 7, char: CHARS[7], tile: BGITEM_PICTURE_7_7 },
+    { code: 8, char: CHARS[8], tile: BGITEM_PICTURE_8_8 },
+    { code: 9, char: CHARS[9], tile: BGITEM_PICTURE_9_9 },
+    { code: 10, char: CHARS[10], tile: BGITEM_PICTURE_10_10 },
+    { code: 11, char: CHARS[11], tile: BGITEM_PICTURE_11_11 },
+    { code: 12, char: CHARS[12], tile: BGITEM_PICTURE_12_12 },
+    { code: 13, char: CHARS[13], tile: BGITEM_PICTURE_13_13 },
+    { code: 14, char: CHARS[14], tile: BGITEM_PICTURE_14_14 },
+    { code: 15, char: CHARS[15], tile: BGITEM_PICTURE_15_15 },
+    { code: 16, char: CHARS[16], tile: BGITEM_PICTURE_16_16 },
+    { code: 17, char: CHARS[17], tile: BGITEM_PICTURE_17_17 },
+    { code: 18, char: CHARS[18], tile: BGITEM_PICTURE_18_18 },
+    { code: 19, char: CHARS[19], tile: BGITEM_PICTURE_19_19 },
+    { code: 20, char: CHARS[20], tile: BGITEM_PICTURE_20_20 },
+    { code: 21, char: CHARS[21], tile: BGITEM_PICTURE_21_21 },
+    { code: 22, char: CHARS[22], tile: BGITEM_PICTURE_22_22 },
+    { code: 23, char: CHARS[23], tile: BGITEM_PICTURE_23_23 },
+    { code: 24, char: CHARS[24], tile: BGITEM_PICTURE_24_24 },
+    { code: 25, char: CHARS[25], tile: BGITEM_PICTURE_25_25 },
+    { code: 26, char: CHARS[26], tile: BGITEM_PICTURE_26_26 },
+    { code: 27, char: CHARS[27], tile: BGITEM_PICTURE_27_27 },
+    { code: 28, char: CHARS[28], tile: BGITEM_PICTURE_28_28 },
+    { code: 29, char: CHARS[29], tile: BGITEM_PICTURE_29_29 },
+    { code: 30, char: CHARS[30], tile: BGITEM_PICTURE_30_30 },
+    { code: 31, char: CHARS[31], tile: BGITEM_PICTURE_31_31 },
+    { code: 184, char: CHARS[184], tile: BGITEM_PICTURE_184_184 },
+    { code: 185, char: CHARS[185], tile: BGITEM_PICTURE_185_185 },
+    { code: 186, char: CHARS[186], tile: BGITEM_PICTURE_186_186 },
+    { code: 187, char: CHARS[187], tile: BGITEM_PICTURE_187_187 },
+    { code: 188, char: CHARS[188], tile: BGITEM_PICTURE_188_188 },
+    { code: 189, char: CHARS[189], tile: BGITEM_PICTURE_189_189 },
+    { code: 190, char: CHARS[190], tile: BGITEM_PICTURE_190_190 },
+    { code: 191, char: CHARS[191], tile: BGITEM_PICTURE_191_191 },
+    { code: 192, char: CHARS[192], tile: BGITEM_PICTURE_192_192 },
+    { code: 193, char: CHARS[193], tile: BGITEM_PICTURE_193_193 },
+    { code: 194, char: CHARS[194], tile: BGITEM_PICTURE_194_194 },
+    { code: 195, char: CHARS[195], tile: BGITEM_PICTURE_195_195 },
+    { code: 196, char: CHARS[196], tile: BGITEM_PICTURE_196_196 },
+    { code: 197, char: CHARS[197], tile: BGITEM_PICTURE_197_197 },
+    { code: 198, char: CHARS[198], tile: BGITEM_PICTURE_198_198 },
+    { code: 199, char: CHARS[199], tile: BGITEM_PICTURE_199_199 },
+    { code: 200, char: CHARS[200], tile: BGITEM_PICTURE_200_200 },
+    { code: 201, char: CHARS[201], tile: BGITEM_PICTURE_201_201 },
+    { code: 202, char: CHARS[202], tile: BGITEM_PICTURE_202_202 },
+    { code: 203, char: CHARS[203], tile: BGITEM_PICTURE_203_203 },
+    { code: 204, char: CHARS[204], tile: BGITEM_PICTURE_204_204 },
+    { code: 205, char: CHARS[205], tile: BGITEM_PICTURE_205_205 },
+    { code: 206, char: CHARS[206], tile: BGITEM_PICTURE_206_206 },
+    { code: 207, char: CHARS[207], tile: BGITEM_PICTURE_207_207 },
+    { code: 208, char: CHARS[208], tile: BGITEM_PICTURE_208_208 },
+    { code: 209, char: CHARS[209], tile: BGITEM_PICTURE_209_209 },
+    { code: 210, char: CHARS[210], tile: BGITEM_PICTURE_210_210 },
+    { code: 211, char: CHARS[211], tile: BGITEM_PICTURE_211_211 },
+    { code: 212, char: CHARS[212], tile: BGITEM_PICTURE_212_212 },
+    { code: 213, char: CHARS[213], tile: BGITEM_PICTURE_213_213 },
+    { code: 214, char: CHARS[214], tile: BGITEM_PICTURE_214_214 },
+    { code: 215, char: CHARS[215], tile: BGITEM_PICTURE_215_215 },
+    { code: 216, char: CHARS[216], tile: BGITEM_PICTURE_216_216 },
+    { code: 217, char: CHARS[217], tile: BGITEM_PICTURE_217_217 },
+    { code: 218, char: CHARS[218], tile: BGITEM_PICTURE_218_218 },
+    { code: 219, char: CHARS[219], tile: BGITEM_PICTURE_219_219 },
+    { code: 220, char: CHARS[220], tile: BGITEM_PICTURE_220_220 },
+    { code: 221, char: CHARS[221], tile: BGITEM_PICTURE_221_221 },
+    { code: 222, char: CHARS[222], tile: BGITEM_PICTURE_222_222 },
+    { code: 223, char: CHARS[223], tile: BGITEM_PICTURE_223_223 },
+    { code: 224, char: CHARS[224], tile: BGITEM_PICTURE_224_224 },
+    { code: 225, char: CHARS[225], tile: BGITEM_PICTURE_225_225 },
+    { code: 226, char: CHARS[226], tile: BGITEM_PICTURE_226_226 },
+    { code: 227, char: CHARS[227], tile: BGITEM_PICTURE_227_227 },
+    { code: 228, char: CHARS[228], tile: BGITEM_PICTURE_228_228 },
+    { code: 229, char: CHARS[229], tile: BGITEM_PICTURE_229_229 },
+    { code: 230, char: CHARS[230], tile: BGITEM_PICTURE_230_230 },
+    { code: 231, char: CHARS[231], tile: BGITEM_PICTURE_231_231 },
+    { code: 232, char: CHARS[232], tile: BGITEM_PICTURE_232_232 },
+    { code: 233, char: CHARS[233], tile: BGITEM_PICTURE_233_233 },
+    { code: 234, char: CHARS[234], tile: BGITEM_PICTURE_234_234 },
+    { code: 235, char: CHARS[235], tile: BGITEM_PICTURE_235_235 },
+    { code: 236, char: CHARS[236], tile: BGITEM_PICTURE_236_236 },
+    { code: 237, char: CHARS[237], tile: BGITEM_PICTURE_237_237 },
+    { code: 238, char: CHARS[238], tile: BGITEM_PICTURE_238_238 },
+    { code: 239, char: CHARS[239], tile: BGITEM_PICTURE_239_239 },
+    { code: 240, char: CHARS[240], tile: BGITEM_PICTURE_240_240 },
+    { code: 241, char: CHARS[241], tile: BGITEM_PICTURE_241_241 },
+    { code: 242, char: CHARS[242], tile: BGITEM_PICTURE_242_242 },
+    { code: 243, char: CHARS[243], tile: BGITEM_PICTURE_243_243 },
+    { code: 244, char: CHARS[244], tile: BGITEM_PICTURE_244_244 },
+    { code: 245, char: CHARS[245], tile: BGITEM_PICTURE_245_245 },
+    { code: 246, char: CHARS[246], tile: BGITEM_PICTURE_246_246 },
+    { code: 247, char: CHARS[247], tile: BGITEM_PICTURE_247_247 },
+    { code: 248, char: CHARS[248], tile: BGITEM_PICTURE_248_248 },
+    { code: 249, char: CHARS[249], tile: BGITEM_PICTURE_249_249 },
+    { code: 250, char: CHARS[250], tile: BGITEM_PICTURE_250_250 },
+    { code: 251, char: CHARS[251], tile: BGITEM_PICTURE_251_251 },
+    { code: 252, char: CHARS[252], tile: BGITEM_PICTURE_252_252 },
+    { code: 253, char: CHARS[253], tile: BGITEM_PICTURE_253_253 },
+    { code: 254, char: CHARS[254], tile: BGITEM_PICTURE_254_254 },
+    { code: 255, char: CHARS[255], tile: BGITEM_PICTURE_255_255 }
   ];
 
   // src/shared/utils/backgroundLookup.ts

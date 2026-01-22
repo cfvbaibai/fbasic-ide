@@ -24,7 +24,8 @@
     "pause": "暫停示範",
     "gaming": "搖桿測試",
     "complex": "複雜",
-    "comprehensive": "完整示範"
+    "comprehensive": "完整示範",
+    "allChars": "所有字元"
   },
   "joystick": {
     "control": "搖桿控制",

@@ -133,6 +133,15 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 280 PRINT ""
 290 PRINT "Demo completed successfully!"
 300 END`
+  },
+
+  allChars: {
+    name: 'All Chars',
+    description: 'Print all characters from CHR$(0) to CHR$(255) without newline breaks',
+    code: `10 FOR I = 0 TO 255
+20   PRINT CHR$(I);
+30 NEXT
+40 END`
   }
 }
 

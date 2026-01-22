@@ -90,6 +90,10 @@ onMounted(() => {
                     @click="loadSampleCode('comprehensive')" size="small">
                     {{ t('ide.samples.comprehensive') }}
                   </GameButton>
+                  <GameButton variant="toggle" :selected="currentSampleType === 'allChars'"
+                    @click="loadSampleCode('allChars')" size="small">
+                    {{ t('ide.samples.allChars') }}
+                  </GameButton>
                 </GameButtonGroup>
               </div>
               <IdeControls 

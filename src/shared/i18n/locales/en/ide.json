@@ -24,7 +24,8 @@
     "pause": "Pause Demo",
     "gaming": "Joystick Test",
     "complex": "Complex",
-    "comprehensive": "Full Demo"
+    "comprehensive": "Full Demo",
+    "allChars": "All Chars"
   },
   "joystick": {
     "control": "Joystick Control",
