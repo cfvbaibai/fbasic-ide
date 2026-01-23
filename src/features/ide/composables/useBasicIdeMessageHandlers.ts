@@ -130,6 +130,45 @@ export function handleScreenUpdateMessage(
       if (update.cursorX !== undefined) context.cursorX.value = update.cursorX
       if (update.cursorY !== undefined) context.cursorY.value = update.cursorY
       break
+    case 'color':
+      // Update color pattern for cells specified in colorUpdates
+      if (update.colorUpdates) {
+        console.log('🖥️ [COMPOSABLE] Updating color patterns:', update.colorUpdates)
+        
+        for (const colorUpdate of update.colorUpdates) {
+          const { x, y, pattern } = colorUpdate
+          
+          // Ensure row exists
+          if (!context.screenBuffer.value[y]) {
+            context.screenBuffer.value[y] = []
+          }
+          
+          // Ensure cell exists
+          const currentRow = context.screenBuffer.value[y]
+          if (!currentRow[x]) {
+            currentRow[x] = {
+              character: ' ',
+              colorPattern: 0,
+              x,
+              y
+            }
+          }
+          
+          // Update color pattern - force reactivity by creating new object
+          const currentCell = currentRow[x]
+          const newCell: ScreenCell = {
+            character: currentCell.character,
+            colorPattern: pattern,
+            x: currentCell.x,
+            y: currentCell.y
+          }
+          currentRow[x] = newCell
+          
+          // Also trigger reactivity by reassigning the row
+          context.screenBuffer.value[y] = [...currentRow]
+        }
+      }
+      break
   }
 }
 

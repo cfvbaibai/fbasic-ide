@@ -32,7 +32,8 @@ describe('PrintExecutor', () => {
       debugOutput: vi.fn(),
       errorOutput: vi.fn(),
       clearScreen: vi.fn(),
-      setCursorPosition: vi.fn()
+      setCursorPosition: vi.fn(),
+      setColorPattern: vi.fn()
     }
 
     context = new ExecutionContext({

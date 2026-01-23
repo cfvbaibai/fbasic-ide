@@ -508,6 +508,93 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     } as ScreenUpdateMessage)
   }
 
+  setColorPattern(x: number, y: number, pattern: number): void {
+    console.log('🔌 [WEB_WORKER_DEVICE] Set color pattern:', { x, y, pattern })
+    
+    // Validate ranges
+    if (x < 0 || x > 27 || y < 0 || y > 23) {
+      console.warn(`🔌 [WEB_WORKER_DEVICE] Invalid color position: (${x}, ${y}), clamping to valid range`)
+      x = Math.max(0, Math.min(27, x))
+      y = Math.max(0, Math.min(23, y))
+    }
+    
+    if (pattern < 0 || pattern > 3) {
+      console.warn(`🔌 [WEB_WORKER_DEVICE] Invalid color pattern: ${pattern}, clamping to valid range (0-3)`)
+      pattern = Math.max(0, Math.min(3, pattern))
+    }
+    
+    // Calculate the 2×2 area containing position (x, y)
+    // Based on manual page 70: For COLOR 10, 10, 3, the area includes:
+    // - Column 10, 9th line (A) = (10, 8) in 0-indexed
+    // - Column 11, 9th line (B) = (11, 8)
+    // - Column 10, 10th line (C) = (10, 9)
+    // - Column 11, 10th line (D) = (11, 9)
+    // So for position (x, y), the area is:
+    // - Top-left: (areaX, areaY - 1) if areaY > 0, else (areaX, 0)
+    // - Top-right: (areaX + 1, areaY - 1) if areaY > 0, else (areaX + 1, 0)
+    // - Bottom-left: (areaX, areaY)
+    // - Bottom-right: (areaX + 1, areaY)
+    // Where areaX = Math.floor(x / 2) * 2 (round down to even)
+    const areaX = Math.floor(x / 2) * 2  // Round down to even number (0, 2, 4, ...)
+    const areaY = y  // The y coordinate itself is the bottom row of the area
+    
+    // Update color pattern for all 4 cells in the 2×2 area
+    const cellsToUpdate: Array<{ x: number; y: number; pattern: number }> = []
+    
+    // Top-left: (areaX, areaY - 1) or (areaX, 0) if areaY is 0
+    const topY = areaY > 0 ? areaY - 1 : 0
+    if (areaX < 28 && topY < 24) {
+      const cell = this.screenBuffer[topY]?.[areaX]
+      if (cell) {
+        cell.colorPattern = pattern
+        cellsToUpdate.push({ x: areaX, y: topY, pattern })
+      }
+    }
+    
+    // Top-right: (areaX + 1, areaY - 1) or (areaX + 1, 0) if areaY is 0
+    if (areaX + 1 < 28 && topY < 24) {
+      const row = this.screenBuffer[topY]
+      const cell = row?.[areaX + 1]
+      if (cell) {
+        cell.colorPattern = pattern
+        cellsToUpdate.push({ x: areaX + 1, y: topY, pattern })
+      }
+    }
+    
+    // Bottom-left: (areaX, areaY)
+    if (areaX < 28 && areaY < 24) {
+      const row = this.screenBuffer[areaY]
+      const cell = row?.[areaX]
+      if (cell) {
+        cell.colorPattern = pattern
+        cellsToUpdate.push({ x: areaX, y: areaY, pattern })
+      }
+    }
+    
+    // Bottom-right: (areaX + 1, areaY)
+    if (areaX + 1 < 28 && areaY < 24) {
+      const row = this.screenBuffer[areaY]
+      const cell = row?.[areaX + 1]
+      if (cell) {
+        cell.colorPattern = pattern
+        cellsToUpdate.push({ x: areaX + 1, y: areaY, pattern })
+      }
+    }
+    
+    // Send screen update with color pattern changes
+    self.postMessage({
+      type: 'SCREEN_UPDATE',
+      id: `screen-color-${Date.now()}`,
+      timestamp: Date.now(),
+      data: {
+        executionId: this.currentExecutionId || 'unknown',
+        updateType: 'color',
+        colorUpdates: cellsToUpdate,
+        timestamp: Date.now()
+      }
+    } as ScreenUpdateMessage)
+  }
+
   /**
    * Set the current execution ID (called by WebWorkerInterpreter)
    */

@@ -19,6 +19,7 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
   public errorOutputs: string[] = []
   public clearScreenCalls = 0
   public cursorPosition: { x: number; y: number } = { x: 0, y: 0 }
+  public colorPatternCalls: Array<{ x: number; y: number; pattern: number }> = []
 
   constructor() {
     console.log('🧪 [TEST_DEVICE] TestDeviceAdapter created')
@@ -91,6 +92,15 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
   setCursorPosition(x: number, y: number): void {
     this.cursorPosition = { x, y }
     console.log('🧪 [TEST_DEVICE] Set cursor position:', { x, y })
+  }
+
+  setColorPattern(x: number, y: number, pattern: number): void {
+    // Store color pattern calls for testing
+    if (!this.colorPatternCalls) {
+      this.colorPatternCalls = []
+    }
+    this.colorPatternCalls.push({ x, y, pattern })
+    console.log('🧪 [TEST_DEVICE] Set color pattern:', { x, y, pattern })
   }
 
   // === TEST HELPER METHODS ===

@@ -22,6 +22,7 @@ import { ReadExecutor } from './executors/ReadExecutor'
 import { RestoreExecutor } from './executors/RestoreExecutor'
 import { ClsExecutor } from './executors/ClsExecutor'
 import { LocateExecutor } from './executors/LocateExecutor'
+import { ColorExecutor } from './executors/ColorExecutor'
 import type { VariableService } from '../services/VariableService'
 import type { DataService } from '../services/DataService'
 import type { ExpressionEvaluator } from '../evaluation/ExpressionEvaluator'
@@ -47,6 +48,7 @@ export class StatementRouter {
   private restoreExecutor: RestoreExecutor
   private clsExecutor: ClsExecutor
   private locateExecutor: LocateExecutor
+  private colorExecutor: ColorExecutor
 
   constructor(
     private context: ExecutionContext,
@@ -71,6 +73,7 @@ export class StatementRouter {
     this.restoreExecutor = new RestoreExecutor(dataService)
     this.clsExecutor = new ClsExecutor(context)
     this.locateExecutor = new LocateExecutor(context, evaluator)
+    this.colorExecutor = new ColorExecutor(context, evaluator)
   }
 
   /**
@@ -296,6 +299,11 @@ export class StatementRouter {
       const locateStmtCst = getFirstCstNode(singleCommandCst.children.locateStatement)
       if (locateStmtCst) {
         this.locateExecutor.execute(locateStmtCst, expandedStatement.lineNumber)
+      }
+    } else if (singleCommandCst.children.colorStatement) {
+      const colorStmtCst = getFirstCstNode(singleCommandCst.children.colorStatement)
+      if (colorStmtCst) {
+        this.colorExecutor.execute(colorStmtCst, expandedStatement.lineNumber)
       }
     } else {
       // Other statement types not yet implemented

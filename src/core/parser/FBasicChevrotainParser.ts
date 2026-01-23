@@ -21,7 +21,7 @@ import type {
 } from 'chevrotain';
 import {
   // Keywords
-  Let, Print, For, To, Step, Next, End, Pause, If, Then, Goto, Gosub, Return, On, Dim, Data, Read, Restore, Cls, Locate,
+  Let, Print, For, To, Step, Next, End, Pause, If, Then, Goto, Gosub, Return, On, Dim, Data, Read, Restore, Cls, Locate, Color,
   // String functions
   Len, Left, Right, Mid, Str, Hex, Chr, Asc,
   // Arithmetic functions
@@ -80,6 +80,7 @@ class FBasicChevrotainParser extends CstParser {
   declare restoreStatement: () => CstNode;
   declare clsStatement: () => CstNode;
   declare locateStatement: () => CstNode;
+  declare colorStatement: () => CstNode;
   declare arrayDeclaration: () => CstNode;
   declare dimensionList: () => CstNode;
   declare expressionList: () => CstNode;
@@ -604,6 +605,17 @@ class FBasicChevrotainParser extends CstParser {
       this.SUBRULE2(this.expression); // Y coordinate
     });
 
+    // COLOR X, Y, n
+    // Sets color pattern for a 2×2 character area containing position (X, Y)
+    this.colorStatement = this.RULE('colorStatement', () => {
+      this.CONSUME(Color);
+      this.SUBRULE(this.expression); // X coordinate
+      this.CONSUME(Comma);
+      this.SUBRULE2(this.expression); // Y coordinate
+      this.CONSUME2(Comma);
+      this.SUBRULE3(this.expression); // Color pattern number (0-3)
+    });
+
     // IF LogicalExpression THEN (CommandList | NumberLiteral)
     // IF LogicalExpression GOTO NumberLiteral
     // Executes the commands after THEN or jumps to line number if condition is true
@@ -712,6 +724,10 @@ class FBasicChevrotainParser extends CstParser {
         {
           GATE: () => this.LA(1).tokenType === Locate,
           ALT: () => this.SUBRULE(this.locateStatement)
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Color,
+          ALT: () => this.SUBRULE(this.colorStatement)
         },
         { ALT: () => this.SUBRULE(this.letStatement) } // Must be last since it can start with Identifier
       ]);

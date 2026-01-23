@@ -23,7 +23,8 @@ describe('Colon-Separated Statement Execution', () => {
       debugOutput: vi.fn(),
       errorOutput: vi.fn(),
       clearScreen: vi.fn(),
-      setCursorPosition: vi.fn()
+      setCursorPosition: vi.fn(),
+      setColorPattern: vi.fn()
     }
 
     interpreter = new BasicInterpreter({

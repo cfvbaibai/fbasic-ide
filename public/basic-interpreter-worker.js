@@ -9287,6 +9287,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
   var Restore = createToken({ name: "Restore", pattern: /\bRESTORE\b/i });
   var Cls = createToken({ name: "Cls", pattern: /\bCLS\b/i });
   var Locate = createToken({ name: "Locate", pattern: /\bLOCATE\b/i });
+  var Color = createToken({ name: "Color", pattern: /\bCOLOR\b/i });
   var Len = createToken({ name: "Len", pattern: /\bLEN\b/i });
   var Left = createToken({ name: "Left", pattern: /\bLEFT\$/i });
   var Right = createToken({ name: "Right", pattern: /\bRIGHT\$/i });
@@ -9378,6 +9379,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     Restore,
     Cls,
     Locate,
+    Color,
     // String functions (must come before Identifier)
     Len,
     Left,
@@ -9798,6 +9800,14 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         this.CONSUME(Comma);
         this.SUBRULE2(this.expression);
       });
+      this.colorStatement = this.RULE("colorStatement", () => {
+        this.CONSUME(Color);
+        this.SUBRULE(this.expression);
+        this.CONSUME(Comma);
+        this.SUBRULE2(this.expression);
+        this.CONSUME2(Comma);
+        this.SUBRULE3(this.expression);
+      });
       this.ifThenStatement = this.RULE("ifThenStatement", () => {
         this.CONSUME(If);
         this.SUBRULE(this.logicalExpression);
@@ -9894,6 +9904,10 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           {
             GATE: () => this.LA(1).tokenType === Locate,
             ALT: () => this.SUBRULE(this.locateStatement)
+          },
+          {
+            GATE: () => this.LA(1).tokenType === Color,
+            ALT: () => this.SUBRULE(this.colorStatement)
           },
           { ALT: () => this.SUBRULE(this.letStatement) }
           // Must be last since it can start with Identifier
@@ -17018,6 +17032,91 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     }
   };
 
+  // src/core/execution/executors/ColorExecutor.ts
+  var ColorExecutor = class {
+    constructor(context, evaluator) {
+      this.context = context;
+      this.evaluator = evaluator;
+    }
+    /**
+     * Execute a COLOR statement from CST
+     * Sets color pattern for a 2×2 character area containing position (X, Y)
+     * X: Horizontal column (0 to 27)
+     * Y: Vertical line (0 to 23)
+     * n: Color pattern number (0 to 3)
+     */
+    execute(colorStmtCst, lineNumber) {
+      const expressions = getCstNodes(colorStmtCst.children.expression);
+      if (expressions.length < 3) {
+        this.context.addError({
+          line: lineNumber || 0,
+          message: "COLOR: Expected three arguments (X, Y, n)",
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      const xExprCst = expressions[0];
+      const yExprCst = expressions[1];
+      const patternExprCst = expressions[2];
+      if (!xExprCst || !yExprCst || !patternExprCst) {
+        this.context.addError({
+          line: lineNumber || 0,
+          message: "COLOR: Invalid arguments",
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      let x;
+      let y;
+      let pattern;
+      try {
+        const xValue = this.evaluator.evaluateExpression(xExprCst);
+        const yValue = this.evaluator.evaluateExpression(yExprCst);
+        const patternValue = this.evaluator.evaluateExpression(patternExprCst);
+        x = typeof xValue === "number" ? Math.floor(xValue) : Math.floor(parseFloat(String(xValue)) || 0);
+        y = typeof yValue === "number" ? Math.floor(yValue) : Math.floor(parseFloat(String(yValue)) || 0);
+        pattern = typeof patternValue === "number" ? Math.floor(patternValue) : Math.floor(parseFloat(String(patternValue)) || 0);
+      } catch (error) {
+        this.context.addError({
+          line: lineNumber || 0,
+          message: `COLOR: Error evaluating arguments: ${error instanceof Error ? error.message : String(error)}`,
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      if (x < 0 || x > 27) {
+        this.context.addError({
+          line: lineNumber || 0,
+          message: `COLOR: X coordinate out of range (0-27), got ${x}`,
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      if (y < 0 || y > 23) {
+        this.context.addError({
+          line: lineNumber || 0,
+          message: `COLOR: Y coordinate out of range (0-23), got ${y}`,
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      if (pattern < 0 || pattern > 3) {
+        this.context.addError({
+          line: lineNumber || 0,
+          message: `COLOR: Color pattern number out of range (0-3), got ${pattern}`,
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      if (this.context.deviceAdapter) {
+        this.context.deviceAdapter.setColorPattern(x, y, pattern);
+      }
+      if (this.context.config.enableDebugMode) {
+        this.context.addDebugOutput(`COLOR: Color pattern ${pattern} set for area containing (${x}, ${y})`);
+      }
+    }
+  };
+
   // src/core/execution/StatementRouter.ts
   var StatementRouter = class {
     constructor(context, evaluator, variableService, dataService) {
@@ -17042,6 +17141,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       __publicField(this, "restoreExecutor");
       __publicField(this, "clsExecutor");
       __publicField(this, "locateExecutor");
+      __publicField(this, "colorExecutor");
       this.printExecutor = new PrintExecutor(context, evaluator);
       this.letExecutor = new LetExecutor(variableService);
       this.forExecutor = new ForExecutor(context, evaluator, variableService);
@@ -17059,6 +17159,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       this.restoreExecutor = new RestoreExecutor(dataService);
       this.clsExecutor = new ClsExecutor(context);
       this.locateExecutor = new LocateExecutor(context, evaluator);
+      this.colorExecutor = new ColorExecutor(context, evaluator);
     }
     /**
      * Route an expanded statement to its appropriate executor
@@ -17243,6 +17344,11 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         const locateStmtCst = getFirstCstNode(singleCommandCst.children.locateStatement);
         if (locateStmtCst) {
           this.locateExecutor.execute(locateStmtCst, expandedStatement.lineNumber);
+        }
+      } else if (singleCommandCst.children.colorStatement) {
+        const colorStmtCst = getFirstCstNode(singleCommandCst.children.colorStatement);
+        if (colorStmtCst) {
+          this.colorExecutor.execute(colorStmtCst, expandedStatement.lineNumber);
         }
       } else {
         this.context.addError({
@@ -18448,6 +18554,64 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           updateType: "cursor",
           cursorX: x,
           cursorY: y,
+          timestamp: Date.now()
+        }
+      });
+    }
+    setColorPattern(x, y, pattern) {
+      console.log("\u{1F50C} [WEB_WORKER_DEVICE] Set color pattern:", { x, y, pattern });
+      if (x < 0 || x > 27 || y < 0 || y > 23) {
+        console.warn(`\u{1F50C} [WEB_WORKER_DEVICE] Invalid color position: (${x}, ${y}), clamping to valid range`);
+        x = Math.max(0, Math.min(27, x));
+        y = Math.max(0, Math.min(23, y));
+      }
+      if (pattern < 0 || pattern > 3) {
+        console.warn(`\u{1F50C} [WEB_WORKER_DEVICE] Invalid color pattern: ${pattern}, clamping to valid range (0-3)`);
+        pattern = Math.max(0, Math.min(3, pattern));
+      }
+      const areaX = Math.floor(x / 2) * 2;
+      const areaY = y;
+      const cellsToUpdate = [];
+      const topY = areaY > 0 ? areaY - 1 : 0;
+      if (areaX < 28 && topY < 24) {
+        const cell = this.screenBuffer[topY]?.[areaX];
+        if (cell) {
+          cell.colorPattern = pattern;
+          cellsToUpdate.push({ x: areaX, y: topY, pattern });
+        }
+      }
+      if (areaX + 1 < 28 && topY < 24) {
+        const row = this.screenBuffer[topY];
+        const cell = row?.[areaX + 1];
+        if (cell) {
+          cell.colorPattern = pattern;
+          cellsToUpdate.push({ x: areaX + 1, y: topY, pattern });
+        }
+      }
+      if (areaX < 28 && areaY < 24) {
+        const row = this.screenBuffer[areaY];
+        const cell = row?.[areaX];
+        if (cell) {
+          cell.colorPattern = pattern;
+          cellsToUpdate.push({ x: areaX, y: areaY, pattern });
+        }
+      }
+      if (areaX + 1 < 28 && areaY < 24) {
+        const row = this.screenBuffer[areaY];
+        const cell = row?.[areaX + 1];
+        if (cell) {
+          cell.colorPattern = pattern;
+          cellsToUpdate.push({ x: areaX + 1, y: areaY, pattern });
+        }
+      }
+      self.postMessage({
+        type: "SCREEN_UPDATE",
+        id: `screen-color-${Date.now()}`,
+        timestamp: Date.now(),
+        data: {
+          executionId: this.currentExecutionId || "unknown",
+          updateType: "color",
+          colorUpdates: cellsToUpdate,
           timestamp: Date.now()
         }
       });

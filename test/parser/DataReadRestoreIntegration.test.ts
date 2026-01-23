@@ -25,7 +25,8 @@ describe('DATA/READ/RESTORE Integration', () => {
       debugOutput: vi.fn(),
       errorOutput: vi.fn(),
       clearScreen: vi.fn(),
-      setCursorPosition: vi.fn()
+      setCursorPosition: vi.fn(),
+      setColorPattern: vi.fn()
     }
 
     interpreter = new BasicInterpreter({
