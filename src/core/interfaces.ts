@@ -63,6 +63,7 @@ export interface BasicDeviceAdapter {
   debugOutput(output: string): void
   errorOutput(output: string): void
   clearScreen(): void
+  setCursorPosition(x: number, y: number): void
 }
 
 /**

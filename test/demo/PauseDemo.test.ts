@@ -33,7 +33,8 @@ describe.skipIf(!shouldRunPauseDemoTests)('Pause Demo Program', () => {
       printOutput: printOutputMock,
       debugOutput: () => {},
       errorOutput: () => {},
-      clearScreen: () => {}
+      clearScreen: () => {},
+      setCursorPosition: () => {}
     }
 
     interpreter = new BasicInterpreter({

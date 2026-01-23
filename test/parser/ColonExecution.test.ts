@@ -22,7 +22,8 @@ describe('Colon-Separated Statement Execution', () => {
       printOutput: printOutputMock,
       debugOutput: vi.fn(),
       errorOutput: vi.fn(),
-      clearScreen: vi.fn()
+      clearScreen: vi.fn(),
+      setCursorPosition: vi.fn()
     }
 
     interpreter = new BasicInterpreter({

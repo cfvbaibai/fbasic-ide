@@ -9285,6 +9285,8 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
   var Data = createToken({ name: "Data", pattern: /\bDATA\b/i });
   var Read = createToken({ name: "Read", pattern: /\bREAD\b/i });
   var Restore = createToken({ name: "Restore", pattern: /\bRESTORE\b/i });
+  var Cls = createToken({ name: "Cls", pattern: /\bCLS\b/i });
+  var Locate = createToken({ name: "Locate", pattern: /\bLOCATE\b/i });
   var Len = createToken({ name: "Len", pattern: /\bLEN\b/i });
   var Left = createToken({ name: "Left", pattern: /\bLEFT\$/i });
   var Right = createToken({ name: "Right", pattern: /\bRIGHT\$/i });
@@ -9374,6 +9376,8 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     Data,
     Read,
     Restore,
+    Cls,
+    Locate,
     // String functions (must come before Identifier)
     Len,
     Left,
@@ -9785,6 +9789,15 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           this.CONSUME(NumberLiteral);
         });
       });
+      this.clsStatement = this.RULE("clsStatement", () => {
+        this.CONSUME(Cls);
+      });
+      this.locateStatement = this.RULE("locateStatement", () => {
+        this.CONSUME(Locate);
+        this.SUBRULE(this.expression);
+        this.CONSUME(Comma);
+        this.SUBRULE2(this.expression);
+      });
       this.ifThenStatement = this.RULE("ifThenStatement", () => {
         this.CONSUME(If);
         this.SUBRULE(this.logicalExpression);
@@ -9873,6 +9886,14 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           {
             GATE: () => this.LA(1).tokenType === Restore,
             ALT: () => this.SUBRULE(this.restoreStatement)
+          },
+          {
+            GATE: () => this.LA(1).tokenType === Cls,
+            ALT: () => this.SUBRULE(this.clsStatement)
+          },
+          {
+            GATE: () => this.LA(1).tokenType === Locate,
+            ALT: () => this.SUBRULE(this.locateStatement)
           },
           { ALT: () => this.SUBRULE(this.letStatement) }
           // Must be last since it can start with Identifier
@@ -16906,6 +16927,97 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     }
   };
 
+  // src/core/execution/executors/ClsExecutor.ts
+  var ClsExecutor = class {
+    constructor(context) {
+      this.context = context;
+    }
+    /**
+     * Execute a CLS statement from CST
+     * Clears the background screen
+     */
+    execute(_clsStmtCst) {
+      if (this.context.deviceAdapter) {
+        this.context.deviceAdapter.clearScreen();
+      }
+      if (this.context.config.enableDebugMode) {
+        this.context.addDebugOutput("CLS: Screen cleared");
+      }
+    }
+  };
+
+  // src/core/execution/executors/LocateExecutor.ts
+  var LocateExecutor = class {
+    constructor(context, evaluator) {
+      this.context = context;
+      this.evaluator = evaluator;
+    }
+    /**
+     * Execute a LOCATE statement from CST
+     * Sets cursor position to (X, Y)
+     * X: Horizontal column (0 to 27)
+     * Y: Vertical line (0 to 23)
+     */
+    execute(locateStmtCst, lineNumber) {
+      const expressions = getCstNodes(locateStmtCst.children.expression);
+      if (expressions.length < 2) {
+        this.context.addError({
+          line: lineNumber || 0,
+          message: "LOCATE: Expected two arguments (X, Y)",
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      const xExprCst = expressions[0];
+      const yExprCst = expressions[1];
+      if (!xExprCst || !yExprCst) {
+        this.context.addError({
+          line: lineNumber || 0,
+          message: "LOCATE: Invalid arguments",
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      let x;
+      let y;
+      try {
+        const xValue = this.evaluator.evaluateExpression(xExprCst);
+        const yValue = this.evaluator.evaluateExpression(yExprCst);
+        x = typeof xValue === "number" ? Math.floor(xValue) : Math.floor(parseFloat(String(xValue)) || 0);
+        y = typeof yValue === "number" ? Math.floor(yValue) : Math.floor(parseFloat(String(yValue)) || 0);
+      } catch (error) {
+        this.context.addError({
+          line: lineNumber || 0,
+          message: `LOCATE: Error evaluating coordinates: ${error instanceof Error ? error.message : String(error)}`,
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      if (x < 0 || x > 27) {
+        this.context.addError({
+          line: lineNumber || 0,
+          message: `LOCATE: X coordinate out of range (0-27), got ${x}`,
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      if (y < 0 || y > 23) {
+        this.context.addError({
+          line: lineNumber || 0,
+          message: `LOCATE: Y coordinate out of range (0-23), got ${y}`,
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      if (this.context.deviceAdapter) {
+        this.context.deviceAdapter.setCursorPosition(x, y);
+      }
+      if (this.context.config.enableDebugMode) {
+        this.context.addDebugOutput(`LOCATE: Cursor set to (${x}, ${y})`);
+      }
+    }
+  };
+
   // src/core/execution/StatementRouter.ts
   var StatementRouter = class {
     constructor(context, evaluator, variableService, dataService) {
@@ -16928,6 +17040,8 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       __publicField(this, "dataExecutor");
       __publicField(this, "readExecutor");
       __publicField(this, "restoreExecutor");
+      __publicField(this, "clsExecutor");
+      __publicField(this, "locateExecutor");
       this.printExecutor = new PrintExecutor(context, evaluator);
       this.letExecutor = new LetExecutor(variableService);
       this.forExecutor = new ForExecutor(context, evaluator, variableService);
@@ -16943,6 +17057,8 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       this.dataExecutor = new DataExecutor(dataService);
       this.readExecutor = new ReadExecutor(dataService, variableService, evaluator);
       this.restoreExecutor = new RestoreExecutor(dataService);
+      this.clsExecutor = new ClsExecutor(context);
+      this.locateExecutor = new LocateExecutor(context, evaluator);
     }
     /**
      * Route an expanded statement to its appropriate executor
@@ -17117,6 +17233,16 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         const restoreStmtCst = getFirstCstNode(singleCommandCst.children.restoreStatement);
         if (restoreStmtCst) {
           this.restoreExecutor.execute(restoreStmtCst);
+        }
+      } else if (singleCommandCst.children.clsStatement) {
+        const clsStmtCst = getFirstCstNode(singleCommandCst.children.clsStatement);
+        if (clsStmtCst) {
+          this.clsExecutor.execute(clsStmtCst);
+        }
+      } else if (singleCommandCst.children.locateStatement) {
+        const locateStmtCst = getFirstCstNode(singleCommandCst.children.locateStatement);
+        if (locateStmtCst) {
+          this.locateExecutor.execute(locateStmtCst, expandedStatement.lineNumber);
         }
       } else {
         this.context.addError({
@@ -18300,6 +18426,28 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         data: {
           executionId: this.currentExecutionId || "unknown",
           updateType: "clear",
+          timestamp: Date.now()
+        }
+      });
+    }
+    setCursorPosition(x, y) {
+      console.log("\u{1F50C} [WEB_WORKER_DEVICE] Set cursor position:", { x, y });
+      if (x < 0 || x > 27 || y < 0 || y > 23) {
+        console.warn(`\u{1F50C} [WEB_WORKER_DEVICE] Invalid cursor position: (${x}, ${y}), clamping to valid range`);
+        x = Math.max(0, Math.min(27, x));
+        y = Math.max(0, Math.min(23, y));
+      }
+      this.cursorX = x;
+      this.cursorY = y;
+      self.postMessage({
+        type: "SCREEN_UPDATE",
+        id: `screen-cursor-${Date.now()}`,
+        timestamp: Date.now(),
+        data: {
+          executionId: this.currentExecutionId || "unknown",
+          updateType: "cursor",
+          cursorX: x,
+          cursorY: y,
           timestamp: Date.now()
         }
       });

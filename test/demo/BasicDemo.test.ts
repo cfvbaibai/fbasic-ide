@@ -26,7 +26,8 @@ describe('Family Basic IDE Demo Program', () => {
       printOutput: printOutputMock,
       debugOutput: vi.fn(),
       errorOutput: vi.fn(),
-      clearScreen: vi.fn()
+      clearScreen: vi.fn(),
+      setCursorPosition: vi.fn()
     }
 
     interpreter = new BasicInterpreter({

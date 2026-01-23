@@ -479,6 +479,35 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     } as ScreenUpdateMessage)
   }
 
+  setCursorPosition(x: number, y: number): void {
+    console.log('🔌 [WEB_WORKER_DEVICE] Set cursor position:', { x, y })
+    
+    // Validate ranges
+    if (x < 0 || x > 27 || y < 0 || y > 23) {
+      console.warn(`🔌 [WEB_WORKER_DEVICE] Invalid cursor position: (${x}, ${y}), clamping to valid range`)
+      x = Math.max(0, Math.min(27, x))
+      y = Math.max(0, Math.min(23, y))
+    }
+    
+    // Update cursor position
+    this.cursorX = x
+    this.cursorY = y
+    
+    // Send cursor update
+    self.postMessage({
+      type: 'SCREEN_UPDATE',
+      id: `screen-cursor-${Date.now()}`,
+      timestamp: Date.now(),
+      data: {
+        executionId: this.currentExecutionId || 'unknown',
+        updateType: 'cursor',
+        cursorX: x,
+        cursorY: y,
+        timestamp: Date.now()
+      }
+    } as ScreenUpdateMessage)
+  }
+
   /**
    * Set the current execution ID (called by WebWorkerInterpreter)
    */

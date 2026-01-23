@@ -24,7 +24,8 @@ describe('DATA/READ/RESTORE Integration', () => {
       printOutput: printOutputMock,
       debugOutput: vi.fn(),
       errorOutput: vi.fn(),
-      clearScreen: vi.fn()
+      clearScreen: vi.fn(),
+      setCursorPosition: vi.fn()
     }
 
     interpreter = new BasicInterpreter({

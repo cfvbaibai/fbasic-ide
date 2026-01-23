@@ -21,7 +21,7 @@ import type {
 } from 'chevrotain';
 import {
   // Keywords
-  Let, Print, For, To, Step, Next, End, Pause, If, Then, Goto, Gosub, Return, On, Dim, Data, Read, Restore, Cls,
+  Let, Print, For, To, Step, Next, End, Pause, If, Then, Goto, Gosub, Return, On, Dim, Data, Read, Restore, Cls, Locate,
   // String functions
   Len, Left, Right, Mid, Str, Hex, Chr, Asc,
   // Arithmetic functions
@@ -79,6 +79,7 @@ class FBasicChevrotainParser extends CstParser {
   declare readStatement: () => CstNode;
   declare restoreStatement: () => CstNode;
   declare clsStatement: () => CstNode;
+  declare locateStatement: () => CstNode;
   declare arrayDeclaration: () => CstNode;
   declare dimensionList: () => CstNode;
   declare expressionList: () => CstNode;
@@ -591,6 +592,18 @@ class FBasicChevrotainParser extends CstParser {
       this.CONSUME(Cls);
     });
 
+    // LOCATE
+    // Moves cursor to specified position
+    // Example: LOCATE X, Y
+    // X: Horizontal column (0 to 27)
+    // Y: Vertical line (0 to 23)
+    this.locateStatement = this.RULE('locateStatement', () => {
+      this.CONSUME(Locate);
+      this.SUBRULE(this.expression); // X coordinate
+      this.CONSUME(Comma);
+      this.SUBRULE2(this.expression); // Y coordinate
+    });
+
     // IF LogicalExpression THEN (CommandList | NumberLiteral)
     // IF LogicalExpression GOTO NumberLiteral
     // Executes the commands after THEN or jumps to line number if condition is true
@@ -695,6 +708,10 @@ class FBasicChevrotainParser extends CstParser {
         {
           GATE: () => this.LA(1).tokenType === Cls,
           ALT: () => this.SUBRULE(this.clsStatement)
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Locate,
+          ALT: () => this.SUBRULE(this.locateStatement)
         },
         { ALT: () => this.SUBRULE(this.letStatement) } // Must be last since it can start with Identifier
       ]);

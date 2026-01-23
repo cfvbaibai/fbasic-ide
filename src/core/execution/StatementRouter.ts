@@ -21,6 +21,7 @@ import { DataExecutor } from './executors/DataExecutor'
 import { ReadExecutor } from './executors/ReadExecutor'
 import { RestoreExecutor } from './executors/RestoreExecutor'
 import { ClsExecutor } from './executors/ClsExecutor'
+import { LocateExecutor } from './executors/LocateExecutor'
 import type { VariableService } from '../services/VariableService'
 import type { DataService } from '../services/DataService'
 import type { ExpressionEvaluator } from '../evaluation/ExpressionEvaluator'
@@ -45,6 +46,7 @@ export class StatementRouter {
   private readExecutor: ReadExecutor
   private restoreExecutor: RestoreExecutor
   private clsExecutor: ClsExecutor
+  private locateExecutor: LocateExecutor
 
   constructor(
     private context: ExecutionContext,
@@ -68,6 +70,7 @@ export class StatementRouter {
     this.readExecutor = new ReadExecutor(dataService, variableService, evaluator)
     this.restoreExecutor = new RestoreExecutor(dataService)
     this.clsExecutor = new ClsExecutor(context)
+    this.locateExecutor = new LocateExecutor(context, evaluator)
   }
 
   /**
@@ -288,6 +291,11 @@ export class StatementRouter {
       const clsStmtCst = getFirstCstNode(singleCommandCst.children.clsStatement)
       if (clsStmtCst) {
         this.clsExecutor.execute(clsStmtCst)
+      }
+    } else if (singleCommandCst.children.locateStatement) {
+      const locateStmtCst = getFirstCstNode(singleCommandCst.children.locateStatement)
+      if (locateStmtCst) {
+        this.locateExecutor.execute(locateStmtCst, expandedStatement.lineNumber)
       }
     } else {
       // Other statement types not yet implemented

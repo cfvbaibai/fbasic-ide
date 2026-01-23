@@ -31,7 +31,8 @@ describe('PrintExecutor', () => {
       printOutput: printOutputMock,
       debugOutput: vi.fn(),
       errorOutput: vi.fn(),
-      clearScreen: vi.fn()
+      clearScreen: vi.fn(),
+      setCursorPosition: vi.fn()
     }
 
     context = new ExecutionContext({

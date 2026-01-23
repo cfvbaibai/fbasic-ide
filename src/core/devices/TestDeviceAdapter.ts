@@ -18,6 +18,7 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
   public debugOutputs: string[] = []
   public errorOutputs: string[] = []
   public clearScreenCalls = 0
+  public cursorPosition: { x: number; y: number } = { x: 0, y: 0 }
 
   constructor() {
     console.log('🧪 [TEST_DEVICE] TestDeviceAdapter created')
@@ -85,6 +86,11 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
     this.debugOutputs = []
     this.errorOutputs = []
     console.log('🧪 [TEST_DEVICE] Clear screen called')
+  }
+
+  setCursorPosition(x: number, y: number): void {
+    this.cursorPosition = { x, y }
+    console.log('🧪 [TEST_DEVICE] Set cursor position:', { x, y })
   }
 
   // === TEST HELPER METHODS ===
