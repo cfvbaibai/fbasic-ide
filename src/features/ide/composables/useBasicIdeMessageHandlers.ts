@@ -21,6 +21,7 @@ export interface MessageHandlerContext {
   screenBuffer: Ref<ScreenCell[][]>
   cursorX: Ref<number>
   cursorY: Ref<number>
+  bgPalette: Ref<number>
   webWorkerManager: WebWorkerManager
 }
 
@@ -167,6 +168,18 @@ export function handleScreenUpdateMessage(
           // Also trigger reactivity by reassigning the row
           context.screenBuffer.value[y] = [...currentRow]
         }
+      }
+      break
+    case 'palette':
+      // Update background and sprite palette codes
+      if (update.bgPalette !== undefined) {
+        context.bgPalette.value = update.bgPalette
+        console.log('🖥️ [COMPOSABLE] Updated background palette:', update.bgPalette)
+      }
+      if (update.spritePalette !== undefined) {
+        // Note: spritePalette is stored but not currently used in rendering
+        // It will be used when sprite system is implemented
+        console.log('🖥️ [COMPOSABLE] Updated sprite palette:', update.spritePalette)
       }
       break
   }

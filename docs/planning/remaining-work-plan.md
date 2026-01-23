@@ -43,12 +43,12 @@ This document outlines the remaining work needed to complete the Family Basic ID
 - ✅ **Control Flow**: PRINT, LET, IF-THEN, FOR-NEXT, GOTO, GOSUB, RETURN, END, ON
 - ✅ **Data Management**: DATA, READ, RESTORE, DIM
 - ✅ **Program Control**: PAUSE, REM
-- ✅ **Screen Control**: CLS, LOCATE
+- ✅ **Screen Control**: CLS, LOCATE, COLOR, CGSET
 - ✅ **Functions**: ABS, SGN, RND, VAL, LEN, LEFT$, RIGHT$, MID$, STR$, HEX$, CHR$, ASC
 - ✅ **Operators**: Arithmetic, comparison, logical operators
 - ✅ **Input Functions**: STICK, STRIG (controller input)
 
-**Status**: Core language features implemented, remaining screen commands (COLOR, CGSET, CGEN, VIEW) and input commands missing.
+**Status**: Core language features implemented, remaining screen commands (CGEN, VIEW) and input commands missing.
 
 ---
 
@@ -96,7 +96,7 @@ This document outlines the remaining work needed to complete the Family Basic ID
 
 ### Phase 2: Implement Missing F-BASIC Screen Commands (High Priority)
 
-**Estimated Effort**: 3-5 days  
+**Estimated Effort**: 2-4 days remaining (COLOR completed)  
 **Priority**: High (core language features)
 
 #### 2.1 Screen Control Commands
@@ -118,18 +118,19 @@ This document outlines the remaining work needed to complete the Family Basic ID
 - [x] Add device adapter tests for cursor positioning
 
 **COLOR** (Color Pattern)
-- [ ] Add `COLOR` token to parser
-- [ ] Add `colorStatement` rule (COLOR X, Y, n)
-- [ ] Create `ColorExecutor.ts`
-- [ ] Implement color pattern setting in device adapter
-- [ ] Add tests for COLOR command
+- [x] Add `COLOR` token to parser
+- [x] Add `colorStatement` rule (COLOR X, Y, n)
+- [x] Create `ColorExecutor.ts`
+- [x] Implement color pattern setting in device adapter
+- [x] Add tests for COLOR command
+- [x] Fix message handler to process 'color' update messages
 
 **CGSET** (Color Palette)
-- [ ] Add `CGSET` token to parser
-- [ ] Add `cgsetStatement` rule (CGSET palet_code, combination)
-- [ ] Create `CgsetExecutor.ts`
-- [ ] Implement palette setting in device adapter
-- [ ] Add tests for CGSET command
+- [x] Add `CGSET` token to parser
+- [x] Add `cgsetStatement` rule (CGSET [m][,n])
+- [x] Create `CgsetExecutor.ts`
+- [x] Implement palette setting in device adapter
+- [x] Add tests for CGSET command
 
 **CGEN** (Character Generator)
 - [ ] Add `CGEN` token to parser
@@ -148,8 +149,8 @@ This document outlines the remaining work needed to complete the Family Basic ID
 **Files to Create**:
 - `src/core/execution/executors/ClsExecutor.ts` ✅
 - `src/core/execution/executors/LocateExecutor.ts` ✅
-- `src/core/execution/executors/ColorExecutor.ts`
-- `src/core/execution/executors/CgsetExecutor.ts`
+- `src/core/execution/executors/ColorExecutor.ts` ✅
+- `src/core/execution/executors/CgsetExecutor.ts` ✅
 - `src/core/execution/executors/CgenExecutor.ts`
 - `src/core/execution/executors/ViewExecutor.ts`
 
@@ -157,6 +158,9 @@ This document outlines the remaining work needed to complete the Family Basic ID
 - `test/executors/LocateExecutor.test.ts` ✅
 - `test/integration/LocatePrintIntegration.test.ts` ✅
 - `test/devices/WebWorkerDeviceAdapter.test.ts` ✅
+- `test/executors/ColorExecutor.test.ts` ✅
+- `test/integration/ColorIntegration.test.ts` ✅
+- `test/executors/CgsetExecutor.test.ts` ✅
 
 **Files to Modify**:
 - `src/core/parser/parser-tokens.ts` (add tokens)
@@ -296,11 +300,11 @@ This document outlines the remaining work needed to complete the Family Basic ID
 
 #### 6.1 Test Coverage
 - [ ] Review test coverage for all executors
-- [x] Add missing tests for new executors (LOCATE executor tests added)
-- [x] Add integration tests for screen commands (LOCATE integration tests added)
+- [x] Add missing tests for new executors (LOCATE, COLOR executor tests added)
+- [x] Add integration tests for screen commands (LOCATE, COLOR integration tests added)
 - [ ] Add integration tests for input commands
-- [x] Test error handling for all commands (LOCATE error handling tested)
-- [x] Test edge cases and boundary conditions (LOCATE edge cases tested)
+- [x] Test error handling for all commands (LOCATE, COLOR error handling tested)
+- [x] Test edge cases and boundary conditions (LOCATE, COLOR edge cases tested)
 
 #### 6.2 Type Checking
 - [ ] Ensure all new code passes `pnpm type-check`
@@ -380,7 +384,7 @@ This document outlines the remaining work needed to complete the Family Basic ID
 
 | Phase | Priority | Effort | Impact | Dependencies |
 |-------|----------|--------|--------|--------------|
-| Phase 2: Screen Commands | High | 3-5 days | High | None |
+| Phase 2: Screen Commands | High | 1-3 days | High | None (COLOR ✅, CGSET ✅ completed) |
 | Phase 3: Input Commands | High | 2-3 days | High | None |
 | Phase 6: Testing & QA | High | 2-3 days | High | Phases 2-3 |
 | Phase 1: Vue Best Practices | Low | 1 day | Low | None (mostly complete) |
@@ -394,14 +398,14 @@ This document outlines the remaining work needed to complete the Family Basic ID
 
 ### Minimum Viable Product (MVP)
 - ✅ Core language features (PRINT, LET, IF-THEN, FOR-NEXT, etc.)
-- [x] Screen commands (CLS ✅, LOCATE ✅, COLOR)
+- [x] Screen commands (CLS ✅, LOCATE ✅, COLOR ✅, CGSET ✅)
 - [ ] Input commands (INPUT, LINPUT)
-- [x] Comprehensive test coverage (>80%) (LOCATE fully tested)
+- [x] Comprehensive test coverage (>80%) (LOCATE, COLOR, CGSET fully tested)
 - [x] All TypeScript errors resolved
 - [x] All linting errors resolved
 
 ### Complete Product
-- [ ] All screen commands implemented
+- [ ] All screen commands implemented (CGSET ✅, CGEN ⏳, VIEW ⏳)
 - [ ] All input commands implemented
 - [ ] Additional commands (STOP, CONT, SWAP, etc.)
 - [ ] Complete test coverage
@@ -412,8 +416,8 @@ This document outlines the remaining work needed to complete the Family Basic ID
 
 ## Timeline Estimate
 
-**Minimum (MVP)**: 7-11 days
-- Phase 2: Screen Commands (3-5 days)
+**Minimum (MVP)**: 6-10 days
+- Phase 2: Screen Commands (1-3 days remaining, COLOR ✅, CGSET ✅ completed)
 - Phase 3: Input Commands (2-3 days)
 - Phase 6: Testing & QA (2-3 days)
 
@@ -461,10 +465,52 @@ This document outlines the remaining work needed to complete the Family Basic ID
 
 ---
 
-**Last Updated**: 2026-01-22  
+**Last Updated**: 2026-01-23  
 **Next Review**: After Phase 2 completion
 
 ## Recent Updates
+
+### CGSET Command Implementation & Palette Rendering Fix (2026-01-23)
+- ✅ **Parser**: Added `CGSET` token and `cgsetStatement` rule (CGSET [m][,n])
+- ✅ **Executor**: Created `CgsetExecutor.ts` with full validation (m: 0-1, n: 0-2, both optional, defaults: m=1, n=1)
+- ✅ **Device Adapter**: Implemented `setColorPalette()` in `WebWorkerDeviceAdapter` and `TestDeviceAdapter`
+  - Sends 'palette' update messages with bgPalette and spritePalette values
+- ✅ **Message Handler**: Added 'palette' update type handling in `useBasicIdeMessageHandlers.ts`
+  - Processes palette updates to update bgPalette ref in context
+- ✅ **UI Integration**: Fixed palette rendering in Screen component
+  - Added `bgPalette` prop to Screen and RuntimeOutput components
+  - Screen component now uses palette from props instead of hardcoded value
+  - Added watcher to re-render when palette changes
+- ✅ **Integration**: Registered CGSET in `StatementRouter.ts`
+- ✅ **Interface Updates**: Extended `ScreenUpdateMessage` interface to support 'palette' update type
+- ✅ **Testing**: 
+  - 18 unit tests in `CgsetExecutor.test.ts` covering all scenarios including CGSET + PRINT integration
+  - 11 integration tests in `CgsetIntegration.test.ts` verifying message generation, handler processing, and PRINT integration
+  - Tests verify that CGSET 0, 1 sets palette correctly and characters use color 0x2C from palette 0
+- ✅ **Type Safety**: All tests use proper TypeScript types, no `any` types
+
+**Status**: CGSET command fully implemented and tested. Palette changes now correctly affect character rendering. Characters printed after `CGSET 0, 1` are rendered with color 0x2C (#4EB7BC) from palette 0 instead of white.
+
+### COLOR Command Implementation (2026-01-23)
+
+### COLOR Command Implementation (2026-01-23)
+- ✅ **Parser**: Added `COLOR` token and `colorStatement` rule (COLOR X, Y, n)
+- ✅ **Executor**: Created `ColorExecutor.ts` with full validation (X: 0-27, Y: 0-23, pattern: 0-3)
+- ✅ **Device Adapter**: Implemented `setColorPattern()` in `WebWorkerDeviceAdapter` and `TestDeviceAdapter`
+  - Updates 2×2 character area containing specified position
+  - Sends 'color' update messages with colorUpdates array
+- ✅ **Message Handler**: Fixed bug where 'color' update messages weren't being processed
+  - Added 'color' case handler in `useBasicIdeMessageHandlers.ts`
+  - Processes colorUpdates array to update screen buffer colorPattern values
+- ✅ **Integration**: Registered COLOR in `StatementRouter.ts`
+- ✅ **Interface Updates**: Extended `ScreenUpdateMessage` interface to support 'color' update type
+- ✅ **Testing**: 
+  - 16 unit tests in `ColorExecutor.test.ts` covering all scenarios
+  - 9 integration tests in `ColorIntegration.test.ts` with message handler simulation
+  - Tests verify message generation, handler processing, and area calculation
+- ✅ **Type Safety**: All tests use proper TypeScript types, no `any` types
+
+**Status**: COLOR command fully implemented and tested. Color patterns are correctly applied to screen areas and visible in the IDE.
 
 ### LOCATE Command Implementation (2026-01-22)
 - ✅ **Parser**: Added `LOCATE` token and `locateStatement` rule

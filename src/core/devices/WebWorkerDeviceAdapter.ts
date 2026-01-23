@@ -38,6 +38,8 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   private screenBuffer: ScreenCell[][] = []
   private cursorX = 0
   private cursorY = 0
+  private bgPalette = 1  // Default background palette (0-1)
+  private spritePalette = 1  // Default sprite palette (0-2)
   
   constructor() {
     console.log('🔌 [WEB_WORKER_DEVICE] WebWorkerDeviceAdapter created')
@@ -590,6 +592,41 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
         executionId: this.currentExecutionId || 'unknown',
         updateType: 'color',
         colorUpdates: cellsToUpdate,
+        timestamp: Date.now()
+      }
+    } as ScreenUpdateMessage)
+  }
+
+  setColorPalette(bgPalette: number, spritePalette: number): void {
+    console.log('🔌 [WEB_WORKER_DEVICE] Set color palette:', { bgPalette, spritePalette })
+    
+    // Validate ranges
+    if (bgPalette < 0 || bgPalette > 1) {
+      console.warn(`🔌 [WEB_WORKER_DEVICE] Invalid background palette: ${bgPalette}, clamping to valid range (0-1)`)
+      bgPalette = Math.max(0, Math.min(1, bgPalette))
+    }
+    
+    if (spritePalette < 0 || spritePalette > 2) {
+      console.warn(`🔌 [WEB_WORKER_DEVICE] Invalid sprite palette: ${spritePalette}, clamping to valid range (0-2)`)
+      spritePalette = Math.max(0, Math.min(2, spritePalette))
+    }
+    
+    // Update palette state
+    this.bgPalette = bgPalette
+    this.spritePalette = spritePalette
+    
+    // Send palette update message
+    // Note: The UI will need to handle this update type to apply the palette
+    // For now, we'll send it as a screen update with a new updateType
+    self.postMessage({
+      type: 'SCREEN_UPDATE',
+      id: `screen-palette-${Date.now()}`,
+      timestamp: Date.now(),
+      data: {
+        executionId: this.currentExecutionId || 'unknown',
+        updateType: 'palette',
+        bgPalette,
+        spritePalette,
         timestamp: Date.now()
       }
     } as ScreenUpdateMessage)

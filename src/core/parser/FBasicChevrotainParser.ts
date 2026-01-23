@@ -21,7 +21,7 @@ import type {
 } from 'chevrotain';
 import {
   // Keywords
-  Let, Print, For, To, Step, Next, End, Pause, If, Then, Goto, Gosub, Return, On, Dim, Data, Read, Restore, Cls, Locate, Color,
+  Let, Print, For, To, Step, Next, End, Pause, If, Then, Goto, Gosub, Return, On, Dim, Data, Read, Restore, Cls, Locate, Color, Cgset,
   // String functions
   Len, Left, Right, Mid, Str, Hex, Chr, Asc,
   // Arithmetic functions
@@ -81,6 +81,7 @@ class FBasicChevrotainParser extends CstParser {
   declare clsStatement: () => CstNode;
   declare locateStatement: () => CstNode;
   declare colorStatement: () => CstNode;
+  declare cgsetStatement: () => CstNode;
   declare arrayDeclaration: () => CstNode;
   declare dimensionList: () => CstNode;
   declare expressionList: () => CstNode;
@@ -616,6 +617,22 @@ class FBasicChevrotainParser extends CstParser {
       this.SUBRULE3(this.expression); // Color pattern number (0-3)
     });
 
+    // CGSET [m][,n]
+    // Sets color palette for background (m: 0-1) and sprites (n: 0-2)
+    // Both parameters are optional (default: m=1, n=1)
+    this.cgsetStatement = this.RULE('cgsetStatement', () => {
+      this.CONSUME(Cgset);
+      // First parameter (m) is optional
+      this.OPTION(() => {
+        this.SUBRULE(this.expression); // Background palette code (0-1)
+        // Second parameter (n) is optional if first is present
+        this.OPTION2(() => {
+          this.CONSUME(Comma);
+          this.SUBRULE2(this.expression); // Sprite palette code (0-2)
+        });
+      });
+    });
+
     // IF LogicalExpression THEN (CommandList | NumberLiteral)
     // IF LogicalExpression GOTO NumberLiteral
     // Executes the commands after THEN or jumps to line number if condition is true
@@ -728,6 +745,10 @@ class FBasicChevrotainParser extends CstParser {
         {
           GATE: () => this.LA(1).tokenType === Color,
           ALT: () => this.SUBRULE(this.colorStatement)
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Cgset,
+          ALT: () => this.SUBRULE(this.cgsetStatement)
         },
         { ALT: () => this.SUBRULE(this.letStatement) } // Must be last since it can start with Identifier
       ]);

@@ -9288,6 +9288,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
   var Cls = createToken({ name: "Cls", pattern: /\bCLS\b/i });
   var Locate = createToken({ name: "Locate", pattern: /\bLOCATE\b/i });
   var Color = createToken({ name: "Color", pattern: /\bCOLOR\b/i });
+  var Cgset = createToken({ name: "Cgset", pattern: /\bCGSET\b/i });
   var Len = createToken({ name: "Len", pattern: /\bLEN\b/i });
   var Left = createToken({ name: "Left", pattern: /\bLEFT\$/i });
   var Right = createToken({ name: "Right", pattern: /\bRIGHT\$/i });
@@ -9380,6 +9381,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     Cls,
     Locate,
     Color,
+    Cgset,
     // String functions (must come before Identifier)
     Len,
     Left,
@@ -9808,6 +9810,16 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         this.CONSUME2(Comma);
         this.SUBRULE3(this.expression);
       });
+      this.cgsetStatement = this.RULE("cgsetStatement", () => {
+        this.CONSUME(Cgset);
+        this.OPTION(() => {
+          this.SUBRULE(this.expression);
+          this.OPTION2(() => {
+            this.CONSUME(Comma);
+            this.SUBRULE2(this.expression);
+          });
+        });
+      });
       this.ifThenStatement = this.RULE("ifThenStatement", () => {
         this.CONSUME(If);
         this.SUBRULE(this.logicalExpression);
@@ -9908,6 +9920,10 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           {
             GATE: () => this.LA(1).tokenType === Color,
             ALT: () => this.SUBRULE(this.colorStatement)
+          },
+          {
+            GATE: () => this.LA(1).tokenType === Cgset,
+            ALT: () => this.SUBRULE(this.cgsetStatement)
           },
           { ALT: () => this.SUBRULE(this.letStatement) }
           // Must be last since it can start with Identifier
@@ -17117,6 +17133,84 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     }
   };
 
+  // src/core/execution/executors/CgsetExecutor.ts
+  var CgsetExecutor = class {
+    constructor(context, evaluator) {
+      this.context = context;
+      this.evaluator = evaluator;
+    }
+    /**
+     * Execute a CGSET statement from CST
+     * Sets color palette for background and/or sprites
+     * m: Background palette code (0 to 1), optional (default: 1)
+     * n: Sprite palette code (0 to 2), optional (default: 1)
+     * Syntax: CGSET [m][,n]
+     */
+    execute(cgsetStmtCst, lineNumber) {
+      const expressions = getCstNodes(cgsetStmtCst.children.expression);
+      let bgPalette = void 0;
+      let spritePalette = void 0;
+      if (expressions.length >= 1) {
+        const mExprCst = expressions[0];
+        if (mExprCst) {
+          try {
+            const mValue = this.evaluator.evaluateExpression(mExprCst);
+            bgPalette = typeof mValue === "number" ? Math.floor(mValue) : Math.floor(parseFloat(String(mValue)) || 0);
+          } catch (error) {
+            this.context.addError({
+              line: lineNumber || 0,
+              message: `CGSET: Error evaluating background palette code: ${error instanceof Error ? error.message : String(error)}`,
+              type: ERROR_TYPES.RUNTIME
+            });
+            return;
+          }
+        }
+      }
+      if (expressions.length >= 2) {
+        const nExprCst = expressions[1];
+        if (nExprCst) {
+          try {
+            const nValue = this.evaluator.evaluateExpression(nExprCst);
+            spritePalette = typeof nValue === "number" ? Math.floor(nValue) : Math.floor(parseFloat(String(nValue)) || 0);
+          } catch (error) {
+            this.context.addError({
+              line: lineNumber || 0,
+              message: `CGSET: Error evaluating sprite palette code: ${error instanceof Error ? error.message : String(error)}`,
+              type: ERROR_TYPES.RUNTIME
+            });
+            return;
+          }
+        }
+      }
+      const finalBgPalette = bgPalette !== void 0 ? bgPalette : 1;
+      const finalSpritePalette = spritePalette !== void 0 ? spritePalette : 1;
+      if (bgPalette !== void 0 && (bgPalette < 0 || bgPalette > 1)) {
+        this.context.addError({
+          line: lineNumber || 0,
+          message: `CGSET: Background palette code out of range (0-1), got ${bgPalette}`,
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      if (spritePalette !== void 0 && (spritePalette < 0 || spritePalette > 2)) {
+        this.context.addError({
+          line: lineNumber || 0,
+          message: `CGSET: Sprite palette code out of range (0-2), got ${spritePalette}`,
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      if (this.context.deviceAdapter) {
+        this.context.deviceAdapter.setColorPalette(finalBgPalette, finalSpritePalette);
+      }
+      if (this.context.config.enableDebugMode) {
+        const bgStr = bgPalette !== void 0 ? String(bgPalette) : "default(1)";
+        const spriteStr = spritePalette !== void 0 ? String(spritePalette) : "default(1)";
+        this.context.addDebugOutput(`CGSET: Background palette=${bgStr}, Sprite palette=${spriteStr}`);
+      }
+    }
+  };
+
   // src/core/execution/StatementRouter.ts
   var StatementRouter = class {
     constructor(context, evaluator, variableService, dataService) {
@@ -17142,6 +17236,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       __publicField(this, "clsExecutor");
       __publicField(this, "locateExecutor");
       __publicField(this, "colorExecutor");
+      __publicField(this, "cgsetExecutor");
       this.printExecutor = new PrintExecutor(context, evaluator);
       this.letExecutor = new LetExecutor(variableService);
       this.forExecutor = new ForExecutor(context, evaluator, variableService);
@@ -17160,6 +17255,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       this.clsExecutor = new ClsExecutor(context);
       this.locateExecutor = new LocateExecutor(context, evaluator);
       this.colorExecutor = new ColorExecutor(context, evaluator);
+      this.cgsetExecutor = new CgsetExecutor(context, evaluator);
     }
     /**
      * Route an expanded statement to its appropriate executor
@@ -17349,6 +17445,11 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         const colorStmtCst = getFirstCstNode(singleCommandCst.children.colorStatement);
         if (colorStmtCst) {
           this.colorExecutor.execute(colorStmtCst, expandedStatement.lineNumber);
+        }
+      } else if (singleCommandCst.children.cgsetStatement) {
+        const cgsetStmtCst = getFirstCstNode(singleCommandCst.children.cgsetStatement);
+        if (cgsetStmtCst) {
+          this.cgsetExecutor.execute(cgsetStmtCst, expandedStatement.lineNumber);
         }
       } else {
         this.context.addError({
@@ -18172,6 +18273,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
 
   // src/core/devices/WebWorkerDeviceAdapter.ts
   var WebWorkerDeviceAdapter = class _WebWorkerDeviceAdapter {
+    // Default sprite palette (0-2)
     constructor() {
       // === DEVICE STATE ===
       __publicField(this, "strigClickBuffer", /* @__PURE__ */ new Map());
@@ -18182,6 +18284,9 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       __publicField(this, "screenBuffer", []);
       __publicField(this, "cursorX", 0);
       __publicField(this, "cursorY", 0);
+      __publicField(this, "bgPalette", 1);
+      // Default background palette (0-1)
+      __publicField(this, "spritePalette", 1);
       // === WEB WORKER MANAGEMENT ===
       __publicField(this, "worker", null);
       __publicField(this, "messageId", 0);
@@ -18612,6 +18717,31 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           executionId: this.currentExecutionId || "unknown",
           updateType: "color",
           colorUpdates: cellsToUpdate,
+          timestamp: Date.now()
+        }
+      });
+    }
+    setColorPalette(bgPalette, spritePalette) {
+      console.log("\u{1F50C} [WEB_WORKER_DEVICE] Set color palette:", { bgPalette, spritePalette });
+      if (bgPalette < 0 || bgPalette > 1) {
+        console.warn(`\u{1F50C} [WEB_WORKER_DEVICE] Invalid background palette: ${bgPalette}, clamping to valid range (0-1)`);
+        bgPalette = Math.max(0, Math.min(1, bgPalette));
+      }
+      if (spritePalette < 0 || spritePalette > 2) {
+        console.warn(`\u{1F50C} [WEB_WORKER_DEVICE] Invalid sprite palette: ${spritePalette}, clamping to valid range (0-2)`);
+        spritePalette = Math.max(0, Math.min(2, spritePalette));
+      }
+      this.bgPalette = bgPalette;
+      this.spritePalette = spritePalette;
+      self.postMessage({
+        type: "SCREEN_UPDATE",
+        id: `screen-palette-${Date.now()}`,
+        timestamp: Date.now(),
+        data: {
+          executionId: this.currentExecutionId || "unknown",
+          updateType: "palette",
+          bgPalette,
+          spritePalette,
           timestamp: Date.now()
         }
       });

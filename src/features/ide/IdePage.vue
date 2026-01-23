@@ -31,6 +31,7 @@ const {
   screenBuffer,
   cursorX,
   cursorY,
+  bgPalette,
   runCode,
   stopCode,
   clearOutput,
@@ -115,7 +116,7 @@ onMounted(() => {
         <div class="output-panel">
           <RuntimeOutput :output="output" :is-running="isRunning" :errors="errors" :variables="variables"
             :debug-output="debugOutput" :debug-mode="debugMode" :screen-buffer="screenBuffer" :cursor-x="cursorX"
-            :cursor-y="cursorY" />
+            :cursor-y="cursorY" :bg-palette="bgPalette" />
         </div>
       </div>
 

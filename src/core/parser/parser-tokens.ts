@@ -37,6 +37,7 @@ export const Restore = createToken({ name: 'Restore', pattern: /\bRESTORE\b/i })
 export const Cls = createToken({ name: 'Cls', pattern: /\bCLS\b/i });
 export const Locate = createToken({ name: 'Locate', pattern: /\bLOCATE\b/i });
 export const Color = createToken({ name: 'Color', pattern: /\bCOLOR\b/i });
+export const Cgset = createToken({ name: 'Cgset', pattern: /\bCGSET\b/i });
 
 // String function keywords (must be before Identifier)
 export const Len = createToken({ name: 'Len', pattern: /\bLEN\b/i });
@@ -136,7 +137,7 @@ export const Whitespace = createToken({
 export const allTokens = [
   Whitespace,
   // Keywords
-  Let, Print, For, To, Step, Next, End, Rem, Pause, If, Then, Goto, Gosub, Return, On, Dim, Data, Read, Restore, Cls, Locate, Color,
+  Let, Print, For, To, Step, Next, End, Rem, Pause, If, Then, Goto, Gosub, Return, On, Dim, Data, Read, Restore, Cls, Locate, Color, Cgset,
   // String functions (must come before Identifier)
   Len, Left, Right, Mid, Str, Hex, Chr, Asc,
   // Arithmetic functions (must come before Identifier)

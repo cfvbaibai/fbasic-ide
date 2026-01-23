@@ -20,6 +20,8 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
   public clearScreenCalls = 0
   public cursorPosition: { x: number; y: number } = { x: 0, y: 0 }
   public colorPatternCalls: Array<{ x: number; y: number; pattern: number }> = []
+  public colorPaletteCalls: Array<{ bgPalette: number; spritePalette: number }> = []
+  public currentColorPalette: { bgPalette: number; spritePalette: number } = { bgPalette: 1, spritePalette: 1 }
 
   constructor() {
     console.log('🧪 [TEST_DEVICE] TestDeviceAdapter created')
@@ -101,6 +103,16 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
     }
     this.colorPatternCalls.push({ x, y, pattern })
     console.log('🧪 [TEST_DEVICE] Set color pattern:', { x, y, pattern })
+  }
+
+  setColorPalette(bgPalette: number, spritePalette: number): void {
+    // Store color palette calls for testing
+    if (!this.colorPaletteCalls) {
+      this.colorPaletteCalls = []
+    }
+    this.colorPaletteCalls.push({ bgPalette, spritePalette })
+    this.currentColorPalette = { bgPalette, spritePalette }
+    console.log('🧪 [TEST_DEVICE] Set color palette:', { bgPalette, spritePalette })
   }
 
   // === TEST HELPER METHODS ===

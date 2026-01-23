@@ -65,6 +65,7 @@ export interface BasicDeviceAdapter {
   clearScreen(): void
   setCursorPosition(x: number, y: number): void
   setColorPattern(x: number, y: number, pattern: number): void
+  setColorPalette(bgPalette: number, spritePalette: number): void
 }
 
 /**
@@ -241,7 +242,7 @@ export interface ScreenUpdateMessage extends ServiceWorkerMessage {
   type: 'SCREEN_UPDATE'
   data: {
     executionId: string
-    updateType: 'character' | 'cursor' | 'clear' | 'full' | 'color'
+    updateType: 'character' | 'cursor' | 'clear' | 'full' | 'color' | 'palette'
     x?: number
     y?: number
     character?: string
@@ -249,6 +250,8 @@ export interface ScreenUpdateMessage extends ServiceWorkerMessage {
     cursorY?: number
     screenBuffer?: ScreenCell[][]
     colorUpdates?: Array<{ x: number; y: number; pattern: number }>
+    bgPalette?: number
+    spritePalette?: number
     timestamp: number
   }
 }

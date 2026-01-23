@@ -16,6 +16,7 @@ interface Props {
   screenBuffer: ScreenCell[][]
   cursorX: number
   cursorY: number
+  bgPalette?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -32,12 +33,14 @@ const props = withDefaults(defineProps<Props>(), {
     return grid
   },
   cursorX: 0,
-  cursorY: 0
+  cursorY: 0,
+  bgPalette: 1
 })
 
 // Canvas reference
 const screenCanvas = useTemplateRef<HTMLCanvasElement>('screenCanvas')
-const paletteCode = ref(1) // Default background palette code is 1
+// Use bgPalette from props instead of hardcoded value
+const paletteCode = computed(() => props.bgPalette ?? 1)
 
 // Zoom state - default to 2x (current scale)
 const zoomLevel = ref<1 | 2 | 3 | 4>(2)
@@ -68,6 +71,11 @@ function render(): void {
   if (!screenCanvas.value) return
   renderScreenBuffer(screenCanvas.value, props.screenBuffer, paletteCode.value)
 }
+
+// Watch paletteCode changes to trigger re-render
+watch(paletteCode, () => {
+  scheduleRender()
+})
 
 // Use requestAnimationFrame for batching
 let pendingRender = false

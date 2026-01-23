@@ -66,6 +66,7 @@ export function useBasicIde() {
   const screenBuffer = ref(initializeScreenBuffer())
   const cursorX = ref(0)
   const cursorY = ref(0)
+  const bgPalette = ref(1) // Default background palette code is 1
 
   // Parser instance
   const parser = new FBasicParser()
@@ -114,6 +115,7 @@ export function useBasicIde() {
     screenBuffer,
     cursorX,
     cursorY,
+    bgPalette,
     webWorkerManager
   }
 
@@ -383,6 +385,7 @@ export function useBasicIde() {
     screenBuffer,
     cursorX,
     cursorY,
+    bgPalette,
 
     // Methods
     runCode,

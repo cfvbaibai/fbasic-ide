@@ -24,6 +24,7 @@ interface Props {
   screenBuffer?: ScreenCell[][]
   cursorX?: number
   cursorY?: number
+  bgPalette?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -43,7 +44,8 @@ const props = withDefaults(defineProps<Props>(), {
     return grid
   },
   cursorX: 0,
-  cursorY: 0
+  cursorY: 0,
+  bgPalette: 1
 })
 
 const outputRef = ref<HTMLDivElement>()
@@ -87,6 +89,7 @@ watch(() => props.output.length, scrollToBottom)
             :screen-buffer="screenBuffer"
             :cursor-x="cursorX"
             :cursor-y="cursorY"
+            :bg-palette="bgPalette"
           />
         </div>
       </GameTabPane>
