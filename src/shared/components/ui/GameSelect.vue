@@ -73,13 +73,11 @@ const selectClasses = computed(() => {
   }
 })
 
-const selectStyle = computed(() => {
-  return props.width ? { width: props.width } : {}
-})
+const selectWidth = computed(() => props.width ?? '100%')
 </script>
 
 <template>
-  <div ref="selectRef" :class="selectClasses" :style="selectStyle">
+  <div ref="selectRef" :class="selectClasses">
     <button
       type="button"
       class="game-select-trigger bg-game-surface border-game-surface"
@@ -114,7 +112,7 @@ const selectStyle = computed(() => {
 .game-select {
   position: relative;
   display: inline-block;
-  width: 100%;
+  width: v-bind(selectWidth);
 }
 
 .game-select-trigger {

@@ -66,19 +66,16 @@ const rotateValue = computed((): number | undefined => {
   }
   return undefined
 })
+
+const iconColorValue = computed(() => props.color)
+const iconFontSize = computed(() => `${iconSize.value}px`)
 </script>
 
 <template>
-  <span v-if="icon" :class="iconClasses" :style="{
-    color: color,
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center'
-  }">
+  <span v-if="icon" :class="iconClasses">
     <Icon :icon="icon" :width="iconSize" :height="iconSize" :color="color" :inline="inline" :rotate="rotateValue" />
   </span>
-  <span v-else class="game-icon-placeholder"
-    :style="{ fontSize: typeof iconSize === 'number' ? `${iconSize}px` : iconSize }">
+  <span v-else class="game-icon-placeholder">
     <slot />
   </span>
 </template>
@@ -90,6 +87,7 @@ const rotateValue = computed((): number | undefined => {
   justify-content: center;
   flex-shrink: 0;
   transition: all 0.2s ease;
+  color: v-bind(iconColorValue);
 }
 
 .game-icon-rotate {
@@ -127,5 +125,6 @@ const rotateValue = computed((): number | undefined => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  font-size: v-bind(iconFontSize);
 }
 </style>

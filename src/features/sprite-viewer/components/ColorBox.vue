@@ -52,15 +52,14 @@ const hexCode = computed(() => {
 const tooltipTitle = computed(() => {
   return `Color ${props.colorCode} (${hexCode.value}): ${color.value}`
 })
+
+const backgroundColorValue = computed(() => color.value)
 </script>
 
 <template>
   <div
     class="color-box"
     :class="[props.customClass || '', { 'color-box-light': isLight }]"
-    :style="{
-      backgroundColor: color
-    }"
     :title="tooltipTitle"
   >
     <span
@@ -85,6 +84,7 @@ const tooltipTitle = computed(() => {
   transition: transform 0.1s;
   cursor: pointer;
   box-shadow: none;
+  background-color: v-bind(backgroundColorValue);
 }
 
 .color-box:hover {

@@ -56,6 +56,8 @@ const textareaClasses = computed(() => {
     'game-textarea-disabled': props.disabled
   }
 })
+
+const resizeValue = computed(() => props.resize)
 </script>
 
 <template>
@@ -66,7 +68,6 @@ const textareaClasses = computed(() => {
     :disabled="disabled"
     :readonly="readonly"
     :rows="rows"
-    :style="{ resize }"
     @input="handleInput"
     @focus="handleFocus"
     @blur="handleBlur"
@@ -76,6 +77,7 @@ const textareaClasses = computed(() => {
 
 <style scoped>
 .game-textarea-inner {
+  resize: v-bind(resizeValue);
   width: 100%;
   padding: 0.625rem 1rem;
   font-size: 0.875rem;

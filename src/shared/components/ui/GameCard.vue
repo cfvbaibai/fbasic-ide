@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import GameIcon from './GameIcon.vue'
 import GameBlock from './GameBlock.vue'
 import type { GameCardProps, GameCardEmits } from './GameCard.types'
@@ -37,6 +38,8 @@ const handleClick = () => {
     emit('click')
   }
 }
+
+const iconColorValue = computed(() => props.iconColor)
 </script>
 
 <template>
@@ -46,7 +49,7 @@ const handleClick = () => {
     :float-on-hover="floatOnHover"
     :clickable="clickable"
     class="game-card"
-    :style="{ '--icon-color': iconColor, padding: '2rem' }"
+    :style="{ padding: '2rem' }"
     @click="handleClick"
   >
     <div
@@ -66,7 +69,7 @@ const handleClick = () => {
 
 <style scoped>
 .game-card {
-  --icon-color: var(--base-solid-primary);
+  --icon-color: v-bind(iconColorValue);
 }
 
 .game-card-icon-wrapper {
