@@ -141,11 +141,11 @@ This document outlines the remaining work needed to complete the Family Basic ID
 - [x] Add tests for CGEN command
 
 **PALET B** (Backdrop Color)
-- [ ] Add `PALET` token to parser (if not exists)
-- [ ] Add `paletStatement` rule (PALET {B|S} n, C1, C2, C3, C4)
-- [ ] Create `PaletExecutor.ts` (handle both PALET B and PALET S)
-- [ ] Implement backdrop color setting (PALET B 0, colorCode, ...)
-- [ ] Add tests for PALET B command
+- [x] Add `PALET` token to parser (if not exists)
+- [x] Add `paletStatement` rule (PALET {B|S} n, C1, C2, C3, C4)
+- [x] Create `PaletExecutor.ts` (handle both PALET B and PALET S)
+- [x] Implement backdrop color setting (PALET B 0, colorCode, ...)
+- [x] Add tests for PALET B command
 - **Note**: Infrastructure already in place (`setBackdropColor()` method exists)
 
 **VIEW** (Display BG GRAPHIC)
@@ -161,7 +161,7 @@ This document outlines the remaining work needed to complete the Family Basic ID
 - `src/core/execution/executors/ColorExecutor.ts` ✅
 - `src/core/execution/executors/CgsetExecutor.ts` ✅
 - `src/core/execution/executors/CgenExecutor.ts` ✅
-- `src/core/execution/executors/PaletExecutor.ts` (PALET B/S support)
+- `src/core/execution/executors/PaletExecutor.ts` (PALET B/S support) ✅
 - `src/core/execution/executors/ViewExecutor.ts`
 
 **Test Files Created**:
@@ -173,6 +173,7 @@ This document outlines the remaining work needed to complete the Family Basic ID
 - `test/executors/CgsetExecutor.test.ts` ✅
 - `test/integration/CgsetIntegration.test.ts` ✅
 - `test/executors/CgenExecutor.test.ts` ✅
+- `test/executors/PaletExecutor.test.ts` ✅
 
 **Files to Modify**:
 - `src/core/parser/parser-tokens.ts` (add tokens)
@@ -421,7 +422,7 @@ This document outlines the remaining work needed to complete the Family Basic ID
 - [x] All linting errors resolved
 
 ### Complete Product
-- [ ] All screen commands implemented (CGSET ✅, CGEN ✅, Backdrop Screen ✅, PALET B ⏳, VIEW ⏳)
+- [ ] All screen commands implemented (CGSET ✅, CGEN ✅, Backdrop Screen ✅, PALET B ✅, VIEW ⏳)
 - [ ] All input commands implemented
 - [ ] Additional commands (STOP, CONT, SWAP, etc.)
 - [ ] Complete test coverage
@@ -435,7 +436,7 @@ This document outlines the remaining work needed to complete the Family Basic ID
 
 **Minimum (MVP)**: 5-8 days
 - Phase 2: Screen Commands (1-2 days remaining, COLOR ✅, CGSET ✅, CGEN ✅, Backdrop Screen ✅ completed)
-  - Remaining: PALET B executor/parser (infrastructure ready), VIEW command
+  - Remaining: VIEW command (PALET B ✅ completed)
 - Phase 3: Input Commands (2-3 days)
 - Phase 6: Testing & QA (1-2 days, mostly complete)
 
@@ -521,12 +522,15 @@ This document outlines the remaining work needed to complete the Family Basic ID
   - Backdrop rendered first (solid color fill)
   - Background screen rendered on top at correct offset
   - Proper layer ordering maintained
-- ⏳ **PALET B Command**: Infrastructure ready, executor/parser implementation pending
-  - `setBackdropColor()` method available in device adapters
-  - Message handling supports backdrop color updates
-  - Need to add PALET B parser rule and executor
+- ✅ **PALET B Command**: Fully implemented
+  - Added PALET, PALETB, PALETS tokens to parser
+  - Added `paletStatement` rule supporting both `PALET B/S` (with space) and `PALETB/PALETS` (no space) forms
+  - Created `PaletExecutor.ts` handling PALET B and PALET S commands
+  - When `PALET B 0, C1, ...` is executed, sets backdrop color to C1
+  - 16 comprehensive unit tests covering all scenarios
+  - All tests pass, type checking and linting pass
 
-**Status**: Backdrop screen fully implemented. PALET B command infrastructure ready, only executor/parser needed for dynamic backdrop color changes.
+**Status**: Backdrop screen and PALET B command fully implemented. Dynamic backdrop color changes now supported via `PALET B 0, colorCode, ...` command.
 
 ### CGEN Command Implementation & WebWorkerDeviceAdapter Refactoring (2026-01-24)
 - ✅ **Parser**: Added `CGEN` token and `cgenStatement` rule (CGEN n, where n is 0-3)

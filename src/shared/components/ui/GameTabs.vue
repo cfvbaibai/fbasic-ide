@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, provide, ref } from 'vue'
+import type { VNode } from 'vue'
 import {
   ActiveTabKey,
   SetActiveTabKey,
@@ -44,9 +45,9 @@ const activeTab = computed({
   set: (value: string) => emit('update:modelValue', value)
 })
 
-const tabButtons = ref<Array<{ name: string; render: () => any }>>([])
+const tabButtons = ref<Array<{ name: string; render: () => VNode }>>([])
 
-const registerTab = (name: string, render: () => any) => {
+const registerTab = (name: string, render: () => VNode) => {
   const existingIndex = tabButtons.value.findIndex(t => t.name === name)
   if (existingIndex > -1) {
     // Update existing tab

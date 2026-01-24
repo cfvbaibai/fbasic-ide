@@ -19,16 +19,16 @@ defineOptions({
   name: 'GameTable'
 })
 
-interface Column {
+export interface Column {
   prop: string
   label: string
   width?: string | number
   align?: 'left' | 'center' | 'right'
-  formatter?: (row: any, column: Column, cellValue: any) => any
+  formatter?: (row: Record<string, unknown>, column: Column, cellValue: unknown) => unknown
 }
 
-interface Props {
-  data: any[]
+export interface Props {
+  data: Record<string, unknown>[]
   columns: Column[]
   showHeader?: boolean
   stripe?: boolean

@@ -21,7 +21,7 @@ import type {
 } from 'chevrotain';
 import {
   // Keywords
-  Let, Print, For, To, Step, Next, End, Pause, If, Then, Goto, Gosub, Return, On, Dim, Data, Read, Restore, Cls, Locate, Color, Cgset, Cgen,
+  Let, Print, For, To, Step, Next, End, Pause, If, Then, Goto, Gosub, Return, On, Dim, Data, Read, Restore, Cls, Locate, Color, Cgset, Cgen, Palet, Paletb, Palets,
   // String functions
   Len, Left, Right, Mid, Str, Hex, Chr, Asc,
   // Arithmetic functions
@@ -83,6 +83,8 @@ class FBasicChevrotainParser extends CstParser {
   declare colorStatement: () => CstNode;
   declare cgsetStatement: () => CstNode;
   declare cgenStatement: () => CstNode;
+  declare paletStatement: () => CstNode;
+  declare paletParameterList: () => CstNode;
   declare arrayDeclaration: () => CstNode;
   declare dimensionList: () => CstNode;
   declare expressionList: () => CstNode;
@@ -645,6 +647,55 @@ class FBasicChevrotainParser extends CstParser {
       this.SUBRULE(this.expression); // Character generator mode (0-3)
     });
 
+    // PALET parameter list: n, C1, C2, C3, C4
+    // Common parameter parsing for all PALET forms
+    this.paletParameterList = this.RULE('paletParameterList', () => {
+      this.SUBRULE(this.expression); // n (color combination number 0-3)
+      this.CONSUME(Comma);
+      this.SUBRULE2(this.expression); // C1
+      this.CONSUME2(Comma);
+      this.SUBRULE3(this.expression); // C2
+      this.CONSUME3(Comma);
+      this.SUBRULE4(this.expression); // C3
+      this.CONSUME4(Comma);
+      this.SUBRULE5(this.expression); // C4
+    });
+
+    // PALET {B|S} n, C1, C2, C3, C4
+    // or PALETB n, C1, C2, C3, C4 (for background, no space)
+    // or PALETS n, C1, C2, C3, C4 (for sprites, no space)
+    // Sets color codes for color combination n (0-3)
+    // C1, C2, C3, C4 are color codes (0-60)
+    // When n=0 and target is B, C1 is the backdrop color
+    this.paletStatement = this.RULE('paletStatement', () => {
+      // Handle both forms: PALETB/PALETS (no space) or PALET B/S (with space)
+      this.OR([
+        {
+          // PALETB n, C1, C2, C3, C4 (background, no space)
+          ALT: () => {
+            this.CONSUME(Paletb);
+            this.SUBRULE(this.paletParameterList);
+          }
+        },
+        {
+          // PALETS n, C1, C2, C3, C4 (sprites, no space)
+          ALT: () => {
+            this.CONSUME(Palets);
+            this.SUBRULE2(this.paletParameterList);
+          }
+        },
+        {
+          // PALET B n, C1, C2, C3, C4 (background, with space)
+          ALT: () => {
+            this.CONSUME(Palet);
+            // B or S identifier (must be uppercase B or S)
+            this.CONSUME(Identifier, { LABEL: 'target' }); // B or S
+            this.SUBRULE3(this.paletParameterList);
+          }
+        }
+      ]);
+    });
+
     // IF LogicalExpression THEN (CommandList | NumberLiteral)
     // IF LogicalExpression GOTO NumberLiteral
     // Executes the commands after THEN or jumps to line number if condition is true
@@ -765,6 +816,10 @@ class FBasicChevrotainParser extends CstParser {
         {
           GATE: () => this.LA(1).tokenType === Cgen,
           ALT: () => this.SUBRULE(this.cgenStatement)
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Paletb || this.LA(1).tokenType === Palets || this.LA(1).tokenType === Palet,
+          ALT: () => this.SUBRULE(this.paletStatement)
         },
         { ALT: () => this.SUBRULE(this.letStatement) } // Must be last since it can start with Identifier
       ]);

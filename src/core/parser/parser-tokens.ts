@@ -15,6 +15,7 @@ import {
 // ============================================================================
 
 // Keywords (must be before Identifier)
+// Note: PALETB and PALETS must come before PALET to match the longer form first
 export const Let = createToken({ name: 'Let', pattern: /\bLET\b/i });
 export const Print = createToken({ name: 'Print', pattern: /\bPRINT\b/i });
 export const For = createToken({ name: 'For', pattern: /\bFOR\b/i });
@@ -39,6 +40,10 @@ export const Locate = createToken({ name: 'Locate', pattern: /\bLOCATE\b/i });
 export const Color = createToken({ name: 'Color', pattern: /\bCOLOR\b/i });
 export const Cgset = createToken({ name: 'Cgset', pattern: /\bCGSET\b/i });
 export const Cgen = createToken({ name: 'Cgen', pattern: /\bCGEN\b/i });
+// PALETB and PALETS must come before PALET to match longer forms first
+export const Paletb = createToken({ name: 'Paletb', pattern: /\bPALETB\b/i });
+export const Palets = createToken({ name: 'Palets', pattern: /\bPALETS\b/i });
+export const Palet = createToken({ name: 'Palet', pattern: /\bPALET\b/i });
 
 // String function keywords (must be before Identifier)
 export const Len = createToken({ name: 'Len', pattern: /\bLEN\b/i });
@@ -138,7 +143,7 @@ export const Whitespace = createToken({
 export const allTokens = [
   Whitespace,
   // Keywords
-  Let, Print, For, To, Step, Next, End, Rem, Pause, If, Then, Goto, Gosub, Return, On, Dim, Data, Read, Restore, Cls, Locate, Color, Cgset, Cgen,
+  Let, Print, For, To, Step, Next, End, Rem, Pause, If, Then, Goto, Gosub, Return, On, Dim, Data, Read, Restore, Cls, Locate, Color, Cgset, Cgen, Paletb, Palets, Palet,
   // String functions (must come before Identifier)
   Len, Left, Right, Mid, Str, Hex, Chr, Asc,
   // Arithmetic functions (must come before Identifier)

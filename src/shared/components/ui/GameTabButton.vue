@@ -27,7 +27,7 @@ interface Props {
   /** Display label for the tab button */
   label?: string
   /** Icon to display (from iconify) */
-  icon?: any
+  icon?: string | null
   /** Whether the tab button is disabled */
   disabled?: boolean
 }

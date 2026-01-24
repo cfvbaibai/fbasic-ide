@@ -80,11 +80,8 @@ function render(): void {
 }
 
 // Watch paletteCode and backdropColor changes to trigger re-render
-watch(paletteCode, () => {
-  scheduleRender()
-})
-
-watch(() => props.backdropColor, () => {
+// Combined watcher for better performance (Vue 3 best practice)
+watch([paletteCode, () => props.backdropColor], () => {
   scheduleRender()
 })
 

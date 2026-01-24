@@ -8,7 +8,7 @@ Family Basic IDE - a web-based emulator/IDE for the F-BASIC programming language
 
 **Tech Stack**: Vue 3, TypeScript, Vite, Chevrotain parser
 
-**Architecture**: Direct CST (Concrete Syntax Tree) execution - parser outputs CST, executors consume CST nodes directly (no AST conversion).
+**Skills**: Vue 3 and VueUse best practices are available as agent skills. See [Architecture](docs/guides/architecture.md) for system architecture details.
 
 ## Development Commands
 
@@ -23,27 +23,6 @@ pnpm test:run <path>  # Run specific test file (no -- separator needed)
                       # Example: pnpm test:run test/executors/RestoreExecutor.test.ts
 ```
 
-## Architecture
-
-### Core Interpreter (DOM-free)
-- `src/core/BasicInterpreter.ts` - Main interpreter orchestrating parsing and execution
-- `src/core/parser/FBasicChevrotainParser.ts` - Chevrotain-based CST parser
-- `src/core/execution/ExecutionEngine.ts` - Executes programs from CST
-- `src/core/execution/executors/*.ts` - Individual statement executors (LetExecutor, PrintExecutor, etc.)
-- `src/core/evaluation/ExpressionEvaluator.ts` - Expression evaluation
-- `src/core/state/ExecutionContext.ts` - Runtime state management
-- `src/core/devices/*.ts` - Device adapters (joystick, screen output)
-
-**Key Pattern**: Direct CST execution - no AST conversion. Parser outputs CST, executors consume CST nodes directly.
-
-### Frontend
-- `src/features/ide/` - Code editor, runtime output, controls
-- `src/features/sprite-viewer/` - Character sprite viewer
-- `src/shared/components/ui/` - Reusable Game* UI components
-- `src/shared/styles/` - Global CSS (theme.css, utilities.css)
-
-### Reference Documentation
-- `docs/reference/family-basic-manual/` - Original F-BASIC manual pages (consult for language behavior)
 
 ## Development Guidelines
 
@@ -86,13 +65,6 @@ pnpm test:run <path>  # Run specific test file (no -- separator needed)
 - `docs/reference/` - Language references, manuals, specifications
 - `docs/poc/` - Experimental documentation and POCs
 
-### Creating Documentation
-
-- **Refactoring/Migration Plans**: Place in `docs/planning/`
-- **Analysis Reports**: Place in `docs/analysis/`
-- **Developer Guides**: Place in `docs/guides/`
-- Use descriptive, kebab-case filenames (e.g., `i18n-refactoring-plan.md`)
-
 **NEVER create documentation files at the workspace root.** All documentation belongs in `docs/` with appropriate subdirectories.
 
 ### File Naming
@@ -100,12 +72,6 @@ pnpm test:run <path>  # Run specific test file (no -- separator needed)
 - Be descriptive but concise
 - Include document type when helpful: `*-plan.md`, `*-guide.md`, `*-analysis.md`
 
-## Commit Convention
+## Commits
 
-```
-refactor: description  # code restructuring
-feat: description      # new features
-fix: description       # bug fixes
-chore: description     # maintenance, data files
-doc(*): description    # documentation
-```
+Use the `commit-code` command for commits. Follow conventional commit format: `refactor:`, `feat:`, `fix:`, `chore:`, `doc(*):`.

@@ -43,18 +43,18 @@ defineOptions({
 
 const { t } = useI18n()
 
+interface StatusRow extends Record<string, unknown> {
+  id: number
+  stick: number
+  strig: number
+}
+
 interface Column {
   prop: string
   label: string
   width?: string | number
   align?: 'left' | 'center' | 'right'
-  formatter?: (row: any, column: Column, cellValue: any) => any
-}
-
-interface StatusRow {
-  id: number
-  stick: number
-  strig: number
+  formatter?: (row: Record<string, unknown>, column: Column, cellValue: unknown) => unknown
 }
 
 interface Props {
