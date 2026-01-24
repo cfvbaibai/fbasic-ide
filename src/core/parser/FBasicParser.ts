@@ -55,7 +55,7 @@ export class FBasicParser {
 
       if (!parseResult.success) {
         // Include error details for debugging
-        const errorMessages = parseResult.errors?.map(e => e.message).join('; ') || 'Unknown parse error';
+        const errorMessages = parseResult.errors?.map(e => e.message).join('; ') ?? 'Unknown parse error';
         return {
           success: false,
           errors: parseResult.errors?.map((err) => ({
@@ -63,16 +63,16 @@ export class FBasicParser {
             location: {
               start: {
                 offset: 0,
-                line: err.line || 1,
-                column: err.column || 1
+                line: err.line ?? 1,
+                column: err.column ?? 1
               },
               end: {
                 offset: 0,
-                line: err.line || 1,
-                column: (err.column || 1) + (err.length || 1)
+                line: err.line ?? 1,
+                column: (err.column ?? 1) + (err.length ?? 1)
               }
             }
-          })) || [{
+          })) ?? [{
             message: errorMessages,
             location: {
               start: { offset: 0, line: 1, column: 1 },
@@ -114,7 +114,7 @@ export class FBasicParser {
    */
   async parseStatement(statementText: string): Promise<CstNode | null> {
     const result = await this.parse(statementText);
-    if (result.success && result.cst && result.cst.children.statement) {
+    if (result.success && result.cst?.children.statement) {
       const statements = result.cst.children.statement;
       if (Array.isArray(statements) && statements.length > 0) {
         const firstStmt = statements[0];

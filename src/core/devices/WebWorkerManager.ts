@@ -68,7 +68,7 @@ export class WebWorkerManager {
       return // Already initialized
     }
 
-    const script = workerScript || DEFAULTS.WEB_WORKER.WORKER_SCRIPT
+    const script = workerScript ?? DEFAULTS.WEB_WORKER.WORKER_SCRIPT
     console.log('🔧 [WEB_WORKER] Creating worker with script:', script)
     
     try {
@@ -82,7 +82,7 @@ export class WebWorkerManager {
     // Handle worker errors
     this.worker.onerror = (error) => {
       console.error('❌ [WEB_WORKER] Web worker error:', error)
-      this.rejectAllPending('Web worker error: ' + error.message)
+      this.rejectAllPending(`Web worker error: ${error.message}`)
     }
 
     // Handle worker termination
@@ -103,7 +103,7 @@ export class WebWorkerManager {
     options: WebWorkerExecutionOptions = {},
     onMessage?: (message: AnyServiceWorkerMessage) => void
   ): Promise<ExecutionResult> {
-    console.log('executeInWorker called with code:', code.substring(0, 50) + '...')
+    console.log(`executeInWorker called with code: ${code.substring(0, 50)  }...`)
     if (!this.worker) {
       console.log('Worker not initialized, initializing...')
       await this.initialize(DEFAULTS.WEB_WORKER.WORKER_SCRIPT)
@@ -114,7 +114,7 @@ export class WebWorkerManager {
     }
 
     const messageId = (++this.messageId).toString()
-    const timeout = options.timeout || DEFAULTS.WEB_WORKER.MESSAGE_TIMEOUT
+    const timeout = options.timeout ?? DEFAULTS.WEB_WORKER.MESSAGE_TIMEOUT
     console.log('Sending message with ID:', messageId, 'timeout:', timeout)
 
     return new Promise<ExecutionResult>((resolve, reject) => {

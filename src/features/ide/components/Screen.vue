@@ -12,14 +12,6 @@ defineOptions({
   name: 'Screen'
 })
 
-interface Props {
-  screenBuffer: ScreenCell[][]
-  cursorX: number
-  cursorY: number
-  bgPalette?: number
-  backdropColor?: number
-}
-
 const props = withDefaults(defineProps<Props>(), {
   screenBuffer: () => {
     // Initialize empty 28×24 grid
@@ -38,6 +30,14 @@ const props = withDefaults(defineProps<Props>(), {
   bgPalette: 1,
   backdropColor: 0
 })
+
+interface Props {
+  screenBuffer: ScreenCell[][]
+  cursorX: number
+  cursorY: number
+  bgPalette?: number
+  backdropColor?: number
+}
 
 // Canvas reference
 const screenCanvas = useTemplateRef<HTMLCanvasElement>('screenCanvas')

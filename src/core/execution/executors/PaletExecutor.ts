@@ -9,7 +9,7 @@ import type { CstNode } from 'chevrotain'
 import type { ExecutionContext } from '../../state/ExecutionContext'
 import type { ExpressionEvaluator } from '../../evaluation/ExpressionEvaluator'
 import { getCstNodes, getFirstToken, getFirstCstNode } from '../../parser/cst-helpers'
-import { ERROR_TYPES } from '../../constants'
+import { ERROR_TYPES, COLOR_PATTERNS, COLOR_CODES } from '../../constants'
 
 export class PaletExecutor {
   constructor(
@@ -54,7 +54,7 @@ export class PaletExecutor {
           target = 'S'
         } else {
           this.context.addError({
-            line: lineNumber || 0,
+            line: lineNumber ?? 0,
             message: `PALET: Invalid target, expected B or S, got ${targetStr}`,
             type: ERROR_TYPES.RUNTIME
           })
@@ -62,7 +62,7 @@ export class PaletExecutor {
         }
       } else {
         this.context.addError({
-          line: lineNumber || 0,
+          line: lineNumber ?? 0,
           message: 'PALET: Missing target (B or S)',
           type: ERROR_TYPES.RUNTIME
         })
@@ -70,7 +70,7 @@ export class PaletExecutor {
       }
     } else {
       this.context.addError({
-        line: lineNumber || 0,
+        line: lineNumber ?? 0,
         message: 'PALET: Invalid statement format',
         type: ERROR_TYPES.RUNTIME
       })
@@ -81,7 +81,7 @@ export class PaletExecutor {
     const paletParameterListCst = getFirstCstNode(paletStmtCst.children.paletParameterList)
     if (!paletParameterListCst) {
       this.context.addError({
-        line: lineNumber || 0,
+        line: lineNumber ?? 0,
         message: 'PALET: Missing parameter list',
         type: ERROR_TYPES.RUNTIME
       })
@@ -93,7 +93,7 @@ export class PaletExecutor {
     // Validate we have 5 expressions: n, C1, C2, C3, C4
     if (expressions.length < 5) {
       this.context.addError({
-        line: lineNumber || 0,
+        line: lineNumber ?? 0,
         message: 'PALET: Expected 5 arguments (n, C1, C2, C3, C4)',
         type: ERROR_TYPES.RUNTIME
       })
@@ -108,7 +108,7 @@ export class PaletExecutor {
 
     if (!nExprCst || !c1ExprCst || !c2ExprCst || !c3ExprCst || !c4ExprCst) {
       this.context.addError({
-        line: lineNumber || 0,
+        line: lineNumber ?? 0,
         message: 'PALET: Invalid arguments',
         type: ERROR_TYPES.RUNTIME
       })
@@ -132,26 +132,26 @@ export class PaletExecutor {
       // Convert to numbers
       n = typeof nValue === 'number'
         ? Math.floor(nValue)
-        : Math.floor(parseFloat(String(nValue)) || 0)
-      
+        : Math.floor(parseFloat(String(nValue)) || 0)  
+
       c1 = typeof c1Value === 'number'
         ? Math.floor(c1Value)
-        : Math.floor(parseFloat(String(c1Value)) || 0)
-      
+        : Math.floor(parseFloat(String(c1Value)) || 0)  
+
       c2 = typeof c2Value === 'number'
         ? Math.floor(c2Value)
-        : Math.floor(parseFloat(String(c2Value)) || 0)
-      
+        : Math.floor(parseFloat(String(c2Value)) || 0)  
+
       c3 = typeof c3Value === 'number'
         ? Math.floor(c3Value)
-        : Math.floor(parseFloat(String(c3Value)) || 0)
-      
+        : Math.floor(parseFloat(String(c3Value)) || 0)  
+
       c4 = typeof c4Value === 'number'
         ? Math.floor(c4Value)
-        : Math.floor(parseFloat(String(c4Value)) || 0)
+        : Math.floor(parseFloat(String(c4Value)) || 0)  
     } catch (error) {
       this.context.addError({
-        line: lineNumber || 0,
+        line: lineNumber ?? 0,
         message: `PALET: Error evaluating arguments: ${error instanceof Error ? error.message : String(error)}`,
         type: ERROR_TYPES.RUNTIME
       })
@@ -159,21 +159,24 @@ export class PaletExecutor {
     }
 
     // Validate ranges
-    // n: 0 to 3 (color combination number)
-    if (n < 0 || n > 3) {
+    // n: MIN to MAX (color combination number)
+    if (n < COLOR_PATTERNS.MIN || n > COLOR_PATTERNS.MAX) {
       this.context.addError({
-        line: lineNumber || 0,
-        message: `PALET: Color combination number out of range (0-3), got ${n}`,
+        line: lineNumber ?? 0,
+        message: `PALET: Color combination number out of range (${COLOR_PATTERNS.MIN}-${COLOR_PATTERNS.MAX}), got ${n}`,
         type: ERROR_TYPES.RUNTIME
       })
       return
     }
 
-    // C1, C2, C3, C4: 0 to 60 (color codes)
-    if (c1 < 0 || c1 > 60 || c2 < 0 || c2 > 60 || c3 < 0 || c3 > 60 || c4 < 0 || c4 > 60) {
+    // C1, C2, C3, C4: MIN to MAX (color codes)
+    if (c1 < COLOR_CODES.MIN || c1 > COLOR_CODES.MAX || 
+        c2 < COLOR_CODES.MIN || c2 > COLOR_CODES.MAX || 
+        c3 < COLOR_CODES.MIN || c3 > COLOR_CODES.MAX || 
+        c4 < COLOR_CODES.MIN || c4 > COLOR_CODES.MAX) {
       this.context.addError({
-        line: lineNumber || 0,
-        message: `PALET: Color code out of range (0-60), got C1=${c1}, C2=${c2}, C3=${c3}, C4=${c4}`,
+        line: lineNumber ?? 0,
+        message: `PALET: Color code out of range (${COLOR_CODES.MIN}-${COLOR_CODES.MAX}), got C1=${c1}, C2=${c2}, C3=${c3}, C4=${c4}`,
         type: ERROR_TYPES.RUNTIME
       })
       return

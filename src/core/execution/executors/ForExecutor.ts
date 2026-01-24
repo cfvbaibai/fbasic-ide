@@ -9,7 +9,7 @@ import type { LoopState } from '../../state/ExecutionContext'
 import type { ExpressionEvaluator } from '../../evaluation/ExpressionEvaluator'
 import type { VariableService } from '../../services/VariableService'
 import { getFirstToken, getCstNodes } from '../../parser/cst-helpers'
-import { ERROR_TYPES } from '../../constants'
+import { ERROR_TYPES, DEFAULTS } from '../../constants'
 
 export class ForExecutor {
   constructor(
@@ -73,8 +73,8 @@ export class ForExecutor {
       return
     }
 
-    // Evaluate step expression (defaults to 1)
-    let stepValue = 1
+    // Evaluate step expression (defaults to DEFAULTS.FOR_LOOP_STEP)
+    let stepValue: number = DEFAULTS.FOR_LOOP_STEP
     const stepExprCst = expressions[2] // Third expression if present
     if (stepExprCst) {
       const stepValueResult = this.evaluator.evaluateExpression(stepExprCst)

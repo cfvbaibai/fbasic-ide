@@ -162,7 +162,7 @@ export function useBasicIde() {
         // Update errors from parser
         if (result.errors) {
           errors.value = result.errors.map(error => ({
-            line: error.location?.start?.line || 0,
+            line: error.location?.start?.line ?? 0,
             message: error.message,
             type: 'syntax'
           }))
@@ -234,11 +234,11 @@ export function useBasicIde() {
         }
       })
 
-      if (result && result.errors && result.errors.length > 0) {
+      if (result?.errors && result.errors.length > 0) {
         errors.value = result.errors
       }
-      
-      if (result && result.variables) {
+
+      if (result?.variables) {
         const vars: Record<string, BasicVariable> = result.variables instanceof Map 
           ? Object.fromEntries(result.variables) 
           : result.variables
@@ -326,7 +326,7 @@ export function useBasicIde() {
     if (sample) {
       code.value = sample.code
       currentSampleType.value = sampleType
-      updateHighlighting()
+      void updateHighlighting()
     }
   }
 
@@ -358,7 +358,7 @@ export function useBasicIde() {
 
 
   // Initialize highlighting
-  updateHighlighting()
+  void updateHighlighting()
 
   // Cleanup function for web worker
   const cleanupWebWorker = () => {

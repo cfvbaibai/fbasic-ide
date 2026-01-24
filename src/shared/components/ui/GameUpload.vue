@@ -22,8 +22,6 @@ defineOptions({
   name: 'GameUpload'
 })
 
-const { t } = useI18n()
-
 const props = withDefaults(defineProps<GameUploadProps>(), {
   accept: '*',
   multiple: false,
@@ -32,6 +30,8 @@ const props = withDefaults(defineProps<GameUploadProps>(), {
 })
 
 const emit = defineEmits<GameUploadEmits>()
+
+const { t } = useI18n()
 
 const fileInput = useTemplateRef<HTMLInputElement>('fileInput')
 const isDragging = ref(false)

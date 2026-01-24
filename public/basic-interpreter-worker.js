@@ -46,6 +46,70 @@
     RUNTIME: "RUNTIME",
     COMPILATION: "COMPILATION"
   };
+  var SCREEN_DIMENSIONS = {
+    BACKGROUND: {
+      MAX_X: 27,
+      // Maximum X coordinate (0-27, 28 columns)
+      MAX_Y: 23,
+      // Maximum Y coordinate (0-23, 24 lines)
+      COLUMNS: 28,
+      // Total columns
+      LINES: 24
+      // Total lines
+    },
+    BACKDROP: {
+      MAX_X: 31,
+      // Maximum X coordinate (0-31, 32 columns)
+      MAX_Y: 29,
+      // Maximum Y coordinate (0-29, 30 lines)
+      COLUMNS: 32,
+      // Total columns  
+      LINES: 30
+      // Total lines
+    },
+    BG_GRAPHIC: {
+      MAX_X: 27,
+      // Maximum X coordinate (0-27, 28 columns)
+      MAX_Y: 20,
+      // Maximum Y coordinate (0-20, 21 lines)
+      COLUMNS: 28,
+      // Total columns
+      LINES: 21
+      // Total lines
+    },
+    SPRITE: {
+      MAX_X: 255,
+      // Maximum X coordinate (0-255, 256 dots)
+      MAX_Y: 239,
+      // Maximum Y coordinate (0-239, 240 dots)
+      WIDTH: 256,
+      // Total width in dots
+      HEIGHT: 240
+      // Total height in dots
+    }
+  };
+  var COLOR_PATTERNS = {
+    MIN: 0,
+    // Minimum color pattern number
+    MAX: 3
+    // Maximum color pattern number (0-3)
+  };
+  var COLOR_CODES = {
+    MIN: 0,
+    // Minimum color code
+    MAX: 60
+    // Maximum color code (0-60)
+  };
+  var PRINT_TAB_STOPS = {
+    BLOCK_1_END: 8,
+    // End of block 1 (columns 0-7)
+    BLOCK_2_END: 16,
+    // End of block 2 (columns 8-15)
+    BLOCK_3_END: 24,
+    // End of block 3 (columns 16-23)
+    BLOCK_4_END: 28
+    // End of block 4 (columns 24-27)
+  };
 
   // node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_freeGlobal.js
   var freeGlobal = typeof global == "object" && global && global.Object === Object && global;
@@ -9290,6 +9354,9 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
   var Color = createToken({ name: "Color", pattern: /\bCOLOR\b/i });
   var Cgset = createToken({ name: "Cgset", pattern: /\bCGSET\b/i });
   var Cgen = createToken({ name: "Cgen", pattern: /\bCGEN\b/i });
+  var Paletb = createToken({ name: "Paletb", pattern: /\bPALETB\b/i });
+  var Palets = createToken({ name: "Palets", pattern: /\bPALETS\b/i });
+  var Palet = createToken({ name: "Palet", pattern: /\bPALET\b/i });
   var Len = createToken({ name: "Len", pattern: /\bLEN\b/i });
   var Left = createToken({ name: "Left", pattern: /\bLEFT\$/i });
   var Right = createToken({ name: "Right", pattern: /\bRIGHT\$/i });
@@ -9384,6 +9451,9 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     Color,
     Cgset,
     Cgen,
+    Paletb,
+    Palets,
+    Palet,
     // String functions (must come before Identifier)
     Len,
     Left,
@@ -9826,6 +9896,43 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         this.CONSUME(Cgen);
         this.SUBRULE(this.expression);
       });
+      this.paletParameterList = this.RULE("paletParameterList", () => {
+        this.SUBRULE(this.expression);
+        this.CONSUME(Comma);
+        this.SUBRULE2(this.expression);
+        this.CONSUME2(Comma);
+        this.SUBRULE3(this.expression);
+        this.CONSUME3(Comma);
+        this.SUBRULE4(this.expression);
+        this.CONSUME4(Comma);
+        this.SUBRULE5(this.expression);
+      });
+      this.paletStatement = this.RULE("paletStatement", () => {
+        this.OR([
+          {
+            // PALETB n, C1, C2, C3, C4 (background, no space)
+            ALT: () => {
+              this.CONSUME(Paletb);
+              this.SUBRULE(this.paletParameterList);
+            }
+          },
+          {
+            // PALETS n, C1, C2, C3, C4 (sprites, no space)
+            ALT: () => {
+              this.CONSUME(Palets);
+              this.SUBRULE2(this.paletParameterList);
+            }
+          },
+          {
+            // PALET B n, C1, C2, C3, C4 (background, with space)
+            ALT: () => {
+              this.CONSUME(Palet);
+              this.CONSUME(Identifier, { LABEL: "target" });
+              this.SUBRULE3(this.paletParameterList);
+            }
+          }
+        ]);
+      });
       this.ifThenStatement = this.RULE("ifThenStatement", () => {
         this.CONSUME(If);
         this.SUBRULE(this.logicalExpression);
@@ -9934,6 +10041,10 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           {
             GATE: () => this.LA(1).tokenType === Cgen,
             ALT: () => this.SUBRULE(this.cgenStatement)
+          },
+          {
+            GATE: () => this.LA(1).tokenType === Paletb || this.LA(1).tokenType === Palets || this.LA(1).tokenType === Palet,
+            ALT: () => this.SUBRULE(this.paletStatement)
           },
           { ALT: () => this.SUBRULE(this.letStatement) }
           // Must be last since it can start with Identifier
@@ -10044,7 +10155,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       try {
         const parseResult = parseWithChevrotain(source);
         if (!parseResult.success) {
-          const errorMessages = parseResult.errors?.map((e) => e.message).join("; ") || "Unknown parse error";
+          const errorMessages = parseResult.errors?.map((e) => e.message).join("; ") ?? "Unknown parse error";
           return {
             success: false,
             errors: parseResult.errors?.map((err) => ({
@@ -10052,16 +10163,16 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
               location: {
                 start: {
                   offset: 0,
-                  line: err.line || 1,
-                  column: err.column || 1
+                  line: err.line ?? 1,
+                  column: err.column ?? 1
                 },
                 end: {
                   offset: 0,
-                  line: err.line || 1,
-                  column: (err.column || 1) + (err.length || 1)
+                  line: err.line ?? 1,
+                  column: (err.column ?? 1) + (err.length ?? 1)
                 }
               }
-            })) || [{
+            })) ?? [{
               message: errorMessages,
               location: {
                 start: { offset: 0, line: 1, column: 1 },
@@ -10099,7 +10210,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
      */
     async parseStatement(statementText) {
       const result = await this.parse(statementText);
-      if (result.success && result.cst && result.cst.children.statement) {
+      if (result.success && result.cst?.children.statement) {
         const statements = result.cst.children.statement;
         if (Array.isArray(statements) && statements.length > 0) {
           const firstStmt = statements[0];
@@ -15369,7 +15480,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       }
       const num = toNumber2(args[0] ?? 0);
       if (num >= 0) {
-        return " " + String(num);
+        return ` ${String(num)}`;
       }
       return String(num);
     }
@@ -16062,7 +16173,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
             let separator = null;
             const nextElement = elements[i + 1];
             if (nextElement && nextElement.type === "separator") {
-              separator = nextElement.separator || null;
+              separator = nextElement.separator ?? null;
             }
             items.push({ value, separator });
           }
@@ -16093,7 +16204,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       let currentColumn = 0;
       for (let i = 0; i < items.length; i++) {
         const item = items[i];
-        if (!item || item.value === void 0) continue;
+        if (item?.value === void 0) continue;
         const itemString = this.toString(item.value);
         if (this.context.config.enableDebugMode) {
           this.context.addDebugOutput(`PRINT: value = ${item.value}, separator = ${item.separator}`);
@@ -16115,7 +16226,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           } else {
             this.context.addError({
               line: this.context.getCurrentLineNumber(),
-              message: "PRINT: Invalid separator: " + prevSeparator,
+              message: `PRINT: Invalid separator: ${prevSeparator}`,
               type: ERROR_TYPES.RUNTIME
             });
             return "";
@@ -16126,13 +16237,13 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     }
     /**
      * Get the next tab stop (8-character block boundary)
-     * Block 1: 0-7, Block 2: 8-15, Block 3: 16-23, Block 4: 24-27
+     * Uses PRINT_TAB_STOPS constants for block boundaries
      */
     getNextTabStop(currentColumn) {
-      if (currentColumn < 8) return 8;
-      if (currentColumn < 16) return 16;
-      if (currentColumn < 24) return 24;
-      return 28;
+      if (currentColumn < PRINT_TAB_STOPS.BLOCK_1_END) return PRINT_TAB_STOPS.BLOCK_1_END;
+      if (currentColumn < PRINT_TAB_STOPS.BLOCK_2_END) return PRINT_TAB_STOPS.BLOCK_2_END;
+      if (currentColumn < PRINT_TAB_STOPS.BLOCK_3_END) return PRINT_TAB_STOPS.BLOCK_3_END;
+      return PRINT_TAB_STOPS.BLOCK_4_END;
     }
     /**
      * Convert a printable value to its string representation.
@@ -16206,21 +16317,37 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         const identifierToken = getFirstToken(arrayAccessCst.children.Identifier);
         const expressionListCst = getFirstCstNode(arrayAccessCst.children.expressionList);
         if (!identifierToken || !expressionListCst) {
-          throw new Error("Invalid LET statement: invalid array access");
+          this.variableService.context.addError({
+            line: 0,
+            message: "Invalid LET statement: invalid array access",
+            type: ERROR_TYPES.RUNTIME
+          });
+          return;
         }
         const expressionCst = getFirstCstNode(letStmtCst.children.expression);
         if (!expressionCst) {
-          throw new Error("Invalid LET statement: missing expression");
+          this.variableService.context.addError({
+            line: 0,
+            message: "Invalid LET statement: missing expression",
+            type: ERROR_TYPES.RUNTIME
+          });
+          return;
         }
         const arrayName = identifierToken.image.toUpperCase();
         const indexExpressions = getCstNodes(expressionListCst.children.expression);
-        const indices = indexExpressions.map((exprCst) => {
+        const indices = [];
+        for (const exprCst of indexExpressions) {
           const indexValue = this.variableService.evaluator.evaluateExpression(exprCst);
           if (typeof indexValue !== "number") {
-            throw new Error(`Invalid array index: expected number, got ${typeof indexValue}`);
+            this.variableService.context.addError({
+              line: 0,
+              message: `Invalid array index: expected number, got ${typeof indexValue}`,
+              type: ERROR_TYPES.RUNTIME
+            });
+            return;
           }
-          return Math.floor(indexValue);
-        });
+          indices.push(Math.floor(indexValue));
+        }
         const value = this.variableService.evaluator.evaluateExpression(expressionCst);
         const basicValue = typeof value === "string" ? value : Math.floor(value);
         this.variableService.setArrayElement(arrayName, indices, basicValue);
@@ -16231,13 +16358,28 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         const identifierToken = getFirstToken(letStmtCst.children.Identifier);
         const expressionCst = getFirstCstNode(letStmtCst.children.expression);
         if (!identifierToken && !expressionCst) {
-          throw new Error("Invalid LET statement: missing identifier or expression");
+          this.variableService.context.addError({
+            line: 0,
+            message: "Invalid LET statement: missing identifier or expression",
+            type: ERROR_TYPES.RUNTIME
+          });
+          return;
         }
         if (!identifierToken) {
-          throw new Error("Invalid LET statement: missing identifier or expression");
+          this.variableService.context.addError({
+            line: 0,
+            message: "Invalid LET statement: missing identifier",
+            type: ERROR_TYPES.RUNTIME
+          });
+          return;
         }
         if (!expressionCst) {
-          throw new Error("Invalid LET statement: missing identifier or expression");
+          this.variableService.context.addError({
+            line: 0,
+            message: "Invalid LET statement: missing expression",
+            type: ERROR_TYPES.RUNTIME
+          });
+          return;
         }
         const varName = identifierToken.image.toUpperCase();
         const value = this.variableService.evaluator.evaluateExpression(expressionCst);
@@ -16297,7 +16439,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         });
         return;
       }
-      let stepValue = 1;
+      let stepValue = DEFAULTS.FOR_LOOP_STEP;
       const stepExprCst = expressions[2];
       if (stepExprCst) {
         const stepValueResult = this.evaluator.evaluateExpression(stepExprCst);
@@ -16430,7 +16572,12 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     async execute(pauseStmtCst) {
       const expressionCst = getFirstCstNode(pauseStmtCst.children.expression);
       if (!expressionCst) {
-        throw new Error("Invalid PAUSE statement: missing expression");
+        this.context.addError({
+          line: 0,
+          message: "Invalid PAUSE statement: missing expression",
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
       }
       const durationValue = this.evaluator.evaluateExpression(expressionCst);
       const duration = typeof durationValue === "number" ? Math.max(0, Math.floor(durationValue)) : Math.max(0, Math.floor(parseFloat(String(durationValue)) || 0));
@@ -17002,7 +17149,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       const expressions = getCstNodes(locateStmtCst.children.expression);
       if (expressions.length < 2) {
         this.context.addError({
-          line: lineNumber || 0,
+          line: lineNumber ?? 0,
           message: "LOCATE: Expected two arguments (X, Y)",
           type: ERROR_TYPES.RUNTIME
         });
@@ -17012,7 +17159,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       const yExprCst = expressions[1];
       if (!xExprCst || !yExprCst) {
         this.context.addError({
-          line: lineNumber || 0,
+          line: lineNumber ?? 0,
           message: "LOCATE: Invalid arguments",
           type: ERROR_TYPES.RUNTIME
         });
@@ -17027,24 +17174,24 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         y = typeof yValue === "number" ? Math.floor(yValue) : Math.floor(parseFloat(String(yValue)) || 0);
       } catch (error) {
         this.context.addError({
-          line: lineNumber || 0,
+          line: lineNumber ?? 0,
           message: `LOCATE: Error evaluating coordinates: ${error instanceof Error ? error.message : String(error)}`,
           type: ERROR_TYPES.RUNTIME
         });
         return;
       }
-      if (x < 0 || x > 27) {
+      if (x < 0 || x > SCREEN_DIMENSIONS.BACKGROUND.MAX_X) {
         this.context.addError({
-          line: lineNumber || 0,
-          message: `LOCATE: X coordinate out of range (0-27), got ${x}`,
+          line: lineNumber ?? 0,
+          message: `LOCATE: X coordinate out of range (0-${SCREEN_DIMENSIONS.BACKGROUND.MAX_X}), got ${x}`,
           type: ERROR_TYPES.RUNTIME
         });
         return;
       }
-      if (y < 0 || y > 23) {
+      if (y < 0 || y > SCREEN_DIMENSIONS.BACKGROUND.MAX_Y) {
         this.context.addError({
-          line: lineNumber || 0,
-          message: `LOCATE: Y coordinate out of range (0-23), got ${y}`,
+          line: lineNumber ?? 0,
+          message: `LOCATE: Y coordinate out of range (0-${SCREEN_DIMENSIONS.BACKGROUND.MAX_Y}), got ${y}`,
           type: ERROR_TYPES.RUNTIME
         });
         return;
@@ -17075,7 +17222,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       const expressions = getCstNodes(colorStmtCst.children.expression);
       if (expressions.length < 3) {
         this.context.addError({
-          line: lineNumber || 0,
+          line: lineNumber ?? 0,
           message: "COLOR: Expected three arguments (X, Y, n)",
           type: ERROR_TYPES.RUNTIME
         });
@@ -17086,7 +17233,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       const patternExprCst = expressions[2];
       if (!xExprCst || !yExprCst || !patternExprCst) {
         this.context.addError({
-          line: lineNumber || 0,
+          line: lineNumber ?? 0,
           message: "COLOR: Invalid arguments",
           type: ERROR_TYPES.RUNTIME
         });
@@ -17104,32 +17251,32 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         pattern = typeof patternValue === "number" ? Math.floor(patternValue) : Math.floor(parseFloat(String(patternValue)) || 0);
       } catch (error) {
         this.context.addError({
-          line: lineNumber || 0,
+          line: lineNumber ?? 0,
           message: `COLOR: Error evaluating arguments: ${error instanceof Error ? error.message : String(error)}`,
           type: ERROR_TYPES.RUNTIME
         });
         return;
       }
-      if (x < 0 || x > 27) {
+      if (x < 0 || x > SCREEN_DIMENSIONS.BACKGROUND.MAX_X) {
         this.context.addError({
-          line: lineNumber || 0,
-          message: `COLOR: X coordinate out of range (0-27), got ${x}`,
+          line: lineNumber ?? 0,
+          message: `COLOR: X coordinate out of range (0-${SCREEN_DIMENSIONS.BACKGROUND.MAX_X}), got ${x}`,
           type: ERROR_TYPES.RUNTIME
         });
         return;
       }
-      if (y < 0 || y > 23) {
+      if (y < 0 || y > SCREEN_DIMENSIONS.BACKGROUND.MAX_Y) {
         this.context.addError({
-          line: lineNumber || 0,
-          message: `COLOR: Y coordinate out of range (0-23), got ${y}`,
+          line: lineNumber ?? 0,
+          message: `COLOR: Y coordinate out of range (0-${SCREEN_DIMENSIONS.BACKGROUND.MAX_Y}), got ${y}`,
           type: ERROR_TYPES.RUNTIME
         });
         return;
       }
-      if (pattern < 0 || pattern > 3) {
+      if (pattern < COLOR_PATTERNS.MIN || pattern > COLOR_PATTERNS.MAX) {
         this.context.addError({
-          line: lineNumber || 0,
-          message: `COLOR: Color pattern number out of range (0-3), got ${pattern}`,
+          line: lineNumber ?? 0,
+          message: `COLOR: Color pattern number out of range (${COLOR_PATTERNS.MIN}-${COLOR_PATTERNS.MAX}), got ${pattern}`,
           type: ERROR_TYPES.RUNTIME
         });
         return;
@@ -17168,7 +17315,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
             bgPalette = typeof mValue === "number" ? Math.floor(mValue) : Math.floor(parseFloat(String(mValue)) || 0);
           } catch (error) {
             this.context.addError({
-              line: lineNumber || 0,
+              line: lineNumber ?? 0,
               message: `CGSET: Error evaluating background palette code: ${error instanceof Error ? error.message : String(error)}`,
               type: ERROR_TYPES.RUNTIME
             });
@@ -17184,7 +17331,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
             spritePalette = typeof nValue === "number" ? Math.floor(nValue) : Math.floor(parseFloat(String(nValue)) || 0);
           } catch (error) {
             this.context.addError({
-              line: lineNumber || 0,
+              line: lineNumber ?? 0,
               message: `CGSET: Error evaluating sprite palette code: ${error instanceof Error ? error.message : String(error)}`,
               type: ERROR_TYPES.RUNTIME
             });
@@ -17192,11 +17339,11 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           }
         }
       }
-      const finalBgPalette = bgPalette !== void 0 ? bgPalette : 1;
-      const finalSpritePalette = spritePalette !== void 0 ? spritePalette : 1;
+      const finalBgPalette = bgPalette ?? 1;
+      const finalSpritePalette = spritePalette ?? 1;
       if (bgPalette !== void 0 && (bgPalette < 0 || bgPalette > 1)) {
         this.context.addError({
-          line: lineNumber || 0,
+          line: lineNumber ?? 0,
           message: `CGSET: Background palette code out of range (0-1), got ${bgPalette}`,
           type: ERROR_TYPES.RUNTIME
         });
@@ -17204,7 +17351,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       }
       if (spritePalette !== void 0 && (spritePalette < 0 || spritePalette > 2)) {
         this.context.addError({
-          line: lineNumber || 0,
+          line: lineNumber ?? 0,
           message: `CGSET: Sprite palette code out of range (0-2), got ${spritePalette}`,
           type: ERROR_TYPES.RUNTIME
         });
@@ -17242,7 +17389,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       const expressionCst = getFirstCstNode(cgenStmtCst.children.expression);
       if (!expressionCst) {
         this.context.addError({
-          line: lineNumber || 0,
+          line: lineNumber ?? 0,
           message: "CGEN: Missing mode parameter",
           type: ERROR_TYPES.RUNTIME
         });
@@ -17254,7 +17401,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         mode = typeof modeValue === "number" ? Math.floor(modeValue) : Math.floor(parseFloat(String(modeValue)) || 0);
       } catch (error) {
         this.context.addError({
-          line: lineNumber || 0,
+          line: lineNumber ?? 0,
           message: `CGEN: Error evaluating mode: ${error instanceof Error ? error.message : String(error)}`,
           type: ERROR_TYPES.RUNTIME
         });
@@ -17262,7 +17409,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       }
       if (mode < 0 || mode > 3) {
         this.context.addError({
-          line: lineNumber || 0,
+          line: lineNumber ?? 0,
           message: `CGEN: Mode out of range (0-3), got ${mode}`,
           type: ERROR_TYPES.RUNTIME
         });
@@ -17273,6 +17420,151 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       }
       if (this.context.config.enableDebugMode) {
         this.context.addDebugOutput(`CGEN: Character generator mode set to ${mode}`);
+      }
+    }
+  };
+
+  // src/core/execution/executors/PaletExecutor.ts
+  var PaletExecutor = class {
+    constructor(context, evaluator) {
+      this.context = context;
+      this.evaluator = evaluator;
+    }
+    /**
+     * Execute a PALET statement from CST
+     * Sets color codes for color combination n (0-3)
+     * Syntax: PALET {B|S} n, C1, C2, C3, C4
+     * or: PALETB n, C1, C2, C3, C4 (background, no space)
+     * or: PALETS n, C1, C2, C3, C4 (sprites, no space)
+     * 
+     * When target is B and n=0, C1 is the backdrop color.
+     * C1, C2, C3, C4 are color codes (0-60).
+     */
+    execute(paletStmtCst, lineNumber) {
+      let target = "B";
+      const paletbToken = paletStmtCst.children.Paletb?.[0];
+      const paletsToken = paletStmtCst.children.Palets?.[0];
+      const paletToken = paletStmtCst.children.Palet?.[0];
+      if (paletbToken) {
+        target = "B";
+      } else if (paletsToken) {
+        target = "S";
+      } else if (paletToken) {
+        const targetToken = getFirstToken(paletStmtCst.children.target);
+        if (targetToken) {
+          const targetStr = targetToken.image.toUpperCase();
+          if (targetStr === "B") {
+            target = "B";
+          } else if (targetStr === "S") {
+            target = "S";
+          } else {
+            this.context.addError({
+              line: lineNumber ?? 0,
+              message: `PALET: Invalid target, expected B or S, got ${targetStr}`,
+              type: ERROR_TYPES.RUNTIME
+            });
+            return;
+          }
+        } else {
+          this.context.addError({
+            line: lineNumber ?? 0,
+            message: "PALET: Missing target (B or S)",
+            type: ERROR_TYPES.RUNTIME
+          });
+          return;
+        }
+      } else {
+        this.context.addError({
+          line: lineNumber ?? 0,
+          message: "PALET: Invalid statement format",
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      const paletParameterListCst = getFirstCstNode(paletStmtCst.children.paletParameterList);
+      if (!paletParameterListCst) {
+        this.context.addError({
+          line: lineNumber ?? 0,
+          message: "PALET: Missing parameter list",
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      const expressions = getCstNodes(paletParameterListCst.children.expression);
+      if (expressions.length < 5) {
+        this.context.addError({
+          line: lineNumber ?? 0,
+          message: "PALET: Expected 5 arguments (n, C1, C2, C3, C4)",
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      const nExprCst = expressions[0];
+      const c1ExprCst = expressions[1];
+      const c2ExprCst = expressions[2];
+      const c3ExprCst = expressions[3];
+      const c4ExprCst = expressions[4];
+      if (!nExprCst || !c1ExprCst || !c2ExprCst || !c3ExprCst || !c4ExprCst) {
+        this.context.addError({
+          line: lineNumber ?? 0,
+          message: "PALET: Invalid arguments",
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      let n;
+      let c1;
+      let c2;
+      let c3;
+      let c4;
+      try {
+        const nValue = this.evaluator.evaluateExpression(nExprCst);
+        const c1Value = this.evaluator.evaluateExpression(c1ExprCst);
+        const c2Value = this.evaluator.evaluateExpression(c2ExprCst);
+        const c3Value = this.evaluator.evaluateExpression(c3ExprCst);
+        const c4Value = this.evaluator.evaluateExpression(c4ExprCst);
+        n = typeof nValue === "number" ? Math.floor(nValue) : Math.floor(parseFloat(String(nValue)) || 0);
+        c1 = typeof c1Value === "number" ? Math.floor(c1Value) : Math.floor(parseFloat(String(c1Value)) || 0);
+        c2 = typeof c2Value === "number" ? Math.floor(c2Value) : Math.floor(parseFloat(String(c2Value)) || 0);
+        c3 = typeof c3Value === "number" ? Math.floor(c3Value) : Math.floor(parseFloat(String(c3Value)) || 0);
+        c4 = typeof c4Value === "number" ? Math.floor(c4Value) : Math.floor(parseFloat(String(c4Value)) || 0);
+      } catch (error) {
+        this.context.addError({
+          line: lineNumber ?? 0,
+          message: `PALET: Error evaluating arguments: ${error instanceof Error ? error.message : String(error)}`,
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      if (n < COLOR_PATTERNS.MIN || n > COLOR_PATTERNS.MAX) {
+        this.context.addError({
+          line: lineNumber ?? 0,
+          message: `PALET: Color combination number out of range (${COLOR_PATTERNS.MIN}-${COLOR_PATTERNS.MAX}), got ${n}`,
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      if (c1 < COLOR_CODES.MIN || c1 > COLOR_CODES.MAX || c2 < COLOR_CODES.MIN || c2 > COLOR_CODES.MAX || c3 < COLOR_CODES.MIN || c3 > COLOR_CODES.MAX || c4 < COLOR_CODES.MIN || c4 > COLOR_CODES.MAX) {
+        this.context.addError({
+          line: lineNumber ?? 0,
+          message: `PALET: Color code out of range (${COLOR_CODES.MIN}-${COLOR_CODES.MAX}), got C1=${c1}, C2=${c2}, C3=${c3}, C4=${c4}`,
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      if (target === "B" && n === 0) {
+        if (this.context.deviceAdapter) {
+          this.context.deviceAdapter.setBackdropColor(c1);
+        }
+        if (this.context.config.enableDebugMode) {
+          this.context.addDebugOutput(`PALET B: Set backdrop color to ${c1} (color combination 0)`);
+        }
+      } else {
+        if (this.context.config.enableDebugMode) {
+          this.context.addDebugOutput(
+            `PALET ${target}: Set color combination ${n} to C1=${c1}, C2=${c2}, C3=${c3}, C4=${c4} (not yet fully implemented)`
+          );
+        }
       }
     }
   };
@@ -17304,6 +17596,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       __publicField(this, "colorExecutor");
       __publicField(this, "cgsetExecutor");
       __publicField(this, "cgenExecutor");
+      __publicField(this, "paletExecutor");
       this.printExecutor = new PrintExecutor(context, evaluator);
       this.letExecutor = new LetExecutor(variableService);
       this.forExecutor = new ForExecutor(context, evaluator, variableService);
@@ -17324,6 +17617,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       this.colorExecutor = new ColorExecutor(context, evaluator);
       this.cgsetExecutor = new CgsetExecutor(context, evaluator);
       this.cgenExecutor = new CgenExecutor(context, evaluator);
+      this.paletExecutor = new PaletExecutor(context, evaluator);
     }
     /**
      * Route an expanded statement to its appropriate executor
@@ -17524,6 +17818,11 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         if (cgenStmtCst) {
           this.cgenExecutor.execute(cgenStmtCst, expandedStatement.lineNumber);
         }
+      } else if (singleCommandCst.children.paletStatement) {
+        const paletStmtCst = getFirstCstNode(singleCommandCst.children.paletStatement);
+        if (paletStmtCst) {
+          this.paletExecutor.execute(paletStmtCst, expandedStatement.lineNumber);
+        }
       } else {
         this.context.addError({
           line: expandedStatement.lineNumber,
@@ -17579,9 +17878,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         if (!Array.isArray(current)) {
           current = [];
         }
-        if (!current[index]) {
-          current[index] = [];
-        }
+        current[index] ?? (current[index] = []);
         current = current[index];
       }
       if (Array.isArray(current)) {
@@ -18125,7 +18422,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
      * Find statement indices by line number
      */
     findStatementIndicesByLine(lineNumber) {
-      return this.labelMap.get(lineNumber) || [];
+      return this.labelMap.get(lineNumber) ?? [];
     }
     /**
      * Find first statement index by line number (for GOTO/GOSUB)
@@ -18134,7 +18431,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       const indices = this.labelMap.get(lineNumber);
       if (indices && indices.length > 0) {
         const firstIndex = indices[0];
-        return firstIndex !== void 0 ? firstIndex : -1;
+        return firstIndex ?? -1;
       }
       return -1;
     }
@@ -18250,15 +18547,15 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           return {
             success: false,
             errors: parseResult.errors?.map((error) => ({
-              line: error.location?.start?.line || 0,
+              line: error.location?.start?.line ?? 0,
               message: error.message,
               type: ERROR_TYPES.SYNTAX
-            })) || [],
+            })) ?? [],
             variables: /* @__PURE__ */ new Map(),
             executionTime: 0
           };
         }
-        if (!this.context || !this.context.deviceAdapter) {
+        if (!this.context?.deviceAdapter) {
           this.context = new ExecutionContext(this.config);
           if (this.config.deviceAdapter) {
             this.context.deviceAdapter = this.config.deviceAdapter;
@@ -18334,13 +18631,13 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
      * Check if interpreter is currently running
      */
     isRunning() {
-      return this.context?.isRunning || false;
+      return this.context?.isRunning ?? false;
     }
     /**
      * Get current variables
      */
     getVariables() {
-      return this.context?.variables || /* @__PURE__ */ new Map();
+      return this.context?.variables ?? /* @__PURE__ */ new Map();
     }
   };
 
@@ -18387,7 +18684,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         console.log("\u2705 [WEB_WORKER] Worker already initialized");
         return;
       }
-      const script = workerScript || DEFAULTS.WEB_WORKER.WORKER_SCRIPT;
+      const script = workerScript ?? DEFAULTS.WEB_WORKER.WORKER_SCRIPT;
       console.log("\u{1F527} [WEB_WORKER] Creating worker with script:", script);
       try {
         this.worker = new Worker(script);
@@ -18398,7 +18695,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       }
       this.worker.onerror = (error) => {
         console.error("\u274C [WEB_WORKER] Web worker error:", error);
-        this.rejectAllPending("Web worker error: " + error.message);
+        this.rejectAllPending(`Web worker error: ${error.message}`);
       };
       this.worker.onmessageerror = (error) => {
         console.error("\u274C [WEB_WORKER] Web worker message error:", error);
@@ -18410,7 +18707,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
      * Execute BASIC code in the web worker
      */
     async executeInWorker(code, config2, options = {}, onMessage) {
-      console.log("executeInWorker called with code:", code.substring(0, 50) + "...");
+      console.log(`executeInWorker called with code: ${code.substring(0, 50)}...`);
       if (!this.worker) {
         console.log("Worker not initialized, initializing...");
         await this.initialize(DEFAULTS.WEB_WORKER.WORKER_SCRIPT);
@@ -18419,7 +18716,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         throw new Error("Failed to initialize web worker");
       }
       const messageId = (++this.messageId).toString();
-      const timeout = options.timeout || DEFAULTS.WEB_WORKER.MESSAGE_TIMEOUT;
+      const timeout = options.timeout ?? DEFAULTS.WEB_WORKER.MESSAGE_TIMEOUT;
       console.log("Sending message with ID:", messageId, "timeout:", timeout);
       return new Promise((resolve, reject2) => {
         const timeoutHandle = setTimeout(() => {
@@ -18589,6 +18886,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
      * Write a character to the screen at the current cursor position
      */
     writeCharacter(char) {
+      var _a, _b;
       if (char === "\n") {
         this.cursorX = 0;
         this.cursorY++;
@@ -18598,9 +18896,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         return;
       }
       if (this.cursorY < 24 && this.cursorX < 28) {
-        if (!this.screenBuffer[this.cursorY]) {
-          this.screenBuffer[this.cursorY] = [];
-        }
+        (_a = this.screenBuffer)[_b = this.cursorY] ?? (_a[_b] = []);
         const row = this.screenBuffer[this.cursorY];
         let cell = row[this.cursorX];
         if (!cell) {
@@ -18747,7 +19043,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         id: `screen-full-${Date.now()}`,
         timestamp: Date.now(),
         data: {
-          executionId: this.currentExecutionId || "unknown",
+          executionId: this.currentExecutionId ?? "unknown",
           updateType: "full",
           screenBuffer: this.screenBuffer,
           cursorX: this.cursorX,
@@ -18765,7 +19061,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         id: `screen-cursor-${Date.now()}`,
         timestamp: Date.now(),
         data: {
-          executionId: this.currentExecutionId || "unknown",
+          executionId: this.currentExecutionId ?? "unknown",
           updateType: "cursor",
           cursorX: this.cursorX,
           cursorY: this.cursorY,
@@ -18782,7 +19078,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         id: `screen-clear-${Date.now()}`,
         timestamp: Date.now(),
         data: {
-          executionId: this.currentExecutionId || "unknown",
+          executionId: this.currentExecutionId ?? "unknown",
           updateType: "clear",
           timestamp: Date.now()
         }
@@ -18797,7 +19093,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         id: `screen-color-${Date.now()}`,
         timestamp: Date.now(),
         data: {
-          executionId: this.currentExecutionId || "unknown",
+          executionId: this.currentExecutionId ?? "unknown",
           updateType: "color",
           colorUpdates: cellsToUpdate,
           timestamp: Date.now()
@@ -18813,7 +19109,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         id: `screen-palette-${Date.now()}`,
         timestamp: Date.now(),
         data: {
-          executionId: this.currentExecutionId || "unknown",
+          executionId: this.currentExecutionId ?? "unknown",
           updateType: "palette",
           bgPalette: this.bgPalette,
           spritePalette: this.spritePalette,
@@ -18830,7 +19126,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         id: `screen-backdrop-${Date.now()}`,
         timestamp: Date.now(),
         data: {
-          executionId: this.currentExecutionId || "unknown",
+          executionId: this.currentExecutionId ?? "unknown",
           updateType: "backdrop",
           backdropColor: this.backdropColor,
           timestamp: Date.now()
@@ -18846,7 +19142,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         id: `screen-cgen-${Date.now()}`,
         timestamp: Date.now(),
         data: {
-          executionId: this.currentExecutionId || "unknown",
+          executionId: this.currentExecutionId ?? "unknown",
           updateType: "cgen",
           cgenMode: this.cgenMode,
           timestamp: Date.now()
@@ -18930,6 +19226,9 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           });
           break;
         }
+        default:
+          console.log("\u26A0\uFE0F [MESSAGE_HANDLER] Unexpected message type:", message.type);
+          break;
       }
     }
     /**
@@ -19047,7 +19346,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       return 2;
     }
     getStickState(joystickId) {
-      return this.stickStates.get(joystickId) || 0;
+      return this.stickStates.get(joystickId) ?? 0;
     }
     setStickState(joystickId, state) {
       this.stickStates.set(joystickId, state);
@@ -19092,7 +19391,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         id: `output-${Date.now()}`,
         timestamp: Date.now(),
         data: {
-          executionId: this.screenStateManager.getCurrentExecutionId() || "unknown",
+          executionId: this.screenStateManager.getCurrentExecutionId() ?? "unknown",
           output,
           outputType: "print",
           timestamp: Date.now()
@@ -19111,7 +19410,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         id: `debug-${Date.now()}`,
         timestamp: Date.now(),
         data: {
-          executionId: this.screenStateManager.getCurrentExecutionId() || "unknown",
+          executionId: this.screenStateManager.getCurrentExecutionId() ?? "unknown",
           output,
           outputType: "debug",
           timestamp: Date.now()
@@ -19125,7 +19424,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         id: `error-${Date.now()}`,
         timestamp: Date.now(),
         data: {
-          executionId: this.screenStateManager.getCurrentExecutionId() || "unknown",
+          executionId: this.screenStateManager.getCurrentExecutionId() ?? "unknown",
           output,
           outputType: "error",
           timestamp: Date.now()
@@ -19240,7 +19539,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           timestamp: event.data.timestamp,
           dataSize: JSON.stringify(event.data).length
         });
-        this.handleMessage(event.data);
+        void this.handleMessage(event.data);
       });
     }
     async handleMessage(message) {
@@ -19266,6 +19565,9 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           case "STICK_EVENT":
             console.log("\u{1F3AE} [WORKER] Handling STICK_EVENT message");
             this.handleStickEvent(message);
+            break;
+          default:
+            console.log("\u26A0\uFE0F [WORKER] Unexpected message type:", message.type);
             break;
         }
       } catch (error) {
@@ -19301,7 +19603,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         this.isRunning = false;
         console.log("\u2705 [WORKER] Execution completed:", {
           success: result.success,
-          outputLines: this.webWorkerDeviceAdapter?.printOutput.length || 0,
+          outputLines: this.webWorkerDeviceAdapter?.printOutput.length ?? 0,
           executionTime: result.executionTime
         });
         const enhancedResult = {

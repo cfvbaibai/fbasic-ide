@@ -1,3 +1,27 @@
+<script setup lang="ts">
+/**
+ * Dpad component - D-pad (directional pad) component for Nintendo controller.
+ */
+defineOptions({
+  name: 'Dpad'
+})
+
+const emit = defineEmits<Emits>()
+
+interface Emits {
+  (type: 'dpadStart', direction: 'up' | 'down' | 'left' | 'right'): void
+  (type: 'dpadStop', direction: 'up' | 'down' | 'left' | 'right'): void
+}
+
+const handleDpadStart = (direction: 'up' | 'down' | 'left' | 'right') => {
+  emit('dpadStart', direction)
+}
+
+const handleDpadStop = (direction: 'up' | 'down' | 'left' | 'right') => {
+  emit('dpadStop', direction)
+}
+</script>
+
 <template>
   <div class="controller-section d-pad-section">
     <div class="manual-cross">
@@ -47,30 +71,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-/**
- * Dpad component - D-pad (directional pad) component for Nintendo controller.
- */
-defineOptions({
-  name: 'Dpad'
-})
-
-interface Emits {
-  (type: 'dpad-start', direction: 'up' | 'down' | 'left' | 'right'): void
-  (type: 'dpad-stop', direction: 'up' | 'down' | 'left' | 'right'): void
-}
-
-const emit = defineEmits<Emits>()
-
-const handleDpadStart = (direction: 'up' | 'down' | 'left' | 'right') => {
-  emit('dpad-start', direction)
-}
-
-const handleDpadStop = (direction: 'up' | 'down' | 'left' | 'right') => {
-  emit('dpad-stop', direction)
-}
-</script>
 
 <style scoped>
 .controller-section {

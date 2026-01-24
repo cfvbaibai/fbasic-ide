@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, nextTick, computed } from 'vue'
+import { ref, watch, nextTick, computed, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { BasicVariable, ScreenCell } from '../../../core/interfaces'
 import Screen from './Screen.vue'
@@ -11,22 +11,6 @@ import { GameTabs, GameTabPane, GameTag, GameIcon } from '../../../shared/compon
 defineOptions({
   name: 'RuntimeOutput'
 })
-
-const { t } = useI18n()
-
-interface Props {
-  output: string[]
-  isRunning: boolean
-  errors?: { line: number; message: string; type: string }[]
-  variables?: Record<string, BasicVariable>
-  debugOutput?: string
-  debugMode?: boolean
-  screenBuffer?: ScreenCell[][]
-  cursorX?: number
-  cursorY?: number
-  bgPalette?: number
-  backdropColor?: number
-}
 
 const props = withDefaults(defineProps<Props>(), {
   errors: () => [],
@@ -50,7 +34,23 @@ const props = withDefaults(defineProps<Props>(), {
   backdropColor: 0
 })
 
-const outputRef = ref<HTMLDivElement>()
+const { t } = useI18n()
+
+interface Props {
+  output: string[]
+  isRunning: boolean
+  errors?: { line: number; message: string; type: string }[]
+  variables?: Record<string, BasicVariable>
+  debugOutput?: string
+  debugMode?: boolean
+  screenBuffer?: ScreenCell[][]
+  cursorX?: number
+  cursorY?: number
+  bgPalette?: number
+  backdropColor?: number
+}
+
+const outputRef = useTemplateRef<HTMLDivElement>('outputRef')
 const activeTab = ref('screen')
 
 // Maximum number of lines to keep in the output buffer

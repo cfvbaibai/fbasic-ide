@@ -19,6 +19,14 @@ defineOptions({
   name: 'GameTable'
 })
 
+const props = withDefaults(defineProps<Props>(), {
+  showHeader: true,
+  stripe: false,
+  border: false,
+  size: 'medium',
+  highlightRow: true
+})
+
 export interface Column {
   prop: string
   label: string
@@ -36,14 +44,6 @@ export interface Props {
   size?: 'small' | 'medium' | 'large'
   highlightRow?: boolean
 }
-
-const props = withDefaults(defineProps<Props>(), {
-  showHeader: true,
-  stripe: false,
-  border: false,
-  size: 'medium',
-  highlightRow: true
-})
 
 const tableSize = computed(() => {
   const sizeMap = {

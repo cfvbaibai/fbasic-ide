@@ -207,7 +207,7 @@ export class FunctionEvaluator {
     const num = toNumber(args[0] ?? 0)
     // For positive numbers, add leading space
     if (num >= 0) {
-      return ' ' + String(num)
+      return ` ${String(num)}`
     }
     return String(num)
   }

@@ -9,6 +9,7 @@ import type { CstNode } from 'chevrotain'
 import type { VariableService } from '../../services/VariableService'
 import { getFirstToken, getFirstCstNode, getCstNodes } from '../../parser/cst-helpers'
 import type { BasicScalarValue } from '../../types/BasicTypes'
+import { ERROR_TYPES } from '../../constants'
 
 export class LetExecutor {
   constructor(private variableService: VariableService) {}
@@ -27,25 +28,41 @@ export class LetExecutor {
       const expressionListCst = getFirstCstNode(arrayAccessCst.children.expressionList)
       
       if (!identifierToken || !expressionListCst) {
-        throw new Error('Invalid LET statement: invalid array access')
+        this.variableService.context.addError({
+          line: 0,
+          message: 'Invalid LET statement: invalid array access',
+          type: ERROR_TYPES.RUNTIME
+        })
+        return
       }
 
       const expressionCst = getFirstCstNode(letStmtCst.children.expression)
       if (!expressionCst) {
-        throw new Error('Invalid LET statement: missing expression')
+        this.variableService.context.addError({
+          line: 0,
+          message: 'Invalid LET statement: missing expression',
+          type: ERROR_TYPES.RUNTIME
+        })
+        return
       }
 
       const arrayName = identifierToken.image.toUpperCase()
       const indexExpressions = getCstNodes(expressionListCst.children.expression)
       
       // Evaluate indices
-      const indices = indexExpressions.map(exprCst => {
+      const indices: number[] = []
+      for (const exprCst of indexExpressions) {
         const indexValue = this.variableService.evaluator.evaluateExpression(exprCst)
         if (typeof indexValue !== 'number') {
-          throw new Error(`Invalid array index: expected number, got ${typeof indexValue}`)
+          this.variableService.context.addError({
+            line: 0,
+            message: `Invalid array index: expected number, got ${typeof indexValue}`,
+            type: ERROR_TYPES.RUNTIME
+          })
+          return
         }
-        return Math.floor(indexValue)
-      })
+        indices.push(Math.floor(indexValue))
+      }
 
       // Evaluate value expression
       const value = this.variableService.evaluator.evaluateExpression(expressionCst)
@@ -65,13 +82,28 @@ export class LetExecutor {
       const expressionCst = getFirstCstNode(letStmtCst.children.expression)
       
       if (!identifierToken && !expressionCst) {
-        throw new Error('Invalid LET statement: missing identifier or expression')
+        this.variableService.context.addError({
+          line: 0,
+          message: 'Invalid LET statement: missing identifier or expression',
+          type: ERROR_TYPES.RUNTIME
+        })
+        return
       }
       if (!identifierToken) {
-        throw new Error('Invalid LET statement: missing identifier or expression')
+        this.variableService.context.addError({
+          line: 0,
+          message: 'Invalid LET statement: missing identifier',
+          type: ERROR_TYPES.RUNTIME
+        })
+        return
       }
       if (!expressionCst) {
-        throw new Error('Invalid LET statement: missing identifier or expression')
+        this.variableService.context.addError({
+          line: 0,
+          message: 'Invalid LET statement: missing expression',
+          type: ERROR_TYPES.RUNTIME
+        })
+        return
       }
 
       const varName = identifierToken.image.toUpperCase()

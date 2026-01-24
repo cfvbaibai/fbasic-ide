@@ -81,7 +81,7 @@ export function findStatementIndicesByLine(
   labelMap: Map<number, number[]>,
   lineNumber: number
 ): number[] {
-  return labelMap.get(lineNumber) || []
+  return labelMap.get(lineNumber) ?? []
 }
 
 /**

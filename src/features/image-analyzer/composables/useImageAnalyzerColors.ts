@@ -17,13 +17,13 @@ export function useGridLineColors() {
 
   const getGridLineColor = (i: number): string => {
     if (i === 1 || i === 17) {
-      return semanticWarning.value || '#ffa500' // fallback to orange
+      return semanticWarning.value ?? '#ffa500' // fallback to orange
     } else if (i === 9) {
-      return semanticSuccess.value || '#00ff00' // fallback to green
+      return semanticSuccess.value ?? '#00ff00' // fallback to green
     } else if (i === 5 || i === 13) {
-      return semanticInfo.value || '#00ffff' // fallback to cyan
+      return semanticInfo.value ?? '#00ffff' // fallback to cyan
     } else {
-      return semanticDanger.value || '#ff0000' // fallback to red
+      return semanticDanger.value ?? '#ff0000' // fallback to red
     }
   }
 

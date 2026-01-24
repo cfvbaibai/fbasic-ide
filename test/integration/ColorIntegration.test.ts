@@ -51,19 +51,15 @@ function simulateMessageHandler(message: ScreenUpdateMessage, screenBuffer: Scre
           const { x, y, pattern } = colorUpdate
 
           // Ensure row exists
-          if (!screenBuffer[y]) {
-            screenBuffer[y] = []
-          }
+          screenBuffer[y] ??= []
 
           // Ensure cell exists
           const currentRow = screenBuffer[y]
-          if (!currentRow[x]) {
-            currentRow[x] = {
-              character: ' ',
-              colorPattern: 0,
-              x,
-              y
-            }
+          currentRow[x] ??= {
+            character: ' ',
+            colorPattern: 0,
+            x,
+            y
           }
           
           // Update color pattern
@@ -74,20 +70,16 @@ function simulateMessageHandler(message: ScreenUpdateMessage, screenBuffer: Scre
     case 'character':
       // Handle character updates (existing handler)
       if (update.x !== undefined && update.y !== undefined && update.character !== undefined) {
-        if (!screenBuffer[update.y]) {
-          screenBuffer[update.y] = []
-        }
+        screenBuffer[update.y] ??= []
         const row = screenBuffer[update.y]
         if (!row) {
           throw new Error('Row not found')
         }
-        if (!row[update.x]) {
-          row[update.x] = {
-            character: ' ',
-            colorPattern: 0,
-            x: update.x,
-            y: update.y
-          }
+        row[update.x] ??= {
+          character: ' ',
+          colorPattern: 0,
+          x: update.x,
+          y: update.y
         }
         const cell = row[update.x]
         if (cell) {

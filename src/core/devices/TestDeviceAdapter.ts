@@ -38,7 +38,7 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
   }
 
   getStickState(joystickId: number): number {
-    return this.stickStates.get(joystickId) || 0
+    return this.stickStates.get(joystickId) ?? 0
   }
 
   setStickState(joystickId: number, state: number): void {

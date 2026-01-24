@@ -41,10 +41,10 @@ export class CgsetExecutor {
           const mValue = this.evaluator.evaluateExpression(mExprCst)
           bgPalette = typeof mValue === 'number'
             ? Math.floor(mValue)
-            : Math.floor(parseFloat(String(mValue)) || 0)
+            : Math.floor(parseFloat(String(mValue)) || 0)  
         } catch (error) {
           this.context.addError({
-            line: lineNumber || 0,
+            line: lineNumber ?? 0,
             message: `CGSET: Error evaluating background palette code: ${error instanceof Error ? error.message : String(error)}`,
             type: ERROR_TYPES.RUNTIME
           })
@@ -61,10 +61,10 @@ export class CgsetExecutor {
           const nValue = this.evaluator.evaluateExpression(nExprCst)
           spritePalette = typeof nValue === 'number'
             ? Math.floor(nValue)
-            : Math.floor(parseFloat(String(nValue)) || 0)
+            : Math.floor(parseFloat(String(nValue)) || 0)  
         } catch (error) {
           this.context.addError({
-            line: lineNumber || 0,
+            line: lineNumber ?? 0,
             message: `CGSET: Error evaluating sprite palette code: ${error instanceof Error ? error.message : String(error)}`,
             type: ERROR_TYPES.RUNTIME
           })
@@ -74,14 +74,14 @@ export class CgsetExecutor {
     }
 
     // Apply default values if not provided
-    const finalBgPalette = bgPalette !== undefined ? bgPalette : 1
-    const finalSpritePalette = spritePalette !== undefined ? spritePalette : 1
+    const finalBgPalette = bgPalette ?? 1
+    const finalSpritePalette = spritePalette ?? 1
 
     // Validate ranges
     // Background palette: 0 to 1
     if (bgPalette !== undefined && (bgPalette < 0 || bgPalette > 1)) {
       this.context.addError({
-        line: lineNumber || 0,
+        line: lineNumber ?? 0,
         message: `CGSET: Background palette code out of range (0-1), got ${bgPalette}`,
         type: ERROR_TYPES.RUNTIME
       })
@@ -91,7 +91,7 @@ export class CgsetExecutor {
     // Sprite palette: 0 to 2
     if (spritePalette !== undefined && (spritePalette < 0 || spritePalette > 2)) {
       this.context.addError({
-        line: lineNumber || 0,
+        line: lineNumber ?? 0,
         message: `CGSET: Sprite palette code out of range (0-2), got ${spritePalette}`,
         type: ERROR_TYPES.RUNTIME
       })

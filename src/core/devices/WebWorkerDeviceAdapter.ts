@@ -143,7 +143,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   }
 
   getStickState(joystickId: number): number {
-    return this.stickStates.get(joystickId) || 0
+    return this.stickStates.get(joystickId) ?? 0
   }
 
   setStickState(joystickId: number, state: number): void {
@@ -201,7 +201,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       id: `output-${Date.now()}`,
       timestamp: Date.now(),
       data: {
-        executionId: this.screenStateManager.getCurrentExecutionId() || 'unknown',
+        executionId: this.screenStateManager.getCurrentExecutionId() ?? 'unknown',
         output: output,
         outputType: 'print',
         timestamp: Date.now()
@@ -226,7 +226,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       id: `debug-${Date.now()}`,
       timestamp: Date.now(),
       data: {
-        executionId: this.screenStateManager.getCurrentExecutionId() || 'unknown',
+        executionId: this.screenStateManager.getCurrentExecutionId() ?? 'unknown',
         output: output,
         outputType: 'debug',
         timestamp: Date.now()
@@ -242,7 +242,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       id: `error-${Date.now()}`,
       timestamp: Date.now(),
       data: {
-        executionId: this.screenStateManager.getCurrentExecutionId() || 'unknown',
+        executionId: this.screenStateManager.getCurrentExecutionId() ?? 'unknown',
         output: output,
         outputType: 'error',
         timestamp: Date.now()

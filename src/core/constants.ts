@@ -128,6 +128,53 @@ export const SEPARATORS = {
   SEMICOLON: ';',
 } as const
 
+// Screen dimensions and coordinate limits
+export const SCREEN_DIMENSIONS = {
+  BACKGROUND: {
+    MAX_X: 27,        // Maximum X coordinate (0-27, 28 columns)
+    MAX_Y: 23,        // Maximum Y coordinate (0-23, 24 lines)
+    COLUMNS: 28,      // Total columns
+    LINES: 24,        // Total lines
+  },
+  BACKDROP: {
+    MAX_X: 31,        // Maximum X coordinate (0-31, 32 columns)
+    MAX_Y: 29,        // Maximum Y coordinate (0-29, 30 lines)
+    COLUMNS: 32,      // Total columns  
+    LINES: 30,        // Total lines
+  },
+  BG_GRAPHIC: {
+    MAX_X: 27,        // Maximum X coordinate (0-27, 28 columns)
+    MAX_Y: 20,        // Maximum Y coordinate (0-20, 21 lines)
+    COLUMNS: 28,      // Total columns
+    LINES: 21,        // Total lines
+  },
+  SPRITE: {
+    MAX_X: 255,       // Maximum X coordinate (0-255, 256 dots)
+    MAX_Y: 239,       // Maximum Y coordinate (0-239, 240 dots)
+    WIDTH: 256,       // Total width in dots
+    HEIGHT: 240,      // Total height in dots
+  }
+} as const
+
+// Color patterns and codes
+export const COLOR_PATTERNS = {
+  MIN: 0,             // Minimum color pattern number
+  MAX: 3,             // Maximum color pattern number (0-3)
+} as const
+
+export const COLOR_CODES = {
+  MIN: 0,             // Minimum color code
+  MAX: 60,            // Maximum color code (0-60)
+} as const
+
+// PRINT statement tab stops (8-character blocks)
+export const PRINT_TAB_STOPS = {
+  BLOCK_1_END: 8,     // End of block 1 (columns 0-7)
+  BLOCK_2_END: 16,    // End of block 2 (columns 8-15)
+  BLOCK_3_END: 24,    // End of block 3 (columns 16-23)
+  BLOCK_4_END: 28,    // End of block 4 (columns 24-27)
+} as const
+
 // Colors for syntax highlighting
 export const SYNTAX_COLORS = {
   COMMAND: '#0066cc',

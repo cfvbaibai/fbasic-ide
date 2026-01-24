@@ -247,9 +247,9 @@ export function convertToMonacoDiagnostics(
 ): monaco.editor.IMarkerData[] {
   return errors.map((error) => {
     // Extract line/column from error (support both formats)
-    const line = error.line || error.location?.start?.line || 1;
-    const column = error.column || error.location?.start?.column || 1;
-    const length = error.length || 1;
+    const line = error.line ?? error.location?.start?.line ?? 1;
+    const column = error.column ?? error.location?.start?.column ?? 1;
+    const length = error.length ?? 1;
 
     return {
       severity: monaco.MarkerSeverity.Error,
@@ -299,11 +299,11 @@ export function setupLiveErrorChecking(
 
   // Listen for content changes
   model.onDidChangeContent(() => {
-    debouncedUpdateDiagnostics();
+    void debouncedUpdateDiagnostics();
   });
 
   // Initial parse
-  updateDiagnostics();
+  void updateDiagnostics();
 }
 
 // ============================================================================

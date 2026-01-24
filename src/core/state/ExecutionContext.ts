@@ -165,7 +165,7 @@ export class ExecutionContext {
    * Find statement indices by line number
    */
   findStatementIndicesByLine(lineNumber: number): number[] {
-    return this.labelMap.get(lineNumber) || []
+    return this.labelMap.get(lineNumber) ?? []
   }
 
   /**
@@ -175,7 +175,7 @@ export class ExecutionContext {
     const indices = this.labelMap.get(lineNumber)
     if (indices && indices.length > 0) {
       const firstIndex = indices[0]
-      return firstIndex !== undefined ? firstIndex : -1
+      return firstIndex ?? -1
     }
     return -1
   }

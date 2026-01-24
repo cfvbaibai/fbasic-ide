@@ -122,7 +122,7 @@ class WebWorkerInterpreter {
 
       console.log('✅ [WORKER] Execution completed:', {
         success: result.success,
-        outputLines: this.webWorkerDeviceAdapter?.printOutput.length || 0,
+        outputLines: this.webWorkerDeviceAdapter?.printOutput.length ?? 0,
         executionTime: result.executionTime
       })
 

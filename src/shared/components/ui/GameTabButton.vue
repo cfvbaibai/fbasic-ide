@@ -21,6 +21,12 @@ defineOptions({
   name: 'GameTabButton'
 })
 
+const props = withDefaults(defineProps<Props>(), {
+  label: '',
+  icon: null,
+  disabled: false
+})
+
 interface Props {
   /** Unique identifier for this tab */
   name: string
@@ -31,12 +37,6 @@ interface Props {
   /** Whether the tab button is disabled */
   disabled?: boolean
 }
-
-const props = withDefaults(defineProps<Props>(), {
-  label: '',
-  icon: null,
-  disabled: false
-})
 
 // Type-safe injection with runtime error handling
 const activeTab = injectStrict(ActiveTabKey) as ComputedRef<string>

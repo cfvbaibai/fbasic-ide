@@ -1,30 +1,3 @@
-<template>
-  <GameBlock :title="t('ide.joystick.control')" title-icon="mdi:play" :clickable-header="true" class="joystick-control"
-    :class="{ collapsed: !isExpanded }" @click-header="isExpanded = !isExpanded">
-    <template #right>
-      <GameCollapseToggle :expanded="isExpanded" @toggle="isExpanded = !isExpanded" />
-    </template>
-
-    <!-- Joystick Controls and Status Display in same row -->
-    <div class="joystick-content" :class="{ expanded: isExpanded }">
-      <div class="joystick-panels-row">
-        <!-- Joystick Controls -->
-        <div class="control-grid">
-          <GameSubBlock v-for="joystickId in 2" :key="joystickId - 1" :title="t('ide.joystick.joystick', { id: joystickId - 1 })">
-            <!-- Nintendo Controller Layout -->
-            <NintendoController :joystick-id="joystickId - 1" :held-buttons="heldButtons"
-              @dpad-start="(direction: 'up' | 'down' | 'left' | 'right') => startDpadHold(joystickId - 1, direction)"
-              @dpad-stop="(direction: 'up' | 'down' | 'left' | 'right') => stopDpadHold(joystickId - 1, direction)"
-              @action-button="(button: 'select' | 'start' | 'a' | 'b') => toggleActionButton(joystickId - 1, button)" />
-          </GameSubBlock>
-
-          <JoystickStatusTable :status-data="joystickStatusData" :flashing-cells="flashingCells" />
-        </div>
-      </div>
-    </div>
-  </GameBlock>
-</template>
-
 <script setup lang="ts">
 /**
  * JoystickControl component - Control interface for Nintendo controller joysticks.
@@ -32,6 +5,7 @@
 defineOptions({
   name: 'JoystickControl'
 })
+const props = defineProps<Props>()
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { GameBlock, GameCollapseToggle, GameSubBlock } from '../../../shared/components/ui'
@@ -47,8 +21,6 @@ interface Props {
   sendStrigEvent?: (joystickId: number, state: number) => void
 }
 
-const props = defineProps<Props>()
-
 // Reactive state
 const stickStates = ref([0, 0, 0, 0]) // STICK values for joysticks 0-3
 const trigStates = ref([0, 0, 0, 0]) // STRIG values for joysticks 0-3
@@ -63,6 +35,7 @@ const {
   startDpadHold,
   stopDpadHold,
   toggleActionButton
+// eslint-disable-next-line vue/no-setup-props-reactivity-loss -- Function props don't need reactivity wrapping
 } = useJoystickEvents({
   sendStickEvent: props.sendStickEvent,
   sendStrigEvent: props.sendStrigEvent,
@@ -90,6 +63,33 @@ const joystickStatusData = computed(() => {
   ]
 })
 </script>
+
+<template>
+  <GameBlock :title="t('ide.joystick.control')" title-icon="mdi:play" :clickable-header="true" class="joystick-control"
+    :class="{ collapsed: !isExpanded }" @click-header="isExpanded = !isExpanded">
+    <template #right>
+      <GameCollapseToggle :expanded="isExpanded" @toggle="isExpanded = !isExpanded" />
+    </template>
+
+    <!-- Joystick Controls and Status Display in same row -->
+    <div class="joystick-content" :class="{ expanded: isExpanded }">
+      <div class="joystick-panels-row">
+        <!-- Joystick Controls -->
+        <div class="control-grid">
+          <GameSubBlock v-for="joystickId in 2" :key="joystickId - 1" :title="t('ide.joystick.joystick', { id: joystickId - 1 })">
+            <!-- Nintendo Controller Layout -->
+            <NintendoController :joystick-id="joystickId - 1" :held-buttons="heldButtons"
+              @dpad-start="(direction: 'up' | 'down' | 'left' | 'right') => startDpadHold(joystickId - 1, direction)"
+              @dpad-stop="(direction: 'up' | 'down' | 'left' | 'right') => stopDpadHold(joystickId - 1, direction)"
+              @action-button="(button: 'select' | 'start' | 'a' | 'b') => toggleActionButton(joystickId - 1, button)" />
+          </GameSubBlock>
+
+          <JoystickStatusTable :status-data="joystickStatusData" :flashing-cells="flashingCells" />
+        </div>
+      </div>
+    </div>
+  </GameBlock>
+</template>
 
 <style scoped>
 .joystick-content {

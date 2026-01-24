@@ -63,9 +63,7 @@ export class VariableService {
       if (!Array.isArray(current)) {
         current = []
       }
-      if (!current[index]) {
-        current[index] = [] as BasicScalarValue[]
-      }
+      current[index] ??= [] as BasicScalarValue[]
       current = current[index]
     }
 

@@ -83,9 +83,7 @@ export class ScreenStateManager {
     
     // Write character at cursor position
     if (this.cursorY < 24 && this.cursorX < 28) {
-      if (!this.screenBuffer[this.cursorY]) {
-        this.screenBuffer[this.cursorY] = []
-      }
+      this.screenBuffer[this.cursorY] ??= []
       const row = this.screenBuffer[this.cursorY]!
       let cell = row[this.cursorX]
       if (!cell) {
@@ -267,7 +265,7 @@ export class ScreenStateManager {
       id: `screen-full-${Date.now()}`,
       timestamp: Date.now(),
       data: {
-        executionId: this.currentExecutionId || 'unknown',
+        executionId: this.currentExecutionId ?? 'unknown',
         updateType: 'full',
         screenBuffer: this.screenBuffer,
         cursorX: this.cursorX,
@@ -286,7 +284,7 @@ export class ScreenStateManager {
       id: `screen-cursor-${Date.now()}`,
       timestamp: Date.now(),
       data: {
-        executionId: this.currentExecutionId || 'unknown',
+        executionId: this.currentExecutionId ?? 'unknown',
         updateType: 'cursor',
         cursorX: this.cursorX,
         cursorY: this.cursorY,
@@ -304,7 +302,7 @@ export class ScreenStateManager {
       id: `screen-clear-${Date.now()}`,
       timestamp: Date.now(),
       data: {
-        executionId: this.currentExecutionId || 'unknown',
+        executionId: this.currentExecutionId ?? 'unknown',
         updateType: 'clear',
         timestamp: Date.now()
       }
@@ -320,7 +318,7 @@ export class ScreenStateManager {
       id: `screen-color-${Date.now()}`,
       timestamp: Date.now(),
       data: {
-        executionId: this.currentExecutionId || 'unknown',
+        executionId: this.currentExecutionId ?? 'unknown',
         updateType: 'color',
         colorUpdates: cellsToUpdate,
         timestamp: Date.now()
@@ -337,7 +335,7 @@ export class ScreenStateManager {
       id: `screen-palette-${Date.now()}`,
       timestamp: Date.now(),
       data: {
-        executionId: this.currentExecutionId || 'unknown',
+        executionId: this.currentExecutionId ?? 'unknown',
         updateType: 'palette',
         bgPalette: this.bgPalette,
         spritePalette: this.spritePalette,
@@ -355,7 +353,7 @@ export class ScreenStateManager {
       id: `screen-backdrop-${Date.now()}`,
       timestamp: Date.now(),
       data: {
-        executionId: this.currentExecutionId || 'unknown',
+        executionId: this.currentExecutionId ?? 'unknown',
         updateType: 'backdrop',
         backdropColor: this.backdropColor,
         timestamp: Date.now()
@@ -372,7 +370,7 @@ export class ScreenStateManager {
       id: `screen-cgen-${Date.now()}`,
       timestamp: Date.now(),
       data: {
-        executionId: this.currentExecutionId || 'unknown',
+        executionId: this.currentExecutionId ?? 'unknown',
         updateType: 'cgen',
         cgenMode: this.cgenMode,
         timestamp: Date.now()

@@ -22,8 +22,6 @@ defineOptions({
   name: 'GameSelect'
 })
 
-const { t } = useI18n()
-
 const props = withDefaults(defineProps<GameSelectProps>(), {
   options: () => [],
   placeholder: '',
@@ -32,6 +30,8 @@ const props = withDefaults(defineProps<GameSelectProps>(), {
 })
 
 const emit = defineEmits<GameSelectEmits>()
+
+const { t } = useI18n()
 
 const isOpen = ref(false)
 const selectRef = useTemplateRef<HTMLDivElement>('selectRef')

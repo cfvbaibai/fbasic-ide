@@ -20,6 +20,13 @@ defineOptions({
   name: 'GameCodeQuote'
 })
 
+const props = withDefaults(defineProps<Props>(), {
+  language: '',
+  showCopyButton: true,
+  copyButtonText: '',
+  copySuccessMessage: ''
+})
+
 const { t } = useI18n()
 
 interface Props {
@@ -29,13 +36,6 @@ interface Props {
   copyButtonText?: string
   copySuccessMessage?: string
 }
-
-const props = withDefaults(defineProps<Props>(), {
-  language: '',
-  showCopyButton: true,
-  copyButtonText: '',
-  copySuccessMessage: ''
-})
 
 const isCopying = ref(false)
 

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+/* eslint-disable vue/no-v-html */
 import { useTemplateRef, ref, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { DEFAULTS } from '../../../core/constants'
@@ -52,10 +53,10 @@ const handleKeyDown = (event: KeyboardEvent) => {
     const start = target.selectionStart
     const end = target.selectionEnd
     const value = target.value
-    
+
     target.value = value.substring(0, start) + '  ' + value.substring(end)
     target.selectionStart = target.selectionEnd = start + DEFAULTS.TAB_SIZE
-    
+
     emit('update:modelValue', target.value)
     updateLineNumbers(target.value)
   }
@@ -71,41 +72,22 @@ onMounted(() => {
 </script>
 
 <template>
-  <GameBlock 
-    :title="props.title || t('ide.codeEditor.title')"
-    :title-icon="props.titleIcon"
-    class="code-editor"
-  >
+  <GameBlock :title="props.title || t('ide.codeEditor.title')" :title-icon="props.titleIcon" class="code-editor">
     <div class="editor-container">
       <!-- Line Numbers -->
       <div class="line-numbers bg-game-surface border-game-surface-right">
-        <div 
-          v-for="line in lineNumbers" 
-          :key="line" 
-          class="line-number"
-        >
+        <div v-for="line in lineNumbers" :key="line" class="line-number">
           {{ line }}
         </div>
       </div>
-      
+
       <!-- Code Textarea -->
-      <textarea
-        ref="textareaRef"
-        :value="modelValue"
-        @input="handleInput"
-        @keydown="handleKeyDown"
-        class="code-textarea"
-        :placeholder="t('ide.codeEditor.placeholder')"
-        spellcheck="false"
-      />
-      
+      <textarea ref="textareaRef" :value="modelValue" @input="handleInput" @keydown="handleKeyDown"
+        class="code-textarea" :placeholder="t('ide.codeEditor.placeholder')" spellcheck="false" />
+
       <!-- Syntax Highlighted Display (overlay) -->
-      <div
-        v-if="highlightedCode && highlightedCode !== modelValue"
-        class="syntax-highlighted"
-        <!-- eslint-disable-next-line vue/no-v-html -- Required for syntax highlighting HTML from external highlighter -->
-        v-html="highlightedCode"
-      />
+      <div v-if="highlightedCode && highlightedCode !== modelValue" class="syntax-highlighted"
+        v-html="highlightedCode" />
     </div>
   </GameBlock>
 </template>
@@ -116,8 +98,12 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   font-family: 'Courier New', Monaco, Menlo, monospace;
-  min-height: 0; /* Allow component to shrink */
-  overflow: hidden; /* Prevent overflow */
+  min-height: 0;
+
+  /* Allow component to shrink */
+  overflow: hidden;
+
+  /* Prevent overflow */
 }
 
 .code-editor :deep(.game-block-content) {
@@ -133,7 +119,9 @@ onMounted(() => {
   display: flex;
   position: relative;
   overflow: hidden;
-  min-height: 0; /* Allow container to shrink */
+  min-height: 0;
+
+  /* Allow container to shrink */
 }
 
 .line-numbers {

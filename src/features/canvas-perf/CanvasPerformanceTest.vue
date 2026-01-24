@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { GameLayout, GameButton } from '@/shared/components/ui'
 import { renderScreenBuffer, type ScreenCell } from '@/features/ide/composables/canvasRenderer'
@@ -14,7 +14,7 @@ defineOptions({
 const { t } = useI18n()
 
 // Canvas reference
-const canvasRef = ref<HTMLCanvasElement | null>(null)
+const canvasRef = useTemplateRef<HTMLCanvasElement>('canvasRef')
 
 // Test state
 const isRunning = ref(false)

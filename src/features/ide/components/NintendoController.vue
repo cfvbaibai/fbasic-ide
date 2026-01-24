@@ -1,3 +1,42 @@
+<script setup lang="ts">
+import Dpad from './Dpad.vue'
+import ManualActionButton from './ManualActionButton.vue'
+
+/**
+ * NintendoController component - Full Nintendo controller component with D-pad and action buttons.
+ */
+defineOptions({
+  name: 'NintendoController'
+})
+
+defineProps<Props>()
+
+const emit = defineEmits<Emits>()
+
+interface Props {
+  joystickId: number
+  heldButtons: Record<string, boolean>
+}
+
+interface Emits {
+  (e: 'dpadStart', direction: 'up' | 'down' | 'left' | 'right'): void
+  (e: 'dpadStop', direction: 'up' | 'down' | 'left' | 'right'): void
+  (e: 'actionButton', button: 'select' | 'start' | 'a' | 'b'): void
+}
+
+const handleDpadStart = (direction: 'up' | 'down' | 'left' | 'right') => {
+  emit('dpadStart', direction)
+}
+
+const handleDpadStop = (direction: 'up' | 'down' | 'left' | 'right') => {
+  emit('dpadStop', direction)
+}
+
+const handleActionButton = (button: 'select' | 'start' | 'a' | 'b') => {
+  emit('actionButton', button)
+}
+</script>
+
 <template>
   <div class="nintendo-controller">
     <!-- D-Pad (Cross) on the left -->
@@ -39,44 +78,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import Dpad from './Dpad.vue'
-import ManualActionButton from './ManualActionButton.vue'
-
-/**
- * NintendoController component - Full Nintendo controller component with D-pad and action buttons.
- */
-defineOptions({
-  name: 'NintendoController'
-})
-
-interface Props {
-  joystickId: number
-  heldButtons: Record<string, boolean>
-}
-
-interface Emits {
-  (e: 'dpad-start', direction: 'up' | 'down' | 'left' | 'right'): void
-  (e: 'dpad-stop', direction: 'up' | 'down' | 'left' | 'right'): void
-  (e: 'action-button', button: 'select' | 'start' | 'a' | 'b'): void
-}
-
-defineProps<Props>()
-const emit = defineEmits<Emits>()
-
-const handleDpadStart = (direction: 'up' | 'down' | 'left' | 'right') => {
-  emit('dpad-start', direction)
-}
-
-const handleDpadStop = (direction: 'up' | 'down' | 'left' | 'right') => {
-  emit('dpad-stop', direction)
-}
-
-const handleActionButton = (button: 'select' | 'start' | 'a' | 'b') => {
-  emit('action-button', button)
-}
-</script>
 
 <style scoped>
 /* Nintendo Controller Layout */

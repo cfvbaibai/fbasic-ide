@@ -34,7 +34,7 @@ const emit = defineEmits<GameBlockEmits>()
 
 const handleHeaderClick = () => {
   if (props.clickableHeader) {
-    emit('click-header')
+    emit('clickHeader')
   }
 }
 

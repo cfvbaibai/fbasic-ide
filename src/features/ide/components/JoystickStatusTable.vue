@@ -1,3 +1,59 @@
+<script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+import { GameTable, GameSubBlock } from '../../../shared/components/ui'
+
+/**
+ * JoystickStatusTable component - Displays joystick status in a table format.
+ */
+defineOptions({
+  name: 'JoystickStatusTable'
+})
+
+defineProps<Props>()
+
+const { t } = useI18n()
+
+interface StatusRow extends Record<string, unknown> {
+  id: number
+  stick: number
+  strig: number
+}
+
+interface Column {
+  prop: string
+  label: string
+  width?: string | number
+  align?: 'left' | 'center' | 'right'
+  formatter?: (row: Record<string, unknown>, column: Column, cellValue: unknown) => unknown
+}
+
+interface Props {
+  statusData: StatusRow[]
+  flashingCells: Record<string, boolean>
+}
+
+const tableColumns: Column[] = [
+  {
+    prop: 'id',
+    label: t('ide.joystick.columns.id'),
+    width: 40,
+    align: 'center'
+  },
+  {
+    prop: 'stick',
+    label: t('ide.joystick.columns.stick'),
+    width: 60,
+    align: 'center'
+  },
+  {
+    prop: 'strig',
+    label: t('ide.joystick.columns.strig'),
+    width: 60,
+    align: 'center'
+  }
+]
+</script>
+
 <template>
   <GameSubBlock :title="t('ide.joystick.status')">
     <GameTable 
@@ -29,62 +85,6 @@
     </GameTable>
   </GameSubBlock>
 </template>
-
-<script setup lang="ts">
-import { useI18n } from 'vue-i18n'
-import { GameTable, GameSubBlock } from '../../../shared/components/ui'
-
-/**
- * JoystickStatusTable component - Displays joystick status in a table format.
- */
-defineOptions({
-  name: 'JoystickStatusTable'
-})
-
-const { t } = useI18n()
-
-interface StatusRow extends Record<string, unknown> {
-  id: number
-  stick: number
-  strig: number
-}
-
-interface Column {
-  prop: string
-  label: string
-  width?: string | number
-  align?: 'left' | 'center' | 'right'
-  formatter?: (row: Record<string, unknown>, column: Column, cellValue: unknown) => unknown
-}
-
-interface Props {
-  statusData: StatusRow[]
-  flashingCells: Record<string, boolean>
-}
-
-defineProps<Props>()
-
-const tableColumns: Column[] = [
-  {
-    prop: 'id',
-    label: t('ide.joystick.columns.id'),
-    width: 40,
-    align: 'center'
-  },
-  {
-    prop: 'stick',
-    label: t('ide.joystick.columns.stick'),
-    width: 60,
-    align: 'center'
-  },
-  {
-    prop: 'strig',
-    label: t('ide.joystick.columns.strig'),
-    width: 60,
-    align: 'center'
-  }
-]
-</script>
 
 <style scoped>
 .cell-wrapper {

@@ -13,14 +13,15 @@ defineOptions({
   name: 'GameSection'
 })
 
+withDefaults(defineProps<Props>(), {
+  title: ''
+})
+
 interface Props {
   /** Optional section title */
   title?: string
 }
 
-withDefaults(defineProps<Props>(), {
-  title: ''
-})
 </script>
 
 <template>

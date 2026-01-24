@@ -19,7 +19,7 @@ export interface GameBlockProps {
 
 export interface GameBlockEmits {
   /** Header clicked */
-  'click-header': []
+  clickHeader: []
   /** Block clicked */
   click: []
 }

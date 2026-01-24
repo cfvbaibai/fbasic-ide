@@ -80,17 +80,17 @@ export class BasicInterpreter {
         return {
           success: false,
           errors: parseResult.errors?.map((error) => ({
-            line: error.location?.start?.line || 0,
+            line: error.location?.start?.line ?? 0,
             message: error.message,
             type: ERROR_TYPES.SYNTAX
-          })) || [],
+          })) ?? [],
           variables: new Map(),
           executionTime: 0
         }
       }
 
       // Create execution context (or reuse existing one if it has device adapter)
-      if (!this.context || !this.context.deviceAdapter) {
+      if (!this.context?.deviceAdapter) {
         this.context = new ExecutionContext(this.config)
         // Set device adapter if provided
         if (this.config.deviceAdapter) {
@@ -127,7 +127,7 @@ export class BasicInterpreter {
       this.context.deviceAdapter = preservedDeviceAdapter
 
       // Execute the program
-      const result = await this.executionEngine!.execute()
+      const result = await this.executionEngine.execute()
 
       return result
 
@@ -189,13 +189,13 @@ export class BasicInterpreter {
    * Check if interpreter is currently running
    */
   isRunning(): boolean {
-    return this.context?.isRunning || false
+    return this.context?.isRunning ?? false
   }
 
   /**
    * Get current variables
    */
   getVariables(): Map<string, BasicVariable> {
-    return this.context?.variables || new Map()
+    return this.context?.variables ?? new Map()
   }
 }

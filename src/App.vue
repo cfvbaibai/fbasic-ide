@@ -1,7 +1,3 @@
-<template>
-  <router-view />
-</template>
-
 <script setup lang="ts">
 import { watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -23,6 +19,10 @@ watch(locale, (newLocale) => {
   }
 }, { immediate: true })
 </script>
+
+<template>
+  <router-view />
+</template>
 
 <style>
 /* Global styles */

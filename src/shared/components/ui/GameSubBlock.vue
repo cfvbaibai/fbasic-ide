@@ -13,12 +13,13 @@ defineOptions({
   name: 'GameSubBlock'
 })
 
+defineProps<Props>()
+
 interface Props {
   /** Title for the sub-block */
   title: string
 }
 
-defineProps<Props>()
 </script>
 
 <template>

@@ -74,19 +74,15 @@ export function handleScreenUpdateMessage(
         })
         
         // Ensure row exists
-        if (!context.screenBuffer.value[y]) {
-          context.screenBuffer.value[y] = []
-        }
-        
+        context.screenBuffer.value[y] ??= []
+
         // Ensure cell exists
         const currentRow = context.screenBuffer.value[y]
-        if (!currentRow[x]) {
-          currentRow[x] = {
-            character: ' ',
-            colorPattern: 0,
-            x,
-            y
-          }
+        currentRow[x] ??= {
+          character: ' ',
+          colorPattern: 0,
+          x,
+          y
         }
         
         // Update character - force reactivity by creating new object
@@ -139,19 +135,15 @@ export function handleScreenUpdateMessage(
           const { x, y, pattern } = colorUpdate
           
           // Ensure row exists
-          if (!context.screenBuffer.value[y]) {
-            context.screenBuffer.value[y] = []
-          }
-          
+          context.screenBuffer.value[y] ??= []
+
           // Ensure cell exists
           const currentRow = context.screenBuffer.value[y]
-          if (!currentRow[x]) {
-            currentRow[x] = {
-              character: ' ',
-              colorPattern: 0,
-              x,
-              y
-            }
+          currentRow[x] ??= {
+            character: ' ',
+            colorPattern: 0,
+            x,
+            y
           }
           
           // Update color pattern - force reactivity by creating new object

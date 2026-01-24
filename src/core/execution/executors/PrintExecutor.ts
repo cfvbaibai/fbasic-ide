@@ -8,7 +8,7 @@ import type { CstNode, IToken } from 'chevrotain'
 import type { ExpressionEvaluator } from '../../evaluation/ExpressionEvaluator'
 import type { ExecutionContext } from '../../state/ExecutionContext'
 import { getFirstCstNode, getCstNodes, getFirstToken, getTokens, isCstToken, isCstNode } from '../../parser/cst-helpers'
-import { ERROR_TYPES } from '@/core/constants'
+import { ERROR_TYPES, PRINT_TAB_STOPS } from '@/core/constants'
 
 export type PrintSeparator = ',' | ';' | null
 
@@ -79,7 +79,7 @@ export class PrintExecutor {
       elements.push({
         type: 'separator',
         separator: ',',
-        startOffset: token.startOffset!
+        startOffset: token.startOffset
       })
     })
     
@@ -87,7 +87,7 @@ export class PrintExecutor {
       elements.push({
         type: 'separator',
         separator: ';',
-        startOffset: token.startOffset!
+        startOffset: token.startOffset
       })
     })
     
@@ -125,7 +125,7 @@ export class PrintExecutor {
           let separator: PrintSeparator = null
           const nextElement = elements[i + 1]
           if (nextElement && nextElement.type === 'separator') {
-            separator = nextElement.separator || null
+            separator = nextElement.separator ?? null
           }
           
           items.push({ value, separator })
@@ -170,7 +170,7 @@ export class PrintExecutor {
 
     for (let i = 0; i < items.length; i++) {
       const item = items[i]
-      if (!item || item.value === undefined) continue
+      if (item?.value === undefined) continue
       
       // Step 1: Build the string representation of the item
       // The toString method already handles the sign char for numbers
@@ -191,8 +191,8 @@ export class PrintExecutor {
         const prevSeparator = items[i - 1]?.separator
         
         if (prevSeparator === ',') {
-          // Comma separator: use tab character to move to next 8-character tab stop
-          // Block 1: 0-7, Block 2: 8-15, Block 3: 16-23, Block 4: 24-27
+          // Comma separator: use tab character to move to next tab stop
+          // Blocks defined by PRINT_TAB_STOPS constants
           output += '\t'
           const nextTabStop = this.getNextTabStop(currentColumn)
           currentColumn = nextTabStop
@@ -207,7 +207,7 @@ export class PrintExecutor {
         } else {
           this.context.addError({
             line: this.context.getCurrentLineNumber(),
-            message: 'PRINT: Invalid separator: ' + prevSeparator,
+            message: `PRINT: Invalid separator: ${  prevSeparator}`,
             type: ERROR_TYPES.RUNTIME
           })
           return ''
@@ -220,13 +220,13 @@ export class PrintExecutor {
 
   /**
    * Get the next tab stop (8-character block boundary)
-   * Block 1: 0-7, Block 2: 8-15, Block 3: 16-23, Block 4: 24-27
+   * Uses PRINT_TAB_STOPS constants for block boundaries
    */
   private getNextTabStop(currentColumn: number): number {
-    if (currentColumn < 8) return 8      // Block 1 -> Block 2
-    if (currentColumn < 16) return 16   // Block 2 -> Block 3
-    if (currentColumn < 24) return 24   // Block 3 -> Block 4
-    return 28                            // Block 4 -> next line (or wrap)
+    if (currentColumn < PRINT_TAB_STOPS.BLOCK_1_END) return PRINT_TAB_STOPS.BLOCK_1_END
+    if (currentColumn < PRINT_TAB_STOPS.BLOCK_2_END) return PRINT_TAB_STOPS.BLOCK_2_END
+    if (currentColumn < PRINT_TAB_STOPS.BLOCK_3_END) return PRINT_TAB_STOPS.BLOCK_3_END
+    return PRINT_TAB_STOPS.BLOCK_4_END    // Block 4 -> next line (or wrap)
   }
 
   /**

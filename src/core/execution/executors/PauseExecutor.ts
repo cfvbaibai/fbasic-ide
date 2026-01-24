@@ -8,6 +8,7 @@ import type { CstNode } from 'chevrotain'
 import type { ExecutionContext } from '../../state/ExecutionContext'
 import type { ExpressionEvaluator } from '../../evaluation/ExpressionEvaluator'
 import { getFirstCstNode } from '../../parser/cst-helpers'
+import { ERROR_TYPES } from '../../constants'
 
 export class PauseExecutor {
   constructor(
@@ -23,15 +24,20 @@ export class PauseExecutor {
     const expressionCst = getFirstCstNode(pauseStmtCst.children.expression)
     
     if (!expressionCst) {
-      throw new Error('Invalid PAUSE statement: missing expression')
+      this.context.addError({
+        line: 0,
+        message: 'Invalid PAUSE statement: missing expression',
+        type: ERROR_TYPES.RUNTIME
+      })
+      return
     }
 
     // Evaluate the pause duration
     const durationValue = this.evaluator.evaluateExpression(expressionCst)
     // Convert to number (handles both numeric and string values)
-    const duration = typeof durationValue === 'number' 
+    const duration = typeof durationValue === 'number'
       ? Math.max(0, Math.floor(durationValue))
-      : Math.max(0, Math.floor(parseFloat(String(durationValue)) || 0))
+      : Math.max(0, Math.floor(parseFloat(String(durationValue)) || 0))  
 
     // Pause for the specified duration (in milliseconds)
     // In Family BASIC, PAUSE typically pauses for frames, but we'll use milliseconds

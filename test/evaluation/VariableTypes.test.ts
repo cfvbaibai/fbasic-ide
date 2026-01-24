@@ -235,7 +235,7 @@ describe('Variable Types', () => {
     })
 
     it('should handle long variable names (up to 255 chars)', async () => {
-      const longName = 'A' + 'B'.repeat(100) // Create a long name
+      const longName = `A${  'B'.repeat(100)}` // Create a long name
       const code = `10 LET ${longName} = 999`
       const result = await interpreter.execute(code)
       

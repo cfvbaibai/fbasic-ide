@@ -1,9 +1,5 @@
-<template>
-  <div ref="editorContainer" class="monaco-editor-container"></div>
-</template>
-
 <script setup lang="ts">
-import { useTemplateRef, onMounted, onBeforeUnmount, watch } from 'vue';
+import { useTemplateRef, onMounted, onBeforeUnmount, onDeactivated, watch } from 'vue';
 import * as monaco from 'monaco-editor';
 import { setupMonacoLanguage, setupLiveErrorChecking } from '../integrations/monaco-integration';
 
@@ -14,6 +10,10 @@ defineOptions({
   name: 'MonacoCodeEditor'
 })
 
+const props = defineProps<Props>();
+
+const emit = defineEmits<Emits>();
+
 interface Props {
   modelValue: string;
 }
@@ -21,9 +21,6 @@ interface Props {
 interface Emits {
   (e: 'update:modelValue', value: string): void;
 }
-
-const props = defineProps<Props>();
-const emit = defineEmits<Emits>();
 
 const editorContainer = useTemplateRef<HTMLElement>('editorContainer');
 let editor: monaco.editor.IStandaloneCodeEditor | null = null;
@@ -109,16 +106,26 @@ watch(
   }
 );
 
-onBeforeUnmount(() => {
+// Cleanup function for editor and mutation observer
+const cleanup = () => {
   if (mutationObserver) {
     mutationObserver.disconnect();
     mutationObserver = null;
   }
   if (editor) {
     editor.dispose();
+    editor = null;
   }
-});
+};
+
+// Clean up on unmount AND deactivation (keep-alive support)
+onBeforeUnmount(cleanup);
+onDeactivated(cleanup);
 </script>
+
+<template>
+  <div ref="editorContainer" class="monaco-editor-container"></div>
+</template>
 
 <style scoped>
 .monaco-editor-container {

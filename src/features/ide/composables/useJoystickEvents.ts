@@ -50,7 +50,7 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
   const resetStrigValue = (joystickId: number) => {
     // Stop existing timer if any
     if (strigResetTimers.value[joystickId]) {
-      strigResetTimers.value[joystickId]!()
+      strigResetTimers.value[joystickId]()
       strigResetTimers.value[joystickId] = null
     }
     
@@ -78,7 +78,7 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
       'right': 1
     }
     
-    const stickValue = directionMap[direction] || 0
+    const stickValue = directionMap[direction] ?? 0
     
     // Send STICK event to service worker
     if (sendStickEvent && stickValue > 0) {
@@ -94,7 +94,7 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
     
     // Pause existing interval for this button if any
     if (heldDpadButtons.value[buttonKey]) {
-      heldDpadButtons.value[buttonKey]!()
+      heldDpadButtons.value[buttonKey]()
       heldDpadButtons.value[buttonKey] = null
     }
     
@@ -117,7 +117,7 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
     
     // Pause the repeat interval
     if (heldDpadButtons.value[buttonKey]) {
-      heldDpadButtons.value[buttonKey]!()
+      heldDpadButtons.value[buttonKey]()
       heldDpadButtons.value[buttonKey] = null
     }
     
@@ -172,7 +172,7 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
       'a': 8
     }
     
-    const strigValue = buttonMap[button] || 0
+    const strigValue = buttonMap[button] ?? 0
     
     // Send STRIG event to service worker
     if (sendStrigEvent && strigValue > 0) {

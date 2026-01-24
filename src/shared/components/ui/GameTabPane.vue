@@ -24,6 +24,12 @@ defineOptions({
   name: 'GameTabPane'
 })
 
+const props = withDefaults(defineProps<Props>(), {
+  label: '',
+  icon: null,
+  disabled: false
+})
+
 interface Props {
   /** Unique identifier for this tab pane */
   name: string
@@ -34,12 +40,6 @@ interface Props {
   /** Whether the tab pane is disabled */
   disabled?: boolean
 }
-
-const props = withDefaults(defineProps<Props>(), {
-  label: '',
-  icon: null,
-  disabled: false
-})
 
 const slots = useSlots()
 

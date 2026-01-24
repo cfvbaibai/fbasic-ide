@@ -9,16 +9,16 @@ defineOptions({
   name: 'ColorBox'
 })
 
+const props = withDefaults(defineProps<Props>(), {
+  showHex: true,
+  customClass: ''
+})
+
 interface Props {
   colorCode: number
   showHex?: boolean
   customClass?: string
 }
-
-const props = withDefaults(defineProps<Props>(), {
-  showHex: true,
-  customClass: ''
-})
 
 // Get the color from COLORS array
 const color = computed(() => {

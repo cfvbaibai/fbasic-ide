@@ -40,16 +40,16 @@ export async function initializeWebWorker(
     
     webWorkerManager.worker.onerror = (error) => {
       console.error('❌ [COMPOSABLE] Web worker error:', error)
-      rejectAllPendingMessages(webWorkerManager, 'Web worker error: ' + error.message)
+      rejectAllPendingMessages(webWorkerManager, `Web worker error: ${  error.message}`)
       // Restart web worker on error
-      restartWebWorker(webWorkerManager, onMessage)
+      void restartWebWorker(webWorkerManager, onMessage)
     }
     
     webWorkerManager.worker.onmessageerror = (error) => {
       console.error('❌ [COMPOSABLE] Web worker message error:', error)
       rejectAllPendingMessages(webWorkerManager, 'Web worker message error')
       // Restart web worker on message error
-      restartWebWorker(webWorkerManager, onMessage)
+      void restartWebWorker(webWorkerManager, onMessage)
     }
     
     console.log('✅ [COMPOSABLE] Web worker initialized successfully')

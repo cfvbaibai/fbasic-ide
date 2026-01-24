@@ -17,6 +17,13 @@ defineOptions({
   name: 'GameCollapseToggle'
 })
 
+withDefaults(defineProps<Props>(), {
+  expanded: false,
+  size: 'small'
+})
+
+const emit = defineEmits<Emits>()
+
 interface Props {
   expanded?: boolean
   size?: 'small' | 'medium' | 'large'
@@ -25,13 +32,6 @@ interface Props {
 interface Emits {
   (e: 'toggle'): void
 }
-
-withDefaults(defineProps<Props>(), {
-  expanded: false,
-  size: 'small'
-})
-
-const emit = defineEmits<Emits>()
 
 const handleClick = (event: Event) => {
   event.stopPropagation()

@@ -33,7 +33,7 @@ export class CgenExecutor {
     
     if (!expressionCst) {
       this.context.addError({
-        line: lineNumber || 0,
+        line: lineNumber ?? 0,
         message: 'CGEN: Missing mode parameter',
         type: ERROR_TYPES.RUNTIME
       })
@@ -46,10 +46,10 @@ export class CgenExecutor {
       const modeValue = this.evaluator.evaluateExpression(expressionCst)
       mode = typeof modeValue === 'number'
         ? Math.floor(modeValue)
-        : Math.floor(parseFloat(String(modeValue)) || 0)
+        : Math.floor(parseFloat(String(modeValue)) || 0)  
     } catch (error) {
       this.context.addError({
-        line: lineNumber || 0,
+        line: lineNumber ?? 0,
         message: `CGEN: Error evaluating mode: ${error instanceof Error ? error.message : String(error)}`,
         type: ERROR_TYPES.RUNTIME
       })
@@ -59,7 +59,7 @@ export class CgenExecutor {
     // Validate range (0-3)
     if (mode < 0 || mode > 3) {
       this.context.addError({
-        line: lineNumber || 0,
+        line: lineNumber ?? 0,
         message: `CGEN: Mode out of range (0-3), got ${mode}`,
         type: ERROR_TYPES.RUNTIME
       })

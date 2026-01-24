@@ -1,14 +1,3 @@
-<template>
-  <button 
-    class="manual-action-button" 
-    :class="[buttonType, { active }]"
-    @mousedown="handleClick"
-    tabindex="-1"
-  >
-    <slot>{{ label }}</slot>
-  </button>
-</template>
-
 <script setup lang="ts">
 import { computed } from 'vue'
 
@@ -19,20 +8,20 @@ defineOptions({
   name: 'ManualActionButton'
 })
 
+const props = withDefaults(defineProps<Props>(), {
+  active: false
+})
+
+const emit = defineEmits<Emits>()
+
 interface Props {
   button: 'select' | 'start' | 'a' | 'b'
   active?: boolean
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  active: false
-})
-
 interface Emits {
   (e: 'click', button: 'select' | 'start' | 'a' | 'b'): void
 }
-
-const emit = defineEmits<Emits>()
 
 const buttonType = computed(() => props.button)
 
@@ -44,6 +33,17 @@ const handleClick = () => {
   emit('click', props.button)
 }
 </script>
+
+<template>
+  <button 
+    class="manual-action-button" 
+    :class="[buttonType, { active }]"
+    @mousedown="handleClick"
+    tabindex="-1"
+  >
+    <slot>{{ label }}</slot>
+  </button>
+</template>
 
 <style scoped>
 /* Action button base styles */

@@ -183,7 +183,7 @@ describe('GOSUB/RETURN Executor', () => {
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
       // Should print "Called" 3 times
-      const callCount = (outputs.match(/Called/g) || []).length
+      const callCount = (outputs.match(/Called/g) ?? []).length
       expect(callCount).toBe(3)
     })
 

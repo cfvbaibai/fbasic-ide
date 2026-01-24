@@ -23,6 +23,14 @@ defineOptions({
   name: 'IdeControls'
 })
 
+withDefaults(defineProps<Props>(), {
+  canRun: true,
+  canStop: false,
+  debugMode: false
+})
+
+const emit = defineEmits<Emits>()
+
 const { t } = useI18n()
 
 interface Props {
@@ -44,15 +52,8 @@ interface Emits {
   /** Emitted when the clear button is clicked */
   (e: 'clear'): void
   /** Emitted when the debug toggle is changed */
-  (e: 'toggle-debug'): void
+  (e: 'toggleDebug'): void
 }
-
-withDefaults(defineProps<Props>(), {
-  canRun: true,
-  canStop: false,
-  debugMode: false
-})
-const emit = defineEmits<Emits>()
 
 const handleRun = () => {
   emit('run')
@@ -67,7 +68,7 @@ const handleClear = () => {
 }
 
 const handleDebugToggle = () => {
-  emit('toggle-debug')
+  emit('toggleDebug')
 }
 </script>
 

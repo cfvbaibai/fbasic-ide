@@ -25,13 +25,6 @@ defineOptions({
   name: 'GameTabs'
 })
 
-interface Props {
-  /** The currently active tab name */
-  modelValue: string
-  /** Tab style variant */
-  type?: 'default' | 'border-card'
-}
-
 const props = withDefaults(defineProps<Props>(), {
   type: 'default'
 })
@@ -40,10 +33,19 @@ const emit = defineEmits<{
   'update:modelValue': [value: string]
 }>()
 
+interface Props {
+  /** The currently active tab name */
+  modelValue: string
+  /** Tab style variant */
+  type?: 'default' | 'border-card'
+}
+
 const activeTab = computed({
   get: () => props.modelValue,
   set: (value: string) => emit('update:modelValue', value)
 })
+
+const tabsType = computed(() => props.type)
 
 const tabButtons = ref<Array<{ name: string; render: () => VNode }>>([])
 
@@ -72,7 +74,7 @@ const setActiveTab = (name: string) => {
 // Provide to children with type-safe injection keys
 provide(ActiveTabKey, activeTab)
 provide(SetActiveTabKey, setActiveTab)
-provide(TabsTypeKey, props.type)
+provide(TabsTypeKey, tabsType)
 provide(RegisterTabKey, registerTab)
 provide(UnregisterTabKey, unregisterTab)
 </script>

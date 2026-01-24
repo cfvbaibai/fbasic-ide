@@ -14,15 +14,6 @@ defineOptions({
   name: 'GameIcon'
 })
 
-interface Props {
-  icon?: string // Icon name in format "prefix:name" (e.g., "mdi:play")
-  size?: 'small' | 'medium' | 'large' | number
-  color?: string
-  rotate?: boolean | number | string
-  pulse?: boolean
-  inline?: boolean
-}
-
 const props = withDefaults(defineProps<Props>(), {
   icon: undefined,
   size: 'medium',
@@ -31,6 +22,15 @@ const props = withDefaults(defineProps<Props>(), {
   pulse: false,
   inline: false
 })
+
+interface Props {
+  icon?: string // Icon name in format "prefix:name" (e.g., "mdi:play")
+  size?: 'small' | 'medium' | 'large' | number
+  color?: string
+  rotate?: boolean | number | string
+  pulse?: boolean
+  inline?: boolean
+}
 
 const iconSize = computed(() => {
   if (typeof props.size === 'number') {

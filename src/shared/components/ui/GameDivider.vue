@@ -13,6 +13,11 @@ defineOptions({
   name: 'GameDivider'
 })
 
+withDefaults(defineProps<Props>(), {
+  direction: 'horizontal',
+  contentPosition: 'center'
+})
+
 interface Props {
   /** Divider direction */
   direction?: 'horizontal' | 'vertical'
@@ -20,10 +25,6 @@ interface Props {
   contentPosition?: 'left' | 'center' | 'right'
 }
 
-withDefaults(defineProps<Props>(), {
-  direction: 'horizontal',
-  contentPosition: 'center'
-})
 </script>
 
 <template>
