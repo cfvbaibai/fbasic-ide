@@ -41,19 +41,20 @@ afterEach(() => {
  */
 function simulateMessageHandler(message: ScreenUpdateMessage, screenBuffer: ScreenCell[][]): void {
   const update = message.data
-  
+
+  // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check -- Test helper only handles specific update types
   switch (update.updateType) {
     case 'color':
       // This is the handler that was missing - would catch the bug!
       if (update.colorUpdates) {
         for (const colorUpdate of update.colorUpdates) {
           const { x, y, pattern } = colorUpdate
-          
+
           // Ensure row exists
           if (!screenBuffer[y]) {
             screenBuffer[y] = []
           }
-          
+
           // Ensure cell exists
           const currentRow = screenBuffer[y]
           if (!currentRow[x]) {
@@ -94,7 +95,9 @@ function simulateMessageHandler(message: ScreenUpdateMessage, screenBuffer: Scre
         }
       }
       break
-    // Other cases omitted for brevity
+    default:
+      // Other update types not relevant for this test
+      break
   }
 }
 

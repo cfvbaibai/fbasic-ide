@@ -5,11 +5,8 @@
 import type { Ref } from 'vue'
 import type {
   AnyServiceWorkerMessage,
-  OutputMessage,
-  ScreenUpdateMessage,
   ResultMessage,
   ErrorMessage,
-  ProgressMessage,
   ScreenCell
 } from '../../../core/interfaces'
 import type { WebWorkerManager } from './useBasicIdeWebWorkerUtils'
@@ -35,13 +32,13 @@ export function handleOutputMessage(
   context: MessageHandlerContext
 ): void {
   if (message.type !== 'OUTPUT') return
-  const { output: outputText, outputType } = (message as OutputMessage).data
+  const { output: outputText, outputType } = (message).data
   console.log('📤 [COMPOSABLE] Handling output:', outputType, outputText)
   
   if (outputType === 'print') {
     context.output.value.push(outputText)
   } else if (outputType === 'debug') {
-    context.debugOutput.value += outputText + '\n'
+    context.debugOutput.value += `${outputText  }\n`
   } else if (outputType === 'error') {
     context.errors.value.push({
       line: 0,
@@ -59,7 +56,7 @@ export function handleScreenUpdateMessage(
   context: MessageHandlerContext
 ): void {
   if (message.type !== 'SCREEN_UPDATE') return
-  const update = (message as ScreenUpdateMessage).data
+  const update = (message).data
   console.log('🖥️ [COMPOSABLE] Handling screen update:', update.updateType, update)
   
   switch (update.updateType) {
@@ -254,7 +251,7 @@ export function handleProgressMessage(
   _context: MessageHandlerContext
 ): void {
   if (message.type !== 'PROGRESS') return
-  const { iterationCount, currentStatement } = (message as ProgressMessage).data
+  const { iterationCount, currentStatement } = (message).data
   console.log('🔄 [COMPOSABLE] Progress:', iterationCount, currentStatement)
   // Could emit progress events here if needed
 }
@@ -267,7 +264,8 @@ export function handleWorkerMessage(
   context: MessageHandlerContext
 ): void {
   console.log('📨 [COMPOSABLE] Received message from worker:', message.type)
-  
+
+  // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check -- Only handling response messages, request messages sent elsewhere
   switch (message.type) {
     case 'OUTPUT':
       handleOutputMessage(message, context)

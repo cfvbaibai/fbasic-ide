@@ -11,6 +11,13 @@ defineOptions({
   name: 'CodeEditor'
 })
 
+const props = withDefaults(defineProps<Props>(), {
+  title: '',
+  titleIcon: 'mdi:pencil'
+})
+
+const emit = defineEmits<Emits>()
+
 const { t } = useI18n()
 
 interface Props {
@@ -23,12 +30,6 @@ interface Props {
 interface Emits {
   (type: 'update:modelValue', value: string): void
 }
-
-const props = withDefaults(defineProps<Props>(), {
-  title: '',
-  titleIcon: 'mdi:pencil'
-})
-const emit = defineEmits<Emits>()
 
 const textareaRef = useTemplateRef<HTMLTextAreaElement>('textareaRef')
 const lineNumbers = ref<string[]>([])
@@ -99,9 +100,10 @@ onMounted(() => {
       />
       
       <!-- Syntax Highlighted Display (overlay) -->
-      <div 
+      <div
         v-if="highlightedCode && highlightedCode !== modelValue"
         class="syntax-highlighted"
+        <!-- eslint-disable-next-line vue/no-v-html -- Required for syntax highlighting HTML from external highlighter -->
         v-html="highlightedCode"
       />
     </div>

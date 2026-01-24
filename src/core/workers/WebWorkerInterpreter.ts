@@ -44,7 +44,7 @@ class WebWorkerInterpreter {
         timestamp: event.data.timestamp,
         dataSize: JSON.stringify(event.data).length
       })
-      this.handleMessage(event.data)
+      void this.handleMessage(event.data)
     })
   }
 
@@ -54,24 +54,31 @@ class WebWorkerInterpreter {
       id: message.id,
       timestamp: message.timestamp
     })
-    
+
     try {
+      // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check -- Only handling request messages, not response messages
       switch (message.type) {
         case 'EXECUTE':
           console.log('▶️ [WORKER] Handling EXECUTE message')
-          await this.handleExecute(message as ExecuteMessage)
+          await this.handleExecute(message)
           break
         case 'STOP':
           console.log('⏹️ [WORKER] Handling STOP message')
-          this.handleStop(message as StopMessage)
+          this.handleStop(message)
           break
         case 'STRIG_EVENT':
           console.log('🎮 [WORKER] Handling STRIG_EVENT message')
-          this.handleStrigEvent(message as StrigEventMessage)
+          this.handleStrigEvent(message)
           break
         case 'STICK_EVENT':
           console.log('🎮 [WORKER] Handling STICK_EVENT message')
-          this.handleStickEvent(message as StickEventMessage)
+          this.handleStickEvent(message)
+          break
+
+        default:
+          // Other message types (RESULT, PROGRESS, OUTPUT, ERROR, SCREEN_UPDATE, INIT, READY)
+          // are sent FROM the worker, not handled BY the worker
+          console.log('⚠️ [WORKER] Unexpected message type:', message.type)
           break
       }
     } catch (error) {

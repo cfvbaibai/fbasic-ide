@@ -43,7 +43,8 @@ afterEach(() => {
  */
 function simulateMessageHandler(message: ScreenUpdateMessage, context: { bgPalette: number }): void {
   const update = message.data
-  
+
+  // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check -- Test helper only handles specific update types
   switch (update.updateType) {
     case 'palette':
       // Handle palette update (this is the handler that was missing)
@@ -55,7 +56,9 @@ function simulateMessageHandler(message: ScreenUpdateMessage, context: { bgPalet
       // Handle character updates
       // Characters use the current bgPalette from context
       break
-    // Other cases omitted for brevity
+    default:
+      // Other update types not relevant for this test
+      break
   }
 }
 

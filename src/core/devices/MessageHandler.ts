@@ -6,9 +6,6 @@
 
 import type {
   AnyServiceWorkerMessage,
-  ResultMessage,
-  ErrorMessage,
-  ProgressMessage,
   OutputMessage,
   ExecutionResult
 } from '../interfaces'
@@ -40,11 +37,11 @@ export class MessageHandler {
     // Handle OUTPUT messages separately as they don't have pending message IDs
     if (message.type === 'OUTPUT') {
       console.log('📤 [MESSAGE_HANDLER] Handling OUTPUT message:', {
-        outputType: (message as OutputMessage).data.outputType,
-        outputLength: (message as OutputMessage).data.output.length
+        outputType: message.data.outputType,
+        outputLength: message.data.output.length
       })
       if (onOutput) {
-        onOutput(message as OutputMessage)
+        onOutput(message)
       }
       return
     }
@@ -66,9 +63,10 @@ export class MessageHandler {
     }
 
     console.log('✅ [MESSAGE_HANDLER] Found pending message for ID:', message.id)
+    // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check -- Only handling response messages, not request messages
     switch (message.type) {
       case 'RESULT': {
-        const resultMessage = message as ResultMessage
+        const resultMessage = message
         console.log('📊 [MESSAGE_HANDLER] Received RESULT message:', {
           success: resultMessage.data.success,
           executionTime: resultMessage.data.executionTime
@@ -89,7 +87,7 @@ export class MessageHandler {
       }
 
       case 'ERROR': {
-        const errorMessage = message as ErrorMessage
+        const errorMessage = message
         console.log('❌ [MESSAGE_HANDLER] Received ERROR message:', {
           message: errorMessage.data.message,
           errorType: errorMessage.data.errorType,
@@ -104,13 +102,19 @@ export class MessageHandler {
 
       case 'PROGRESS': {
         // Handle progress updates if needed
-        const progressMessage = message as ProgressMessage
+        const progressMessage = message
         console.log('📈 [MESSAGE_HANDLER] Received PROGRESS message:', {
           progress: progressMessage.data.progress
         })
         // Could emit progress events here
         break
       }
+
+      default:
+        // Other message types (EXECUTE, STOP, STRIG_EVENT, STICK_EVENT, INIT, READY)
+        // are requests sent to the worker, not responses handled here
+        console.log('⚠️ [MESSAGE_HANDLER] Unexpected message type:', message.type)
+        break
     }
   }
 
