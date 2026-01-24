@@ -93,6 +93,28 @@ CGEN mode
 
 Abbreviation: `CG.`
 
+## PALET
+
+Reset color code within a color combination.
+```
+PALET {B|S} n, C1, C2, C3, C4
+```
+or
+```
+PALETB n, C1, C2, C3, C4  (for background)
+PALETS n, C1, C2, C3, C4  (for sprites)
+```
+
+- `B` or `PALETB`: Background/backdrop
+- `S` or `PALETS`: Sprites
+- `n`: Color combination number (0 to 3)
+- `C1`: Background color (valid when n=0)
+- `C1, C2, C3, C4`: Color codes (0 to 60)
+
+**Note**: Both `PALET B` (with space) and `PALETB` (no space) are valid syntax forms, verified on real F-BASIC hardware. Same applies to `PALET S` and `PALETS`.
+
+Abbreviation: `PAL.B`, `PAL.S`
+
 ## Coordinate Conversion
 
 ### Sprite to BG GRAPHIC

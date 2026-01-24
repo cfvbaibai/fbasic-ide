@@ -143,15 +143,19 @@ Family BASIC uses a **multi-layer screen system** with 4 main display screens pl
 - **Abbreviation**: `CG.`
 
 #### PALET
-- **Syntax**: `PALET {B|S} n, C1, C2, C3, C4`
+- **Syntax**: 
+  - `PALET {B|S} n, C1, C2, C3, C4` (with space)
+  - `PALETB n, C1, C2, C3, C4` (for background, no space)
+  - `PALETS n, C1, C2, C3, C4` (for sprites, no space)
 - **Parameters**:
-  - `B`: Background
-  - `S`: Sprite
+  - `B` or `PALETB`: Background/backdrop
+  - `S` or `PALETS`: Sprites
   - `n`: Color combination number (0 to 3)
   - `C1`: Background color (valid when n=0)
   - `C1, C2, C3, C4`: Color codes (0 to 60) for left edge, center, right edge
 - **Function**: Resets color code within color combination to arbitrary color
 - **Abbreviation**: `PAL.B`, `PAL.S`
+- **Note**: Both `PALET B` (with space) and `PALETB` (no space) are valid syntax forms, verified on real F-BASIC hardware. Same applies to `PALET S` and `PALETS`.
 
 ### Color System
 
