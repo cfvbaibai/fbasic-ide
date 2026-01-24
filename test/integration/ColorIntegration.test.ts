@@ -77,6 +77,9 @@ function simulateMessageHandler(message: ScreenUpdateMessage, screenBuffer: Scre
           screenBuffer[update.y] = []
         }
         const row = screenBuffer[update.y]
+        if (!row) {
+          throw new Error('Row not found')
+        }
         if (!row[update.x]) {
           row[update.x] = {
             character: ' ',
@@ -85,7 +88,10 @@ function simulateMessageHandler(message: ScreenUpdateMessage, screenBuffer: Scre
             y: update.y
           }
         }
-        row[update.x].character = update.character
+        const cell = row[update.x]
+        if (cell) {
+          cell.character = update.character
+        }
       }
       break
     // Other cases omitted for brevity
@@ -192,9 +198,10 @@ describe('COLOR Integration', () => {
       // Create a test screen buffer
       const screenBuffer: ScreenCell[][] = []
       for (let y = 0; y < 24; y++) {
-        screenBuffer[y] = []
+        const row: ScreenCell[] = []
+        screenBuffer[y] = row
         for (let x = 0; x < 28; x++) {
-          screenBuffer[y][x] = {
+          row[x] = {
             character: ' ',
             colorPattern: 0,
             x,
@@ -225,18 +232,19 @@ describe('COLOR Integration', () => {
       simulateMessageHandler(colorMessage, screenBuffer)
       
       // Verify color patterns were updated
-      expect(screenBuffer[0][0].colorPattern).toBe(3)
-      expect(screenBuffer[0][1].colorPattern).toBe(3)
-      expect(screenBuffer[1][0].colorPattern).toBe(3)
-      expect(screenBuffer[1][1].colorPattern).toBe(3)
+      expect(screenBuffer[0]?.[0]?.colorPattern).toBe(3)
+      expect(screenBuffer[0]?.[1]?.colorPattern).toBe(3)
+      expect(screenBuffer[1]?.[0]?.colorPattern).toBe(3)
+      expect(screenBuffer[1]?.[1]?.colorPattern).toBe(3)
     })
 
     it('should handle color updates for existing cells with characters', () => {
       const screenBuffer: ScreenCell[][] = []
       for (let y = 0; y < 24; y++) {
-        screenBuffer[y] = []
+        const row: ScreenCell[] = []
+        screenBuffer[y] = row
         for (let x = 0; x < 28; x++) {
-          screenBuffer[y][x] = {
+          row[x] = {
             character: x === 0 && y === 0 ? 'H' : ' ',
             colorPattern: 0,
             x,
@@ -262,8 +270,8 @@ describe('COLOR Integration', () => {
       simulateMessageHandler(colorMessage, screenBuffer)
       
       // Character should be preserved, color pattern should be updated
-      expect(screenBuffer[0][0].character).toBe('H')
-      expect(screenBuffer[0][0].colorPattern).toBe(2)
+      expect(screenBuffer[0]?.[0]?.character).toBe('H')
+      expect(screenBuffer[0]?.[0]?.colorPattern).toBe(2)
     })
   })
 
@@ -296,10 +304,16 @@ describe('COLOR Integration', () => {
       )
       
       expect(screenMessages.length).toBeGreaterThan(0)
+      expect(colorMessages.length).toBeGreaterThan(0)
       
       // Verify color update came before screen update
-      const colorMessageIndex = capturedMessages.indexOf(colorMessages[0])
-      const screenMessageIndex = capturedMessages.indexOf(screenMessages[screenMessages.length - 1])
+      const colorMessage = colorMessages[0]
+      const screenMessage = screenMessages[screenMessages.length - 1]
+      if (!colorMessage || !screenMessage) {
+        throw new Error('Expected messages not found')
+      }
+      const colorMessageIndex = capturedMessages.indexOf(colorMessage)
+      const screenMessageIndex = capturedMessages.indexOf(screenMessage)
       
       // Color should be set before or around the same time as printing
       // (In practice, COLOR happens first, then PRINT)

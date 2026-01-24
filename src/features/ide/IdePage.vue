@@ -32,6 +32,7 @@ const {
   cursorX,
   cursorY,
   bgPalette,
+  backdropColor,
   runCode,
   stopCode,
   clearOutput,
@@ -116,7 +117,7 @@ onMounted(() => {
         <div class="output-panel">
           <RuntimeOutput :output="output" :is-running="isRunning" :errors="errors" :variables="variables"
             :debug-output="debugOutput" :debug-mode="debugMode" :screen-buffer="screenBuffer" :cursor-x="cursorX"
-            :cursor-y="cursorY" :bg-palette="bgPalette" />
+            :cursor-y="cursorY" :bg-palette="bgPalette" :backdrop-color="backdropColor" />
         </div>
       </div>
 

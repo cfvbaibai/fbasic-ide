@@ -21,7 +21,7 @@ import type {
 } from 'chevrotain';
 import {
   // Keywords
-  Let, Print, For, To, Step, Next, End, Pause, If, Then, Goto, Gosub, Return, On, Dim, Data, Read, Restore, Cls, Locate, Color, Cgset,
+  Let, Print, For, To, Step, Next, End, Pause, If, Then, Goto, Gosub, Return, On, Dim, Data, Read, Restore, Cls, Locate, Color, Cgset, Cgen,
   // String functions
   Len, Left, Right, Mid, Str, Hex, Chr, Asc,
   // Arithmetic functions
@@ -82,6 +82,7 @@ class FBasicChevrotainParser extends CstParser {
   declare locateStatement: () => CstNode;
   declare colorStatement: () => CstNode;
   declare cgsetStatement: () => CstNode;
+  declare cgenStatement: () => CstNode;
   declare arrayDeclaration: () => CstNode;
   declare dimensionList: () => CstNode;
   declare expressionList: () => CstNode;
@@ -633,6 +634,17 @@ class FBasicChevrotainParser extends CstParser {
       });
     });
 
+    // CGEN n
+    // Sets character generator mode (n: 0-3)
+    // 0: A on BG, A on sprite
+    // 1: A on BG, B on sprite
+    // 2: B on BG, A on sprite (default)
+    // 3: B on BG, B on sprite
+    this.cgenStatement = this.RULE('cgenStatement', () => {
+      this.CONSUME(Cgen);
+      this.SUBRULE(this.expression); // Character generator mode (0-3)
+    });
+
     // IF LogicalExpression THEN (CommandList | NumberLiteral)
     // IF LogicalExpression GOTO NumberLiteral
     // Executes the commands after THEN or jumps to line number if condition is true
@@ -749,6 +761,10 @@ class FBasicChevrotainParser extends CstParser {
         {
           GATE: () => this.LA(1).tokenType === Cgset,
           ALT: () => this.SUBRULE(this.cgsetStatement)
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Cgen,
+          ALT: () => this.SUBRULE(this.cgenStatement)
         },
         { ALT: () => this.SUBRULE(this.letStatement) } // Must be last since it can start with Identifier
       ]);

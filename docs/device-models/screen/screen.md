@@ -1,5 +1,9 @@
 ## Family BASIC Screen Specification
 
+**Reference**: F-BASIC Manual Page 36 (Screen Display Process)
+
+**Note**: The manual page 36 contains coordinate range errors for sprite screens (lists character coordinates instead of pixel coordinates). This documentation provides the correct specifications verified against the manual's dimension descriptions and our implementation.
+
 ### Screen Layer Architecture
 
 Family BASIC uses a **multi-layer screen system** with 4 main display screens plus a separate BG GRAPHIC screen. Understanding the layer structure is critical for correct implementation.

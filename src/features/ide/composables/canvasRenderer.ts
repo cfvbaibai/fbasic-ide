@@ -16,11 +16,22 @@ interface ScreenCell {
 const CELL_SIZE = 8 // 8×8 pixels per cell
 const COLS = 28
 const ROWS = 24
-const CONTENT_WIDTH = COLS * CELL_SIZE // 224 pixels
-const CONTENT_HEIGHT = ROWS * CELL_SIZE // 192 pixels
-const PADDING = 8 // 1 character width = 8 pixels (matches backdrop screen margin)
-const CANVAS_WIDTH = CONTENT_WIDTH + PADDING * 2 // 240 pixels (224 + 16)
-const CANVAS_HEIGHT = CONTENT_HEIGHT + PADDING * 2 // 208 pixels (192 + 16)
+const _CONTENT_WIDTH = COLS * CELL_SIZE // 224 pixels
+const _CONTENT_HEIGHT = ROWS * CELL_SIZE // 192 pixels
+
+// Backdrop screen dimensions: 32×30 characters = 256×240 pixels
+const BACKDROP_COLS = 32
+const BACKDROP_ROWS = 30
+const BACKDROP_WIDTH = BACKDROP_COLS * CELL_SIZE // 256 pixels
+const BACKDROP_HEIGHT = BACKDROP_ROWS * CELL_SIZE // 240 pixels
+
+// Background screen offset within backdrop (adds 2 columns left, 3 lines top)
+const BG_OFFSET_X = 2 * CELL_SIZE // 16 pixels
+const BG_OFFSET_Y = 3 * CELL_SIZE // 24 pixels
+
+// Canvas uses full backdrop/sprite screen dimensions
+const CANVAS_WIDTH = BACKDROP_WIDTH // 256 pixels
+const CANVAS_HEIGHT = BACKDROP_HEIGHT // 240 pixels
 
 /**
  * Cache for pre-rendered tile ImageData objects
@@ -119,7 +130,8 @@ function getTileImageData(
 }
 
 /**
- * Render a single 8×8 cell at position (x, y) on the canvas using cached ImageData
+ * Render a single 8×8 cell at position (x, y) on the background screen using cached ImageData
+ * Background screen is offset by (BG_OFFSET_X, BG_OFFSET_Y) within the backdrop canvas
  */
 function renderCell(
   ctx: CanvasRenderingContext2D,
@@ -130,38 +142,39 @@ function renderCell(
   paletteCode: number
 ): void {
   const imageData = getTileImageData(character, colorPattern, paletteCode)
-  const pixelX = x * CELL_SIZE + PADDING
-  const pixelY = y * CELL_SIZE + PADDING
+  const pixelX = x * CELL_SIZE + BG_OFFSET_X
+  const pixelY = y * CELL_SIZE + BG_OFFSET_Y
   ctx.putImageData(imageData, pixelX, pixelY)
 }
 
 /**
  * Render screen buffer to canvas (no Vue reactivity)
+ * Implements full backdrop screen (32×30) with background screen (28×24) at offset (16, 24)
  */
 export function renderScreenBuffer(
   canvas: HTMLCanvasElement,
   buffer: ScreenCell[][],
-  paletteCode: number = 1
+  paletteCode: number = 1,
+  backdropColor: number = 0 // Default backdrop color code (0 = black)
 ): void {
   const ctx = canvas.getContext('2d', { alpha: false })
   if (!ctx) return
 
-  // Set canvas size
+  // Set canvas size to full backdrop/sprite screen dimensions
   if (canvas.width !== CANVAS_WIDTH || canvas.height !== CANVAS_HEIGHT) {
     canvas.width = CANVAS_WIDTH
     canvas.height = CANVAS_HEIGHT
     ctx.imageSmoothingEnabled = false
   }
 
-  // Fill entire canvas (including padding) with default background color
-  const palette = BACKGROUND_PALETTES[paletteCode] ?? BACKGROUND_PALETTES[1]
-  const defaultColorCombination = palette[0]
-  const bgColorIndex = defaultColorCombination[0] ?? 0
-  const bgColor = COLORS[bgColorIndex] ?? COLORS[0] ?? '#000000'
-  ctx.fillStyle = bgColor
+  // 1. Render backdrop screen (32×30 characters, single color)
+  // Backdrop uses color code directly (not from palette combination)
+  const backdropColorHex = COLORS[backdropColor] ?? COLORS[0] ?? '#000000'
+  ctx.fillStyle = backdropColorHex
   ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
 
-  // Render all cells using cached ImageData tiles
+  // 2. Render background screen (28×24 characters) at offset (16, 24)
+  // Background screen uses palette colors
   for (let y = 0; y < ROWS; y++) {
     const row = buffer[y]
     if (!row) continue

@@ -22,6 +22,10 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
   public colorPatternCalls: Array<{ x: number; y: number; pattern: number }> = []
   public colorPaletteCalls: Array<{ bgPalette: number; spritePalette: number }> = []
   public currentColorPalette: { bgPalette: number; spritePalette: number } = { bgPalette: 1, spritePalette: 1 }
+  public backdropColorCalls: number[] = []
+  public currentBackdropColor: number = 0 // Default backdrop color (0 = black)
+  public cgenModeCalls: number[] = []
+  public currentCgenMode: number = 2 // Default is 2 (B on BG, A on sprite)
 
   constructor() {
     console.log('🧪 [TEST_DEVICE] TestDeviceAdapter created')
@@ -113,6 +117,26 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
     this.colorPaletteCalls.push({ bgPalette, spritePalette })
     this.currentColorPalette = { bgPalette, spritePalette }
     console.log('🧪 [TEST_DEVICE] Set color palette:', { bgPalette, spritePalette })
+  }
+
+  setBackdropColor(colorCode: number): void {
+    // Store backdrop color calls for testing
+    if (!this.backdropColorCalls) {
+      this.backdropColorCalls = []
+    }
+    this.backdropColorCalls.push(colorCode)
+    this.currentBackdropColor = colorCode
+    console.log('🧪 [TEST_DEVICE] Set backdrop color:', colorCode)
+  }
+
+  setCharacterGeneratorMode(mode: number): void {
+    // Store CGEN mode calls for testing
+    if (!this.cgenModeCalls) {
+      this.cgenModeCalls = []
+    }
+    this.cgenModeCalls.push(mode)
+    this.currentCgenMode = mode
+    console.log('🧪 [TEST_DEVICE] Set character generator mode:', mode)
   }
 
   // === TEST HELPER METHODS ===

@@ -67,6 +67,7 @@ export function useBasicIde() {
   const cursorX = ref(0)
   const cursorY = ref(0)
   const bgPalette = ref(1) // Default background palette code is 1
+  const backdropColor = ref(0) // Default backdrop color code (0 = black)
 
   // Parser instance
   const parser = new FBasicParser()
@@ -116,6 +117,7 @@ export function useBasicIde() {
     cursorX,
     cursorY,
     bgPalette,
+    backdropColor,
     webWorkerManager
   }
 
@@ -386,6 +388,7 @@ export function useBasicIde() {
     cursorX,
     cursorY,
     bgPalette,
+    backdropColor,
 
     // Methods
     runCode,

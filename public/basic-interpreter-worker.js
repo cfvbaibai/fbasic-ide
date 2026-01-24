@@ -9289,6 +9289,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
   var Locate = createToken({ name: "Locate", pattern: /\bLOCATE\b/i });
   var Color = createToken({ name: "Color", pattern: /\bCOLOR\b/i });
   var Cgset = createToken({ name: "Cgset", pattern: /\bCGSET\b/i });
+  var Cgen = createToken({ name: "Cgen", pattern: /\bCGEN\b/i });
   var Len = createToken({ name: "Len", pattern: /\bLEN\b/i });
   var Left = createToken({ name: "Left", pattern: /\bLEFT\$/i });
   var Right = createToken({ name: "Right", pattern: /\bRIGHT\$/i });
@@ -9382,6 +9383,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     Locate,
     Color,
     Cgset,
+    Cgen,
     // String functions (must come before Identifier)
     Len,
     Left,
@@ -9820,6 +9822,10 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           });
         });
       });
+      this.cgenStatement = this.RULE("cgenStatement", () => {
+        this.CONSUME(Cgen);
+        this.SUBRULE(this.expression);
+      });
       this.ifThenStatement = this.RULE("ifThenStatement", () => {
         this.CONSUME(If);
         this.SUBRULE(this.logicalExpression);
@@ -9924,6 +9930,10 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           {
             GATE: () => this.LA(1).tokenType === Cgset,
             ALT: () => this.SUBRULE(this.cgsetStatement)
+          },
+          {
+            GATE: () => this.LA(1).tokenType === Cgen,
+            ALT: () => this.SUBRULE(this.cgenStatement)
           },
           { ALT: () => this.SUBRULE(this.letStatement) }
           // Must be last since it can start with Identifier
@@ -17211,6 +17221,62 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     }
   };
 
+  // src/core/execution/executors/CgenExecutor.ts
+  var CgenExecutor = class {
+    constructor(context, evaluator) {
+      this.context = context;
+      this.evaluator = evaluator;
+    }
+    /**
+     * Execute a CGEN statement from CST
+     * Sets character generator mode (0-3)
+     * Syntax: CGEN n
+     * 
+     * Mode meanings:
+     * - 0: Character table A on background screen, A on sprite screen
+     * - 1: Character table A on background screen, B on sprite screen
+     * - 2: Character table B on background screen, A on sprite screen (default)
+     * - 3: Character table B on background screen, B on sprite screen
+     */
+    execute(cgenStmtCst, lineNumber) {
+      const expressionCst = getFirstCstNode(cgenStmtCst.children.expression);
+      if (!expressionCst) {
+        this.context.addError({
+          line: lineNumber || 0,
+          message: "CGEN: Missing mode parameter",
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      let mode;
+      try {
+        const modeValue = this.evaluator.evaluateExpression(expressionCst);
+        mode = typeof modeValue === "number" ? Math.floor(modeValue) : Math.floor(parseFloat(String(modeValue)) || 0);
+      } catch (error) {
+        this.context.addError({
+          line: lineNumber || 0,
+          message: `CGEN: Error evaluating mode: ${error instanceof Error ? error.message : String(error)}`,
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      if (mode < 0 || mode > 3) {
+        this.context.addError({
+          line: lineNumber || 0,
+          message: `CGEN: Mode out of range (0-3), got ${mode}`,
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      if (this.context.deviceAdapter) {
+        this.context.deviceAdapter.setCharacterGeneratorMode(mode);
+      }
+      if (this.context.config.enableDebugMode) {
+        this.context.addDebugOutput(`CGEN: Character generator mode set to ${mode}`);
+      }
+    }
+  };
+
   // src/core/execution/StatementRouter.ts
   var StatementRouter = class {
     constructor(context, evaluator, variableService, dataService) {
@@ -17237,6 +17303,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       __publicField(this, "locateExecutor");
       __publicField(this, "colorExecutor");
       __publicField(this, "cgsetExecutor");
+      __publicField(this, "cgenExecutor");
       this.printExecutor = new PrintExecutor(context, evaluator);
       this.letExecutor = new LetExecutor(variableService);
       this.forExecutor = new ForExecutor(context, evaluator, variableService);
@@ -17256,6 +17323,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       this.locateExecutor = new LocateExecutor(context, evaluator);
       this.colorExecutor = new ColorExecutor(context, evaluator);
       this.cgsetExecutor = new CgsetExecutor(context, evaluator);
+      this.cgenExecutor = new CgenExecutor(context, evaluator);
     }
     /**
      * Route an expanded statement to its appropriate executor
@@ -17450,6 +17518,11 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         const cgsetStmtCst = getFirstCstNode(singleCommandCst.children.cgsetStatement);
         if (cgsetStmtCst) {
           this.cgsetExecutor.execute(cgsetStmtCst, expandedStatement.lineNumber);
+        }
+      } else if (singleCommandCst.children.cgenStatement) {
+        const cgenStmtCst = getFirstCstNode(singleCommandCst.children.cgenStatement);
+        if (cgenStmtCst) {
+          this.cgenExecutor.execute(cgenStmtCst, expandedStatement.lineNumber);
         }
       } else {
         this.context.addError({
@@ -18271,43 +18344,13 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     }
   };
 
-  // src/core/devices/WebWorkerDeviceAdapter.ts
-  var WebWorkerDeviceAdapter = class _WebWorkerDeviceAdapter {
-    // Default sprite palette (0-2)
+  // src/core/devices/WebWorkerManager.ts
+  var WebWorkerManager = class _WebWorkerManager {
     constructor() {
-      // === DEVICE STATE ===
-      __publicField(this, "strigClickBuffer", /* @__PURE__ */ new Map());
-      __publicField(this, "stickStates", /* @__PURE__ */ new Map());
-      __publicField(this, "isEnabled", true);
-      __publicField(this, "currentExecutionId", null);
-      // === SCREEN STATE ===
-      __publicField(this, "screenBuffer", []);
-      __publicField(this, "cursorX", 0);
-      __publicField(this, "cursorY", 0);
-      __publicField(this, "bgPalette", 1);
-      // Default background palette (0-1)
-      __publicField(this, "spritePalette", 1);
-      // === WEB WORKER MANAGEMENT ===
       __publicField(this, "worker", null);
       __publicField(this, "messageId", 0);
       __publicField(this, "pendingMessages", /* @__PURE__ */ new Map());
-      console.log("\u{1F50C} [WEB_WORKER_DEVICE] WebWorkerDeviceAdapter created");
-      this.initializeScreen();
-      this.setupMessageListener();
     }
-    initializeScreen() {
-      this.screenBuffer = [];
-      for (let y = 0; y < 24; y++) {
-        const row = [];
-        for (let x = 0; x < 28; x++) {
-          row.push({ character: " ", colorPattern: 0, x, y });
-        }
-        this.screenBuffer.push(row);
-      }
-      this.cursorX = 0;
-      this.cursorY = 0;
-    }
-    // === WEB WORKER MANAGEMENT METHODS ===
     /**
      * Check if web workers are supported
      */
@@ -18335,8 +18378,8 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
      * Initialize the web worker
      */
     async initialize(workerScript) {
-      console.log("\u{1F527} [WEB_WORKER] WebWorkerDeviceAdapter.initialize called with script:", workerScript);
-      if (!_WebWorkerDeviceAdapter.isSupported()) {
+      console.log("\u{1F527} [WEB_WORKER] WebWorkerManager.initialize called with script:", workerScript);
+      if (!_WebWorkerManager.isSupported()) {
         console.error("\u274C [WEB_WORKER] Web workers are not supported in this environment");
         throw new Error("Web workers are not supported in this environment");
       }
@@ -18353,7 +18396,6 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         console.error("\u274C [WEB_WORKER] Failed to create worker:", error);
         throw error;
       }
-      this.setupMessageListener();
       this.worker.onerror = (error) => {
         console.error("\u274C [WEB_WORKER] Web worker error:", error);
         this.rejectAllPending("Web worker error: " + error.message);
@@ -18367,7 +18409,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     /**
      * Execute BASIC code in the web worker
      */
-    async executeInWorker(code, config2, options = {}) {
+    async executeInWorker(code, config2, options = {}, onMessage) {
       console.log("executeInWorker called with code:", code.substring(0, 50) + "...");
       if (!this.worker) {
         console.log("Worker not initialized, initializing...");
@@ -18403,6 +18445,12 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
             }
           }
         };
+        if (onMessage && this.worker) {
+          this.worker.onmessage = (event) => {
+            const message2 = event.data;
+            onMessage(message2);
+          };
+        }
         console.log("\u{1F504} [MAIN\u2192WORKER] Posting message to worker:", {
           type: message.type,
           id: message.id,
@@ -18410,7 +18458,9 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           dataSize: JSON.stringify(message.data).length,
           hasDeviceAdapter: !!config2.deviceAdapter
         });
-        this.worker.postMessage(message);
+        if (this.worker) {
+          this.worker.postMessage(message);
+        }
         console.log("\u2705 [MAIN\u2192WORKER] Message posted to worker successfully");
       });
     }
@@ -18438,10 +18488,519 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       console.log("\u2705 [MAIN\u2192WORKER] STOP message posted to worker successfully");
     }
     /**
+     * Send a message to the web worker
+     */
+    sendMessage(message) {
+      if (this.worker) {
+        this.worker.postMessage(message);
+      }
+    }
+    /**
+     * Terminate the web worker
+     */
+    terminate() {
+      if (this.worker) {
+        this.worker.terminate();
+        this.worker = null;
+        this.rejectAllPending("Web worker terminated");
+      }
+    }
+    /**
+     * Get the worker instance (for setting up message listeners)
+     */
+    getWorker() {
+      return this.worker;
+    }
+    /**
+     * Get pending messages map (for use by MessageHandler)
+     */
+    getPendingMessages() {
+      return this.pendingMessages;
+    }
+    /**
+     * Reject all pending messages (cleanup)
+     */
+    rejectAllPending(reason) {
+      for (const [_id, pending] of this.pendingMessages) {
+        clearTimeout(pending.timeout);
+        pending.reject(new Error(reason));
+      }
+      this.pendingMessages.clear();
+    }
+  };
+
+  // src/core/devices/ScreenStateManager.ts
+  var ScreenStateManager = class {
+    constructor() {
+      __publicField(this, "screenBuffer", []);
+      __publicField(this, "cursorX", 0);
+      __publicField(this, "cursorY", 0);
+      __publicField(this, "bgPalette", 1);
+      // Default background palette (0-1)
+      __publicField(this, "spritePalette", 1);
+      // Default sprite palette (0-2)
+      __publicField(this, "backdropColor", 0);
+      // Default backdrop color code (0-60, 0 = black)
+      __publicField(this, "cgenMode", 2);
+      // Default character generator mode (0-3): B on BG, A on sprite
+      __publicField(this, "currentExecutionId", null);
+      this.initializeScreen();
+    }
+    /**
+     * Initialize the screen buffer
+     */
+    initializeScreen() {
+      this.screenBuffer = [];
+      for (let y = 0; y < 24; y++) {
+        const row = [];
+        for (let x = 0; x < 28; x++) {
+          row.push({ character: " ", colorPattern: 0, x, y });
+        }
+        this.screenBuffer.push(row);
+      }
+      this.cursorX = 0;
+      this.cursorY = 0;
+    }
+    /**
+     * Get the current screen buffer
+     */
+    getScreenBuffer() {
+      return this.screenBuffer;
+    }
+    /**
+     * Get cursor position
+     */
+    getCursorPosition() {
+      return { x: this.cursorX, y: this.cursorY };
+    }
+    /**
+     * Set cursor position
+     */
+    setCursorPosition(x, y) {
+      if (x < 0 || x > 27 || y < 0 || y > 23) {
+        console.warn(`\u{1F50C} [SCREEN] Invalid cursor position: (${x}, ${y}), clamping to valid range`);
+        x = Math.max(0, Math.min(27, x));
+        y = Math.max(0, Math.min(23, y));
+      }
+      this.cursorX = x;
+      this.cursorY = y;
+    }
+    /**
+     * Write a character to the screen at the current cursor position
+     */
+    writeCharacter(char) {
+      if (char === "\n") {
+        this.cursorX = 0;
+        this.cursorY++;
+        if (this.cursorY >= 24) {
+          this.cursorY = 0;
+        }
+        return;
+      }
+      if (this.cursorY < 24 && this.cursorX < 28) {
+        if (!this.screenBuffer[this.cursorY]) {
+          this.screenBuffer[this.cursorY] = [];
+        }
+        const row = this.screenBuffer[this.cursorY];
+        let cell = row[this.cursorX];
+        if (!cell) {
+          cell = {
+            character: " ",
+            colorPattern: 0,
+            x: this.cursorX,
+            y: this.cursorY
+          };
+          row[this.cursorX] = cell;
+        }
+        cell.character = char;
+        this.cursorX++;
+        if (this.cursorX >= 28) {
+          this.cursorX = 0;
+          this.cursorY++;
+          if (this.cursorY >= 24) {
+            this.cursorY = 0;
+          }
+        }
+      }
+    }
+    /**
+     * Set color pattern for a 2×2 area containing the specified position
+     */
+    setColorPattern(x, y, pattern) {
+      if (x < 0 || x > 27 || y < 0 || y > 23) {
+        console.warn(`\u{1F50C} [SCREEN] Invalid color position: (${x}, ${y}), clamping to valid range`);
+        x = Math.max(0, Math.min(27, x));
+        y = Math.max(0, Math.min(23, y));
+      }
+      if (pattern < 0 || pattern > 3) {
+        console.warn(`\u{1F50C} [SCREEN] Invalid color pattern: ${pattern}, clamping to valid range (0-3)`);
+        pattern = Math.max(0, Math.min(3, pattern));
+      }
+      const areaX = Math.floor(x / 2) * 2;
+      const areaY = y;
+      const cellsToUpdate = [];
+      const topY = areaY > 0 ? areaY - 1 : 0;
+      if (areaX < 28 && topY < 24) {
+        const cell = this.screenBuffer[topY]?.[areaX];
+        if (cell) {
+          cell.colorPattern = pattern;
+          cellsToUpdate.push({ x: areaX, y: topY, pattern });
+        }
+      }
+      if (areaX + 1 < 28 && topY < 24) {
+        const row = this.screenBuffer[topY];
+        const cell = row?.[areaX + 1];
+        if (cell) {
+          cell.colorPattern = pattern;
+          cellsToUpdate.push({ x: areaX + 1, y: topY, pattern });
+        }
+      }
+      if (areaX < 28 && areaY < 24) {
+        const row = this.screenBuffer[areaY];
+        const cell = row?.[areaX];
+        if (cell) {
+          cell.colorPattern = pattern;
+          cellsToUpdate.push({ x: areaX, y: areaY, pattern });
+        }
+      }
+      if (areaX + 1 < 28 && areaY < 24) {
+        const row = this.screenBuffer[areaY];
+        const cell = row?.[areaX + 1];
+        if (cell) {
+          cell.colorPattern = pattern;
+          cellsToUpdate.push({ x: areaX + 1, y: areaY, pattern });
+        }
+      }
+      return cellsToUpdate;
+    }
+    /**
+     * Set color palette
+     */
+    setColorPalette(bgPalette, spritePalette) {
+      if (bgPalette < 0 || bgPalette > 1) {
+        console.warn(`\u{1F50C} [SCREEN] Invalid background palette: ${bgPalette}, clamping to valid range (0-1)`);
+        bgPalette = Math.max(0, Math.min(1, bgPalette));
+      }
+      if (spritePalette < 0 || spritePalette > 2) {
+        console.warn(`\u{1F50C} [SCREEN] Invalid sprite palette: ${spritePalette}, clamping to valid range (0-2)`);
+        spritePalette = Math.max(0, Math.min(2, spritePalette));
+      }
+      this.bgPalette = bgPalette;
+      this.spritePalette = spritePalette;
+    }
+    /**
+     * Set backdrop color
+     */
+    setBackdropColor(colorCode) {
+      if (colorCode < 0 || colorCode > 60) {
+        console.warn(`\u{1F50C} [SCREEN] Invalid backdrop color code: ${colorCode}, clamping to valid range (0-60)`);
+        colorCode = Math.max(0, Math.min(60, colorCode));
+      }
+      this.backdropColor = colorCode;
+    }
+    /**
+     * Set character generator mode
+     */
+    setCharacterGeneratorMode(mode) {
+      if (mode < 0 || mode > 3) {
+        console.warn(`\u{1F50C} [SCREEN] Invalid CGEN mode: ${mode}, clamping to valid range (0-3)`);
+        mode = Math.max(0, Math.min(3, mode));
+      }
+      this.cgenMode = mode;
+    }
+    /**
+     * Get palette values
+     */
+    getPalette() {
+      return { bgPalette: this.bgPalette, spritePalette: this.spritePalette };
+    }
+    /**
+     * Get backdrop color
+     */
+    getBackdropColor() {
+      return this.backdropColor;
+    }
+    /**
+     * Get CGEN mode
+     */
+    getCgenMode() {
+      return this.cgenMode;
+    }
+    /**
+     * Set current execution ID
+     */
+    setCurrentExecutionId(executionId) {
+      this.currentExecutionId = executionId;
+    }
+    /**
+     * Get current execution ID
+     */
+    getCurrentExecutionId() {
+      return this.currentExecutionId;
+    }
+    /**
+     * Create a full screen update message
+     */
+    createFullScreenUpdateMessage() {
+      return {
+        type: "SCREEN_UPDATE",
+        id: `screen-full-${Date.now()}`,
+        timestamp: Date.now(),
+        data: {
+          executionId: this.currentExecutionId || "unknown",
+          updateType: "full",
+          screenBuffer: this.screenBuffer,
+          cursorX: this.cursorX,
+          cursorY: this.cursorY,
+          timestamp: Date.now()
+        }
+      };
+    }
+    /**
+     * Create a cursor update message
+     */
+    createCursorUpdateMessage() {
+      return {
+        type: "SCREEN_UPDATE",
+        id: `screen-cursor-${Date.now()}`,
+        timestamp: Date.now(),
+        data: {
+          executionId: this.currentExecutionId || "unknown",
+          updateType: "cursor",
+          cursorX: this.cursorX,
+          cursorY: this.cursorY,
+          timestamp: Date.now()
+        }
+      };
+    }
+    /**
+     * Create a clear screen update message
+     */
+    createClearScreenUpdateMessage() {
+      return {
+        type: "SCREEN_UPDATE",
+        id: `screen-clear-${Date.now()}`,
+        timestamp: Date.now(),
+        data: {
+          executionId: this.currentExecutionId || "unknown",
+          updateType: "clear",
+          timestamp: Date.now()
+        }
+      };
+    }
+    /**
+     * Create a color pattern update message
+     */
+    createColorUpdateMessage(cellsToUpdate) {
+      return {
+        type: "SCREEN_UPDATE",
+        id: `screen-color-${Date.now()}`,
+        timestamp: Date.now(),
+        data: {
+          executionId: this.currentExecutionId || "unknown",
+          updateType: "color",
+          colorUpdates: cellsToUpdate,
+          timestamp: Date.now()
+        }
+      };
+    }
+    /**
+     * Create a palette update message
+     */
+    createPaletteUpdateMessage() {
+      return {
+        type: "SCREEN_UPDATE",
+        id: `screen-palette-${Date.now()}`,
+        timestamp: Date.now(),
+        data: {
+          executionId: this.currentExecutionId || "unknown",
+          updateType: "palette",
+          bgPalette: this.bgPalette,
+          spritePalette: this.spritePalette,
+          timestamp: Date.now()
+        }
+      };
+    }
+    /**
+     * Create a backdrop color update message
+     */
+    createBackdropUpdateMessage() {
+      return {
+        type: "SCREEN_UPDATE",
+        id: `screen-backdrop-${Date.now()}`,
+        timestamp: Date.now(),
+        data: {
+          executionId: this.currentExecutionId || "unknown",
+          updateType: "backdrop",
+          backdropColor: this.backdropColor,
+          timestamp: Date.now()
+        }
+      };
+    }
+    /**
+     * Create a CGEN mode update message
+     */
+    createCgenUpdateMessage() {
+      return {
+        type: "SCREEN_UPDATE",
+        id: `screen-cgen-${Date.now()}`,
+        timestamp: Date.now(),
+        data: {
+          executionId: this.currentExecutionId || "unknown",
+          updateType: "cgen",
+          cgenMode: this.cgenMode,
+          timestamp: Date.now()
+        }
+      };
+    }
+  };
+
+  // src/core/devices/MessageHandler.ts
+  var MessageHandler = class {
+    constructor(pendingMessages) {
+      this.pendingMessages = pendingMessages;
+    }
+    /**
+     * Handle messages from the web worker
+     */
+    handleWorkerMessage(message, onOutput) {
+      console.log("\u{1F50D} [MESSAGE_HANDLER] Processing worker message:", {
+        type: message.type,
+        id: message.id,
+        timestamp: message.timestamp
+      });
+      if (message.type === "OUTPUT") {
+        console.log("\u{1F4E4} [MESSAGE_HANDLER] Handling OUTPUT message:", {
+          outputType: message.data.outputType,
+          outputLength: message.data.output.length
+        });
+        if (onOutput) {
+          onOutput(message);
+        }
+        return;
+      }
+      if (message.type === "SCREEN_UPDATE") {
+        const screenMessage = message;
+        console.log("\u{1F5A5}\uFE0F [MESSAGE_HANDLER] SCREEN_UPDATE message received (handled by composable):", {
+          updateType: screenMessage.data.updateType
+        });
+        return;
+      }
+      const pending = this.pendingMessages.get(message.id);
+      if (!pending) {
+        console.log("\u26A0\uFE0F [MESSAGE_HANDLER] No pending message found for ID:", message.id);
+        return;
+      }
+      console.log("\u2705 [MESSAGE_HANDLER] Found pending message for ID:", message.id);
+      switch (message.type) {
+        case "RESULT": {
+          const resultMessage = message;
+          console.log("\u{1F4CA} [MESSAGE_HANDLER] Received RESULT message:", {
+            success: resultMessage.data.success,
+            executionTime: resultMessage.data.executionTime
+          });
+          clearTimeout(pending.timeout);
+          this.pendingMessages.delete(message.id);
+          if (resultMessage.data.errors?.some((error) => error.message.includes("not yet fully implemented"))) {
+            console.log("\u26A0\uFE0F [MESSAGE_HANDLER] Web worker indicates fallback needed, rejecting to trigger fallback");
+            pending.reject(new Error("Web worker execution not implemented, falling back to main thread"));
+          } else {
+            console.log("\u2705 [MESSAGE_HANDLER] Web worker result is valid, resolving pending promise");
+            pending.resolve(resultMessage.data);
+          }
+          break;
+        }
+        case "ERROR": {
+          const errorMessage = message;
+          console.log("\u274C [MESSAGE_HANDLER] Received ERROR message:", {
+            message: errorMessage.data.message,
+            errorType: errorMessage.data.errorType,
+            recoverable: errorMessage.data.recoverable
+          });
+          clearTimeout(pending.timeout);
+          this.pendingMessages.delete(message.id);
+          console.log("\u274C [MESSAGE_HANDLER] Rejecting pending promise due to error");
+          pending.reject(new Error(errorMessage.data.message));
+          break;
+        }
+        case "PROGRESS": {
+          const progressMessage = message;
+          console.log("\u{1F4C8} [MESSAGE_HANDLER] Received PROGRESS message:", {
+            progress: progressMessage.data.progress
+          });
+          break;
+        }
+      }
+    }
+    /**
+     * Reject all pending messages (cleanup)
+     */
+    rejectAllPending(reason) {
+      for (const [_id, pending] of this.pendingMessages) {
+        clearTimeout(pending.timeout);
+        pending.reject(new Error(reason));
+      }
+      this.pendingMessages.clear();
+    }
+  };
+
+  // src/core/devices/WebWorkerDeviceAdapter.ts
+  var WebWorkerDeviceAdapter = class {
+    constructor() {
+      // === DEVICE STATE ===
+      __publicField(this, "strigClickBuffer", /* @__PURE__ */ new Map());
+      __publicField(this, "stickStates", /* @__PURE__ */ new Map());
+      __publicField(this, "isEnabled", true);
+      // === MANAGERS ===
+      __publicField(this, "webWorkerManager");
+      __publicField(this, "screenStateManager");
+      __publicField(this, "messageHandler");
+      console.log("\u{1F50C} [WEB_WORKER_DEVICE] WebWorkerDeviceAdapter created");
+      this.webWorkerManager = new WebWorkerManager();
+      this.screenStateManager = new ScreenStateManager();
+      this.messageHandler = new MessageHandler(this.webWorkerManager.getPendingMessages());
+      this.setupMessageListener();
+    }
+    // === WEB WORKER MANAGEMENT METHODS ===
+    /**
+     * Check if web workers are supported
+     */
+    static isSupported() {
+      return WebWorkerManager.isSupported();
+    }
+    /**
+     * Check if we're currently running in a web worker context
+     */
+    static isInWebWorker() {
+      return WebWorkerManager.isInWebWorker();
+    }
+    /**
+     * Initialize the web worker
+     */
+    async initialize(workerScript) {
+      await this.webWorkerManager.initialize(workerScript);
+      this.setupMessageListener();
+    }
+    /**
+     * Execute BASIC code in the web worker
+     */
+    async executeInWorker(code, config2, options = {}) {
+      return this.webWorkerManager.executeInWorker(code, config2, options, (message) => {
+        this.handleWorkerMessage(message);
+      });
+    }
+    /**
+     * Stop execution in the web worker
+     */
+    stopExecution() {
+      this.webWorkerManager.stopExecution();
+    }
+    /**
      * Send a STRIG event to the web worker
      */
     sendStrigEvent(joystickId, state) {
-      if (!this.worker) {
+      const worker = this.webWorkerManager.getWorker();
+      if (!worker) {
         console.log("\u{1F50C} [WEB_WORKER] No worker available for STRIG event");
         return;
       }
@@ -18460,25 +19019,20 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         state,
         messageId: message.id
       });
-      this.worker.postMessage(message);
+      worker.postMessage(message);
     }
     /**
      * Send a message to the web worker
      */
     sendMessage(message) {
-      if (this.worker) {
-        this.worker.postMessage(message);
-      }
+      this.webWorkerManager.sendMessage(message);
     }
     /**
      * Terminate the web worker
      */
     terminate() {
-      if (this.worker) {
-        this.worker.terminate();
-        this.worker = null;
-        this.rejectAllPending("Web worker terminated");
-      }
+      this.webWorkerManager.terminate();
+      this.messageHandler.rejectAllPending("Web worker terminated");
     }
     // === DEVICE ADAPTER METHODS ===
     /**
@@ -18538,66 +19092,17 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         id: `output-${Date.now()}`,
         timestamp: Date.now(),
         data: {
-          executionId: this.currentExecutionId || "unknown",
+          executionId: this.screenStateManager.getCurrentExecutionId() || "unknown",
           output,
           outputType: "print",
           timestamp: Date.now()
         }
       });
       for (const char of output) {
-        this.writeCharacterToScreen(char);
+        this.screenStateManager.writeCharacter(char);
       }
-      this.sendFullScreenUpdate();
-    }
-    writeCharacterToScreen(char) {
-      if (char === "\n") {
-        this.cursorX = 0;
-        this.cursorY++;
-        if (this.cursorY >= 24) {
-          this.cursorY = 0;
-        }
-        return;
-      }
-      if (this.cursorY < 24 && this.cursorX < 28) {
-        if (!this.screenBuffer[this.cursorY]) {
-          this.screenBuffer[this.cursorY] = [];
-        }
-        const row = this.screenBuffer[this.cursorY];
-        let cell = row[this.cursorX];
-        if (!cell) {
-          cell = {
-            character: " ",
-            colorPattern: 0,
-            x: this.cursorX,
-            y: this.cursorY
-          };
-          row[this.cursorX] = cell;
-        }
-        cell.character = char;
-        this.cursorX++;
-        if (this.cursorX >= 28) {
-          this.cursorX = 0;
-          this.cursorY++;
-          if (this.cursorY >= 24) {
-            this.cursorY = 0;
-          }
-        }
-      }
-    }
-    sendFullScreenUpdate() {
-      self.postMessage({
-        type: "SCREEN_UPDATE",
-        id: `screen-full-${Date.now()}`,
-        timestamp: Date.now(),
-        data: {
-          executionId: this.currentExecutionId || "unknown",
-          updateType: "full",
-          screenBuffer: this.screenBuffer,
-          cursorX: this.cursorX,
-          cursorY: this.cursorY,
-          timestamp: Date.now()
-        }
-      });
+      const updateMessage = this.screenStateManager.createFullScreenUpdateMessage();
+      self.postMessage(updateMessage);
     }
     debugOutput(output) {
       console.log("\u{1F50C} [WEB_WORKER_DEVICE] Debug output:", output);
@@ -18606,7 +19111,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         id: `debug-${Date.now()}`,
         timestamp: Date.now(),
         data: {
-          executionId: this.currentExecutionId || "unknown",
+          executionId: this.screenStateManager.getCurrentExecutionId() || "unknown",
           output,
           outputType: "debug",
           timestamp: Date.now()
@@ -18620,7 +19125,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         id: `error-${Date.now()}`,
         timestamp: Date.now(),
         data: {
-          executionId: this.currentExecutionId || "unknown",
+          executionId: this.screenStateManager.getCurrentExecutionId() || "unknown",
           output,
           outputType: "error",
           timestamp: Date.now()
@@ -18629,144 +19134,50 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     }
     clearScreen() {
       console.log("\u{1F50C} [WEB_WORKER_DEVICE] Clear screen");
-      this.initializeScreen();
-      self.postMessage({
-        type: "SCREEN_UPDATE",
-        id: `screen-clear-${Date.now()}`,
-        timestamp: Date.now(),
-        data: {
-          executionId: this.currentExecutionId || "unknown",
-          updateType: "clear",
-          timestamp: Date.now()
-        }
-      });
+      this.screenStateManager.initializeScreen();
+      const updateMessage = this.screenStateManager.createClearScreenUpdateMessage();
+      self.postMessage(updateMessage);
     }
     setCursorPosition(x, y) {
       console.log("\u{1F50C} [WEB_WORKER_DEVICE] Set cursor position:", { x, y });
-      if (x < 0 || x > 27 || y < 0 || y > 23) {
-        console.warn(`\u{1F50C} [WEB_WORKER_DEVICE] Invalid cursor position: (${x}, ${y}), clamping to valid range`);
-        x = Math.max(0, Math.min(27, x));
-        y = Math.max(0, Math.min(23, y));
-      }
-      this.cursorX = x;
-      this.cursorY = y;
-      self.postMessage({
-        type: "SCREEN_UPDATE",
-        id: `screen-cursor-${Date.now()}`,
-        timestamp: Date.now(),
-        data: {
-          executionId: this.currentExecutionId || "unknown",
-          updateType: "cursor",
-          cursorX: x,
-          cursorY: y,
-          timestamp: Date.now()
-        }
-      });
+      this.screenStateManager.setCursorPosition(x, y);
+      const updateMessage = this.screenStateManager.createCursorUpdateMessage();
+      self.postMessage(updateMessage);
     }
     setColorPattern(x, y, pattern) {
       console.log("\u{1F50C} [WEB_WORKER_DEVICE] Set color pattern:", { x, y, pattern });
-      if (x < 0 || x > 27 || y < 0 || y > 23) {
-        console.warn(`\u{1F50C} [WEB_WORKER_DEVICE] Invalid color position: (${x}, ${y}), clamping to valid range`);
-        x = Math.max(0, Math.min(27, x));
-        y = Math.max(0, Math.min(23, y));
-      }
-      if (pattern < 0 || pattern > 3) {
-        console.warn(`\u{1F50C} [WEB_WORKER_DEVICE] Invalid color pattern: ${pattern}, clamping to valid range (0-3)`);
-        pattern = Math.max(0, Math.min(3, pattern));
-      }
-      const areaX = Math.floor(x / 2) * 2;
-      const areaY = y;
-      const cellsToUpdate = [];
-      const topY = areaY > 0 ? areaY - 1 : 0;
-      if (areaX < 28 && topY < 24) {
-        const cell = this.screenBuffer[topY]?.[areaX];
-        if (cell) {
-          cell.colorPattern = pattern;
-          cellsToUpdate.push({ x: areaX, y: topY, pattern });
-        }
-      }
-      if (areaX + 1 < 28 && topY < 24) {
-        const row = this.screenBuffer[topY];
-        const cell = row?.[areaX + 1];
-        if (cell) {
-          cell.colorPattern = pattern;
-          cellsToUpdate.push({ x: areaX + 1, y: topY, pattern });
-        }
-      }
-      if (areaX < 28 && areaY < 24) {
-        const row = this.screenBuffer[areaY];
-        const cell = row?.[areaX];
-        if (cell) {
-          cell.colorPattern = pattern;
-          cellsToUpdate.push({ x: areaX, y: areaY, pattern });
-        }
-      }
-      if (areaX + 1 < 28 && areaY < 24) {
-        const row = this.screenBuffer[areaY];
-        const cell = row?.[areaX + 1];
-        if (cell) {
-          cell.colorPattern = pattern;
-          cellsToUpdate.push({ x: areaX + 1, y: areaY, pattern });
-        }
-      }
-      self.postMessage({
-        type: "SCREEN_UPDATE",
-        id: `screen-color-${Date.now()}`,
-        timestamp: Date.now(),
-        data: {
-          executionId: this.currentExecutionId || "unknown",
-          updateType: "color",
-          colorUpdates: cellsToUpdate,
-          timestamp: Date.now()
-        }
-      });
+      const cellsToUpdate = this.screenStateManager.setColorPattern(x, y, pattern);
+      const updateMessage = this.screenStateManager.createColorUpdateMessage(cellsToUpdate);
+      self.postMessage(updateMessage);
     }
     setColorPalette(bgPalette, spritePalette) {
       console.log("\u{1F50C} [WEB_WORKER_DEVICE] Set color palette:", { bgPalette, spritePalette });
-      if (bgPalette < 0 || bgPalette > 1) {
-        console.warn(`\u{1F50C} [WEB_WORKER_DEVICE] Invalid background palette: ${bgPalette}, clamping to valid range (0-1)`);
-        bgPalette = Math.max(0, Math.min(1, bgPalette));
-      }
-      if (spritePalette < 0 || spritePalette > 2) {
-        console.warn(`\u{1F50C} [WEB_WORKER_DEVICE] Invalid sprite palette: ${spritePalette}, clamping to valid range (0-2)`);
-        spritePalette = Math.max(0, Math.min(2, spritePalette));
-      }
-      this.bgPalette = bgPalette;
-      this.spritePalette = spritePalette;
-      self.postMessage({
-        type: "SCREEN_UPDATE",
-        id: `screen-palette-${Date.now()}`,
-        timestamp: Date.now(),
-        data: {
-          executionId: this.currentExecutionId || "unknown",
-          updateType: "palette",
-          bgPalette,
-          spritePalette,
-          timestamp: Date.now()
-        }
-      });
+      this.screenStateManager.setColorPalette(bgPalette, spritePalette);
+      const updateMessage = this.screenStateManager.createPaletteUpdateMessage();
+      self.postMessage(updateMessage);
+    }
+    setBackdropColor(colorCode) {
+      console.log("\u{1F50C} [WEB_WORKER_DEVICE] Set backdrop color:", colorCode);
+      this.screenStateManager.setBackdropColor(colorCode);
+      const updateMessage = this.screenStateManager.createBackdropUpdateMessage();
+      self.postMessage(updateMessage);
+    }
+    setCharacterGeneratorMode(mode) {
+      console.log("\u{1F50C} [WEB_WORKER_DEVICE] Set character generator mode:", mode);
+      this.screenStateManager.setCharacterGeneratorMode(mode);
+      const updateMessage = this.screenStateManager.createCgenUpdateMessage();
+      self.postMessage(updateMessage);
     }
     /**
      * Set the current execution ID (called by WebWorkerInterpreter)
      */
     setCurrentExecutionId(executionId) {
-      this.currentExecutionId = executionId;
+      this.screenStateManager.setCurrentExecutionId(executionId);
       if (executionId) {
-        this.initializeScreen();
-        this.sendScreenClear();
+        this.screenStateManager.initializeScreen();
+        const updateMessage = this.screenStateManager.createClearScreenUpdateMessage();
+        self.postMessage(updateMessage);
       }
-    }
-    sendScreenClear() {
-      self.postMessage({
-        type: "SCREEN_UPDATE",
-        id: `screen-clear-${Date.now()}`,
-        timestamp: Date.now(),
-        data: {
-          executionId: this.currentExecutionId || "unknown",
-          updateType: "clear",
-          timestamp: Date.now()
-        }
-      });
     }
     // === PRIVATE METHODS ===
     /**
@@ -18774,8 +19185,9 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
      */
     setupMessageListener() {
       if (typeof window === "undefined") return;
-      if (this.worker) {
-        this.worker.onmessage = (event) => {
+      const worker = this.webWorkerManager.getWorker();
+      if (worker) {
+        worker.onmessage = (event) => {
           console.log("\u{1F4E8} [WORKER\u2192MAIN] Main thread received message from worker:", {
             type: event.data.type,
             id: event.data.id,
@@ -18791,70 +19203,9 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
      * Handle messages from the web worker
      */
     handleWorkerMessage(message) {
-      console.log("\u{1F50D} [MAIN] Processing worker message:", {
-        type: message.type,
-        id: message.id,
-        timestamp: message.timestamp
+      this.messageHandler.handleWorkerMessage(message, (outputMessage) => {
+        this.handleOutputMessage(outputMessage);
       });
-      if (message.type === "OUTPUT") {
-        console.log("\u{1F4E4} [MAIN] Handling OUTPUT message:", {
-          outputType: message.data.outputType,
-          outputLength: message.data.output.length
-        });
-        this.handleOutputMessage(message);
-        return;
-      }
-      if (message.type === "SCREEN_UPDATE") {
-        console.log("\u{1F5A5}\uFE0F [MAIN] SCREEN_UPDATE message received (handled by composable):", {
-          updateType: message.data.updateType
-        });
-        return;
-      }
-      const pending = this.pendingMessages.get(message.id);
-      if (!pending) {
-        console.log("\u26A0\uFE0F [MAIN] No pending message found for ID:", message.id);
-        return;
-      }
-      console.log("\u2705 [MAIN] Found pending message for ID:", message.id);
-      switch (message.type) {
-        case "RESULT": {
-          const resultMessage = message;
-          console.log("\u{1F4CA} [MAIN] Received RESULT message:", {
-            success: resultMessage.data.success,
-            executionTime: resultMessage.data.executionTime
-          });
-          clearTimeout(pending.timeout);
-          this.pendingMessages.delete(message.id);
-          if (resultMessage.data.errors?.some((error) => error.message.includes("not yet fully implemented"))) {
-            console.log("\u26A0\uFE0F [MAIN] Web worker indicates fallback needed, rejecting to trigger fallback");
-            pending.reject(new Error("Web worker execution not implemented, falling back to main thread"));
-          } else {
-            console.log("\u2705 [MAIN] Web worker result is valid, resolving pending promise");
-            pending.resolve(resultMessage.data);
-          }
-          break;
-        }
-        case "ERROR": {
-          const errorMessage = message;
-          console.log("\u274C [MAIN] Received ERROR message:", {
-            message: errorMessage.data.message,
-            errorType: errorMessage.data.errorType,
-            recoverable: errorMessage.data.recoverable
-          });
-          clearTimeout(pending.timeout);
-          this.pendingMessages.delete(message.id);
-          console.log("\u274C [MAIN] Rejecting pending promise due to error");
-          pending.reject(new Error(errorMessage.data.message));
-          break;
-        }
-        case "PROGRESS": {
-          const progressMessage = message;
-          console.log("\u{1F4C8} [MAIN] Received PROGRESS message:", {
-            progress: progressMessage.data.progress
-          });
-          break;
-        }
-      }
     }
     /**
      * Handle OUTPUT messages from the web worker
@@ -18864,16 +19215,6 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         outputType: message.data.outputType,
         outputLength: message.data.output.length
       });
-    }
-    /**
-     * Reject all pending messages (cleanup)
-     */
-    rejectAllPending(reason) {
-      for (const [_id, pending] of this.pendingMessages) {
-        clearTimeout(pending.timeout);
-        pending.reject(new Error(reason));
-      }
-      this.pendingMessages.clear();
     }
   };
 

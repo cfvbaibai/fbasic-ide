@@ -1,19 +1,32 @@
 # Screen System Reference
 
+**Reference**: F-BASIC Manual Page 36
+
 ## Screen Dimensions
 
 ### Background Screen (PRINT output)
 - Size: 28 columns × 24 rows
 - Coordinates: X (0-27), Y (0-23)
 - Origin: Top-left (0,0)
+- Purpose: Primary screen for BASIC programs, displays alphanumeric characters, Kana, and symbols
+
+### Backdrop Screen
+- Size: 32 columns × 30 rows
+- Coordinates: X (0-31), Y (0-29)
+- Purpose: Displays background color, always visible
+- Structure: Extends beyond Background Screen (adds 3 lines top/bottom, 2 columns left/right)
 
 ### BG GRAPHIC Screen
 - Size: 28 columns × 21 rows
-- For graphics drawing
+- Coordinates: X (0-27), Y (0-20)
+- Purpose: Draws BG GRAPHIC patterns
+- Can be copied to Background Screen via VIEW command
 
 ### Sprite Screen
-- Size: 256 × 240 dots
+- Size: 256 × 240 dots (pixel-based)
+- Coordinates: X (0-255), Y (0-239) in dots
 - Visible range: X (0-240), Y (5-220)
+- Note: Uses pixel coordinates, not character coordinates
 
 ## Screen Layers (front to back)
 1. Sprite Screen (Front) - sprites with priority 0
@@ -63,12 +76,12 @@ Abbreviation: `CL.`
 
 Set color palette code.
 ```
-CGSET palet_code, combination
+CGSET [m][,n]
 ```
-- palet_code: Palette number (0-3)
-- combination: Color combination within palette
+- m: Background palette code (0 or 1), optional, default: 1
+- n: Sprite palette code (0 to 2), optional, default: 1
 
-Abbreviation: `CGS.`
+Abbreviation: `CG.`
 
 ## CGEN
 
@@ -101,4 +114,6 @@ bg_y = (sprite_y - 24) / 8
 Color pattern numbers (0-3) reference colors within the active palette set by CGSET.
 
 ## Source
-Manual pages: 70-73, 113
+- Manual page 36: Screen Display Process
+- Manual pages 70-73: Screen Control Statements
+- Manual page 113: Character tables

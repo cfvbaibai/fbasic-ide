@@ -24,6 +24,7 @@ import { ClsExecutor } from './executors/ClsExecutor'
 import { LocateExecutor } from './executors/LocateExecutor'
 import { ColorExecutor } from './executors/ColorExecutor'
 import { CgsetExecutor } from './executors/CgsetExecutor'
+import { CgenExecutor } from './executors/CgenExecutor'
 import type { VariableService } from '../services/VariableService'
 import type { DataService } from '../services/DataService'
 import type { ExpressionEvaluator } from '../evaluation/ExpressionEvaluator'
@@ -51,6 +52,7 @@ export class StatementRouter {
   private locateExecutor: LocateExecutor
   private colorExecutor: ColorExecutor
   private cgsetExecutor: CgsetExecutor
+  private cgenExecutor: CgenExecutor
 
   constructor(
     private context: ExecutionContext,
@@ -77,6 +79,7 @@ export class StatementRouter {
     this.locateExecutor = new LocateExecutor(context, evaluator)
     this.colorExecutor = new ColorExecutor(context, evaluator)
     this.cgsetExecutor = new CgsetExecutor(context, evaluator)
+    this.cgenExecutor = new CgenExecutor(context, evaluator)
   }
 
   /**
@@ -312,6 +315,11 @@ export class StatementRouter {
       const cgsetStmtCst = getFirstCstNode(singleCommandCst.children.cgsetStatement)
       if (cgsetStmtCst) {
         this.cgsetExecutor.execute(cgsetStmtCst, expandedStatement.lineNumber)
+      }
+    } else if (singleCommandCst.children.cgenStatement) {
+      const cgenStmtCst = getFirstCstNode(singleCommandCst.children.cgenStatement)
+      if (cgenStmtCst) {
+        this.cgenExecutor.execute(cgenStmtCst, expandedStatement.lineNumber)
       }
     } else {
       // Other statement types not yet implemented

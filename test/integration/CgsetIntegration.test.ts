@@ -14,7 +14,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { WebWorkerDeviceAdapter } from '@/core/devices/WebWorkerDeviceAdapter'
-import type { AnyServiceWorkerMessage, ScreenUpdateMessage, ScreenCell } from '@/core/interfaces'
+import type { AnyServiceWorkerMessage, ScreenUpdateMessage } from '@/core/interfaces'
 
 // Mock self.postMessage to capture screen updates
 let capturedMessages: AnyServiceWorkerMessage[] = []
@@ -265,10 +265,16 @@ describe('CGSET Integration', () => {
       )
       
       expect(screenMessages.length).toBeGreaterThan(0)
+      expect(paletteMessages.length).toBeGreaterThan(0)
       
       // Verify palette update came before screen update
-      const paletteMessageIndex = capturedMessages.indexOf(paletteMessages[0])
-      const screenMessageIndex = capturedMessages.indexOf(screenMessages[screenMessages.length - 1])
+      const paletteMessage = paletteMessages[0]
+      const screenMessage = screenMessages[screenMessages.length - 1]
+      if (!paletteMessage || !screenMessage) {
+        throw new Error('Expected messages not found')
+      }
+      const paletteMessageIndex = capturedMessages.indexOf(paletteMessage)
+      const screenMessageIndex = capturedMessages.indexOf(screenMessage)
       
       // Palette should be set before printing
       expect(paletteMessageIndex).toBeLessThanOrEqual(screenMessageIndex)

@@ -2,7 +2,7 @@
  * Web Worker Device Adapter
  * 
  * A comprehensive device adapter that handles both device operations and web worker management.
- * Merges WebWorkerManager functionality for unified web worker communication.
+ * Delegates to specialized modules for web worker management, screen state, and message handling.
  */
 
 import type { 
@@ -10,66 +10,32 @@ import type {
   InterpreterConfig, 
   ExecutionResult,
   AnyServiceWorkerMessage,
-  ExecuteMessage,
-  ResultMessage,
-  ErrorMessage,
-  ProgressMessage,
-  StopMessage,
-  OutputMessage,
-  ScreenUpdateMessage,
-  ScreenCell
+  OutputMessage
 } from '../interfaces'
-import { DEFAULTS } from '../constants'
+import { WebWorkerManager, type WebWorkerExecutionOptions } from './WebWorkerManager'
+import { ScreenStateManager } from './ScreenStateManager'
+import { MessageHandler } from './MessageHandler'
 
-export interface WebWorkerExecutionOptions {
-  onProgress?: (iterationCount: number, currentStatement?: string) => void
-  onError?: (error: Error) => void
-  timeout?: number
-}
+export type { WebWorkerExecutionOptions }
 
 export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   // === DEVICE STATE ===
   private strigClickBuffer: Map<number, number[]> = new Map()
   private stickStates: Map<number, number> = new Map()
   private isEnabled = true
-  private currentExecutionId: string | null = null
   
-  // === SCREEN STATE ===
-  private screenBuffer: ScreenCell[][] = []
-  private cursorX = 0
-  private cursorY = 0
-  private bgPalette = 1  // Default background palette (0-1)
-  private spritePalette = 1  // Default sprite palette (0-2)
-  
+  // === MANAGERS ===
+  private webWorkerManager: WebWorkerManager
+  private screenStateManager: ScreenStateManager
+  private messageHandler: MessageHandler
+
   constructor() {
     console.log('🔌 [WEB_WORKER_DEVICE] WebWorkerDeviceAdapter created')
-    this.initializeScreen()
+    this.webWorkerManager = new WebWorkerManager()
+    this.screenStateManager = new ScreenStateManager()
+    this.messageHandler = new MessageHandler(this.webWorkerManager.getPendingMessages())
     this.setupMessageListener()
   }
-  
-  private initializeScreen(): void {
-    // Initialize empty 28×24 grid
-    this.screenBuffer = []
-    for (let y = 0; y < 24; y++) {
-      const row: ScreenCell[] = []
-      for (let x = 0; x < 28; x++) {
-        row.push({ character: ' ', colorPattern: 0, x, y })
-      }
-      this.screenBuffer.push(row)
-    }
-    this.cursorX = 0
-    this.cursorY = 0
-  }
-
-  // === WEB WORKER MANAGEMENT ===
-  private worker: Worker | null = null
-  private messageId = 0
-  private pendingMessages = new Map<string, {
-    resolve: (result: ExecutionResult) => void
-    reject: (error: Error) => void
-    timeout: NodeJS.Timeout
-  }>()
-
 
   // === WEB WORKER MANAGEMENT METHODS ===
 
@@ -77,69 +43,22 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
    * Check if web workers are supported
    */
   static isSupported(): boolean {
-    const supported = typeof Worker !== 'undefined'
-    console.log('🔍 [WEB_WORKER] isSupported check:', {
-      hasWorker: typeof Worker !== 'undefined',
-      supported
-    })
-    return supported
+    return WebWorkerManager.isSupported()
   }
 
   /**
    * Check if we're currently running in a web worker context
    */
   static isInWebWorker(): boolean {
-    const inWebWorker = typeof window === 'undefined' && typeof self !== 'undefined'
-    console.log('🔍 [WEB_WORKER] isInWebWorker check:', {
-      hasWindow: typeof window !== 'undefined',
-      hasSelf: typeof self !== 'undefined',
-      inWebWorker
-    })
-    return inWebWorker
+    return WebWorkerManager.isInWebWorker()
   }
 
   /**
    * Initialize the web worker
    */
   async initialize(workerScript?: string): Promise<void> {
-    console.log('🔧 [WEB_WORKER] WebWorkerDeviceAdapter.initialize called with script:', workerScript)
-    if (!WebWorkerDeviceAdapter.isSupported()) {
-      console.error('❌ [WEB_WORKER] Web workers are not supported in this environment')
-      throw new Error('Web workers are not supported in this environment')
-    }
-
-    if (this.worker) {
-      console.log('✅ [WEB_WORKER] Worker already initialized')
-      return // Already initialized
-    }
-
-    const script = workerScript || DEFAULTS.WEB_WORKER.WORKER_SCRIPT
-    console.log('🔧 [WEB_WORKER] Creating worker with script:', script)
-    
-    try {
-      this.worker = new Worker(script)
-      console.log('✅ [WEB_WORKER] Worker created successfully')
-    } catch (error) {
-      console.error('❌ [WEB_WORKER] Failed to create worker:', error)
-      throw error
-    }
-    
-    // Set up message handling
+    await this.webWorkerManager.initialize(workerScript)
     this.setupMessageListener()
-    
-    // Handle worker errors
-    this.worker.onerror = (error) => {
-      console.error('❌ [WEB_WORKER] Web worker error:', error)
-      this.rejectAllPending('Web worker error: ' + error.message)
-    }
-
-    // Handle worker termination
-    this.worker.onmessageerror = (error) => {
-      console.error('❌ [WEB_WORKER] Web worker message error:', error)
-      this.rejectAllPending('Web worker message error')
-    }
-    
-    console.log('✅ [WEB_WORKER] Worker initialization completed successfully')
   }
 
   /**
@@ -150,59 +69,8 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     config: InterpreterConfig,
     options: WebWorkerExecutionOptions = {}
   ): Promise<ExecutionResult> {
-    console.log('executeInWorker called with code:', code.substring(0, 50) + '...')
-    if (!this.worker) {
-      console.log('Worker not initialized, initializing...')
-      await this.initialize(DEFAULTS.WEB_WORKER.WORKER_SCRIPT)
-    }
-
-    if (!this.worker) {
-      throw new Error('Failed to initialize web worker')
-    }
-
-    const messageId = (++this.messageId).toString()
-    const timeout = options.timeout || DEFAULTS.WEB_WORKER.MESSAGE_TIMEOUT
-    console.log('Sending message with ID:', messageId, 'timeout:', timeout)
-
-    return new Promise<ExecutionResult>((resolve, reject) => {
-      // Set up timeout
-      const timeoutHandle = setTimeout(() => {
-        console.log('Web worker timeout after', timeout, 'ms for message ID:', messageId)
-        this.pendingMessages.delete(messageId)
-        reject(new Error(`Web worker execution timeout after ${timeout}ms`))
-      }, timeout)
-
-      // Store pending message
-      this.pendingMessages.set(messageId, {
-        resolve,
-        reject,
-        timeout: timeoutHandle
-      })
-
-      // Send execution message
-      const message: ExecuteMessage = {
-        type: 'EXECUTE',
-        id: messageId,
-        timestamp: Date.now(),
-        data: { 
-          code, 
-          config,
-          options: {
-            timeout,
-            enableProgress: options.onProgress !== undefined
-          }
-        }
-      }
-
-      console.log('🔄 [MAIN→WORKER] Posting message to worker:', {
-        type: message.type,
-        id: message.id,
-        timestamp: message.timestamp,
-        dataSize: JSON.stringify(message.data).length,
-        hasDeviceAdapter: !!config.deviceAdapter
-      })
-      this.worker!.postMessage(message)
-      console.log('✅ [MAIN→WORKER] Message posted to worker successfully')
+    return this.webWorkerManager.executeInWorker(code, config, options, (message) => {
+      this.handleWorkerMessage(message)
     })
   }
 
@@ -210,33 +78,15 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
    * Stop execution in the web worker
    */
   stopExecution(): void {
-    if (!this.worker) return
-
-    const message: StopMessage = {
-      type: 'STOP',
-      id: 'stop',
-      timestamp: Date.now(),
-      data: {
-        executionId: 'current',
-        reason: 'user_request'
-      }
-    }
-
-    console.log('🛑 [MAIN→WORKER] Posting STOP message to worker:', {
-      type: message.type,
-      id: message.id,
-      timestamp: message.timestamp,
-      reason: message.data.reason
-    })
-    this.worker.postMessage(message)
-    console.log('✅ [MAIN→WORKER] STOP message posted to worker successfully')
+    this.webWorkerManager.stopExecution()
   }
 
   /**
    * Send a STRIG event to the web worker
    */
   sendStrigEvent(joystickId: number, state: number): void {
-    if (!this.worker) {
+    const worker = this.webWorkerManager.getWorker()
+    if (!worker) {
       console.log('🔌 [WEB_WORKER] No worker available for STRIG event')
       return
     }
@@ -258,27 +108,22 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       messageId: message.id
     })
     
-    this.worker.postMessage(message)
+    worker.postMessage(message)
   }
 
   /**
    * Send a message to the web worker
    */
   sendMessage(message: AnyServiceWorkerMessage): void {
-    if (this.worker) {
-      this.worker.postMessage(message)
-    }
+    this.webWorkerManager.sendMessage(message)
   }
 
   /**
    * Terminate the web worker
    */
   terminate(): void {
-    if (this.worker) {
-      this.worker.terminate()
-      this.worker = null
-      this.rejectAllPending('Web worker terminated')
-    }
+    this.webWorkerManager.terminate()
+    this.messageHandler.rejectAllPending('Web worker terminated')
   }
 
   // === DEVICE ADAPTER METHODS ===
@@ -356,79 +201,21 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       id: `output-${Date.now()}`,
       timestamp: Date.now(),
       data: {
-        executionId: this.currentExecutionId || 'unknown',
+        executionId: this.screenStateManager.getCurrentExecutionId() || 'unknown',
         output: output,
         outputType: 'print',
         timestamp: Date.now()
       }
     })
     
-    // Process all characters and update screen buffer (no individual messages)
+    // Process all characters and update screen buffer
     for (const char of output) {
-      this.writeCharacterToScreen(char)
+      this.screenStateManager.writeCharacter(char)
     }
     
     // Send a single 'full' screen buffer update after processing all characters
-    this.sendFullScreenUpdate()
-  }
-  
-  private writeCharacterToScreen(char: string): void {
-    // Handle newline
-    if (char === '\n') {
-      this.cursorX = 0
-      this.cursorY++
-      if (this.cursorY >= 24) {
-        // Scroll screen up (simple implementation: reset to top)
-        this.cursorY = 0
-      }
-      return
-    }
-    
-    // Write character at cursor position
-    if (this.cursorY < 24 && this.cursorX < 28) {
-      if (!this.screenBuffer[this.cursorY]) {
-        this.screenBuffer[this.cursorY] = []
-      }
-      const row = this.screenBuffer[this.cursorY]!
-      let cell = row[this.cursorX]
-      if (!cell) {
-        cell = {
-          character: ' ',
-          colorPattern: 0,
-          x: this.cursorX,
-          y: this.cursorY
-        }
-        row[this.cursorX] = cell
-      }
-      cell.character = char
-      
-      // Advance cursor
-      this.cursorX++
-      if (this.cursorX >= 28) {
-        this.cursorX = 0
-        this.cursorY++
-        if (this.cursorY >= 24) {
-          // Scroll screen up (simple implementation: reset to top)
-          this.cursorY = 0
-        }
-      }
-    }
-  }
-  
-  private sendFullScreenUpdate(): void {
-    self.postMessage({
-      type: 'SCREEN_UPDATE',
-      id: `screen-full-${Date.now()}`,
-      timestamp: Date.now(),
-      data: {
-        executionId: this.currentExecutionId || 'unknown',
-        updateType: 'full',
-        screenBuffer: this.screenBuffer,
-        cursorX: this.cursorX,
-        cursorY: this.cursorY,
-        timestamp: Date.now()
-      }
-    } as ScreenUpdateMessage)
+    const updateMessage = this.screenStateManager.createFullScreenUpdateMessage()
+    self.postMessage(updateMessage)
   }
 
   debugOutput(output: string): void {
@@ -439,7 +226,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       id: `debug-${Date.now()}`,
       timestamp: Date.now(),
       data: {
-        executionId: this.currentExecutionId || 'unknown',
+        executionId: this.screenStateManager.getCurrentExecutionId() || 'unknown',
         output: output,
         outputType: 'debug',
         timestamp: Date.now()
@@ -455,7 +242,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       id: `error-${Date.now()}`,
       timestamp: Date.now(),
       data: {
-        executionId: this.currentExecutionId || 'unknown',
+        executionId: this.screenStateManager.getCurrentExecutionId() || 'unknown',
         output: output,
         outputType: 'error',
         timestamp: Date.now()
@@ -466,196 +253,76 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   clearScreen(): void {
     console.log('🔌 [WEB_WORKER_DEVICE] Clear screen')
     // Clear screen buffer
-    this.initializeScreen()
+    this.screenStateManager.initializeScreen()
     
     // Send clear update
-    self.postMessage({
-      type: 'SCREEN_UPDATE',
-      id: `screen-clear-${Date.now()}`,
-      timestamp: Date.now(),
-      data: {
-        executionId: this.currentExecutionId || 'unknown',
-        updateType: 'clear',
-        timestamp: Date.now()
-      }
-    } as ScreenUpdateMessage)
+    const updateMessage = this.screenStateManager.createClearScreenUpdateMessage()
+    self.postMessage(updateMessage)
   }
 
   setCursorPosition(x: number, y: number): void {
     console.log('🔌 [WEB_WORKER_DEVICE] Set cursor position:', { x, y })
     
-    // Validate ranges
-    if (x < 0 || x > 27 || y < 0 || y > 23) {
-      console.warn(`🔌 [WEB_WORKER_DEVICE] Invalid cursor position: (${x}, ${y}), clamping to valid range`)
-      x = Math.max(0, Math.min(27, x))
-      y = Math.max(0, Math.min(23, y))
-    }
-    
-    // Update cursor position
-    this.cursorX = x
-    this.cursorY = y
+    this.screenStateManager.setCursorPosition(x, y)
     
     // Send cursor update
-    self.postMessage({
-      type: 'SCREEN_UPDATE',
-      id: `screen-cursor-${Date.now()}`,
-      timestamp: Date.now(),
-      data: {
-        executionId: this.currentExecutionId || 'unknown',
-        updateType: 'cursor',
-        cursorX: x,
-        cursorY: y,
-        timestamp: Date.now()
-      }
-    } as ScreenUpdateMessage)
+    const updateMessage = this.screenStateManager.createCursorUpdateMessage()
+    self.postMessage(updateMessage)
   }
 
   setColorPattern(x: number, y: number, pattern: number): void {
     console.log('🔌 [WEB_WORKER_DEVICE] Set color pattern:', { x, y, pattern })
     
-    // Validate ranges
-    if (x < 0 || x > 27 || y < 0 || y > 23) {
-      console.warn(`🔌 [WEB_WORKER_DEVICE] Invalid color position: (${x}, ${y}), clamping to valid range`)
-      x = Math.max(0, Math.min(27, x))
-      y = Math.max(0, Math.min(23, y))
-    }
-    
-    if (pattern < 0 || pattern > 3) {
-      console.warn(`🔌 [WEB_WORKER_DEVICE] Invalid color pattern: ${pattern}, clamping to valid range (0-3)`)
-      pattern = Math.max(0, Math.min(3, pattern))
-    }
-    
-    // Calculate the 2×2 area containing position (x, y)
-    // Based on manual page 70: For COLOR 10, 10, 3, the area includes:
-    // - Column 10, 9th line (A) = (10, 8) in 0-indexed
-    // - Column 11, 9th line (B) = (11, 8)
-    // - Column 10, 10th line (C) = (10, 9)
-    // - Column 11, 10th line (D) = (11, 9)
-    // So for position (x, y), the area is:
-    // - Top-left: (areaX, areaY - 1) if areaY > 0, else (areaX, 0)
-    // - Top-right: (areaX + 1, areaY - 1) if areaY > 0, else (areaX + 1, 0)
-    // - Bottom-left: (areaX, areaY)
-    // - Bottom-right: (areaX + 1, areaY)
-    // Where areaX = Math.floor(x / 2) * 2 (round down to even)
-    const areaX = Math.floor(x / 2) * 2  // Round down to even number (0, 2, 4, ...)
-    const areaY = y  // The y coordinate itself is the bottom row of the area
-    
-    // Update color pattern for all 4 cells in the 2×2 area
-    const cellsToUpdate: Array<{ x: number; y: number; pattern: number }> = []
-    
-    // Top-left: (areaX, areaY - 1) or (areaX, 0) if areaY is 0
-    const topY = areaY > 0 ? areaY - 1 : 0
-    if (areaX < 28 && topY < 24) {
-      const cell = this.screenBuffer[topY]?.[areaX]
-      if (cell) {
-        cell.colorPattern = pattern
-        cellsToUpdate.push({ x: areaX, y: topY, pattern })
-      }
-    }
-    
-    // Top-right: (areaX + 1, areaY - 1) or (areaX + 1, 0) if areaY is 0
-    if (areaX + 1 < 28 && topY < 24) {
-      const row = this.screenBuffer[topY]
-      const cell = row?.[areaX + 1]
-      if (cell) {
-        cell.colorPattern = pattern
-        cellsToUpdate.push({ x: areaX + 1, y: topY, pattern })
-      }
-    }
-    
-    // Bottom-left: (areaX, areaY)
-    if (areaX < 28 && areaY < 24) {
-      const row = this.screenBuffer[areaY]
-      const cell = row?.[areaX]
-      if (cell) {
-        cell.colorPattern = pattern
-        cellsToUpdate.push({ x: areaX, y: areaY, pattern })
-      }
-    }
-    
-    // Bottom-right: (areaX + 1, areaY)
-    if (areaX + 1 < 28 && areaY < 24) {
-      const row = this.screenBuffer[areaY]
-      const cell = row?.[areaX + 1]
-      if (cell) {
-        cell.colorPattern = pattern
-        cellsToUpdate.push({ x: areaX + 1, y: areaY, pattern })
-      }
-    }
+    const cellsToUpdate = this.screenStateManager.setColorPattern(x, y, pattern)
     
     // Send screen update with color pattern changes
-    self.postMessage({
-      type: 'SCREEN_UPDATE',
-      id: `screen-color-${Date.now()}`,
-      timestamp: Date.now(),
-      data: {
-        executionId: this.currentExecutionId || 'unknown',
-        updateType: 'color',
-        colorUpdates: cellsToUpdate,
-        timestamp: Date.now()
-      }
-    } as ScreenUpdateMessage)
+    const updateMessage = this.screenStateManager.createColorUpdateMessage(cellsToUpdate)
+    self.postMessage(updateMessage)
   }
 
   setColorPalette(bgPalette: number, spritePalette: number): void {
     console.log('🔌 [WEB_WORKER_DEVICE] Set color palette:', { bgPalette, spritePalette })
     
-    // Validate ranges
-    if (bgPalette < 0 || bgPalette > 1) {
-      console.warn(`🔌 [WEB_WORKER_DEVICE] Invalid background palette: ${bgPalette}, clamping to valid range (0-1)`)
-      bgPalette = Math.max(0, Math.min(1, bgPalette))
-    }
-    
-    if (spritePalette < 0 || spritePalette > 2) {
-      console.warn(`🔌 [WEB_WORKER_DEVICE] Invalid sprite palette: ${spritePalette}, clamping to valid range (0-2)`)
-      spritePalette = Math.max(0, Math.min(2, spritePalette))
-    }
-    
-    // Update palette state
-    this.bgPalette = bgPalette
-    this.spritePalette = spritePalette
+    this.screenStateManager.setColorPalette(bgPalette, spritePalette)
     
     // Send palette update message
-    // Note: The UI will need to handle this update type to apply the palette
-    // For now, we'll send it as a screen update with a new updateType
-    self.postMessage({
-      type: 'SCREEN_UPDATE',
-      id: `screen-palette-${Date.now()}`,
-      timestamp: Date.now(),
-      data: {
-        executionId: this.currentExecutionId || 'unknown',
-        updateType: 'palette',
-        bgPalette,
-        spritePalette,
-        timestamp: Date.now()
-      }
-    } as ScreenUpdateMessage)
+    const updateMessage = this.screenStateManager.createPaletteUpdateMessage()
+    self.postMessage(updateMessage)
+  }
+
+  setBackdropColor(colorCode: number): void {
+    console.log('🔌 [WEB_WORKER_DEVICE] Set backdrop color:', colorCode)
+    
+    this.screenStateManager.setBackdropColor(colorCode)
+    
+    // Send backdrop color update message
+    const updateMessage = this.screenStateManager.createBackdropUpdateMessage()
+    self.postMessage(updateMessage)
+  }
+
+  setCharacterGeneratorMode(mode: number): void {
+    console.log('🔌 [WEB_WORKER_DEVICE] Set character generator mode:', mode)
+    
+    this.screenStateManager.setCharacterGeneratorMode(mode)
+    
+    // Send CGEN update message
+    const updateMessage = this.screenStateManager.createCgenUpdateMessage()
+    self.postMessage(updateMessage)
   }
 
   /**
    * Set the current execution ID (called by WebWorkerInterpreter)
    */
   setCurrentExecutionId(executionId: string | null): void {
-    this.currentExecutionId = executionId
+    this.screenStateManager.setCurrentExecutionId(executionId)
     // Clear screen when starting new execution
     if (executionId) {
-      this.initializeScreen()
-      this.sendScreenClear()
+      this.screenStateManager.initializeScreen()
+      const updateMessage = this.screenStateManager.createClearScreenUpdateMessage()
+      self.postMessage(updateMessage)
     }
   }
-  
-  private sendScreenClear(): void {
-    self.postMessage({
-      type: 'SCREEN_UPDATE',
-      id: `screen-clear-${Date.now()}`,
-      timestamp: Date.now(),
-      data: {
-        executionId: this.currentExecutionId || 'unknown',
-        updateType: 'clear',
-        timestamp: Date.now()
-      }
-    } as ScreenUpdateMessage)
-  }
+
   // === PRIVATE METHODS ===
 
   /**
@@ -664,9 +331,9 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   private setupMessageListener(): void {
     if (typeof window === 'undefined') return // Not in main thread
 
-    // Use worker.onmessage instead of window.addEventListener
-    if (this.worker) {
-      this.worker.onmessage = (event) => {
+    const worker = this.webWorkerManager.getWorker()
+    if (worker) {
+      worker.onmessage = (event) => {
         console.log('📨 [WORKER→MAIN] Main thread received message from worker:', {
           type: event.data.type,
           id: event.data.id,
@@ -683,84 +350,9 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
    * Handle messages from the web worker
    */
   private handleWorkerMessage(message: AnyServiceWorkerMessage): void {
-    console.log('🔍 [MAIN] Processing worker message:', {
-      type: message.type,
-      id: message.id,
-      timestamp: message.timestamp
+    this.messageHandler.handleWorkerMessage(message, (outputMessage) => {
+      this.handleOutputMessage(outputMessage)
     })
-    
-    // Handle OUTPUT and SCREEN_UPDATE messages separately as they don't have pending message IDs
-    if (message.type === 'OUTPUT') {
-      console.log('📤 [MAIN] Handling OUTPUT message:', {
-        outputType: (message as OutputMessage).data.outputType,
-        outputLength: (message as OutputMessage).data.output.length
-      })
-      this.handleOutputMessage(message as OutputMessage)
-      return
-    }
-    
-    // SCREEN_UPDATE messages are handled by the composable directly via worker.onmessage
-    // They don't need to be processed here, just pass through
-    if (message.type === 'SCREEN_UPDATE') {
-      console.log('🖥️ [MAIN] SCREEN_UPDATE message received (handled by composable):', {
-        updateType: (message as ScreenUpdateMessage).data.updateType
-      })
-      return
-    }
-    
-    const pending = this.pendingMessages.get(message.id)
-    if (!pending) {
-      console.log('⚠️ [MAIN] No pending message found for ID:', message.id)
-      return
-    }
-
-    console.log('✅ [MAIN] Found pending message for ID:', message.id)
-    switch (message.type) {
-      case 'RESULT': {
-        const resultMessage = message as ResultMessage
-        console.log('📊 [MAIN] Received RESULT message:', {
-          success: resultMessage.data.success,
-          executionTime: resultMessage.data.executionTime
-        })
-        clearTimeout(pending.timeout)
-        this.pendingMessages.delete(message.id)
-        
-        // Check if web worker indicates fallback is needed
-        if (resultMessage.data.errors?.some(error => error.message.includes('not yet fully implemented'))) {
-          console.log('⚠️ [MAIN] Web worker indicates fallback needed, rejecting to trigger fallback')
-          // Web worker can't handle the execution, reject to trigger fallback
-          pending.reject(new Error('Web worker execution not implemented, falling back to main thread'))
-        } else {
-          console.log('✅ [MAIN] Web worker result is valid, resolving pending promise')
-          pending.resolve(resultMessage.data)
-        }
-        break
-      }
-
-      case 'ERROR': {
-        const errorMessage = message as ErrorMessage
-        console.log('❌ [MAIN] Received ERROR message:', {
-          message: errorMessage.data.message,
-          errorType: errorMessage.data.errorType,
-          recoverable: errorMessage.data.recoverable
-        })
-        clearTimeout(pending.timeout)
-        this.pendingMessages.delete(message.id)
-        console.log('❌ [MAIN] Rejecting pending promise due to error')
-        pending.reject(new Error(errorMessage.data.message))
-        break
-      }
-
-      case 'PROGRESS': {
-        // Handle progress updates if needed
-        const progressMessage = message as ProgressMessage
-        console.log('📈 [MAIN] Received PROGRESS message:', {
-          progress: progressMessage.data.progress
-        })
-        // Could emit progress events here
-        break
-      }
-    }
   }
 
   /**
@@ -775,16 +367,4 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     // Output is now handled by the device adapter in the web worker
     // No need to forward to main thread callbacks
   }
-
-  /**
-   * Reject all pending messages (cleanup)
-   */
-  private rejectAllPending(reason: string): void {
-    for (const [_id, pending] of this.pendingMessages) {
-      clearTimeout(pending.timeout)
-      pending.reject(new Error(reason))
-    }
-    this.pendingMessages.clear()
-  }
 }
-

@@ -66,6 +66,8 @@ export interface BasicDeviceAdapter {
   setCursorPosition(x: number, y: number): void
   setColorPattern(x: number, y: number, pattern: number): void
   setColorPalette(bgPalette: number, spritePalette: number): void
+  setBackdropColor(colorCode: number): void
+  setCharacterGeneratorMode(mode: number): void
 }
 
 /**
@@ -242,7 +244,7 @@ export interface ScreenUpdateMessage extends ServiceWorkerMessage {
   type: 'SCREEN_UPDATE'
   data: {
     executionId: string
-    updateType: 'character' | 'cursor' | 'clear' | 'full' | 'color' | 'palette'
+    updateType: 'character' | 'cursor' | 'clear' | 'full' | 'color' | 'palette' | 'cgen' | 'backdrop'
     x?: number
     y?: number
     character?: string
@@ -252,6 +254,8 @@ export interface ScreenUpdateMessage extends ServiceWorkerMessage {
     colorUpdates?: Array<{ x: number; y: number; pattern: number }>
     bgPalette?: number
     spritePalette?: number
+    backdropColor?: number
+    cgenMode?: number
     timestamp: number
   }
 }

@@ -25,6 +25,7 @@ interface Props {
   cursorX?: number
   cursorY?: number
   bgPalette?: number
+  backdropColor?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -45,7 +46,8 @@ const props = withDefaults(defineProps<Props>(), {
   },
   cursorX: 0,
   cursorY: 0,
-  bgPalette: 1
+  bgPalette: 1,
+  backdropColor: 0
 })
 
 const outputRef = ref<HTMLDivElement>()
@@ -90,6 +92,7 @@ watch(() => props.output.length, scrollToBottom)
             :cursor-x="cursorX"
             :cursor-y="cursorY"
             :bg-palette="bgPalette"
+            :backdrop-color="backdropColor"
           />
         </div>
       </GameTabPane>

@@ -35,7 +35,10 @@ describe.skipIf(!shouldRunPauseDemoTests)('Pause Demo Program', () => {
       errorOutput: () => {},
       clearScreen: () => {},
       setCursorPosition: () => {},
-      setColorPattern: () => {}
+      setColorPattern: () => {},
+      setColorPalette: () => {},
+      setBackdropColor: () => {},
+      setCharacterGeneratorMode: () => {}
     }
 
     interpreter = new BasicInterpreter({

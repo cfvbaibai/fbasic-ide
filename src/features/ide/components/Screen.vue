@@ -17,6 +17,7 @@ interface Props {
   cursorX: number
   cursorY: number
   bgPalette?: number
+  backdropColor?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -34,7 +35,8 @@ const props = withDefaults(defineProps<Props>(), {
   },
   cursorX: 0,
   cursorY: 0,
-  bgPalette: 1
+  bgPalette: 1,
+  backdropColor: 0
 })
 
 // Canvas reference
@@ -45,9 +47,9 @@ const paletteCode = computed(() => props.bgPalette ?? 1)
 // Zoom state - default to 2x (current scale)
 const zoomLevel = ref<1 | 2 | 3 | 4>(2)
 
-// Base canvas dimensions
-const BASE_WIDTH = 240
-const BASE_HEIGHT = 208
+// Base canvas dimensions (full backdrop/sprite screen: 256×240)
+const BASE_WIDTH = 256
+const BASE_HEIGHT = 240
 
 // Computed canvas display dimensions based on zoom
 const canvasWidth = computed(() => BASE_WIDTH * zoomLevel.value)
@@ -69,11 +71,20 @@ function setZoom(level: 1 | 2 | 3 | 4): void {
 // Direct rendering function (no Vue reactivity overhead)
 function render(): void {
   if (!screenCanvas.value) return
-  renderScreenBuffer(screenCanvas.value, props.screenBuffer, paletteCode.value)
+  renderScreenBuffer(
+    screenCanvas.value,
+    props.screenBuffer,
+    paletteCode.value,
+    props.backdropColor ?? 0
+  )
 }
 
-// Watch paletteCode changes to trigger re-render
+// Watch paletteCode and backdropColor changes to trigger re-render
 watch(paletteCode, () => {
+  scheduleRender()
+})
+
+watch(() => props.backdropColor, () => {
   scheduleRender()
 })
 
@@ -123,8 +134,8 @@ watchEffect(() => {
           <canvas
             ref="screenCanvas"
             class="screen-canvas"
-            :width="240"
-            :height="208"
+            :width="256"
+            :height="240"
             :style="{
               width: `${canvasWidth}px`,
               height: `${canvasHeight}px`

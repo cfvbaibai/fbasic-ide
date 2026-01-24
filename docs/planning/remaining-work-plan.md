@@ -1,6 +1,6 @@
 # Remaining Work Plan
 
-**Date**: 2024  
+**Date**: 2026-01-24  
 **Status**: Active  
 **Purpose**: Comprehensive plan for completing the Family Basic IDE project
 
@@ -43,12 +43,13 @@ This document outlines the remaining work needed to complete the Family Basic ID
 - ✅ **Control Flow**: PRINT, LET, IF-THEN, FOR-NEXT, GOTO, GOSUB, RETURN, END, ON
 - ✅ **Data Management**: DATA, READ, RESTORE, DIM
 - ✅ **Program Control**: PAUSE, REM
-- ✅ **Screen Control**: CLS, LOCATE, COLOR, CGSET
+- ✅ **Screen Control**: CLS, LOCATE, COLOR, CGSET, CGEN
+- ✅ **Backdrop Screen**: Full backdrop screen implementation (32×30, infrastructure for PALET B ready)
 - ✅ **Functions**: ABS, SGN, RND, VAL, LEN, LEFT$, RIGHT$, MID$, STR$, HEX$, CHR$, ASC
 - ✅ **Operators**: Arithmetic, comparison, logical operators
 - ✅ **Input Functions**: STICK, STRIG (controller input)
 
-**Status**: Core language features implemented, remaining screen commands (CGEN, VIEW) and input commands missing.
+**Status**: Core language features implemented, remaining screen commands (VIEW, PALET B) and input commands missing.
 
 ---
 
@@ -96,7 +97,7 @@ This document outlines the remaining work needed to complete the Family Basic ID
 
 ### Phase 2: Implement Missing F-BASIC Screen Commands (High Priority)
 
-**Estimated Effort**: 2-4 days remaining (COLOR completed)  
+**Estimated Effort**: 1-2 days remaining (COLOR ✅, CGSET ✅, CGEN ✅, Backdrop Screen ✅ completed)  
 **Priority**: High (core language features)
 
 #### 2.1 Screen Control Commands
@@ -133,11 +134,19 @@ This document outlines the remaining work needed to complete the Family Basic ID
 - [x] Add tests for CGSET command
 
 **CGEN** (Character Generator)
-- [ ] Add `CGEN` token to parser
-- [ ] Add `cgenStatement` rule (CGEN mode)
-- [ ] Create `CgenExecutor.ts`
-- [ ] Implement character generator mode in device adapter
-- [ ] Add tests for CGEN command
+- [x] Add `CGEN` token to parser
+- [x] Add `cgenStatement` rule (CGEN mode)
+- [x] Create `CgenExecutor.ts`
+- [x] Implement character generator mode in device adapter
+- [x] Add tests for CGEN command
+
+**PALET B** (Backdrop Color)
+- [ ] Add `PALET` token to parser (if not exists)
+- [ ] Add `paletStatement` rule (PALET {B|S} n, C1, C2, C3, C4)
+- [ ] Create `PaletExecutor.ts` (handle both PALET B and PALET S)
+- [ ] Implement backdrop color setting (PALET B 0, colorCode, ...)
+- [ ] Add tests for PALET B command
+- **Note**: Infrastructure already in place (`setBackdropColor()` method exists)
 
 **VIEW** (Display BG GRAPHIC)
 - [ ] Add `VIEW` token to parser
@@ -151,7 +160,8 @@ This document outlines the remaining work needed to complete the Family Basic ID
 - `src/core/execution/executors/LocateExecutor.ts` ✅
 - `src/core/execution/executors/ColorExecutor.ts` ✅
 - `src/core/execution/executors/CgsetExecutor.ts` ✅
-- `src/core/execution/executors/CgenExecutor.ts`
+- `src/core/execution/executors/CgenExecutor.ts` ✅
+- `src/core/execution/executors/PaletExecutor.ts` (PALET B/S support)
 - `src/core/execution/executors/ViewExecutor.ts`
 
 **Test Files Created**:
@@ -161,6 +171,8 @@ This document outlines the remaining work needed to complete the Family Basic ID
 - `test/executors/ColorExecutor.test.ts` ✅
 - `test/integration/ColorIntegration.test.ts` ✅
 - `test/executors/CgsetExecutor.test.ts` ✅
+- `test/integration/CgsetIntegration.test.ts` ✅
+- `test/executors/CgenExecutor.test.ts` ✅
 
 **Files to Modify**:
 - `src/core/parser/parser-tokens.ts` (add tokens)
@@ -172,7 +184,11 @@ This document outlines the remaining work needed to complete the Family Basic ID
 - `docs/reference/family-basic-manual/page-70.md` (LOCATE, COLOR)
 - `docs/reference/family-basic-manual/page-71.md` (CGEN, CLS)
 - `docs/reference/family-basic-manual/page-72.md` (CGSET)
+- `docs/reference/family-basic-manual/page-73.md` (PALET B/S)
+- `docs/reference/family-basic-manual/page-36.md` (Screen Display Process, Backdrop Screen)
 - `.claude/skills/fbasic-reference/references/screen.md`
+- `docs/device-models/screen/screen.md` (Screen Specification)
+- `docs/analysis/screen-model-manual-comparison.md` (Screen Model Verification)
 
 ---
 
@@ -307,14 +323,14 @@ This document outlines the remaining work needed to complete the Family Basic ID
 - [x] Test edge cases and boundary conditions (LOCATE, COLOR edge cases tested)
 
 #### 6.2 Type Checking
-- [ ] Ensure all new code passes `pnpm type-check`
-- [ ] Fix any TypeScript errors
-- [ ] Ensure strict template checking passes
+- [x] Ensure all new code passes `pnpm type-check`
+- [x] Fix any TypeScript errors
+- [x] Ensure strict template checking passes
 
 #### 6.3 Linting & Formatting
-- [ ] Run `pnpm lint` and fix all issues
-- [ ] Ensure consistent code style
-- [ ] Verify file size limits are respected
+- [x] Run `pnpm lint` and fix all issues
+- [x] Ensure consistent code style
+- [x] Verify file size limits are respected
 
 ---
 
@@ -384,7 +400,7 @@ This document outlines the remaining work needed to complete the Family Basic ID
 
 | Phase | Priority | Effort | Impact | Dependencies |
 |-------|----------|--------|--------|--------------|
-| Phase 2: Screen Commands | High | 1-3 days | High | None (COLOR ✅, CGSET ✅ completed) |
+| Phase 2: Screen Commands | High | 1-2 days | High | None (COLOR ✅, CGSET ✅, CGEN ✅ completed) |
 | Phase 3: Input Commands | High | 2-3 days | High | None |
 | Phase 6: Testing & QA | High | 2-3 days | High | Phases 2-3 |
 | Phase 1: Vue Best Practices | Low | 1 day | Low | None (mostly complete) |
@@ -398,28 +414,30 @@ This document outlines the remaining work needed to complete the Family Basic ID
 
 ### Minimum Viable Product (MVP)
 - ✅ Core language features (PRINT, LET, IF-THEN, FOR-NEXT, etc.)
-- [x] Screen commands (CLS ✅, LOCATE ✅, COLOR ✅, CGSET ✅)
+- [x] Screen commands (CLS ✅, LOCATE ✅, COLOR ✅, CGSET ✅, CGEN ✅, Backdrop Screen ✅)
 - [ ] Input commands (INPUT, LINPUT)
-- [x] Comprehensive test coverage (>80%) (LOCATE, COLOR, CGSET fully tested)
+- [x] Comprehensive test coverage (>80%) (LOCATE, COLOR, CGSET, CGEN fully tested)
 - [x] All TypeScript errors resolved
 - [x] All linting errors resolved
 
 ### Complete Product
-- [ ] All screen commands implemented (CGSET ✅, CGEN ⏳, VIEW ⏳)
+- [ ] All screen commands implemented (CGSET ✅, CGEN ✅, Backdrop Screen ✅, PALET B ⏳, VIEW ⏳)
 - [ ] All input commands implemented
 - [ ] Additional commands (STOP, CONT, SWAP, etc.)
 - [ ] Complete test coverage
 - [ ] Full documentation
 - [x] Vue best practices fully implemented (critical items complete)
+- [x] Code quality: File size limits respected (WebWorkerDeviceAdapter refactored)
 
 ---
 
 ## Timeline Estimate
 
-**Minimum (MVP)**: 6-10 days
-- Phase 2: Screen Commands (1-3 days remaining, COLOR ✅, CGSET ✅ completed)
+**Minimum (MVP)**: 5-8 days
+- Phase 2: Screen Commands (1-2 days remaining, COLOR ✅, CGSET ✅, CGEN ✅, Backdrop Screen ✅ completed)
+  - Remaining: PALET B executor/parser (infrastructure ready), VIEW command
 - Phase 3: Input Commands (2-3 days)
-- Phase 6: Testing & QA (2-3 days)
+- Phase 6: Testing & QA (1-2 days, mostly complete)
 
 **Complete**: 15-25 days
 - All phases above
@@ -451,9 +469,20 @@ This document outlines the remaining work needed to complete the Family Basic ID
 ### Technical Considerations
 
 - **Device Adapter**: Screen commands require device adapter updates
+  - ✅ **Refactored**: `WebWorkerDeviceAdapter` split into focused modules for better maintainability
+  - ✅ **File Size**: All device adapter files now respect 500-line limit
+  - ✅ **Modules Created**: 
+    - `WebWorkerManager.ts` - Web worker lifecycle management
+    - `ScreenStateManager.ts` - Screen buffer and state management
+    - `MessageHandler.ts` - Message routing and handling
+  - ✅ **Separation of Concerns**: Clear boundaries between web worker management, screen state, and message handling
 - **UI Integration**: Input commands require UI components for prompts
 - **Testing**: Screen commands may require visual testing
 - **Performance**: Consider performance impact of screen updates
+- **Code Quality**: 
+  - ✅ File size limits enforced and respected
+  - ✅ TypeScript strict mode compliance
+  - ✅ Linting standards maintained
 
 ---
 
@@ -465,10 +494,69 @@ This document outlines the remaining work needed to complete the Family Basic ID
 
 ---
 
-**Last Updated**: 2026-01-23  
-**Next Review**: After Phase 2 completion
+**Last Updated**: 2026-01-24  
+**Next Review**: After Phase 2 completion (VIEW command, PALET B command)
 
 ## Recent Updates
+
+### Backdrop Screen Implementation (2026-01-24)
+- ✅ **Canvas Dimensions**: Extended canvas from 240×208 to 256×240 pixels (full backdrop/sprite screen size)
+- ✅ **Backdrop Rendering**: Implemented proper 32×30 character backdrop screen rendering
+  - Backdrop screen: 32×30 characters = 256×240 pixels
+  - Background screen positioned at offset (16, 24) within backdrop
+  - Backdrop rendered as solid color (default: black, color code 0)
+- ✅ **State Management**: Added backdrop color state to device adapters
+  - Added `backdropColor` state (default: 0 = black)
+  - Added `setBackdropColor()` method to `BasicDeviceAdapter` interface
+  - Implemented in `WebWorkerDeviceAdapter` and `TestDeviceAdapter`
+- ✅ **Message Handling**: Extended `ScreenUpdateMessage` interface to support 'backdrop' update type
+  - Added backdrop color to message handlers
+  - Updated `useBasicIdeMessageHandlers.ts` to handle backdrop color updates
+- ✅ **Component Updates**: Updated all screen components to support backdrop color
+  - `Screen.vue`: Accepts `backdropColor` prop, passes to renderer
+  - `RuntimeOutput.vue`: Passes backdrop color to Screen component
+  - `IdePage.vue`: Connects backdrop color state to components
+  - Added watchers to re-render when backdrop color changes
+- ✅ **Rendering Logic**: Updated `canvasRenderer.ts` to properly render backdrop layer
+  - Backdrop rendered first (solid color fill)
+  - Background screen rendered on top at correct offset
+  - Proper layer ordering maintained
+- ⏳ **PALET B Command**: Infrastructure ready, executor/parser implementation pending
+  - `setBackdropColor()` method available in device adapters
+  - Message handling supports backdrop color updates
+  - Need to add PALET B parser rule and executor
+
+**Status**: Backdrop screen fully implemented. PALET B command infrastructure ready, only executor/parser needed for dynamic backdrop color changes.
+
+### CGEN Command Implementation & WebWorkerDeviceAdapter Refactoring (2026-01-24)
+- ✅ **Parser**: Added `CGEN` token and `cgenStatement` rule (CGEN n, where n is 0-3)
+- ✅ **Executor**: Created `CgenExecutor.ts` with full validation (mode: 0-3)
+  - Mode 0: Character table A on BG, A on sprite
+  - Mode 1: Character table A on BG, B on sprite
+  - Mode 2: Character table B on BG, A on sprite (default)
+  - Mode 3: Character table B on BG, B on sprite
+- ✅ **Device Adapter**: Implemented `setCharacterGeneratorMode()` in device adapters
+  - Added to `BasicDeviceAdapter` interface
+  - Implemented in `WebWorkerDeviceAdapter` and `TestDeviceAdapter`
+  - Sends 'cgen' update messages with cgenMode value
+- ✅ **Message Handler**: Added 'cgen' update type handling in `useBasicIdeMessageHandlers.ts`
+- ✅ **Integration**: Registered CGEN in `StatementRouter.ts`
+- ✅ **Interface Updates**: Extended `ScreenUpdateMessage` interface to support 'cgen' update type
+- ✅ **Testing**: 
+  - 13 unit tests in `CgenExecutor.test.ts` covering all modes, expressions, error handling, and integration
+  - All tests pass with proper TypeScript types
+- ✅ **Code Quality**: Refactored `WebWorkerDeviceAdapter.ts` to address file size limit
+  - Split 849-line file into focused modules:
+    - `WebWorkerDeviceAdapter.ts` (370 lines) - Main adapter class
+    - `WebWorkerManager.ts` (242 lines) - Web worker lifecycle management
+    - `ScreenStateManager.ts` (382 lines) - Screen buffer and state management
+    - `MessageHandler.ts` (127 lines) - Message routing and handling
+  - All files now under 500-line limit
+  - Improved separation of concerns and maintainability
+- ✅ **Type Safety**: All code uses proper TypeScript types, no `any` types
+- ✅ **Linting**: All lint errors resolved, file size limits respected
+
+**Status**: CGEN command fully implemented and tested. WebWorkerDeviceAdapter successfully refactored into maintainable modules.
 
 ### CGSET Command Implementation & Palette Rendering Fix (2026-01-23)
 - ✅ **Parser**: Added `CGSET` token and `cgsetStatement` rule (CGSET [m][,n])

@@ -22,6 +22,8 @@ export interface MessageHandlerContext {
   cursorX: Ref<number>
   cursorY: Ref<number>
   bgPalette: Ref<number>
+  backdropColor?: Ref<number>
+  cgenMode?: Ref<number>
   webWorkerManager: WebWorkerManager
 }
 
@@ -180,6 +182,22 @@ export function handleScreenUpdateMessage(
         // Note: spritePalette is stored but not currently used in rendering
         // It will be used when sprite system is implemented
         console.log('🖥️ [COMPOSABLE] Updated sprite palette:', update.spritePalette)
+      }
+      break
+    case 'backdrop':
+      // Update backdrop color
+      if (update.backdropColor !== undefined && context.backdropColor) {
+        context.backdropColor.value = update.backdropColor
+        console.log('🖥️ [COMPOSABLE] Updated backdrop color:', update.backdropColor)
+      }
+      break
+    case 'cgen':
+      // Update character generator mode
+      if (update.cgenMode !== undefined) {
+        if (context.cgenMode) {
+          context.cgenMode.value = update.cgenMode
+        }
+        console.log('🖥️ [COMPOSABLE] Updated character generator mode:', update.cgenMode)
       }
       break
   }
