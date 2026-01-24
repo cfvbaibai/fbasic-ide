@@ -26,6 +26,12 @@ export const skinConfigs: Record<SkinName, SkinConfig> = {
   },
   'classic-light': {
     isLightTheme: true
+  },
+  'y2k-futuristic': {
+    isLightTheme: false
+  },
+  'sunset-vaporwave': {
+    isLightTheme: false
   }
 }
 

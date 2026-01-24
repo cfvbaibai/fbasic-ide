@@ -140,4 +140,5 @@ const iconColorValue = computed(() => props.iconColor)
   opacity: 0.8;
   transition: all 0.3s ease;
 }
+
 </style>

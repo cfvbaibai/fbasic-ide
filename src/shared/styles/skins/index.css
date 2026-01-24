@@ -13,3 +13,11 @@
  * 
  * Default skin (current theme) is defined in theme.css :root
  */
+
+/* Import all available skins */
+@import './default.css';
+@import './classic-light.css';
+@import './nintendo.css';
+@import './retro-blue.css';
+@import './y2k-futuristic.css';
+@import './sunset-vaporwave.css';

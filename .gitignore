@@ -23,6 +23,16 @@ coverage
 # Vitest cache
 .vitest
 
+# Python cache
+__pycache__/
+
+# Python build info
+*.pyc
+*.pyo
+*.pyd
+*.pyw
+*.pyz
+
 # Environment variables
 .env
 .env.local

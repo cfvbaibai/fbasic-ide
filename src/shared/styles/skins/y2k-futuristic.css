@@ -1,0 +1,571 @@
+/**
+ * Y2K Futuristic Skin - ENHANCED EDITION
+ *
+ * An authentic Y2K/cyber-futuristic themed skin capturing the essence of early 2000s
+ * digital culture with holographic gradients, intense neon glows, chrome effects,
+ * and glass-morphism aesthetics. Features iridescent colors, multi-layered shadows,
+ * and that iconic futuristic shimmer of the millennium era.
+ *
+ * Only overrides --base-xxx variables; --game-xxx variables adapt automatically.
+ */
+
+[data-skin="y2k-futuristic"] {
+    /* ═══════════════════════════════════════════════════════════════════════
+       PRIMARY ACCENT COLOR - Electric Cyan with Holographic Shimmer
+       ═══════════════════════════════════════════════════════════════════════ */
+    --base-solid-primary: #00ffff;
+    --base-solid-primary-10: #0d2626;
+    --base-solid-primary-20: #194d4d;
+    --base-solid-primary-30: #267373;
+    --base-solid-primary-40: #339999;
+    --base-solid-primary-50: #40bfbf;
+    --base-solid-primary-60: #4dd9d9;
+    --base-solid-primary-70: #66e6e6;
+    --base-solid-primary-80: #80f2f2;
+    --base-solid-primary-90: #b3f9f9;
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       Y2K CHROME/METALLIC GRAY SCALE - Reflective Surface Tones
+       ═══════════════════════════════════════════════════════════════════════ */
+    --base-solid-gray-00: #000509;        /* Deep void black with blue tint */
+    --base-solid-gray-10: #0a1620;        /* Dark chrome base */
+    --base-solid-gray-20: #0f1f2e;        /* Metallic shadow */
+    --base-solid-gray-30: #1a2d3f;        /* Steel depth */
+    --base-solid-gray-40: #253a4f;        /* Chrome mid-tone */
+    --base-solid-gray-50: #4a5f75;        /* Brushed metal */
+    --base-solid-gray-60: #6b8199;        /* Polished chrome */
+    --base-solid-gray-70: #8fa3b8;        /* Silver sheen */
+    --base-solid-gray-80: #b8c9d9;        /* Bright reflective */
+    --base-solid-gray-90: #dce6ee;        /* Chrome highlight */
+    --base-solid-gray-100: #f4f9ff;       /* Pure cyber white */
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       Y2K SEMANTIC COLORS - Ultra-Vibrant Neon Palette
+       ═══════════════════════════════════════════════════════════════════════ */
+    --semantic-solid-success: #00ff88;     /* Matrix green */
+    --semantic-solid-warning: #ffea00;     /* Cyber yellow-gold */
+    --semantic-solid-danger: #ff0099;      /* Hot magenta */
+    --semantic-solid-info: #7700ff;        /* Deep electric purple */
+    --semantic-solid-neutral: #00d4ff;     /* Neon sky blue */
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       ENHANCED GAME TEXT - Multi-Layered Glow Effects
+       ═══════════════════════════════════════════════════════════════════════ */
+    --game-text-primary: #ffffff;          /* Pure white with glow */
+    --game-text-secondary: #c0e0ff;        /* Bright cyan-white */
+    --game-text-tertiary: #8fa3b8;         /* Muted chrome */
+    --game-text-contrast: #000509;         /* Deep void black */
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       Y2K SCREEN & INTERFACE - Deep Space Cyber Aesthetic
+       ═══════════════════════════════════════════════════════════════════════ */
+    --game-screen-bg-color: #000509;       /* Void background */
+    --game-screen-text-color: #00ffff;     /* Electric cyan */
+    --game-screen-border-color: #00ff88;   /* Matrix green border */
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       HOLOGRAPHIC GRADIENTS - Iridescent Y2K Shimmer
+       ═══════════════════════════════════════════════════════════════════════ */
+    --y2k-gradient-holographic: linear-gradient(
+        135deg,
+        #00ffff 0%,
+        #ff00ff 25%,
+        #00ff88 50%,
+        #ffea00 75%,
+        #00ffff 100%
+    );
+
+    --y2k-gradient-cyber: linear-gradient(
+        180deg,
+        #0a1620 0%,
+        #000509 50%,
+        #0f1f2e 100%
+    );
+
+    --y2k-gradient-chrome: linear-gradient(
+        135deg,
+        #4a5f75 0%,
+        #8fa3b8 50%,
+        #4a5f75 100%
+    );
+
+    --y2k-gradient-neon-border: linear-gradient(
+        90deg,
+        #00ffff 0%,
+        #ff00ff 33%,
+        #00ff88 66%,
+        #00ffff 100%
+    );
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       MEGA GLOWS - Multi-Layer Neon Shadow Effects
+       ═══════════════════════════════════════════════════════════════════════ */
+    --y2k-glow-cyan-intense:
+        0 0 5px #00ffff,
+        0 0 10px #00ffff,
+        0 0 20px #00ffff,
+        0 0 40px #00ffff,
+        0 0 80px #00ffff80;
+
+    --y2k-glow-magenta-intense:
+        0 0 5px #ff00ff,
+        0 0 10px #ff00ff,
+        0 0 20px #ff00ff,
+        0 0 40px #ff00ff,
+        0 0 80px #ff00ff80;
+
+    --y2k-glow-green-intense:
+        0 0 5px #00ff88,
+        0 0 10px #00ff88,
+        0 0 20px #00ff88,
+        0 0 40px #00ff88;
+
+    --y2k-glow-multi-color:
+        0 0 10px #00ffff,
+        0 0 20px #ff00ff,
+        0 0 30px #00ff88,
+        0 0 40px #00ffff80;
+
+    --game-shadow-glow: var(--y2k-glow-cyan-intense);
+    --game-shadow-glow-sm: 0 0 10px #00ffff80, 0 0 20px #00ffff40;
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       TEXT EFFECTS - Cyberpunk Typography Enhancement
+       ═══════════════════════════════════════════════════════════════════════ */
+    --y2k-text-glow-primary:
+        0 0 5px #00ffff,
+        0 0 10px #00ffffcc,
+        0 0 15px #00ffff99,
+        0 0 20px #00ffff66,
+        1px 1px 2px #000000;
+
+    --y2k-text-glow-secondary:
+        0 0 3px #ff00ff,
+        0 0 6px #ff00ffaa,
+        0 0 10px #ff00ff66,
+        1px 1px 1px #000000;
+
+    --y2k-text-glow-accent:
+        0 0 4px #00ff88,
+        0 0 8px #00ff88aa,
+        0 0 12px #00ff8866;
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       GLASS-MORPHISM EFFECTS - Frosted Cyber Glass
+       ═══════════════════════════════════════════════════════════════════════ */
+    --y2k-glass-bg: rgba(15, 31, 46, 0.7);
+    --y2k-glass-border: rgba(0, 255, 255, 0.3);
+    --y2k-glass-blur: blur(12px);
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       CHROME SURFACES - Reflective Metallic Finishes
+       ═══════════════════════════════════════════════════════════════════════ */
+    --game-surface-bg-start: #0f1f2e;      /* Dark metallic gradient start */
+    --game-surface-bg-end: #0a1620;        /* Chrome gradient end */
+
+    --y2k-chrome-surface: linear-gradient(
+        145deg,
+        #1a2d3f 0%,
+        #4a5f75 25%,
+        #6b8199 50%,
+        #4a5f75 75%,
+        #253a4f 100%
+    );
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       BORDER & OUTLINE EFFECTS - Neon Edge Glow
+       ═══════════════════════════════════════════════════════════════════════ */
+    --y2k-border-glow-cyan:
+        0 0 3px #00ffff,
+        0 0 6px #00ffff80,
+        inset 0 0 3px #00ffff40;
+
+    --y2k-border-glow-magenta:
+        0 0 3px #ff00ff,
+        0 0 6px #ff00ff80,
+        inset 0 0 3px #ff00ff40;
+
+    --y2k-border-glow-multi:
+        0 0 5px #00ffff,
+        0 0 10px #ff00ff,
+        0 0 15px #00ff88;
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       DEPTH & DIMENSION - Layered Shadow System
+       ═══════════════════════════════════════════════════════════════════════ */
+    --y2k-depth-low:
+        0 2px 4px rgba(0, 255, 255, 0.1),
+        0 4px 8px rgba(0, 0, 0, 0.5);
+
+    --y2k-depth-medium:
+        0 4px 8px rgba(0, 255, 255, 0.15),
+        0 8px 16px rgba(0, 0, 0, 0.6),
+        0 0 20px rgba(0, 255, 255, 0.05);
+
+    --y2k-depth-high:
+        0 8px 16px rgba(0, 255, 255, 0.2),
+        0 16px 32px rgba(0, 0, 0, 0.7),
+        0 0 40px rgba(0, 255, 255, 0.1);
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       INTERACTIVE STATES - Hover & Active Glows
+       ═══════════════════════════════════════════════════════════════════════ */
+    --y2k-hover-glow:
+        0 0 10px #00ffff,
+        0 0 20px #00ffffaa,
+        0 0 30px #00ffff66,
+        0 4px 12px rgba(0, 0, 0, 0.5);
+
+    --y2k-active-glow:
+        0 0 5px #ff00ff,
+        0 0 15px #ff00ffaa,
+        0 0 25px #ff00ff66,
+        inset 0 2px 8px rgba(255, 0, 255, 0.3);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Y2K COMPONENT ENHANCEMENTS - Apply Cyber Aesthetics to UI Elements
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+[data-skin="y2k-futuristic"] {
+    /* Glass-morphism effect for cards and panels */
+    & .card,
+    & .panel,
+    & .surface {
+        background: var(--y2k-glass-bg);
+        border: 1px solid var(--y2k-glass-border);
+        backdrop-filter: var(--y2k-glass-blur);
+        box-shadow: var(--y2k-depth-medium);
+    }
+
+    /* Buttons with intense neon glow */
+    & button:not(.minimal),
+    & .btn {
+        position: relative;
+        background: linear-gradient(135deg, #0f1f2e 0%, #0a1620 100%);
+        border: 1px solid var(--base-solid-primary);
+        color: var(--base-solid-primary);
+        text-shadow: var(--y2k-text-glow-primary);
+        box-shadow: var(--y2k-border-glow-cyan);
+        transition: all 0.3s ease;
+    }
+
+    & button:not(.minimal):hover,
+    & .btn:hover {
+        background: linear-gradient(135deg, #1a2d3f 0%, #0f1f2e 100%);
+        border-color: var(--semantic-solid-danger);
+        color: var(--semantic-solid-danger);
+        text-shadow: var(--y2k-text-glow-secondary);
+        box-shadow: var(--y2k-hover-glow);
+        transform: translateY(-2px);
+    }
+
+    & button:not(.minimal):active,
+    & .btn:active {
+        background: linear-gradient(135deg, #0a1620 0%, #000509 100%);
+        box-shadow: var(--y2k-active-glow);
+        transform: translateY(0);
+    }
+
+    /* Primary action buttons - magenta accent */
+    & button.primary,
+    & .btn-primary {
+        background: linear-gradient(135deg, #ff00ff 0%, #ff0099 100%);
+        border-color: #ff00ff;
+        color: #ffffff;
+        box-shadow: var(--y2k-glow-magenta-intense);
+    }
+
+    & button.primary:hover,
+    & .btn-primary:hover {
+        background: linear-gradient(135deg, #ff33ff 0%, #ff33bb 100%);
+        box-shadow:
+            0 0 10px #ff00ff,
+            0 0 25px #ff00ffaa,
+            0 0 40px #ff00ff66,
+            0 8px 20px rgba(0, 0, 0, 0.6);
+    }
+
+    /* Inputs and textareas with cyber borders */
+    & input[type="text"],
+    & input[type="number"],
+    & textarea,
+    & .input {
+        background: rgba(0, 5, 9, 0.8);
+        border: 1px solid var(--base-solid-primary-30);
+        color: var(--base-solid-primary);
+        box-shadow:
+            inset 0 2px 8px rgba(0, 0, 0, 0.5),
+            0 0 10px rgba(0, 255, 255, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    & input[type="text"]:focus,
+    & input[type="number"]:focus,
+    & textarea:focus,
+    & .input:focus {
+        border-color: var(--base-solid-primary);
+        outline: none;
+        box-shadow:
+            inset 0 2px 8px rgba(0, 0, 0, 0.5),
+            var(--y2k-border-glow-cyan);
+        text-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+    }
+
+    /* Headers with holographic gradient text */
+    & h1, & h2, & h3 {
+        background: var(--y2k-gradient-holographic);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: none;
+        filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.5))
+                drop-shadow(0 0 20px rgba(255, 0, 255, 0.3));
+    }
+
+    /* Chrome-style dividers */
+    & hr,
+    & .divider {
+        height: 2px;
+        background: var(--y2k-gradient-neon-border);
+        border: none;
+        box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    }
+
+    /* Links with neon glow */
+    & a {
+        color: var(--base-solid-primary);
+        text-decoration: none;
+        text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+        transition: all 0.2s ease;
+    }
+
+    & a:hover {
+        color: var(--semantic-solid-danger);
+        text-shadow: var(--y2k-text-glow-secondary);
+    }
+
+    /* Code blocks with matrix-style aesthetic */
+    & code,
+    & pre {
+        background: rgba(0, 5, 9, 0.9);
+        border: 1px solid var(--semantic-solid-success);
+        color: var(--semantic-solid-success);
+        text-shadow: 0 0 5px rgba(0, 255, 136, 0.3);
+        box-shadow:
+            inset 0 0 20px rgba(0, 255, 136, 0.05),
+            0 0 10px rgba(0, 255, 136, 0.2);
+    }
+
+    /* Scrollbars with cyber styling */
+    & ::-webkit-scrollbar {
+        width: 12px;
+        height: 12px;
+    }
+
+    & ::-webkit-scrollbar-track {
+        background: var(--base-solid-gray-00);
+        border: 1px solid var(--base-solid-gray-30);
+    }
+
+    & ::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg,
+            var(--base-solid-primary-30) 0%,
+            var(--base-solid-primary-50) 50%,
+            var(--base-solid-primary-30) 100%);
+        border: 1px solid var(--base-solid-primary);
+        box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+    }
+
+    & ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg,
+            var(--base-solid-primary-50) 0%,
+            var(--base-solid-primary) 50%,
+            var(--base-solid-primary-50) 100%);
+        box-shadow: var(--y2k-glow-cyan-intense);
+    }
+
+    /* Selection highlight with neon glow */
+    & ::selection {
+        background: rgba(0, 255, 255, 0.3);
+        color: #ffffff;
+        text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+    }
+
+    /* Modal/Dialog overlays with glass effect */
+    & .modal,
+    & .dialog {
+        background: var(--y2k-glass-bg);
+        border: 2px solid var(--base-solid-primary);
+        backdrop-filter: var(--y2k-glass-blur);
+        box-shadow:
+            0 0 40px rgba(0, 255, 255, 0.3),
+            0 20px 60px rgba(0, 0, 0, 0.8),
+            inset 0 0 60px rgba(0, 255, 255, 0.05);
+    }
+
+    /* Badges with intense glow */
+    & .badge {
+        background: var(--base-solid-primary);
+        color: var(--base-solid-gray-00);
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-weight: 600;
+        text-shadow: none;
+        box-shadow: 0 0 15px var(--base-solid-primary);
+    }
+
+    & .badge.danger {
+        background: var(--semantic-solid-danger);
+        box-shadow: 0 0 15px var(--semantic-solid-danger);
+    }
+
+    & .badge.success {
+        background: var(--semantic-solid-success);
+        box-shadow: 0 0 15px var(--semantic-solid-success);
+    }
+
+    /* Loading spinners with neon trail */
+    & .spinner,
+    & .loading {
+        border-color: rgba(0, 255, 255, 0.2);
+        border-top-color: var(--base-solid-primary);
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+    }
+
+    /* Tooltips with glass-morphism */
+    & .tooltip {
+        background: var(--y2k-glass-bg);
+        border: 1px solid var(--base-solid-primary);
+        color: var(--base-solid-primary);
+        backdrop-filter: var(--y2k-glass-blur);
+        box-shadow: var(--y2k-depth-high);
+        text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+    }
+
+    /* Tables with cyber grid lines */
+    & table {
+        border-collapse: separate;
+        border-spacing: 0;
+        border: 1px solid var(--base-solid-primary-30);
+    }
+
+    & th {
+        background: linear-gradient(135deg, #0f1f2e 0%, #0a1620 100%);
+        color: var(--base-solid-primary);
+        border: 1px solid var(--base-solid-primary-30);
+        text-shadow: var(--y2k-text-glow-primary);
+    }
+
+    & td {
+        border: 1px solid var(--base-solid-gray-30);
+        background: rgba(0, 5, 9, 0.5);
+    }
+
+    & tr:hover td {
+        background: rgba(0, 255, 255, 0.05);
+        box-shadow: inset 0 0 10px rgba(0, 255, 255, 0.1);
+    }
+
+    /* Progress bars with animated holographic fill */
+    & progress,
+    & .progress-bar {
+        background: rgba(0, 5, 9, 0.8);
+        border: 1px solid var(--base-solid-primary-30);
+        height: 20px;
+        overflow: hidden;
+    }
+
+    & progress::-webkit-progress-value,
+    & .progress-fill {
+        background: var(--y2k-gradient-holographic);
+        box-shadow:
+            0 0 20px rgba(0, 255, 255, 0.6),
+            inset 0 0 20px rgba(255, 255, 255, 0.2);
+    }
+
+    /* Checkboxes and radios with neon glow */
+    & input[type="checkbox"],
+    & input[type="radio"] {
+        accent-color: var(--base-solid-primary);
+        filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.5));
+    }
+
+    /* Cards hover effect with depth */
+    & .card:hover,
+    & .panel:hover {
+        border-color: var(--base-solid-primary);
+        box-shadow: var(--y2k-depth-high);
+        transform: translateY(-4px);
+        transition: all 0.3s ease;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Y2K UTILITY CLASSES - Quick-Apply Cyber Effects
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+[data-skin="y2k-futuristic"] {
+    /* Glass-morphism utility */
+    & .y2k-glass {
+        background: var(--y2k-glass-bg) !important;
+        border: 1px solid var(--y2k-glass-border) !important;
+        backdrop-filter: var(--y2k-glass-blur) !important;
+    }
+
+    /* Chrome surface utility */
+    & .y2k-chrome {
+        background: var(--y2k-chrome-surface) !important;
+        box-shadow: var(--y2k-depth-medium) !important;
+    }
+
+    /* Holographic text utility */
+    & .y2k-holographic-text {
+        background: var(--y2k-gradient-holographic) !important;
+        background-clip: text !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+        filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.5)) !important;
+    }
+
+    /* Cyan glow utility */
+    & .y2k-glow-cyan {
+        box-shadow: var(--y2k-glow-cyan-intense) !important;
+    }
+
+    /* Magenta glow utility */
+    & .y2k-glow-magenta {
+        box-shadow: var(--y2k-glow-magenta-intense) !important;
+    }
+
+    /* Green glow utility */
+    & .y2k-glow-green {
+        box-shadow: var(--y2k-glow-green-intense) !important;
+    }
+
+    /* Multi-color glow utility */
+    & .y2k-glow-multi {
+        box-shadow: var(--y2k-glow-multi-color) !important;
+    }
+
+    /* Neon border utility */
+    & .y2k-border-neon {
+        border: 2px solid transparent !important;
+        background-image: var(--y2k-gradient-neon-border) !important;
+        background-origin: border-box !important;
+        background-clip: padding-box, border-box !important;
+    }
+
+    /* Text glow utilities */
+    & .y2k-text-glow-cyan {
+        text-shadow: var(--y2k-text-glow-primary) !important;
+    }
+
+    & .y2k-text-glow-magenta {
+        text-shadow: var(--y2k-text-glow-secondary) !important;
+    }
+
+    & .y2k-text-glow-green {
+        text-shadow: var(--y2k-text-glow-accent) !important;
+    }
+}

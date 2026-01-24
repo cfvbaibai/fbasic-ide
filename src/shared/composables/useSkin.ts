@@ -9,13 +9,13 @@ import { computed, watch } from 'vue'
 import { useLocalStorage } from '@vueuse/core'
 import { skinConfigs, type SkinConfig } from './skinConfig'
 
-export type SkinName = 'default' | 'retro-blue' | 'nintendo' | 'classic-light'
+export type SkinName = 'default' | 'retro-blue' | 'nintendo' | 'classic-light' | 'y2k-futuristic' | 'sunset-vaporwave'
 
 const SKIN_STORAGE_KEY = 'fbasic-emu-skin'
 const SKIN_ATTRIBUTE = 'data-skin'
 
 const isValidSkinName = (value: unknown): value is SkinName => {
-  return value === 'default' || value === 'retro-blue' || value === 'nintendo' || value === 'classic-light'
+  return value === 'default' || value === 'retro-blue' || value === 'nintendo' || value === 'classic-light' || value === 'y2k-futuristic' || value === 'sunset-vaporwave'
 }
 
 /**
@@ -113,6 +113,8 @@ export function useSkin() {
     { name: 'retro-blue', label: 'Retro Blue', description: 'Blue-tinted retro theme' },
     { name: 'nintendo', label: 'Nintendo', description: 'Nintendo-themed with inverted colors and red accent' },
     { name: 'classic-light', label: 'Classic Light', description: 'Warm classic light theme with soft purple accent' },
+    { name: 'y2k-futuristic', label: 'Y2K Futuristic', description: 'Retro-futuristic Y2K aesthetic with neon colors, CRT effects, and cyberpunk vibes' },
+    { name: 'sunset-vaporwave', label: 'Sunset Vaporwave', description: 'Dreamy 80s/90s aesthetic with pastel gradients, soft glows, and nostalgic vibes' },
   ]
 
   /**

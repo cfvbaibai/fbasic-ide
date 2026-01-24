@@ -1,0 +1,592 @@
+/**
+ * Sunset Vaporwave Skin - AESTHETIC EDITION
+ *
+ * A dreamy 80s/90s vaporwave-inspired theme capturing the essence of Japanese
+ * city pop, retro aesthetics, and nostalgic digital sunsets. Features soft pastel
+ * gradients, warm glows, and that iconic A E S T H E T I C vibe.
+ *
+ * Color Philosophy:
+ * - Soft purples and lavenders for dreamy backgrounds
+ * - Coral and pink for warm sunset accents
+ * - Teal and turquoise for retro computer nostalgia
+ * - Cream and peach for gentle highlights
+ *
+ * Only overrides --base-xxx variables; --game-xxx variables adapt automatically.
+ */
+
+[data-skin="sunset-vaporwave"] {
+    /* ═══════════════════════════════════════════════════════════════════════
+       PRIMARY ACCENT COLOR - Soft Lavender Dream
+       ═══════════════════════════════════════════════════════════════════════ */
+    --base-solid-primary: #c77dff;        /* Soft electric lavender */
+    --base-solid-primary-10: #291633;
+    --base-solid-primary-20: #3d2249;
+    --base-solid-primary-30: #522d60;
+    --base-solid-primary-40: #663976;
+    --base-solid-primary-50: #8855a3;
+    --base-solid-primary-60: #a066cc;
+    --base-solid-primary-70: #b077dd;
+    --base-solid-primary-80: #d088ff;
+    --base-solid-primary-90: #e0aaff;
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       VAPORWAVE GRADIENT GRAY SCALE - Purple-Tinted Twilight
+       ═══════════════════════════════════════════════════════════════════════ */
+    --base-solid-gray-00: #0f0a1a;        /* Deep twilight purple-black */
+    --base-solid-gray-10: #1a1228;        /* Dark violet night */
+    --base-solid-gray-20: #251b36;        /* Midnight purple */
+    --base-solid-gray-30: #332744;        /* Shadow violet */
+    --base-solid-gray-40: #443555;        /* Dusk purple */
+    --base-solid-gray-50: #5c4d6b;        /* Twilight mid */
+    --base-solid-gray-60: #7a6b8a;        /* Lavender gray */
+    --base-solid-gray-70: #9a8ca9;        /* Soft lavender */
+    --base-solid-gray-80: #bdb3ca;        /* Pastel lavender */
+    --base-solid-gray-90: #ddd7e5;        /* Light lavender mist */
+    --base-solid-gray-100: #f5f3f8;       /* Cream white */
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       VAPORWAVE SEMANTIC COLORS - Pastel Sunset Palette
+       ═══════════════════════════════════════════════════════════════════════ */
+    --semantic-solid-success: #72dbb8;     /* Soft teal-green */
+    --semantic-solid-warning: #ffb86c;     /* Warm peach-orange */
+    --semantic-solid-danger: #ff6b9d;      /* Coral pink */
+    --semantic-solid-info: #7dd3fc;        /* Sky blue */
+    --semantic-solid-neutral: #a78bfa;     /* Soft purple */
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       ENHANCED GAME TEXT - Soft Pastel Contrast
+       ═══════════════════════════════════════════════════════════════════════ */
+    --game-text-primary: #f5f3f8;          /* Cream white */
+    --game-text-secondary: #ddd7e5;        /* Light lavender mist */
+    --game-text-tertiary: #bdb3ca;         /* Pastel lavender */
+    --game-text-contrast: #0f0a1a;         /* Deep twilight */
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       VAPORWAVE SCREEN & INTERFACE - Dreamy Sunset Aesthetic
+       ═══════════════════════════════════════════════════════════════════════ */
+    --game-screen-bg-color: #0f0a1a;       /* Deep twilight background */
+    --game-screen-text-color: #e0aaff;     /* Light lavender text */
+    --game-screen-border-color: #ff6b9d;   /* Coral pink border */
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       VAPORWAVE GRADIENTS - Sunset & Dreamy Transitions
+       ═══════════════════════════════════════════════════════════════════════ */
+    --vapor-gradient-sunset: linear-gradient(
+        135deg,
+        #ff6b9d 0%,         /* Coral pink */
+        #c77dff 25%,        /* Lavender */
+        #7dd3fc 50%,        /* Sky blue */
+        #72dbb8 75%,        /* Teal */
+        #ffb86c 100%        /* Peach */
+    );
+
+    --vapor-gradient-twilight: linear-gradient(
+        180deg,
+        #251b36 0%,         /* Midnight purple */
+        #1a1228 50%,
+        #0f0a1a 100%        /* Deep twilight */
+    );
+
+    --vapor-gradient-aurora: linear-gradient(
+        135deg,
+        #c77dff 0%,         /* Lavender */
+        #7dd3fc 50%,        /* Sky blue */
+        #72dbb8 100%        /* Teal */
+    );
+
+    --vapor-gradient-coral-dream: linear-gradient(
+        90deg,
+        #ff6b9d 0%,         /* Coral */
+        #ffb86c 50%,        /* Peach */
+        #ff6b9d 100%        /* Coral */
+    );
+
+    --vapor-gradient-pastel-sky: linear-gradient(
+        135deg,
+        #e0aaff 0%,         /* Light lavender */
+        #7dd3fc 33%,        /* Sky blue */
+        #72dbb8 66%,        /* Teal */
+        #c77dff 100%        /* Lavender */
+    );
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       SOFT GLOWS - Dreamy Haze Effects
+       ═══════════════════════════════════════════════════════════════════════ */
+    --vapor-glow-lavender:
+        0 0 10px rgba(199, 125, 255, 0.4),
+        0 0 20px rgba(199, 125, 255, 0.3),
+        0 0 40px rgba(199, 125, 255, 0.2),
+        0 0 60px rgba(199, 125, 255, 0.1);
+
+    --vapor-glow-coral:
+        0 0 10px rgba(255, 107, 157, 0.4),
+        0 0 20px rgba(255, 107, 157, 0.3),
+        0 0 40px rgba(255, 107, 157, 0.2);
+
+    --vapor-glow-teal:
+        0 0 10px rgba(114, 219, 184, 0.4),
+        0 0 20px rgba(114, 219, 184, 0.3),
+        0 0 40px rgba(114, 219, 184, 0.2);
+
+    --vapor-glow-sky:
+        0 0 10px rgba(125, 211, 252, 0.4),
+        0 0 20px rgba(125, 211, 252, 0.3),
+        0 0 40px rgba(125, 211, 252, 0.2);
+
+    --vapor-glow-sunset:
+        0 0 15px rgba(255, 107, 157, 0.3),
+        0 0 30px rgba(199, 125, 255, 0.2),
+        0 0 45px rgba(125, 211, 252, 0.1);
+
+    --game-shadow-glow: var(--vapor-glow-lavender);
+    --game-shadow-glow-sm: 0 0 15px rgba(199, 125, 255, 0.3);
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       TEXT EFFECTS - Soft Pastel Typography
+       ═══════════════════════════════════════════════════════════════════════ */
+    --vapor-text-glow-primary:
+        0 0 10px rgba(199, 125, 255, 0.5),
+        0 0 20px rgba(199, 125, 255, 0.3),
+        1px 1px 3px rgba(0, 0, 0, 0.3);
+
+    --vapor-text-glow-coral:
+        0 0 10px rgba(255, 107, 157, 0.5),
+        0 0 20px rgba(255, 107, 157, 0.3),
+        1px 1px 3px rgba(0, 0, 0, 0.3);
+
+    --vapor-text-glow-teal:
+        0 0 10px rgba(114, 219, 184, 0.5),
+        0 0 20px rgba(114, 219, 184, 0.3),
+        1px 1px 3px rgba(0, 0, 0, 0.3);
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       DREAMY GLASS EFFECTS - Soft Translucent Surfaces
+       ═══════════════════════════════════════════════════════════════════════ */
+    --vapor-glass-bg: rgba(37, 27, 54, 0.6);
+    --vapor-glass-border: rgba(199, 125, 255, 0.3);
+    --vapor-glass-blur: blur(16px);
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       GRADIENT SURFACES - Sunset Shimmer
+       ═══════════════════════════════════════════════════════════════════════ */
+    --game-surface-bg-start: #251b36;      /* Midnight purple */
+    --game-surface-bg-end: #1a1228;        /* Dark violet night */
+
+    --vapor-surface-dreamy: linear-gradient(
+        135deg,
+        rgba(199, 125, 255, 0.15) 0%,
+        rgba(125, 211, 252, 0.1) 50%,
+        rgba(114, 219, 184, 0.15) 100%
+    );
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       SOFT BORDERS - Pastel Edge Glow
+       ═══════════════════════════════════════════════════════════════════════ */
+    --vapor-border-glow-lavender:
+        0 0 10px rgba(199, 125, 255, 0.3),
+        inset 0 0 10px rgba(199, 125, 255, 0.1);
+
+    --vapor-border-glow-coral:
+        0 0 10px rgba(255, 107, 157, 0.3),
+        inset 0 0 10px rgba(255, 107, 157, 0.1);
+
+    --vapor-border-glow-sunset:
+        0 0 15px rgba(255, 107, 157, 0.2),
+        0 0 30px rgba(199, 125, 255, 0.15);
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       DEPTH & ATMOSPHERE - Layered Sunset Shadows
+       ═══════════════════════════════════════════════════════════════════════ */
+    --vapor-depth-low:
+        0 2px 8px rgba(15, 10, 26, 0.3),
+        0 4px 16px rgba(199, 125, 255, 0.1);
+
+    --vapor-depth-medium:
+        0 4px 12px rgba(15, 10, 26, 0.4),
+        0 8px 24px rgba(199, 125, 255, 0.15),
+        0 0 40px rgba(125, 211, 252, 0.05);
+
+    --vapor-depth-high:
+        0 8px 20px rgba(15, 10, 26, 0.5),
+        0 16px 40px rgba(199, 125, 255, 0.2),
+        0 0 60px rgba(255, 107, 157, 0.1);
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       INTERACTIVE STATES - Dreamy Hover Effects
+       ═══════════════════════════════════════════════════════════════════════ */
+    --vapor-hover-glow:
+        0 0 20px rgba(199, 125, 255, 0.4),
+        0 0 40px rgba(125, 211, 252, 0.2),
+        0 4px 20px rgba(15, 10, 26, 0.4);
+
+    --vapor-active-glow:
+        0 0 10px rgba(255, 107, 157, 0.5),
+        0 0 30px rgba(255, 107, 157, 0.3),
+        inset 0 2px 10px rgba(255, 107, 157, 0.2);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   VAPORWAVE COMPONENT ENHANCEMENTS - Dreamy UI Elements
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+[data-skin="sunset-vaporwave"] {
+    /* Glass-morphism with pastel tint */
+    & .card,
+    & .panel,
+    & .surface {
+        background: var(--vapor-glass-bg);
+        border: 1px solid var(--vapor-glass-border);
+        backdrop-filter: var(--vapor-glass-blur);
+        box-shadow: var(--vapor-depth-medium);
+    }
+
+    /* Buttons with sunset gradient */
+    & button:not(.minimal),
+    & .btn {
+        background: linear-gradient(135deg, #251b36 0%, #1a1228 100%);
+        border: 1px solid var(--base-solid-primary);
+        color: var(--base-solid-primary);
+        text-shadow: var(--vapor-text-glow-primary);
+        box-shadow: var(--vapor-border-glow-lavender);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    & button:not(.minimal):hover,
+    & .btn:hover {
+        background: linear-gradient(135deg, #332744 0%, #251b36 100%);
+        border-color: var(--semantic-solid-danger);
+        color: var(--semantic-solid-danger);
+        text-shadow: var(--vapor-text-glow-coral);
+        box-shadow: var(--vapor-hover-glow);
+        transform: translateY(-3px) scale(1.02);
+    }
+
+    & button:not(.minimal):active,
+    & .btn:active {
+        background: linear-gradient(135deg, #1a1228 0%, #0f0a1a 100%);
+        box-shadow: var(--vapor-active-glow);
+        transform: translateY(0) scale(0.98);
+    }
+
+    /* Primary buttons - coral sunset */
+    & button.primary,
+    & .btn-primary {
+        background: var(--vapor-gradient-coral-dream);
+        border-color: var(--semantic-solid-danger);
+        color: var(--base-solid-gray-00);
+        font-weight: 600;
+        box-shadow: var(--vapor-glow-coral);
+        text-shadow: none;
+    }
+
+    & button.primary:hover,
+    & .btn-primary:hover {
+        background: linear-gradient(90deg, #ff8ab3 0%, #ffc98c 50%, #ff8ab3 100%);
+        box-shadow:
+            0 0 20px rgba(255, 107, 157, 0.5),
+            0 0 40px rgba(255, 107, 157, 0.3),
+            0 8px 30px rgba(15, 10, 26, 0.5);
+    }
+
+    /* Inputs with dreamy purple glow */
+    & input[type="text"],
+    & input[type="number"],
+    & textarea,
+    & .input {
+        background: rgba(15, 10, 26, 0.7);
+        border: 1px solid var(--base-solid-primary-30);
+        color: var(--base-solid-primary);
+        box-shadow:
+            inset 0 2px 8px rgba(0, 0, 0, 0.4),
+            0 0 15px rgba(199, 125, 255, 0.1);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    & input[type="text"]:focus,
+    & input[type="number"]:focus,
+    & textarea:focus,
+    & .input:focus {
+        border-color: var(--base-solid-primary);
+        outline: none;
+        box-shadow:
+            inset 0 2px 8px rgba(0, 0, 0, 0.4),
+            var(--vapor-border-glow-lavender);
+        text-shadow: 0 0 10px rgba(199, 125, 255, 0.4);
+    }
+
+    /* Headers with sunset gradient text */
+    & h1, & h2, & h3 {
+        background: var(--vapor-gradient-sunset);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 0 15px rgba(199, 125, 255, 0.4))
+                drop-shadow(0 0 30px rgba(255, 107, 157, 0.2));
+        animation: vapor-shimmer 8s ease-in-out infinite;
+    }
+
+    @keyframes vapor-shimmer {
+        0%, 100% {
+            filter: drop-shadow(0 0 15px rgba(199, 125, 255, 0.4))
+                    drop-shadow(0 0 30px rgba(255, 107, 157, 0.2));
+        }
+        50% {
+            filter: drop-shadow(0 0 20px rgba(125, 211, 252, 0.4))
+                    drop-shadow(0 0 35px rgba(114, 219, 184, 0.2));
+        }
+    }
+
+    /* Soft gradient dividers */
+    & hr,
+    & .divider {
+        height: 2px;
+        background: var(--vapor-gradient-pastel-sky);
+        border: none;
+        box-shadow: 0 0 15px rgba(199, 125, 255, 0.3);
+    }
+
+    /* Links with soft pastel glow */
+    & a {
+        color: var(--base-solid-primary);
+        text-decoration: none;
+        text-shadow: var(--vapor-text-glow-primary);
+        transition: all 0.3s ease;
+    }
+
+    & a:hover {
+        color: var(--semantic-solid-danger);
+        text-shadow: var(--vapor-text-glow-coral);
+    }
+
+    /* Code blocks with teal aesthetic */
+    & code,
+    & pre {
+        background: rgba(15, 10, 26, 0.8);
+        border: 1px solid var(--semantic-solid-success);
+        color: var(--semantic-solid-success);
+        text-shadow: 0 0 8px rgba(114, 219, 184, 0.3);
+        box-shadow:
+            inset 0 0 20px rgba(114, 219, 184, 0.05),
+            0 0 15px rgba(114, 219, 184, 0.2);
+    }
+
+    /* Dreamy scrollbars */
+    & ::-webkit-scrollbar {
+        width: 12px;
+        height: 12px;
+    }
+
+    & ::-webkit-scrollbar-track {
+        background: var(--base-solid-gray-00);
+        border: 1px solid var(--base-solid-gray-30);
+    }
+
+    & ::-webkit-scrollbar-thumb {
+        background: var(--vapor-gradient-aurora);
+        border: 1px solid var(--base-solid-primary);
+        border-radius: 6px;
+        box-shadow: 0 0 15px rgba(199, 125, 255, 0.3);
+    }
+
+    & ::-webkit-scrollbar-thumb:hover {
+        background: var(--vapor-gradient-sunset);
+        box-shadow: var(--vapor-glow-lavender);
+    }
+
+    /* Pastel selection highlight */
+    & ::selection {
+        background: rgba(199, 125, 255, 0.3);
+        color: var(--base-solid-gray-100);
+        text-shadow: 0 0 10px rgba(199, 125, 255, 0.5);
+    }
+
+    /* Modal/Dialog with dreamy glass */
+    & .modal,
+    & .dialog {
+        background: var(--vapor-glass-bg);
+        border: 2px solid var(--base-solid-primary);
+        backdrop-filter: var(--vapor-glass-blur);
+        box-shadow:
+            0 0 60px rgba(199, 125, 255, 0.3),
+            0 20px 80px rgba(15, 10, 26, 0.7),
+            inset 0 0 80px rgba(199, 125, 255, 0.05);
+    }
+
+    /* Badges with soft glow */
+    & .badge {
+        background: var(--base-solid-primary);
+        color: var(--base-solid-gray-00);
+        padding: 3px 10px;
+        border-radius: 14px;
+        font-weight: 600;
+        text-shadow: none;
+        box-shadow: 0 0 20px rgba(199, 125, 255, 0.4);
+    }
+
+    & .badge.danger {
+        background: var(--semantic-solid-danger);
+        box-shadow: 0 0 20px rgba(255, 107, 157, 0.4);
+    }
+
+    & .badge.success {
+        background: var(--semantic-solid-success);
+        box-shadow: 0 0 20px rgba(114, 219, 184, 0.4);
+    }
+
+    /* Loading spinners with pastel trail */
+    & .spinner,
+    & .loading {
+        border-color: rgba(199, 125, 255, 0.2);
+        border-top-color: var(--base-solid-primary);
+        box-shadow: 0 0 30px rgba(199, 125, 255, 0.3);
+    }
+
+    /* Tooltips with dreamy glass */
+    & .tooltip {
+        background: var(--vapor-glass-bg);
+        border: 1px solid var(--base-solid-primary);
+        color: var(--base-solid-primary);
+        backdrop-filter: var(--vapor-glass-blur);
+        box-shadow: var(--vapor-depth-high);
+        text-shadow: var(--vapor-text-glow-primary);
+    }
+
+    /* Tables with gradient rows */
+    & table {
+        border-collapse: separate;
+        border-spacing: 0;
+        border: 1px solid var(--base-solid-primary-30);
+    }
+
+    & th {
+        background: linear-gradient(135deg, #251b36 0%, #1a1228 100%);
+        color: var(--base-solid-primary);
+        border: 1px solid var(--base-solid-primary-30);
+        text-shadow: var(--vapor-text-glow-primary);
+    }
+
+    & td {
+        border: 1px solid var(--base-solid-gray-30);
+        background: rgba(15, 10, 26, 0.5);
+    }
+
+    & tr:hover td {
+        background: rgba(199, 125, 255, 0.08);
+        box-shadow: inset 0 0 20px rgba(199, 125, 255, 0.1);
+    }
+
+    /* Progress bars with sunset fill */
+    & progress,
+    & .progress-bar {
+        background: rgba(15, 10, 26, 0.8);
+        border: 1px solid var(--base-solid-primary-30);
+        height: 22px;
+        overflow: hidden;
+        border-radius: 11px;
+    }
+
+    & progress::-webkit-progress-value,
+    & .progress-fill {
+        background: var(--vapor-gradient-sunset);
+        box-shadow:
+            0 0 20px rgba(199, 125, 255, 0.5),
+            inset 0 0 20px rgba(255, 255, 255, 0.15);
+        animation: vapor-progress 2s ease-in-out infinite;
+    }
+
+    @keyframes vapor-progress {
+        0%, 100% {
+            filter: brightness(1);
+        }
+        50% {
+            filter: brightness(1.2);
+        }
+    }
+
+    /* Checkboxes and radios with pastel accent */
+    & input[type="checkbox"],
+    & input[type="radio"] {
+        accent-color: var(--base-solid-primary);
+        filter: drop-shadow(0 0 8px rgba(199, 125, 255, 0.4));
+    }
+
+    /* Cards with dreamy hover lift */
+    & .card:hover,
+    & .panel:hover {
+        border-color: var(--semantic-solid-danger);
+        box-shadow: var(--vapor-depth-high);
+        transform: translateY(-6px);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   VAPORWAVE UTILITY CLASSES - Quick Aesthetic Effects
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+[data-skin="sunset-vaporwave"] {
+    /* Dreamy glass utility */
+    & .vapor-glass {
+        background: var(--vapor-glass-bg) !important;
+        border: 1px solid var(--vapor-glass-border) !important;
+        backdrop-filter: var(--vapor-glass-blur) !important;
+    }
+
+    /* Sunset gradient utility */
+    & .vapor-sunset-bg {
+        background: var(--vapor-gradient-sunset) !important;
+    }
+
+    /* Aurora gradient utility */
+    & .vapor-aurora-bg {
+        background: var(--vapor-gradient-aurora) !important;
+    }
+
+    /* Sunset gradient text */
+    & .vapor-sunset-text {
+        background: var(--vapor-gradient-sunset) !important;
+        background-clip: text !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+        filter: drop-shadow(0 0 15px rgba(199, 125, 255, 0.3)) !important;
+    }
+
+    /* Lavender glow utility */
+    & .vapor-glow-lavender {
+        box-shadow: var(--vapor-glow-lavender) !important;
+    }
+
+    /* Coral glow utility */
+    & .vapor-glow-coral {
+        box-shadow: var(--vapor-glow-coral) !important;
+    }
+
+    /* Teal glow utility */
+    & .vapor-glow-teal {
+        box-shadow: var(--vapor-glow-teal) !important;
+    }
+
+    /* Sunset composite glow */
+    & .vapor-glow-sunset {
+        box-shadow: var(--vapor-glow-sunset) !important;
+    }
+
+    /* Text glow utilities */
+    & .vapor-text-glow-lavender {
+        text-shadow: var(--vapor-text-glow-primary) !important;
+    }
+
+    & .vapor-text-glow-coral {
+        text-shadow: var(--vapor-text-glow-coral) !important;
+    }
+
+    & .vapor-text-glow-teal {
+        text-shadow: var(--vapor-text-glow-teal) !important;
+    }
+
+    /* Dreamy border glow */
+    & .vapor-border-dreamy {
+        border: 1px solid transparent !important;
+        box-shadow: var(--vapor-border-glow-sunset) !important;
+    }
+}
