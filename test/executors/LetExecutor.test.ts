@@ -194,7 +194,7 @@ describe('LetExecutor', () => {
   })
 
   describe('LET Error Handling', () => {
-    it('should throw error for invalid LET statement without identifier', () => {
+    it('should add error for invalid LET statement without identifier', () => {
       // Create invalid CST node (missing identifier)
       const invalidCst: CstNode = {
         name: 'letStatement',
@@ -203,12 +203,14 @@ describe('LetExecutor', () => {
         }
       }
 
-      expect(() => {
-        executor.execute(invalidCst)
-      }).toThrow('Invalid LET statement: missing identifier or expression')
+      executor.execute(invalidCst)
+      
+      const errors = context.getErrors()
+      expect(errors.length).toBeGreaterThan(0)
+      expect(errors[0]?.message).toBe('Invalid LET statement: missing identifier or expression')
     })
 
-    it('should throw error for invalid LET statement without expression', () => {
+    it('should add error for invalid LET statement without expression', () => {
       // Create invalid CST node (missing expression)
       // Create a minimal token for Identifier
       const identifierToken: IToken = {
@@ -232,9 +234,11 @@ describe('LetExecutor', () => {
         }
       }
 
-      expect(() => {
-        executor.execute(invalidCst)
-      }).toThrow('Invalid LET statement: missing identifier or expression')
+      executor.execute(invalidCst)
+      
+      const errors = context.getErrors()
+      expect(errors.length).toBeGreaterThan(0)
+      expect(errors[0]?.message).toBe('Invalid LET statement: missing expression')
     })
   })
 

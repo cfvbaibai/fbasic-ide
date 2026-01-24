@@ -4,7 +4,6 @@ import type { VNode } from 'vue'
 import {
   ActiveTabKey,
   SetActiveTabKey,
-  TabsTypeKey,
   RegisterTabKey,
   UnregisterTabKey
 } from './game-tabs-keys'
@@ -45,8 +44,6 @@ const activeTab = computed({
   set: (value: string) => emit('update:modelValue', value)
 })
 
-const tabsType = computed(() => props.type)
-
 const tabButtons = ref<Array<{ name: string; render: () => VNode }>>([])
 
 const registerTab = (name: string, render: () => VNode) => {
@@ -74,7 +71,6 @@ const setActiveTab = (name: string) => {
 // Provide to children with type-safe injection keys
 provide(ActiveTabKey, activeTab)
 provide(SetActiveTabKey, setActiveTab)
-provide(TabsTypeKey, tabsType)
 provide(RegisterTabKey, registerTab)
 provide(UnregisterTabKey, unregisterTab)
 </script>
