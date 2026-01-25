@@ -1,8 +1,10 @@
-import { createApp } from 'vue'
 import './style.css'
 import './shared/styles/theme.css'
 import './shared/styles/utilities.css'
 import './shared/styles/skins/index.css'
+
+import { createApp } from 'vue'
+
 import App from './App.vue'
 import router from './router/index'
 import i18n from './shared/i18n'

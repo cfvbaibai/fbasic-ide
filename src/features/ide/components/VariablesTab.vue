@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { BasicVariable } from '../../../core/interfaces'
-import { GameTabPane, GameTag, GameIcon } from '../../../shared/components/ui'
+
+import type { BasicVariable } from '@/core/interfaces'
+import { GameIcon, GameTabPane, GameTag } from '@/shared/components/ui'
 
 /**
  * VariablesTab component - Displays variables in a tab pane format.

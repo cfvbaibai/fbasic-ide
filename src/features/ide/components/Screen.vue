@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { useTemplateRef, watch, computed } from 'vue'
+import { computed, useTemplateRef, watch } from 'vue'
+
 import type { ScreenCell } from '@/core/interfaces'
-import { renderScreenBuffer, renderScreenLayers } from '../composables/canvasRenderer'
-import type { SpriteState, MovementState } from '@/core/sprite/types'
-import { useScreenZoom } from '../composables/useScreenZoom'
+import type { MovementState, SpriteState } from '@/core/sprite/types'
+import { renderScreenBuffer, renderScreenLayers } from '@/features/ide/composables/canvasRenderer'
+import { useScreenZoom } from '@/features/ide/composables/useScreenZoom'
 
 /**
  * Screen component - Renders the F-BASIC screen buffer on a canvas.

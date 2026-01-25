@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { useSpriteViewerStore } from '../composables/useSpriteViewerStore'
-import { GameCodeQuote, GameBlock, GameButton } from '../../../shared/components/ui'
-import { message } from '../../../shared/utils/message'
+
+import { useSpriteViewerStore } from '@/features/sprite-viewer/composables/useSpriteViewerStore'
+import { GameBlock, GameButton,GameCodeQuote } from '@/shared/components/ui'
+import { message } from '@/shared/utils/message'
 
 /**
  * DefStatements component - Displays and allows copying of DEF SPRITE and DEF MOVE statements.

@@ -1,4 +1,4 @@
-import type { SpriteDefinition } from "../types"
+import type { SpriteDefinition } from "@/shared/data/types"
 
 const SPRITE_PAINTCOLOR_1_214 = [
   [1,1,1,1,1,1,1,1],

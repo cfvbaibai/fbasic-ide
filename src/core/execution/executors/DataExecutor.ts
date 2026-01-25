@@ -7,8 +7,9 @@
  */
 
 import type { CstNode } from 'chevrotain'
-import type { DataService } from '../../services/DataService'
-import { getFirstCstNode, getCstNodes } from '../../parser/cst-helpers'
+
+import { getCstNodes,getFirstCstNode } from '@/core/parser/cst-helpers'
+import type { DataService } from '@/core/services/DataService'
 
 export class DataExecutor {
   constructor(private dataService: DataService) {}

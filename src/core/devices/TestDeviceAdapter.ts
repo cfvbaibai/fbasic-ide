@@ -5,7 +5,7 @@
  * Provides controlled behavior for testing without external dependencies.
  */
 
-import type { BasicDeviceAdapter } from '../interfaces'
+import type { BasicDeviceAdapter } from '@/core/interfaces'
 
 export class TestDeviceAdapter implements BasicDeviceAdapter {
   // === JOYSTICK STATE ===

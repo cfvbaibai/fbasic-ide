@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { computed, provide, ref } from 'vue'
 import type { VNode } from 'vue'
+import { computed, provide, ref } from 'vue'
+
 import {
   ActiveTabKey,
-  SetActiveTabKey,
   RegisterTabKey,
+  SetActiveTabKey,
   UnregisterTabKey
 } from './game-tabs-keys'
 

@@ -4,7 +4,7 @@
  * Manages screen buffer, cursor position, and screen-related operations.
  */
 
-import type { ScreenCell, ScreenUpdateMessage } from '../interfaces'
+import type { ScreenCell, ScreenUpdateMessage } from '@/core/interfaces'
 
 export class ScreenStateManager {
   private screenBuffer: ScreenCell[][] = []

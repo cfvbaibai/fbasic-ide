@@ -1,4 +1,4 @@
-import { MoveCharacterCode, type SpriteDefinition } from "../types"
+import { MoveCharacterCode, type SpriteDefinition } from "@/shared/data/types"
 
 const SPRITE_STARKILLER_LEFT_152 = [
   [0,0,0,0,0,0,1,3],

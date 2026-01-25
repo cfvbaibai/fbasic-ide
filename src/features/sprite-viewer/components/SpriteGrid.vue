@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useSpriteViewerStore } from '../composables/useSpriteViewerStore'
-import { GameBlock } from '../../../shared/components/ui'
+
+import { useSpriteViewerStore } from '@/features/sprite-viewer/composables/useSpriteViewerStore'
+import { GameBlock } from '@/shared/components/ui'
 
 /**
  * SpriteGrid component - Displays the sprite grid with color visualization.

@@ -1,4 +1,4 @@
-import type { BackgroundItem } from "../types"
+import type { BackgroundItem } from "@/shared/data/types"
 
 const BGITEM_SYMBOL_EMPTY_32 = [
   [0,0,0,0,0,0,0,0],

@@ -5,6 +5,7 @@
  */
 
 import type { CstNode } from 'chevrotain'
+
 import { FBasicParser } from '../src/core/parser/FBasicParser'
 
 const parser = new FBasicParser()

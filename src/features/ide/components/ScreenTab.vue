@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { ScreenCell } from '../../../core/interfaces'
-import type { SpriteState } from '../../../core/sprite/types'
+
+import type { ScreenCell } from '@/core/interfaces'
+import type { SpriteState } from '@/core/sprite/types'
+import { provideScreenZoom } from '@/features/ide/composables/useScreenZoom'
+import { GameButton, GameButtonGroup, GameIcon, GameTabPane } from '@/shared/components/ui'
+
 import Screen from './Screen.vue'
-import { GameTabPane, GameIcon, GameButtonGroup, GameButton } from '../../../shared/components/ui'
-import { provideScreenZoom } from '../composables/useScreenZoom'
 
 /**
  * ScreenTab component - Displays the screen buffer in a tab pane format with zoom controls.

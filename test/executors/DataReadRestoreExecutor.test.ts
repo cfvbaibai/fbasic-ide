@@ -4,16 +4,17 @@
  * Unit tests for DataExecutor, ReadExecutor, and RestoreExecutor classes.
  */
 
-import { describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach,describe, expect, it } from 'vitest'
+
+import { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
 import { DataExecutor } from '@/core/execution/executors/DataExecutor'
 import { ReadExecutor } from '@/core/execution/executors/ReadExecutor'
 import { RestoreExecutor } from '@/core/execution/executors/RestoreExecutor'
+import { getFirstCstNode } from '@/core/parser/cst-helpers'
+import { FBasicParser } from '@/core/parser/FBasicParser'
 import { DataService } from '@/core/services/DataService'
 import { VariableService } from '@/core/services/VariableService'
-import { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
 import { ExecutionContext } from '@/core/state/ExecutionContext'
-import { FBasicParser } from '@/core/parser/FBasicParser'
-import { getFirstCstNode } from '@/core/parser/cst-helpers'
 
 describe('DataExecutor', () => {
   let executor: DataExecutor

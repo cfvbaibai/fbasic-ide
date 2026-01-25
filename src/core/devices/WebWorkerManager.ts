@@ -4,14 +4,14 @@
  * Handles web worker lifecycle, initialization, and communication.
  */
 
+import { DEFAULTS } from '@/core/constants'
 import type { 
-  InterpreterConfig, 
-  ExecutionResult,
   AnyServiceWorkerMessage,
   ExecuteMessage,
+  ExecutionResult,
+  InterpreterConfig, 
   StopMessage
-} from '../interfaces'
-import { DEFAULTS } from '../constants'
+} from '@/core/interfaces'
 
 export interface WebWorkerExecutionOptions {
   onProgress?: (iterationCount: number, currentStatement?: string) => void

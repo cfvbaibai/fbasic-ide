@@ -10,9 +10,10 @@
  * 3. Use parseWithChevrotain from FBasicChevrotainParser.ts
  */
 
-import * as monaco from 'monaco-editor';
 import { useDebounceFn } from '@vueuse/core';
-import { parseWithChevrotain } from '../../../core/parser/FBasicChevrotainParser';
+import * as monaco from 'monaco-editor';
+
+import { parseWithChevrotain } from '@/core/parser/FBasicChevrotainParser';
 
 // ============================================================================
 // STEP 1: Define Monarch Tokenizer for Syntax Highlighting

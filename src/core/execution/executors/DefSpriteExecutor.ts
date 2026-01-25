@@ -6,12 +6,13 @@
  */
 
 import type { CstNode } from 'chevrotain'
-import type { ExecutionContext } from '../../state/ExecutionContext'
-import type { ExpressionEvaluator } from '../../evaluation/ExpressionEvaluator'
-import type { DefSpriteDefinition } from '../../sprite/types'
-import { getCstNodes, getFirstCstNode, getFirstToken } from '../../parser/cst-helpers'
-import { ERROR_TYPES } from '../../constants'
-import { convertCharacterSetToTiles, stringToCharCodes } from '../../sprite/characterSetConverter'
+
+import { ERROR_TYPES } from '@/core/constants'
+import type { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
+import { getCstNodes, getFirstCstNode, getFirstToken } from '@/core/parser/cst-helpers'
+import { convertCharacterSetToTiles, stringToCharCodes } from '@/core/sprite/characterSetConverter'
+import type { DefSpriteDefinition } from '@/core/sprite/types'
+import type { ExecutionContext } from '@/core/state/ExecutionContext'
 
 export class DefSpriteExecutor {
   constructor(

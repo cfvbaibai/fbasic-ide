@@ -1,6 +1,7 @@
 import { computed } from 'vue'
-import { isEightTileSprite, isFourTileSprite, isSixTileSprite, type SpriteDefinition } from '@/shared/data/types'
+
 import { COLORS, SPRITE_PALETTES } from '@/shared/data/palette'
+import { isEightTileSprite, isFourTileSprite, isSixTileSprite, type SpriteDefinition } from '@/shared/data/types'
 
 export function useSpriteDisplay(
   selectedSprite: { value: SpriteDefinition | null },

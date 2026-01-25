@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { Icon } from '@iconify/vue'
+import { computed } from 'vue'
 
 /**
  * GameIcon component - An icon component using Iconify with size, color, and animation options.

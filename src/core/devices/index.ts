@@ -5,8 +5,8 @@
  */
 
 // Device implementations
-export * from './WebWorkerDeviceAdapter'
 export * from './TestDeviceAdapter'
+export * from './WebWorkerDeviceAdapter'
 
 // Re-export commonly used types for convenience
 export type {

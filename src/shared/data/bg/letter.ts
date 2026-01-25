@@ -1,4 +1,4 @@
-import type { BackgroundItem } from "../types"
+import type { BackgroundItem } from "@/shared/data/types"
 
 const BGITEM_LETTER_A_65= [
   [0,0,1,1,1,0,0,0],

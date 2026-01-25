@@ -5,8 +5,10 @@
  * It uses Chevrotain parser to create CST (Concrete Syntax Tree) from F-Basic source code.
  */
 
-import type { ParserInfo } from '../interfaces';
 import type { CstNode } from 'chevrotain';
+
+import type { ParserInfo } from '@/core/interfaces';
+
 import { parseWithChevrotain } from './FBasicChevrotainParser';
 
 /**

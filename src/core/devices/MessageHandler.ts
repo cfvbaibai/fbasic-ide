@@ -6,9 +6,8 @@
 
 import type {
   AnyServiceWorkerMessage,
-  OutputMessage,
-  ExecutionResult
-} from '../interfaces'
+  ExecutionResult,
+  OutputMessage} from '@/core/interfaces'
 
 export interface PendingMessage {
   resolve: (result: ExecutionResult) => void

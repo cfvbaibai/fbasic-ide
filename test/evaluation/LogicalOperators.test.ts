@@ -6,7 +6,8 @@
  * Return values: -1 for true, 0 for false (per Family BASIC spec)
  */
 
-import { describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach,describe, expect, it } from 'vitest'
+
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
 

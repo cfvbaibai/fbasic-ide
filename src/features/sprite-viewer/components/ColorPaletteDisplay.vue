@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
+
+import { GameBlock } from '@/shared/components/ui'
+
 import ColorBox from './ColorBox.vue'
-import { GameBlock } from '../../../shared/components/ui'
 
 /**
  * ColorPaletteDisplay component - Displays the full color palette in a grid.

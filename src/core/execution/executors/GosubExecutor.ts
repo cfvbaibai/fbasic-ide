@@ -6,9 +6,10 @@
  */
 
 import type { CstNode } from 'chevrotain'
-import type { ExecutionContext } from '../../state/ExecutionContext'
-import { getFirstToken } from '../../parser/cst-helpers'
-import { ERROR_TYPES } from '../../constants'
+
+import { ERROR_TYPES } from '@/core/constants'
+import { getFirstToken } from '@/core/parser/cst-helpers'
+import type { ExecutionContext } from '@/core/state/ExecutionContext'
 
 export class GosubExecutor {
   constructor(

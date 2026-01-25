@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { useRoute, useRouter } from 'vue-router'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRoute, useRouter } from 'vue-router'
+
+import { useLocale } from '@/shared/composables/useLocale'
+import { useSkin } from '@/shared/composables/useSkin'
+
 import GameIcon from './ui/GameIcon.vue'
 import GameSelect from './ui/GameSelect.vue'
-import { useSkin } from '../composables/useSkin'
-import { useLocale } from '../composables/useLocale'
 
 /**
  * GameNavigation component - Main navigation component with route navigation, skin switcher, and locale switcher.

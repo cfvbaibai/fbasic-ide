@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { useTemplateRef, onMounted, onBeforeUnmount, onDeactivated, watch } from 'vue';
 import * as monaco from 'monaco-editor';
-import { setupMonacoLanguage, setupLiveErrorChecking } from '../integrations/monaco-integration';
+import { onBeforeUnmount, onDeactivated, onMounted, useTemplateRef, watch } from 'vue';
+
+import { setupLiveErrorChecking, setupMonacoLanguage } from '@/features/ide/integrations/monaco-integration'
 
 /**
  * MonacoCodeEditor component - Monaco Editor integration for F-BASIC code editing.

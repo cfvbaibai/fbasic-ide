@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { GameInputProps, GameInputEmits } from './GameInput.types'
+
+import type { GameInputEmits,GameInputProps } from './GameInput.types'
 
 /**
  * GameInput component - A styled input field with validation, clearable option, and size variants.

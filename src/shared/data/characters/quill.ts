@@ -1,4 +1,4 @@
-import type { SpriteDefinition } from "../types"
+import type { SpriteDefinition } from "@/shared/data/types"
 
 const SPRITE_QUILL1_1_224 = [
   [2,2,0,0,0,0,0,0],

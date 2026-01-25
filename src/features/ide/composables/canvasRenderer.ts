@@ -3,10 +3,11 @@
  * For performance testing and direct rendering
  */
 
+import type { MovementState,SpriteState } from '@/core/sprite/types'
 import { BACKGROUND_PALETTES, COLORS } from '@/shared/data/palette'
 import { getBackgroundItemByChar } from '@/shared/utils/backgroundLookup'
+
 import { renderSprites } from './spriteCanvasRenderer'
-import type { SpriteState, MovementState } from '@/core/sprite/types'
 
 interface ScreenCell {
   character: string

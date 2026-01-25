@@ -5,11 +5,12 @@
  */
 
 import type { CstNode } from 'chevrotain'
-import type { LoopState } from '../../state/ExecutionContext'
-import type { ExpressionEvaluator } from '../../evaluation/ExpressionEvaluator'
-import type { VariableService } from '../../services/VariableService'
-import { getFirstToken, getCstNodes } from '../../parser/cst-helpers'
-import { ERROR_TYPES, DEFAULTS } from '../../constants'
+
+import { DEFAULTS,ERROR_TYPES } from '@/core/constants'
+import type { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
+import { getCstNodes,getFirstToken } from '@/core/parser/cst-helpers'
+import type { VariableService } from '@/core/services/VariableService'
+import type { LoopState } from '@/core/state/ExecutionContext'
 
 export class ForExecutor {
   constructor(

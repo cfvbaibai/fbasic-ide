@@ -6,7 +6,8 @@
  */
 
 import type { CstNode } from 'chevrotain'
-import { getFirstCstNode, getCstNodes, getFirstToken } from '../parser/cst-helpers'
+
+import { getCstNodes, getFirstCstNode, getFirstToken } from '@/core/parser/cst-helpers'
 
 export interface ExpandedStatement {
   command: CstNode // Single command CST node

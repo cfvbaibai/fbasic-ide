@@ -3,12 +3,14 @@
  */
 
 import type { Ref } from 'vue'
+
 import type {
   AnyServiceWorkerMessage,
-  ResultMessage,
   ErrorMessage,
+  ResultMessage,
   ScreenCell
-} from '../../../core/interfaces'
+} from '@/core/interfaces'
+
 import type { WebWorkerManager } from './useBasicIdeWebWorkerUtils'
 
 export interface MessageHandlerContext {

@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import SpriteSelector from './SpriteSelector.vue'
+
+import { GameBlock } from '@/shared/components/ui'
+
 import DisplayOptions from './DisplayOptions.vue'
 import PaletteSelector from './PaletteSelector.vue'
-import { GameBlock } from '../../../shared/components/ui'
+import SpriteSelector from './SpriteSelector.vue'
 
 /**
  * SpriteControls component - Container for sprite viewer controls (selector, display options, palette).

@@ -5,7 +5,7 @@
 import type {
   AnyServiceWorkerMessage,
   ExecutionResult
-} from '../../../core/interfaces'
+} from '@/core/interfaces'
 
 export interface WebWorkerManager {
   worker: Worker | null

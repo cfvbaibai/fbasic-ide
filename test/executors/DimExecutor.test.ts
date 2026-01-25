@@ -4,13 +4,14 @@
  * Unit tests for the DimExecutor class.
  */
 
-import { describe, it, expect, beforeEach } from 'vitest'
-import { DimExecutor } from '@/core/execution/executors/DimExecutor'
-import { VariableService } from '@/core/services/VariableService'
+import { beforeEach,describe, expect, it } from 'vitest'
+
 import { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
-import { ExecutionContext } from '@/core/state/ExecutionContext'
-import { FBasicParser } from '@/core/parser/FBasicParser'
+import { DimExecutor } from '@/core/execution/executors/DimExecutor'
 import { getFirstCstNode } from '@/core/parser/cst-helpers'
+import { FBasicParser } from '@/core/parser/FBasicParser'
+import { VariableService } from '@/core/services/VariableService'
+import { ExecutionContext } from '@/core/state/ExecutionContext'
 import type { BasicArrayValue, BasicScalarValue } from '@/core/types/BasicTypes'
 
 describe('DimExecutor', () => {

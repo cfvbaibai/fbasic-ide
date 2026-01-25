@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import GameIcon from './GameIcon.vue'
+
 import GameBlock from './GameBlock.vue'
-import type { GameCardProps, GameCardEmits } from './GameCard.types'
+import type { GameCardEmits,GameCardProps } from './GameCard.types'
+import GameIcon from './GameIcon.vue'
 
 /**
  * GameCard component - A card component with icon, title, description, and action.

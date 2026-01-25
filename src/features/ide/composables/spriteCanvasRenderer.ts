@@ -3,9 +3,9 @@
  * Supports both static sprites (DEF SPRITE) and animated sprites (DEF MOVE)
  */
 
-import { SPRITE_PALETTES, COLORS } from '@/shared/data/palette'
+import type { ColorCombination, MovementState,SpriteState } from '@/core/sprite/types'
+import { COLORS,SPRITE_PALETTES } from '@/shared/data/palette'
 import type { Tile } from '@/shared/data/types'
-import type { ColorCombination, SpriteState, MovementState } from '@/core/sprite/types'
 
 /**
  * Cache for pre-rendered sprite tile ImageBitmap objects

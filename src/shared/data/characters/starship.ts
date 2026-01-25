@@ -1,4 +1,4 @@
-import { MoveCharacterCode, type SpriteDefinition } from "../types"
+import { MoveCharacterCode, type SpriteDefinition } from "@/shared/data/types"
 
 const SPRITE_STARSHIP_LEFT_164 = [
   [0,0,0,0,0,0,1,1],

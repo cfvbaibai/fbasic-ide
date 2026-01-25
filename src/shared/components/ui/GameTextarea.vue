@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { GameTextareaProps, GameTextareaEmits } from './GameTextarea.types'
+
+import type { GameTextareaEmits,GameTextareaProps } from './GameTextarea.types'
 
 /**
  * GameTextarea component - A styled textarea component with size variants and resize options.

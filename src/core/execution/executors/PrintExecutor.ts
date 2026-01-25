@@ -5,10 +5,11 @@
  */
 
 import type { CstNode, IToken } from 'chevrotain'
-import type { ExpressionEvaluator } from '../../evaluation/ExpressionEvaluator'
-import type { ExecutionContext } from '../../state/ExecutionContext'
-import { getFirstCstNode, getCstNodes, getFirstToken, getTokens, isCstToken, isCstNode } from '../../parser/cst-helpers'
+
 import { ERROR_TYPES, PRINT_TAB_STOPS } from '@/core/constants'
+import type { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
+import { getCstNodes, getFirstCstNode, getFirstToken, getTokens, isCstNode,isCstToken } from '@/core/parser/cst-helpers'
+import type { ExecutionContext } from '@/core/state/ExecutionContext'
 
 export type PrintSeparator = ',' | ';' | null
 

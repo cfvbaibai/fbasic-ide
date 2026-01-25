@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import MonacoCodeEditor from '../ide/components/MonacoCodeEditor.vue';
-import { GameLayout, GameDivider, GameBlock, GameCodeQuote } from '../../shared/components/ui';
+
+import MonacoCodeEditor from '@/features/ide/components/MonacoCodeEditor.vue';
+import { GameBlock, GameCodeQuote,GameDivider, GameLayout } from '@/shared/components/ui';
 
 /**
  * MonacoEditorPage component - Page showcasing Monaco Editor for F-BASIC code editing.

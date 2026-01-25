@@ -4,16 +4,15 @@
  * Holds the state and context needed for BASIC program execution.
  */
 
-import { ERROR_TYPES } from '../constants'
+import { ERROR_TYPES } from '@/core/constants'
+import type { ExpandedStatement } from '@/core/execution/statement-expander'
 import type {
-  BasicVariable,
+  BasicDeviceAdapter,
   BasicError,
-  InterpreterConfig,
-  BasicDeviceAdapter
-} from '../interfaces'
-import type { BasicScalarValue, BasicArrayValue } from '../types/BasicTypes'
-import type { ExpandedStatement } from '../execution/statement-expander'
-import type { SpriteStateManager } from '../sprite/SpriteStateManager'
+  BasicVariable,
+  InterpreterConfig} from '@/core/interfaces'
+import type { SpriteStateManager } from '@/core/sprite/SpriteStateManager'
+import type { BasicArrayValue,BasicScalarValue } from '@/core/types/BasicTypes'
 
 export interface LoopState {
   variableName: string

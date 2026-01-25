@@ -4,7 +4,8 @@
  * Integration tests for executing expressions with unary minus operator.
  */
 
-import { describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach,describe, expect, it } from 'vitest'
+
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 
 describe('Unary Minus Execution', () => {

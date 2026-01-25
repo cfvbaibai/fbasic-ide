@@ -6,8 +6,9 @@
  */
 
 import type { CstNode } from 'chevrotain'
-import { getFirstCstNode, getCstNodes, getFirstToken } from '../parser/cst-helpers'
-import type { ExecutionContext } from '../state/ExecutionContext'
+
+import { getCstNodes, getFirstCstNode, getFirstToken } from '@/core/parser/cst-helpers'
+import type { ExecutionContext } from '@/core/state/ExecutionContext'
 import { getCharacterByCode } from '@/shared/utils/backgroundLookup'
 
 /**

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+
+import type { GameButtonEmits,GameButtonProps } from './GameButton.types'
 import GameIcon from './GameIcon.vue'
-import type { GameButtonProps, GameButtonEmits } from './GameButton.types'
 
 /**
  * GameButton component - A styled button component with multiple variants, sizes, and states.

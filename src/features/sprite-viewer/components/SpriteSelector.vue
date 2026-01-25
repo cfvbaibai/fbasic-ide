@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { CHARACTER_SPRITES } from '../../../shared/data/sprites'
-import { useSpriteViewerStore } from '../composables/useSpriteViewerStore'
-import { GameSelect } from '../../../shared/components/ui'
+
+import { useSpriteViewerStore } from '@/features/sprite-viewer/composables/useSpriteViewerStore'
+import { GameSelect } from '@/shared/components/ui'
+import { CHARACTER_SPRITES } from '@/shared/data/sprites'
 
 /**
  * SpriteSelector component - Dropdown selector for choosing character sprites.

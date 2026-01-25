@@ -8,26 +8,23 @@
  * @version 3.0.0
  */
 
-import { 
-  EXECUTION_LIMITS, 
-  ERROR_TYPES,
-} from './constants'
-import type { 
-  BasicVariable, 
-  InterpreterConfig, 
-  ExecutionResult
-} from './interfaces'
 import type { CstNode } from 'chevrotain'
 
-// Import the FBasicParser
-import { FBasicParser } from './parser/FBasicParser'
-
+import { 
+  ERROR_TYPES,
+  EXECUTION_LIMITS, 
+} from './constants'
 // Import refactored components
 import {
-  ExecutionEngine,
-  ExecutionContext
-} from './execution'
+  ExecutionContext,
+  ExecutionEngine} from './execution'
 import { expandStatements } from './execution/statement-expander'
+import type { 
+  BasicVariable, 
+  ExecutionResult,
+  InterpreterConfig} from './interfaces'
+// Import the FBasicParser
+import { FBasicParser } from './parser/FBasicParser'
 import { SpriteStateManager } from './sprite/SpriteStateManager'
 
 /**

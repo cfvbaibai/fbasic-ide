@@ -4,7 +4,8 @@
  * Tests for the REM (remark/comment) statement in Family Basic.
  */
 
-import { describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach,describe, expect, it } from 'vitest'
+
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { FBasicParser } from '@/core/parser/FBasicParser'
 

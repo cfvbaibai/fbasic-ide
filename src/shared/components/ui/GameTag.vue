@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+
 import GameIcon from './GameIcon.vue'
-import type { GameTagProps, GameTagEmits } from './GameTag.types'
+import type { GameTagEmits,GameTagProps } from './GameTag.types'
 
 /**
  * GameTag component - A tag/badge component with type variants, sizes, and effects.

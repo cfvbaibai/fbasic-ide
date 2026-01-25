@@ -5,8 +5,9 @@
  */
 
 import type { CstNode } from 'chevrotain'
-import type { DataService } from '../../services/DataService'
-import { getFirstToken } from '../../parser/cst-helpers'
+
+import { getFirstToken } from '@/core/parser/cst-helpers'
+import type { DataService } from '@/core/services/DataService'
 
 export class RestoreExecutor {
   constructor(private dataService: DataService) {}

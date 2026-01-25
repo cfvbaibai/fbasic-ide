@@ -4,7 +4,7 @@
  * Utility functions for navigating and extracting data from Chevrotain CST nodes.
  */
 
-import type { CstNode, CstElement, IToken } from 'chevrotain';
+import type { CstElement, CstNode, IToken } from 'chevrotain';
 
 export function isCstNode(cst: CstElement): cst is CstNode {
   return 'children' in cst;

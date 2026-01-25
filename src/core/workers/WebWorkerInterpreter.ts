@@ -5,18 +5,17 @@
  * with the interpreter code.
  */
 
-import { BasicInterpreter } from '../BasicInterpreter'
-import { WebWorkerDeviceAdapter } from '../devices/WebWorkerDeviceAdapter'
+import { BasicInterpreter } from '@/core/BasicInterpreter'
+import { WebWorkerDeviceAdapter } from '@/core/devices/WebWorkerDeviceAdapter'
 import type { 
   AnyServiceWorkerMessage,
-  ExecuteMessage,
-  ResultMessage,
   ErrorMessage,
-  StopMessage,
+  ExecuteMessage,
   OutputMessage,
-  StrigEventMessage,
-  StickEventMessage
-} from '../interfaces'
+  ResultMessage,
+  StickEventMessage,
+  StopMessage,
+  StrigEventMessage} from '@/core/interfaces'
 
 // Web Worker Interpreter Implementation
 class WebWorkerInterpreter {

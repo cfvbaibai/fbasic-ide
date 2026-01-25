@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { useSpriteViewerStore } from '../composables/useSpriteViewerStore'
-import { GameSwitch } from '../../../shared/components/ui'
+
+import { useSpriteViewerStore } from '@/features/sprite-viewer/composables/useSpriteViewerStore'
+import { GameSwitch } from '@/shared/components/ui'
 
 /**
  * DisplayOptions component - Toggle switches for sprite display options (values, grid lines, reverse).

@@ -9,10 +9,11 @@
  * This test would have caught the bug where COLOR messages weren't being handled.
  */
 
-import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { afterEach,beforeEach, describe, expect, it } from 'vitest'
+
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { WebWorkerDeviceAdapter } from '@/core/devices/WebWorkerDeviceAdapter'
-import type { AnyServiceWorkerMessage, ScreenUpdateMessage, ScreenCell } from '@/core/interfaces'
+import type { AnyServiceWorkerMessage, ScreenCell,ScreenUpdateMessage } from '@/core/interfaces'
 
 // Mock self.postMessage to capture screen updates
 let capturedMessages: AnyServiceWorkerMessage[] = []

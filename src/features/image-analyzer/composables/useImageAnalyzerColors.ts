@@ -2,8 +2,9 @@
  * Composable for image analyzer color-related functionality
  */
 
-import { computed } from 'vue'
 import { useCssVar } from '@vueuse/core'
+import { computed } from 'vue'
+
 import { BACKGROUND_PALETTES, SPRITE_PALETTES } from '@/shared/data/palette'
 
 /**

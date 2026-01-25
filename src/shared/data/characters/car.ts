@@ -1,4 +1,4 @@
-import { MoveCharacterCode, type SpriteDefinition } from "../types"
+import { MoveCharacterCode, type SpriteDefinition } from "@/shared/data/types"
 
 const SPRITE_CAR_LEFT1_120 = [
   [0,0,0,0,0,0,0,0],

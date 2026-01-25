@@ -22,23 +22,24 @@
  * @returns Object containing reactive state and methods for IDE functionality
  */
 
-import { ref, watch, onUnmounted, onDeactivated } from 'vue'
-import { FBasicParser } from '../../../core/parser/FBasicParser'
-import { getSampleCode } from '../../../core/samples/sampleCodes'
-import type { ExecutionResult, ParserInfo, HighlighterInfo, BasicVariable, AnyServiceWorkerMessage } from '../../../core/interfaces'
-import type { SpriteState } from '../../../core/sprite/types'
-import { EXECUTION_LIMITS } from '../../../core/constants'
-import { initializeScreenBuffer, clearScreenBuffer } from './useBasicIdeScreenUtils'
+import { onDeactivated,onUnmounted, ref, watch } from 'vue'
+
+import { EXECUTION_LIMITS } from '@/core/constants'
+import type { AnyServiceWorkerMessage,BasicVariable, ExecutionResult, HighlighterInfo, ParserInfo } from '@/core/interfaces'
+import { FBasicParser } from '@/core/parser/FBasicParser'
+import { getSampleCode } from '@/core/samples/sampleCodes'
+import type { SpriteState } from '@/core/sprite/types'
+
+import { formatArrayForDisplay } from './useBasicIdeFormatting'
 import { handleWorkerMessage, type MessageHandlerContext } from './useBasicIdeMessageHandlers'
+import { clearScreenBuffer,initializeScreenBuffer } from './useBasicIdeScreenUtils'
 import type { WebWorkerManager } from './useBasicIdeWebWorkerUtils'
 import {
-  initializeWebWorker,
-  restartWebWorker,
   checkWebWorkerHealth,
-  sendMessageToWorker as sendMessageToWorkerUtil,
-  rejectAllPendingMessages
-} from './useBasicIdeWebWorkerUtils'
-import { formatArrayForDisplay } from './useBasicIdeFormatting'
+  initializeWebWorker,
+  rejectAllPendingMessages,
+  restartWebWorker,
+  sendMessageToWorker as sendMessageToWorkerUtil} from './useBasicIdeWebWorkerUtils'
 
 /**
  * Enhanced composable function for BASIC IDE functionality with AST-based parsing

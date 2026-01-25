@@ -6,10 +6,11 @@
  */
 
 import type { CstNode } from 'chevrotain'
-import type { ExecutionContext } from '../../state/ExecutionContext'
-import type { ExpressionEvaluator } from '../../evaluation/ExpressionEvaluator'
-import { getCstNodes, getFirstToken, getFirstCstNode } from '../../parser/cst-helpers'
-import { ERROR_TYPES, COLOR_PATTERNS, COLOR_CODES } from '../../constants'
+
+import { COLOR_CODES,COLOR_PATTERNS, ERROR_TYPES } from '@/core/constants'
+import type { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
+import { getCstNodes, getFirstCstNode,getFirstToken } from '@/core/parser/cst-helpers'
+import type { ExecutionContext } from '@/core/state/ExecutionContext'
 
 export class PaletExecutor {
   constructor(

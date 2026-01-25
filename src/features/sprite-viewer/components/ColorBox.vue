@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { COLORS } from '../../../shared/data/palette'
+
+import { COLORS } from '@/shared/data/palette'
 
 /**
  * ColorBox component - Displays a color box with optional hex code.

@@ -6,12 +6,14 @@ defineOptions({
   name: 'JoystickControl'
 })
 const props = defineProps<Props>()
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { GameBlock, GameCollapseToggle, GameSubBlock } from '../../../shared/components/ui'
-import NintendoController from './NintendoController.vue'
-import JoystickStatusTable from './JoystickStatusTable.vue'
+
+import { GameBlock, GameCollapseToggle, GameSubBlock } from '@/shared/components/ui'
+
 import { useJoystickEvents } from '../composables/useJoystickEvents'
+import JoystickStatusTable from './JoystickStatusTable.vue'
+import NintendoController from './NintendoController.vue'
 
 const { t } = useI18n()
 

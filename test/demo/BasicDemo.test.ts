@@ -4,7 +4,8 @@
  * Tests for a complete BASIC program demonstrating various features.
  */
 
-import { describe, it, expect, beforeEach, vi, type MockedFunction } from 'vitest'
+import { beforeEach, describe, expect, it, type MockedFunction,vi } from 'vitest'
+
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import type { BasicDeviceAdapter } from '@/core/interfaces'
 import { FBasicParser } from '@/core/parser/FBasicParser'

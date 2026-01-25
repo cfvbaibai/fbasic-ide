@@ -1,4 +1,5 @@
-import { ref, watchEffect, type Ref } from 'vue'
+import { type Ref,ref, watchEffect } from 'vue'
+
 import { renderScreenBuffer, type ScreenCell } from './canvasRenderer'
 
 /**

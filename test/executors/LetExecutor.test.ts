@@ -4,14 +4,16 @@
  * Unit tests for the LetExecutor class.
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
 import type { CstNode, IToken } from 'chevrotain'
-import { LetExecutor } from '@/core/execution/executors/LetExecutor'
-import { VariableService } from '@/core/services/VariableService'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
-import { ExecutionContext } from '@/core/state/ExecutionContext'
-import { parseLetStatement } from '../test-helpers'
+import { LetExecutor } from '@/core/execution/executors/LetExecutor'
 import { FBasicParser } from '@/core/parser/FBasicParser'
+import { VariableService } from '@/core/services/VariableService'
+import { ExecutionContext } from '@/core/state/ExecutionContext'
+
+import { parseLetStatement } from '../test-helpers'
 
 describe('LetExecutor', () => {
   let executor: LetExecutor

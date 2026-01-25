@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, useSlots, h } from 'vue'
 import type { ComputedRef } from 'vue'
-import GameTabButton from './GameTabButton.vue'
+import { computed, h,onMounted, onUnmounted, useSlots } from 'vue'
+
 import {
   ActiveTabKey,
+  injectStrict,
   RegisterTabKey,
-  UnregisterTabKey,
-  injectStrict
-} from './game-tabs-keys'
+  UnregisterTabKey} from './game-tabs-keys'
+import GameTabButton from './GameTabButton.vue'
 
 /**
  * GameTabPane component - A pane that displays content for a specific tab.

@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { useSpriteViewerStore } from '../composables/useSpriteViewerStore'
+
+import { useSpriteViewerStore } from '@/features/sprite-viewer/composables/useSpriteViewerStore'
+import { GameButton, GameButtonGroup } from '@/shared/components/ui'
+
 import ColorBox from './ColorBox.vue'
-import { GameButton, GameButtonGroup } from '../../../shared/components/ui'
 
 /**
  * PaletteSelector component - Selector for choosing sprite palette codes.

@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import type { GameBlockEmits,GameBlockProps } from './GameBlock.types'
 import GameIcon from './GameIcon.vue'
-import type { GameBlockProps, GameBlockEmits } from './GameBlock.types'
 
 /**
  * GameBlock component - A block/section component with title, icon, and clickable options.

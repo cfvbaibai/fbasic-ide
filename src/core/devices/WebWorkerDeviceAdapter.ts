@@ -6,15 +6,16 @@
  */
 
 import type { 
-  BasicDeviceAdapter,
-  InterpreterConfig, 
-  ExecutionResult,
   AnyServiceWorkerMessage,
+  BasicDeviceAdapter,
+  ExecutionResult,
+  InterpreterConfig, 
   OutputMessage
-} from '../interfaces'
-import { WebWorkerManager, type WebWorkerExecutionOptions } from './WebWorkerManager'
-import { ScreenStateManager } from './ScreenStateManager'
+} from '@/core/interfaces'
+
 import { MessageHandler } from './MessageHandler'
+import { ScreenStateManager } from './ScreenStateManager'
+import { type WebWorkerExecutionOptions,WebWorkerManager } from './WebWorkerManager'
 
 export type { WebWorkerExecutionOptions }
 

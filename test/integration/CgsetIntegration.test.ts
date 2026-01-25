@@ -11,7 +11,8 @@
  * characters are rendered with the correct colors from palette 0.
  */
 
-import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { afterEach,beforeEach, describe, expect, it } from 'vitest'
+
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { WebWorkerDeviceAdapter } from '@/core/devices/WebWorkerDeviceAdapter'
 import type { AnyServiceWorkerMessage, ScreenUpdateMessage } from '@/core/interfaces'

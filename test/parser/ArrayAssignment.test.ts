@@ -4,11 +4,12 @@
  * Tests for assigning values to array elements using LET statement.
  */
 
-import { describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach,describe, expect, it } from 'vitest'
+
 import { BasicInterpreter } from '@/core/BasicInterpreter'
-import { FBasicParser } from '@/core/parser/FBasicParser'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
-import type { BasicScalarValue, BasicArrayValue } from '@/core/types/BasicTypes'
+import { FBasicParser } from '@/core/parser/FBasicParser'
+import type { BasicArrayValue,BasicScalarValue } from '@/core/types/BasicTypes'
 
 describe('Array Assignment', () => {
   let interpreter: BasicInterpreter

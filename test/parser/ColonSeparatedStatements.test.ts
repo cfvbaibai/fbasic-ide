@@ -2,9 +2,10 @@
  * Tests for colon-separated statements (multiple statements per line)
  */
 
-import { describe, it, expect } from 'vitest'
+import { describe, expect,it } from 'vitest'
+
+import { getCstNodes,getFirstCstNode } from '@/core/parser/cst-helpers'
 import { FBasicParser } from '@/core/parser/FBasicParser'
-import { getFirstCstNode, getCstNodes } from '@/core/parser/cst-helpers'
 
 describe('Colon-Separated Statements', () => {
   const parser = new FBasicParser()

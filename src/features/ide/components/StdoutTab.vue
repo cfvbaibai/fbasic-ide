@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { watch, nextTick, computed, useTemplateRef } from 'vue'
+import { computed, nextTick, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { GameTabPane, GameIcon } from '../../../shared/components/ui'
+
+import { GameIcon,GameTabPane } from '@/shared/components/ui'
 
 /**
  * StdoutTab component - Displays standard output and errors in a tab pane format.

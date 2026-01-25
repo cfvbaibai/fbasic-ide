@@ -4,7 +4,8 @@
  * Tests that verify LOCATE and PRINT work together correctly in actual BASIC programs.
  */
 
-import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { afterEach,beforeEach, describe, expect, it } from 'vitest'
+
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { WebWorkerDeviceAdapter } from '@/core/devices/WebWorkerDeviceAdapter'
 import type { AnyServiceWorkerMessage } from '@/core/interfaces'

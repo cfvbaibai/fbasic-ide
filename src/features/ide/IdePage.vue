@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { computed, onMounted,ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import MonacoCodeEditor from './components/MonacoCodeEditor.vue'
-import RuntimeOutput from './components/RuntimeOutput.vue'
+
+import type { HighlighterInfo,ParserInfo } from '@/core/interfaces'
+import { GameBlock,GameButton, GameButtonGroup, GameLayout } from '@/shared/components/ui'
+
 import IdeControls from './components/IdeControls.vue'
 import JoystickControl from './components/JoystickControl.vue'
-import { GameLayout, GameButton, GameButtonGroup, GameBlock } from '../../shared/components/ui'
+import MonacoCodeEditor from './components/MonacoCodeEditor.vue'
+import RuntimeOutput from './components/RuntimeOutput.vue'
 import { useBasicIde as useBasicIdeEnhanced } from './composables/useBasicIdeEnhanced'
-import type { ParserInfo, HighlighterInfo } from '../../core/interfaces'
 
 /**
  * IdePage component - The main IDE page for F-BASIC code editing and execution.

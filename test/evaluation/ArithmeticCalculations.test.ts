@@ -9,10 +9,11 @@
  * through the full interpreter pipeline, not just parser tests.
  */
 
-import { describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach,describe, expect, it } from 'vitest'
+
 import { BasicInterpreter } from '@/core/BasicInterpreter'
-import { FBasicParser } from '@/core/parser/FBasicParser'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
+import { FBasicParser } from '@/core/parser/FBasicParser'
 
 describe('Arithmetic Calculations', () => {
   let interpreter: BasicInterpreter

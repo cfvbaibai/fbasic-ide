@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed,ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { GameLayout, GameBlock } from '../../shared/components/ui'
-import { GameButton, GameButtonGroup, GameUpload, GameCodeQuote } from '../../shared/components/ui'
-import { useImageAnalysis } from './composables/useImageAnalysis'
+
+import ColorBox from '@/features/sprite-viewer/components/ColorBox.vue'
+import { GameBlock,GameLayout } from '@/shared/components/ui'
+import { GameButton, GameButtonGroup, GameCodeQuote,GameUpload } from '@/shared/components/ui'
+
 import { useGridManipulation } from './composables/useGridManipulation'
-import { useGridLineColors, useColorCombinationColors } from './composables/useImageAnalyzerColors'
-import ColorBox from '../sprite-viewer/components/ColorBox.vue'
+import { useImageAnalysis } from './composables/useImageAnalysis'
+import { useColorCombinationColors,useGridLineColors } from './composables/useImageAnalyzerColors'
 
 /**
  * ImageAnalyzerPage component - Page for analyzing images and generating sprite arrays.

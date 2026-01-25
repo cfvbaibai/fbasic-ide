@@ -7,11 +7,12 @@
  */
 
 import type { CstNode } from 'chevrotain'
-import type { ExecutionContext } from '../../state/ExecutionContext'
-import type { ExpressionEvaluator } from '../../evaluation/ExpressionEvaluator'
-import { getFirstToken, getTokens, getFirstCstNode } from '../../parser/cst-helpers'
-import type { DataService } from '../../services/DataService'
-import { ERROR_TYPES } from '../../constants'
+
+import { ERROR_TYPES } from '@/core/constants'
+import type { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
+import { getFirstCstNode,getFirstToken, getTokens } from '@/core/parser/cst-helpers'
+import type { DataService } from '@/core/services/DataService'
+import type { ExecutionContext } from '@/core/state/ExecutionContext'
 
 export class OnExecutor {
   constructor(

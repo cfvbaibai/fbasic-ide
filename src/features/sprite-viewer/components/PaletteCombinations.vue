@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { SPRITE_PALETTES, BACKGROUND_PALETTES } from '../../../shared/data/palette'
+
+import { GameBlock } from '@/shared/components/ui'
+import { BACKGROUND_PALETTES,SPRITE_PALETTES } from '@/shared/data/palette'
+
 import ColorBox from './ColorBox.vue'
-import { GameBlock } from '../../../shared/components/ui'
 
 /**
  * PaletteCombinations component - Displays sprite and background palette combinations.

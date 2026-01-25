@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { GameLayout, HeroSection, GameSection, GameCard, GameBlock } from '../../shared/components/ui'
+import { useRouter } from 'vue-router'
+
+import { GameBlock,GameCard, GameLayout, GameSection, HeroSection } from '@/shared/components/ui'
 
 /**
  * HomePage component - The home/landing page of the application.

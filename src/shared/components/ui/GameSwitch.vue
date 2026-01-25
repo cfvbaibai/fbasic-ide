@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { GameSwitchProps, GameSwitchEmits } from './GameSwitch.types'
+
+import type { GameSwitchEmits,GameSwitchProps } from './GameSwitch.types'
 
 /**
  * GameSwitch component - A toggle switch component with size variants.

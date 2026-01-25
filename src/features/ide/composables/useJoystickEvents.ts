@@ -1,5 +1,5 @@
-import { ref, onUnmounted, onDeactivated } from 'vue'
-import { useTimeoutFn, useIntervalFn } from '@vueuse/core'
+import { useIntervalFn,useTimeoutFn } from '@vueuse/core'
+import { onDeactivated,onUnmounted, ref } from 'vue'
 
 interface UseJoystickEventsOptions {
   sendStickEvent?: (joystickId: number, state: number) => void

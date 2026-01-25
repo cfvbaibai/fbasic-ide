@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { useTemplateRef, ref, computed, onDeactivated } from 'vue'
-import { useI18n } from 'vue-i18n'
 import { useEventListener } from '@vueuse/core'
+import { computed, onDeactivated,ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+
 import GameIcon from './GameIcon.vue'
-import type { GameSelectProps, GameSelectEmits, GameSelectOption } from './GameSelect.types'
+import type { GameSelectEmits, GameSelectOption,GameSelectProps } from './GameSelect.types'
 
 /**
  * GameSelect component - A styled select dropdown component with options.

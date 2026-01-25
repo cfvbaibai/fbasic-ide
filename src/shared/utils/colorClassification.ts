@@ -1,4 +1,4 @@
-import { COLORS, BACKGROUND_PALETTES, SPRITE_PALETTES } from '@/shared/data/palette'
+import { BACKGROUND_PALETTES, COLORS, SPRITE_PALETTES } from '@/shared/data/palette'
 
 /**
  * Color classification utilities for F-BASIC sprite generation.

@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import GameNavigation from '@/shared/components/GameNavigation.vue'
+
 import GamePageContainer from './GamePageContainer.vue'
-import GameNavigation from '../GameNavigation.vue'
 
 /**
  * GameLayout component - Main layout component with navigation and content areas.

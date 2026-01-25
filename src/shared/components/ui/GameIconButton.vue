@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+
 import GameIcon from './GameIcon.vue'
-import type { GameIconButtonProps, GameIconButtonEmits } from './GameIconButton.types'
+import type { GameIconButtonEmits,GameIconButtonProps } from './GameIconButton.types'
 
 /**
  * GameIconButton component - An icon-only button component with variants and states.

@@ -11,11 +11,12 @@
  */
 
 import type { CstNode } from 'chevrotain'
-import type { VariableService } from '../../services/VariableService'
-import type { ExpressionEvaluator } from '../../evaluation/ExpressionEvaluator'
-import type { ExecutionContext } from '../../state/ExecutionContext'
-import { ERROR_TYPES } from '../../constants'
-import { getFirstCstNode, getCstNodes, getFirstToken } from '../../parser/cst-helpers'
+
+import { ERROR_TYPES } from '@/core/constants'
+import type { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
+import { getCstNodes, getFirstCstNode, getFirstToken } from '@/core/parser/cst-helpers'
+import type { VariableService } from '@/core/services/VariableService'
+import type { ExecutionContext } from '@/core/state/ExecutionContext'
 
 export class DimExecutor {
   constructor(

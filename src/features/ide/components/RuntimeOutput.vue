@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { BasicVariable, ScreenCell } from '../../../core/interfaces'
-import type { SpriteState } from '../../../core/sprite/types'
-import ScreenTab from './ScreenTab.vue'
-import VariablesTab from './VariablesTab.vue'
+
+import type { BasicVariable, ScreenCell } from '@/core/interfaces'
+import type { SpriteState } from '@/core/sprite/types'
+import { GameTabs } from '@/shared/components/ui'
+
 import DebugTab from './DebugTab.vue'
+import ScreenTab from './ScreenTab.vue'
 import StdoutTab from './StdoutTab.vue'
-import { GameTabs } from '../../../shared/components/ui'
+import VariablesTab from './VariablesTab.vue'
 
 /**
  * RuntimeOutput component - Displays runtime output, errors, variables, debug info, and screen buffer.

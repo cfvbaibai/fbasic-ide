@@ -5,7 +5,8 @@
  */
 
 import type { CstNode } from 'chevrotain'
-import type { ExecutionContext } from '../../state/ExecutionContext'
+
+import type { ExecutionContext } from '@/core/state/ExecutionContext'
 
 export class EndExecutor {
   constructor(private context: ExecutionContext) {}

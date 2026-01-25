@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { useTemplateRef, ref } from 'vue'
+import { ref,useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
+
 import GameButton from './GameButton.vue'
 import GameIcon from './GameIcon.vue'
-import type { GameUploadProps, GameUploadEmits } from './GameUpload.types'
+import type { GameUploadEmits,GameUploadProps } from './GameUpload.types'
 
 /**
  * GameUpload component - A file upload component with drag-and-drop support.

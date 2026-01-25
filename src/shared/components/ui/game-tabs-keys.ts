@@ -1,4 +1,4 @@
-import { inject, type InjectionKey, type ComputedRef, type VNode } from 'vue'
+import { type ComputedRef, inject, type InjectionKey, type VNode } from 'vue'
 
 /**
  * Injection keys for GameTabs component provide/inject pattern.

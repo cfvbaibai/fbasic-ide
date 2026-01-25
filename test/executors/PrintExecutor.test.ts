@@ -4,12 +4,14 @@
  * Unit tests for the PrintExecutor class.
  */
 
-import { describe, it, expect, beforeEach, vi, type MockedFunction } from 'vitest'
-import type { BasicDeviceAdapter } from '@/core/interfaces'
-import { PrintExecutor } from '@/core/execution/executors/PrintExecutor'
+import { beforeEach, describe, expect, it, type MockedFunction,vi } from 'vitest'
+
 import { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
-import { ExecutionContext } from '@/core/state/ExecutionContext'
+import { PrintExecutor } from '@/core/execution/executors/PrintExecutor'
+import type { BasicDeviceAdapter } from '@/core/interfaces'
 import { FBasicParser } from '@/core/parser/FBasicParser'
+import { ExecutionContext } from '@/core/state/ExecutionContext'
+
 import { parsePrintStatement } from '../test-helpers'
 
 describe('PrintExecutor', () => {

@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+
+import { message } from '@/shared/utils/message'
+
 import GameIconButton from './GameIconButton.vue'
-import { message } from '../../utils/message'
 
 /**
  * GameCodeQuote component - A code block component with copy functionality.

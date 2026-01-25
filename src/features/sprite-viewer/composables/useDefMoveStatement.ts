@@ -1,4 +1,5 @@
 import { computed } from 'vue'
+
 import type { SpriteDefinition } from '@/shared/data/types'
 
 export function useDefMoveStatement(

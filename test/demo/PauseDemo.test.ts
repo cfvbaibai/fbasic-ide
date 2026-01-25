@@ -5,10 +5,11 @@
  * PAUSE command usage with countdown and timing delays.
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { BasicInterpreter } from '@/core/BasicInterpreter'
-import { FBasicParser } from '@/core/parser/FBasicParser'
 import type { BasicDeviceAdapter } from '@/core/interfaces'
+import { FBasicParser } from '@/core/parser/FBasicParser'
 import { getSampleCode } from '@/core/samples/sampleCodes'
 
 // Skip by default - this test takes a long time due to PAUSE delays

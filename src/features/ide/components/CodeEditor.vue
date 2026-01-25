@@ -1,9 +1,10 @@
 <script setup lang="ts">
 /* eslint-disable vue/no-v-html */
-import { useTemplateRef, ref, watch, onMounted } from 'vue'
+import { onMounted, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { DEFAULTS } from '../../../core/constants'
-import { GameBlock } from '../../../shared/components/ui'
+
+import { DEFAULTS } from '@/core/constants'
+import { GameBlock } from '@/shared/components/ui'
 
 /**
  * CodeEditor component - A code editor component with syntax highlighting.

@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { provideSpriteViewerStore } from './composables/useSpriteViewerStore'
-import { GameLayout } from '../../shared/components/ui'
+import { GameLayout } from '@/shared/components/ui'
+
+import ColorPaletteDisplay from './components/ColorPaletteDisplay.vue'
+import DefStatements from './components/DefStatements.vue'
+import PaletteCombinations from './components/PaletteCombinations.vue'
 import SpriteControls from './components/SpriteControls.vue'
 import SpriteGrid from './components/SpriteGrid.vue'
-import ColorPaletteDisplay from './components/ColorPaletteDisplay.vue'
-import PaletteCombinations from './components/PaletteCombinations.vue'
-import DefStatements from './components/DefStatements.vue'
+import { provideSpriteViewerStore } from './composables/useSpriteViewerStore'
 
 /**
  * CharacterSpriteViewerPage component - Main page for viewing and editing character sprites.

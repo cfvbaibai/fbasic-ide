@@ -2,10 +2,10 @@
  * Core interfaces for the Family Basic Interpreter
  */
 
-import type { VARIABLE_TYPES, ERROR_TYPES } from './constants'
+import type { ERROR_TYPES,VARIABLE_TYPES } from './constants'
+import type { SpriteState } from './sprite/types'
 import type { ExecutionContext } from './state/ExecutionContext'
 import type { BasicArrayValue } from './types/BasicTypes'
-import type { SpriteState } from './sprite/types'
 
 /**
  * Represents a BASIC variable with its value and type

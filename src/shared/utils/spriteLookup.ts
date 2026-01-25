@@ -6,7 +6,7 @@
 
 import { CHARACTER_SPRITES } from '@/shared/data/sprites'
 import type { SpriteDefinition, Tile } from '@/shared/data/types'
-import { isOneTileSprite, isFourTileSprite, isSixTileSprite, isEightTileSprite } from '@/shared/data/types'
+import { isEightTileSprite,isFourTileSprite, isOneTileSprite, isSixTileSprite } from '@/shared/data/types'
 
 /**
  * Find sprite tile by character code from Table A

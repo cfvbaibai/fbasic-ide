@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, useTemplateRef } from 'vue'
+import { computed, onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { GameLayout, GameButton } from '@/shared/components/ui'
+
 import { renderScreenBuffer, type ScreenCell } from '@/features/ide/composables/canvasRenderer'
+import { GameButton,GameLayout } from '@/shared/components/ui'
 
 /**
  * CanvasPerformanceTest component - Performance testing component for canvas rendering.

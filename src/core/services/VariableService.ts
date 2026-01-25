@@ -4,12 +4,13 @@
  * Handles variable management including simple variables and arrays.
  */
 
-import Decimal from 'decimal.js'
-import type { BasicVariable } from '../interfaces'
 import type { CstNode } from 'chevrotain'
-import type { ExpressionEvaluator } from '../evaluation/ExpressionEvaluator'
-import type { ExecutionContext } from '../state/ExecutionContext'
-import type { BasicScalarValue, BasicArrayValue } from '../types/BasicTypes'
+import Decimal from 'decimal.js'
+
+import type { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
+import type { BasicVariable } from '@/core/interfaces'
+import type { ExecutionContext } from '@/core/state/ExecutionContext'
+import type { BasicArrayValue,BasicScalarValue } from '@/core/types/BasicTypes'
 
 export class VariableService {
   constructor(

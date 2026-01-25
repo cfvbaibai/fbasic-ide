@@ -1,4 +1,4 @@
-import { MoveCharacterCode, type SpriteDefinition } from "../types"
+import { MoveCharacterCode, type SpriteDefinition } from "@/shared/data/types"
 
 const SPRITE_NITPICKER_1_200 = [
   [0,0,0,0,0,0,0,0],

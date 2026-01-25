@@ -4,8 +4,8 @@
  * Uses Character Table A (sprite table) instead of Table B (background table)
  */
 
-import { getSpriteTilesByCodes } from '@/shared/utils/spriteLookup'
 import type { Tile } from '@/shared/data/types'
+import { getSpriteTilesByCodes } from '@/shared/utils/spriteLookup'
 
 /**
  * Convert character set to tiles from Table A (sprite table)

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { GameIconButton } from '../../../shared/components/ui'
+
+import { GameIconButton } from '@/shared/components/ui'
 
 /**
  * IdeControls component - Control buttons for the IDE (run, stop, clear, debug toggle).

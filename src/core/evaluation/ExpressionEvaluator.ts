@@ -7,11 +7,13 @@
 
 import type { CstNode } from 'chevrotain'
 import Decimal from 'decimal.js'
-import type { BasicScalarValue, BasicArrayValue } from '../types/BasicTypes'
-import { getFirstCstNode, getCstNodes, getFirstToken, getTokens } from '../parser/cst-helpers'
+
+import { ERROR_TYPES } from '@/core/constants'
+import { getCstNodes, getFirstCstNode, getFirstToken, getTokens } from '@/core/parser/cst-helpers'
+import type { ExecutionContext } from '@/core/state/ExecutionContext'
+import type { BasicArrayValue,BasicScalarValue } from '@/core/types/BasicTypes'
+
 import { FunctionEvaluator } from './FunctionEvaluator'
-import type { ExecutionContext } from '../state/ExecutionContext'
-import { ERROR_TYPES } from '../constants'
 
 export class ExpressionEvaluator {
   private functionEvaluator: FunctionEvaluator

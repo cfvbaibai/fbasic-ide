@@ -5,10 +5,11 @@
  */
 
 import type { CstNode } from 'chevrotain'
-import type { ExecutionContext } from '../../state/ExecutionContext'
-import type { ExpressionEvaluator } from '../../evaluation/ExpressionEvaluator'
-import { getCstNodes } from '../../parser/cst-helpers'
-import { ERROR_TYPES, SCREEN_DIMENSIONS } from '../../constants'
+
+import { ERROR_TYPES, SCREEN_DIMENSIONS } from '@/core/constants'
+import type { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
+import { getCstNodes } from '@/core/parser/cst-helpers'
+import type { ExecutionContext } from '@/core/state/ExecutionContext'
 
 export class LocateExecutor {
   constructor(

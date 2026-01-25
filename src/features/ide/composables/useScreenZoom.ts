@@ -1,4 +1,4 @@
-import { ref, type InjectionKey, provide, inject, type Ref } from 'vue'
+import { inject, type InjectionKey, provide, type Ref,ref } from 'vue'
 
 /**
  * Zoom control interface

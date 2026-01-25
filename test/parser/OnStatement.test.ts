@@ -4,9 +4,10 @@
  * Unit tests for parsing ON statements.
  */
 
-import { describe, it, expect } from 'vitest'
-import { parseWithChevrotain } from '@/core/parser/FBasicChevrotainParser'
+import { describe, expect,it } from 'vitest'
+
 import { getFirstCstNode } from '@/core/parser/cst-helpers'
+import { parseWithChevrotain } from '@/core/parser/FBasicChevrotainParser'
 
 describe('ON Statement', () => {
   describe('Parser Tests', () => {

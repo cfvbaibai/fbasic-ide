@@ -5,9 +5,10 @@
  * Uses data-skin attribute on <html> element to switch themes.
  */
 
-import { computed, watch } from 'vue'
 import { useLocalStorage } from '@vueuse/core'
-import { skinConfigs, type SkinConfig } from './skinConfig'
+import { computed, watch } from 'vue'
+
+import { type SkinConfig,skinConfigs } from './skinConfig'
 
 export type SkinName = 'default' | 'retro-blue' | 'nintendo' | 'classic-light' | 'y2k-futuristic' | 'sunset-vaporwave'
 
@@ -134,4 +135,4 @@ export function useSkin() {
 }
 
 // Export skin configs for global access
-export { skinConfigs, type SkinConfig }
+export { type SkinConfig,skinConfigs }

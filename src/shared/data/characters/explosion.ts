@@ -1,4 +1,4 @@
-import type { SpriteDefinition } from "../types"
+import type { SpriteDefinition } from "@/shared/data/types"
 
 const SPRITE_EXPLOSION_1_176 = [
   [0,0,0,0,0,0,0,0],

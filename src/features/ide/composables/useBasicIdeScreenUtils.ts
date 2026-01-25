@@ -2,8 +2,9 @@
  * Screen utilities for BASIC IDE
  */
 
-import type { ScreenCell } from '../../../core/interfaces'
 import type { Ref } from 'vue'
+
+import type { ScreenCell } from '@/core/interfaces'
 
 /**
  * Initialize screen buffer as full grid for proper reactivity

@@ -1,10 +1,12 @@
-import { ref, computed, provide, inject, type InjectionKey } from 'vue'
-import { CHARACTER_SPRITES } from '../../../shared/data/sprites'
+import { computed, inject, type InjectionKey,provide, ref } from 'vue'
+
+import { CHARACTER_SPRITES } from '@/shared/data/sprites'
 import type { SpriteDefinition } from '@/shared/data/types'
-import { useSpriteDisplay } from './useSpriteDisplay'
-import { usePaletteSelection } from './usePaletteSelection'
-import { useDefSpriteStatement } from './useDefSpriteStatement'
+
 import { useDefMoveStatement } from './useDefMoveStatement'
+import { useDefSpriteStatement } from './useDefSpriteStatement'
+import { usePaletteSelection } from './usePaletteSelection'
+import { useSpriteDisplay } from './useSpriteDisplay'
 
 export interface SpriteViewerStore {
   // State (reactive refs/computed)

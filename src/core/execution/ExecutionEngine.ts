@@ -4,13 +4,14 @@
  * Main execution engine that orchestrates BASIC program execution.
  */
 
-import type { ExecutionResult, BasicDeviceAdapter } from '../interfaces'
-import { ERROR_TYPES } from '../constants'
-import type { ExecutionContext } from '../state/ExecutionContext'
-import { ExpressionEvaluator } from '../evaluation/ExpressionEvaluator'
+import { ERROR_TYPES } from '@/core/constants'
+import { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
+import type { BasicDeviceAdapter,ExecutionResult } from '@/core/interfaces'
+import { DataService } from '@/core/services/DataService'
+import { VariableService } from '@/core/services/VariableService'
+import type { ExecutionContext } from '@/core/state/ExecutionContext'
+
 import { StatementRouter } from './StatementRouter'
-import { VariableService } from '../services/VariableService'
-import { DataService } from '../services/DataService'
 
 export class ExecutionEngine {
   private context: ExecutionContext

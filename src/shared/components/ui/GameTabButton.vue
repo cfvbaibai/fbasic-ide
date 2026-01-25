@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import type { ComputedRef } from 'vue'
-import GameIcon from './GameIcon.vue'
+import { computed } from 'vue'
+
 import {
   ActiveTabKey,
-  SetActiveTabKey,
-  injectStrict
-} from './game-tabs-keys'
+  injectStrict,
+  SetActiveTabKey} from './game-tabs-keys'
+import GameIcon from './GameIcon.vue'
 
 /**
  * GameTabButton component - A button for tab navigation.

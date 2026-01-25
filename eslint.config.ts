@@ -4,6 +4,8 @@ import tsparser from '@typescript-eslint/parser'
 import vuePlugin from 'eslint-plugin-vue'
 import vueParser from 'vue-eslint-parser'
 import globals from 'globals'
+import simpleImportSort from 'eslint-plugin-simple-import-sort'
+import noRelativeImportPaths from 'eslint-plugin-no-relative-import-paths'
 
 export default [
     js.configs.recommended,
@@ -28,8 +30,20 @@ export default [
         },
         plugins: {
             '@typescript-eslint': tseslint,
+            'simple-import-sort': simpleImportSort,
+            'no-relative-import-paths': noRelativeImportPaths,
         },
         rules: {
+            // === IMPORT SORTING & ALIAS CONVERSION ===
+            'simple-import-sort/imports': 'error',
+            'simple-import-sort/exports': 'error',
+            'no-relative-import-paths/no-relative-import-paths': ['error', {
+                allowSameFolder: true,  // Allow same-folder imports (./Component)
+                allowedDepth: 1,        // Allow ../ imports (for composables sibling folder)
+                rootDir: 'src',        // Remove 'src/' from absolute paths
+                prefix: '@',            // Add '@' prefix to converted imports
+            }],
+
             // === EXISTING CORE RULES ===
             '@typescript-eslint/no-unused-vars': ['error', {
                 'argsIgnorePattern': '^_',
@@ -139,7 +153,9 @@ export default [
         files: ['**/*.vue'],
         plugins: {
             'vue': vuePlugin,
-            '@typescript-eslint': tseslint
+            '@typescript-eslint': tseslint,
+            'simple-import-sort': simpleImportSort,
+            'no-relative-import-paths': noRelativeImportPaths,
         },
         languageOptions: {
             parser: vueParser,
@@ -217,6 +233,16 @@ export default [
             // === PHASE 2: VUEUSE COMPOSABLE PATTERNS ===
 
             'vue/prefer-use-template-ref': 'error',                  // Use useTemplateRef() in script setup
+
+            // === IMPORT SORTING & ALIAS CONVERSION ===
+            'simple-import-sort/imports': 'error',
+            'simple-import-sort/exports': 'error',
+            'no-relative-import-paths/no-relative-import-paths': ['error', {
+                allowSameFolder: true,  // Allow same-folder imports (./Component)
+                allowedDepth: 1,        // Allow ../ imports (for composables sibling folder)
+                rootDir: 'src',        // Remove 'src/' from absolute paths
+                prefix: '@',            // Add '@' prefix to converted imports
+            }],
         }
     },
     {
