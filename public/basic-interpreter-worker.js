@@ -193,7 +193,7 @@
      */
     getMovementStatus(actionNumber) {
       const movement = this.movementStates.get(actionNumber);
-      if (movement && movement.isActive) {
+      if (movement?.isActive) {
         return -1;
       }
       return 0;
@@ -309,6 +309,12 @@
     SYNTAX: "SYNTAX",
     RUNTIME: "RUNTIME",
     COMPILATION: "COMPILATION"
+  };
+  var TIMING = {
+    FRAME_RATE: 30,
+    // Family BASIC frame rate (frames per second)
+    FRAME_DURATION_MS: 1e3 / 30
+    // Duration of one frame in milliseconds (~33.33ms)
   };
   var SCREEN_DIMENSIONS = {
     BACKGROUND: {
@@ -11484,7 +11490,8 @@
     }
     /**
      * Execute a PAUSE statement from CST
-     * Pauses execution for the specified duration (in milliseconds)
+     * Pauses execution for the specified number of frames
+     * In Family BASIC, PAUSE uses frames (1 frame = ~1/30 second = ~33.33ms)
      */
     async execute(pauseStmtCst) {
       const expressionCst = getFirstCstNode(pauseStmtCst.children.expression);
@@ -11497,12 +11504,13 @@
         return;
       }
       const durationValue = this.evaluator.evaluateExpression(expressionCst);
-      const duration = typeof durationValue === "number" ? Math.max(0, Math.floor(durationValue)) : Math.max(0, Math.floor(parseFloat(String(durationValue)) || 0));
-      if (duration > 0) {
-        await new Promise((resolve) => setTimeout(resolve, duration));
+      const frames = typeof durationValue === "number" ? Math.max(0, Math.floor(durationValue)) : Math.max(0, Math.floor(parseFloat(String(durationValue)) || 0));
+      const durationMs = frames * TIMING.FRAME_DURATION_MS;
+      if (durationMs > 0) {
+        await new Promise((resolve) => setTimeout(resolve, durationMs));
       }
       if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(`PAUSE: ${duration}ms`);
+        this.context.addDebugOutput(`PAUSE: ${frames} frames (${Math.round(durationMs)}ms)`);
       }
     }
   };

@@ -51,49 +51,52 @@ describe('PAUSE Statement', () => {
   describe('Execution Tests', () => {
     it('should pause for specified duration', async () => {
       const startTime = Date.now()
-      const code = '10 PAUSE 100'
+      const code = '10 PAUSE 3' // 3 frames = ~100ms
       const result = await interpreter.execute(code)
       const endTime = Date.now()
       
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      // Should have paused for approximately 100ms (allow some tolerance)
+      // Should have paused for approximately 3 frames = ~100ms (allow some tolerance)
       expect(endTime - startTime).toBeGreaterThanOrEqual(90)
       expect(endTime - startTime).toBeLessThan(200)
     })
 
     it('should pause with numeric literal', async () => {
       const startTime = Date.now()
-      const code = '10 PAUSE 50'
+      const code = '10 PAUSE 2' // 2 frames = ~67ms
       const result = await interpreter.execute(code)
       const endTime = Date.now()
       
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      expect(endTime - startTime).toBeGreaterThanOrEqual(40)
+      // 2 frames = ~67ms, allow some tolerance
+      expect(endTime - startTime).toBeGreaterThanOrEqual(50)
     })
 
     it('should pause with expression', async () => {
       const startTime = Date.now()
-      const code = '10 PAUSE 25 + 25'
+      const code = '10 PAUSE 1 + 1' // 2 frames = ~67ms
       const result = await interpreter.execute(code)
       const endTime = Date.now()
       
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      expect(endTime - startTime).toBeGreaterThanOrEqual(40)
+      // 2 frames = ~67ms, allow some tolerance
+      expect(endTime - startTime).toBeGreaterThanOrEqual(50)
     })
 
     it('should pause with variable', async () => {
       const startTime = Date.now()
-      const code = `10 LET DURATION = 75
-20 PAUSE DURATION`
+      const code = `10 LET DURATION = 3
+20 PAUSE DURATION` // 3 frames = ~100ms
       const result = await interpreter.execute(code)
       const endTime = Date.now()
       
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      expect(endTime - startTime).toBeGreaterThanOrEqual(65)
+      // 3 frames = ~100ms, allow some tolerance
+      expect(endTime - startTime).toBeGreaterThanOrEqual(90)
     })
 
     it('should handle PAUSE 0 (no delay)', async () => {
@@ -122,53 +125,54 @@ describe('PAUSE Statement', () => {
 
     it('should handle multiple PAUSE statements', async () => {
       const startTime = Date.now()
-      const code = `10 PAUSE 30
-20 PAUSE 30
-30 PAUSE 30`
+      const code = `10 PAUSE 1
+20 PAUSE 1
+30 PAUSE 1` // 3 frames total = ~100ms
       const result = await interpreter.execute(code)
       const endTime = Date.now()
       
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      // Should pause for approximately 90ms total
-      expect(endTime - startTime).toBeGreaterThanOrEqual(80)
+      // Should pause for approximately 3 frames = ~100ms total
+      expect(endTime - startTime).toBeGreaterThanOrEqual(90)
     })
 
     it('should work with PAUSE in loops', async () => {
       const startTime = Date.now()
       const code = `10 FOR I = 1 TO 3
-20   PAUSE 20
-30 NEXT`
+20   PAUSE 1
+30 NEXT` // 3 iterations * 1 frame = 3 frames = ~100ms
       const result = await interpreter.execute(code)
       const endTime = Date.now()
       
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      // Should pause 3 times for 20ms each = ~60ms
-      expect(endTime - startTime).toBeGreaterThanOrEqual(50)
+      // Should pause 3 times for 1 frame each = 3 frames = ~100ms
+      expect(endTime - startTime).toBeGreaterThanOrEqual(90)
     })
 
     it('should work with PAUSE on same line as other statements', async () => {
       const startTime = Date.now()
-      const code = `10 PRINT "Before": PAUSE 50: PRINT "After"`
+      const code = `10 PRINT "Before": PAUSE 2: PRINT "After"` // 2 frames = ~67ms
       const result = await interpreter.execute(code)
       const endTime = Date.now()
       
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      expect(endTime - startTime).toBeGreaterThanOrEqual(40)
+      // 2 frames = ~67ms, allow some tolerance
+      expect(endTime - startTime).toBeGreaterThanOrEqual(50)
     })
 
     it('should handle PAUSE with string expression (converts to number)', async () => {
       const startTime = Date.now()
-      const code = `10 LET DURATION$ = "100"
-20 PAUSE DURATION$`
+      const code = `10 LET DURATION$ = "3"
+20 PAUSE DURATION$` // 3 frames = ~100ms
       const result = await interpreter.execute(code)
       const endTime = Date.now()
       
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      // String "100" should be converted to number 100
+      // String "3" should be converted to number 3 frames = ~100ms
       expect(endTime - startTime).toBeGreaterThanOrEqual(90)
     })
 

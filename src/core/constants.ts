@@ -128,6 +128,12 @@ export const SEPARATORS = {
   SEMICOLON: ';',
 } as const
 
+// Timing constants
+export const TIMING = {
+  FRAME_RATE: 30,              // Family BASIC frame rate (frames per second)
+  FRAME_DURATION_MS: 1000 / 30, // Duration of one frame in milliseconds (~33.33ms)
+} as const
+
 // Screen dimensions and coordinate limits
 export const SCREEN_DIMENSIONS = {
   BACKGROUND: {

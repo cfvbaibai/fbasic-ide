@@ -6,7 +6,7 @@
 
 import type { CstNode } from 'chevrotain'
 
-import { ERROR_TYPES } from '@/core/constants'
+import { ERROR_TYPES, TIMING } from '@/core/constants'
 import type { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
 import { getFirstCstNode } from '@/core/parser/cst-helpers'
 import type { ExecutionContext } from '@/core/state/ExecutionContext'
@@ -19,7 +19,8 @@ export class PauseExecutor {
 
   /**
    * Execute a PAUSE statement from CST
-   * Pauses execution for the specified duration (in milliseconds)
+   * Pauses execution for the specified number of frames
+   * In Family BASIC, PAUSE uses frames (1 frame = ~1/30 second = ~33.33ms)
    */
   async execute(pauseStmtCst: CstNode): Promise<void> {
     const expressionCst = getFirstCstNode(pauseStmtCst.children.expression)
@@ -33,23 +34,23 @@ export class PauseExecutor {
       return
     }
 
-    // Evaluate the pause duration
+    // Evaluate the pause duration (in frames)
     const durationValue = this.evaluator.evaluateExpression(expressionCst)
     // Convert to number (handles both numeric and string values)
-    const duration = typeof durationValue === 'number'
+    const frames = typeof durationValue === 'number'
       ? Math.max(0, Math.floor(durationValue))
       : Math.max(0, Math.floor(parseFloat(String(durationValue)) || 0))  
 
-    // Pause for the specified duration (in milliseconds)
-    // In Family BASIC, PAUSE typically pauses for frames, but we'll use milliseconds
-    // for better compatibility with web environments
-    if (duration > 0) {
-      await new Promise(resolve => setTimeout(resolve, duration))
+    // Convert frames to milliseconds (1 frame = 1000/30 ms = ~33.33ms)
+    const durationMs = frames * TIMING.FRAME_DURATION_MS
+
+    if (durationMs > 0) {
+      await new Promise(resolve => setTimeout(resolve, durationMs))
     }
 
     // Add debug output
     if (this.context.config.enableDebugMode) {
-      this.context.addDebugOutput(`PAUSE: ${duration}ms`)
+      this.context.addDebugOutput(`PAUSE: ${frames} frames (${Math.round(durationMs)}ms)`)
     }
   }
 }

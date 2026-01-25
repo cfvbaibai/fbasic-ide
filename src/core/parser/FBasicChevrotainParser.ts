@@ -403,7 +403,7 @@ class FBasicChevrotainParser extends CstParser {
     });
 
     // PAUSE Expression
-    // Pauses program execution for the specified number of milliseconds/frames
+    // Pauses program execution for the specified number of frames (1 frame = ~1/30 second)
     this.pauseStatement = this.RULE('pauseStatement', () => {
       this.CONSUME(Pause);
       this.SUBRULE(this.expression);
