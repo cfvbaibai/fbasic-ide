@@ -1,10 +1,10 @@
 /**
  * Enhanced Composable for Family Basic IDE functionality
- * 
+ *
  * Provides reactive state and methods for managing a BASIC interpreter
  * within a Vue.js application using the new AST-based parser system.
  * Handles code execution, error management, and UI state coordination.
- * 
+ *
  * @example
  * ```typescript
  * const {
@@ -18,32 +18,39 @@
  *   highlightedCode
  * } = useBasicIde()
  * ```
- * 
+ *
  * @returns Object containing reactive state and methods for IDE functionality
  */
 
-import { onDeactivated,onUnmounted, ref, watch } from 'vue'
+import { onDeactivated, onUnmounted, ref, watch } from 'vue'
 
 import { EXECUTION_LIMITS } from '@/core/constants'
-import type { AnyServiceWorkerMessage,BasicVariable, ExecutionResult, HighlighterInfo, ParserInfo } from '@/core/interfaces'
+import type {
+  AnyServiceWorkerMessage,
+  BasicVariable,
+  ExecutionResult,
+  HighlighterInfo,
+  ParserInfo,
+} from '@/core/interfaces'
 import { FBasicParser } from '@/core/parser/FBasicParser'
 import { getSampleCode } from '@/core/samples/sampleCodes'
 import type { MovementState, SpriteState } from '@/core/sprite/types'
 
 import { formatArrayForDisplay } from './useBasicIdeFormatting'
 import { handleWorkerMessage, type MessageHandlerContext } from './useBasicIdeMessageHandlers'
-import { clearScreenBuffer,initializeScreenBuffer } from './useBasicIdeScreenUtils'
+import { clearScreenBuffer, initializeScreenBuffer } from './useBasicIdeScreenUtils'
 import type { WebWorkerManager } from './useBasicIdeWebWorkerUtils'
 import {
   checkWebWorkerHealth,
   initializeWebWorker,
   rejectAllPendingMessages,
   restartWebWorker,
-  sendMessageToWorker as sendMessageToWorkerUtil} from './useBasicIdeWebWorkerUtils'
+  sendMessageToWorker as sendMessageToWorkerUtil,
+} from './useBasicIdeWebWorkerUtils'
 
 /**
  * Enhanced composable function for BASIC IDE functionality with AST-based parsing
- * 
+ *
  * @returns Object with reactive state and methods for IDE management
  */
 export function useBasicIde() {
@@ -54,7 +61,9 @@ export function useBasicIde() {
 40 FOR I=1 TO 3: PRINT "I="; I: NEXT
 50 END`)
 
-  const currentSampleType = ref<'basic' | 'gaming' | 'complex' | 'comprehensive' | 'pause' | 'allChars' | 'spriteTest' | 'moveTest' | null>(null)
+  const currentSampleType = ref<
+    'basic' | 'gaming' | 'complex' | 'comprehensive' | 'pause' | 'allChars' | 'spriteTest' | 'moveTest' | null
+  >(null)
 
   const isRunning = ref(false)
   const output = ref<string[]>([])
@@ -63,14 +72,14 @@ export function useBasicIde() {
   const highlightedCode = ref('')
   const debugOutput = ref<string>('')
   const debugMode = ref(false)
-  
+
   // Screen state - initialize as full grid for proper reactivity
   const screenBuffer = ref(initializeScreenBuffer())
   const cursorX = ref(0)
   const cursorY = ref(0)
   const bgPalette = ref(1) // Default background palette code is 1
   const backdropColor = ref(0) // Default backdrop color code (0 = black)
-  
+
   // Sprite state
   const spriteStates = ref<SpriteState[]>([])
   const spriteEnabled = ref(false)
@@ -78,12 +87,12 @@ export function useBasicIde() {
 
   // Parser instance
   const parser = new FBasicParser()
-  
+
   // Web Worker Manager
   const webWorkerManager: WebWorkerManager = {
     worker: null,
     messageId: 0,
-    pendingMessages: new Map()
+    pendingMessages: new Map(),
   }
 
   // Functions to send joystick events directly to web worker
@@ -93,7 +102,7 @@ export function useBasicIde() {
         type: 'STICK_EVENT',
         id: `stick-${Date.now()}`,
         timestamp: Date.now(),
-        data: { joystickId, state }
+        data: { joystickId, state },
       })
     }
   }
@@ -104,7 +113,7 @@ export function useBasicIde() {
         type: 'STRIG_EVENT',
         id: `strig-${Date.now()}`,
         timestamp: Date.now(),
-        data: { joystickId, state }
+        data: { joystickId, state },
       })
     }
   }
@@ -120,24 +129,24 @@ export function useBasicIde() {
     bgPalette,
     backdropColor,
     movementStates,
-    webWorkerManager
+    webWorkerManager,
   }
 
   // Web Worker Management Functions
   const initializeWebWorkerWrapper = async (): Promise<void> => {
-    await initializeWebWorker(webWorkerManager, (message) => {
+    await initializeWebWorker(webWorkerManager, message => {
       handleWorkerMessage(message, messageHandlerContext)
     })
   }
 
   const restartWebWorkerWrapper = async (): Promise<void> => {
-    await restartWebWorker(webWorkerManager, (message) => {
+    await restartWebWorker(webWorkerManager, message => {
       handleWorkerMessage(message, messageHandlerContext)
     })
   }
 
   const checkWebWorkerHealthWrapper = async (): Promise<boolean> => {
-    return checkWebWorkerHealth(webWorkerManager, (message) => sendMessageToWorkerWrapper(message))
+    return checkWebWorkerHealth(webWorkerManager, message => sendMessageToWorkerWrapper(message))
   }
 
   const sendMessageToWorkerWrapper = (message: AnyServiceWorkerMessage): Promise<ExecutionResult> => {
@@ -166,18 +175,20 @@ export function useBasicIde() {
           errors.value = result.errors.map(error => ({
             line: error.location?.start?.line ?? 0,
             message: error.message,
-            type: 'syntax'
+            type: 'syntax',
           }))
         }
         return null
       }
     } catch (error) {
       console.error('Parse error:', error)
-      errors.value = [{
-        line: 0,
-        message: error instanceof Error ? error.message : 'Parse error',
-        type: 'syntax'
-      }]
+      errors.value = [
+        {
+          line: 0,
+          message: error instanceof Error ? error.message : 'Parse error',
+          type: 'syntax',
+        },
+      ]
       return null
     }
   }
@@ -214,7 +225,7 @@ export function useBasicIde() {
 
       // Clear screen
       clearScreenBuffer(screenBuffer, cursorX, cursorY)
-      
+
       // Clear movement states before new execution
       movementStates.value = []
 
@@ -230,8 +241,8 @@ export function useBasicIde() {
             maxOutputLines: EXECUTION_LIMITS.MAX_OUTPUT_LINES_PRODUCTION,
             enableDebugMode: debugMode.value,
             strictMode: true,
-          }
-        }
+          },
+        },
       })
 
       if (result?.errors && result.errors.length > 0) {
@@ -239,10 +250,9 @@ export function useBasicIde() {
       }
 
       if (result?.variables) {
-        const vars: Record<string, BasicVariable> = result.variables instanceof Map 
-          ? Object.fromEntries(result.variables) 
-          : result.variables
-        
+        const vars: Record<string, BasicVariable> =
+          result.variables instanceof Map ? Object.fromEntries(result.variables) : result.variables
+
         // Add arrays as variables for display (show actual array values)
         if (result.arrays) {
           const arrays = result.arrays instanceof Map ? result.arrays : new Map(Object.entries(result.arrays))
@@ -251,11 +261,11 @@ export function useBasicIde() {
             const formatted = formatArrayForDisplay(arrayValue)
             vars[arrayName] = {
               value: formatted,
-              type: arrayName.endsWith('$') ? 'string' : 'number'
+              type: arrayName.endsWith('$') ? 'string' : 'number',
             }
           }
         }
-        
+
         variables.value = vars
       }
 
@@ -270,14 +280,15 @@ export function useBasicIde() {
       if (result?.movementStates) {
         movementStates.value = result.movementStates
       }
-
     } catch (error) {
       console.error('Execution error:', error)
-      errors.value = [{
-        line: 0,
-        message: error instanceof Error ? error.message : 'Execution error',
-        type: 'runtime'
-      }]
+      errors.value = [
+        {
+          line: 0,
+          message: error instanceof Error ? error.message : 'Execution error',
+          type: 'runtime',
+        },
+      ]
     } finally {
       isRunning.value = false
     }
@@ -294,7 +305,7 @@ export function useBasicIde() {
         type: 'STOP',
         id: `stop-${Date.now()}`,
         timestamp: Date.now(),
-        data: {}
+        data: {},
       })
     }
   }
@@ -307,12 +318,12 @@ export function useBasicIde() {
     errors.value = []
     variables.value = {}
     debugOutput.value = ''
-    
+
     // Clear screen - reassign to force reactivity
     screenBuffer.value = initializeScreenBuffer()
     cursorX.value = 0
     cursorY.value = 0
-    
+
     // Clear sprite states
     spriteStates.value = []
     spriteEnabled.value = false
@@ -337,7 +348,17 @@ export function useBasicIde() {
   /**
    * Load sample code
    */
-  const loadSampleCode = (sampleType: 'basic' | 'gaming' | 'complex' | 'comprehensive' | 'pause' | 'allChars' | 'spriteTest' | 'moveTest' = 'basic') => {
+  const loadSampleCode = (
+    sampleType:
+      | 'basic'
+      | 'gaming'
+      | 'complex'
+      | 'comprehensive'
+      | 'pause'
+      | 'allChars'
+      | 'spriteTest'
+      | 'moveTest' = 'basic'
+  ) => {
     const sample = getSampleCode(sampleType)
     if (sample) {
       code.value = sample.code
@@ -360,7 +381,7 @@ export function useBasicIde() {
     return {
       name: 'Basic Highlighter',
       version: '1.0.0',
-      features: ['basic-syntax']
+      features: ['basic-syntax'],
     }
   }
 
@@ -373,9 +394,13 @@ export function useBasicIde() {
   }
 
   // Watch code changes and update highlighting reactively
-  watch(code, () => {
-    void updateHighlighting()
-  }, { immediate: true })
+  watch(
+    code,
+    () => {
+      void updateHighlighting()
+    },
+    { immediate: true }
+  )
 
   // Cleanup function for web worker
   const cleanupWebWorker = () => {
@@ -422,10 +447,9 @@ export function useBasicIde() {
     getParserCapabilities,
     getHighlighterCapabilities,
     toggleDebugMode,
-    
+
     // Web worker communication
     sendStickEvent,
     sendStrigEvent,
   }
 }
-

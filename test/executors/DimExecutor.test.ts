@@ -1,10 +1,10 @@
 /**
  * DIM Executor Tests
- * 
+ *
  * Unit tests for the DimExecutor class.
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
 import { DimExecutor } from '@/core/execution/executors/DimExecutor'
@@ -26,13 +26,13 @@ describe('DimExecutor', () => {
       maxIterations: 1000,
       maxOutputLines: 100,
       enableDebugMode: false,
-      strictMode: false
+      strictMode: false,
     })
     evaluator = new ExpressionEvaluator(context)
     variableService = new VariableService(context, evaluator)
     executor = new DimExecutor(context, evaluator, variableService)
     parser = new FBasicParser()
-    
+
     // Clear arrays before each test
     context.arrays.clear()
   })
@@ -40,22 +40,22 @@ describe('DimExecutor', () => {
   async function parseDimStatement(code: string) {
     const result = await parser.parse(code)
     if (!result.success || !result.cst) return null
-    
+
     const statements = result.cst.children.statement
     if (!Array.isArray(statements) || statements.length === 0) return null
-    
+
     const stmt = statements[0]
     if (!stmt || !('children' in stmt)) return null
-    
+
     const commandListCst = getFirstCstNode(stmt.children.commandList)
     if (!commandListCst) return null
-    
+
     const commandCst = getFirstCstNode(commandListCst.children.command)
     if (!commandCst) return null
-    
+
     const singleCommandCst = getFirstCstNode(commandCst.children.singleCommand)
     if (!singleCommandCst) return null
-    
+
     return getFirstCstNode(singleCommandCst.children.dimStatement)
   }
 
@@ -196,9 +196,9 @@ describe('DimExecutor', () => {
       // DIM A(0) is valid - it creates an array with 1 element at index 0
       const dimStmtCst = await parseDimStatement('70 DIM A(0)')
       expect(dimStmtCst).not.toBeNull()
-      
+
       executor.execute(dimStmtCst!, 70)
-      
+
       // Dimension 0 is valid - creates array with 1 element
       expect(context.arrays.has('A')).toBe(true)
       const array = context.arrays.get('A') as BasicScalarValue[]
@@ -212,9 +212,9 @@ describe('DimExecutor', () => {
     it('should handle expression dimensions correctly', async () => {
       const dimStmtCst = await parseDimStatement('80 DIM A(10+5)')
       expect(dimStmtCst).not.toBeNull()
-      
+
       executor.execute(dimStmtCst!, 80)
-      
+
       expect(context.arrays.has('A')).toBe(true)
       const array = context.arrays.get('A')
       expect(array).toBeDefined()
@@ -225,16 +225,16 @@ describe('DimExecutor', () => {
     it('should handle complex expression dimensions', async () => {
       const dimStmtCst = await parseDimStatement('90 DIM A(2*3+1), B(10-5, 2+2)')
       expect(dimStmtCst).not.toBeNull()
-      
+
       executor.execute(dimStmtCst!, 90)
-      
+
       expect(context.arrays.has('A')).toBe(true)
       expect(context.arrays.has('B')).toBe(true)
-      
+
       // A should have size 8 (indices 0-7, since 2*3+1 = 7)
       const arrayA = context.arrays.get('A') as BasicScalarValue[]
       expect(arrayA.length).toBe(8)
-      
+
       // B should be 2D: 6x5 (indices 0-5, 0-4)
       const arrayB = context.arrays.get('B') as BasicArrayValue[]
       expect(arrayB.length).toBe(6)
@@ -248,16 +248,16 @@ describe('DimExecutor', () => {
       const dimStmtCst1 = await parseDimStatement('100 DIM A(2)')
       expect(dimStmtCst1).not.toBeNull()
       executor.execute(dimStmtCst1!, 100)
-      
+
       // Set some values
       variableService.setArrayElement('A', [0], 10)
       variableService.setArrayElement('A', [1], 20)
-      
+
       // Re-declare with different size
       const dimStmtCst2 = await parseDimStatement('110 DIM A(4)')
       expect(dimStmtCst2).not.toBeNull()
       executor.execute(dimStmtCst2!, 110)
-      
+
       // Array should be recreated and all elements should be 0
       const array = context.arrays.get('A') as BasicScalarValue[]
       expect(array).toBeDefined()
@@ -270,16 +270,16 @@ describe('DimExecutor', () => {
     it('should initialize 2D string array elements to empty string', async () => {
       const dimStmtCst = await parseDimStatement('120 DIM B$(2,2)')
       expect(dimStmtCst).not.toBeNull()
-      
+
       executor.execute(dimStmtCst!, 120)
-      
+
       const array = context.arrays.get('B$') as BasicArrayValue[]
       expect(array).toBeDefined()
       const firstRow = array[0] as BasicScalarValue[]
       expect(firstRow[0]).toBe('')
       expect(firstRow[1]).toBe('')
       expect(firstRow[2]).toBe('')
-      
+
       const secondRow = array[1] as BasicScalarValue[]
       expect(secondRow[0]).toBe('')
       expect(secondRow[1]).toBe('')
@@ -290,9 +290,9 @@ describe('DimExecutor', () => {
       // DIM A(0,0) is valid - creates 1x1 array
       const dimStmtCst = await parseDimStatement('130 DIM A(0,0)')
       expect(dimStmtCst).not.toBeNull()
-      
+
       executor.execute(dimStmtCst!, 130)
-      
+
       expect(context.arrays.has('A')).toBe(true)
       const array = context.arrays.get('A') as BasicArrayValue[]
       expect(array).toBeDefined()
@@ -307,12 +307,12 @@ describe('DimExecutor', () => {
     it('should handle DIM with variable expressions', async () => {
       // Set variable first
       context.variables.set('X', { value: 5, type: 'number' })
-      
+
       const dimStmtCst = await parseDimStatement('140 DIM A(X)')
       expect(dimStmtCst).not.toBeNull()
-      
+
       executor.execute(dimStmtCst!, 140)
-      
+
       expect(context.arrays.has('A')).toBe(true)
       const array = context.arrays.get('A') as BasicArrayValue[]
       expect(array).toBeDefined()
@@ -323,13 +323,13 @@ describe('DimExecutor', () => {
     it('should truncate fractional dimension expressions to integer', async () => {
       // Set variable to fractional value
       context.variables.set('X', { value: 5, type: 'number' })
-      
+
       // X / 2 = 2.5, should truncate to 2
       const dimStmtCst = await parseDimStatement('150 DIM A(X/2)')
       expect(dimStmtCst).not.toBeNull()
-      
+
       executor.execute(dimStmtCst!, 150)
-      
+
       expect(context.arrays.has('A')).toBe(true)
       const array = context.arrays.get('A') as BasicArrayValue[]
       expect(array).toBeDefined()
@@ -343,19 +343,19 @@ describe('DimExecutor', () => {
       // From manual page 62, example (1)
       const dimStmtCst = await parseDimStatement('20 DIM A(3),B(3,3)')
       expect(dimStmtCst).not.toBeNull()
-      
+
       executor.execute(dimStmtCst!, 20)
-      
+
       // Verify arrays are created
       expect(context.arrays.has('A')).toBe(true)
       expect(context.arrays.has('B')).toBe(true)
-      
+
       // Verify 1D array A(3) - indices 0-3
       const arrayA = context.arrays.get('A') as BasicScalarValue[]
       expect(arrayA.length).toBe(4)
       expect(arrayA[0]).toBe(0)
       expect(arrayA[3]).toBe(0)
-      
+
       // Verify 2D array B(3,3) - indices 0-3, 0-3
       const arrayB = context.arrays.get('B') as BasicArrayValue[]
       expect(arrayB.length).toBe(4)
@@ -372,19 +372,19 @@ describe('DimExecutor', () => {
       // From manual page 62, example (2)
       const dimStmtCst = await parseDimStatement('20 DIM A$(3),B$(3,3)')
       expect(dimStmtCst).not.toBeNull()
-      
+
       executor.execute(dimStmtCst!, 20)
-      
+
       // Verify arrays are created
       expect(context.arrays.has('A$')).toBe(true)
       expect(context.arrays.has('B$')).toBe(true)
-      
+
       // Verify 1D string array A$(3) - indices 0-3
       const arrayA = context.arrays.get('A$') as BasicScalarValue[]
       expect(arrayA.length).toBe(4)
       expect(arrayA[0]).toBe('')
       expect(arrayA[3]).toBe('')
-      
+
       // Verify 2D string array B$(3,3) - indices 0-3, 0-3
       const arrayB = context.arrays.get('B$') as BasicArrayValue[]
       expect(arrayB.length).toBe(4)
@@ -398,4 +398,3 @@ describe('DimExecutor', () => {
     })
   })
 })
-

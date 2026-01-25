@@ -1,13 +1,13 @@
 /**
  * Web Worker Entry Point for BASIC Interpreter
- * 
+ *
  * This is the main entry point for the web worker that will be bundled
  * with the interpreter code.
  */
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { WebWorkerDeviceAdapter } from '@/core/devices/WebWorkerDeviceAdapter'
-import type { 
+import type {
   AnyServiceWorkerMessage,
   ErrorMessage,
   ExecuteMessage,
@@ -15,7 +15,8 @@ import type {
   ResultMessage,
   StickEventMessage,
   StopMessage,
-  StrigEventMessage} from '@/core/interfaces'
+  StrigEventMessage,
+} from '@/core/interfaces'
 
 // Web Worker Interpreter Implementation
 class WebWorkerInterpreter {
@@ -36,12 +37,12 @@ class WebWorkerInterpreter {
   setupMessageListener() {
     if (typeof self === 'undefined') return
 
-    self.addEventListener('message', (event) => {
+    self.addEventListener('message', event => {
       console.log('📨 [WORKER] Web worker received message from main thread:', {
         type: event.data.type,
         id: event.data.id,
         timestamp: event.data.timestamp,
-        dataSize: JSON.stringify(event.data).length
+        dataSize: JSON.stringify(event.data).length,
       })
       void this.handleMessage(event.data)
     })
@@ -51,11 +52,12 @@ class WebWorkerInterpreter {
     console.log('🔍 [WORKER] Processing message:', {
       type: message.type,
       id: message.id,
-      timestamp: message.timestamp
+      timestamp: message.timestamp,
     })
 
     try {
-      // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check -- Only handling request messages, not response messages
+      // -- Only handling request messages, not response messages
+      // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
       switch (message.type) {
         case 'EXECUTE':
           console.log('▶️ [WORKER] Handling EXECUTE message')
@@ -75,8 +77,9 @@ class WebWorkerInterpreter {
           break
 
         default:
-          // Other message types (RESULT, PROGRESS, OUTPUT, ERROR, SCREEN_UPDATE, INIT, READY)
-          // are sent FROM the worker, not handled BY the worker
+          // Other message types (RESULT, PROGRESS, OUTPUT, ERROR,
+          // SCREEN_UPDATE, INIT, READY) are sent FROM the worker, not
+          // handled BY the worker
           console.log('⚠️ [WORKER] Unexpected message type:', message.type)
           break
       }
@@ -90,22 +93,22 @@ class WebWorkerInterpreter {
     try {
       const { code, config } = message.data
       this.currentExecutionId = message.id
-      
+
       // Set execution ID in device adapter so it can include it in OUTPUT messages
       if (this.webWorkerDeviceAdapter) {
         this.webWorkerDeviceAdapter.setCurrentExecutionId(message.id)
       }
-      
+
       console.log('▶️ [WORKER] Starting execution:', {
         executionId: message.id,
         codeLength: code.length,
       })
-      
+
       // Create a new interpreter for each execution to ensure correct configuration
       console.log('🔧 [WORKER] Creating interpreter with WebWorkerDeviceAdapter:', {
         hasOriginalDeviceAdapter: !!config.deviceAdapter,
         maxIterations: config.maxIterations,
-        maxOutputLines: config.maxOutputLines
+        maxOutputLines: config.maxOutputLines,
       })
       this.interpreter = new BasicInterpreter({
         ...config,
@@ -122,7 +125,7 @@ class WebWorkerInterpreter {
       console.log('✅ [WORKER] Execution completed:', {
         success: result.success,
         outputLines: this.webWorkerDeviceAdapter?.printOutput.length ?? 0,
-        executionTime: result.executionTime
+        executionTime: result.executionTime,
       })
 
       // Get sprite states and movement states from interpreter
@@ -140,7 +143,7 @@ class WebWorkerInterpreter {
         workerId: 'web-worker-1',
         spriteStates,
         spriteEnabled,
-        movementStates
+        movementStates,
       }
 
       this.sendResult(message.id, enhancedResult)
@@ -153,7 +156,7 @@ class WebWorkerInterpreter {
   handleStop(_message: StopMessage) {
     console.log('⏹️ [WORKER] Stopping execution:', {
       wasRunning: this.isRunning,
-      currentExecutionId: this.currentExecutionId
+      currentExecutionId: this.currentExecutionId,
     })
     this.isRunning = false
     if (this.interpreter) {
@@ -165,7 +168,7 @@ class WebWorkerInterpreter {
   handleStrigEvent(message: StrigEventMessage) {
     const { joystickId, state } = message.data
     console.log('🎮 [WORKER] Processing STRIG event:', { joystickId, state })
-    
+
     // Update the WebWorkerDeviceAdapter directly
     if (this.webWorkerDeviceAdapter) {
       console.log('🎮 [WORKER] Updating WebWorkerDeviceAdapter STRIG buffer')
@@ -178,7 +181,7 @@ class WebWorkerInterpreter {
   handleStickEvent(message: StickEventMessage) {
     const { joystickId, state } = message.data
     console.log('🎮 [WORKER] Processing STICK event:', { joystickId, state })
-    
+
     // Update the WebWorkerDeviceAdapter directly
     if (this.webWorkerDeviceAdapter) {
       console.log('🎮 [WORKER] Updating WebWorkerDeviceAdapter STICK state')
@@ -199,13 +202,13 @@ class WebWorkerInterpreter {
         executionId: this.currentExecutionId,
         output,
         outputType,
-        timestamp: Date.now()
-      }
+        timestamp: Date.now(),
+      },
     }
     console.log('📤 [WORKER→MAIN] Sending OUTPUT message:', {
       outputType,
       outputLength: output.length,
-      executionId: this.currentExecutionId
+      executionId: this.currentExecutionId,
     })
     self.postMessage(message)
   }
@@ -215,12 +218,12 @@ class WebWorkerInterpreter {
       type: 'RESULT',
       id: messageId,
       timestamp: Date.now(),
-      data: result
+      data: result,
     }
     console.log('📊 [WORKER→MAIN] Sending RESULT message:', {
       messageId,
       success: result.success,
-      executionTime: result.executionTime
+      executionTime: result.executionTime,
     })
     self.postMessage(message)
   }
@@ -235,14 +238,14 @@ class WebWorkerInterpreter {
         message: error.message,
         stack: error.stack,
         errorType: 'execution',
-        recoverable: true
-      }
+        recoverable: true,
+      },
     }
     console.log('❌ [WORKER→MAIN] Sending ERROR message:', {
       messageId,
       errorMessage: error.message,
       errorType: 'execution',
-      recoverable: true
+      recoverable: true,
     })
     self.postMessage(message)
   }
@@ -250,4 +253,3 @@ class WebWorkerInterpreter {
 
 // Initialize web worker interpreter
 new WebWorkerInterpreter()
-

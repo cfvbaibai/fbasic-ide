@@ -2,12 +2,12 @@
 import { computed } from 'vue'
 
 import GameBlock from './GameBlock.vue'
-import type { GameCardEmits,GameCardProps } from './GameCard.types'
+import type { GameCardEmits, GameCardProps } from './GameCard.types'
 import GameIcon from './GameIcon.vue'
 
 /**
  * GameCard component - A card component with icon, title, description, and action.
- * 
+ *
  * @example
  * ```vue
  * <GameCard
@@ -20,7 +20,7 @@ import GameIcon from './GameIcon.vue'
  * ```
  */
 defineOptions({
-  name: 'GameCard'
+  name: 'GameCard',
 })
 
 const props = withDefaults(defineProps<GameCardProps>(), {
@@ -29,7 +29,7 @@ const props = withDefaults(defineProps<GameCardProps>(), {
   iconColor: 'var(--base-solid-primary)',
   actionText: '',
   clickable: true,
-  floatOnHover: true
+  floatOnHover: true,
 })
 
 const emit = defineEmits<GameCardEmits>()
@@ -53,10 +53,7 @@ const iconColorValue = computed(() => props.iconColor)
     :style="{ padding: '2rem' }"
     @click="handleClick"
   >
-    <div
-      v-if="icon"
-      class="game-card-icon-wrapper"
-    >
+    <div v-if="icon" class="game-card-icon-wrapper">
       <GameIcon :icon="icon" size="large" class="game-card-icon" />
     </div>
     <h3 v-if="title" class="game-card-title text-game-heading">{{ title }}</h3>
@@ -141,5 +138,4 @@ const iconColorValue = computed(() => props.iconColor)
   opacity: 0.8;
   transition: all 0.3s ease;
 }
-
 </style>

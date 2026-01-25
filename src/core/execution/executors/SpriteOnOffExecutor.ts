@@ -28,7 +28,7 @@ export class SpriteOnOffExecutor {
         this.context.addError({
           line: lineNumber ?? 0,
           message: 'SPRITE: Expected ON or OFF',
-          type: ERROR_TYPES.RUNTIME
+          type: ERROR_TYPES.RUNTIME,
         })
         return
       }
@@ -47,7 +47,7 @@ export class SpriteOnOffExecutor {
       this.context.addError({
         line: lineNumber ?? 0,
         message: `SPRITE ON/OFF: ${error instanceof Error ? error.message : String(error)}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
     }
   }

@@ -2,29 +2,26 @@
 import type { ComputedRef } from 'vue'
 import { computed } from 'vue'
 
-import {
-  ActiveTabKey,
-  injectStrict,
-  SetActiveTabKey} from './game-tabs-keys'
+import { ActiveTabKey, injectStrict, SetActiveTabKey } from './game-tabs-keys'
 import GameIcon from './GameIcon.vue'
 
 /**
  * GameTabButton component - A button for tab navigation.
  * Must be used within a GameTabs component.
- * 
+ *
  * @example
  * ```vue
  * <GameTabButton name="tab1" label="Tab 1" icon="mdi:home" />
  * ```
  */
 defineOptions({
-  name: 'GameTabButton'
+  name: 'GameTabButton',
 })
 
 const props = withDefaults(defineProps<Props>(), {
   label: '',
   icon: null,
-  disabled: false
+  disabled: false,
 })
 
 interface Props {
@@ -115,11 +112,7 @@ const handleClick = () => {
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    var(--base-solid-primary) 50%, 
-    transparent 100%
-  );
+  background: linear-gradient(90deg, transparent 0%, var(--base-solid-primary) 50%, transparent 100%);
   transform: scaleX(0);
   transform-origin: center;
   transition: transform 0.3s ease;
@@ -156,5 +149,4 @@ const handleClick = () => {
   flex-shrink: 0;
   transition: filter 0.3s ease;
 }
-
 </style>

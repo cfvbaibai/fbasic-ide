@@ -2,19 +2,19 @@
  * Web worker management utilities for BASIC IDE
  */
 
-import type {
-  AnyServiceWorkerMessage,
-  ExecutionResult
-} from '@/core/interfaces'
+import type { AnyServiceWorkerMessage, ExecutionResult } from '@/core/interfaces'
 
 export interface WebWorkerManager {
   worker: Worker | null
   messageId: number
-  pendingMessages: Map<string, {
-    resolve: (result: ExecutionResult) => void
-    reject: (error: Error) => void
-    timeout: NodeJS.Timeout
-  }>
+  pendingMessages: Map<
+    string,
+    {
+      resolve: (result: ExecutionResult) => void
+      reject: (error: Error) => void
+      timeout: NodeJS.Timeout
+    }
+  >
 }
 
 /**
@@ -32,26 +32,26 @@ export async function initializeWebWorker(
   try {
     console.log('🔧 [COMPOSABLE] Initializing web worker...')
     webWorkerManager.worker = new Worker('/basic-interpreter-worker.js')
-    
+
     // Set up message handling
-    webWorkerManager.worker.onmessage = (event) => {
+    webWorkerManager.worker.onmessage = event => {
       onMessage(event.data)
     }
-    
-    webWorkerManager.worker.onerror = (error) => {
+
+    webWorkerManager.worker.onerror = error => {
       console.error('❌ [COMPOSABLE] Web worker error:', error)
-      rejectAllPendingMessages(webWorkerManager, `Web worker error: ${  error.message}`)
+      rejectAllPendingMessages(webWorkerManager, `Web worker error: ${error.message}`)
       // Restart web worker on error
       void restartWebWorker(webWorkerManager, onMessage)
     }
-    
-    webWorkerManager.worker.onmessageerror = (error) => {
+
+    webWorkerManager.worker.onmessageerror = error => {
       console.error('❌ [COMPOSABLE] Web worker message error:', error)
       rejectAllPendingMessages(webWorkerManager, 'Web worker message error')
       // Restart web worker on message error
       void restartWebWorker(webWorkerManager, onMessage)
     }
-    
+
     console.log('✅ [COMPOSABLE] Web worker initialized successfully')
   } catch (error) {
     console.error('❌ [COMPOSABLE] Failed to initialize web worker:', error)
@@ -67,19 +67,19 @@ export async function restartWebWorker(
   onMessage: (message: AnyServiceWorkerMessage) => void
 ): Promise<void> {
   console.log('🔄 [COMPOSABLE] Restarting web worker...')
-  
+
   // Terminate existing worker
   if (webWorkerManager.worker) {
     webWorkerManager.worker.terminate()
     webWorkerManager.worker = null
   }
-  
+
   // Clear pending messages
   rejectAllPendingMessages(webWorkerManager, 'Web worker restarted')
-  
+
   // Wait a bit before restarting
   await new Promise(resolve => setTimeout(resolve, 100))
-  
+
   // Reinitialize
   await initializeWebWorker(webWorkerManager, onMessage)
 }
@@ -108,14 +108,14 @@ export async function checkWebWorkerHealth(
           maxOutputLines: 10,
           enableDebugMode: false,
           strictMode: false,
-          deviceAdapter: undefined
+          deviceAdapter: undefined,
         },
         options: {
-          timeout: 5000
-        }
-      }
+          timeout: 5000,
+        },
+      },
     })
-    
+
     return true
   } catch (error) {
     console.warn('⚠️ [COMPOSABLE] Web worker health check failed:', error)
@@ -126,10 +126,7 @@ export async function checkWebWorkerHealth(
 /**
  * Reject all pending messages
  */
-export function rejectAllPendingMessages(
-  webWorkerManager: WebWorkerManager,
-  reason: string
-): void {
+export function rejectAllPendingMessages(webWorkerManager: WebWorkerManager, reason: string): void {
   console.log('🚫 [COMPOSABLE] Rejecting all pending messages:', reason)
   for (const [_messageId, pending] of webWorkerManager.pendingMessages) {
     clearTimeout(pending.timeout)
@@ -153,21 +150,21 @@ export function sendMessageToWorker(
 
     const _messageId = (++webWorkerManager.messageId).toString()
     const messageWithId = { ...message, id: _messageId }
-    
+
     // Set up timeout
     const timeout = setTimeout(() => {
       console.log('⏰ [COMPOSABLE] Message timeout:', _messageId)
       webWorkerManager.pendingMessages.delete(_messageId)
       reject(new Error('Web worker message timeout'))
     }, 30000) // 30 second timeout
-    
+
     // Store pending message
     webWorkerManager.pendingMessages.set(_messageId, {
       resolve,
       reject,
-      timeout
+      timeout,
     })
-    
+
     console.log('📤 [COMPOSABLE] Sending message to worker:', messageWithId.type, _messageId)
     console.log('📤 [COMPOSABLE] Pending messages count:', webWorkerManager.pendingMessages.size)
     webWorkerManager.worker.postMessage(messageWithId)

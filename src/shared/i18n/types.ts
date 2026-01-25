@@ -1,6 +1,6 @@
 /**
  * Type definitions for i18n translation keys
- * 
+ *
  * This file provides TypeScript type safety for translation keys throughout the application.
  * The types are derived from the English locale files (master schema).
  */

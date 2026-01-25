@@ -1,15 +1,15 @@
 /**
  * PALET Statement Executor
- * 
+ *
  * Handles execution of PALET statements to set color codes for color combinations.
  * Supports both PALET B (background/backdrop) and PALET S (sprites).
  */
 
 import type { CstNode } from 'chevrotain'
 
-import { COLOR_CODES,COLOR_PATTERNS, ERROR_TYPES } from '@/core/constants'
+import { COLOR_CODES, COLOR_PATTERNS, ERROR_TYPES } from '@/core/constants'
 import type { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
-import { getCstNodes, getFirstCstNode,getFirstToken } from '@/core/parser/cst-helpers'
+import { getCstNodes, getFirstCstNode, getFirstToken } from '@/core/parser/cst-helpers'
 import type { ExecutionContext } from '@/core/state/ExecutionContext'
 
 export class PaletExecutor {
@@ -24,19 +24,19 @@ export class PaletExecutor {
    * Syntax: PALET {B|S} n, C1, C2, C3, C4
    * or: PALETB n, C1, C2, C3, C4 (background, no space)
    * or: PALETS n, C1, C2, C3, C4 (sprites, no space)
-   * 
+   *
    * When target is B and n=0, C1 is the backdrop color.
    * C1, C2, C3, C4 are color codes (0-60).
    */
   execute(paletStmtCst: CstNode, lineNumber?: number): void {
     // Determine target (B or S)
     let target: 'B' | 'S' = 'B'
-    
+
     // Check if this is PALETB or PALETS (no space form)
     const paletbToken = paletStmtCst.children.Paletb?.[0]
     const paletsToken = paletStmtCst.children.Palets?.[0]
     const paletToken = paletStmtCst.children.Palet?.[0]
-    
+
     if (paletbToken) {
       // PALETB form (background, no space)
       target = 'B'
@@ -57,7 +57,7 @@ export class PaletExecutor {
           this.context.addError({
             line: lineNumber ?? 0,
             message: `PALET: Invalid target, expected B or S, got ${targetStr}`,
-            type: ERROR_TYPES.RUNTIME
+            type: ERROR_TYPES.RUNTIME,
           })
           return
         }
@@ -65,7 +65,7 @@ export class PaletExecutor {
         this.context.addError({
           line: lineNumber ?? 0,
           message: 'PALET: Missing target (B or S)',
-          type: ERROR_TYPES.RUNTIME
+          type: ERROR_TYPES.RUNTIME,
         })
         return
       }
@@ -73,7 +73,7 @@ export class PaletExecutor {
       this.context.addError({
         line: lineNumber ?? 0,
         message: 'PALET: Invalid statement format',
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }
@@ -84,19 +84,19 @@ export class PaletExecutor {
       this.context.addError({
         line: lineNumber ?? 0,
         message: 'PALET: Missing parameter list',
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }
 
     const expressions = getCstNodes(paletParameterListCst.children.expression)
-    
+
     // Validate we have 5 expressions: n, C1, C2, C3, C4
     if (expressions.length < 5) {
       this.context.addError({
         line: lineNumber ?? 0,
         message: 'PALET: Expected 5 arguments (n, C1, C2, C3, C4)',
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }
@@ -111,7 +111,7 @@ export class PaletExecutor {
       this.context.addError({
         line: lineNumber ?? 0,
         message: 'PALET: Invalid arguments',
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }
@@ -131,30 +131,20 @@ export class PaletExecutor {
       const c4Value = this.evaluator.evaluateExpression(c4ExprCst)
 
       // Convert to numbers
-      n = typeof nValue === 'number'
-        ? Math.floor(nValue)
-        : Math.floor(parseFloat(String(nValue)) || 0)  
+      n = typeof nValue === 'number' ? Math.floor(nValue) : Math.floor(parseFloat(String(nValue)) || 0)
 
-      c1 = typeof c1Value === 'number'
-        ? Math.floor(c1Value)
-        : Math.floor(parseFloat(String(c1Value)) || 0)  
+      c1 = typeof c1Value === 'number' ? Math.floor(c1Value) : Math.floor(parseFloat(String(c1Value)) || 0)
 
-      c2 = typeof c2Value === 'number'
-        ? Math.floor(c2Value)
-        : Math.floor(parseFloat(String(c2Value)) || 0)  
+      c2 = typeof c2Value === 'number' ? Math.floor(c2Value) : Math.floor(parseFloat(String(c2Value)) || 0)
 
-      c3 = typeof c3Value === 'number'
-        ? Math.floor(c3Value)
-        : Math.floor(parseFloat(String(c3Value)) || 0)  
+      c3 = typeof c3Value === 'number' ? Math.floor(c3Value) : Math.floor(parseFloat(String(c3Value)) || 0)
 
-      c4 = typeof c4Value === 'number'
-        ? Math.floor(c4Value)
-        : Math.floor(parseFloat(String(c4Value)) || 0)  
+      c4 = typeof c4Value === 'number' ? Math.floor(c4Value) : Math.floor(parseFloat(String(c4Value)) || 0)
     } catch (error) {
       this.context.addError({
         line: lineNumber ?? 0,
         message: `PALET: Error evaluating arguments: ${error instanceof Error ? error.message : String(error)}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }
@@ -165,20 +155,26 @@ export class PaletExecutor {
       this.context.addError({
         line: lineNumber ?? 0,
         message: `PALET: Color combination number out of range (${COLOR_PATTERNS.MIN}-${COLOR_PATTERNS.MAX}), got ${n}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }
 
     // C1, C2, C3, C4: MIN to MAX (color codes)
-    if (c1 < COLOR_CODES.MIN || c1 > COLOR_CODES.MAX || 
-        c2 < COLOR_CODES.MIN || c2 > COLOR_CODES.MAX || 
-        c3 < COLOR_CODES.MIN || c3 > COLOR_CODES.MAX || 
-        c4 < COLOR_CODES.MIN || c4 > COLOR_CODES.MAX) {
+    if (
+      c1 < COLOR_CODES.MIN ||
+      c1 > COLOR_CODES.MAX ||
+      c2 < COLOR_CODES.MIN ||
+      c2 > COLOR_CODES.MAX ||
+      c3 < COLOR_CODES.MIN ||
+      c3 > COLOR_CODES.MAX ||
+      c4 < COLOR_CODES.MIN ||
+      c4 > COLOR_CODES.MAX
+    ) {
       this.context.addError({
         line: lineNumber ?? 0,
         message: `PALET: Color code out of range (${COLOR_CODES.MIN}-${COLOR_CODES.MAX}), got C1=${c1}, C2=${c2}, C3=${c3}, C4=${c4}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }

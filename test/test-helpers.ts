@@ -1,6 +1,6 @@
 /**
  * Test Helpers for Executor Tests
- * 
+ *
  * Utility functions for creating test fixtures and CST nodes.
  */
 
@@ -18,7 +18,7 @@ export async function parseStatement(code: string): Promise<CstNode | null> {
   if (!result.success || !result.cst) {
     return null
   }
-  
+
   const statements = result.cst.children.statement
   if (Array.isArray(statements) && statements.length > 0) {
     const stmt = statements[0]
@@ -46,7 +46,7 @@ export function getCommandListCst(statementCst: CstNode): CstNode | null {
 export function getCommandCst(statementCst: CstNode): CstNode | null {
   const commandListCst = getCommandListCst(statementCst)
   if (!commandListCst) return null
-  
+
   const commandCst = commandListCst.children.command?.[0]
   if (commandCst && 'children' in commandCst) {
     return commandCst
@@ -93,13 +93,13 @@ export function getLetStatementCst(singleCommandCst: CstNode): CstNode | null {
 export async function parsePrintStatement(code: string): Promise<CstNode | null> {
   const stmtCst = await parseStatement(code)
   if (!stmtCst) return null
-  
+
   const cmdCst = getCommandCst(stmtCst)
   if (!cmdCst) return null
-  
+
   const singleCmdCst = getSingleCommandCst(cmdCst)
   if (!singleCmdCst) return null
-  
+
   return getPrintStatementCst(singleCmdCst)
 }
 
@@ -109,13 +109,12 @@ export async function parsePrintStatement(code: string): Promise<CstNode | null>
 export async function parseLetStatement(code: string): Promise<CstNode | null> {
   const stmtCst = await parseStatement(code)
   if (!stmtCst) return null
-  
+
   const cmdCst = getCommandCst(stmtCst)
   if (!cmdCst) return null
-  
+
   const singleCmdCst = getSingleCommandCst(cmdCst)
   if (!singleCmdCst) return null
-  
+
   return getLetStatementCst(singleCmdCst)
 }
-

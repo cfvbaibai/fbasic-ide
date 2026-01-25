@@ -14,7 +14,7 @@ import VariablesTab from './VariablesTab.vue'
  * RuntimeOutput component - Displays runtime output, errors, variables, debug info, and screen buffer.
  */
 defineOptions({
-  name: 'RuntimeOutput'
+  name: 'RuntimeOutput',
 })
 
 // Props are used in template, but linter requires assignment for withDefaults
@@ -41,9 +41,8 @@ const props = withDefaults(defineProps<Props>(), {
   backdropColor: 0,
   spriteStates: () => [],
   spriteEnabled: false,
-  movementStates: () => []
+  movementStates: () => [],
 })
-
 
 interface Props {
   output: string[]

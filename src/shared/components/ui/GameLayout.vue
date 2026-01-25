@@ -5,7 +5,7 @@ import GamePageContainer from './GamePageContainer.vue'
 
 /**
  * GameLayout component - Main layout component with navigation and content areas.
- * 
+ *
  * @example
  * ```vue
  * <GameLayout>
@@ -14,7 +14,7 @@ import GamePageContainer from './GamePageContainer.vue'
  * ```
  */
 defineOptions({
-  name: 'GameLayout'
+  name: 'GameLayout',
 })
 </script>
 

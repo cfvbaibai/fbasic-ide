@@ -1,10 +1,10 @@
 /**
  * IF-THEN Executor Tests
- * 
+ *
  * Unit tests for the IfThenExecutor class execution behavior.
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
@@ -20,7 +20,7 @@ describe('IfThenExecutor', () => {
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
-      deviceAdapter: deviceAdapter
+      deviceAdapter: deviceAdapter,
     })
   })
 
@@ -31,7 +31,7 @@ describe('IfThenExecutor', () => {
 30 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(deviceAdapter.getAllOutputs()).toEqual('Equal\n')
   })
@@ -43,7 +43,7 @@ describe('IfThenExecutor', () => {
 30 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(deviceAdapter.getAllOutputs()).toEqual('')
   })
@@ -56,7 +56,7 @@ describe('IfThenExecutor', () => {
 40 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(deviceAdapter.getAllOutputs()).toEqual(' 10\n')
   })
@@ -68,7 +68,7 @@ describe('IfThenExecutor', () => {
 30 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(deviceAdapter.getAllOutputs()).toEqual('Greater\n')
   })
@@ -80,7 +80,7 @@ describe('IfThenExecutor', () => {
 30 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(deviceAdapter.getAllOutputs()).toEqual('Less\n')
   })
@@ -92,7 +92,7 @@ describe('IfThenExecutor', () => {
 30 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(deviceAdapter.getAllOutputs()).toEqual('Not Equal\n')
   })
@@ -104,7 +104,7 @@ describe('IfThenExecutor', () => {
 30 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
   })
@@ -116,7 +116,7 @@ describe('IfThenExecutor', () => {
 30 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(deviceAdapter.getAllOutputs()).toEqual('')
   })
@@ -128,7 +128,7 @@ describe('IfThenExecutor', () => {
 30 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(deviceAdapter.getAllOutputs()).toEqual('Match\n')
   })
@@ -141,7 +141,7 @@ describe('IfThenExecutor', () => {
 40 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(deviceAdapter.getAllOutputs()).toEqual('Both\n')
   })
@@ -153,7 +153,7 @@ describe('IfThenExecutor', () => {
 30 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     // Colon is just statement separator - PRINT I doesn't end with semicolon, so each adds newline
     // Last PRINT I doesn't end with semicolon, so adds newline
@@ -170,7 +170,7 @@ describe('IfThenExecutor', () => {
 60 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
@@ -187,7 +187,7 @@ describe('IfThenExecutor', () => {
 60 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
@@ -204,7 +204,7 @@ describe('IfThenExecutor', () => {
 60 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
@@ -221,7 +221,7 @@ describe('IfThenExecutor', () => {
 60 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
@@ -238,13 +238,13 @@ describe('IfThenExecutor', () => {
 60 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
-      // PRINT I doesn't end with semicolon, so each adds newline
-      // PRINT "Done" doesn't end with semicolon, so adds newline
-      expect(outputs).toEqual(' 1\n 2\n 3\nDone\n')
+    // PRINT I doesn't end with semicolon, so each adds newline
+    // PRINT "Done" doesn't end with semicolon, so adds newline
+    expect(outputs).toEqual(' 1\n 2\n 3\nDone\n')
   })
 
   it('should error on IF-THEN with non-existent line number', async () => {
@@ -255,12 +255,12 @@ describe('IfThenExecutor', () => {
 40 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
     const errorMessages = result.errors.map(e => e.message).join(' ')
     expect(errorMessages).toEqual('IF-THEN: line number 999 not found')
-    
+
     // Verify that PRINT statements after the error are not executed
     const outputs = deviceAdapter.getAllOutputs()
     expect(outputs).toEqual('RUNTIME: IF-THEN: line number 999 not found')
@@ -276,7 +276,7 @@ describe('IfThenExecutor', () => {
 60 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
@@ -292,7 +292,7 @@ describe('IfThenExecutor', () => {
 30 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
@@ -311,7 +311,7 @@ describe('IfThenExecutor', () => {
 40 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -330,7 +330,7 @@ describe('IfThenExecutor', () => {
 40 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -348,7 +348,7 @@ describe('IfThenExecutor', () => {
 30 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -363,7 +363,7 @@ describe('IfThenExecutor', () => {
 40 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -378,7 +378,7 @@ describe('IfThenExecutor', () => {
 30 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -393,7 +393,7 @@ describe('IfThenExecutor', () => {
 40 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -407,7 +407,7 @@ describe('IfThenExecutor', () => {
 30 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -417,7 +417,7 @@ describe('IfThenExecutor', () => {
 
   describe('IF-THEN Program Flow', () => {
     it('should continue to next line after executing THEN when condition is true', async () => {
-      // Manual: "If the logical equation is established (YES), it executes the command sentence 
+      // Manual: "If the logical equation is established (YES), it executes the command sentence
       // after THEN, then continues to the following line written after the IF sentence."
       const source = `
 10 LET X = 5
@@ -426,7 +426,7 @@ describe('IfThenExecutor', () => {
 40 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -437,7 +437,7 @@ describe('IfThenExecutor', () => {
     })
 
     it('should go directly to next line when condition is false', async () => {
-      // Manual: "If the logical equation is not established (NO), it bypasses the command sentence 
+      // Manual: "If the logical equation is not established (NO), it bypasses the command sentence
       // after THEN and directly executes the following line written after the IF sentence."
       const source = `
 10 LET X = 5
@@ -446,7 +446,7 @@ describe('IfThenExecutor', () => {
 40 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -463,7 +463,7 @@ describe('IfThenExecutor', () => {
 30 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -477,7 +477,7 @@ describe('IfThenExecutor', () => {
 30 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -492,7 +492,7 @@ describe('IfThenExecutor', () => {
 30 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -500,4 +500,3 @@ describe('IfThenExecutor', () => {
     })
   })
 })
-

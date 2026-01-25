@@ -1,6 +1,6 @@
 /**
  * Operator Precedence Tests
- * 
+ *
  * Comprehensive tests for operator precedence according to Family BASIC spec:
  * 1. Part between ( ) - Parentheses (highest)
  * 2. Functions
@@ -14,7 +14,7 @@
  * 10. XOR - Exclusive logical sums (lowest)
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
@@ -30,7 +30,7 @@ describe('Operator Precedence', () => {
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
-      deviceAdapter
+      deviceAdapter,
     })
   })
 
@@ -39,7 +39,7 @@ describe('Operator Precedence', () => {
       // (2 + 3) * 4 = 5 * 4 = 20
       const code = '10 LET X = (2 + 3) * 4'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('X')?.value).toBe(20)
@@ -49,7 +49,7 @@ describe('Operator Precedence', () => {
       // ((2 + 3) * 4) - 1 = 20 - 1 = 19
       const code = '10 LET X = ((2 + 3) * 4) - 1'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.variables.get('X')?.value).toBe(19)
     })
@@ -58,7 +58,7 @@ describe('Operator Precedence', () => {
       // 2 + (3 * 4) = 2 + 12 = 14
       const code = '10 LET X = 2 + (3 * 4)'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.variables.get('X')?.value).toBe(14)
     })
@@ -69,7 +69,7 @@ describe('Operator Precedence', () => {
       // ABS(-5) + 3 = 5 + 3 = 8
       const code = '10 LET X = ABS(-5) + 3'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.variables.get('X')?.value).toBe(8)
     })
@@ -78,7 +78,7 @@ describe('Operator Precedence', () => {
       // ABS(-5) * 2 = 5 * 2 = 10
       const code = '10 LET X = ABS(-5) * 2'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.variables.get('X')?.value).toBe(10)
     })
@@ -89,7 +89,7 @@ describe('Operator Precedence', () => {
       // 2 + 3 * 4 = 2 + 12 = 14
       const code = '10 LET X = 2 + 3 * 4'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.variables.get('X')?.value).toBe(14)
     })
@@ -98,7 +98,7 @@ describe('Operator Precedence', () => {
       // 10 + 8 / 2 = 10 + 4 = 14
       const code = '10 LET X = 10 + 8 / 2'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.variables.get('X')?.value).toBe(14)
     })
@@ -107,7 +107,7 @@ describe('Operator Precedence', () => {
       // 10 - 2 * 3 = 10 - 6 = 4
       const code = '10 LET X = 10 - 2 * 3'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.variables.get('X')?.value).toBe(4)
     })
@@ -118,7 +118,7 @@ describe('Operator Precedence', () => {
       // 10 + 15 MOD 4 = 10 + 3 = 13
       const code = '10 LET X = 10 + 15 MOD 4'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.variables.get('X')?.value).toBe(13)
     })
@@ -128,7 +128,7 @@ describe('Operator Precedence', () => {
       // MOD has lower precedence than multiplication
       const code = '10 LET X = 2 * 15 MOD 4'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.variables.get('X')?.value).toBe(2)
     })
@@ -137,7 +137,7 @@ describe('Operator Precedence', () => {
       // 20 - 15 MOD 4 = 20 - 3 = 17
       const code = '10 LET X = 20 - 15 MOD 4'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.variables.get('X')?.value).toBe(17)
     })
@@ -148,7 +148,7 @@ describe('Operator Precedence', () => {
       // 2 + 3 * 4 = 2 + 12 = 14
       const code = '10 LET X = 2 + 3 * 4'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.variables.get('X')?.value).toBe(14)
     })
@@ -157,7 +157,7 @@ describe('Operator Precedence', () => {
       // 10 + 15 MOD 4 = 10 + 3 = 13
       const code = '10 LET X = 10 + 15 MOD 4'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.variables.get('X')?.value).toBe(13)
     })
@@ -171,7 +171,7 @@ describe('Operator Precedence', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
     })
@@ -183,7 +183,7 @@ describe('Operator Precedence', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
     })
@@ -195,7 +195,7 @@ describe('Operator Precedence', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
     })
@@ -209,7 +209,7 @@ describe('Operator Precedence', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
     })
@@ -221,7 +221,7 @@ describe('Operator Precedence', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('')
     })
@@ -235,7 +235,7 @@ describe('Operator Precedence', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
     })
@@ -247,7 +247,7 @@ describe('Operator Precedence', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
     })
@@ -259,7 +259,7 @@ describe('Operator Precedence', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
     })
@@ -267,25 +267,28 @@ describe('Operator Precedence', () => {
 
   describe('Priority 9: OR (Logical Sum)', () => {
     it('should evaluate OR after AND', async () => {
-      // 0 > 5 OR 5 > 0 AND 0 > 10 should be evaluated as (0 > 5) OR ((5 > 0) AND (0 > 10)) = false OR (true AND false) = false OR false = false
+      // 0 > 5 OR 5 > 0 AND 0 > 10 should be evaluated as (0 > 5) OR ((5 > 0)
+      // AND (0 > 10)) = false OR (true AND false) = false OR false = false
       const code = `
 10 IF 0 > 5 OR 5 > 0 AND 0 > 10 THEN PRINT "True"
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('')
     })
 
     it('should evaluate OR after NOT and AND', async () => {
-      // NOT 0 > 5 OR 0 > 10 AND 5 > 0 should be evaluated as (NOT (0 > 5)) OR ((0 > 10) AND (5 > 0)) = true OR (false AND true) = true OR false = true
+      // NOT 0 > 5 OR 0 > 10 AND 5 > 0 should be evaluated as (NOT (0 > 5))
+      // OR ((0 > 10) AND (5 > 0)) = true OR (false AND true) = true OR false
+      // = true
       const code = `
 10 IF NOT 0 > 5 OR 0 > 10 AND 5 > 0 THEN PRINT "True"
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
     })
@@ -293,25 +296,28 @@ describe('Operator Precedence', () => {
 
   describe('Priority 10: XOR (Exclusive Logical Sum)', () => {
     it('should evaluate XOR after OR', async () => {
-      // 5 > 0 OR 0 > 10 XOR 10 > 0 should be evaluated as ((5 > 0) OR (0 > 10)) XOR (10 > 0) = (true OR false) XOR true = true XOR true = false
+      // 5 > 0 OR 0 > 10 XOR 10 > 0 should be evaluated as ((5 > 0) OR (0 > 10))
+      // XOR (10 > 0) = (true OR false) XOR true = true XOR true = false
       const code = `
 10 IF 5 > 0 OR 0 > 10 XOR 10 > 0 THEN PRINT "True"
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('')
     })
 
     it('should evaluate XOR after AND and OR', async () => {
-      // 5 > 0 AND 10 > 0 OR 0 > 5 XOR 15 > 0 should be evaluated as (((5 > 0) AND (10 > 0)) OR (0 > 5)) XOR (15 > 0) = ((true AND true) OR false) XOR true = (true OR false) XOR true = true XOR true = false
+      // 5 > 0 AND 10 > 0 OR 0 > 5 XOR 15 > 0 should be evaluated as (((5 > 0)
+      // AND (10 > 0)) OR (0 > 5)) XOR (15 > 0) = ((true AND true) OR false)
+      // XOR true = (true OR false) XOR true = true XOR true = false
       const code = `
 10 IF 5 > 0 AND 10 > 0 OR 0 > 5 XOR 15 > 0 THEN PRINT "True"
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('')
     })
@@ -331,7 +337,7 @@ describe('Operator Precedence', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('')
     })
@@ -349,7 +355,7 @@ describe('Operator Precedence', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
     })
@@ -366,10 +372,9 @@ describe('Operator Precedence', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
     })
   })
 })
-

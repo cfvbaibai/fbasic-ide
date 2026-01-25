@@ -26,10 +26,10 @@ export function formatArrayForDisplay(array: unknown): string {
   if (!Array.isArray(array)) {
     return 'Array'
   }
-  
+
   // Check if it's a 2D array (nested arrays)
   const is2D = array.length > 0 && Array.isArray(array[0])
-  
+
   if (is2D) {
     // 2D array: show matrix representation
     const rows: string[] = []

@@ -3,7 +3,7 @@
  * JoystickControl component - Control interface for Nintendo controller joysticks.
  */
 defineOptions({
-  name: 'JoystickControl'
+  name: 'JoystickControl',
 })
 const props = defineProps<Props>()
 import { computed, ref } from 'vue'
@@ -36,8 +36,8 @@ const {
   flashingCells,
   startDpadHold,
   stopDpadHold,
-  toggleActionButton
-// eslint-disable-next-line vue/no-setup-props-reactivity-loss -- Function props don't need reactivity wrapping
+  toggleActionButton,
+  // eslint-disable-next-line vue/no-setup-props-reactivity-loss -- Function props don't need reactivity wrapping
 } = useJoystickEvents({
   sendStickEvent: props.sendStickEvent,
   sendStrigEvent: props.sendStrigEvent,
@@ -46,7 +46,7 @@ const {
   },
   onStrigStateChange: (joystickId, state) => {
     trigStates.value[joystickId] = state
-  }
+  },
 })
 
 // Computed property for table data
@@ -55,20 +55,26 @@ const joystickStatusData = computed(() => {
     {
       id: 0,
       stick: stickStates.value[0] || 0,
-      strig: trigStates.value[0] || 0
+      strig: trigStates.value[0] || 0,
     },
     {
       id: 1,
       stick: stickStates.value[1] || 0,
-      strig: trigStates.value[1] || 0
-    }
+      strig: trigStates.value[1] || 0,
+    },
   ]
 })
 </script>
 
 <template>
-  <GameBlock :title="t('ide.joystick.control')" title-icon="mdi:play" :clickable-header="true" class="joystick-control"
-    :class="{ collapsed: !isExpanded }" @click-header="isExpanded = !isExpanded">
+  <GameBlock
+    :title="t('ide.joystick.control')"
+    title-icon="mdi:play"
+    :clickable-header="true"
+    class="joystick-control"
+    :class="{ collapsed: !isExpanded }"
+    @click-header="isExpanded = !isExpanded"
+  >
     <template #right>
       <GameCollapseToggle :expanded="isExpanded" @toggle="isExpanded = !isExpanded" />
     </template>
@@ -78,12 +84,19 @@ const joystickStatusData = computed(() => {
       <div class="joystick-panels-row">
         <!-- Joystick Controls -->
         <div class="control-grid">
-          <GameSubBlock v-for="joystickId in 2" :key="joystickId - 1" :title="t('ide.joystick.joystick', { id: joystickId - 1 })">
+          <GameSubBlock
+            v-for="joystickId in 2"
+            :key="joystickId - 1"
+            :title="t('ide.joystick.joystick', { id: joystickId - 1 })"
+          >
             <!-- Nintendo Controller Layout -->
-            <NintendoController :joystick-id="joystickId - 1" :held-buttons="heldButtons"
+            <NintendoController
+              :joystick-id="joystickId - 1"
+              :held-buttons="heldButtons"
               @dpad-start="(direction: 'up' | 'down' | 'left' | 'right') => startDpadHold(joystickId - 1, direction)"
               @dpad-stop="(direction: 'up' | 'down' | 'left' | 'right') => stopDpadHold(joystickId - 1, direction)"
-              @action-button="(button: 'select' | 'start' | 'a' | 'b') => toggleActionButton(joystickId - 1, button)" />
+              @action-button="(button: 'select' | 'start' | 'a' | 'b') => toggleActionButton(joystickId - 1, button)"
+            />
           </GameSubBlock>
 
           <JoystickStatusTable :status-data="joystickStatusData" :flashing-cells="flashingCells" />
@@ -138,7 +151,6 @@ const joystickStatusData = computed(() => {
   gap: 1rem;
   justify-content: start;
 }
-
 
 /* Glowing border animations */
 @keyframes border-shimmer {

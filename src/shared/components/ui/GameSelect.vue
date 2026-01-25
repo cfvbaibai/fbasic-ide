@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { useEventListener } from '@vueuse/core'
-import { computed, onDeactivated,ref, useTemplateRef } from 'vue'
+import { computed, onDeactivated, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import GameIcon from './GameIcon.vue'
-import type { GameSelectEmits, GameSelectOption,GameSelectProps } from './GameSelect.types'
+import type { GameSelectEmits, GameSelectOption, GameSelectProps } from './GameSelect.types'
 
 /**
  * GameSelect component - A styled select dropdown component with options.
- * 
+ *
  * @example
  * ```vue
  * <GameSelect
@@ -20,14 +20,14 @@ import type { GameSelectEmits, GameSelectOption,GameSelectProps } from './GameSe
  * ```
  */
 defineOptions({
-  name: 'GameSelect'
+  name: 'GameSelect',
 })
 
 const props = withDefaults(defineProps<GameSelectProps>(), {
   options: () => [],
   placeholder: '',
   disabled: false,
-  size: 'medium'
+  size: 'medium',
 })
 
 const emit = defineEmits<GameSelectEmits>()
@@ -70,7 +70,7 @@ const selectClasses = computed(() => {
     'game-select': true,
     [`game-select-${props.size}`]: true,
     'game-select-open': isOpen.value,
-    'game-select-disabled': props.disabled
+    'game-select-disabled': props.disabled,
   }
 })
 
@@ -90,16 +90,19 @@ const selectWidth = computed(() => props.width ?? '100%')
       </span>
       <GameIcon icon="mdi:chevron-down" size="small" class="game-select-arrow" />
     </button>
-    
+
     <Transition name="game-select-dropdown">
       <div v-if="isOpen" class="game-select-dropdown">
         <div
           v-for="option in options"
           :key="String(option.value)"
-          :class="['game-select-option', { 
-            selected: option.value === modelValue,
-            disabled: option.disabled 
-          }]"
+          :class="[
+            'game-select-option',
+            {
+              selected: option.value === modelValue,
+              disabled: option.disabled,
+            },
+          ]"
           @click="handleSelect(option)"
         >
           {{ option.label }}
@@ -129,7 +132,7 @@ const selectWidth = computed(() => props.width ?? '100%')
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 
+  box-shadow:
     0 2px 4px var(--base-alpha-gray-00-30),
     inset 0 1px 0 var(--base-alpha-gray-100-10);
   display: flex;
@@ -140,7 +143,7 @@ const selectWidth = computed(() => props.width ?? '100%')
 
 .game-select-trigger:focus {
   border-color: var(--base-solid-primary);
-  box-shadow: 
+  box-shadow:
     0 0 12px var(--game-accent-glow),
     0 2px 4px var(--base-alpha-gray-00-30),
     inset 0 1px 0 var(--base-alpha-gray-100-10);
@@ -151,7 +154,6 @@ const selectWidth = computed(() => props.width ?? '100%')
   opacity: 0.5;
   cursor: not-allowed;
 }
-
 
 .game-select-text {
   flex: 1;
@@ -182,7 +184,7 @@ const selectWidth = computed(() => props.width ?? '100%')
   background: var(--game-surface-bg-gradient);
   border: 2px solid var(--game-surface-border);
   border-radius: 8px;
-  box-shadow: 
+  box-shadow:
     0 4px 12px var(--base-alpha-gray-00-40),
     0 0 20px var(--base-alpha-primary-20),
     inset 0 1px 0 var(--base-alpha-gray-100-10);

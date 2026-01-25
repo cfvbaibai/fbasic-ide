@@ -1,10 +1,10 @@
 /**
  * GOSUB/RETURN Executor Tests
- * 
+ *
  * Unit tests for the GosubExecutor and ReturnExecutor classes.
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
@@ -20,7 +20,7 @@ describe('GOSUB/RETURN Executor', () => {
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
-      deviceAdapter: deviceAdapter
+      deviceAdapter: deviceAdapter,
     })
   })
 
@@ -41,7 +41,7 @@ describe('GOSUB/RETURN Executor', () => {
 1040 RETURN
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -64,7 +64,7 @@ describe('GOSUB/RETURN Executor', () => {
 210 RETURN
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -79,12 +79,12 @@ describe('GOSUB/RETURN Executor', () => {
 30 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(false)
       expect(result.errors.length).toBeGreaterThan(0)
       const errorMessages = result.errors.map(e => e.message).join(' ')
       expect(errorMessages).toEqual('GOSUB: line number 999 not found')
-      
+
       // Verify that PRINT statements after the error are not executed
       const outputs = deviceAdapter.getAllOutputs()
       expect(outputs).toEqual('RUNTIME: GOSUB: line number 999 not found')
@@ -102,7 +102,7 @@ describe('GOSUB/RETURN Executor', () => {
 110 RETURN
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -122,7 +122,7 @@ describe('GOSUB/RETURN Executor', () => {
 110 RETURN 40
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -137,12 +137,12 @@ describe('GOSUB/RETURN Executor', () => {
 30 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(false)
       expect(result.errors.length).toBeGreaterThan(0)
       const errorMessages = result.errors.map(e => e.message).join(' ')
       expect(errorMessages).toEqual('RETURN: no GOSUB to return from')
-      
+
       // Verify that PRINT statements after the error are not executed
       const outputs = deviceAdapter.getAllOutputs()
       expect(outputs).toEqual('RUNTIME: RETURN: no GOSUB to return from')
@@ -156,12 +156,12 @@ describe('GOSUB/RETURN Executor', () => {
 100 RETURN 999
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(false)
       expect(result.errors.length).toBeGreaterThan(0)
       const errorMessages = result.errors.map(e => e.message).join(' ')
       expect(errorMessages).toEqual('RETURN: line number 999 not found')
-      
+
       // Verify that PRINT statements after the error are not executed
       const outputs = deviceAdapter.getAllOutputs()
       expect(outputs).toEqual('RUNTIME: RETURN: line number 999 not found')
@@ -179,7 +179,7 @@ describe('GOSUB/RETURN Executor', () => {
 110 RETURN
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -198,7 +198,7 @@ describe('GOSUB/RETURN Executor', () => {
 110 RETURN
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -208,4 +208,3 @@ describe('GOSUB/RETURN Executor', () => {
     })
   })
 })
-

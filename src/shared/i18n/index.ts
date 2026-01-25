@@ -35,7 +35,7 @@ import zhTWImageAnalyzer from './locales/zh-TW/image-analyzer.json'
 import zhTWMonacoEditor from './locales/zh-TW/monaco-editor.json'
 import zhTWNavigation from './locales/zh-TW/navigation.json'
 import zhTWSpriteViewer from './locales/zh-TW/sprite-viewer.json'
-import type { Locale,MessageSchema } from './types'
+import type { Locale, MessageSchema } from './types'
 
 // Get saved locale from localStorage or default to browser language
 const getDefaultLocale = (): Locale => {
@@ -43,7 +43,7 @@ const getDefaultLocale = (): Locale => {
   if (saved && (saved === 'en' || saved === 'ja' || saved === 'zh-CN' || saved === 'zh-TW')) {
     return saved as Locale
   }
-  
+
   // Detect browser language
   const browserLang = navigator.language
   if (browserLang.startsWith('zh')) {
@@ -72,7 +72,7 @@ const i18n = createI18n<{ message: MessageSchema }, Locale>({
       spriteViewer: enSpriteViewer,
       imageAnalyzer: enImageAnalyzer,
       monacoEditor: enMonacoEditor,
-      canvasPerf: enCanvasPerf
+      canvasPerf: enCanvasPerf,
     },
     ja: {
       navigation: jaNavigation,
@@ -82,7 +82,7 @@ const i18n = createI18n<{ message: MessageSchema }, Locale>({
       spriteViewer: jaSpriteViewer,
       imageAnalyzer: jaImageAnalyzer,
       monacoEditor: jaMonacoEditor,
-      canvasPerf: jaCanvasPerf
+      canvasPerf: jaCanvasPerf,
     },
     'zh-CN': {
       navigation: zhCNNavigation,
@@ -92,7 +92,7 @@ const i18n = createI18n<{ message: MessageSchema }, Locale>({
       spriteViewer: zhCNSpriteViewer,
       imageAnalyzer: zhCNImageAnalyzer,
       monacoEditor: zhCNMonacoEditor,
-      canvasPerf: zhCNCanvasPerf
+      canvasPerf: zhCNCanvasPerf,
     },
     'zh-TW': {
       navigation: zhTWNavigation,
@@ -102,9 +102,9 @@ const i18n = createI18n<{ message: MessageSchema }, Locale>({
       spriteViewer: zhTWSpriteViewer,
       imageAnalyzer: zhTWImageAnalyzer,
       monacoEditor: zhTWMonacoEditor,
-      canvasPerf: zhTWCanvasPerf
-    }
-  }
+      canvasPerf: zhTWCanvasPerf,
+    },
+  },
 })
 
 export default i18n

@@ -1,22 +1,22 @@
 /**
  * Web Worker Device Adapter
- * 
+ *
  * A comprehensive device adapter that handles both device operations and web worker management.
  * Delegates to specialized modules for web worker management, screen state, and message handling.
  */
 
-import type { 
+import type {
   AnimationCommand,
   AnyServiceWorkerMessage,
   BasicDeviceAdapter,
   ExecutionResult,
-  InterpreterConfig, 
-  OutputMessage
+  InterpreterConfig,
+  OutputMessage,
 } from '@/core/interfaces'
 
 import { MessageHandler } from './MessageHandler'
 import { ScreenStateManager } from './ScreenStateManager'
-import { type WebWorkerExecutionOptions,WebWorkerManager } from './WebWorkerManager'
+import { type WebWorkerExecutionOptions, WebWorkerManager } from './WebWorkerManager'
 
 export type { WebWorkerExecutionOptions }
 
@@ -25,7 +25,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   private strigClickBuffer: Map<number, number[]> = new Map()
   private stickStates: Map<number, number> = new Map()
   private isEnabled = true
-  
+
   // === MANAGERS ===
   private webWorkerManager: WebWorkerManager
   private screenStateManager: ScreenStateManager
@@ -67,11 +67,11 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
    * Execute BASIC code in the web worker
    */
   async executeInWorker(
-    code: string, 
+    code: string,
     config: InterpreterConfig,
     options: WebWorkerExecutionOptions = {}
   ): Promise<ExecutionResult> {
-    return this.webWorkerManager.executeInWorker(code, config, options, (message) => {
+    return this.webWorkerManager.executeInWorker(code, config, options, message => {
       this.handleWorkerMessage(message)
     })
   }
@@ -100,16 +100,16 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       data: {
         joystickId,
         state,
-        timestamp: Date.now()
-      }
+        timestamp: Date.now(),
+      },
     }
-    
+
     console.log('🔌 [WEB_WORKER] Sending STRIG event to web worker:', {
       joystickId,
       state,
-      messageId: message.id
+      messageId: message.id,
     })
-    
+
     worker.postMessage(message)
   }
 
@@ -150,13 +150,19 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
 
   setStickState(joystickId: number, state: number): void {
     this.stickStates.set(joystickId, state)
-    console.log('🔌 [WEB_WORKER_DEVICE] Stick state set:', { joystickId, state })
+    console.log('🔌 [WEB_WORKER_DEVICE] Stick state set:', {
+      joystickId,
+      state,
+    })
   }
 
   pushStrigState(joystickId: number, state: number): void {
     if (!this.isEnabled) return
 
-    console.log('🔌 [WEB_WORKER_DEVICE] pushStrigState called:', { joystickId, state })
+    console.log('🔌 [WEB_WORKER_DEVICE] pushStrigState called:', {
+      joystickId,
+      state,
+    })
 
     if (state > 0) {
       if (!this.strigClickBuffer.has(joystickId)) {
@@ -167,7 +173,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       console.log('🔌 [WEB_WORKER_DEVICE] STRIG pulse buffered:', {
         joystickId,
         state,
-        bufferSize: buffer.length
+        bufferSize: buffer.length,
       })
     }
   }
@@ -180,15 +186,17 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     if (!this.strigClickBuffer.has(joystickId)) {
       return 0
     }
-    
+
     const buffer = this.strigClickBuffer.get(joystickId)!
     if (buffer.length === 0) {
       return 0
     }
-    
+
     const clickValue = buffer.shift()!
-    console.log(`🔌 [WEB_WORKER_DEVICE] consumeStrigState: consumed STRIG event ` +
-      `for joystick ${joystickId}, value=${clickValue}, remaining=${buffer.length}`)
+    console.log(
+      `🔌 [WEB_WORKER_DEVICE] consumeStrigState: consumed STRIG event ` +
+        `for joystick ${joystickId}, value=${clickValue}, remaining=${buffer.length}`
+    )
     return clickValue
   }
 
@@ -196,7 +204,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
 
   printOutput(output: string): void {
     console.log('🔌 [WEB_WORKER_DEVICE] Print output:', output)
-    
+
     // Send to STDOUT (original textarea output)
     self.postMessage({
       type: 'OUTPUT',
@@ -206,15 +214,15 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
         executionId: this.screenStateManager.getCurrentExecutionId() ?? 'unknown',
         output: output,
         outputType: 'print',
-        timestamp: Date.now()
-      }
+        timestamp: Date.now(),
+      },
     })
-    
+
     // Process all characters and update screen buffer
     for (const char of output) {
       this.screenStateManager.writeCharacter(char)
     }
-    
+
     // Send a single 'full' screen buffer update after processing all characters
     const updateMessage = this.screenStateManager.createFullScreenUpdateMessage()
     self.postMessage(updateMessage)
@@ -231,8 +239,8 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
         executionId: this.screenStateManager.getCurrentExecutionId() ?? 'unknown',
         output: output,
         outputType: 'debug',
-        timestamp: Date.now()
-      }
+        timestamp: Date.now(),
+      },
     })
   }
 
@@ -247,8 +255,8 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
         executionId: this.screenStateManager.getCurrentExecutionId() ?? 'unknown',
         output: output,
         outputType: 'error',
-        timestamp: Date.now()
-      }
+        timestamp: Date.now(),
+      },
     })
   }
 
@@ -256,7 +264,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     console.log('🔌 [WEB_WORKER_DEVICE] Clear screen')
     // Clear screen buffer
     this.screenStateManager.initializeScreen()
-    
+
     // Send clear update
     const updateMessage = this.screenStateManager.createClearScreenUpdateMessage()
     self.postMessage(updateMessage)
@@ -264,9 +272,9 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
 
   setCursorPosition(x: number, y: number): void {
     console.log('🔌 [WEB_WORKER_DEVICE] Set cursor position:', { x, y })
-    
+
     this.screenStateManager.setCursorPosition(x, y)
-    
+
     // Send cursor update
     const updateMessage = this.screenStateManager.createCursorUpdateMessage()
     self.postMessage(updateMessage)
@@ -274,19 +282,22 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
 
   setColorPattern(x: number, y: number, pattern: number): void {
     console.log('🔌 [WEB_WORKER_DEVICE] Set color pattern:', { x, y, pattern })
-    
+
     const cellsToUpdate = this.screenStateManager.setColorPattern(x, y, pattern)
-    
+
     // Send screen update with color pattern changes
     const updateMessage = this.screenStateManager.createColorUpdateMessage(cellsToUpdate)
     self.postMessage(updateMessage)
   }
 
   setColorPalette(bgPalette: number, spritePalette: number): void {
-    console.log('🔌 [WEB_WORKER_DEVICE] Set color palette:', { bgPalette, spritePalette })
-    
+    console.log('🔌 [WEB_WORKER_DEVICE] Set color palette:', {
+      bgPalette,
+      spritePalette,
+    })
+
     this.screenStateManager.setColorPalette(bgPalette, spritePalette)
-    
+
     // Send palette update message
     const updateMessage = this.screenStateManager.createPaletteUpdateMessage()
     self.postMessage(updateMessage)
@@ -294,9 +305,9 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
 
   setBackdropColor(colorCode: number): void {
     console.log('🔌 [WEB_WORKER_DEVICE] Set backdrop color:', colorCode)
-    
+
     this.screenStateManager.setBackdropColor(colorCode)
-    
+
     // Send backdrop color update message
     const updateMessage = this.screenStateManager.createBackdropUpdateMessage()
     self.postMessage(updateMessage)
@@ -304,9 +315,9 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
 
   setCharacterGeneratorMode(mode: number): void {
     console.log('🔌 [WEB_WORKER_DEVICE] Set character generator mode:', mode)
-    
+
     this.screenStateManager.setCharacterGeneratorMode(mode)
-    
+
     // Send CGEN update message
     const updateMessage = this.screenStateManager.createCgenUpdateMessage()
     self.postMessage(updateMessage)
@@ -318,14 +329,14 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
    */
   sendAnimationCommand(command: AnimationCommand): void {
     console.log('🎬 [WEB_WORKER_DEVICE] Sending animation command:', command.type, command)
-    
+
     const message: AnyServiceWorkerMessage = {
       type: 'ANIMATION_COMMAND',
       id: `anim-${Date.now()}-${Math.random()}`,
       timestamp: Date.now(),
-      data: command
+      data: command,
     }
-    
+
     self.postMessage(message)
   }
 
@@ -352,12 +363,12 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
 
     const worker = this.webWorkerManager.getWorker()
     if (worker) {
-      worker.onmessage = (event) => {
+      worker.onmessage = event => {
         console.log('📨 [WORKER→MAIN] Main thread received message from worker:', {
           type: event.data.type,
           id: event.data.id,
           timestamp: event.data.timestamp,
-          dataSize: JSON.stringify(event.data).length
+          dataSize: JSON.stringify(event.data).length,
         })
         const message = event.data as AnyServiceWorkerMessage
         this.handleWorkerMessage(message)
@@ -369,7 +380,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
    * Handle messages from the web worker
    */
   private handleWorkerMessage(message: AnyServiceWorkerMessage): void {
-    this.messageHandler.handleWorkerMessage(message, (outputMessage) => {
+    this.messageHandler.handleWorkerMessage(message, outputMessage => {
       this.handleOutputMessage(outputMessage)
     })
   }
@@ -380,9 +391,9 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   private handleOutputMessage(message: OutputMessage): void {
     console.log('📤 [MAIN] Handling OUTPUT message:', {
       outputType: message.data.outputType,
-      outputLength: message.data.output.length
+      outputLength: message.data.output.length,
     })
-    
+
     // Output is now handled by the device adapter in the web worker
     // No need to forward to main thread callbacks
   }

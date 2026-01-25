@@ -27,7 +27,7 @@ if (typeof window !== 'undefined') {
         // In production, use a CDN or copy workers to public directory
         return `https://cdn.jsdelivr.net/npm/monaco-editor@0.55.1/esm/vs/${path}`
       }
-      
+
       if (label === 'json') {
         return getWorkerUrl('language/json/json.worker.js')
       }
@@ -42,7 +42,7 @@ if (typeof window !== 'undefined') {
       }
       // Default editor worker for other languages (including our custom 'fbasic')
       return getWorkerUrl('editor/editor.worker.js')
-    }
+    },
   }
 }
 

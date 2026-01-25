@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import type { GameSwitchEmits,GameSwitchProps } from './GameSwitch.types'
+import type { GameSwitchEmits, GameSwitchProps } from './GameSwitch.types'
 
 /**
  * GameSwitch component - A toggle switch component with size variants.
- * 
+ *
  * @example
  * ```vue
  * <GameSwitch
@@ -16,12 +16,12 @@ import type { GameSwitchEmits,GameSwitchProps } from './GameSwitch.types'
  * ```
  */
 defineOptions({
-  name: 'GameSwitch'
+  name: 'GameSwitch',
 })
 
 const props = withDefaults(defineProps<GameSwitchProps>(), {
   disabled: false,
-  size: 'medium'
+  size: 'medium',
 })
 
 const emit = defineEmits<GameSwitchEmits>()
@@ -45,7 +45,7 @@ const switchClasses = computed(() => {
     'game-switch': true,
     [`game-switch-${props.size}`]: true,
     'game-switch-checked': isChecked.value,
-    'game-switch-disabled': props.disabled
+    'game-switch-disabled': props.disabled,
   }
 })
 </script>
@@ -85,7 +85,7 @@ const switchClasses = computed(() => {
   height: 100%;
   border-radius: 11px;
   transition: all 0.2s ease;
-  box-shadow: 
+  box-shadow:
     0 2px 4px var(--base-alpha-gray-00-30),
     inset 0 1px 0 var(--base-alpha-gray-100-10);
 }
@@ -105,7 +105,7 @@ const switchClasses = computed(() => {
 .game-switch-checked .game-switch-core {
   background: linear-gradient(135deg, var(--base-solid-primary) 0%, var(--base-solid-primary) 100%);
   border-color: var(--base-solid-primary);
-  box-shadow: 
+  box-shadow:
     0 0 12px var(--game-accent-glow),
     0 2px 4px var(--base-alpha-gray-00-30),
     inset 0 1px 0 var(--base-alpha-gray-100-20);
@@ -124,7 +124,7 @@ const switchClasses = computed(() => {
 
 .game-switch:hover:not(.game-switch-disabled) .game-switch-core {
   border-color: var(--base-solid-primary);
-  box-shadow: 
+  box-shadow:
     0 0 8px var(--game-accent-glow),
     0 2px 4px var(--base-alpha-gray-00-30),
     inset 0 1px 0 var(--base-alpha-gray-100-10);
@@ -151,5 +151,4 @@ const switchClasses = computed(() => {
 .game-switch-small.game-switch-checked .game-switch-button {
   left: calc(100% - 13px);
 }
-
 </style>

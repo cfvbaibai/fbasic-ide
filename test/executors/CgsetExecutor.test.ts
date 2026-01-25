@@ -1,10 +1,10 @@
 /**
  * CGSET Executor Tests
- * 
+ *
  * Unit tests for the CgsetExecutor class execution behavior.
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
@@ -20,7 +20,7 @@ describe('CgsetExecutor', () => {
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
-      deviceAdapter: deviceAdapter
+      deviceAdapter: deviceAdapter,
     })
   })
 
@@ -30,7 +30,7 @@ describe('CgsetExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.colorPaletteCalls).toHaveLength(1)
@@ -44,7 +44,7 @@ describe('CgsetExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.colorPaletteCalls).toHaveLength(1)
@@ -57,7 +57,7 @@ describe('CgsetExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.colorPaletteCalls).toHaveLength(1)
@@ -70,7 +70,7 @@ describe('CgsetExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.colorPaletteCalls).toHaveLength(1)
@@ -84,7 +84,7 @@ describe('CgsetExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.colorPaletteCalls).toHaveLength(1)
@@ -100,7 +100,7 @@ describe('CgsetExecutor', () => {
 40 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.colorPaletteCalls).toHaveLength(1)
@@ -113,7 +113,7 @@ describe('CgsetExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.colorPaletteCalls).toHaveLength(1)
@@ -128,7 +128,7 @@ describe('CgsetExecutor', () => {
 40 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.colorPaletteCalls).toHaveLength(3)
@@ -145,7 +145,7 @@ describe('CgsetExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.colorPaletteCalls).toHaveLength(2)
@@ -159,7 +159,7 @@ describe('CgsetExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
     expect(result.errors[0]?.message).toContain('Background palette code out of range (0-1)')
@@ -171,7 +171,7 @@ describe('CgsetExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
     expect(result.errors[0]?.message).toContain('Background palette code out of range (0-1)')
@@ -183,7 +183,7 @@ describe('CgsetExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
     expect(result.errors[0]?.message).toContain('Sprite palette code out of range (0-2)')
@@ -195,7 +195,7 @@ describe('CgsetExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
     expect(result.errors[0]?.message).toContain('Sprite palette code out of range (0-2)')
@@ -208,7 +208,7 @@ describe('CgsetExecutor', () => {
 30 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.colorPaletteCalls).toHaveLength(2)
@@ -222,7 +222,7 @@ describe('CgsetExecutor', () => {
 40 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.colorPaletteCalls).toHaveLength(3)
@@ -234,7 +234,7 @@ describe('CgsetExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.colorPaletteCalls).toHaveLength(1)
@@ -249,7 +249,7 @@ describe('CgsetExecutor', () => {
 30 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.colorPaletteCalls).toHaveLength(1)
@@ -269,20 +269,20 @@ describe('CgsetExecutor', () => {
 30 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
-    
+
     // Verify CGSET was called with correct palette
     expect(deviceAdapter.colorPaletteCalls).toHaveLength(1)
     expect(deviceAdapter.colorPaletteCalls[0]).toEqual({ bgPalette: 0, spritePalette: 1 })
     expect(deviceAdapter.currentColorPalette).toEqual({ bgPalette: 0, spritePalette: 1 })
-    
+
     // Verify PRINT was executed (characters were printed)
     expect(deviceAdapter.printOutputs.length).toBeGreaterThan(0)
     // PRINT adds a newline at the end
     expect(deviceAdapter.printOutputs[0]).toBe('HELLO WORLD!\n')
-    
+
     // The palette should be set before characters are printed
     // This ensures characters will be rendered with palette 0 colors (0x2C for first color)
   })

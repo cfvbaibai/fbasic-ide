@@ -27,14 +27,14 @@ export class AnimationManager {
     // Initialize 8 action slots with different default positions to avoid overlap
     // Spread them out in a grid pattern
     const defaultPositions = [
-      { x: 80, y: 80 },   // Action 0: top-left
-      { x: 176, y: 80 },  // Action 1: top-right
-      { x: 80, y: 160 },  // Action 2: bottom-left
+      { x: 80, y: 80 }, // Action 0: top-left
+      { x: 176, y: 80 }, // Action 1: top-right
+      { x: 80, y: 160 }, // Action 2: bottom-left
       { x: 176, y: 160 }, // Action 3: bottom-right
-      { x: 128, y: 60 },  // Action 4: top-center
+      { x: 128, y: 60 }, // Action 4: top-center
       { x: 128, y: 180 }, // Action 5: bottom-center
-      { x: 50, y: 120 },  // Action 6: left-center
-      { x: 206, y: 120 }  // Action 7: right-center
+      { x: 50, y: 120 }, // Action 6: left-center
+      { x: 206, y: 120 }, // Action 7: right-center
     ]
     for (let i = 0; i < 8; i++) {
       this.storedPositions.set(i, defaultPositions[i] ?? { x: 120, y: 120 })
@@ -120,7 +120,7 @@ export class AnimationManager {
       directionDeltaY: deltaY,
       isActive: true,
       currentFrameIndex: 0,
-      frameCounter: 0
+      frameCounter: 0,
     }
 
     this.movementStates.set(actionNumber, movementState)
@@ -132,7 +132,7 @@ export class AnimationManager {
         actionNumber,
         definition,
         startX: initialX,
-        startY: initialY
+        startY: initialY,
       }
       this.deviceAdapter.sendAnimationCommand(command)
     }
@@ -168,7 +168,7 @@ export class AnimationManager {
         // Update stored position for next movement
         this.storedPositions.set(movement.actionNumber, {
           x: movement.currentX,
-          y: movement.currentY
+          y: movement.currentY,
         })
       }
     }
@@ -186,7 +186,7 @@ export class AnimationManager {
         // Update stored position
         this.storedPositions.set(actionNumber, {
           x: movement.currentX,
-          y: movement.currentY
+          y: movement.currentY,
         })
       }
     }
@@ -245,7 +245,7 @@ export class AnimationManager {
     if (movement) {
       return {
         x: movement.currentX,
-        y: movement.currentY
+        y: movement.currentY,
       }
     }
     // Return stored position if no active movement
@@ -276,7 +276,10 @@ export class AnimationManager {
    *            5=down, 6=down-left, 7=left, 8=up-left
    * Returns dx, dy in range [-1, 0, 1]
    */
-  private getDirectionDeltas(direction: number): { deltaX: number; deltaY: number } {
+  private getDirectionDeltas(direction: number): {
+    deltaX: number
+    deltaY: number
+  } {
     switch (direction) {
       case 0: // None
         return { deltaX: 0, deltaY: 0 }

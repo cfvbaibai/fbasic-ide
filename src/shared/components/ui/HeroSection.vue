@@ -11,7 +11,7 @@ interface Props {
 withDefaults(defineProps<Props>(), {
   subtitle: '',
   description: '',
-  icon: undefined
+  icon: undefined,
 })
 </script>
 
@@ -50,7 +50,7 @@ withDefaults(defineProps<Props>(), {
   font-weight: 700;
   font-family: var(--game-font-family-heading);
   color: var(--base-solid-primary);
-  text-shadow: 
+  text-shadow:
     0 0 20px var(--game-accent-glow),
     0 4px 8px var(--base-alpha-gray-00-80);
   letter-spacing: 3px;

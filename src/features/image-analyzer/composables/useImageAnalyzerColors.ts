@@ -40,26 +40,24 @@ export function useColorCombinationColors(
   selectedColorCombination: { value: number }
 ) {
   const selectedColorCombinationColors = computed(() => {
-    const palette = paletteType.value === 'sprite'
-      ? SPRITE_PALETTES[selectedPaletteCode.value]
-      : BACKGROUND_PALETTES[selectedPaletteCode.value]
-    
+    const palette =
+      paletteType.value === 'sprite'
+        ? SPRITE_PALETTES[selectedPaletteCode.value]
+        : BACKGROUND_PALETTES[selectedPaletteCode.value]
+
     if (!palette) {
       return []
     }
-    
+
     const colorCombination = palette[selectedColorCombination.value]
     if (!colorCombination) {
       return []
     }
-    
+
     // Return all 4 colors (background + 3 foreground colors)
-    return [
-      colorCombination[0],
-      colorCombination[1],
-      colorCombination[2],
-      colorCombination[3]
-    ].filter((code): code is number => code !== undefined)
+    return [colorCombination[0], colorCombination[1], colorCombination[2], colorCombination[3]].filter(
+      (code): code is number => code !== undefined
+    )
   })
 
   return { selectedColorCombinationColors }

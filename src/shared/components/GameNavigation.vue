@@ -11,14 +11,14 @@ import GameSelect from './ui/GameSelect.vue'
 
 /**
  * GameNavigation component - Main navigation component with route navigation, skin switcher, and locale switcher.
- * 
+ *
  * @example
  * ```vue
  * <GameNavigation />
  * ```
  */
 defineOptions({
-  name: 'GameNavigation'
+  name: 'GameNavigation',
 })
 
 const { t } = useI18n()
@@ -44,38 +44,38 @@ const navItems = computed<NavItem[]>(() => [
     name: t('navigation.items.home.name'),
     path: '/',
     icon: 'mdi:monitor',
-    description: t('navigation.items.home.description')
+    description: t('navigation.items.home.description'),
   },
   {
     name: t('navigation.items.ide.name'),
     path: '/ide',
     icon: 'mdi:pencil',
-    description: t('navigation.items.ide.description')
+    description: t('navigation.items.ide.description'),
   },
   {
     name: t('navigation.items.monaco.name'),
     path: '/monaco',
     icon: 'mdi:pencil',
-    description: t('navigation.items.monaco.description')
+    description: t('navigation.items.monaco.description'),
   },
   {
     name: t('navigation.items.imageAnalyzer.name'),
     path: '/image-analyzer',
     icon: 'mdi:image',
-    description: t('navigation.items.imageAnalyzer.description')
+    description: t('navigation.items.imageAnalyzer.description'),
   },
   {
     name: t('navigation.items.spriteViewer.name'),
     path: '/character-sprite-viewer',
     icon: 'mdi:grid',
-    description: t('navigation.items.spriteViewer.description')
+    description: t('navigation.items.spriteViewer.description'),
   },
   {
     name: t('navigation.items.canvasPerformance.name'),
     path: '/canvas-test',
     icon: 'mdi:speedometer',
-    description: t('navigation.items.canvasPerformance.description')
-  }
+    description: t('navigation.items.canvasPerformance.description'),
+  },
 ])
 
 const isActive = (path: string) => {
@@ -89,7 +89,7 @@ const navigate = (path: string) => {
 const skinOptions = computed(() => {
   return availableSkins.map(skin => ({
     label: skin.label,
-    value: skin.name
+    value: skin.name,
   }))
 })
 
@@ -100,7 +100,7 @@ const handleSkinChange = (skinValue: string | number) => {
 const localeOptions = computed(() => {
   return availableLocales.map(locale => ({
     label: locale.label,
-    value: locale.value
+    value: locale.value,
   }))
 })
 
@@ -177,7 +177,7 @@ const handleLocaleChange = (localeValue: string | number) => {
   font-weight: 700;
   font-family: var(--game-font-family-heading);
   color: var(--base-solid-primary);
-  text-shadow: 
+  text-shadow:
     0 0 10px var(--game-accent-glow),
     0 2px 4px var(--base-alpha-gray-00-80);
   letter-spacing: 2px;
@@ -218,7 +218,7 @@ const handleLocaleChange = (localeValue: string | number) => {
   align-items: center;
   gap: 0.5rem;
   white-space: nowrap;
-  box-shadow: 
+  box-shadow:
     0 2px 4px var(--base-alpha-gray-00-30),
     inset 0 1px 0 var(--base-alpha-gray-100-10);
 }
@@ -228,7 +228,7 @@ const handleLocaleChange = (localeValue: string | number) => {
   border-color: var(--base-solid-primary);
   color: var(--game-text-primary);
   transform: translateY(-2px);
-  box-shadow: 
+  box-shadow:
     0 4px 8px var(--game-accent-glow),
     0 2px 4px var(--base-alpha-gray-00-40),
     inset 0 1px 0 var(--base-alpha-gray-100-10);
@@ -239,7 +239,7 @@ const handleLocaleChange = (localeValue: string | number) => {
   border-color: var(--base-solid-primary);
   color: var(--game-text-contrast);
   font-weight: 700;
-  box-shadow: 
+  box-shadow:
     var(--game-shadow-glow),
     0 4px 8px var(--base-alpha-gray-00-40),
     inset 0 1px 0 var(--base-alpha-gray-100-30);

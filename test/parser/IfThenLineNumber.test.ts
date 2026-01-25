@@ -1,10 +1,10 @@
 /**
  * IF-THEN with Line Number Parser Tests
- * 
+ *
  * Tests for parsing IF-THEN and IF-GOTO statements with line numbers.
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { FBasicParser } from '@/core/parser/FBasicParser'
 
@@ -102,4 +102,3 @@ describe('IF-THEN with Line Number Parser', () => {
     })
   })
 })
-

@@ -1,6 +1,6 @@
 /**
  * Screen State Manager
- * 
+ *
  * Manages screen buffer, cursor position, and screen-related operations.
  */
 
@@ -10,10 +10,10 @@ export class ScreenStateManager {
   private screenBuffer: ScreenCell[][] = []
   private cursorX = 0
   private cursorY = 0
-  private bgPalette = 1  // Default background palette (0-1)
-  private spritePalette = 1  // Default sprite palette (0-2)
-  private backdropColor = 0  // Default backdrop color code (0-60, 0 = black)
-  private cgenMode = 2  // Default character generator mode (0-3): B on BG, A on sprite
+  private bgPalette = 1 // Default background palette (0-1)
+  private spritePalette = 1 // Default sprite palette (0-2)
+  private backdropColor = 0 // Default backdrop color code (0-60, 0 = black)
+  private cgenMode = 2 // Default character generator mode (0-3): B on BG, A on sprite
   private currentExecutionId: string | null = null
 
   constructor() {
@@ -61,7 +61,7 @@ export class ScreenStateManager {
       x = Math.max(0, Math.min(27, x))
       y = Math.max(0, Math.min(23, y))
     }
-    
+
     this.cursorX = x
     this.cursorY = y
   }
@@ -80,7 +80,7 @@ export class ScreenStateManager {
       }
       return
     }
-    
+
     // Write character at cursor position
     if (this.cursorY < 24 && this.cursorX < 28) {
       this.screenBuffer[this.cursorY] ??= []
@@ -91,12 +91,12 @@ export class ScreenStateManager {
           character: ' ',
           colorPattern: 0,
           x: this.cursorX,
-          y: this.cursorY
+          y: this.cursorY,
         }
         row[this.cursorX] = cell
       }
       cell.character = char
-      
+
       // Advance cursor
       this.cursorX++
       if (this.cursorX >= 28) {
@@ -120,19 +120,19 @@ export class ScreenStateManager {
       x = Math.max(0, Math.min(27, x))
       y = Math.max(0, Math.min(23, y))
     }
-    
+
     if (pattern < 0 || pattern > 3) {
       console.warn(`🔌 [SCREEN] Invalid color pattern: ${pattern}, clamping to valid range (0-3)`)
       pattern = Math.max(0, Math.min(3, pattern))
     }
-    
+
     // Calculate the 2×2 area containing position (x, y)
-    const areaX = Math.floor(x / 2) * 2  // Round down to even number (0, 2, 4, ...)
-    const areaY = y  // The y coordinate itself is the bottom row of the area
-    
+    const areaX = Math.floor(x / 2) * 2 // Round down to even number (0, 2, 4, ...)
+    const areaY = y // The y coordinate itself is the bottom row of the area
+
     // Update color pattern for all 4 cells in the 2×2 area
     const cellsToUpdate: Array<{ x: number; y: number; pattern: number }> = []
-    
+
     // Top-left: (areaX, areaY - 1) or (areaX, 0) if areaY is 0
     const topY = areaY > 0 ? areaY - 1 : 0
     if (areaX < 28 && topY < 24) {
@@ -142,7 +142,7 @@ export class ScreenStateManager {
         cellsToUpdate.push({ x: areaX, y: topY, pattern })
       }
     }
-    
+
     // Top-right: (areaX + 1, areaY - 1) or (areaX + 1, 0) if areaY is 0
     if (areaX + 1 < 28 && topY < 24) {
       const row = this.screenBuffer[topY]
@@ -152,7 +152,7 @@ export class ScreenStateManager {
         cellsToUpdate.push({ x: areaX + 1, y: topY, pattern })
       }
     }
-    
+
     // Bottom-left: (areaX, areaY)
     if (areaX < 28 && areaY < 24) {
       const row = this.screenBuffer[areaY]
@@ -162,7 +162,7 @@ export class ScreenStateManager {
         cellsToUpdate.push({ x: areaX, y: areaY, pattern })
       }
     }
-    
+
     // Bottom-right: (areaX + 1, areaY)
     if (areaX + 1 < 28 && areaY < 24) {
       const row = this.screenBuffer[areaY]
@@ -172,7 +172,7 @@ export class ScreenStateManager {
         cellsToUpdate.push({ x: areaX + 1, y: areaY, pattern })
       }
     }
-    
+
     return cellsToUpdate
   }
 
@@ -185,12 +185,12 @@ export class ScreenStateManager {
       console.warn(`🔌 [SCREEN] Invalid background palette: ${bgPalette}, clamping to valid range (0-1)`)
       bgPalette = Math.max(0, Math.min(1, bgPalette))
     }
-    
+
     if (spritePalette < 0 || spritePalette > 2) {
       console.warn(`🔌 [SCREEN] Invalid sprite palette: ${spritePalette}, clamping to valid range (0-2)`)
       spritePalette = Math.max(0, Math.min(2, spritePalette))
     }
-    
+
     this.bgPalette = bgPalette
     this.spritePalette = spritePalette
   }
@@ -204,7 +204,7 @@ export class ScreenStateManager {
       console.warn(`🔌 [SCREEN] Invalid backdrop color code: ${colorCode}, clamping to valid range (0-60)`)
       colorCode = Math.max(0, Math.min(60, colorCode))
     }
-    
+
     this.backdropColor = colorCode
   }
 
@@ -217,7 +217,7 @@ export class ScreenStateManager {
       console.warn(`🔌 [SCREEN] Invalid CGEN mode: ${mode}, clamping to valid range (0-3)`)
       mode = Math.max(0, Math.min(3, mode))
     }
-    
+
     this.cgenMode = mode
   }
 
@@ -270,8 +270,8 @@ export class ScreenStateManager {
         screenBuffer: this.screenBuffer,
         cursorX: this.cursorX,
         cursorY: this.cursorY,
-        timestamp: Date.now()
-      }
+        timestamp: Date.now(),
+      },
     }
   }
 
@@ -288,8 +288,8 @@ export class ScreenStateManager {
         updateType: 'cursor',
         cursorX: this.cursorX,
         cursorY: this.cursorY,
-        timestamp: Date.now()
-      }
+        timestamp: Date.now(),
+      },
     }
   }
 
@@ -304,8 +304,8 @@ export class ScreenStateManager {
       data: {
         executionId: this.currentExecutionId ?? 'unknown',
         updateType: 'clear',
-        timestamp: Date.now()
-      }
+        timestamp: Date.now(),
+      },
     }
   }
 
@@ -321,8 +321,8 @@ export class ScreenStateManager {
         executionId: this.currentExecutionId ?? 'unknown',
         updateType: 'color',
         colorUpdates: cellsToUpdate,
-        timestamp: Date.now()
-      }
+        timestamp: Date.now(),
+      },
     }
   }
 
@@ -339,8 +339,8 @@ export class ScreenStateManager {
         updateType: 'palette',
         bgPalette: this.bgPalette,
         spritePalette: this.spritePalette,
-        timestamp: Date.now()
-      }
+        timestamp: Date.now(),
+      },
     }
   }
 
@@ -356,8 +356,8 @@ export class ScreenStateManager {
         executionId: this.currentExecutionId ?? 'unknown',
         updateType: 'backdrop',
         backdropColor: this.backdropColor,
-        timestamp: Date.now()
-      }
+        timestamp: Date.now(),
+      },
     }
   }
 
@@ -373,8 +373,8 @@ export class ScreenStateManager {
         executionId: this.currentExecutionId ?? 'unknown',
         updateType: 'cgen',
         cgenMode: this.cgenMode,
-        timestamp: Date.now()
-      }
+        timestamp: Date.now(),
+      },
     }
   }
 }

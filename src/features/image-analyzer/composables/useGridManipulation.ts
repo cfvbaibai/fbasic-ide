@@ -55,6 +55,6 @@ export function useGridManipulation() {
     moveGridUp,
     moveGridDown,
     moveGridLeft,
-    moveGridRight
+    moveGridRight,
   }
 }

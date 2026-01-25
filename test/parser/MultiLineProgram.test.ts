@@ -1,10 +1,10 @@
 /**
  * Multi-line Program Parser Tests
- * 
+ *
  * Tests for parsing multi-line BASIC programs with multiple statements.
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { FBasicParser } from '@/core/parser/FBasicParser'
 
@@ -64,4 +64,3 @@ describe('Multi-line Program Parser', () => {
     })
   })
 })
-

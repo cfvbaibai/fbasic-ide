@@ -3,7 +3,7 @@ import GameIcon from './GameIcon.vue'
 
 /**
  * GameCollapseToggle component - A toggle button for collapsing/expanding content.
- * 
+ *
  * @example
  * ```vue
  * <GameCollapseToggle
@@ -14,12 +14,12 @@ import GameIcon from './GameIcon.vue'
  * ```
  */
 defineOptions({
-  name: 'GameCollapseToggle'
+  name: 'GameCollapseToggle',
 })
 
 withDefaults(defineProps<Props>(), {
   expanded: false,
-  size: 'small'
+  size: 'small',
 })
 
 const emit = defineEmits<Emits>()
@@ -40,18 +40,15 @@ const handleClick = (event: Event) => {
 </script>
 
 <template>
-  <button 
-    class="game-collapse-toggle bg-game-surface border-game-surface" 
+  <button
+    class="game-collapse-toggle bg-game-surface border-game-surface"
     :class="{ expanded: expanded }"
     @click="handleClick"
     type="button"
     :aria-expanded="expanded"
     aria-label="Toggle collapse"
   >
-    <GameIcon 
-      :icon="expanded ? 'mdi:chevron-up' : 'mdi:chevron-down'" 
-      :size="size" 
-    />
+    <GameIcon :icon="expanded ? 'mdi:chevron-up' : 'mdi:chevron-down'" :size="size" />
   </button>
 </template>
 
@@ -86,7 +83,7 @@ const handleClick = (event: Event) => {
 
 .game-collapse-toggle:hover {
   border-color: var(--base-solid-primary);
-  box-shadow: 
+  box-shadow:
     0 4px 8px var(--base-alpha-gray-00-40),
     0 0 12px var(--game-accent-glow),
     inset 0 1px 2px var(--base-alpha-gray-100-10);
@@ -106,7 +103,7 @@ const handleClick = (event: Event) => {
 .game-collapse-toggle.expanded {
   background: linear-gradient(135deg, var(--base-solid-primary) 0%, var(--game-accent-glow) 100%);
   border-color: var(--base-solid-primary);
-  box-shadow: 
+  box-shadow:
     0 0 16px var(--game-accent-glow),
     0 2px 6px var(--base-alpha-gray-00-30);
 }
@@ -120,15 +117,13 @@ const handleClick = (event: Event) => {
 
 .game-collapse-toggle:hover :deep(.game-icon) {
   color: var(--base-solid-primary);
-  filter: drop-shadow(0 0 8px var(--game-accent-glow)) 
-          drop-shadow(0 0 16px var(--game-accent-glow));
+  filter: drop-shadow(0 0 8px var(--game-accent-glow)) drop-shadow(0 0 16px var(--game-accent-glow));
   transform: rotate(180deg) scale(1.15);
 }
 
 .game-collapse-toggle.expanded :deep(.game-icon) {
   color: var(--base-solid-primary);
-  filter: drop-shadow(0 0 8px var(--game-accent-glow)) 
-          drop-shadow(0 0 16px var(--game-accent-glow));
+  filter: drop-shadow(0 0 8px var(--game-accent-glow)) drop-shadow(0 0 16px var(--game-accent-glow));
   transform: rotate(0deg) scale(1.1);
 }
 

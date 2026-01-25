@@ -5,7 +5,7 @@ import { GameIconButton } from '@/shared/components/ui'
 
 /**
  * IdeControls component - Control buttons for the IDE (run, stop, clear, debug toggle).
- * 
+ *
  * @example
  * ```vue
  * <IdeControls
@@ -21,13 +21,13 @@ import { GameIconButton } from '@/shared/components/ui'
  * ```
  */
 defineOptions({
-  name: 'IdeControls'
+  name: 'IdeControls',
 })
 
 withDefaults(defineProps<Props>(), {
   canRun: true,
   canStop: false,
-  debugMode: false
+  debugMode: false,
 })
 
 const emit = defineEmits<Emits>()
@@ -75,33 +75,33 @@ const handleDebugToggle = () => {
 
 <template>
   <div class="ide-controls">
-    <GameIconButton 
-      type="primary" 
-      :disabled="!canRun" 
-      icon="mdi:play" 
+    <GameIconButton
+      type="primary"
+      :disabled="!canRun"
+      icon="mdi:play"
       size="small"
       :title="t('ide.controls.run')"
       @click="handleRun"
     />
 
-    <GameIconButton 
-      type="danger" 
-      :disabled="!canStop" 
-      icon="mdi:pause" 
+    <GameIconButton
+      type="danger"
+      :disabled="!canStop"
+      icon="mdi:pause"
       size="small"
       :title="t('ide.controls.stop')"
       @click="handleStop"
     />
 
-    <GameIconButton 
-      type="warning" 
-      icon="mdi:delete" 
+    <GameIconButton
+      type="warning"
+      icon="mdi:delete"
       size="small"
       :title="t('ide.controls.clear')"
       @click="handleClear"
     />
 
-    <GameIconButton 
+    <GameIconButton
       variant="toggle"
       type="info"
       icon="mdi:bug"

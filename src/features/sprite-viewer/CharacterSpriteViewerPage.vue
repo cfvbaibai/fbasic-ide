@@ -13,7 +13,7 @@ import { provideSpriteViewerStore } from './composables/useSpriteViewerStore'
  * Provides sprite selection, grid display, palette management, and DEF SPRITE statement generation.
  */
 defineOptions({
-  name: 'CharacterSpriteViewerPage'
+  name: 'CharacterSpriteViewerPage',
 })
 
 // Provide the store to all child components
@@ -23,18 +23,17 @@ provideSpriteViewerStore()
 <template>
   <GameLayout>
     <div class="sprite-viewer-container">
+      <div class="sprite-viewer-content">
+        <SpriteControls />
 
-    <div class="sprite-viewer-content">
-      <SpriteControls />
+        <SpriteGrid />
 
-      <SpriteGrid />
+        <DefStatements />
 
-      <DefStatements />
+        <ColorPaletteDisplay />
 
-      <ColorPaletteDisplay />
-
-      <PaletteCombinations />
-    </div>
+        <PaletteCombinations />
+      </div>
     </div>
   </GameLayout>
 </template>

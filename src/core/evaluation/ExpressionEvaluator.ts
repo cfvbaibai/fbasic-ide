@@ -1,6 +1,6 @@
 /**
  * Expression Evaluator
- * 
+ *
  * Handles evaluation of BASIC expressions from CST nodes.
  * Uses Decimal.js for precise integer arithmetic to avoid JavaScript floating point precision issues.
  */
@@ -11,7 +11,7 @@ import Decimal from 'decimal.js'
 import { ERROR_TYPES } from '@/core/constants'
 import { getCstNodes, getFirstCstNode, getFirstToken, getTokens } from '@/core/parser/cst-helpers'
 import type { ExecutionContext } from '@/core/state/ExecutionContext'
-import type { BasicArrayValue,BasicScalarValue } from '@/core/types/BasicTypes'
+import type { BasicArrayValue, BasicScalarValue } from '@/core/types/BasicTypes'
 
 import { FunctionEvaluator } from './FunctionEvaluator'
 
@@ -21,10 +21,7 @@ export class ExpressionEvaluator {
   constructor(private context: ExecutionContext) {
     // Create function evaluator with reference to evaluateExpression method
     // We'll set it up after construction to avoid circular dependency
-    this.functionEvaluator = new FunctionEvaluator(
-      context,
-      (exprCst: CstNode) => this.evaluateExpression(exprCst)
-    )
+    this.functionEvaluator = new FunctionEvaluator(context, (exprCst: CstNode) => this.evaluateExpression(exprCst))
   }
 
   /**
@@ -65,7 +62,7 @@ export class ExpressionEvaluator {
       // XOR truth table: 1 XOR 1 = 0, 1 XOR 0 = 1, 0 XOR 1 = 1, 0 XOR 0 = 0
       const leftIsTrue = result !== 0
       const rightIsTrue = operand !== 0
-      result = (leftIsTrue !== rightIsTrue) ? -1 : 0
+      result = leftIsTrue !== rightIsTrue ? -1 : 0
     }
 
     return result
@@ -90,7 +87,7 @@ export class ExpressionEvaluator {
     for (let i = 0; i < orTokens.length && i + 1 < logicalAndExprs.length; i++) {
       const operand = this.evaluateLogicalAndExpression(logicalAndExprs[i + 1]!)
       // OR: at least one must be non-zero (true) to return -1
-      result = (result !== 0 || operand !== 0) ? -1 : 0
+      result = result !== 0 || operand !== 0 ? -1 : 0
     }
 
     return result
@@ -115,7 +112,7 @@ export class ExpressionEvaluator {
     for (let i = 0; i < andTokens.length && i + 1 < logicalNotExprs.length; i++) {
       const operand = this.evaluateLogicalNotExpression(logicalNotExprs[i + 1]!)
       // AND: both must be non-zero (true) to return -1
-      result = (result !== 0 && operand !== 0) ? -1 : 0
+      result = result !== 0 && operand !== 0 ? -1 : 0
     }
 
     return result
@@ -253,7 +250,7 @@ export class ExpressionEvaluator {
     const minusTokens = getTokens(cst.children.Minus)
 
     // Combine operators with their operands
-    const operators: Array<{ op: '+' | '-', operand: CstNode }> = []
+    const operators: Array<{ op: '+' | '-'; operand: CstNode }> = []
     let tokenIndex = 0
     for (let i = 1; i < modExpressionNodes.length; i++) {
       const op = tokenIndex < plusTokens.length ? '+' : '-'
@@ -302,21 +299,21 @@ export class ExpressionEvaluator {
     // Apply MOD operators (left to right)
     for (let i = 0; i < modTokens.length && i + 1 < multiplicativeNodes.length; i++) {
       const operandValue = this.evaluateMultiplicative(multiplicativeNodes[i + 1]!)
-      
+
       // MOD only works with numbers
       if (typeof result === 'string' || typeof operandValue === 'string') {
         throw new Error('MOD operator requires numeric operands')
       }
-      
+
       const resultDecimal = this.toDecimal(result)
       const operandDecimal = this.toDecimal(operandValue)
-      
+
       if (operandDecimal.isZero()) {
         // MOD by zero is a fatal runtime error
         this.context.addError({
           line: this.context.getCurrentLineNumber(),
           message: 'Division by zero',
-          type: ERROR_TYPES.RUNTIME
+          type: ERROR_TYPES.RUNTIME,
         })
         // Return 0 as fallback (execution will halt due to error)
         result = 0
@@ -347,7 +344,7 @@ export class ExpressionEvaluator {
     for (let i = 1; i < unaryNodes.length; i++) {
       const op = tokenIndex < multiplyTokens.length ? '*' : '/'
       const operandValue = this.evaluateUnary(unaryNodes[i]!)
-      
+
       if (op === '*') {
         // Use Decimal for precise integer arithmetic
         const resultDecimal = this.toDecimal(result)
@@ -361,7 +358,7 @@ export class ExpressionEvaluator {
           this.context.addError({
             line: this.context.getCurrentLineNumber(),
             message: 'Division by zero',
-            type: ERROR_TYPES.RUNTIME
+            type: ERROR_TYPES.RUNTIME,
           })
           // Return 0 as fallback (execution will halt due to error)
           result = 0
@@ -389,22 +386,23 @@ export class ExpressionEvaluator {
     }
 
     const primaryValue = this.evaluatePrimary(primaryCst)
-    
+
     // Check for unary minus operator
     const minusTokens = getTokens(cst.children.Minus)
-    
+
     // If there's a minus token, negate the value using Decimal
     if (minusTokens.length > 0) {
       const valueDecimal = this.toDecimal(primaryValue)
       return valueDecimal.negated().truncated().toNumber()
     }
-    
+
     // Unary plus is a no-op (or no unary operator), return the value as-is
     return primaryValue
   }
 
   /**
-   * Evaluate primary expression: NumberLiteral | StringLiteral | ArrayAccess | FunctionCall | Identifier | (LParen Expression RParen)
+   * Evaluate primary expression: 
+   * NumberLiteral | StringLiteral | ArrayAccess | FunctionCall | Identifier | (LParen Expression RParen)
    */
   private evaluatePrimary(cst: CstNode): number | string {
     // Check for array access
@@ -468,7 +466,7 @@ export class ExpressionEvaluator {
 
     const arrayName = identifierToken.image.toUpperCase()
     const expressionListCst = getFirstCstNode(cst.children.expressionList)
-    
+
     if (!expressionListCst) {
       throw new Error('Invalid array access: missing indices')
     }
@@ -476,7 +474,7 @@ export class ExpressionEvaluator {
     // Evaluate indices
     const expressions = getCstNodes(expressionListCst.children.expression)
     const indices: number[] = []
-    
+
     for (const exprCst of expressions) {
       const indexValue = this.evaluateExpression(exprCst)
       if (typeof indexValue !== 'number') {
@@ -510,9 +508,11 @@ export class ExpressionEvaluator {
     }
 
     // Return the scalar value
-    return (typeof value === 'object' && Array.isArray(value)) 
-      ? (arrayName.endsWith('$') ? '' : 0) // Still an array (too few indices)
-      : value as BasicScalarValue
+    return typeof value === 'object' && Array.isArray(value)
+      ? arrayName.endsWith('$')
+        ? ''
+        : 0 // Still an array (too few indices)
+      : (value as BasicScalarValue)
   }
 
   /**

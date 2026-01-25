@@ -1,6 +1,6 @@
 /**
  * Next Statement Executor
- * 
+ *
  * Handles execution of NEXT statements for loop continuation from CST.
  */
 
@@ -20,7 +20,7 @@ export class NextExecutor {
    * Execute a NEXT statement from CST
    * Increments the loop variable and checks if loop should continue
    * Returns true if loop should continue, false if loop should exit
-   * 
+   *
    * Note: Family BASIC spec states that NEXT cannot have a variable name
    */
   execute(nextStmtCst: CstNode, lineNumber: number): boolean {
@@ -30,7 +30,7 @@ export class NextExecutor {
       this.context.addError({
         line: lineNumber,
         message: 'NEXT without FOR',
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return false
     }
@@ -39,16 +39,12 @@ export class NextExecutor {
 
     // Increment loop variable
     loopState.currentValue += loopState.stepValue
-    
+
     // Update the actual variable
     this.variableService.setVariable(loopState.variableName, loopState.currentValue)
 
     // Check if loop should continue
-    const shouldContinue = this.shouldContinueLoop(
-      loopState.currentValue,
-      loopState.endValue,
-      loopState.stepValue
-    )
+    const shouldContinue = this.shouldContinueLoop(loopState.currentValue, loopState.endValue, loopState.stepValue)
 
     if (this.context.config.enableDebugMode) {
       this.context.addDebugOutput(
@@ -83,4 +79,3 @@ export class NextExecutor {
     }
   }
 }
-

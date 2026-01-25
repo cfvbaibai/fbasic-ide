@@ -1,10 +1,10 @@
 /**
  * CLS Executor Tests
- * 
+ *
  * Unit tests for the ClsExecutor class execution behavior.
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
@@ -20,7 +20,7 @@ describe('ClsExecutor', () => {
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
-      deviceAdapter: deviceAdapter
+      deviceAdapter: deviceAdapter,
     })
   })
 
@@ -32,7 +32,7 @@ describe('ClsExecutor', () => {
 40 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.clearScreenCalls).toBe(1)
@@ -48,7 +48,7 @@ describe('ClsExecutor', () => {
 60 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.clearScreenCalls).toBe(2)
@@ -60,7 +60,7 @@ describe('ClsExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.clearScreenCalls).toBe(1)
@@ -77,7 +77,7 @@ describe('ClsExecutor', () => {
 30 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.clearScreenCalls).toBe(1)
@@ -93,7 +93,7 @@ describe('ClsExecutor', () => {
 40 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.clearScreenCalls).toBe(1)
@@ -108,7 +108,7 @@ describe('ClsExecutor', () => {
 50 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.clearScreenCalls).toBe(3)
@@ -122,7 +122,7 @@ describe('ClsExecutor', () => {
 40 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.clearScreenCalls).toBe(1)

@@ -2,7 +2,7 @@
 import { useI18n } from 'vue-i18n'
 
 import { GameBlock } from '@/shared/components/ui'
-import { BACKGROUND_PALETTES,SPRITE_PALETTES } from '@/shared/data/palette'
+import { BACKGROUND_PALETTES, SPRITE_PALETTES } from '@/shared/data/palette'
 
 import ColorBox from './ColorBox.vue'
 
@@ -10,7 +10,7 @@ import ColorBox from './ColorBox.vue'
  * PaletteCombinations component - Displays sprite and background palette combinations.
  */
 defineOptions({
-  name: 'PaletteCombinations'
+  name: 'PaletteCombinations',
 })
 
 const { t } = useI18n()
@@ -28,11 +28,7 @@ const getBackgroundPaletteTitle = (index: number) => {
   <div class="palette-combinations-wrapper">
     <GameBlock :title="t('spriteViewer.palettes.sprite')">
       <div class="palettes-container palettes-container-sprite">
-        <div
-          v-for="(palette, paletteIndex) in SPRITE_PALETTES"
-          :key="`sprite-${paletteIndex}`"
-          class="palette-group"
-        >
+        <div v-for="(palette, paletteIndex) in SPRITE_PALETTES" :key="`sprite-${paletteIndex}`" class="palette-group">
           <h3 class="palette-group-title">{{ getSpritePaletteTitle(paletteIndex) }}</h3>
           <div class="color-combinations">
             <div
@@ -45,10 +41,7 @@ const getBackgroundPaletteTitle = (index: number) => {
                   v-for="(colorCode, colorIndex) in combination"
                   :key="`sprite-${paletteIndex}-${combIndex}-${colorIndex}`"
                 >
-                  <div
-                    v-if="colorIndex > 0"
-                    class="combination-color-wrapper"
-                  >
+                  <div v-if="colorIndex > 0" class="combination-color-wrapper">
                     <ColorBox :color-code="colorCode" />
                   </div>
                 </template>
@@ -61,11 +54,7 @@ const getBackgroundPaletteTitle = (index: number) => {
 
     <GameBlock :title="t('spriteViewer.palettes.background')">
       <div class="palettes-container palettes-container-bg">
-        <div
-          v-for="(palette, paletteIndex) in BACKGROUND_PALETTES"
-          :key="`bg-${paletteIndex}`"
-          class="palette-group"
-        >
+        <div v-for="(palette, paletteIndex) in BACKGROUND_PALETTES" :key="`bg-${paletteIndex}`" class="palette-group">
           <h3 class="palette-group-title">{{ getBackgroundPaletteTitle(paletteIndex) }}</h3>
           <div class="color-combinations">
             <div
@@ -78,10 +67,7 @@ const getBackgroundPaletteTitle = (index: number) => {
                   v-for="(colorCode, colorIndex) in combination"
                   :key="`bg-${paletteIndex}-${combIndex}-${colorIndex}`"
                 >
-                  <div
-                    v-if="colorIndex > 0"
-                    class="combination-color-wrapper"
-                  >
+                  <div v-if="colorIndex > 0" class="combination-color-wrapper">
                     <ColorBox :color-code="colorCode" />
                   </div>
                 </template>
@@ -164,4 +150,3 @@ const getBackgroundPaletteTitle = (index: number) => {
   height: 50px;
 }
 </style>
-

@@ -8,7 +8,7 @@ import { GameSwitch } from '@/shared/components/ui'
  * DisplayOptions component - Toggle switches for sprite display options (values, grid lines, reverse).
  */
 defineOptions({
-  name: 'DisplayOptions'
+  name: 'DisplayOptions',
 })
 
 const { t } = useI18n()
@@ -35,31 +35,19 @@ const updateReverseY = (value: boolean | string | number) => {
   <div class="switches-container">
     <div class="control-group">
       <label for="show-values">{{ t('spriteViewer.displayOptions.showValues') }}</label>
-      <GameSwitch
-        :model-value="store.displayOptions.value.showValues"
-        @update:model-value="updateShowValues"
-      />
+      <GameSwitch :model-value="store.displayOptions.value.showValues" @update:model-value="updateShowValues" />
     </div>
     <div class="control-group">
       <label for="show-grid-lines">{{ t('spriteViewer.displayOptions.showGridLines') }}</label>
-      <GameSwitch
-        :model-value="store.displayOptions.value.showGridLines"
-        @update:model-value="updateShowGridLines"
-      />
+      <GameSwitch :model-value="store.displayOptions.value.showGridLines" @update:model-value="updateShowGridLines" />
     </div>
     <div class="control-group">
       <label for="reverse-x">{{ t('spriteViewer.displayOptions.reverseX') }}</label>
-      <GameSwitch
-        :model-value="store.displayOptions.value.reverseX"
-        @update:model-value="updateReverseX"
-      />
+      <GameSwitch :model-value="store.displayOptions.value.reverseX" @update:model-value="updateReverseX" />
     </div>
     <div class="control-group">
       <label for="reverse-y">{{ t('spriteViewer.displayOptions.reverseY') }}</label>
-      <GameSwitch
-        :model-value="store.displayOptions.value.reverseY"
-        @update:model-value="updateReverseY"
-      />
+      <GameSwitch :model-value="store.displayOptions.value.reverseY" @update:model-value="updateReverseY" />
     </div>
   </div>
 </template>
@@ -88,4 +76,3 @@ const updateReverseY = (value: boolean | string | number) => {
   white-space: nowrap;
 }
 </style>
-

@@ -13,40 +13,43 @@ import Screen from './Screen.vue'
  * ScreenTab component - Displays the screen buffer in a tab pane format with zoom controls.
  */
 defineOptions({
-  name: 'ScreenTab'
+  name: 'ScreenTab',
 })
 
 // Props are used in template, but linter requires assignment for withDefaults
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const props = withDefaults(defineProps<{
-  screenBuffer?: ScreenCell[][]
-  cursorX?: number
-  cursorY?: number
-  bgPalette?: number
-  backdropColor?: number
-  spriteStates?: SpriteState[]
-  spriteEnabled?: boolean
-  movementStates?: MovementState[]
-}>(), {
-  screenBuffer: () => {
-    const grid: ScreenCell[][] = []
-    for (let y = 0; y < 24; y++) {
-      const row: ScreenCell[] = []
-      for (let x = 0; x < 28; x++) {
-        row.push({ character: ' ', colorPattern: 0, x, y })
+const props = withDefaults(
+  defineProps<{
+    screenBuffer?: ScreenCell[][]
+    cursorX?: number
+    cursorY?: number
+    bgPalette?: number
+    backdropColor?: number
+    spriteStates?: SpriteState[]
+    spriteEnabled?: boolean
+    movementStates?: MovementState[]
+  }>(),
+  {
+    screenBuffer: () => {
+      const grid: ScreenCell[][] = []
+      for (let y = 0; y < 24; y++) {
+        const row: ScreenCell[] = []
+        for (let x = 0; x < 28; x++) {
+          row.push({ character: ' ', colorPattern: 0, x, y })
+        }
+        grid.push(row)
       }
-      grid.push(row)
-    }
-    return grid
-  },
-  cursorX: 0,
-  cursorY: 0,
-  bgPalette: 1,
-  backdropColor: 0,
-  spriteStates: () => [],
-  spriteEnabled: false,
-  movementStates: () => []
-})
+      return grid
+    },
+    cursorX: 0,
+    cursorY: 0,
+    bgPalette: 1,
+    backdropColor: 0,
+    spriteStates: () => [],
+    spriteEnabled: false,
+    movementStates: () => [],
+  }
+)
 
 const { t } = useI18n()
 
@@ -58,7 +61,7 @@ const zoomLevels: Array<{ value: 1 | 2 | 3 | 4; label: string }> = [
   { value: 1, label: '×1' },
   { value: 2, label: '×2' },
   { value: 3, label: '×3' },
-  { value: 4, label: '×4' }
+  { value: 4, label: '×4' },
 ]
 
 // Computed property for template binding (Vue templates auto-unwrap refs, but this helps TypeScript)
@@ -71,7 +74,7 @@ const currentZoomLevel = computed(() => zoomLevel.value)
       <GameIcon icon="mdi:monitor" size="small" />
       <span>{{ t('ide.output.screen') }}</span>
     </template>
-    
+
     <template #tab-content-header>
       <div class="screen-controls">
         <GameButtonGroup>
@@ -88,9 +91,9 @@ const currentZoomLevel = computed(() => zoomLevel.value)
         </GameButtonGroup>
       </div>
     </template>
-    
+
     <div class="tab-content">
-      <Screen 
+      <Screen
         :screen-buffer="screenBuffer"
         :cursor-x="cursorX"
         :cursor-y="cursorY"

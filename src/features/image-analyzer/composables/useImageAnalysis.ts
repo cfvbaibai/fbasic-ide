@@ -66,46 +66,46 @@ export function useImageAnalysis() {
     colorCombination: number = 0
   ): Promise<void> => {
     if (!imageUrl || !hasAnalyzed.value) return
-    
+
     try {
       const img = new Image()
       img.src = imageUrl
-      
+
       await new Promise<void>((resolve, reject) => {
         img.onload = () => resolve()
         img.onerror = reject
       })
-      
+
       // Create canvas to sample pixels
       const canvas = document.createElement('canvas')
       canvas.width = img.width
       canvas.height = img.height
       const ctx = canvas.getContext('2d')
       if (!ctx) return
-      
+
       ctx.drawImage(img, 0, 0)
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
-      
+
       // Generate 4 separate 8x8 arrays (one for each quadrant of the 16x16 grid)
       const gridSize = 8
       const arrays: number[][][] = [[], [], [], []]
-      
+
       // Generate array for each quadrant
       for (let quadrant = 0; quadrant < 4; quadrant++) {
         const quadrantRow = Math.floor(quadrant / 2) // 0 or 1
         const quadrantCol = quadrant % 2 // 0 or 1
-        
+
         for (let row = 0; row < gridSize; row++) {
           const rowArray: number[] = []
           for (let col = 0; col < gridSize; col++) {
             // Calculate cell position in the 16x16 grid
             const globalRow = quadrantRow * gridSize + row
             const globalCol = quadrantCol * gridSize + col
-            
+
             // Calculate cell boundaries in original image coordinates
             const cellStartX = gridOffsetX + globalCol * adjustedCellSize
             const cellStartY = gridOffsetY + globalRow * adjustedCellSize
-            
+
             // Sample pixels in the cell (sample center and corners)
             const samplePoints = [
               [cellStartX + adjustedCellSize / 2, cellStartY + adjustedCellSize / 2], // center
@@ -114,7 +114,7 @@ export function useImageAnalysis() {
               [cellStartX + adjustedCellSize * 0.25, cellStartY + adjustedCellSize * 0.75], // bottom-left
               [cellStartX + adjustedCellSize * 0.75, cellStartY + adjustedCellSize * 0.75], // bottom-right
             ]
-            
+
             const colors: number[] = []
             for (const point of samplePoints) {
               const x = point[0] ?? 0
@@ -122,18 +122,18 @@ export function useImageAnalysis() {
               const pixelX = Math.floor(Math.max(0, Math.min(x, imageWidth - 1)))
               const pixelY = Math.floor(Math.max(0, Math.min(y, imageHeight - 1)))
               const index = (pixelY * imageWidth + pixelX) * 4
-              
+
               if (index + 2 >= imageData.data.length) continue
-              
+
               const r = imageData.data[index] ?? 0
               const g = imageData.data[index + 1] ?? 0
               const b = imageData.data[index + 2] ?? 0
-              
+
               // Use palette-based classification if palette and combination are provided
               const colorIndex = classifyColorWithPalette(r, g, b, paletteType, paletteCode, colorCombination)
               colors.push(colorIndex)
             }
-            
+
             // Use most common color in the cell, default to 0 if no samples
             if (colors.length === 0) {
               rowArray.push(0)
@@ -156,19 +156,19 @@ export function useImageAnalysis() {
           }
         }
       }
-      
+
       // Format as 4 separate const declarations
-      const arrayStrings = arrays.map((array) => {
-        if (!array) return ''
-        const arrayString = array.map(row => `  [${row?.join(',') ?? ''}]`).join(',\n')
-        return arrayString
-      }).filter(str => str !== '')
-      
+      const arrayStrings = arrays
+        .map(array => {
+          if (!array) return ''
+          const arrayString = array.map(row => `  [${row?.join(',') ?? ''}]`).join(',\n')
+          return arrayString
+        })
+        .filter(str => str !== '')
+
       const tileNames = ['_0', '_1', '_2', '_3']
-      const formattedArrays = arrayStrings.map((str, index) => 
-        `const SPRITE_ARRAY${tileNames[index]} = [\n${str}\n]`
-      )
-      
+      const formattedArrays = arrayStrings.map((str, index) => `const SPRITE_ARRAY${tileNames[index]} = [\n${str}\n]`)
+
       generatedArray.value = formattedArrays.join('\n\n')
     } catch (error) {
       console.error('Error generating array:', error)
@@ -185,6 +185,6 @@ export function useImageAnalysis() {
     cellWidth,
     cellHeight,
     analyzeImage,
-    generateArray
+    generateArray,
   }
 }

@@ -9,7 +9,7 @@ import ColorBox from './ColorBox.vue'
  * ColorPaletteDisplay component - Displays the full color palette in a grid.
  */
 defineOptions({
-  name: 'ColorPaletteDisplay'
+  name: 'ColorPaletteDisplay',
 })
 
 const { t } = useI18n()
@@ -18,16 +18,8 @@ const { t } = useI18n()
 <template>
   <GameBlock :title="t('spriteViewer.colorPalette.title')">
     <div class="palette-container">
-      <div
-        v-for="row in 4"
-        :key="row"
-        class="palette-row"
-      >
-        <div
-          v-for="col in 16"
-          :key="col"
-          class="palette-color-wrapper"
-        >
+      <div v-for="row in 4" :key="row" class="palette-row">
+        <div v-for="col in 16" :key="col" class="palette-color-wrapper">
           <ColorBox :color-code="(row - 1) * 16 + (col - 1)" />
         </div>
       </div>
@@ -36,7 +28,6 @@ const { t } = useI18n()
 </template>
 
 <style scoped>
-
 .palette-container {
   display: flex;
   flex-direction: column;
@@ -58,4 +49,3 @@ const { t } = useI18n()
   height: 60px;
 }
 </style>
-

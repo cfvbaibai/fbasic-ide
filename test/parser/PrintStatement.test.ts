@@ -1,10 +1,10 @@
 /**
  * PRINT Statement Parser Tests
- * 
+ *
  * Tests for parsing PRINT statements with various formats and expressions.
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { FBasicParser } from '@/core/parser/FBasicParser'
 
@@ -85,4 +85,3 @@ describe('PRINT Statement Parser', () => {
     })
   })
 })
-

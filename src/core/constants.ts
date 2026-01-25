@@ -1,10 +1,10 @@
 /**
  * Constants for the Family Basic Interpreter
- * 
+ *
  * This module contains all configuration constants, limits, and default values
  * used throughout the interpreter. Centralizing these values improves
  * maintainability and makes configuration changes easier.
- * 
+ *
  * @author Family Basic IDE Team
  * @version 1.0.0
  */
@@ -14,15 +14,15 @@ export const EXECUTION_LIMITS = {
   // Test environment limits (strict to prevent infinite loops in tests)
   MAX_ITERATIONS_TEST: 10000,
   MAX_OUTPUT_LINES_TEST: 1000,
-  
+
   // Production environment limits (more permissive for real user interaction)
   MAX_ITERATIONS_PRODUCTION: 1000000, // Much higher limit for production
   MAX_OUTPUT_LINES_PRODUCTION: 10000,
-  
+
   // Legacy limits (for backward compatibility)
   MAX_ITERATIONS: 10000,
   MAX_OUTPUT_LINES: 1000,
-  
+
   // Other limits (same for both environments)
   MAX_LINE_NUMBER: 99999,
   MAX_VARIABLE_NAME_LENGTH: 255,
@@ -48,7 +48,7 @@ export const DEFAULTS = {
     ENABLED_TEST: false,
     WORKER_SCRIPT: '/basic-interpreter-worker.js',
     MESSAGE_TIMEOUT: 30000, // 30 seconds timeout for web worker messages
-  }
+  },
 } as const
 
 // Error types
@@ -130,55 +130,55 @@ export const SEPARATORS = {
 
 // Timing constants
 export const TIMING = {
-  FRAME_RATE: 30,              // Family BASIC frame rate (frames per second)
+  FRAME_RATE: 30, // Family BASIC frame rate (frames per second)
   FRAME_DURATION_MS: 1000 / 30, // Duration of one frame in milliseconds (~33.33ms)
 } as const
 
 // Screen dimensions and coordinate limits
 export const SCREEN_DIMENSIONS = {
   BACKGROUND: {
-    MAX_X: 27,        // Maximum X coordinate (0-27, 28 columns)
-    MAX_Y: 23,        // Maximum Y coordinate (0-23, 24 lines)
-    COLUMNS: 28,      // Total columns
-    LINES: 24,        // Total lines
+    MAX_X: 27, // Maximum X coordinate (0-27, 28 columns)
+    MAX_Y: 23, // Maximum Y coordinate (0-23, 24 lines)
+    COLUMNS: 28, // Total columns
+    LINES: 24, // Total lines
   },
   BACKDROP: {
-    MAX_X: 31,        // Maximum X coordinate (0-31, 32 columns)
-    MAX_Y: 29,        // Maximum Y coordinate (0-29, 30 lines)
-    COLUMNS: 32,      // Total columns  
-    LINES: 30,        // Total lines
+    MAX_X: 31, // Maximum X coordinate (0-31, 32 columns)
+    MAX_Y: 29, // Maximum Y coordinate (0-29, 30 lines)
+    COLUMNS: 32, // Total columns
+    LINES: 30, // Total lines
   },
   BG_GRAPHIC: {
-    MAX_X: 27,        // Maximum X coordinate (0-27, 28 columns)
-    MAX_Y: 20,        // Maximum Y coordinate (0-20, 21 lines)
-    COLUMNS: 28,      // Total columns
-    LINES: 21,        // Total lines
+    MAX_X: 27, // Maximum X coordinate (0-27, 28 columns)
+    MAX_Y: 20, // Maximum Y coordinate (0-20, 21 lines)
+    COLUMNS: 28, // Total columns
+    LINES: 21, // Total lines
   },
   SPRITE: {
-    MAX_X: 255,       // Maximum X coordinate (0-255, 256 dots)
-    MAX_Y: 239,       // Maximum Y coordinate (0-239, 240 dots)
-    WIDTH: 256,       // Total width in dots
-    HEIGHT: 240,      // Total height in dots
-  }
+    MAX_X: 255, // Maximum X coordinate (0-255, 256 dots)
+    MAX_Y: 239, // Maximum Y coordinate (0-239, 240 dots)
+    WIDTH: 256, // Total width in dots
+    HEIGHT: 240, // Total height in dots
+  },
 } as const
 
 // Color patterns and codes
 export const COLOR_PATTERNS = {
-  MIN: 0,             // Minimum color pattern number
-  MAX: 3,             // Maximum color pattern number (0-3)
+  MIN: 0, // Minimum color pattern number
+  MAX: 3, // Maximum color pattern number (0-3)
 } as const
 
 export const COLOR_CODES = {
-  MIN: 0,             // Minimum color code
-  MAX: 60,            // Maximum color code (0-60)
+  MIN: 0, // Minimum color code
+  MAX: 60, // Maximum color code (0-60)
 } as const
 
 // PRINT statement tab stops (8-character blocks)
 export const PRINT_TAB_STOPS = {
-  BLOCK_1_END: 8,     // End of block 1 (columns 0-7)
-  BLOCK_2_END: 16,    // End of block 2 (columns 8-15)
-  BLOCK_3_END: 24,    // End of block 3 (columns 16-23)
-  BLOCK_4_END: 28,    // End of block 4 (columns 24-27)
+  BLOCK_1_END: 8, // End of block 1 (columns 0-7)
+  BLOCK_2_END: 16, // End of block 2 (columns 8-15)
+  BLOCK_3_END: 24, // End of block 3 (columns 16-23)
+  BLOCK_4_END: 28, // End of block 4 (columns 24-27)
 } as const
 
 // Colors for syntax highlighting

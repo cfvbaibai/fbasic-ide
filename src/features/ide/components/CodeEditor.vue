@@ -10,12 +10,12 @@ import { GameBlock } from '@/shared/components/ui'
  * CodeEditor component - A code editor component with syntax highlighting.
  */
 defineOptions({
-  name: 'CodeEditor'
+  name: 'CodeEditor',
 })
 
 const props = withDefaults(defineProps<Props>(), {
   title: '',
-  titleIcon: 'mdi:pencil'
+  titleIcon: 'mdi:pencil',
 })
 
 const emit = defineEmits<Emits>()
@@ -83,12 +83,22 @@ onMounted(() => {
       </div>
 
       <!-- Code Textarea -->
-      <textarea ref="textareaRef" :value="modelValue" @input="handleInput" @keydown="handleKeyDown"
-        class="code-textarea" :placeholder="t('ide.codeEditor.placeholder')" spellcheck="false" />
+      <textarea
+        ref="textareaRef"
+        :value="modelValue"
+        @input="handleInput"
+        @keydown="handleKeyDown"
+        class="code-textarea"
+        :placeholder="t('ide.codeEditor.placeholder')"
+        spellcheck="false"
+      />
 
       <!-- Syntax Highlighted Display (overlay) -->
-      <div v-if="highlightedCode && highlightedCode !== modelValue" class="syntax-highlighted"
-        v-html="highlightedCode" />
+      <div
+        v-if="highlightedCode && highlightedCode !== modelValue"
+        class="syntax-highlighted"
+        v-html="highlightedCode"
+      />
     </div>
   </GameBlock>
 </template>

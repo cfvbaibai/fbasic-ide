@@ -10,7 +10,7 @@ import { useScreenZoom } from '@/features/ide/composables/useScreenZoom'
  * Screen component - Renders the F-BASIC screen buffer on a canvas.
  */
 defineOptions({
-  name: 'Screen'
+  name: 'Screen',
 })
 
 const props = withDefaults(defineProps<Props>(), {
@@ -33,7 +33,7 @@ const props = withDefaults(defineProps<Props>(), {
   spritePalette: 1,
   spriteStates: () => [],
   movementStates: () => [],
-  spriteEnabled: false
+  spriteEnabled: false,
 })
 
 interface Props {
@@ -64,16 +64,14 @@ const BASE_HEIGHT = 240
 const canvasWidth = computed(() => BASE_WIDTH * zoomLevel.value)
 const canvasHeight = computed(() => BASE_HEIGHT * zoomLevel.value)
 
-
 // Direct rendering function (no Vue reactivity overhead)
 function render(): void {
   if (!screenCanvas.value) return
 
   // Use local movement states (with updated positions) for rendering
   const hasSprites = props.spriteStates && props.spriteStates.length > 0
-  const hasMovements = localMovementStates.value.length > 0 && 
-                       localMovementStates.value.some(m => m.isActive)
-  
+  const hasMovements = localMovementStates.value.length > 0 && localMovementStates.value.some(m => m.isActive)
+
   if (hasSprites || hasMovements) {
     // renderScreenLayers is async, but we call it without await to avoid blocking
     void renderScreenLayers(
@@ -88,12 +86,7 @@ function render(): void {
     )
   } else {
     // Fallback to simple rendering when no sprites or movements
-    renderScreenBuffer(
-      screenCanvas.value,
-      props.screenBuffer,
-      paletteCode.value,
-      props.backdropColor ?? 0
-    )
+    renderScreenBuffer(screenCanvas.value, props.screenBuffer, paletteCode.value, props.backdropColor ?? 0)
   }
 }
 
@@ -102,38 +95,42 @@ function render(): void {
 const localMovementStates = ref<MovementState[]>([])
 
 // Update local movement states from props
-watch(() => props.movementStates, (newStates) => {
-  if (!newStates || newStates.length === 0) {
-    localMovementStates.value = []
-    return
-  }
-  
-  // Deep clone movement states to make them mutable
-  // Merge with existing states to preserve positions of active movements
-  const existingStates = new Map(localMovementStates.value.map(m => [m.actionNumber, m]))
-  
-  localMovementStates.value = newStates.map(m => {
-    const existing = existingStates.get(m.actionNumber)
-    if (existing && existing.isActive && m.isActive) {
-      // Preserve existing position if movement is still active
+watch(
+  () => props.movementStates,
+  newStates => {
+    if (!newStates || newStates.length === 0) {
+      localMovementStates.value = []
+      return
+    }
+
+    // Deep clone movement states to make them mutable
+    // Merge with existing states to preserve positions of active movements
+    const existingStates = new Map(localMovementStates.value.map(m => [m.actionNumber, m]))
+
+    localMovementStates.value = newStates.map(m => {
+      const existing = existingStates.get(m.actionNumber)
+      if (existing && existing.isActive && m.isActive) {
+        // Preserve existing position if movement is still active
+        return {
+          ...m,
+          currentX: existing.currentX,
+          currentY: existing.currentY,
+          remainingDistance: existing.remainingDistance,
+          definition: { ...m.definition },
+        }
+      }
+      // New movement or movement was restarted - use new state
       return {
         ...m,
-        currentX: existing.currentX,
-        currentY: existing.currentY,
-        remainingDistance: existing.remainingDistance,
-        definition: { ...m.definition }
+        definition: { ...m.definition },
       }
-    }
-    // New movement or movement was restarted - use new state
-    return {
-      ...m,
-      definition: { ...m.definition }
-    }
-  })
-  
-  // Trigger immediate render when new movements are added
-  scheduleRender()
-}, { immediate: true, deep: true })
+    })
+
+    // Trigger immediate render when new movements are added
+    scheduleRender()
+  },
+  { immediate: true, deep: true }
+)
 
 // Watch paletteCode, backdropColor, spritePalette, sprite states, and sprite enabled to trigger re-render
 // Combined watcher for better performance (Vue 3 best practice)
@@ -141,30 +138,31 @@ watch(() => props.movementStates, (newStates) => {
 const spriteStateFingerprint = computed(() => {
   if (!props.spriteStates || props.spriteStates.length === 0) return ''
   // Create a fingerprint from sprite properties we care about for rendering
-  return props.spriteStates.map(s => 
-    `${s.spriteNumber}:${s.x},${s.y},${s.visible ? '1' : '0'},${s.priority}`
-  ).join('|')
+  return props.spriteStates.map(s => `${s.spriteNumber}:${s.x},${s.y},${s.visible ? '1' : '0'},${s.priority}`).join('|')
 })
 
 // Watch local movement states for changes (positions update in animation loop)
 const movementStateFingerprint = computed(() => {
   if (!localMovementStates.value || localMovementStates.value.length === 0) return ''
-  return localMovementStates.value.map(m => 
-    `${m.actionNumber}:${m.currentX},${m.currentY},${m.isActive ? '1' : '0'},${m.currentFrameIndex}`
-  ).join('|')
+  return localMovementStates.value
+    .map(m => `${m.actionNumber}:${m.currentX},${m.currentY},${m.isActive ? '1' : '0'},${m.currentFrameIndex}`)
+    .join('|')
 })
 
-watch([
-  paletteCode,
-  () => props.backdropColor,
-  () => props.spritePalette,
-  spriteStateFingerprint,
-  movementStateFingerprint,
-  () => props.spriteEnabled,
-  zoomLevel
-], () => {
-  scheduleRender()
-})
+watch(
+  [
+    paletteCode,
+    () => props.backdropColor,
+    () => props.spritePalette,
+    spriteStateFingerprint,
+    movementStateFingerprint,
+    () => props.spriteEnabled,
+    zoomLevel,
+  ],
+  () => {
+    scheduleRender()
+  }
+)
 
 // Animation loop for updating movement positions
 let animationFrameId: number | null = null
@@ -231,17 +229,25 @@ function scheduleRender(): void {
 }
 
 // Watch screenBuffer and render when it changes (shallow watch to reduce overhead)
-watch(() => props.screenBuffer, () => {
-  scheduleRender()
-}, { immediate: true })
+watch(
+  () => props.screenBuffer,
+  () => {
+    scheduleRender()
+  },
+  { immediate: true }
+)
 
 // Initial render when canvas becomes available
 // Use watch instead of watchEffect to avoid conditional dependency tracking issues
-watch(screenCanvas, (canvas) => {
-  if (canvas) {
-    scheduleRender()
-  }
-}, { immediate: true })
+watch(
+  screenCanvas,
+  canvas => {
+    if (canvas) {
+      scheduleRender()
+    }
+  },
+  { immediate: true }
+)
 
 // Start animation loop when component mounts
 onMounted(() => {
@@ -259,24 +265,24 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="screen-display">
-      <div class="crt-bezel">
-        <div class="crt-screen">
-          <div class="crt-scanlines"></div>
-          <canvas
-            ref="screenCanvas"
-            class="screen-canvas"
-            :width="256"
-            :height="240"
-            :style="{
-              width: `${canvasWidth}px`,
-              height: `${canvasHeight}px`
-            }"
-          />
-          <div class="crt-reflection"></div>
-        </div>
+  <div class="screen-display">
+    <div class="crt-bezel">
+      <div class="crt-screen">
+        <div class="crt-scanlines"></div>
+        <canvas
+          ref="screenCanvas"
+          class="screen-canvas"
+          :width="256"
+          :height="240"
+          :style="{
+            width: `${canvasWidth}px`,
+            height: `${canvasHeight}px`,
+          }"
+        />
+        <div class="crt-reflection"></div>
       </div>
     </div>
+  </div>
 </template>
 
 <style scoped>
@@ -309,7 +315,6 @@ onUnmounted(() => {
   gap: 1rem;
 }
 
-
 /* CRT Color Variables - Light Theme */
 .light-theme .screen-display {
   --crt-glow-light-10: rgb(from var(--base-solid-gray-100) r g b / 10%);
@@ -328,10 +333,15 @@ onUnmounted(() => {
 
 /* CRT Bezel - outer frame */
 .crt-bezel {
-  background: linear-gradient(135deg, var(--game-screen-header-bg) 0%, var(--crt-border-color) 50%, var(--game-screen-header-bg) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--game-screen-header-bg) 0%,
+    var(--crt-border-color) 50%,
+    var(--game-screen-header-bg) 100%
+  );
   border: 8px solid var(--crt-border-color);
   border-radius: 12px;
-  box-shadow: 
+  box-shadow:
     inset 0 2px 4px var(--crt-glow-light-10),
     0 8px 32px var(--crt-shadow-dark-80),
     0 0 0 2px var(--crt-shadow-dark-50);
@@ -340,9 +350,14 @@ onUnmounted(() => {
 
 /* Light theme: darker background, lighter border, subtle shadows */
 .light-theme .crt-bezel {
-  background: linear-gradient(135deg, var(--base-solid-gray-30) 0%, var(--base-solid-gray-50) 50%, var(--base-solid-gray-30) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--base-solid-gray-30) 0%,
+    var(--base-solid-gray-50) 50%,
+    var(--base-solid-gray-30) 100%
+  );
   border-color: var(--base-solid-gray-50);
-  box-shadow: 
+  box-shadow:
     inset 0 1px 2px var(--crt-shadow-dark-10),
     0 4px 16px var(--base-alpha-gray-00-20),
     0 0 0 1px var(--crt-shadow-dark-30);
@@ -353,7 +368,7 @@ onUnmounted(() => {
   position: relative;
   border: 4px solid var(--crt-border-color);
   border-radius: 16px;
-  box-shadow: 
+  box-shadow:
     inset 0 0 80px var(--crt-glow-light-80),
     0 4px 20px var(--crt-shadow-dark-60),
     inset 0 -2px 10px var(--crt-shadow-dark-80);
@@ -423,4 +438,3 @@ onUnmounted(() => {
   filter: brightness(1.05) contrast(1.1);
 }
 </style>
-

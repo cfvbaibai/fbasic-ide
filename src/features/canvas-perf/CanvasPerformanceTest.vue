@@ -3,13 +3,13 @@ import { computed, onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { renderScreenBuffer, type ScreenCell } from '@/features/ide/composables/canvasRenderer'
-import { GameButton,GameLayout } from '@/shared/components/ui'
+import { GameButton, GameLayout } from '@/shared/components/ui'
 
 /**
  * CanvasPerformanceTest component - Performance testing component for canvas rendering.
  */
 defineOptions({
-  name: 'CanvasPerformanceTest'
+  name: 'CanvasPerformanceTest',
 })
 
 const { t } = useI18n()
@@ -58,7 +58,7 @@ function renderLoop(): void {
     const y = Math.floor(Math.random() * 24)
     const x = Math.floor(Math.random() * 28)
     const char = testChars[Math.floor(Math.random() * testChars.length)] ?? 'A'
-    
+
     if (screenBuffer[y] && screenBuffer[y][x]) {
       screenBuffer[y][x].character = char
       charsAdded++
@@ -82,10 +82,12 @@ function renderLoop(): void {
     frameCount = 0
     lastFpsUpdate = now
   }
-  
+
   // Log performance if frame time is high
   if (frameTime.value > 20) {
-    console.log(`Slow frame: ${frameTime.value.toFixed(2)}ms (render: ${renderTime.toFixed(2)}ms, chars: ${charsAdded})`)
+    console.log(
+      `Slow frame: ${frameTime.value.toFixed(2)}ms (render: ${renderTime.toFixed(2)}ms, chars: ${charsAdded})`
+    )
   }
 
   if (isRunning.value) {
@@ -134,32 +136,29 @@ onUnmounted(() => {
   <GameLayout>
     <div class="test-page">
       <div class="test-controls">
-      <GameButton type="primary" @click="startTest">{{ t('canvasPerf.buttons.startTest') }}</GameButton>
-      <GameButton type="danger" @click="stopTest">{{ t('canvasPerf.buttons.stopTest') }}</GameButton>
-      <GameButton type="warning" @click="clearScreen">{{ t('canvasPerf.buttons.clearScreen') }}</GameButton>
-      <label>
-        {{ t('canvasPerf.labels.charsPerFrame') }}
-        <input v-model.number="charsPerFrame" type="number" min="1" max="100" />
-      </label>
-    </div>
+        <GameButton type="primary" @click="startTest">{{ t('canvasPerf.buttons.startTest') }}</GameButton>
+        <GameButton type="danger" @click="stopTest">{{ t('canvasPerf.buttons.stopTest') }}</GameButton>
+        <GameButton type="warning" @click="clearScreen">{{ t('canvasPerf.buttons.clearScreen') }}</GameButton>
+        <label>
+          {{ t('canvasPerf.labels.charsPerFrame') }}
+          <input v-model.number="charsPerFrame" type="number" min="1" max="100" />
+        </label>
+      </div>
 
-    <div class="test-stats">
-      <div>{{ t('canvasPerf.labels.fps') }} {{ fps.toFixed(1) }}</div>
-      <div>{{ t('canvasPerf.labels.frameTime') }} {{ frameTime.toFixed(2) }}ms</div>
-      <div>{{ t('canvasPerf.labels.charsRendered') }} {{ totalChars }}</div>
-      <div>{{ t('canvasPerf.labels.charsPerSec') }} {{ charsPerSecond.toFixed(0) }}</div>
-      <div>{{ t('canvasPerf.labels.charsPerFrame') }} {{ charsPerFrame }}</div>
-      <div>{{ t('canvasPerf.labels.testRunning') }} {{ isRunning ? t('common.labels.yes') : t('common.labels.no') }}</div>
-    </div>
+      <div class="test-stats">
+        <div>{{ t('canvasPerf.labels.fps') }} {{ fps.toFixed(1) }}</div>
+        <div>{{ t('canvasPerf.labels.frameTime') }} {{ frameTime.toFixed(2) }}ms</div>
+        <div>{{ t('canvasPerf.labels.charsRendered') }} {{ totalChars }}</div>
+        <div>{{ t('canvasPerf.labels.charsPerSec') }} {{ charsPerSecond.toFixed(0) }}</div>
+        <div>{{ t('canvasPerf.labels.charsPerFrame') }} {{ charsPerFrame }}</div>
+        <div>
+          {{ t('canvasPerf.labels.testRunning') }} {{ isRunning ? t('common.labels.yes') : t('common.labels.no') }}
+        </div>
+      </div>
 
-    <div class="canvas-container">
-      <canvas
-        ref="canvasRef"
-        class="test-canvas"
-        :width="224"
-        :height="192"
-      />
-    </div>
+      <div class="canvas-container">
+        <canvas ref="canvasRef" class="test-canvas" :width="224" :height="192" />
+      </div>
     </div>
   </GameLayout>
 </template>
@@ -182,7 +181,6 @@ onUnmounted(() => {
   border: 1px solid var(--game-surface-border);
   border-radius: 4px;
 }
-
 
 .test-controls label {
   display: flex;

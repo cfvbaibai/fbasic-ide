@@ -1,6 +1,6 @@
 /**
  * RETURN Statement Executor
- * 
+ *
  * Handles execution of RETURN statements from CST.
  * Returns from a subroutine by popping the return address from stack.
  * Supports optional line number to return to a specific line.
@@ -13,9 +13,7 @@ import { getFirstToken } from '@/core/parser/cst-helpers'
 import type { ExecutionContext } from '@/core/state/ExecutionContext'
 
 export class ReturnExecutor {
-  constructor(
-    private context: ExecutionContext
-  ) {}
+  constructor(private context: ExecutionContext) {}
 
   /**
    * Execute a RETURN statement from CST
@@ -25,33 +23,35 @@ export class ReturnExecutor {
   execute(returnStmtCst: CstNode, lineNumber: number): void {
     // Check if RETURN has an optional line number
     const lineNumberToken = getFirstToken(returnStmtCst.children.NumberLiteral)
-    
+
     if (lineNumberToken) {
       // RETURN with line number: return to that specific line
       const targetLineNumber = parseInt(lineNumberToken.image, 10)
-      
+
       if (isNaN(targetLineNumber)) {
         this.context.addError({
           line: lineNumber,
           message: `RETURN: invalid line number: ${lineNumberToken.image}`,
-          type: ERROR_TYPES.RUNTIME
+          type: ERROR_TYPES.RUNTIME,
         })
         return
       }
 
       const targetStatementIndex = this.context.findStatementIndexByLine(targetLineNumber)
-      
+
       if (targetStatementIndex === -1) {
         this.context.addError({
           line: lineNumber,
           message: `RETURN: line number ${targetLineNumber} not found`,
-          type: ERROR_TYPES.RUNTIME
+          type: ERROR_TYPES.RUNTIME,
         })
         return
       }
 
       if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(`RETURN: returning to line ${targetLineNumber} (statement index ${targetStatementIndex})`)
+        this.context.addDebugOutput(
+          `RETURN: returning to line ${targetLineNumber} (statement index ${targetStatementIndex})`
+        )
       }
 
       // Jump to the target statement
@@ -64,18 +64,18 @@ export class ReturnExecutor {
       this.context.addError({
         line: lineNumber,
         message: 'RETURN: no GOSUB to return from',
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }
 
     const returnStatementIndex = this.context.gosubStack.pop()!
-    
+
     if (returnStatementIndex < 0 || returnStatementIndex >= this.context.statements.length) {
       this.context.addError({
         line: lineNumber,
         message: `RETURN: invalid return address: ${returnStatementIndex}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }
@@ -88,4 +88,3 @@ export class ReturnExecutor {
     this.context.jumpToStatement(returnStatementIndex)
   }
 }
-

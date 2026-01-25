@@ -1,6 +1,6 @@
 /**
  * IF-THEN Statement Executor
- * 
+ *
  * Handles execution of IF-THEN statements from CST.
  * Executes the THEN clause only if the condition evaluates to true (non-zero).
  */
@@ -25,12 +25,12 @@ export class IfThenExecutor {
   evaluateCondition(ifThenStmtCst: CstNode, lineNumber: number): boolean {
     // Check for logicalExpression (supports NOT, AND, OR)
     const logicalExprCst = getFirstCstNode(ifThenStmtCst.children.logicalExpression)
-    
+
     if (!logicalExprCst) {
       this.context.addError({
         line: lineNumber,
         message: 'Invalid IF-THEN statement: missing condition',
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return false
     }
@@ -43,7 +43,7 @@ export class IfThenExecutor {
       this.context.addError({
         line: lineNumber,
         message: `Error evaluating IF condition: ${error instanceof Error ? error.message : String(error)}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return false
     }
@@ -69,7 +69,7 @@ export class IfThenExecutor {
   /**
    * Check if IF-THEN has a line number (either THEN number or GOTO number)
    * Returns the line number if present, undefined otherwise
-   * 
+   *
    * Parser structure:
    * - IF ... THEN NumberLiteral -> children.NumberLiteral exists
    * - IF ... THEN CommandList -> children.commandList exists
@@ -95,4 +95,3 @@ export class IfThenExecutor {
     return hasNumberLiteral && !hasCommandList
   }
 }
-

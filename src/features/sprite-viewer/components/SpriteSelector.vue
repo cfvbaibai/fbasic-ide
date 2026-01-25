@@ -10,7 +10,7 @@ import { CHARACTER_SPRITES } from '@/shared/data/sprites'
  * SpriteSelector component - Dropdown selector for choosing character sprites.
  */
 defineOptions({
-  name: 'SpriteSelector'
+  name: 'SpriteSelector',
 })
 
 const { t } = useI18n()
@@ -20,7 +20,7 @@ const store = useSpriteViewerStore()
 const selectOptions = computed(() => {
   return CHARACTER_SPRITES.map((sprite, index) => ({
     label: sprite.name,
-    value: index
+    value: index,
   }))
 })
 </script>
@@ -55,4 +55,3 @@ const selectOptions = computed(() => {
   letter-spacing: 0.5px;
 }
 </style>
-

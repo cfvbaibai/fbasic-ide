@@ -2,7 +2,7 @@
  * Core interfaces for the Family Basic Interpreter
  */
 
-import type { ERROR_TYPES,VARIABLE_TYPES } from './constants'
+import type { ERROR_TYPES, VARIABLE_TYPES } from './constants'
 import type { MoveDefinition, MovementState, SpriteState } from './sprite/types'
 import type { ExecutionContext } from './state/ExecutionContext'
 import type { BasicArrayValue } from './types/BasicTypes'
@@ -12,7 +12,7 @@ import type { BasicArrayValue } from './types/BasicTypes'
  */
 export interface BasicVariable {
   value: number | string
-  type: typeof VARIABLE_TYPES[keyof typeof VARIABLE_TYPES]
+  type: (typeof VARIABLE_TYPES)[keyof typeof VARIABLE_TYPES]
 }
 
 /**
@@ -21,7 +21,7 @@ export interface BasicVariable {
 export interface BasicError {
   line: number
   message: string
-  type: typeof ERROR_TYPES[keyof typeof ERROR_TYPES]
+  type: (typeof ERROR_TYPES)[keyof typeof ERROR_TYPES]
 }
 
 /**
@@ -48,7 +48,7 @@ export interface LoopState {
 
 /**
  * Basic Device Adapter interface for Family BASIC interpreter
- * 
+ *
  * Handles all input/output/debugging/audio features needed for Family BASIC
  */
 export interface BasicDeviceAdapter {
@@ -58,7 +58,7 @@ export interface BasicDeviceAdapter {
   setStickState(joystickId: number, state: number): void
   pushStrigState(joystickId: number, state: number): void
   consumeStrigState(joystickId: number): number
-  
+
   // === TEXT OUTPUT ===
   printOutput(output: string): void
   debugOutput(output: string): void
@@ -69,7 +69,7 @@ export interface BasicDeviceAdapter {
   setColorPalette(bgPalette: number, spritePalette: number): void
   setBackdropColor(colorCode: number): void
   setCharacterGeneratorMode(mode: number): void
-  
+
   // === ANIMATION COMMANDS ===
   sendAnimationCommand?(command: AnimationCommand): void
 }
@@ -78,10 +78,22 @@ export interface BasicDeviceAdapter {
  * Animation command types for real-time communication from web worker to main thread
  */
 export type AnimationCommand =
-  | { type: 'START_MOVEMENT'; actionNumber: number; definition: MoveDefinition; startX: number; startY: number }
+  | {
+      type: 'START_MOVEMENT'
+      actionNumber: number
+      definition: MoveDefinition
+      startX: number
+      startY: number
+    }
   | { type: 'STOP_MOVEMENT'; actionNumbers: number[] }
   | { type: 'ERASE_MOVEMENT'; actionNumbers: number[] }
-  | { type: 'UPDATE_MOVEMENT_POSITION'; actionNumber: number; x: number; y: number; remainingDistance: number }
+  | {
+      type: 'UPDATE_MOVEMENT_POSITION'
+      actionNumber: number
+      x: number
+      y: number
+      remainingDistance: number
+    }
 
 /**
  * Configuration for the BASIC interpreter
@@ -193,7 +205,7 @@ export interface ServiceWorkerMessage {
 }
 
 // Message types enum for better type safety
-export type ServiceWorkerMessageType = 
+export type ServiceWorkerMessageType =
   | 'EXECUTE'
   | 'RESULT'
   | 'ERROR'
@@ -352,7 +364,7 @@ export interface ReadyMessage extends ServiceWorkerMessage {
 }
 
 // Union type for all possible messages
-export type AnyServiceWorkerMessage = 
+export type AnyServiceWorkerMessage =
   | ExecuteMessage
   | ResultMessage
   | ProgressMessage

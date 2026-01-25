@@ -3,9 +3,7 @@ import { computed, ref, watch } from 'vue'
 import { SPRITE_PALETTES } from '@/shared/data/palette'
 import type { SpriteDefinition } from '@/shared/data/types'
 
-export function usePaletteSelection(
-  selectedSprite: { value: SpriteDefinition | null }
-) {
+export function usePaletteSelection(selectedSprite: { value: SpriteDefinition | null }) {
   const selectedPaletteCode = ref<number>(0)
   const selectedColorCombination = ref<number>(0)
 
@@ -18,9 +16,13 @@ export function usePaletteSelection(
   }
 
   // Watch for sprite changes to update defaults
-  watch(selectedSprite, () => {
-    updateDefaults()
-  }, { immediate: true })
+  watch(
+    selectedSprite,
+    () => {
+      updateDefaults()
+    },
+    { immediate: true }
+  )
 
   // Get the selected color combination colors (excluding index 0)
   const selectedColorCombinationColors = computed(() => {
@@ -28,24 +30,21 @@ export function usePaletteSelection(
     if (!palette) {
       return []
     }
-    
+
     const colorCombination = palette[selectedColorCombination.value]
     if (!colorCombination) {
       return []
     }
-    
+
     // Return colors at indices 1, 2, 3 (skip index 0)
-    return [
-      colorCombination[1],
-      colorCombination[2],
-      colorCombination[3]
-    ].filter((code): code is number => code !== undefined)
+    return [colorCombination[1], colorCombination[2], colorCombination[3]].filter(
+      (code): code is number => code !== undefined
+    )
   })
 
   return {
     selectedPaletteCode,
     selectedColorCombination,
-    selectedColorCombinationColors
+    selectedColorCombinationColors,
   }
 }
-

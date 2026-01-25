@@ -1,12 +1,12 @@
 /**
  * Execution Engine
- * 
+ *
  * Main execution engine that orchestrates BASIC program execution.
  */
 
 import { ERROR_TYPES } from '@/core/constants'
 import { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
-import type { BasicDeviceAdapter,ExecutionResult } from '@/core/interfaces'
+import type { BasicDeviceAdapter, ExecutionResult } from '@/core/interfaces'
 import { DataService } from '@/core/services/DataService'
 import { VariableService } from '@/core/services/VariableService'
 import type { ExecutionContext } from '@/core/state/ExecutionContext'
@@ -20,22 +20,14 @@ export class ExecutionEngine {
   private dataService: DataService
   private statementRouter: StatementRouter
 
-  constructor(
-    context: ExecutionContext,
-    _deviceAdapter?: BasicDeviceAdapter
-  ) {
+  constructor(context: ExecutionContext, _deviceAdapter?: BasicDeviceAdapter) {
     this.context = context
-    
+
     // Initialize services
     this.evaluator = new ExpressionEvaluator(this.context)
     this.variableService = new VariableService(this.context, this.evaluator)
     this.dataService = new DataService(this.context, this.evaluator)
-    this.statementRouter = new StatementRouter(
-      this.context,
-      this.evaluator,
-      this.variableService,
-      this.dataService
-    )
+    this.statementRouter = new StatementRouter(this.context, this.evaluator, this.variableService, this.dataService)
   }
 
   /**
@@ -59,41 +51,43 @@ export class ExecutionEngine {
    */
   async execute(): Promise<ExecutionResult> {
     const startTime = Date.now()
-    
+
     try {
       // Preprocess DATA statements
       this.dataService.preprocessDataStatements()
-      
+
       // Preprocess statements
       this.preprocessStatements()
-      
+
       // Start execution
       this.context.isRunning = true
       this.context.shouldStop = false
-      
+
       // Main execution loop
       while (this.context.shouldContinue()) {
         const expandedStatement = this.context.getCurrentStatement()
         if (!expandedStatement) break
-        
+
         // Set current line number for error reporting
         this.context.setCurrentLineNumber(expandedStatement.lineNumber)
-        
+
         // Track the statement index before execution
         const statementIndexBefore = this.context.currentStatementIndex
-        
+
         if (this.context.config.enableDebugMode) {
-          this.context.addDebugOutput(`Executing statement ${statementIndexBefore}: Line ${expandedStatement.lineNumber}`)
+          this.context.addDebugOutput(
+            `Executing statement ${statementIndexBefore}: Line ${expandedStatement.lineNumber}`
+          )
         }
-        
+
         // Execute the statement
         await this.statementRouter.executeStatement(expandedStatement)
-        
+
         // Check if a runtime error occurred (execution should have been halted)
         if (!this.context.isRunning) {
           break
         }
-        
+
         // Only move to next statement if the index wasn't modified by the statement
         if (this.context.currentStatementIndex === statementIndexBefore) {
           this.context.nextStatement()
@@ -105,45 +99,44 @@ export class ExecutionEngine {
             this.context.addDebugOutput(`Statement index modified to: ${this.context.currentStatementIndex}`)
           }
         }
-        
+
         // Increment iteration count
         this.context.incrementIteration()
       }
-      
+
       // Execution completed
       this.context.isRunning = false
-      
+
       // Check for unclosed FOR loops
       if (this.context.loopStack.length > 0) {
         this.context.addError({
           line: 0,
           message: 'Missing NEXT statement for FOR loop',
-          type: ERROR_TYPES.RUNTIME
+          type: ERROR_TYPES.RUNTIME,
         })
       }
-      
+
       return {
         success: this.context.getErrors().length === 0,
         errors: this.context.getErrors(),
         variables: this.context.variables,
         arrays: this.context.arrays,
-        executionTime: Date.now() - startTime
+        executionTime: Date.now() - startTime,
       }
-      
     } catch (error) {
       this.context.isRunning = false
       this.context.addError({
         line: 0,
         message: `Execution error: ${error}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
-      
+
       return {
         success: false,
         errors: this.context.getErrors(),
         variables: this.context.variables,
         arrays: this.context.arrays,
-        executionTime: Date.now() - startTime
+        executionTime: Date.now() - startTime,
       }
     }
   }
@@ -169,7 +162,7 @@ export class ExecutionEngine {
   updateConfig(newConfig: Partial<typeof this.context.config>): void {
     this.context.config = {
       ...this.context.config,
-      ...newConfig
+      ...newConfig,
     }
   }
 }

@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { ref,useTemplateRef } from 'vue'
+import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import GameButton from './GameButton.vue'
 import GameIcon from './GameIcon.vue'
-import type { GameUploadEmits,GameUploadProps } from './GameUpload.types'
+import type { GameUploadEmits, GameUploadProps } from './GameUpload.types'
 
 /**
  * GameUpload component - A file upload component with drag-and-drop support.
- * 
+ *
  * @example
  * ```vue
  * <GameUpload
@@ -20,14 +20,14 @@ import type { GameUploadEmits,GameUploadProps } from './GameUpload.types'
  * ```
  */
 defineOptions({
-  name: 'GameUpload'
+  name: 'GameUpload',
 })
 
 const props = withDefaults(defineProps<GameUploadProps>(), {
   accept: '*',
   multiple: false,
   disabled: false,
-  drag: false
+  drag: false,
 })
 
 const emit = defineEmits<GameUploadEmits>()
@@ -74,7 +74,7 @@ const handleDrop = (event: DragEvent) => {
   if (props.drag && !props.disabled) {
     event.preventDefault()
     isDragging.value = false
-    
+
     const files = event.dataTransfer?.files
     if (files && files.length > 0) {
       if (props.multiple) {
@@ -89,7 +89,10 @@ const handleDrop = (event: DragEvent) => {
 
 <template>
   <div
-    :class="['game-upload', { 'game-upload-drag': drag, 'game-upload-dragging': isDragging, 'game-upload-disabled': disabled }]"
+    :class="[
+      'game-upload',
+      { 'game-upload-drag': drag, 'game-upload-dragging': isDragging, 'game-upload-disabled': disabled },
+    ]"
     @dragover="handleDragOver"
     @dragleave="handleDragLeave"
     @drop="handleDrop"
@@ -104,20 +107,18 @@ const handleDrop = (event: DragEvent) => {
       class="game-upload-input"
       style="display: none"
     />
-    
+
     <div v-if="drag" class="game-upload-drag-area bg-game-surface shadow-game-base" @click="handleClick">
       <GameIcon icon="mdi:upload" size="large" />
       <p class="game-upload-text">
-        {{ t('common.upload.dragAndDrop') }} <span class="game-upload-link">{{ t('common.upload.clickToBrowse') }}</span>
+        {{ t('common.upload.dragAndDrop') }}
+        <span class="game-upload-link">{{ t('common.upload.clickToBrowse') }}</span>
       </p>
     </div>
-    
+
     <div v-else class="game-upload-button-wrapper" @click="handleClick">
       <slot>
-        <GameButton
-          :disabled="disabled"
-          icon="mdi:upload"
-        >
+        <GameButton :disabled="disabled" icon="mdi:upload">
           {{ t('common.buttons.upload') }}
         </GameButton>
       </slot>

@@ -1,6 +1,6 @@
 /**
  * CLS Statement Executor
- * 
+ *
  * Handles execution of CLS statements to clear the screen.
  */
 

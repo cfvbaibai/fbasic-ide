@@ -1,10 +1,10 @@
 /**
  * PALET Executor Tests
- * 
+ *
  * Unit tests for the PaletExecutor class execution behavior.
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
@@ -20,7 +20,7 @@ describe('PaletExecutor', () => {
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
-      deviceAdapter: deviceAdapter
+      deviceAdapter: deviceAdapter,
     })
   })
 
@@ -31,7 +31,7 @@ describe('PaletExecutor', () => {
 20 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(deviceAdapter.backdropColorCalls).toHaveLength(1)
@@ -45,7 +45,7 @@ describe('PaletExecutor', () => {
 20 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(deviceAdapter.backdropColorCalls).toHaveLength(1)
@@ -59,7 +59,7 @@ describe('PaletExecutor', () => {
 20 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(deviceAdapter.backdropColorCalls).toHaveLength(1)
@@ -72,7 +72,7 @@ describe('PaletExecutor', () => {
 20 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(deviceAdapter.backdropColorCalls).toHaveLength(1)
@@ -86,7 +86,7 @@ describe('PaletExecutor', () => {
 30 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(deviceAdapter.backdropColorCalls).toHaveLength(1)
@@ -99,7 +99,7 @@ describe('PaletExecutor', () => {
 20 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       // When n != 0, backdrop color should not be set (only palette colors would be set)
@@ -114,7 +114,7 @@ describe('PaletExecutor', () => {
 40 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(deviceAdapter.backdropColorCalls).toHaveLength(3)
@@ -132,7 +132,7 @@ describe('PaletExecutor', () => {
 20 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       // PALET S doesn't set backdrop color, so no backdrop color calls
@@ -145,7 +145,7 @@ describe('PaletExecutor', () => {
 20 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(deviceAdapter.backdropColorCalls).toHaveLength(0)
@@ -159,7 +159,7 @@ describe('PaletExecutor', () => {
 20 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(false)
       expect(result.errors.length).toBeGreaterThan(0)
       expect(result.errors[0]?.message).toContain('PALET')
@@ -171,7 +171,7 @@ describe('PaletExecutor', () => {
 20 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(false)
       expect(result.errors.length).toBeGreaterThan(0)
       // Parser error for missing comma/argument
@@ -184,7 +184,7 @@ describe('PaletExecutor', () => {
 20 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(false)
       expect(result.errors.length).toBeGreaterThan(0)
       expect(result.errors[0]?.message).toContain('Color combination number out of range')
@@ -196,7 +196,7 @@ describe('PaletExecutor', () => {
 20 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(false)
       expect(result.errors.length).toBeGreaterThan(0)
       expect(result.errors[0]?.message).toContain('Color code out of range')
@@ -208,7 +208,7 @@ describe('PaletExecutor', () => {
 20 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(false)
       expect(result.errors.length).toBeGreaterThan(0)
       expect(result.errors[0]?.message).toContain('Color code out of range')
@@ -222,7 +222,7 @@ describe('PaletExecutor', () => {
 20 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(deviceAdapter.backdropColorCalls).toHaveLength(1)
@@ -240,7 +240,7 @@ describe('PaletExecutor', () => {
 70 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(deviceAdapter.backdropColorCalls).toHaveLength(1)

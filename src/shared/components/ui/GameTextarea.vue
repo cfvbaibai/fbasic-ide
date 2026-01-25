@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import type { GameTextareaEmits,GameTextareaProps } from './GameTextarea.types'
+import type { GameTextareaEmits, GameTextareaProps } from './GameTextarea.types'
 
 /**
  * GameTextarea component - A styled textarea component with size variants and resize options.
- * 
+ *
  * @example
  * ```vue
  * <GameTextarea
@@ -18,7 +18,7 @@ import type { GameTextareaEmits,GameTextareaProps } from './GameTextarea.types'
  * ```
  */
 defineOptions({
-  name: 'GameTextarea'
+  name: 'GameTextarea',
 })
 
 const props = withDefaults(defineProps<GameTextareaProps>(), {
@@ -27,14 +27,14 @@ const props = withDefaults(defineProps<GameTextareaProps>(), {
   readonly: false,
   rows: 4,
   resize: 'vertical',
-  size: 'medium'
+  size: 'medium',
 })
 
 const emit = defineEmits<GameTextareaEmits>()
 
 const textareaValue = computed({
   get: () => props.modelValue,
-  set: (value: string) => emit('update:modelValue', value)
+  set: (value: string) => emit('update:modelValue', value),
 })
 
 const handleInput = (event: Event) => {
@@ -54,7 +54,7 @@ const textareaClasses = computed(() => {
   return {
     'game-textarea': true,
     [`game-textarea-${props.size}`]: true,
-    'game-textarea-disabled': props.disabled
+    'game-textarea-disabled': props.disabled,
   }
 })
 
@@ -89,7 +89,7 @@ const resizeValue = computed(() => props.resize)
   border-radius: 8px;
   outline: none;
   transition: all 0.2s ease;
-  box-shadow: 
+  box-shadow:
     0 2px 4px var(--base-alpha-gray-00-30),
     inset 0 1px 0 var(--base-alpha-gray-100-10);
   line-height: 1.5;
@@ -103,7 +103,7 @@ const resizeValue = computed(() => props.resize)
 
 .game-textarea-inner:focus {
   border-color: var(--base-solid-primary);
-  box-shadow: 
+  box-shadow:
     0 0 12px var(--game-accent-glow),
     0 2px 4px var(--base-alpha-gray-00-30),
     inset 0 1px 0 var(--base-alpha-gray-100-10);

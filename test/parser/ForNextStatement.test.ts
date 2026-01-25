@@ -1,10 +1,10 @@
 /**
  * FOR/NEXT Statement Parser Tests
- * 
+ *
  * Tests for parsing FOR and NEXT statements with various formats.
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { FBasicParser } from '@/core/parser/FBasicParser'
 
@@ -177,4 +177,3 @@ describe('FOR/NEXT Statement Parser', () => {
     })
   })
 })
-

@@ -8,7 +8,7 @@ import GameIconButton from './GameIconButton.vue'
 
 /**
  * GameCodeQuote component - A code block component with copy functionality.
- * 
+ *
  * @example
  * ```vue
  * <GameCodeQuote
@@ -19,14 +19,14 @@ import GameIconButton from './GameIconButton.vue'
  * ```
  */
 defineOptions({
-  name: 'GameCodeQuote'
+  name: 'GameCodeQuote',
 })
 
 const props = withDefaults(defineProps<Props>(), {
   language: '',
   showCopyButton: true,
   copyButtonText: '',
-  copySuccessMessage: ''
+  copySuccessMessage: '',
 })
 
 const { t } = useI18n()
@@ -76,7 +76,10 @@ const handleCopy = async () => {
       </div>
       <pre
         :class="['game-code-quote-code', language ? `language-${language}` : '']"
-      ><code v-if="code">{{ code }}</code><span v-else class="game-code-quote-empty">{{ t('common.codeQuote.empty') }}</span></pre>
+      >
+        <code v-if="code">{{ code }}</code>
+        <span v-else class="game-code-quote-empty">{{ t('common.codeQuote.empty') }}</span>
+      </pre>
     </div>
   </div>
 </template>
@@ -105,15 +108,13 @@ const handleCopy = async () => {
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    var(--base-solid-primary) 50%, 
-    transparent 100%
-  );
+  background: linear-gradient(90deg, transparent 0%, var(--base-solid-primary) 50%, transparent 100%);
   opacity: 0;
   transform: scaleX(0);
   transform-origin: left;
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
   border-radius: 8px 8px 0 0;
   z-index: 1;
 }

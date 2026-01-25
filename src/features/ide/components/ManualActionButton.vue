@@ -5,11 +5,11 @@ import { computed } from 'vue'
  * ManualActionButton component - Action button component for Nintendo controller (Select, Start, A, B).
  */
 defineOptions({
-  name: 'ManualActionButton'
+  name: 'ManualActionButton',
 })
 
 const props = withDefaults(defineProps<Props>(), {
-  active: false
+  active: false,
 })
 
 const emit = defineEmits<Emits>()
@@ -35,12 +35,7 @@ const handleClick = () => {
 </script>
 
 <template>
-  <button 
-    class="manual-action-button" 
-    :class="[buttonType, { active }]"
-    @mousedown="handleClick"
-    tabindex="-1"
-  >
+  <button class="manual-action-button" :class="[buttonType, { active }]" @mousedown="handleClick" tabindex="-1">
     <slot>{{ label }}</slot>
   </button>
 </template>
@@ -54,7 +49,7 @@ const handleClick = () => {
   font-weight: var(--game-font-weight-bold);
   color: var(--game-text-primary);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 
+  box-shadow:
     0 2px 4px var(--base-alpha-gray-00-30),
     inset 0 1px 2px var(--base-alpha-gray-100-10);
   outline: none;
@@ -97,7 +92,7 @@ const handleClick = () => {
   background: var(--game-surface-bg-hover-gradient);
   transform: translateY(-2px) scale(1.05);
   border-color: var(--base-solid-primary);
-  box-shadow: 
+  box-shadow:
     0 4px 8px var(--base-alpha-gray-00-40),
     0 0 12px var(--game-accent-glow),
     inset 0 1px 2px var(--base-alpha-gray-100-10);
@@ -109,7 +104,7 @@ const handleClick = () => {
 .manual-action-button:active {
   background: var(--game-surface-bg-inset-gradient);
   transform: translateY(0) scale(0.98);
-  box-shadow: 
+  box-shadow:
     0 1px 2px var(--base-alpha-gray-00-40),
     inset 0 2px 4px var(--base-alpha-gray-00-30),
     0 0 20px var(--game-accent-glow);
@@ -132,7 +127,7 @@ const handleClick = () => {
   background: linear-gradient(135deg, var(--semantic-solid-success) 0%, var(--semantic-solid-success) 100%);
   color: var(--base-solid-gray-100);
   border-color: var(--semantic-solid-success);
-  box-shadow: 
+  box-shadow:
     0 0 16px var(--semantic-alpha-success-60),
     0 2px 6px var(--base-alpha-gray-00-30),
     inset 0 1px 2px var(--base-alpha-gray-100-20);

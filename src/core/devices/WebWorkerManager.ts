@@ -1,16 +1,16 @@
 /**
  * Web Worker Manager
- * 
+ *
  * Handles web worker lifecycle, initialization, and communication.
  */
 
 import { DEFAULTS } from '@/core/constants'
-import type { 
+import type {
   AnyServiceWorkerMessage,
   ExecuteMessage,
   ExecutionResult,
-  InterpreterConfig, 
-  StopMessage
+  InterpreterConfig,
+  StopMessage,
 } from '@/core/interfaces'
 
 export interface WebWorkerExecutionOptions {
@@ -22,11 +22,14 @@ export interface WebWorkerExecutionOptions {
 export class WebWorkerManager {
   private worker: Worker | null = null
   private messageId = 0
-  private pendingMessages = new Map<string, {
-    resolve: (result: ExecutionResult) => void
-    reject: (error: Error) => void
-    timeout: NodeJS.Timeout
-  }>()
+  private pendingMessages = new Map<
+    string,
+    {
+      resolve: (result: ExecutionResult) => void
+      reject: (error: Error) => void
+      timeout: NodeJS.Timeout
+    }
+  >()
 
   /**
    * Check if web workers are supported
@@ -35,7 +38,7 @@ export class WebWorkerManager {
     const supported = typeof Worker !== 'undefined'
     console.log('🔍 [WEB_WORKER] isSupported check:', {
       hasWorker: typeof Worker !== 'undefined',
-      supported
+      supported,
     })
     return supported
   }
@@ -48,7 +51,7 @@ export class WebWorkerManager {
     console.log('🔍 [WEB_WORKER] isInWebWorker check:', {
       hasWindow: typeof window !== 'undefined',
       hasSelf: typeof self !== 'undefined',
-      inWebWorker
+      inWebWorker,
     })
     return inWebWorker
   }
@@ -70,7 +73,7 @@ export class WebWorkerManager {
 
     const script = workerScript ?? DEFAULTS.WEB_WORKER.WORKER_SCRIPT
     console.log('🔧 [WEB_WORKER] Creating worker with script:', script)
-    
+
     try {
       this.worker = new Worker(script)
       console.log('✅ [WEB_WORKER] Worker created successfully')
@@ -78,19 +81,19 @@ export class WebWorkerManager {
       console.error('❌ [WEB_WORKER] Failed to create worker:', error)
       throw error
     }
-    
+
     // Handle worker errors
-    this.worker.onerror = (error) => {
+    this.worker.onerror = error => {
       console.error('❌ [WEB_WORKER] Web worker error:', error)
       this.rejectAllPending(`Web worker error: ${error.message}`)
     }
 
     // Handle worker termination
-    this.worker.onmessageerror = (error) => {
+    this.worker.onmessageerror = error => {
       console.error('❌ [WEB_WORKER] Web worker message error:', error)
       this.rejectAllPending('Web worker message error')
     }
-    
+
     console.log('✅ [WEB_WORKER] Worker initialization completed successfully')
   }
 
@@ -98,12 +101,12 @@ export class WebWorkerManager {
    * Execute BASIC code in the web worker
    */
   async executeInWorker(
-    code: string, 
+    code: string,
     config: InterpreterConfig,
     options: WebWorkerExecutionOptions = {},
     onMessage?: (message: AnyServiceWorkerMessage) => void
   ): Promise<ExecutionResult> {
-    console.log(`executeInWorker called with code: ${code.substring(0, 50)  }...`)
+    console.log(`executeInWorker called with code: ${code.substring(0, 50)}...`)
     if (!this.worker) {
       console.log('Worker not initialized, initializing...')
       await this.initialize(DEFAULTS.WEB_WORKER.WORKER_SCRIPT)
@@ -129,7 +132,7 @@ export class WebWorkerManager {
       this.pendingMessages.set(messageId, {
         resolve,
         reject,
-        timeout: timeoutHandle
+        timeout: timeoutHandle,
       })
 
       // Send execution message
@@ -137,19 +140,19 @@ export class WebWorkerManager {
         type: 'EXECUTE',
         id: messageId,
         timestamp: Date.now(),
-        data: { 
-          code, 
+        data: {
+          code,
           config,
           options: {
             timeout,
-            enableProgress: options.onProgress !== undefined
-          }
-        }
+            enableProgress: options.onProgress !== undefined,
+          },
+        },
       }
 
       // Set up message listener if provided (must be done before sending message)
       if (onMessage && this.worker) {
-        this.worker.onmessage = (event) => {
+        this.worker.onmessage = event => {
           const message = event.data as AnyServiceWorkerMessage
           onMessage(message)
         }
@@ -160,7 +163,7 @@ export class WebWorkerManager {
         id: message.id,
         timestamp: message.timestamp,
         dataSize: JSON.stringify(message.data).length,
-        hasDeviceAdapter: !!config.deviceAdapter
+        hasDeviceAdapter: !!config.deviceAdapter,
       })
       if (this.worker) {
         this.worker.postMessage(message)
@@ -181,15 +184,15 @@ export class WebWorkerManager {
       timestamp: Date.now(),
       data: {
         executionId: 'current',
-        reason: 'user_request'
-      }
+        reason: 'user_request',
+      },
     }
 
     console.log('🛑 [MAIN→WORKER] Posting STOP message to worker:', {
       type: message.type,
       id: message.id,
       timestamp: message.timestamp,
-      reason: message.data.reason
+      reason: message.data.reason,
     })
     this.worker.postMessage(message)
     console.log('✅ [MAIN→WORKER] STOP message posted to worker successfully')
@@ -225,7 +228,14 @@ export class WebWorkerManager {
   /**
    * Get pending messages map (for use by MessageHandler)
    */
-  getPendingMessages(): Map<string, { resolve: (result: ExecutionResult) => void; reject: (error: Error) => void; timeout: NodeJS.Timeout }> {
+  getPendingMessages(): Map<
+    string,
+    {
+      resolve: (result: ExecutionResult) => void
+      reject: (error: Error) => void
+      timeout: NodeJS.Timeout
+    }
+  > {
     return this.pendingMessages
   }
 

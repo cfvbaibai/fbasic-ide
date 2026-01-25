@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { GameBlockEmits,GameBlockProps } from './GameBlock.types'
+import type { GameBlockEmits, GameBlockProps } from './GameBlock.types'
 import GameIcon from './GameIcon.vue'
 
 /**
  * GameBlock component - A block/section component with title, icon, and clickable options.
- * 
+ *
  * @example
  * ```vue
  * <GameBlock
@@ -19,7 +19,7 @@ import GameIcon from './GameIcon.vue'
  * ```
  */
 defineOptions({
-  name: 'GameBlock'
+  name: 'GameBlock',
 })
 
 const props = withDefaults(defineProps<GameBlockProps>(), {
@@ -27,7 +27,7 @@ const props = withDefaults(defineProps<GameBlockProps>(), {
   clickableHeader: false,
   hideHeader: false,
   floatOnHover: false,
-  clickable: false
+  clickable: false,
 })
 
 const emit = defineEmits<GameBlockEmits>()
@@ -46,19 +46,19 @@ const handleClick = () => {
 </script>
 
 <template>
-  <div 
-    class="game-block bg-game-surface border-game-surface-2 shadow-game-base" 
-    :class="{ 
-      'no-header': hideHeader, 
+  <div
+    class="game-block bg-game-surface border-game-surface-2 shadow-game-base"
+    :class="{
+      'no-header': hideHeader,
       'float-on-hover': floatOnHover,
-      'clickable': clickable
+      clickable: clickable,
     }"
     @click="handleClick"
   >
-    <div 
+    <div
       v-if="!hideHeader"
-      class="game-block-header" 
-      :class="{ 'clickable': clickableHeader }"
+      class="game-block-header"
+      :class="{ clickable: clickableHeader }"
       @click.stop="handleHeaderClick"
     >
       <h3 class="game-block-title text-game-heading">
@@ -144,7 +144,6 @@ const handleClick = () => {
   text-shadow: none;
 }
 
-
 .game-block-header-right {
   display: flex;
   align-items: center;
@@ -161,7 +160,8 @@ const handleClick = () => {
 }
 
 @keyframes border-shimmer {
-  0%, 100% {
+  0%,
+  100% {
     background-position: -200% center;
     opacity: 0.6;
   }
@@ -173,7 +173,8 @@ const handleClick = () => {
 }
 
 @keyframes header-shimmer {
-  0%, 100% {
+  0%,
+  100% {
     background-position: -200% center;
     opacity: 0.6;
   }

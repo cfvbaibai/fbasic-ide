@@ -29,16 +29,20 @@ export function useSpriteDisplay(
   // Generate sprite grid (8x8, 16x16, 16x32, or 48x8)
   const spriteGrid = computed(() => {
     if (!selectedSprite.value) {
-      return Array(16).fill(null).map(() => Array(16).fill(0) as number[])
+      return Array(16)
+        .fill(null)
+        .map(() => Array(16).fill(0) as number[])
     }
-    
+
     if (isSixTileSprite(selectedSprite.value)) {
       // 6-tile sprite: Combine 6 8x8 tiles into a 48x8 grid (6 tiles wide × 1 tile tall)
       // Layout:
       // [0] [1] [2] [3] [4] [5]
-      const grid: number[][] = Array(8).fill(null).map(() => Array(48).fill(0) as number[])
+      const grid: number[][] = Array(8)
+        .fill(null)
+        .map(() => Array(48).fill(0) as number[])
       const tiles = selectedSprite.value.tiles
-      
+
       for (let tileIndex = 0; tileIndex < 6; tileIndex++) {
         const tile = tiles[tileIndex]
         if (tile) {
@@ -55,7 +59,7 @@ export function useSpriteDisplay(
           }
         }
       }
-      
+
       return grid
     } else if (isEightTileSprite(selectedSprite.value)) {
       // 8-tile sprite: Combine 8 8x8 tiles into a 16x32 grid (2 tiles wide × 4 tiles tall)
@@ -64,9 +68,11 @@ export function useSpriteDisplay(
       // [2] [3]
       // [4] [5]
       // [6] [7]
-      const grid: number[][] = Array(32).fill(null).map(() => Array(16).fill(0) as number[])
+      const grid: number[][] = Array(32)
+        .fill(null)
+        .map(() => Array(16).fill(0) as number[])
       const tiles = selectedSprite.value.tiles
-      
+
       // Process each tile pair (left and right columns)
       for (let tileIndex = 0; tileIndex < 8; tileIndex++) {
         const tile = tiles[tileIndex]
@@ -74,7 +80,7 @@ export function useSpriteDisplay(
           // Determine which row (0-3) and column (0 or 1) this tile belongs to
           const rowIndex = Math.floor(tileIndex / 2) // 0, 0, 1, 1, 2, 2, 3, 3
           const colIndex = tileIndex % 2 // 0, 1, 0, 1, 0, 1, 0, 1
-          
+
           for (let row = 0; row < 8 && row < tile.length; row++) {
             const tileRow = tile[row]
             if (tileRow) {
@@ -88,13 +94,15 @@ export function useSpriteDisplay(
           }
         }
       }
-      
+
       return grid
     } else if (isFourTileSprite(selectedSprite.value)) {
       // 4-tile sprite: Combine 4 8x8 tiles into a 16x16 grid
-      const grid: number[][] = Array(16).fill(null).map(() => Array(16).fill(0) as number[])
+      const grid: number[][] = Array(16)
+        .fill(null)
+        .map(() => Array(16).fill(0) as number[])
       const tiles = selectedSprite.value.tiles
-      
+
       // Copy tile 0 (top-left) to positions [0-7, 0-7]
       const tile0 = tiles[0]
       if (tile0) {
@@ -110,7 +118,7 @@ export function useSpriteDisplay(
           }
         }
       }
-      
+
       // Copy tile 1 (top-right) to positions [0-7, 8-15]
       const tile1 = tiles[1]
       if (tile1) {
@@ -126,7 +134,7 @@ export function useSpriteDisplay(
           }
         }
       }
-      
+
       // Copy tile 2 (bottom-left) to positions [8-15, 0-7]
       const tile2 = tiles[2]
       if (tile2) {
@@ -142,7 +150,7 @@ export function useSpriteDisplay(
           }
         }
       }
-      
+
       // Copy tile 3 (bottom-right) to positions [8-15, 8-15]
       const tile3 = tiles[3]
       if (tile3) {
@@ -158,13 +166,15 @@ export function useSpriteDisplay(
           }
         }
       }
-      
+
       return grid
     } else {
       // 1-tile sprite: Use the single 8x8 tile
       const tile = selectedSprite.value.tiles
-      const grid: number[][] = Array(8).fill(null).map(() => Array(8).fill(0) as number[])
-      
+      const grid: number[][] = Array(8)
+        .fill(null)
+        .map(() => Array(8).fill(0) as number[])
+
       if (tile) {
         for (let row = 0; row < 8 && row < tile.length; row++) {
           const tileRow = tile[row]
@@ -178,7 +188,7 @@ export function useSpriteDisplay(
           }
         }
       }
-      
+
       return grid
     }
   })
@@ -213,18 +223,18 @@ export function useSpriteDisplay(
     if (value === 0) {
       return 'transparent'
     }
-    
+
     // Get the color combination from the selected palette
     const palette = SPRITE_PALETTES[selectedPaletteCode.value]
     if (!palette) {
       return 'transparent'
     }
-    
+
     const colorCombination = palette[selectedColorCombination.value]
     if (!colorCombination) {
       return 'transparent'
     }
-    
+
     // Map sprite value to color combination index:
     // value 1 -> C2 (index 1)
     // value 2 -> C3 (index 2)
@@ -236,7 +246,7 @@ export function useSpriteDisplay(
         return COLORS[colorCode] ?? 'transparent'
       }
     }
-    
+
     return 'transparent'
   }
 
@@ -244,7 +254,6 @@ export function useSpriteDisplay(
     sprite16x16, // Legacy alias
     spriteGrid: spriteGridWithInversions,
     spriteSize,
-    getCellColor
+    getCellColor,
   }
 }
-

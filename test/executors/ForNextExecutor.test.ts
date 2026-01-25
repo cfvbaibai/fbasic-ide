@@ -1,11 +1,11 @@
 /**
  * FOR/NEXT Executor Tests
- * 
+ *
  * Unit tests for the ForExecutor and NextExecutor classes execution behavior.
  * Based on Family BASIC manual page 65.
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
@@ -21,7 +21,7 @@ describe('FOR/NEXT Executor', () => {
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
-      deviceAdapter: deviceAdapter
+      deviceAdapter: deviceAdapter,
     })
   })
 
@@ -34,7 +34,7 @@ describe('FOR/NEXT Executor', () => {
 40 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -51,7 +51,7 @@ describe('FOR/NEXT Executor', () => {
 40 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -68,7 +68,7 @@ describe('FOR/NEXT Executor', () => {
 40 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -85,7 +85,7 @@ describe('FOR/NEXT Executor', () => {
 40 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -105,7 +105,7 @@ describe('FOR/NEXT Executor', () => {
 40 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -122,7 +122,7 @@ describe('FOR/NEXT Executor', () => {
 40 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -139,7 +139,7 @@ describe('FOR/NEXT Executor', () => {
 40 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -162,7 +162,7 @@ describe('FOR/NEXT Executor', () => {
 50 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -184,7 +184,7 @@ describe('FOR/NEXT Executor', () => {
 50 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -202,7 +202,7 @@ describe('FOR/NEXT Executor', () => {
 40 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -223,7 +223,7 @@ describe('FOR/NEXT Executor', () => {
 60 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -247,7 +247,7 @@ describe('FOR/NEXT Executor', () => {
 80 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -269,7 +269,7 @@ describe('FOR/NEXT Executor', () => {
 50 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -287,7 +287,7 @@ describe('FOR/NEXT Executor', () => {
 50 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -305,7 +305,7 @@ describe('FOR/NEXT Executor', () => {
 50 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -322,7 +322,7 @@ describe('FOR/NEXT Executor', () => {
 40 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -342,7 +342,7 @@ describe('FOR/NEXT Executor', () => {
 50 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -359,7 +359,7 @@ describe('FOR/NEXT Executor', () => {
 40 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -377,12 +377,12 @@ describe('FOR/NEXT Executor', () => {
 30 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(false)
       expect(result.errors.length).toBeGreaterThan(0)
       const errorMessages = result.errors.map(e => e.message).join(' ')
       expect(errorMessages).toEqual('NEXT without FOR')
-      
+
       // Verify that PRINT statements after the error are not executed
       const outputs = deviceAdapter.getAllOutputs()
       expect(outputs).toEqual('RUNTIME: NEXT without FOR')
@@ -396,11 +396,11 @@ describe('FOR/NEXT Executor', () => {
 40 END
 `
       const result = await interpreter.execute(source)
-      
+
       // This should either error or be handled gracefully
       // The exact behavior depends on implementation
       expect(result.errors.length).toBeGreaterThan(0)
-      
+
       // Verify that PRINT statements after the error are not executed
       const outputs = deviceAdapter.getAllOutputs()
       // Error message format depends on implementation, but should not contain PRINT output
@@ -418,9 +418,9 @@ describe('FOR/NEXT Executor', () => {
 40 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.errors.length).toBeGreaterThan(0)
-      
+
       // Verify that PRINT statements after the error are not executed
       const outputs = deviceAdapter.getAllOutputs()
       // Should only contain error message, not the PRINT output
@@ -437,9 +437,9 @@ describe('FOR/NEXT Executor', () => {
 40 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.errors.length).toBeGreaterThan(0)
-      
+
       // Verify that PRINT statements after the error are not executed
       const outputs = deviceAdapter.getAllOutputs()
       // Should only contain error message, not the PRINT output
@@ -456,7 +456,7 @@ describe('FOR/NEXT Executor', () => {
 20 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -471,7 +471,7 @@ describe('FOR/NEXT Executor', () => {
 20 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -491,7 +491,7 @@ describe('FOR/NEXT Executor', () => {
 40 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -508,7 +508,7 @@ describe('FOR/NEXT Executor', () => {
 40 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -520,4 +520,3 @@ describe('FOR/NEXT Executor', () => {
     })
   })
 })
-

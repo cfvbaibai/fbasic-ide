@@ -12,23 +12,19 @@ const isValidLocale = (value: unknown): value is Locale => {
 
 export function useLocale() {
   const { locale } = useI18n()
-  
+
   // Use VueUse's useLocalStorage with type safety
-  const currentLocale = useLocalStorage<Locale>(
-    LOCALE_STORAGE_KEY,
-    locale.value as Locale,
-    {
-      serializer: {
-        read: (value: string): Locale => {
-          if (isValidLocale(value)) {
-            return value
-          }
-          return locale.value as Locale
-        },
-        write: (value: Locale): string => value
-      }
-    }
-  )
+  const currentLocale = useLocalStorage<Locale>(LOCALE_STORAGE_KEY, locale.value as Locale, {
+    serializer: {
+      read: (value: string): Locale => {
+        if (isValidLocale(value)) {
+          return value
+        }
+        return locale.value as Locale
+      },
+      write: (value: Locale): string => value,
+    },
+  })
 
   // Initialize locale from storage if valid
   if (isValidLocale(currentLocale.value)) {
@@ -36,7 +32,7 @@ export function useLocale() {
   }
 
   // Watch for locale changes and sync with vue-i18n
-  watch(currentLocale, (newLocale) => {
+  watch(currentLocale, newLocale => {
     if (isValidLocale(newLocale)) {
       locale.value = newLocale
     }
@@ -50,12 +46,12 @@ export function useLocale() {
     { value: 'en', label: 'English' },
     { value: 'ja', label: '日本語' },
     { value: 'zh-CN', label: '简体中文' },
-    { value: 'zh-TW', label: '繁體中文' }
+    { value: 'zh-TW', label: '繁體中文' },
   ]
 
   return {
     currentLocale,
     setLocale,
-    availableLocales
+    availableLocales,
   }
 }

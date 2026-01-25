@@ -7,7 +7,7 @@ import { GameSubBlock, GameTable } from '@/shared/components/ui'
  * JoystickStatusTable component - Displays joystick status in a table format.
  */
 defineOptions({
-  name: 'JoystickStatusTable'
+  name: 'JoystickStatusTable',
 })
 
 defineProps<Props>()
@@ -38,27 +38,27 @@ const tableColumns: Column[] = [
     prop: 'id',
     label: t('ide.joystick.columns.id'),
     width: 40,
-    align: 'center'
+    align: 'center',
   },
   {
     prop: 'stick',
     label: t('ide.joystick.columns.stick'),
     width: 60,
-    align: 'center'
+    align: 'center',
   },
   {
     prop: 'strig',
     label: t('ide.joystick.columns.strig'),
     width: 60,
-    align: 'center'
-  }
+    align: 'center',
+  },
 ]
 </script>
 
 <template>
   <GameSubBlock :title="t('ide.joystick.status')">
-    <GameTable 
-      :data="statusData" 
+    <GameTable
+      :data="statusData"
       :columns="tableColumns"
       size="small"
       :show-header="true"

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * GameSection component - A section component with optional title for grouping content.
- * 
+ *
  * @example
  * ```vue
  * <GameSection title="Section Title">
@@ -10,18 +10,17 @@
  * ```
  */
 defineOptions({
-  name: 'GameSection'
+  name: 'GameSection',
 })
 
 withDefaults(defineProps<Props>(), {
-  title: ''
+  title: '',
 })
 
 interface Props {
   /** Optional section title */
   title?: string
 }
-
 </script>
 
 <template>

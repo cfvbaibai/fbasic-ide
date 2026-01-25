@@ -1,41 +1,41 @@
 /**
  * F-Basic Parser Implementation
- * 
+ *
  * This module provides the main parser interface for F-Basic programs.
  * It uses Chevrotain parser to create CST (Concrete Syntax Tree) from F-Basic source code.
  */
 
-import type { CstNode } from 'chevrotain';
+import type { CstNode } from 'chevrotain'
 
-import type { ParserInfo } from '@/core/interfaces';
+import type { ParserInfo } from '@/core/interfaces'
 
-import { parseWithChevrotain } from './FBasicChevrotainParser';
+import { parseWithChevrotain } from './FBasicChevrotainParser'
 
 /**
  * Parser error interface
  */
 export interface ParserError {
-  message: string;
+  message: string
   location?: {
-    start: { offset: number; line: number; column: number };
-    end: { offset: number; line: number; column: number };
-  };
-  expected?: string[];
-  found?: string;
+    start: { offset: number; line: number; column: number }
+    end: { offset: number; line: number; column: number }
+  }
+  expected?: string[]
+  found?: string
 }
 
 /**
  * Parser result interface
  */
 export interface ParseResult {
-  success: boolean;
-  cst?: CstNode; // Changed from ast to cst
-  errors?: ParserError[];
+  success: boolean
+  cst?: CstNode // Changed from ast to cst
+  errors?: ParserError[]
 }
 
 /**
  * F-Basic Parser Class
- * 
+ *
  * Provides methods for parsing F-Basic source code into CST (Concrete Syntax Tree)
  * and handling parsing errors.
  */
@@ -44,88 +44,91 @@ export class FBasicParser {
     // Chevrotain parser is initialized statically, no async initialization needed
   }
 
-
   /**
    * Parse F-Basic source code into a CST
-   * 
+   *
    * @param source - The F-Basic source code to parse
    * @returns Parse result with CST or errors
    */
   async parse(source: string): Promise<ParseResult> {
     try {
-      const parseResult = parseWithChevrotain(source);
+      const parseResult = parseWithChevrotain(source)
 
       if (!parseResult.success) {
         // Include error details for debugging
-        const errorMessages = parseResult.errors?.map(e => e.message).join('; ') ?? 'Unknown parse error';
+        const errorMessages = parseResult.errors?.map(e => e.message).join('; ') ?? 'Unknown parse error'
         return {
           success: false,
-          errors: parseResult.errors?.map((err) => ({
+          errors: parseResult.errors?.map(err => ({
             message: `${err.message} (line ${err.line}, col ${err.column})`,
             location: {
               start: {
                 offset: 0,
                 line: err.line ?? 1,
-                column: err.column ?? 1
+                column: err.column ?? 1,
               },
               end: {
                 offset: 0,
                 line: err.line ?? 1,
-                column: (err.column ?? 1) + (err.length ?? 1)
-              }
-            }
-          })) ?? [{
-            message: errorMessages,
-            location: {
-              start: { offset: 0, line: 1, column: 1 },
-              end: { offset: 0, line: 1, column: 1 }
-            }
-          }]
-        };
+                column: (err.column ?? 1) + (err.length ?? 1),
+              },
+            },
+          })) ?? [
+            {
+              message: errorMessages,
+              location: {
+                start: { offset: 0, line: 1, column: 1 },
+                end: { offset: 0, line: 1, column: 1 },
+              },
+            },
+          ],
+        }
       }
 
       if (!parseResult.cst) {
-        throw new Error('Parser succeeded but no CST returned');
+        throw new Error('Parser succeeded but no CST returned')
       }
 
       // Return CST directly (no conversion to AST)
       return {
         success: true,
-        cst: parseResult.cst
-      };
+        cst: parseResult.cst,
+      }
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Parse error';
+      const errorMessage = error instanceof Error ? error.message : 'Parse error'
       return {
         success: false,
-        errors: [{
-          message: errorMessage,
-          location: {
-            start: { offset: 0, line: 1, column: 1 },
-            end: { offset: 0, line: 1, column: 1 }
-          }
-        }]
-      };
+        errors: [
+          {
+            message: errorMessage,
+            location: {
+              start: { offset: 0, line: 1, column: 1 },
+              end: { offset: 0, line: 1, column: 1 },
+            },
+          },
+        ],
+      }
     }
   }
 
   /**
    * Parse a single statement
-   * 
+   *
    * @param statementText - The statement text to parse
    * @returns Parsed statement CST or null
    */
   async parseStatement(statementText: string): Promise<CstNode | null> {
-    const result = await this.parse(statementText);
+    const result = await this.parse(statementText)
     if (result.success && result.cst?.children.statement) {
-      const statements = result.cst.children.statement;
+      const statements = result.cst.children.statement
       if (Array.isArray(statements) && statements.length > 0) {
-        const firstStmt = statements[0];
+        const firstStmt = statements[0]
         if (firstStmt && 'children' in firstStmt) {
-          return firstStmt;
+          return firstStmt
         }
       }
     }
-    return null;
+    return null
   }
 
   /**
@@ -149,13 +152,30 @@ export class FBasicParser {
         'Tile-based graphics commands',
         'Collision detection commands',
         'Advanced graphics commands',
-        'System commands'
+        'System commands',
       ],
       features: ['ast-parsing', 'error-reporting', 'multi-statement', 'chevrotain', 'no-build-step'],
-      supportedStatements: ['PRINT', 'LET', 'IF', 'FOR', 'NEXT', 'GOTO', 'GOSUB', 'RETURN', 'END', 'REM', 'CLS', 'DATA', 'READ', 'RESTORE', 'DIM', 'COLOR'],
+      supportedStatements: [
+        'PRINT',
+        'LET',
+        'IF',
+        'FOR',
+        'NEXT',
+        'GOTO',
+        'GOSUB',
+        'RETURN',
+        'END',
+        'REM',
+        'CLS',
+        'DATA',
+        'READ',
+        'RESTORE',
+        'DIM',
+        'COLOR',
+      ],
       supportedFunctions: ['ABS', 'SGN', 'RND', 'VAL', 'LEN', 'LEFT$', 'RIGHT$', 'MID$', 'STR$', 'HEX$'],
-      supportedOperators: ['+', '-', '*', '/', '^', 'MOD', '=', '<>', '<', '>', '<=', '>=', 'AND', 'OR', 'NOT']
-    };
+      supportedOperators: ['+', '-', '*', '/', '^', 'MOD', '=', '<>', '<', '>', '<=', '>=', 'AND', 'OR', 'NOT'],
+    }
   }
 }
 
@@ -163,13 +183,13 @@ export class FBasicParser {
  * Create a new F-Basic parser instance
  */
 export function createParser(): FBasicParser {
-  return new FBasicParser();
+  return new FBasicParser()
 }
 
 /**
  * Parse F-Basic source code (convenience function)
  */
 export async function parseFBasic(source: string): Promise<ParseResult> {
-  const parser = createParser();
-  return await parser.parse(source);
+  const parser = createParser()
+  return await parser.parse(source)
 }

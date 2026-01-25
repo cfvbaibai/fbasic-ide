@@ -1,10 +1,10 @@
 /**
  * Print Executor Tests
- * 
+ *
  * Unit tests for the PrintExecutor class.
  */
 
-import { beforeEach, describe, expect, it, type MockedFunction,vi } from 'vitest'
+import { beforeEach, describe, expect, it, type MockedFunction, vi } from 'vitest'
 
 import { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
 import { PrintExecutor } from '@/core/execution/executors/PrintExecutor'
@@ -38,7 +38,7 @@ describe('PrintExecutor', () => {
       setColorPattern: vi.fn(),
       setColorPalette: vi.fn(),
       setBackdropColor: vi.fn(),
-      setCharacterGeneratorMode: vi.fn()
+      setCharacterGeneratorMode: vi.fn(),
     }
 
     context = new ExecutionContext({
@@ -46,7 +46,7 @@ describe('PrintExecutor', () => {
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
-      deviceAdapter: mockDeviceAdapter
+      deviceAdapter: mockDeviceAdapter,
     })
     // Ensure deviceAdapter is set on context
     context.deviceAdapter = mockDeviceAdapter
@@ -106,7 +106,7 @@ describe('PrintExecutor', () => {
     it('should reject floating point number literals', async () => {
       const parser = new FBasicParser()
       const result = await parser.parse('10 PRINT 3.14')
-      
+
       // Floating point literals should be rejected by the parser
       expect(result.success).toBe(false)
       expect(result.errors).toBeDefined()
@@ -297,7 +297,7 @@ describe('PrintExecutor', () => {
       expect(printOutputMock).toHaveBeenCalledTimes(1)
       const output = printOutputMock.mock.calls[0]?.[0]
       expect(output).toBeDefined()
-      
+
       // Semicolon separator should print immediately (no space between strings)
       expect(output).toBe('ABC\n')
     })
@@ -311,7 +311,7 @@ describe('PrintExecutor', () => {
       expect(printOutputMock).toHaveBeenCalledTimes(1)
       const output = printOutputMock.mock.calls[0]?.[0]
       expect(output).toBeDefined()
-      
+
       // Numbers always get a space BEFORE them (even the first one)
       expect(output).toBe(' 1 2 3\n')
     })
@@ -325,7 +325,7 @@ describe('PrintExecutor', () => {
       expect(printOutputMock).toHaveBeenCalledTimes(1)
       const output = printOutputMock.mock.calls[0]?.[0]
       expect(output).toBeDefined()
-      
+
       // Numbers always get a space BEFORE them
       // Does not end with semicolon (semicolon is between items), so should have newline
       expect(output).toBe('A 1\n')
@@ -340,7 +340,7 @@ describe('PrintExecutor', () => {
       expect(printOutputMock).toHaveBeenCalledTimes(1)
       const output = printOutputMock.mock.calls[0]?.[0]
       expect(output).toBeDefined()
-      
+
       // Numbers always get a space BEFORE them, strings follow immediately after numbers
       // Does not end with semicolon (semicolon is between items), so should have newline
       expect(output).toBe(' 1A\n')
@@ -414,10 +414,11 @@ describe('PrintExecutor', () => {
 
       expect(printOutputMock).toHaveBeenCalledTimes(1)
       const output = printOutputMock.mock.calls[0]?.[0]
-      // A at 0 (comma/tab), B at 8 (semicolon), C immediately after B (comma/tab), D at 16 (semicolon), E immediately after D
-      // Does not end with semicolon (semicolons are between items), so should have newline
+      // A at 0 (comma/tab), B at 8 (semicolon), C immediately after B
+      // (comma/tab), D at 16 (semicolon), E immediately after D
+      // Does not end with semicolon (semicolons are between items), so should
+      // have newline
       expect(output).toEqual('A\tBC\tDE\n')
     })
   })
 })
-

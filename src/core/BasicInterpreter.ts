@@ -1,9 +1,9 @@
 /**
  * Basic BASIC Interpreter Core - Refactored
- * 
+ *
  * A streamlined interpreter for Family Basic (F-BASIC) that delegates
  * to focused utility classes for better maintainability.
- * 
+ *
  * @author Family Basic IDE Team
  * @version 3.0.0
  */
@@ -12,25 +12,17 @@ import type { CstNode } from 'chevrotain'
 
 // Import the FBasicParser
 import { AnimationManager } from './animation/AnimationManager'
-import { 
-  ERROR_TYPES,
-  EXECUTION_LIMITS, 
-} from './constants'
+import { ERROR_TYPES, EXECUTION_LIMITS } from './constants'
 // Import refactored components
-import {
-  ExecutionContext,
-  ExecutionEngine} from './execution'
+import { ExecutionContext, ExecutionEngine } from './execution'
 import { expandStatements } from './execution/statement-expander'
-import type { 
-  BasicVariable, 
-  ExecutionResult,
-  InterpreterConfig} from './interfaces'
+import type { BasicVariable, ExecutionResult, InterpreterConfig } from './interfaces'
 import { FBasicParser } from './parser/FBasicParser'
 import { SpriteStateManager } from './sprite/SpriteStateManager'
 
 /**
  * Main interpreter class for executing Family Basic programs
- * 
+ *
  * This refactored version delegates to focused utility classes to keep
  * the main class focused on orchestration rather than implementation.
  */
@@ -46,9 +38,9 @@ export class BasicInterpreter {
       maxIterations: config?.maxIterations,
       maxOutputLines: config?.maxOutputLines,
       enableDebugMode: config?.enableDebugMode,
-      strictMode: config?.strictMode
+      strictMode: config?.strictMode,
     })
-    
+
     this.config = {
       maxIterations: EXECUTION_LIMITS.MAX_ITERATIONS_TEST,
       maxOutputLines: EXECUTION_LIMITS.MAX_OUTPUT_LINES_TEST,
@@ -56,14 +48,14 @@ export class BasicInterpreter {
       strictMode: false,
       ...config,
     }
-    
+
     console.log('🔧 [MAIN] Final config after merge:', {
       maxIterations: this.config.maxIterations,
       maxOutputLines: this.config.maxOutputLines,
       enableDebugMode: this.config.enableDebugMode,
-      strictMode: this.config.strictMode
+      strictMode: this.config.strictMode,
     })
-    
+
     this.parser = new FBasicParser()
   }
 
@@ -78,13 +70,14 @@ export class BasicInterpreter {
       if (!parseResult.success) {
         return {
           success: false,
-          errors: parseResult.errors?.map((error) => ({
-            line: error.location?.start?.line ?? 0,
-            message: error.message,
-            type: ERROR_TYPES.SYNTAX
-          })) ?? [],
+          errors:
+            parseResult.errors?.map(error => ({
+              line: error.location?.start?.line ?? 0,
+              message: error.message,
+              type: ERROR_TYPES.SYNTAX,
+            })) ?? [],
           variables: new Map(),
-          executionTime: 0
+          executionTime: 0,
         }
       }
 
@@ -108,19 +101,19 @@ export class BasicInterpreter {
         // Update existing ExecutionEngine with current output callback
         this.executionEngine = new ExecutionEngine(this.context, this.config.deviceAdapter)
       }
-      
+
       // Reset context for new execution but preserve device adapter and cached states
       const preservedDeviceAdapter = this.context.deviceAdapter
-      
+
       this.context.reset()
-      
+
       // Extract statement nodes from CST program node and expand them
       if (parseResult.cst?.children.statement) {
-        const statementsCst = parseResult.cst.children.statement;
-        const validStatements = Array.isArray(statementsCst) 
+        const statementsCst = parseResult.cst.children.statement
+        const validStatements = Array.isArray(statementsCst)
           ? statementsCst.filter((s): s is CstNode => 'children' in s)
-          : [];
-        
+          : []
+
         // Expand statements (flatten colon-separated commands) and create label map
         const { statements, labelMap } = expandStatements(validStatements)
         this.context.statements = statements
@@ -129,7 +122,7 @@ export class BasicInterpreter {
         this.context.statements = []
         this.context.labelMap = new Map()
       }
-      
+
       // Restore preserved values
       this.context.deviceAdapter = preservedDeviceAdapter
 
@@ -137,18 +130,19 @@ export class BasicInterpreter {
       const result = await this.executionEngine.execute()
 
       return result
-
     } catch (error) {
       return {
         success: false,
-        errors: [{
-          line: 0,
-          message: `Execution error: ${error}`,
-          type: ERROR_TYPES.RUNTIME
-        }],
+        errors: [
+          {
+            line: 0,
+            message: `Execution error: ${error}`,
+            type: ERROR_TYPES.RUNTIME,
+          },
+        ],
         variables: new Map(),
         arrays: new Map(),
-        executionTime: 0
+        executionTime: 0,
       }
     }
   }
@@ -170,7 +164,7 @@ export class BasicInterpreter {
       ...this.config,
       ...newConfig,
     }
-    
+
     if (this.executionEngine) {
       this.executionEngine.updateConfig(this.config)
     }

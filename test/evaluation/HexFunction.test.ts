@@ -1,11 +1,11 @@
 /**
  * HEX$ Function Tests
- * 
+ *
  * Tests for Family BASIC HEX$ function:
  * - HEX$(x) - converts numerical value to hexadecimal string
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
@@ -21,7 +21,7 @@ describe('HEX$ Function', () => {
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
-      deviceAdapter: deviceAdapter
+      deviceAdapter: deviceAdapter,
     })
   })
 
@@ -127,17 +127,17 @@ describe('HEX$ Function', () => {
 30 NEXT
 40 END`
       const result = await interpreter.execute(source)
-      
+
       // Check for errors first
       if (!result.success && result.errors.length > 0) {
         console.log('Errors:', result.errors.map(e => `${e.line}: ${e.message}`).join('\n'))
       }
-      
+
       expect(result.success).toBe(true)
-      
+
       const outputs = deviceAdapter.printOutputs
       expect(outputs.length).toBeGreaterThanOrEqual(21) // At least 21 outputs (0 to 20 inclusive)
-      
+
       // Verify that HEX$ function is being called and produces output
       // The exact format depends on PRINT semicolon behavior, but we can verify
       // that the function executes without errors and produces the expected number of outputs
@@ -167,4 +167,3 @@ describe('HEX$ Function', () => {
     })
   })
 })
-

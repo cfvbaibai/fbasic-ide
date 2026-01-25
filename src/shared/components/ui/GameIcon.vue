@@ -4,14 +4,14 @@ import { computed } from 'vue'
 
 /**
  * GameIcon component - An icon component using Iconify with size, color, and animation options.
- * 
+ *
  * @example
  * ```vue
  * <GameIcon icon="mdi:play" size="medium" color="#fff" :rotate="true" />
  * ```
  */
 defineOptions({
-  name: 'GameIcon'
+  name: 'GameIcon',
 })
 
 const props = withDefaults(defineProps<Props>(), {
@@ -20,7 +20,7 @@ const props = withDefaults(defineProps<Props>(), {
   color: 'currentColor',
   rotate: false,
   pulse: false,
-  inline: false
+  inline: false,
 })
 
 interface Props {
@@ -39,7 +39,7 @@ const iconSize = computed(() => {
   const sizeMap = {
     small: 16,
     medium: 20,
-    large: 24
+    large: 24,
   }
   return sizeMap[props.size]
 })
@@ -48,7 +48,7 @@ const iconClasses = computed(() => {
   return {
     'game-icon': true,
     'game-icon-rotate': props.rotate === true,
-    'game-icon-pulse': props.pulse
+    'game-icon-pulse': props.pulse,
   }
 })
 

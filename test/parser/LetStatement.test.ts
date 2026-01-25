@@ -1,10 +1,10 @@
 /**
  * LET Statement Parser Tests
- * 
+ *
  * Tests for parsing LET statements with various formats and expressions.
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { FBasicParser } from '@/core/parser/FBasicParser'
 
@@ -101,4 +101,3 @@ describe('LET Statement Parser', () => {
     })
   })
 })
-

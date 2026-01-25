@@ -1,6 +1,6 @@
 /**
  * Skin System Composable
- * 
+ *
  * Provides reactive skin management for the application.
  * Uses data-skin attribute on <html> element to switch themes.
  */
@@ -8,7 +8,7 @@
 import { useLocalStorage } from '@vueuse/core'
 import { computed, watch } from 'vue'
 
-import { type SkinConfig,skinConfigs } from './skinConfig'
+import { type SkinConfig, skinConfigs } from './skinConfig'
 
 export type SkinName = 'default' | 'retro-blue' | 'nintendo' | 'classic-light' | 'y2k-futuristic' | 'sunset-vaporwave'
 
@@ -16,7 +16,14 @@ const SKIN_STORAGE_KEY = 'fbasic-emu-skin'
 const SKIN_ATTRIBUTE = 'data-skin'
 
 const isValidSkinName = (value: unknown): value is SkinName => {
-  return value === 'default' || value === 'retro-blue' || value === 'nintendo' || value === 'classic-light' || value === 'y2k-futuristic' || value === 'sunset-vaporwave'
+  return (
+    value === 'default' ||
+    value === 'retro-blue' ||
+    value === 'nintendo' ||
+    value === 'classic-light' ||
+    value === 'y2k-futuristic' ||
+    value === 'sunset-vaporwave'
+  )
 }
 
 /**
@@ -51,13 +58,13 @@ function applySkin(skin: SkinName): void {
   }
 
   const config = skinConfigs[skin]
-  
+
   if (skin === 'default') {
     document.documentElement.removeAttribute(SKIN_ATTRIBUTE)
   } else {
     document.documentElement.setAttribute(SKIN_ATTRIBUTE, skin)
   }
-  
+
   // Apply light theme class if needed
   if (config.isLightTheme) {
     document.documentElement.classList.add('light-theme')
@@ -71,26 +78,22 @@ function applySkin(skin: SkinName): void {
  */
 export function useSkin() {
   // Use VueUse's useLocalStorage with type safety
-  const currentSkin = useLocalStorage<SkinName>(
-    SKIN_STORAGE_KEY,
-    getInitialSkin(),
-    {
-      serializer: {
-        read: (value: string): SkinName => {
-          if (isValidSkinName(value)) {
-            return value
-          }
-          return 'default'
-        },
-        write: (value: SkinName): string => value
-      }
-    }
-  )
+  const currentSkin = useLocalStorage<SkinName>(SKIN_STORAGE_KEY, getInitialSkin(), {
+    serializer: {
+      read: (value: string): SkinName => {
+        if (isValidSkinName(value)) {
+          return value
+        }
+        return 'default'
+      },
+      write: (value: SkinName): string => value,
+    },
+  })
 
   // Apply skin to DOM when it changes
   watch(
     currentSkin,
-    (skin) => {
+    skin => {
       if (typeof window !== 'undefined') {
         applySkin(skin)
       }
@@ -114,8 +117,16 @@ export function useSkin() {
     { name: 'retro-blue', label: 'Retro Blue', description: 'Blue-tinted retro theme' },
     { name: 'nintendo', label: 'Nintendo', description: 'Nintendo-themed with inverted colors and red accent' },
     { name: 'classic-light', label: 'Classic Light', description: 'Warm classic light theme with soft purple accent' },
-    { name: 'y2k-futuristic', label: 'Y2K Futuristic', description: 'Retro-futuristic Y2K aesthetic with neon colors, CRT effects, and cyberpunk vibes' },
-    { name: 'sunset-vaporwave', label: 'Sunset Vaporwave', description: 'Dreamy 80s/90s aesthetic with pastel gradients, soft glows, and nostalgic vibes' },
+    {
+      name: 'y2k-futuristic',
+      label: 'Y2K Futuristic',
+      description: 'Retro-futuristic Y2K aesthetic with neon colors, CRT effects, and cyberpunk vibes',
+    },
+    {
+      name: 'sunset-vaporwave',
+      label: 'Sunset Vaporwave',
+      description: 'Dreamy 80s/90s aesthetic with pastel gradients, soft glows, and nostalgic vibes',
+    },
   ]
 
   /**
@@ -135,4 +146,4 @@ export function useSkin() {
 }
 
 // Export skin configs for global access
-export { type SkinConfig,skinConfigs }
+export { type SkinConfig, skinConfigs }

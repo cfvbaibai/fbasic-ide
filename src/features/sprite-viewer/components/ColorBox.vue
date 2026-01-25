@@ -7,12 +7,12 @@ import { COLORS } from '@/shared/data/palette'
  * ColorBox component - Displays a color box with optional hex code.
  */
 defineOptions({
-  name: 'ColorBox'
+  name: 'ColorBox',
 })
 
 const props = withDefaults(defineProps<Props>(), {
   showHex: true,
-  customClass: ''
+  customClass: '',
 })
 
 interface Props {
@@ -58,16 +58,8 @@ const backgroundColorValue = computed(() => color.value)
 </script>
 
 <template>
-  <div
-    class="color-box"
-    :class="[props.customClass || '', { 'color-box-light': isLight }]"
-    :title="tooltipTitle"
-  >
-    <span
-      v-if="props.showHex"
-      class="color-box-code"
-      :class="{ 'color-box-code-light': isLight }"
-    >
+  <div class="color-box" :class="[props.customClass || '', { 'color-box-light': isLight }]" :title="tooltipTitle">
+    <span v-if="props.showHex" class="color-box-code" :class="{ 'color-box-code-light': isLight }">
       {{ hexCode }}
     </span>
   </div>
@@ -108,4 +100,3 @@ const backgroundColorValue = computed(() => color.value)
   text-shadow: 1px 1px 2px var(--base-alpha-gray-100-80);
 }
 </style>
-

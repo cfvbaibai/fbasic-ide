@@ -1,19 +1,15 @@
 /**
  * Execution Context
- * 
+ *
  * Holds the state and context needed for BASIC program execution.
  */
 
 import type { AnimationManager } from '@/core/animation/AnimationManager'
 import { ERROR_TYPES } from '@/core/constants'
 import type { ExpandedStatement } from '@/core/execution/statement-expander'
-import type {
-  BasicDeviceAdapter,
-  BasicError,
-  BasicVariable,
-  InterpreterConfig} from '@/core/interfaces'
+import type { BasicDeviceAdapter, BasicError, BasicVariable, InterpreterConfig } from '@/core/interfaces'
 import type { SpriteStateManager } from '@/core/sprite/SpriteStateManager'
-import type { BasicArrayValue,BasicScalarValue } from '@/core/types/BasicTypes'
+import type { BasicArrayValue, BasicScalarValue } from '@/core/types/BasicTypes'
 
 export interface LoopState {
   variableName: string
@@ -35,20 +31,19 @@ export class ExecutionContext {
   public labelMap: Map<number, number[]> = new Map() // Line number -> statement indices
   public iterationCount = 0
   private currentLineNumber: number = 0 // Current line number being executed
-  
+
   // Configuration
   public config: InterpreterConfig
-  
+
   // Control flow
   public loopStack: LoopState[] = []
   public gosubStack: number[] = [] // Stack for GOSUB/RETURN
-  
+
   // Data management
   public dataValues: BasicScalarValue[] = [] // Storage for DATA values
   public dataIndex = 0 // Current position in DATA
   public arrays: Map<string, BasicArrayValue> = new Map() // Array storage
-  
-  
+
   // Device integration
   public deviceAdapter?: BasicDeviceAdapter
   public spriteStateManager?: SpriteStateManager
@@ -78,7 +73,7 @@ export class ExecutionContext {
     this.arrays.clear()
     this.currentLineNumber = 0
     this.errors = []
-    
+
     // Reset sprite and animation managers if they exist
     if (this.spriteStateManager) {
       this.spriteStateManager.clear()
@@ -102,7 +97,7 @@ export class ExecutionContext {
   addError(error: BasicError): void {
     this.deviceAdapter?.errorOutput(error.message)
     this.errors.push(error)
-    
+
     // Runtime errors are fatal - halt execution immediately
     if (error.type === ERROR_TYPES.RUNTIME) {
       this.shouldStop = true
@@ -130,10 +125,12 @@ export class ExecutionContext {
    * Check if execution should continue
    */
   shouldContinue(): boolean {
-    return this.isRunning && 
-           !this.shouldStop && 
-           this.iterationCount < this.config.maxIterations &&
-           this.currentStatementIndex < this.statements.length
+    return (
+      this.isRunning &&
+      !this.shouldStop &&
+      this.iterationCount < this.config.maxIterations &&
+      this.currentStatementIndex < this.statements.length
+    )
   }
 
   /**
@@ -145,7 +142,7 @@ export class ExecutionContext {
       this.addError({
         line: 0,
         message: 'Maximum iterations exceeded',
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       this.shouldStop = true
     }
@@ -223,7 +220,7 @@ export class ExecutionContext {
     // Use consumeTriggerState if available
     if (this.deviceAdapter) {
       const consumedValue = this.deviceAdapter.consumeStrigState(joystickId)
-      
+
       if (consumedValue > 0) {
         console.log(`🎮 [EXECUTION] STRIG event consumed: joystickId=${joystickId}, value=${consumedValue}`)
         return consumedValue

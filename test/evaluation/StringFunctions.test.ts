@@ -1,6 +1,6 @@
 /**
  * String Functions Tests
- * 
+ *
  * Tests for Family Basic string operation functions:
  * - LEN(string) - returns the length of a string
  * - LEFT$(string, n) - returns leftmost n characters
@@ -8,7 +8,7 @@
  * - MID$(string, start, length) - returns substring starting at position start with length characters
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { FBasicParser } from '@/core/parser/FBasicParser'
@@ -21,7 +21,7 @@ describe('String Functions', () => {
       maxIterations: 1000,
       maxOutputLines: 100,
       enableDebugMode: false,
-      strictMode: false
+      strictMode: false,
     })
   })
 
@@ -29,7 +29,7 @@ describe('String Functions', () => {
     it('should return the length of a string literal', async () => {
       const code = '10 LET X = LEN("Hello")'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('X')?.value).toBe(5)
@@ -38,7 +38,7 @@ describe('String Functions', () => {
     it('should return the length of an empty string', async () => {
       const code = '10 LET X = LEN("")'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('X')?.value).toBe(0)
@@ -48,7 +48,7 @@ describe('String Functions', () => {
       const code = `10 LET A$ = "World"
 20 LET X = LEN(A$)`
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('X')?.value).toBe(5)
@@ -57,7 +57,7 @@ describe('String Functions', () => {
     it('should return 0 for uninitialized string variable', async () => {
       const code = '10 LET X = LEN(B$)'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('X')?.value).toBe(0)
@@ -66,7 +66,7 @@ describe('String Functions', () => {
     it('should handle LEN in expressions', async () => {
       const code = '10 LET X = LEN("Hello") + LEN("World")'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('X')?.value).toBe(10)
@@ -75,7 +75,7 @@ describe('String Functions', () => {
     it('should count spaces as characters per manual', async () => {
       const code = '10 LET X = LEN("Hello World")'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       // "Hello World" = 11 characters (including space)
@@ -85,7 +85,7 @@ describe('String Functions', () => {
     it('should count multiple spaces', async () => {
       const code = '10 LET X = LEN("A  B")'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       // "A  B" = 4 characters (A, space, space, B)
@@ -95,7 +95,7 @@ describe('String Functions', () => {
     it('should handle string with leading and trailing spaces', async () => {
       const code = '10 LET X = LEN("  Hello  ")'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       // "  Hello  " = 9 characters (2 spaces + Hello + 2 spaces)
@@ -107,7 +107,7 @@ describe('String Functions', () => {
     it('should return leftmost n characters from a string literal', async () => {
       const code = '10 LET A$ = LEFT$("Hello World", 5)'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('A$')?.value).toBe('Hello')
@@ -122,7 +122,7 @@ describe('String Functions', () => {
 60 LET Y$ = LEFT$(A$, 2)
 70 LET Z$ = LEFT$(A$, 5)`
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       // Per manual page 84: LEFT$("HELLO", 1) = "H", LEFT$("HELLO", 2) = "HE", LEFT$("HELLO", 5) = "HELLO"
@@ -134,7 +134,7 @@ describe('String Functions', () => {
     it('should return entire string if n is greater than string length', async () => {
       const code = '10 LET A$ = LEFT$("Hi", 10)'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('A$')?.value).toBe('Hi')
@@ -143,7 +143,7 @@ describe('String Functions', () => {
     it('should return empty string if n is 0', async () => {
       const code = '10 LET A$ = LEFT$("Hello", 0)'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('A$')?.value).toBe('')
@@ -152,7 +152,7 @@ describe('String Functions', () => {
     it('should return empty string if n is negative', async () => {
       const code = '10 LET A$ = LEFT$("Hello", -1)'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('A$')?.value).toBe('')
@@ -162,7 +162,7 @@ describe('String Functions', () => {
       const code = `10 LET TEXT$ = "Family Basic"
 20 LET A$ = LEFT$(TEXT$, 6)`
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('A$')?.value).toBe('Family')
@@ -171,7 +171,7 @@ describe('String Functions', () => {
     it('should reject floating point literals', async () => {
       const parser = new FBasicParser()
       const result = await parser.parse('10 LET A$ = LEFT$("Hello", 3.7)')
-      
+
       // Floating point literals should be rejected by the parser
       expect(result.success).toBe(false)
       expect(result.errors).toBeDefined()
@@ -183,7 +183,7 @@ describe('String Functions', () => {
     it('should return rightmost n characters from a string literal', async () => {
       const code = '10 LET A$ = RIGHT$("Hello World", 5)'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('A$')?.value).toBe('World')
@@ -195,7 +195,7 @@ describe('String Functions', () => {
 30 LET Y$ = RIGHT$(A$, 2)
 40 LET Z$ = RIGHT$(A$, 5)`
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       // Per manual page 84: RIGHT$("HELLO", 1) = "O", RIGHT$("HELLO", 2) = "LO", RIGHT$("HELLO", 5) = "HELLO"
@@ -207,7 +207,7 @@ describe('String Functions', () => {
     it('should return entire string if n is greater than string length', async () => {
       const code = '10 LET A$ = RIGHT$("Hi", 10)'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('A$')?.value).toBe('Hi')
@@ -216,7 +216,7 @@ describe('String Functions', () => {
     it('should return empty string if n is 0', async () => {
       const code = '10 LET A$ = RIGHT$("Hello", 0)'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('A$')?.value).toBe('')
@@ -225,7 +225,7 @@ describe('String Functions', () => {
     it('should return empty string if n is negative', async () => {
       const code = '10 LET A$ = RIGHT$("Hello", -1)'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('A$')?.value).toBe('')
@@ -235,7 +235,7 @@ describe('String Functions', () => {
       const code = `10 LET TEXT$ = "Family Basic"
 20 LET A$ = RIGHT$(TEXT$, 5)`
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('A$')?.value).toBe('Basic')
@@ -244,7 +244,7 @@ describe('String Functions', () => {
     it('should handle single character', async () => {
       const code = '10 LET A$ = RIGHT$("Hello", 1)'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('A$')?.value).toBe('o')
@@ -255,7 +255,7 @@ describe('String Functions', () => {
     it('should return substring starting at position with specified length', async () => {
       const code = '10 LET A$ = MID$("Hello World", 7, 5)'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('A$')?.value).toBe('World')
@@ -267,7 +267,7 @@ describe('String Functions', () => {
 30 LET Y$ = MID$(A$, 2, 1)
 40 LET Z$ = MID$(A$, 4, 1)`
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       // Per manual page 85: MID$("HIYA ", 1, 1) = "H", MID$("HIYA ", 2, 1) = "I", MID$("HIYA ", 4, 1) = "A"
@@ -279,7 +279,7 @@ describe('String Functions', () => {
     it('should use 1-based indexing', async () => {
       const code = '10 LET A$ = MID$("Hello", 1, 2)'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('A$')?.value).toBe('He')
@@ -288,7 +288,7 @@ describe('String Functions', () => {
     it('should return empty string if start is beyond string length', async () => {
       const code = '10 LET A$ = MID$("Hello", 10, 5)'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('A$')?.value).toBe('')
@@ -297,7 +297,7 @@ describe('String Functions', () => {
     it('should return empty string if length is 0 or negative', async () => {
       const code = '10 LET A$ = MID$("Hello", 1, 0)'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('A$')?.value).toBe('')
@@ -306,7 +306,7 @@ describe('String Functions', () => {
     it('should truncate if length exceeds remaining characters', async () => {
       const code = '10 LET A$ = MID$("Hello", 3, 10)'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('A$')?.value).toBe('llo')
@@ -316,7 +316,7 @@ describe('String Functions', () => {
       const code = `10 LET TEXT$ = "Family Basic IDE"
 20 LET A$ = MID$(TEXT$, 8, 5)`
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       // "Family Basic IDE" - position 8 is 'B', so MID$(TEXT$, 8, 5) = "Basic"
@@ -326,7 +326,7 @@ describe('String Functions', () => {
     it('should return empty string for start position 0 or negative', async () => {
       const code = '10 LET A$ = MID$("Hello", 0, 2)'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       // Start position 0 or negative is invalid in BASIC - should return empty string
@@ -336,7 +336,7 @@ describe('String Functions', () => {
     it('should return empty string for negative start position', async () => {
       const code = '10 LET A$ = MID$("Hello", -1, 2)'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       // Negative start position is invalid - should return empty string
@@ -350,7 +350,7 @@ describe('String Functions', () => {
 20 LET HALF = LEN(TEXT$) / 2
 30 LET A$ = LEFT$(TEXT$, HALF)`
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('A$')?.value).toBe('Hello')
@@ -363,7 +363,7 @@ describe('String Functions', () => {
 40 PRINT RIGHT$(TEXT$, 2)
 50 PRINT MID$(TEXT$, 2, 3)`
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
     })
@@ -372,7 +372,7 @@ describe('String Functions', () => {
       const code = `10 LET TEXT$ = "Hello World"
 20 LET A$ = LEFT$(RIGHT$(TEXT$, 5), 2)`
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       // RIGHT$("Hello World", 5) = "World", LEFT$("World", 2) = "Wo"
@@ -380,4 +380,3 @@ describe('String Functions', () => {
     })
   })
 })
-

@@ -42,12 +42,19 @@ export class DefSpriteExecutor {
       const invertYExpr = getCstNodes(defSpriteStmtCst.children.invertY)?.[0]
       const characterSetExpr = getCstNodes(defSpriteStmtCst.children.characterSet)?.[0]
 
-      if (!spriteNumberExpr || !colorCombinationExpr || !sizeExpr ||
-          !priorityExpr || !invertXExpr || !invertYExpr || !characterSetExpr) {
+      if (
+        !spriteNumberExpr ||
+        !colorCombinationExpr ||
+        !sizeExpr ||
+        !priorityExpr ||
+        !invertXExpr ||
+        !invertYExpr ||
+        !characterSetExpr
+      ) {
         this.context.addError({
           line: lineNumber ?? 0,
           message: 'DEF SPRITE: Missing required parameters',
-          type: ERROR_TYPES.RUNTIME
+          type: ERROR_TYPES.RUNTIME,
         })
         return
       }
@@ -60,8 +67,14 @@ export class DefSpriteExecutor {
       const invertX = this.evaluateNumber(invertXExpr, 'invertX', lineNumber)
       const invertY = this.evaluateNumber(invertYExpr, 'invertY', lineNumber)
 
-      if (spriteNumber === null || colorCombination === null || size === null ||
-          priority === null || invertX === null || invertY === null) {
+      if (
+        spriteNumber === null ||
+        colorCombination === null ||
+        size === null ||
+        priority === null ||
+        invertX === null ||
+        invertY === null
+      ) {
         return // Error already added
       }
 
@@ -85,7 +98,7 @@ export class DefSpriteExecutor {
       } else {
         // No CHR$ expressions found: evaluate as normal expression
         const characterSetValue = this.evaluator.evaluateExpression(characterSetExpr)
-        
+
         if (typeof characterSetValue === 'string') {
           // String literal: convert to character codes
           characterSet = stringToCharCodes(characterSetValue)
@@ -96,7 +109,7 @@ export class DefSpriteExecutor {
           this.context.addError({
             line: lineNumber ?? 0,
             message: 'DEF SPRITE: Character set must be a string, number, or CHR$ expression',
-            type: ERROR_TYPES.RUNTIME
+            type: ERROR_TYPES.RUNTIME,
           })
           return
         }
@@ -110,7 +123,7 @@ export class DefSpriteExecutor {
         this.context.addError({
           line: lineNumber ?? 0,
           message: `DEF SPRITE: ${error instanceof Error ? error.message : String(error)}`,
-          type: ERROR_TYPES.RUNTIME
+          type: ERROR_TYPES.RUNTIME,
         })
         return
       }
@@ -124,7 +137,7 @@ export class DefSpriteExecutor {
         invertX: invertX as 0 | 1,
         invertY: invertY as 0 | 1,
         characterSet,
-        tiles
+        tiles,
       }
 
       // Store definition in sprite state manager
@@ -135,14 +148,14 @@ export class DefSpriteExecutor {
       if (this.context.config.enableDebugMode) {
         this.context.addDebugOutput(
           `DEF SPRITE: Defined sprite ${spriteNumber} (${size === 0 ? '8×8' : '16×16'}, ` +
-          `priority=${priority}, color=${colorCombination})`
+            `priority=${priority}, color=${colorCombination})`
         )
       }
     } catch (error) {
       this.context.addError({
         line: lineNumber ?? 0,
         message: `DEF SPRITE: ${error instanceof Error ? error.message : String(error)}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
     }
   }
@@ -150,15 +163,13 @@ export class DefSpriteExecutor {
   private evaluateNumber(expr: CstNode, paramName: string, lineNumber?: number): number | null {
     try {
       const value = this.evaluator.evaluateExpression(expr)
-      const num = typeof value === 'number'
-        ? Math.floor(value)
-        : Math.floor(parseFloat(String(value)) || 0)
+      const num = typeof value === 'number' ? Math.floor(value) : Math.floor(parseFloat(String(value)) || 0)
       return num
     } catch (error) {
       this.context.addError({
         line: lineNumber ?? 0,
         message: `DEF SPRITE: Error evaluating ${paramName}: ${error instanceof Error ? error.message : String(error)}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return null
     }
@@ -169,7 +180,7 @@ export class DefSpriteExecutor {
       this.context.addError({
         line: lineNumber ?? 0,
         message: `DEF SPRITE: Sprite number out of range (0-7), got ${num}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return false
     }
@@ -181,7 +192,7 @@ export class DefSpriteExecutor {
       this.context.addError({
         line: lineNumber ?? 0,
         message: `DEF SPRITE: ${paramName} out of range (${min}-${max}), got ${num}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return false
     }
@@ -195,7 +206,7 @@ export class DefSpriteExecutor {
    */
   private extractChrCodesFromExpression(exprCst: CstNode): number[] {
     const codes: number[] = []
-    
+
     // Check if this is an additive expression (for CHR$(0)+CHR$(1)+...)
     const additiveCst = getFirstCstNode(exprCst.children.additive)
     if (additiveCst) {
@@ -206,25 +217,25 @@ export class DefSpriteExecutor {
       }
       return codes
     }
-    
+
     // Check if this is a mod expression
     const modExprCst = getFirstCstNode(exprCst.children.modExpression)
     if (modExprCst) {
       return this.extractChrCodesFromModExpression(modExprCst)
     }
-    
+
     // Check if this is a multiplicative expression
     const multExprCst = getFirstCstNode(exprCst.children.multiplicative)
     if (multExprCst) {
       return this.extractChrCodesFromMultiplicative(multExprCst)
     }
-    
+
     // Check if this is a primary expression (function call, etc.)
     const primaryCst = getFirstCstNode(exprCst.children.primary)
     if (primaryCst) {
       return this.extractChrCodesFromPrimary(primaryCst)
     }
-    
+
     return codes
   }
 
@@ -269,9 +280,8 @@ export class DefSpriteExecutor {
           if (expressions.length > 0) {
             // Evaluate the argument to get the character code
             const codeValue = this.evaluator.evaluateExpression(expressions[0]!)
-            const code = typeof codeValue === 'number' 
-              ? Math.floor(codeValue)
-              : Math.floor(parseFloat(String(codeValue)) || 0)
+            const code =
+              typeof codeValue === 'number' ? Math.floor(codeValue) : Math.floor(parseFloat(String(codeValue)) || 0)
             // Clamp to valid range
             if (code >= 0 && code <= 255) {
               return [code]

@@ -9,7 +9,7 @@ let messageContainer: HTMLDivElement | null = null
 
 const createMessageContainer = () => {
   if (messageContainer) return messageContainer
-  
+
   messageContainer = document.createElement('div')
   messageContainer.className = 'game-message-container'
   document.body.appendChild(messageContainer)
@@ -21,14 +21,14 @@ const showMessage = (message: string, type: MessageType = 'info', duration = 300
   const messageEl = document.createElement('div')
   messageEl.className = `game-message game-message-${type}`
   messageEl.textContent = message
-  
+
   container.appendChild(messageEl)
-  
+
   // Trigger animation
   requestAnimationFrame(() => {
     messageEl.classList.add('game-message-show')
   })
-  
+
   // Remove after duration
   setTimeout(() => {
     messageEl.classList.remove('game-message-show')
@@ -44,7 +44,7 @@ export const message = {
   success: (msg: string, duration?: number) => showMessage(msg, 'success', duration),
   warning: (msg: string, duration?: number) => showMessage(msg, 'warning', duration),
   error: (msg: string, duration?: number) => showMessage(msg, 'error', duration),
-  info: (msg: string, duration?: number) => showMessage(msg, 'info', duration)
+  info: (msg: string, duration?: number) => showMessage(msg, 'info', duration),
 }
 
 // Add styles

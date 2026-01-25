@@ -1,10 +1,10 @@
 /**
  * CGEN Executor Tests
- * 
+ *
  * Unit tests for the CgenExecutor class execution behavior.
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
@@ -20,7 +20,7 @@ describe('CgenExecutor', () => {
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
-      deviceAdapter: deviceAdapter
+      deviceAdapter: deviceAdapter,
     })
   })
 
@@ -30,7 +30,7 @@ describe('CgenExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.cgenModeCalls).toHaveLength(1)
@@ -44,7 +44,7 @@ describe('CgenExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.cgenModeCalls).toHaveLength(1)
@@ -58,7 +58,7 @@ describe('CgenExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.cgenModeCalls).toHaveLength(1)
@@ -72,7 +72,7 @@ describe('CgenExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.cgenModeCalls).toHaveLength(1)
@@ -87,7 +87,7 @@ describe('CgenExecutor', () => {
 30 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.cgenModeCalls).toHaveLength(1)
@@ -100,7 +100,7 @@ describe('CgenExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.cgenModeCalls).toHaveLength(1)
@@ -116,7 +116,7 @@ describe('CgenExecutor', () => {
 50 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.cgenModeCalls).toHaveLength(4)
@@ -134,7 +134,7 @@ describe('CgenExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.cgenModeCalls).toHaveLength(2)
@@ -148,7 +148,7 @@ describe('CgenExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(false)
     expect(result.errors).toHaveLength(1)
     expect(result.errors[0]?.message).toContain('CGEN: Mode out of range (0-3)')
@@ -161,7 +161,7 @@ describe('CgenExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(false)
     expect(result.errors).toHaveLength(1)
     expect(result.errors[0]?.message).toContain('CGEN: Mode out of range (0-3)')
@@ -174,7 +174,7 @@ describe('CgenExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(false)
     expect(result.errors).toHaveLength(1)
     expect(result.errors[0]?.message).toContain('CGEN: Mode out of range (0-3)')
@@ -187,7 +187,7 @@ describe('CgenExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.cgenModeCalls).toHaveLength(1)
@@ -201,7 +201,7 @@ describe('CgenExecutor', () => {
 30 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.cgenModeCalls).toHaveLength(1)

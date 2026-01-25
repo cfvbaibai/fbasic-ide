@@ -1,6 +1,6 @@
 /**
  * Variable Service
- * 
+ *
  * Handles variable management including simple variables and arrays.
  */
 
@@ -10,7 +10,7 @@ import Decimal from 'decimal.js'
 import type { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
 import type { BasicVariable } from '@/core/interfaces'
 import type { ExecutionContext } from '@/core/state/ExecutionContext'
-import type { BasicArrayValue,BasicScalarValue } from '@/core/types/BasicTypes'
+import type { BasicArrayValue, BasicScalarValue } from '@/core/types/BasicTypes'
 
 export class VariableService {
   constructor(
@@ -31,7 +31,7 @@ export class VariableService {
   setVariable(name: string, value: BasicScalarValue): void {
     const variable: BasicVariable = {
       value,
-      type: typeof value === 'string' ? 'string' : 'number'
+      type: typeof value === 'string' ? 'string' : 'number',
     }
     this.context.variables.set(name, variable)
   }
@@ -78,8 +78,14 @@ export class VariableService {
   /**
    * Set an array element from CST expression nodes
    */
-  setArrayElementFromExpressionsCst(name: string, indexExpressionsCst: CstNode[], valueExpressionCst: CstNode): void {
-    const indices = indexExpressionsCst.map(exprCst => this.toNumber(this.evaluator.evaluateExpression(exprCst)))
+  setArrayElementFromExpressionsCst(
+    name: string,
+    indexExpressionsCst: CstNode[],
+    valueExpressionCst: CstNode
+  ): void {
+    const indices = indexExpressionsCst.map(exprCst =>
+      this.toNumber(this.evaluator.evaluateExpression(exprCst))
+    )
     const value = this.evaluator.evaluateExpression(valueExpressionCst)
     // Convert boolean to number for BASIC compatibility
     const basicValue = typeof value === 'boolean' ? (value ? 1 : 0) : value
@@ -109,7 +115,7 @@ export class VariableService {
     }
 
     // At this point, value should be a scalar (not an array)
-    return (typeof value !== 'object') ? value : 0
+    return typeof value !== 'object' ? value : 0
   }
 
   /**
@@ -131,7 +137,11 @@ export class VariableService {
    * @param currentDim Current dimension index
    * @param defaultValue Default value for leaf elements (0 for numeric, '' for string)
    */
-  private createArrayRecursive(dimensions: number[], currentDim: number, defaultValue: BasicScalarValue): BasicArrayValue {
+  private createArrayRecursive(
+    dimensions: number[],
+    currentDim: number,
+    defaultValue: BasicScalarValue
+  ): BasicArrayValue {
     if (currentDim >= dimensions.length) {
       return []
     }
@@ -140,7 +150,7 @@ export class VariableService {
     const highestIndex = Math.floor(dimensions[currentDim] ?? 0)
     const size = highestIndex + 1
     const array: BasicArrayValue[] = []
-    
+
     for (let i = 0; i < size; i++) {
       if (currentDim === dimensions.length - 1) {
         array[i] = defaultValue // Initialize with default value (0 for numeric, '' for string)
@@ -148,7 +158,7 @@ export class VariableService {
         array[i] = this.createArrayRecursive(dimensions, currentDim + 1, defaultValue)
       }
     }
-    
+
     return array
   }
 

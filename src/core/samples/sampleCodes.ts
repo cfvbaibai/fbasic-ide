@@ -18,7 +18,7 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 30 LET B = 20
 40 LET C = A + B
 50 PRINT "A + B = "; C
-60 END`
+60 END`,
   },
 
   pause: {
@@ -33,7 +33,7 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 70 PRINT "Blast off!"
 80 PAUSE 2000
 90 PRINT "Mission complete!"
-100 END`
+100 END`,
   },
 
   gaming: {
@@ -70,7 +70,7 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 350 PRINT ""
 360 PRINT "START button pressed on joystick #1"
 370 PRINT "Exiting joystick test..."
-380 END`
+380 END`,
   },
 
   complex: {
@@ -96,7 +96,7 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 180 PRINT "Left 5 chars: "; LEFT$(T$, 5)
 190 PRINT "Right 5 chars: "; RIGHT$(T$, 5)
 200 PRINT "Middle chars: "; MID$(T$, 3, 5)
-210 END`
+210 END`,
   },
 
   comprehensive: {
@@ -132,7 +132,7 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 270 PRINT "A = "; A; ", B = "; B; ", C = A + B * 2 = "; C
 280 PRINT ""
 290 PRINT "Demo completed successfully!"
-300 END`
+300 END`,
   },
 
   allChars: {
@@ -141,7 +141,7 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
     code: `10 FOR I = 0 TO 255
 20   PRINT CHR$(I);
 30 NEXT
-40 END`
+40 END`,
   },
 
   spriteTest: {
@@ -186,7 +186,7 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 370 PRINT ""
 380 PRINT "Sprite test completed!"
 390 PRINT "All sprites should be visible on screen"
-400 END`
+400 END`,
   },
 
   moveTest: {
@@ -257,8 +257,8 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 630 PRINT ""
 640 PRINT "Note: Full sprite rendering with character"
 650 PRINT "      animation will be implemented in Phase 4"
-660 END`
-  }
+660 END`,
+  },
 }
 
 /**
@@ -281,4 +281,3 @@ export function getAllSampleCodes(): SampleCode[] {
 export function getSampleCodeKeys(): string[] {
   return Object.keys(SAMPLE_CODES)
 }
-

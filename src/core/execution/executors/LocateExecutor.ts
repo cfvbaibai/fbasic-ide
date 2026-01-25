@@ -1,6 +1,6 @@
 /**
  * LOCATE Statement Executor
- * 
+ *
  * Handles execution of LOCATE statements to set cursor position.
  */
 
@@ -26,12 +26,12 @@ export class LocateExecutor {
   execute(locateStmtCst: CstNode, lineNumber?: number): void {
     // Get expressions from CST (X and Y coordinates)
     const expressions = getCstNodes(locateStmtCst.children.expression)
-    
+
     if (expressions.length < 2) {
       this.context.addError({
         line: lineNumber ?? 0,
         message: 'LOCATE: Expected two arguments (X, Y)',
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }
@@ -43,7 +43,7 @@ export class LocateExecutor {
       this.context.addError({
         line: lineNumber ?? 0,
         message: 'LOCATE: Invalid arguments',
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }
@@ -57,18 +57,14 @@ export class LocateExecutor {
       const yValue = this.evaluator.evaluateExpression(yExprCst)
 
       // Convert to numbers (handle both numeric and string values)
-      x = typeof xValue === 'number'
-        ? Math.floor(xValue)
-        : Math.floor(parseFloat(String(xValue)) || 0)  
+      x = typeof xValue === 'number' ? Math.floor(xValue) : Math.floor(parseFloat(String(xValue)) || 0)
 
-      y = typeof yValue === 'number'
-        ? Math.floor(yValue)
-        : Math.floor(parseFloat(String(yValue)) || 0)  
+      y = typeof yValue === 'number' ? Math.floor(yValue) : Math.floor(parseFloat(String(yValue)) || 0)
     } catch (error) {
       this.context.addError({
         line: lineNumber ?? 0,
         message: `LOCATE: Error evaluating coordinates: ${error instanceof Error ? error.message : String(error)}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }
@@ -80,7 +76,7 @@ export class LocateExecutor {
       this.context.addError({
         line: lineNumber ?? 0,
         message: `LOCATE: X coordinate out of range (0-${SCREEN_DIMENSIONS.BACKGROUND.MAX_X}), got ${x}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }
@@ -89,7 +85,7 @@ export class LocateExecutor {
       this.context.addError({
         line: lineNumber ?? 0,
         message: `LOCATE: Y coordinate out of range (0-${SCREEN_DIMENSIONS.BACKGROUND.MAX_Y}), got ${y}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }

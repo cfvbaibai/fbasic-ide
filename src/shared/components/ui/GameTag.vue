@@ -2,11 +2,11 @@
 import { computed } from 'vue'
 
 import GameIcon from './GameIcon.vue'
-import type { GameTagEmits,GameTagProps } from './GameTag.types'
+import type { GameTagEmits, GameTagProps } from './GameTag.types'
 
 /**
  * GameTag component - A tag/badge component with type variants, sizes, and effects.
- * 
+ *
  * @example
  * ```vue
  * <GameTag type="success" size="medium" effect="light" icon="mdi:check" :closable="true">
@@ -15,7 +15,7 @@ import type { GameTagEmits,GameTagProps } from './GameTag.types'
  * ```
  */
 defineOptions({
-  name: 'GameTag'
+  name: 'GameTag',
 })
 
 const props = withDefaults(defineProps<GameTagProps>(), {
@@ -23,7 +23,7 @@ const props = withDefaults(defineProps<GameTagProps>(), {
   size: 'medium',
   effect: 'light',
   icon: undefined,
-  closable: false
+  closable: false,
 })
 
 const emit = defineEmits<GameTagEmits>()
@@ -33,9 +33,9 @@ const tagClasses = computed(() => {
     'game-tag': true,
     [`game-tag-${props.type}`]: true,
     [`game-tag-${props.size}`]: true,
-    [`game-tag-${props.effect}`]: true
+    [`game-tag-${props.effect}`]: true,
   }
-  
+
   // Add utility classes for variants that use card background
   if ((props.type === 'default' || props.type === 'info') && props.effect === 'light') {
     baseClasses['bg-game-surface'] = true
@@ -44,7 +44,7 @@ const tagClasses = computed(() => {
   if (props.type === 'default' && props.effect === 'dark') {
     baseClasses['bg-game-surface'] = true
   }
-  
+
   return baseClasses
 })
 
@@ -55,24 +55,11 @@ const handleClose = () => {
 
 <template>
   <span :class="tagClasses">
-    <GameIcon
-      v-if="icon"
-      :icon="icon"
-      :size="size === 'small' ? 'small' : 'medium'"
-      class="game-tag-icon"
-    />
+    <GameIcon v-if="icon" :icon="icon" :size="size === 'small' ? 'small' : 'medium'" class="game-tag-icon" />
     <span v-if="$slots.default" class="game-tag-content">
       <slot />
     </span>
-    <button
-      v-if="closable"
-      type="button"
-      class="game-tag-close"
-      @click="handleClose"
-      aria-label="Close"
-    >
-      ×
-    </button>
+    <button v-if="closable" type="button" class="game-tag-close" @click="handleClose" aria-label="Close">×</button>
   </span>
 </template>
 

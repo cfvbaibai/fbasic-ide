@@ -42,12 +42,19 @@ export class DefMoveExecutor {
       const priorityExpr = getCstNodes(defMoveStmtCst.children.priority)?.[0]
       const colorCombinationExpr = getCstNodes(defMoveStmtCst.children.colorCombination)?.[0]
 
-      if (!actionNumberExpr || !characterTypeExpr || !directionExpr ||
-          !speedExpr || !distanceExpr || !priorityExpr || !colorCombinationExpr) {
+      if (
+        !actionNumberExpr ||
+        !characterTypeExpr ||
+        !directionExpr ||
+        !speedExpr ||
+        !distanceExpr ||
+        !priorityExpr ||
+        !colorCombinationExpr
+      ) {
         this.context.addError({
           line: lineNumber ?? 0,
           message: 'DEF MOVE: Missing required parameters',
-          type: ERROR_TYPES.RUNTIME
+          type: ERROR_TYPES.RUNTIME,
         })
         return
       }
@@ -61,8 +68,15 @@ export class DefMoveExecutor {
       const priority = this.evaluateNumber(priorityExpr, 'priority', lineNumber)
       const colorCombination = this.evaluateNumber(colorCombinationExpr, 'color combination', lineNumber)
 
-      if (actionNumber === null || characterType === null || direction === null ||
-          speed === null || distance === null || priority === null || colorCombination === null) {
+      if (
+        actionNumber === null ||
+        characterType === null ||
+        direction === null ||
+        speed === null ||
+        distance === null ||
+        priority === null ||
+        colorCombination === null
+      ) {
         return // Error already added
       }
 
@@ -83,7 +97,7 @@ export class DefMoveExecutor {
         speed,
         distance,
         priority,
-        colorCombination
+        colorCombination,
       }
 
       // Store definition in animation manager
@@ -94,7 +108,7 @@ export class DefMoveExecutor {
           this.context.addError({
             line: lineNumber ?? 0,
             message: `DEF MOVE: ${error instanceof Error ? error.message : String(error)}`,
-            type: ERROR_TYPES.RUNTIME
+            type: ERROR_TYPES.RUNTIME,
           })
           return
         }
@@ -103,14 +117,14 @@ export class DefMoveExecutor {
       if (this.context.config.enableDebugMode) {
         this.context.addDebugOutput(
           `DEF MOVE: Defined action ${actionNumber} (character=${characterType}, ` +
-          `direction=${direction}, speed=${speed}, distance=${distance})`
+            `direction=${direction}, speed=${speed}, distance=${distance})`
         )
       }
     } catch (error) {
       this.context.addError({
         line: lineNumber ?? 0,
         message: `DEF MOVE: ${error instanceof Error ? error.message : String(error)}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
     }
   }
@@ -118,15 +132,13 @@ export class DefMoveExecutor {
   private evaluateNumber(expr: CstNode, paramName: string, lineNumber?: number): number | null {
     try {
       const value = this.evaluator.evaluateExpression(expr)
-      const num = typeof value === 'number'
-        ? Math.floor(value)
-        : Math.floor(parseFloat(String(value)) || 0)
+      const num = typeof value === 'number' ? Math.floor(value) : Math.floor(parseFloat(String(value)) || 0)
       return num
     } catch (error) {
       this.context.addError({
         line: lineNumber ?? 0,
         message: `DEF MOVE: Error evaluating ${paramName}: ${error instanceof Error ? error.message : String(error)}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return null
     }
@@ -137,7 +149,7 @@ export class DefMoveExecutor {
       this.context.addError({
         line: lineNumber ?? 0,
         message: `DEF MOVE: ${paramName} out of range (${min}-${max}), got ${num}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return false
     }

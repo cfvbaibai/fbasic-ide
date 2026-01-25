@@ -32,7 +32,7 @@ export class MoveExecutor {
         this.context.addError({
           line: lineNumber ?? 0,
           message: 'MOVE: Missing action number',
-          type: ERROR_TYPES.RUNTIME
+          type: ERROR_TYPES.RUNTIME,
         })
         return
       }
@@ -55,7 +55,7 @@ export class MoveExecutor {
           this.context.addError({
             line: lineNumber ?? 0,
             message: `MOVE: ${error instanceof Error ? error.message : String(error)}`,
-            type: ERROR_TYPES.RUNTIME
+            type: ERROR_TYPES.RUNTIME,
           })
           return
         }
@@ -68,7 +68,7 @@ export class MoveExecutor {
       this.context.addError({
         line: lineNumber ?? 0,
         message: `MOVE: ${error instanceof Error ? error.message : String(error)}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
     }
   }
@@ -76,15 +76,13 @@ export class MoveExecutor {
   private evaluateNumber(expr: CstNode, paramName: string, lineNumber?: number): number | null {
     try {
       const value = this.evaluator.evaluateExpression(expr)
-      const num = typeof value === 'number'
-        ? Math.floor(value)
-        : Math.floor(parseFloat(String(value)) || 0)
+      const num = typeof value === 'number' ? Math.floor(value) : Math.floor(parseFloat(String(value)) || 0)
       return num
     } catch (error) {
       this.context.addError({
         line: lineNumber ?? 0,
         message: `MOVE: Error evaluating ${paramName}: ${error instanceof Error ? error.message : String(error)}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return null
     }
@@ -95,7 +93,7 @@ export class MoveExecutor {
       this.context.addError({
         line: lineNumber ?? 0,
         message: `MOVE: ${paramName} out of range (${min}-${max}), got ${num}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return false
     }

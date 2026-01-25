@@ -1,6 +1,6 @@
 /**
  * CGSET Statement Executor
- * 
+ *
  * Handles execution of CGSET statements to set color palette for background and sprites.
  */
 
@@ -28,7 +28,7 @@ export class CgsetExecutor {
     // Get expressions from CST (m and/or n)
     // The parser rule allows both parameters to be optional
     const expressions = getCstNodes(cgsetStmtCst.children.expression)
-    
+
     // Both parameters are optional
     // Default values: m=1, n=1 (from manual page 72)
     let bgPalette: number | undefined = undefined
@@ -40,14 +40,12 @@ export class CgsetExecutor {
       if (mExprCst) {
         try {
           const mValue = this.evaluator.evaluateExpression(mExprCst)
-          bgPalette = typeof mValue === 'number'
-            ? Math.floor(mValue)
-            : Math.floor(parseFloat(String(mValue)) || 0)  
+          bgPalette = typeof mValue === 'number' ? Math.floor(mValue) : Math.floor(parseFloat(String(mValue)) || 0)
         } catch (error) {
           this.context.addError({
             line: lineNumber ?? 0,
             message: `CGSET: Error evaluating background palette code: ${error instanceof Error ? error.message : String(error)}`,
-            type: ERROR_TYPES.RUNTIME
+            type: ERROR_TYPES.RUNTIME,
           })
           return
         }
@@ -60,14 +58,12 @@ export class CgsetExecutor {
       if (nExprCst) {
         try {
           const nValue = this.evaluator.evaluateExpression(nExprCst)
-          spritePalette = typeof nValue === 'number'
-            ? Math.floor(nValue)
-            : Math.floor(parseFloat(String(nValue)) || 0)  
+          spritePalette = typeof nValue === 'number' ? Math.floor(nValue) : Math.floor(parseFloat(String(nValue)) || 0)
         } catch (error) {
           this.context.addError({
             line: lineNumber ?? 0,
             message: `CGSET: Error evaluating sprite palette code: ${error instanceof Error ? error.message : String(error)}`,
-            type: ERROR_TYPES.RUNTIME
+            type: ERROR_TYPES.RUNTIME,
           })
           return
         }
@@ -84,7 +80,7 @@ export class CgsetExecutor {
       this.context.addError({
         line: lineNumber ?? 0,
         message: `CGSET: Background palette code out of range (0-1), got ${bgPalette}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }
@@ -94,7 +90,7 @@ export class CgsetExecutor {
       this.context.addError({
         line: lineNumber ?? 0,
         message: `CGSET: Sprite palette code out of range (0-2), got ${spritePalette}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }

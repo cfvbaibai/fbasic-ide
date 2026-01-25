@@ -1,6 +1,6 @@
 /**
  * Print Statement Executor
- * 
+ *
  * Handles execution of PRINT statements from CST.
  */
 
@@ -8,7 +8,14 @@ import type { CstNode, IToken } from 'chevrotain'
 
 import { ERROR_TYPES, PRINT_TAB_STOPS } from '@/core/constants'
 import type { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
-import { getCstNodes, getFirstCstNode, getFirstToken, getTokens, isCstNode,isCstToken } from '@/core/parser/cst-helpers'
+import {
+  getCstNodes,
+  getFirstCstNode,
+  getFirstToken,
+  getTokens,
+  isCstNode,
+  isCstToken,
+} from '@/core/parser/cst-helpers'
 import type { ExecutionContext } from '@/core/state/ExecutionContext'
 
 export type PrintSeparator = ',' | ';' | null
@@ -29,7 +36,7 @@ export class PrintExecutor {
    */
   execute(printStmtCst: CstNode): void {
     const printListCst = getFirstCstNode(printStmtCst.children.printList)
-    
+
     if (!printListCst) {
       // Empty PRINT statement - print newline immediately
       this.printOutput('\n')
@@ -39,7 +46,7 @@ export class PrintExecutor {
     const printItems = getCstNodes(printListCst.children.printItem)
     const commaTokens = getTokens(printListCst.children.Comma)
     const semicolonTokens = getTokens(printListCst.children.Semicolon)
-    
+
     // Build array of all elements (items and separators) in order
     // We need to merge items and separators based on their positions
     interface Element {
@@ -48,16 +55,16 @@ export class PrintExecutor {
       separator?: PrintSeparator
       startOffset: number
     }
-    
+
     const elements: Element[] = []
-    
+
     // Add all print items with their positions
     printItems.forEach((item, index) => {
       // Get the start position from the first token in the item
       const strToken = getFirstToken(item.children.StringLiteral)
       const exprCst = getFirstCstNode(item.children.expression)
       let startOffset = 0
-      
+
       if (strToken) {
         startOffset = strToken.startOffset!
       } else if (exprCst) {
@@ -67,48 +74,48 @@ export class PrintExecutor {
           startOffset = firstToken.startOffset!
         }
       }
-      
+
       elements.push({
         type: 'item',
         itemIndex: index,
-        startOffset
+        startOffset,
       })
     })
-    
+
     // Add all separator tokens with their positions
     commaTokens.forEach(token => {
       elements.push({
         type: 'separator',
         separator: ',',
-        startOffset: token.startOffset
+        startOffset: token.startOffset,
       })
     })
-    
+
     semicolonTokens.forEach(token => {
       elements.push({
         type: 'separator',
         separator: ';',
-        startOffset: token.startOffset
+        startOffset: token.startOffset,
       })
     })
-    
+
     // Sort all elements by position
     elements.sort((a, b) => a.startOffset - b.startOffset)
-    
+
     // Build PrintItem array with separators
     // Separators come AFTER items, so we need to look ahead
     const items: PrintItem[] = []
-    
+
     for (let i = 0; i < elements.length; i++) {
       const element = elements[i]
       if (!element) continue
-      
+
       if (element.type === 'item' && element.itemIndex !== undefined) {
         const item = printItems[element.itemIndex]
         if (!item) continue
-        
+
         let value: number | string | undefined
-        
+
         // Check if it's a string literal
         const strToken = getFirstToken(item.children.StringLiteral)
         if (strToken) {
@@ -120,7 +127,7 @@ export class PrintExecutor {
             value = this.evaluator.evaluateExpression(exprCst)
           }
         }
-        
+
         if (value !== undefined) {
           // Look ahead to find separator after this item
           let separator: PrintSeparator = null
@@ -128,7 +135,7 @@ export class PrintExecutor {
           if (nextElement && nextElement.type === 'separator') {
             separator = nextElement.separator ?? null
           }
-          
+
           items.push({ value, separator })
         }
       }
@@ -136,27 +143,27 @@ export class PrintExecutor {
 
     // Process PRINT items and convert to output string
     let output = this.buildOutputString(items)
-    
+
     // Check if PRINT ends with semicolon or comma by checking the last element
     // The last element in the elements array tells us if there's a trailing separator
     const lastElement = elements[elements.length - 1]
     const endsWithSemicolon = lastElement?.type === 'separator' && lastElement.separator === ';'
     const endsWithComma = lastElement?.type === 'separator' && lastElement.separator === ','
     const endsWithSeparator = endsWithSemicolon || endsWithComma
-    
+
     // In BASIC, PRINT statements automatically add a newline at the end
     // unless they end with a semicolon or comma. Add newline immediately if needed.
     if (!endsWithSeparator && output.length > 0) {
       output += '\n'
     }
-    
+
     // Output the string immediately (newline is already included if needed)
     this.printOutput(output)
   }
 
   /**
    * Build output string from PRINT items, handling all PRINT semantics.
-   * 
+   *
    * This method separates two concerns:
    * 1. Building the string representation of each item (via toString method)
    * 2. Processing separators between items
@@ -172,7 +179,7 @@ export class PrintExecutor {
     for (let i = 0; i < items.length; i++) {
       const item = items[i]
       if (item?.value === undefined) continue
-      
+
       // Step 1: Build the string representation of the item
       // The toString method already handles the sign char for numbers
       const itemString = this.toString(item.value)
@@ -190,7 +197,7 @@ export class PrintExecutor {
       } else {
         // Process separator from previous item
         const prevSeparator = items[i - 1]?.separator
-        
+
         if (prevSeparator === ',') {
           // Comma separator: use tab character to move to next tab stop
           // Blocks defined by PRINT_TAB_STOPS constants
@@ -208,8 +215,8 @@ export class PrintExecutor {
         } else {
           this.context.addError({
             line: this.context.getCurrentLineNumber(),
-            message: `PRINT: Invalid separator: ${  prevSeparator}`,
-            type: ERROR_TYPES.RUNTIME
+            message: `PRINT: Invalid separator: ${prevSeparator}`,
+            type: ERROR_TYPES.RUNTIME,
           })
           return ''
         }
@@ -227,13 +234,13 @@ export class PrintExecutor {
     if (currentColumn < PRINT_TAB_STOPS.BLOCK_1_END) return PRINT_TAB_STOPS.BLOCK_1_END
     if (currentColumn < PRINT_TAB_STOPS.BLOCK_2_END) return PRINT_TAB_STOPS.BLOCK_2_END
     if (currentColumn < PRINT_TAB_STOPS.BLOCK_3_END) return PRINT_TAB_STOPS.BLOCK_3_END
-    return PRINT_TAB_STOPS.BLOCK_4_END    // Block 4 -> next line (or wrap)
+    return PRINT_TAB_STOPS.BLOCK_4_END // Block 4 -> next line (or wrap)
   }
 
   /**
    * Convert a printable value to its string representation.
    * This acts as the "toString" method for printable items.
-   * 
+   *
    * For numbers: always outputs a sign char (space for 0 and positive, dash for negative)
    * followed by the absolute value of the number.
    * For strings: outputs the string itself.
@@ -249,16 +256,14 @@ export class PrintExecutor {
       const sign = value >= 0 ? ' ' : '-'
       const absValue = Math.abs(value)
       // Format the absolute value (handle integers and floats)
-      const absValueStr = Number.isInteger(absValue) 
-        ? absValue.toString() 
-        : absValue.toString()
+      const absValueStr = Number.isInteger(absValue) ? absValue.toString() : absValue.toString()
       return sign + absValueStr
     }
     // This should never happen due to TypeScript type checking, but handle it gracefully
     this.context.addError({
       line: this.context.getCurrentLineNumber(),
       message: `PRINT: Invalid value type: ${typeof value} for value: ${value}`,
-      type: ERROR_TYPES.RUNTIME
+      type: ERROR_TYPES.RUNTIME,
     })
     return ' 0'
   }
@@ -294,7 +299,7 @@ export class PrintExecutor {
         return
       }
     }
-    
+
     // Create new output line
     this.context.addOutput(text)
   }

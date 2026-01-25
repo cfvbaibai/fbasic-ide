@@ -1,10 +1,10 @@
 /**
  * COLOR Executor Tests
- * 
+ *
  * Unit tests for the ColorExecutor class execution behavior.
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
@@ -20,7 +20,7 @@ describe('ColorExecutor', () => {
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
-      deviceAdapter: deviceAdapter
+      deviceAdapter: deviceAdapter,
     })
   })
 
@@ -30,7 +30,7 @@ describe('ColorExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.colorPatternCalls).toHaveLength(1)
@@ -43,7 +43,7 @@ describe('ColorExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.colorPatternCalls).toHaveLength(1)
@@ -56,7 +56,7 @@ describe('ColorExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.colorPatternCalls).toHaveLength(1)
@@ -72,7 +72,7 @@ describe('ColorExecutor', () => {
 50 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.colorPatternCalls).toHaveLength(1)
@@ -85,7 +85,7 @@ describe('ColorExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.colorPatternCalls).toHaveLength(1)
@@ -101,7 +101,7 @@ describe('ColorExecutor', () => {
 50 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.colorPatternCalls).toHaveLength(4)
@@ -117,7 +117,7 @@ describe('ColorExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.colorPatternCalls).toHaveLength(2)
@@ -131,7 +131,7 @@ describe('ColorExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
     expect(result.errors[0]?.message).toContain('X coordinate out of range (0-27)')
@@ -143,7 +143,7 @@ describe('ColorExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
     expect(result.errors[0]?.message).toContain('X coordinate out of range (0-27)')
@@ -155,7 +155,7 @@ describe('ColorExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
     expect(result.errors[0]?.message).toContain('Y coordinate out of range (0-23)')
@@ -167,7 +167,7 @@ describe('ColorExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
     expect(result.errors[0]?.message).toContain('Y coordinate out of range (0-23)')
@@ -179,7 +179,7 @@ describe('ColorExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
     expect(result.errors[0]?.message).toContain('Color pattern number out of range (0-3)')
@@ -191,7 +191,7 @@ describe('ColorExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
     expect(result.errors[0]?.message).toContain('Color pattern number out of range (0-3)')
@@ -206,7 +206,7 @@ describe('ColorExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.colorPatternCalls).toHaveLength(1)
@@ -223,7 +223,7 @@ describe('ColorExecutor', () => {
 50 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.colorPatternCalls).toHaveLength(4)
@@ -236,7 +236,7 @@ describe('ColorExecutor', () => {
 30 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.cursorPosition).toEqual({ x: 10, y: 5 })

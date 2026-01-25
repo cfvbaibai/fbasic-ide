@@ -1,5 +1,5 @@
-import type { RouteRecordRaw } from 'vue-router';
-import { createRouter, createWebHistory } from 'vue-router';
+import type { RouteRecordRaw } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -9,8 +9,8 @@ const routes: RouteRecordRaw[] = [
     meta: {
       title: 'Home',
       showInNav: true,
-      icon: 'mdi:home'
-    }
+      icon: 'mdi:home',
+    },
   },
   {
     path: '/ide',
@@ -19,8 +19,8 @@ const routes: RouteRecordRaw[] = [
     meta: {
       title: 'IDE',
       showInNav: true,
-      icon: 'mdi:monitor'
-    }
+      icon: 'mdi:monitor',
+    },
   },
   {
     path: '/monaco',
@@ -28,8 +28,8 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/features/monaco-editor/MonacoEditorPage.vue'),
     meta: {
       title: 'Monaco Editor',
-      showInNav: false
-    }
+      showInNav: false,
+    },
   },
   {
     path: '/image-analyzer',
@@ -37,8 +37,8 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/features/image-analyzer/ImageAnalyzerPage.vue'),
     meta: {
       title: 'Image Analyzer',
-      showInNav: false
-    }
+      showInNav: false,
+    },
   },
   {
     path: '/character-sprite-viewer',
@@ -47,8 +47,8 @@ const routes: RouteRecordRaw[] = [
     meta: {
       title: 'Sprite Viewer',
       showInNav: true,
-      icon: 'mdi:eye'
-    }
+      icon: 'mdi:eye',
+    },
   },
   {
     path: '/canvas-test',
@@ -56,15 +56,14 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/features/canvas-perf/CanvasPerformanceTest.vue'),
     meta: {
       title: 'Canvas Performance Test',
-      showInNav: false
-    }
-  }
-];
+      showInNav: false,
+    },
+  },
+]
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
-});
+  routes,
+})
 
-export default router;
-
+export default router

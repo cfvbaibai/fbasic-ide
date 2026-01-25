@@ -1,10 +1,10 @@
 /**
  * Unary Minus Parser Tests
- * 
+ *
  * Tests for parsing expressions with unary minus operator.
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { FBasicParser } from '@/core/parser/FBasicParser'
 
@@ -71,4 +71,3 @@ describe('Unary Minus Parser', () => {
     })
   })
 })
-

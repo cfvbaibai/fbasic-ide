@@ -8,7 +8,7 @@ import { GameIcon, GameTabPane } from '@/shared/components/ui'
  * DebugTab component - Displays debug output in a tab pane format.
  */
 defineOptions({
-  name: 'DebugTab'
+  name: 'DebugTab',
 })
 
 const props = defineProps<{
@@ -27,7 +27,7 @@ const isDisabled = computed(() => !props.debugMode || !props.debugOutput)
       <GameIcon icon="mdi:tools" size="small" />
       <span>{{ t('ide.output.debug') }}</span>
     </template>
-    
+
     <div class="tab-content">
       <div class="debug-content border-game-surface">
         <pre class="debug-text">{{ debugOutput }}</pre>

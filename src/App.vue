@@ -10,7 +10,7 @@ import { useSkin } from './shared/composables/useSkin'
  * Initializes skin system early.
  */
 defineOptions({
-  name: 'App'
+  name: 'App',
 })
 
 const { locale } = useI18n()
@@ -19,11 +19,15 @@ const { locale } = useI18n()
 const { currentSkin: _currentSkin } = useSkin()
 
 // Update HTML lang attribute when locale changes
-watch(locale, (newLocale) => {
-  if (typeof document !== 'undefined') {
-    document.documentElement.lang = newLocale
-  }
-}, { immediate: true })
+watch(
+  locale,
+  newLocale => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = newLocale
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <template>

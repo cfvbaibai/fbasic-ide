@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed, onMounted,ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import type { HighlighterInfo,ParserInfo } from '@/core/interfaces'
-import { GameBlock,GameButton, GameButtonGroup, GameLayout } from '@/shared/components/ui'
+import type { HighlighterInfo, ParserInfo } from '@/core/interfaces'
+import { GameBlock, GameButton, GameButtonGroup, GameLayout } from '@/shared/components/ui'
 
 import IdeControls from './components/IdeControls.vue'
 import JoystickControl from './components/JoystickControl.vue'
@@ -16,7 +16,7 @@ import { useBasicIde as useBasicIdeEnhanced } from './composables/useBasicIdeEnh
  * Provides code editor, runtime output, controls, and joystick interface.
  */
 defineOptions({
-  name: 'IdePage'
+  name: 'IdePage',
 })
 
 const { t } = useI18n()
@@ -68,7 +68,6 @@ onMounted(() => {
 <template>
   <GameLayout>
     <div class="ide-container">
-
       <!-- Main IDE Content -->
       <div class="ide-content">
         <!-- Left Panel - Code Editor -->
@@ -77,49 +76,81 @@ onMounted(() => {
             <div class="editor-header-controls">
               <div class="sample-programs">
                 <GameButtonGroup>
-                  <GameButton variant="toggle" :selected="currentSampleType === 'basic'" @click="loadSampleCode('basic')"
-                    size="small">
+                  <GameButton
+                    variant="toggle"
+                    :selected="currentSampleType === 'basic'"
+                    @click="loadSampleCode('basic')"
+                    size="small"
+                  >
                     {{ t('ide.samples.basic') }}
                   </GameButton>
-                  <GameButton variant="toggle" :selected="currentSampleType === 'pause'" @click="loadSampleCode('pause')"
-                    size="small">
+                  <GameButton
+                    variant="toggle"
+                    :selected="currentSampleType === 'pause'"
+                    @click="loadSampleCode('pause')"
+                    size="small"
+                  >
                     {{ t('ide.samples.pause') }}
                   </GameButton>
-                  <GameButton variant="toggle" :selected="currentSampleType === 'gaming'" @click="loadSampleCode('gaming')"
-                    size="small">
+                  <GameButton
+                    variant="toggle"
+                    :selected="currentSampleType === 'gaming'"
+                    @click="loadSampleCode('gaming')"
+                    size="small"
+                  >
                     {{ t('ide.samples.gaming') }}
                   </GameButton>
-                  <GameButton variant="toggle" :selected="currentSampleType === 'complex'" @click="loadSampleCode('complex')"
-                    size="small">
+                  <GameButton
+                    variant="toggle"
+                    :selected="currentSampleType === 'complex'"
+                    @click="loadSampleCode('complex')"
+                    size="small"
+                  >
                     {{ t('ide.samples.complex') }}
                   </GameButton>
-                  <GameButton variant="toggle" :selected="currentSampleType === 'comprehensive'"
-                    @click="loadSampleCode('comprehensive')" size="small">
+                  <GameButton
+                    variant="toggle"
+                    :selected="currentSampleType === 'comprehensive'"
+                    @click="loadSampleCode('comprehensive')"
+                    size="small"
+                  >
                     {{ t('ide.samples.comprehensive') }}
                   </GameButton>
-                  <GameButton variant="toggle" :selected="currentSampleType === 'allChars'"
-                    @click="loadSampleCode('allChars')" size="small">
+                  <GameButton
+                    variant="toggle"
+                    :selected="currentSampleType === 'allChars'"
+                    @click="loadSampleCode('allChars')"
+                    size="small"
+                  >
                     {{ t('ide.samples.allChars') }}
                   </GameButton>
-                  <GameButton variant="toggle" :selected="currentSampleType === 'spriteTest'"
-                    @click="loadSampleCode('spriteTest')" size="small">
+                  <GameButton
+                    variant="toggle"
+                    :selected="currentSampleType === 'spriteTest'"
+                    @click="loadSampleCode('spriteTest')"
+                    size="small"
+                  >
                     {{ t('ide.samples.spriteTest') }}
                   </GameButton>
-                  <GameButton variant="toggle" :selected="currentSampleType === 'moveTest'"
-                    @click="loadSampleCode('moveTest')" size="small">
+                  <GameButton
+                    variant="toggle"
+                    :selected="currentSampleType === 'moveTest'"
+                    @click="loadSampleCode('moveTest')"
+                    size="small"
+                  >
                     {{ t('ide.samples.moveTest') }}
                   </GameButton>
                 </GameButtonGroup>
               </div>
-              <IdeControls 
-                :is-running="isRunning" 
-                :can-run="canRun" 
-                :can-stop="canStop" 
-                :debug-mode="debugMode" 
+              <IdeControls
+                :is-running="isRunning"
+                :can-run="canRun"
+                :can-stop="canStop"
+                :debug-mode="debugMode"
                 @run="runCode"
-                @stop="stopCode" 
-                @clear="clearOutput" 
-                @toggle-debug="toggleDebugMode" 
+                @stop="stopCode"
+                @clear="clearOutput"
+                @toggle-debug="toggleDebugMode"
               />
             </div>
           </template>
@@ -128,10 +159,22 @@ onMounted(() => {
 
         <!-- Right Panel - Runtime Output -->
         <div class="output-panel">
-          <RuntimeOutput :output="output" :is-running="isRunning" :errors="errors" :variables="variables"
-            :debug-output="debugOutput" :debug-mode="debugMode" :screen-buffer="screenBuffer" :cursor-x="cursorX"
-            :cursor-y="cursorY" :bg-palette="bgPalette" :backdrop-color="backdropColor"
-            :sprite-states="spriteStates" :sprite-enabled="spriteEnabled" :movement-states="movementStates" />
+          <RuntimeOutput
+            :output="output"
+            :is-running="isRunning"
+            :errors="errors"
+            :variables="variables"
+            :debug-output="debugOutput"
+            :debug-mode="debugMode"
+            :screen-buffer="screenBuffer"
+            :cursor-x="cursorX"
+            :cursor-y="cursorY"
+            :bg-palette="bgPalette"
+            :backdrop-color="backdropColor"
+            :sprite-states="spriteStates"
+            :sprite-enabled="spriteEnabled"
+            :movement-states="movementStates"
+          />
         </div>
       </div>
 
@@ -226,8 +269,7 @@ onMounted(() => {
   position: relative;
 }
 
-
-.output-panel>* {
+.output-panel > * {
   flex: 1 1 0;
   overflow: auto;
   min-height: 0;

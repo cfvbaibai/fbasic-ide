@@ -1,10 +1,10 @@
 /**
  * Arithmetic Functions Tests
- * 
+ *
  * Tests for Family BASIC arithmetic functions: ABS, SGN, RND
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
@@ -20,7 +20,7 @@ describe('Arithmetic Functions', () => {
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
-      deviceAdapter: deviceAdapter
+      deviceAdapter: deviceAdapter,
     })
   })
 
@@ -58,7 +58,6 @@ describe('Arithmetic Functions', () => {
       expect(deviceAdapter.getAllOutputs()).toEqual(' 24\n')
     })
   })
-
 
   describe('SGN function', () => {
     it('should return 1 for positive number', async () => {
@@ -142,7 +141,6 @@ describe('Arithmetic Functions', () => {
     })
   })
 
-
   describe('Function composition', () => {
     it('should handle nested function calls', async () => {
       const source = '10 LET X = ABS(SGN(-5))\n20 PRINT X\n30 END'
@@ -171,4 +169,3 @@ describe('Arithmetic Functions', () => {
     })
   })
 })
-

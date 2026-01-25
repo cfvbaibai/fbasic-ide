@@ -1,6 +1,6 @@
 /**
  * Let Executor Tests
- * 
+ *
  * Unit tests for the LetExecutor class.
  */
 
@@ -26,12 +26,12 @@ describe('LetExecutor', () => {
       maxIterations: 1000,
       maxOutputLines: 100,
       enableDebugMode: false,
-      strictMode: false
+      strictMode: false,
     })
     evaluator = new ExpressionEvaluator(context)
     variableService = new VariableService(context, evaluator)
     executor = new LetExecutor(variableService)
-    
+
     // Clear variables before each test
     context.variables.clear()
   })
@@ -63,7 +63,7 @@ describe('LetExecutor', () => {
     it('should reject floating point number literals', async () => {
       const parser = new FBasicParser()
       const result = await parser.parse('10 LET Y = 3.14')
-      
+
       // Floating point literals should be rejected by the parser
       expect(result.success).toBe(false)
       expect(result.errors).toBeDefined()
@@ -201,12 +201,12 @@ describe('LetExecutor', () => {
       const invalidCst: CstNode = {
         name: 'letStatement',
         children: {
-          expression: []
-        }
+          expression: [],
+        },
       }
 
       executor.execute(invalidCst)
-      
+
       const errors = context.getErrors()
       expect(errors.length).toBeGreaterThan(0)
       expect(errors[0]?.message).toBe('Invalid LET statement: missing identifier or expression')
@@ -225,19 +225,19 @@ describe('LetExecutor', () => {
         endColumn: 1,
         tokenTypeIdx: 0,
         tokenType: {
-          name: 'Identifier'
-        } as IToken['tokenType']
+          name: 'Identifier',
+        } as IToken['tokenType'],
       }
 
       const invalidCst: CstNode = {
         name: 'letStatement',
         children: {
-          Identifier: [identifierToken]
-        }
+          Identifier: [identifierToken],
+        },
       }
 
       executor.execute(invalidCst)
-      
+
       const errors = context.getErrors()
       expect(errors.length).toBeGreaterThan(0)
       expect(errors[0]?.message).toBe('Invalid LET statement: missing expression')
@@ -247,7 +247,7 @@ describe('LetExecutor', () => {
   describe('LET Debug Mode', () => {
     it('should add debug output when debug mode is enabled', async () => {
       context.config.enableDebugMode = true
-      
+
       const letStmtCst = await parseLetStatement('10 LET X = 42')
       expect(letStmtCst).not.toBeNull()
 
@@ -256,15 +256,13 @@ describe('LetExecutor', () => {
       executor.execute(letStmtCst!)
 
       expect(debugSpy).toHaveBeenCalled()
-      const debugCall = debugSpy.mock.calls.find(call => 
-        call[0]?.includes('LET:') && call[0]?.includes('X')
-      )
+      const debugCall = debugSpy.mock.calls.find(call => call[0]?.includes('LET:') && call[0]?.includes('X'))
       expect(debugCall).toBeDefined()
     })
 
     it('should not add debug output when debug mode is disabled', async () => {
       context.config.enableDebugMode = false
-      
+
       const letStmtCst = await parseLetStatement('10 LET X = 42')
       expect(letStmtCst).not.toBeNull()
 
@@ -278,4 +276,3 @@ describe('LetExecutor', () => {
     })
   })
 })
-

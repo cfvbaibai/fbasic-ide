@@ -1,10 +1,10 @@
 /**
  * DIM Statement Parser Tests
- * 
+ *
  * Tests for parsing DIM statements with various array declarations.
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { FBasicParser } from '@/core/parser/FBasicParser'
 
@@ -97,4 +97,3 @@ describe('DIM Statement Parser', () => {
     })
   })
 })
-

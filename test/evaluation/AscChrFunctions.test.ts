@@ -1,14 +1,14 @@
 /**
  * ASC and CHR$ Functions Tests
- * 
+ *
  * Tests for Family BASIC character conversion functions:
  * - ASC(string) - converts first character to character code (0-255)
  * - CHR$(x) - converts character code (0-255) to character
- * 
+ *
  * Based on Family Basic Manual page 83
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
@@ -24,7 +24,7 @@ describe('ASC and CHR$ Functions', () => {
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
-      deviceAdapter: deviceAdapter
+      deviceAdapter: deviceAdapter,
     })
   })
 
@@ -236,7 +236,8 @@ describe('ASC and CHR$ Functions', () => {
     })
 
     it('should handle CHR$ sample program pattern', async () => {
-      const source = '10 REM * CHR$ *\n20 LET A = 65\n30 LET A$ = CHR$(A)\n40 PRINT A; " THE MATCHING CHARACTER IS"; A$\n50 END'
+      const source =
+        '10 REM * CHR$ *\n20 LET A = 65\n30 LET A$ = CHR$(A)\n40 PRINT A; " THE MATCHING CHARACTER IS"; A$\n50 END'
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
       // Verify variables are set correctly
@@ -248,4 +249,3 @@ describe('ASC and CHR$ Functions', () => {
     })
   })
 })
-

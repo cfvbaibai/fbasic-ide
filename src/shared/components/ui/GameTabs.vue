@@ -2,16 +2,11 @@
 import type { VNode } from 'vue'
 import { computed, provide, ref } from 'vue'
 
-import {
-  ActiveTabKey,
-  RegisterTabKey,
-  SetActiveTabKey,
-  UnregisterTabKey
-} from './game-tabs-keys'
+import { ActiveTabKey, RegisterTabKey, SetActiveTabKey, UnregisterTabKey } from './game-tabs-keys'
 
 /**
  * GameTabs component - A tabbed interface component with type-safe provide/inject.
- * 
+ *
  * @example
  * ```vue
  * <GameTabs v-model="activeTab" type="border-card">
@@ -22,11 +17,11 @@ import {
  * ```
  */
 defineOptions({
-  name: 'GameTabs'
+  name: 'GameTabs',
 })
 
 const props = withDefaults(defineProps<Props>(), {
-  type: 'default'
+  type: 'default',
 })
 
 const emit = defineEmits<{
@@ -42,7 +37,7 @@ interface Props {
 
 const activeTab = computed({
   get: () => props.modelValue,
-  set: (value: string) => emit('update:modelValue', value)
+  set: (value: string) => emit('update:modelValue', value),
 })
 
 const tabButtons = ref<Array<{ name: string; render: () => VNode }>>([])
@@ -79,11 +74,7 @@ provide(UnregisterTabKey, unregisterTab)
 <template>
   <div :class="['game-tabs', `game-tabs-${type}`]">
     <div class="game-tabs-header">
-      <component
-        v-for="tab in tabButtons"
-        :key="`${tab.name}-${activeTab}`"
-        :is="tab.render"
-      />
+      <component v-for="tab in tabButtons" :key="`${tab.name}-${activeTab}`" :is="tab.render" />
     </div>
     <div class="game-tabs-content">
       <slot />
@@ -180,7 +171,9 @@ provide(UnregisterTabKey, unregisterTab)
 /* Icon styles - match text color */
 .game-tabs-border-card :deep(.game-tab-button .game-icon) {
   flex-shrink: 0;
-  transition: color 0.2s ease, filter 0.2s ease;
+  transition:
+    color 0.2s ease,
+    filter 0.2s ease;
   width: 16px;
   height: 16px;
   position: relative;

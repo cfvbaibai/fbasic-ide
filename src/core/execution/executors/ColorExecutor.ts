@@ -1,12 +1,12 @@
 /**
  * COLOR Statement Executor
- * 
+ *
  * Handles execution of COLOR statements to set color pattern for screen areas.
  */
 
 import type { CstNode } from 'chevrotain'
 
-import { COLOR_PATTERNS,ERROR_TYPES, SCREEN_DIMENSIONS } from '@/core/constants'
+import { COLOR_PATTERNS, ERROR_TYPES, SCREEN_DIMENSIONS } from '@/core/constants'
 import type { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
 import { getCstNodes } from '@/core/parser/cst-helpers'
 import type { ExecutionContext } from '@/core/state/ExecutionContext'
@@ -27,12 +27,12 @@ export class ColorExecutor {
   execute(colorStmtCst: CstNode, lineNumber?: number): void {
     // Get expressions from CST (X, Y, and color pattern number)
     const expressions = getCstNodes(colorStmtCst.children.expression)
-    
+
     if (expressions.length < 3) {
       this.context.addError({
         line: lineNumber ?? 0,
         message: 'COLOR: Expected three arguments (X, Y, n)',
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }
@@ -45,7 +45,7 @@ export class ColorExecutor {
       this.context.addError({
         line: lineNumber ?? 0,
         message: 'COLOR: Invalid arguments',
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }
@@ -61,22 +61,17 @@ export class ColorExecutor {
       const patternValue = this.evaluator.evaluateExpression(patternExprCst)
 
       // Convert to numbers (handle both numeric and string values)
-      x = typeof xValue === 'number'
-        ? Math.floor(xValue)
-        : Math.floor(parseFloat(String(xValue)) || 0)  
+      x = typeof xValue === 'number' ? Math.floor(xValue) : Math.floor(parseFloat(String(xValue)) || 0)
 
-      y = typeof yValue === 'number'
-        ? Math.floor(yValue)
-        : Math.floor(parseFloat(String(yValue)) || 0)  
+      y = typeof yValue === 'number' ? Math.floor(yValue) : Math.floor(parseFloat(String(yValue)) || 0)
 
-      pattern = typeof patternValue === 'number'
-        ? Math.floor(patternValue)
-        : Math.floor(parseFloat(String(patternValue)) || 0)  
+      pattern =
+        typeof patternValue === 'number' ? Math.floor(patternValue) : Math.floor(parseFloat(String(patternValue)) || 0)
     } catch (error) {
       this.context.addError({
         line: lineNumber ?? 0,
         message: `COLOR: Error evaluating arguments: ${error instanceof Error ? error.message : String(error)}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }
@@ -89,7 +84,7 @@ export class ColorExecutor {
       this.context.addError({
         line: lineNumber ?? 0,
         message: `COLOR: X coordinate out of range (0-${SCREEN_DIMENSIONS.BACKGROUND.MAX_X}), got ${x}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }
@@ -98,7 +93,7 @@ export class ColorExecutor {
       this.context.addError({
         line: lineNumber ?? 0,
         message: `COLOR: Y coordinate out of range (0-${SCREEN_DIMENSIONS.BACKGROUND.MAX_Y}), got ${y}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }
@@ -107,7 +102,7 @@ export class ColorExecutor {
       this.context.addError({
         line: lineNumber ?? 0,
         message: `COLOR: Color pattern number out of range (${COLOR_PATTERNS.MIN}-${COLOR_PATTERNS.MAX}), got ${pattern}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }

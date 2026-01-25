@@ -1,6 +1,6 @@
 /**
  * DIM Statement Executor
- * 
+ *
  * Handles DIM statement execution for declaring arrays.
  * According to Family BASIC spec:
  * - Arrays can be 1D or 2D
@@ -31,7 +31,7 @@ export class DimExecutor {
    */
   execute(cst: CstNode, lineNumber: number): void {
     const arrayDeclarations = getCstNodes(cst.children.arrayDeclaration)
-    
+
     for (const arrayDeclCst of arrayDeclarations) {
       // Get array name (Identifier)
       const identifierToken = getFirstToken(arrayDeclCst.children.Identifier)
@@ -39,28 +39,28 @@ export class DimExecutor {
         this.context.addError({
           line: lineNumber,
           message: 'DIM: Missing array name',
-          type: ERROR_TYPES.RUNTIME
+          type: ERROR_TYPES.RUNTIME,
         })
         continue
       }
-      
+
       const arrayName = identifierToken.image
-      
+
       // Get dimension list
       const dimensionListCst = getFirstCstNode(arrayDeclCst.children.dimensionList)
       if (!dimensionListCst) {
         this.context.addError({
           line: lineNumber,
           message: `DIM: Missing dimensions for array ${arrayName}`,
-          type: ERROR_TYPES.RUNTIME
+          type: ERROR_TYPES.RUNTIME,
         })
         continue
       }
-      
+
       // Evaluate dimensions (expressions)
       const dimensionExpressions = getCstNodes(dimensionListCst.children.expression)
       const dimensions: number[] = []
-      
+
       for (const exprCst of dimensionExpressions) {
         const value = this.evaluator.evaluateExpression(exprCst)
         const numValue = this.toNumber(value)
@@ -68,26 +68,26 @@ export class DimExecutor {
           this.context.addError({
             line: lineNumber,
             message: `DIM: Array dimension must be >= 0 for ${arrayName}`,
-            type: ERROR_TYPES.RUNTIME
+            type: ERROR_TYPES.RUNTIME,
           })
           return
         }
         dimensions.push(numValue)
       }
-      
+
       // Validate dimensions (1D or 2D only)
       if (dimensions.length < 1 || dimensions.length > 2) {
         this.context.addError({
           line: lineNumber,
           message: `DIM: Arrays can have 1 or 2 dimensions only for ${arrayName}`,
-          type: ERROR_TYPES.RUNTIME
+          type: ERROR_TYPES.RUNTIME,
         })
         continue
       }
-      
+
       // Create the array
       this.variableService.createArray(arrayName, dimensions)
-      
+
       if (this.context.config.enableDebugMode) {
         const dimStr = dimensions.join(',')
         this.context.addDebugOutput(`DIM: Created array ${arrayName}(${dimStr})`)
@@ -110,4 +110,3 @@ export class DimExecutor {
     return 0
   }
 }
-

@@ -2,7 +2,7 @@
  * Integration tests for colon-separated statement execution
  */
 
-import { beforeEach, describe, expect, it, type MockedFunction,vi } from 'vitest'
+import { beforeEach, describe, expect, it, type MockedFunction, vi } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import type { BasicDeviceAdapter } from '@/core/interfaces'
@@ -28,7 +28,7 @@ describe('Colon-Separated Statement Execution', () => {
       setColorPattern: vi.fn(),
       setColorPalette: vi.fn(),
       setBackdropColor: vi.fn(),
-      setCharacterGeneratorMode: vi.fn()
+      setCharacterGeneratorMode: vi.fn(),
     }
 
     interpreter = new BasicInterpreter({
@@ -36,7 +36,7 @@ describe('Colon-Separated Statement Execution', () => {
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
-      deviceAdapter: mockDeviceAdapter
+      deviceAdapter: mockDeviceAdapter,
     })
   })
 
@@ -44,7 +44,7 @@ describe('Colon-Separated Statement Execution', () => {
     it('should execute multiple LET statements sequentially', async () => {
       const code = '10 LET A=5: LET B=10: LET C=15'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('A')?.value).toBe(5)
@@ -55,7 +55,7 @@ describe('Colon-Separated Statement Execution', () => {
     it('should execute LET statements without keyword', async () => {
       const code = '10 A=5: B=10: C=15'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('A')?.value).toBe(5)
@@ -68,7 +68,7 @@ describe('Colon-Separated Statement Execution', () => {
     it('should execute multiple PRINT statements sequentially', async () => {
       const code = '10 PRINT "Hello": PRINT "World"'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(printOutputMock).toHaveBeenCalledTimes(2)
@@ -79,7 +79,7 @@ describe('Colon-Separated Statement Execution', () => {
     it('should execute PRINT with empty statements', async () => {
       const code = '10 PRINT: PRINT "Hello": PRINT'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(printOutputMock).toHaveBeenCalledTimes(3)
@@ -93,7 +93,7 @@ describe('Colon-Separated Statement Execution', () => {
     it('should execute LET then PRINT on the same line', async () => {
       const code = '10 LET A=5: PRINT A'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('A')?.value).toBe(5)
@@ -105,7 +105,7 @@ describe('Colon-Separated Statement Execution', () => {
     it('should execute multiple mixed statements', async () => {
       const code = '10 LET A=5: PRINT A: LET B=10: PRINT B'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('A')?.value).toBe(5)
@@ -119,7 +119,7 @@ describe('Colon-Separated Statement Execution', () => {
     it('should use variables set earlier in the same line', async () => {
       const code = '10 LET X=10: LET Y=X+5: PRINT Y'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('X')?.value).toBe(10)
@@ -135,7 +135,7 @@ describe('Colon-Separated Statement Execution', () => {
       const code = `10 LET A=5: PRINT A
 20 LET B=10: PRINT B`
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('A')?.value).toBe(5)
@@ -148,7 +148,7 @@ describe('Colon-Separated Statement Execution', () => {
 20 PRINT "Single statement"
 30 LET B=10: PRINT B: LET C=15`
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('A')?.value).toBe(5)
@@ -158,4 +158,3 @@ describe('Colon-Separated Statement Execution', () => {
     })
   })
 })
-

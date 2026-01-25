@@ -9,7 +9,7 @@ import { GameIcon, GameTabPane, GameTag } from '@/shared/components/ui'
  * VariablesTab component - Displays variables in a tab pane format.
  */
 defineOptions({
-  name: 'VariablesTab'
+  name: 'VariablesTab',
 })
 
 const props = defineProps<{
@@ -33,17 +33,15 @@ const hasVariables = computed(() => variableCount.value > 0)
         </GameTag>
       </span>
     </template>
-    
+
     <div class="tab-content">
       <div class="variables-content bg-game-surface">
         <div class="variable-list">
-          <div 
-            v-for="(variable, name) in variables" 
-            :key="name" 
-            class="variable-item"
-          >
+          <div v-for="(variable, name) in variables" :key="name" class="variable-item">
             <span class="variable-name">{{ name }}</span>
-            <span class="variable-value bg-game-surface border-game-surface text-game-primary">{{ variable.value }}</span>
+            <span class="variable-value bg-game-surface border-game-surface text-game-primary">{{
+              variable.value
+            }}</span>
           </div>
         </div>
       </div>

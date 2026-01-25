@@ -3,7 +3,7 @@
  * For performance testing and direct rendering
  */
 
-import type { MovementState,SpriteState } from '@/core/sprite/types'
+import type { MovementState, SpriteState } from '@/core/sprite/types'
 import { BACKGROUND_PALETTES, COLORS } from '@/shared/data/palette'
 import { getBackgroundItemByChar } from '@/shared/utils/backgroundLookup'
 
@@ -55,28 +55,24 @@ function hexToRgba(hex: string): [number, number, number, number] {
 /**
  * Create ImageData for an 8×8 tile
  */
-function createTileImageData(
-  character: string,
-  colorPattern: number,
-  paletteCode: number
-): ImageData {
+function createTileImageData(character: string, colorPattern: number, paletteCode: number): ImageData {
   // Lookup background item
   const bgItem = getBackgroundItemByChar(character)
-  
+
   // Get color combination from palette
   const palette = BACKGROUND_PALETTES[paletteCode] ?? BACKGROUND_PALETTES[1]
   const colorCombination = palette[colorPattern] ?? palette[0]
-  
+
   // Create ImageData for 8×8 tile
   const imageData = new ImageData(CELL_SIZE, CELL_SIZE)
   const data = imageData.data
-  
+
   if (!bgItem) {
     // Space or unknown character - fill with background color
     const bgColorIndex = colorCombination[0] ?? 0
     const bgColor = COLORS[bgColorIndex] ?? COLORS[0] ?? '#000000'
     const [r, g, b] = hexToRgba(bgColor)
-    
+
     for (let i = 0; i < CELL_SIZE * CELL_SIZE; i++) {
       const idx = i * 4
       data[idx] = r
@@ -89,19 +85,19 @@ function createTileImageData(
 
   // Render tile pixels
   const tile = bgItem.tile
-  
+
   for (let row = 0; row < CELL_SIZE; row++) {
     const tileRow = tile[row]
     if (!tileRow) continue
-    
+
     for (let col = 0; col < CELL_SIZE; col++) {
       const pixelValue = tileRow[col] ?? 0
-      
+
       // Map tile value (0-3) to color combination index
       const colorIndex = colorCombination[pixelValue] ?? colorCombination[0] ?? 0
       const color = COLORS[colorIndex] ?? COLORS[0] ?? '#000000'
       const [r, g, b] = hexToRgba(color)
-      
+
       const idx = (row * CELL_SIZE + col) * 4
       data[idx] = r
       data[idx + 1] = g
@@ -109,26 +105,22 @@ function createTileImageData(
       data[idx + 3] = 255
     }
   }
-  
+
   return imageData
 }
 
 /**
  * Get cached or create ImageData for a tile
  */
-function getTileImageData(
-  character: string,
-  colorPattern: number,
-  paletteCode: number
-): ImageData {
+function getTileImageData(character: string, colorPattern: number, paletteCode: number): ImageData {
   const cacheKey = `${character}-${colorPattern}-${paletteCode}`
   let imageData = tileCache.get(cacheKey)
-  
+
   if (!imageData) {
     imageData = createTileImageData(character, colorPattern, paletteCode)
     tileCache.set(cacheKey, imageData)
   }
-  
+
   return imageData
 }
 
@@ -181,18 +173,11 @@ export function renderScreenBuffer(
   for (let y = 0; y < ROWS; y++) {
     const row = buffer[y]
     if (!row) continue
-    
+
     for (let x = 0; x < COLS; x++) {
       const cell = row[x]
       if (cell) {
-        renderCell(
-          ctx,
-          x,
-          y,
-          cell.character || ' ',
-          cell.colorPattern,
-          paletteCode
-        )
+        renderCell(ctx, x, y, cell.character || ' ', cell.colorPattern, paletteCode)
       }
     }
   }
@@ -202,11 +187,7 @@ export function renderScreenBuffer(
  * Render background screen (28×24 characters) at offset (16, 24)
  * Used internally by renderScreenLayers
  */
-function renderBackgroundScreen(
-  ctx: CanvasRenderingContext2D,
-  buffer: ScreenCell[][],
-  paletteCode: number
-): void {
+function renderBackgroundScreen(ctx: CanvasRenderingContext2D, buffer: ScreenCell[][], paletteCode: number): void {
   for (let y = 0; y < ROWS; y++) {
     const row = buffer[y]
     if (!row) continue
@@ -214,14 +195,7 @@ function renderBackgroundScreen(
     for (let x = 0; x < COLS; x++) {
       const cell = row[x]
       if (cell) {
-        renderCell(
-          ctx,
-          x,
-          y,
-          cell.character || ' ',
-          cell.colorPattern,
-          paletteCode
-        )
+        renderCell(ctx, x, y, cell.character || ' ', cell.colorPattern, paletteCode)
       }
     }
   }

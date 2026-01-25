@@ -1,10 +1,10 @@
 /**
  * DATA, READ, RESTORE Integration Tests
- * 
+ *
  * Tests for complete DATA/READ/RESTORE workflows based on spec examples.
  */
 
-import { beforeEach, describe, expect, it, type MockedFunction,vi } from 'vitest'
+import { beforeEach, describe, expect, it, type MockedFunction, vi } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import type { BasicDeviceAdapter } from '@/core/interfaces'
@@ -30,7 +30,7 @@ describe('DATA/READ/RESTORE Integration', () => {
       setColorPattern: vi.fn(),
       setColorPalette: vi.fn(),
       setBackdropColor: vi.fn(),
-      setCharacterGeneratorMode: vi.fn()
+      setCharacterGeneratorMode: vi.fn(),
     }
 
     interpreter = new BasicInterpreter({
@@ -38,7 +38,7 @@ describe('DATA/READ/RESTORE Integration', () => {
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
-      deviceAdapter: mockDeviceAdapter
+      deviceAdapter: mockDeviceAdapter,
     })
   })
 
@@ -58,17 +58,17 @@ describe('DATA/READ/RESTORE Integration', () => {
       }
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      
+
       // Each PRINT X; creates a separate output (semicolon at end doesn't suppress newline in current impl)
       // Verify all 10 values were printed
       expect(printOutputMock).toHaveBeenCalledTimes(10)
       const outputs = printOutputMock.mock.calls.map(call => call[0])
-      
+
       // Expected values in order: 3, 4, 1, 6, 2, 7, 8, 3, 4, 9
       // According to spec, positive numbers have a leading space (sign position)
       const expectedValues = [' 3', ' 4', ' 1', ' 6', ' 2', ' 7', ' 8', ' 3', ' 4', ' 9']
       expect(outputs).toEqual(expectedValues)
-      
+
       // Verify variable X has the last read value
       expect(result.variables.get('X')?.value).toBe(9)
     })
@@ -89,12 +89,12 @@ describe('DATA/READ/RESTORE Integration', () => {
       }
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      
+
       // Verify variable values were read correctly
       expect(result.variables.get('A$')?.value).toBe('GOOD')
       expect(result.variables.get('B$')?.value).toBe('MORNING')
       expect(result.variables.get('C$')?.value).toBe('EVENING')
-      
+
       // Verify PRINT outputs
       expect(printOutputMock).toHaveBeenCalledTimes(2)
       const outputs = printOutputMock.mock.calls.map(call => call[0])
@@ -123,7 +123,7 @@ describe('DATA/READ/RESTORE Integration', () => {
       }
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      
+
       // Verify PRINT outputs (6 values printed, one per iteration)
       // Each PRINT A(I); outputs the array element value
       expect(printOutputMock).toHaveBeenCalledTimes(6)
@@ -131,7 +131,7 @@ describe('DATA/READ/RESTORE Integration', () => {
       // According to spec, positive numbers have a leading space (sign position)
       const expectedOutputs = [' 9', ' 1', ' 8', ' 3', ' 4', ' 8']
       expect(outputs).toEqual(expectedOutputs)
-      
+
       // Verify that array elements were read correctly by checking the printed values
       // The array A should contain: [9, 1, 8, 3, 4, 8] at indices 0-5
     })
@@ -160,25 +160,25 @@ describe('DATA/READ/RESTORE Integration', () => {
       if (!result.success) {
         console.log('Execution errors:', result.errors)
       }
-      
+
       // If RESTORE with line number works correctly:
       // First loop should read from line 1010: 12, 56, 34, 68, 53, 2
       // Second loop should read from line 1000: 23, 43, 55, 65, 42, 9
       expect(result.success).toBe(true)
-      
+
       // Verify PRINT outputs (12 values + 1 empty line)
       expect(printOutputMock).toHaveBeenCalledTimes(13)
       const outputs = printOutputMock.mock.calls.map(call => call[0])
-      
+
       // First 6 outputs should be from line 1010
       // According to spec, positive numbers have a leading space (sign position)
       // PRINT A; ends with semicolon, so no newline
       const firstSet = outputs.slice(0, 6)
       expect(firstSet).toEqual([' 12', ' 56', ' 34', ' 68', ' 53', ' 2'])
-      
+
       // 7th output should be empty (PRINT with no arguments) - adds newline
       expect(outputs[6]).toBe('\n')
-      
+
       // Last 6 outputs should be from line 1000
       // PRINT A; ends with semicolon, so no newline
       const secondSet = outputs.slice(7, 13)
@@ -197,14 +197,14 @@ describe('DATA/READ/RESTORE Integration', () => {
 
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      
+
       // Verify variable values
       expect(result.variables.get('A')?.value).toBe(10)
       expect(result.variables.get('B')?.value).toBe(20)
       // After RESTORE, C and D should read the same values as A and B
       expect(result.variables.get('C')?.value).toBe(10)
       expect(result.variables.get('D')?.value).toBe(20)
-      
+
       // Verify PRINT output
       expect(printOutputMock).toHaveBeenCalledTimes(1)
       const output = printOutputMock.mock.calls[0]?.[0]
@@ -227,13 +227,13 @@ describe('DATA/READ/RESTORE Integration', () => {
 
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      
+
       // Verify variable values were read correctly
       expect(result.variables.get('A$')?.value).toBe('ABC')
       expect(result.variables.get('B$')?.value).toBe('DE')
       expect(result.variables.get('C$')?.value).toBe(', ')
       expect(result.variables.get('D$')?.value).toBe('F')
-      
+
       // Verify PRINT output
       expect(printOutputMock).toHaveBeenCalledTimes(1)
       const output = printOutputMock.mock.calls[0]?.[0]
@@ -259,7 +259,7 @@ describe('DATA/READ/RESTORE Integration', () => {
       expect(errors.length).toBeGreaterThan(0)
       const odError = errors.find(e => e.message === 'OD ERROR')
       expect(odError).toBeDefined()
-      
+
       // Verify that PRINT statements after the error are not executed
       // printOutputMock should not be called because execution halts on error
       expect(printOutputMock).not.toHaveBeenCalled()
@@ -278,13 +278,13 @@ describe('DATA/READ/RESTORE Integration', () => {
 
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      
+
       // Verify variable values were read correctly from both DATA statements
       expect(result.variables.get('A')?.value).toBe(10)
       expect(result.variables.get('B')?.value).toBe(20)
       expect(result.variables.get('C')?.value).toBe(30)
       expect(result.variables.get('D')?.value).toBe(40)
-      
+
       // Verify PRINT output
       expect(printOutputMock).toHaveBeenCalledTimes(1)
       const output = printOutputMock.mock.calls[0]?.[0]
@@ -296,4 +296,3 @@ describe('DATA/READ/RESTORE Integration', () => {
     })
   })
 })
-

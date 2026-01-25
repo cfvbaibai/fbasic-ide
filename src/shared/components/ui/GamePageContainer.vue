@@ -2,7 +2,7 @@
 /**
  * GamePageContainer component - Container component for page content.
  * Provides consistent page background and layout structure.
- * 
+ *
  * @example
  * ```vue
  * <GamePageContainer>
@@ -11,7 +11,7 @@
  * ```
  */
 defineOptions({
-  name: 'GamePageContainer'
+  name: 'GamePageContainer',
 })
 </script>
 

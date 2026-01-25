@@ -1,6 +1,6 @@
 /**
  * STICK and STRIG Functions Tests
- * 
+ *
  * Tests for controller input functions: STICK and STRIG
  * According to Family BASIC spec:
  * - STICK(x): Returns D-pad input value (0=nothing, 1=RIGHT, 2=LEFT, 4=DOWN, 8=UP)
@@ -9,7 +9,7 @@
  *   - Controller II: B (4), A (8)
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
@@ -25,7 +25,7 @@ describe('STICK and STRIG Functions', () => {
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
-      deviceAdapter
+      deviceAdapter,
     })
   })
 
@@ -38,7 +38,7 @@ describe('STICK and STRIG Functions', () => {
 30 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       // Numbers get leading space
@@ -53,7 +53,7 @@ describe('STICK and STRIG Functions', () => {
 30 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       // Numbers get leading space
       expect(deviceAdapter.getAllOutputs()).toEqual(' 1\n')
@@ -67,7 +67,7 @@ describe('STICK and STRIG Functions', () => {
 30 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       // Numbers get leading space
       expect(deviceAdapter.getAllOutputs()).toEqual(' 2\n')
@@ -81,7 +81,7 @@ describe('STICK and STRIG Functions', () => {
 30 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       // Numbers get leading space
       expect(deviceAdapter.getAllOutputs()).toEqual(' 4\n')
@@ -95,7 +95,7 @@ describe('STICK and STRIG Functions', () => {
 30 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       // Numbers get leading space
       expect(deviceAdapter.getAllOutputs()).toEqual(' 8\n')
@@ -109,7 +109,7 @@ describe('STICK and STRIG Functions', () => {
 30 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       // Numbers get leading space
       expect(deviceAdapter.getAllOutputs()).toEqual(' 1\n')
@@ -122,7 +122,7 @@ describe('STICK and STRIG Functions', () => {
 30 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(false)
       expect(result.errors.length).toBeGreaterThan(0)
     })
@@ -134,7 +134,7 @@ describe('STICK and STRIG Functions', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('RIGHT\n')
     })
@@ -149,7 +149,7 @@ describe('STICK and STRIG Functions', () => {
 30 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       // Numbers get leading space
@@ -164,7 +164,7 @@ describe('STICK and STRIG Functions', () => {
 30 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       // Numbers get leading space
       expect(deviceAdapter.getAllOutputs()).toEqual(' 1\n')
@@ -178,7 +178,7 @@ describe('STICK and STRIG Functions', () => {
 30 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       // Numbers get leading space
       expect(deviceAdapter.getAllOutputs()).toEqual(' 2\n')
@@ -192,7 +192,7 @@ describe('STICK and STRIG Functions', () => {
 30 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       // Numbers get leading space
       expect(deviceAdapter.getAllOutputs()).toEqual(' 4\n')
@@ -206,7 +206,7 @@ describe('STICK and STRIG Functions', () => {
 30 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       // Numbers get leading space
       expect(deviceAdapter.getAllOutputs()).toEqual(' 8\n')
@@ -220,7 +220,7 @@ describe('STICK and STRIG Functions', () => {
 30 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       // Numbers get leading space
       expect(deviceAdapter.getAllOutputs()).toEqual(' 4\n')
@@ -235,7 +235,7 @@ describe('STICK and STRIG Functions', () => {
 40 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       // First call should return 1, second call should return 0 (consumed)
       // PRINT with semicolon keeps values on same line, numbers get leading space
@@ -250,7 +250,7 @@ describe('STICK and STRIG Functions', () => {
 30 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(false)
       expect(result.errors.length).toBeGreaterThan(0)
     })
@@ -262,7 +262,7 @@ describe('STICK and STRIG Functions', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('A BUTTON\n')
     })
@@ -282,7 +282,7 @@ describe('STICK and STRIG Functions', () => {
 80 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('RIGHT\n')
     })
@@ -299,10 +299,9 @@ describe('STICK and STRIG Functions', () => {
 70 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('A\n')
     })
   })
 })
-

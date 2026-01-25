@@ -1,10 +1,10 @@
 /**
  * DATA, READ, RESTORE Statement Parser Tests
- * 
+ *
  * Tests for parsing DATA, READ, and RESTORE statements.
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { FBasicParser } from '@/core/parser/FBasicParser'
 
@@ -158,4 +158,3 @@ describe('RESTORE Statement Parser', () => {
     })
   })
 })
-

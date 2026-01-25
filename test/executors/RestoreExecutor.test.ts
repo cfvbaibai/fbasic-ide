@@ -1,11 +1,11 @@
 /**
  * RESTORE Executor Tests
- * 
+ *
  * Unit tests for the RestoreExecutor class execution behavior.
  * Tests RESTORE functionality matching the FamilyBasicManual specification.
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
@@ -21,7 +21,7 @@ describe('RestoreExecutor', () => {
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
-      deviceAdapter: deviceAdapter
+      deviceAdapter: deviceAdapter,
     })
   })
 
@@ -39,7 +39,7 @@ describe('RestoreExecutor', () => {
 80 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -60,7 +60,7 @@ describe('RestoreExecutor', () => {
 80 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -90,7 +90,7 @@ describe('RestoreExecutor', () => {
 1010 DATA 12,56,34,68,53,2
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -109,7 +109,7 @@ describe('RestoreExecutor', () => {
 100 DATA 10, 20, 30
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -127,7 +127,7 @@ describe('RestoreExecutor', () => {
 70 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -150,7 +150,7 @@ describe('RestoreExecutor', () => {
 90 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -168,7 +168,7 @@ describe('RestoreExecutor', () => {
 60 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -184,7 +184,7 @@ describe('RestoreExecutor', () => {
 50 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -201,7 +201,7 @@ describe('RestoreExecutor', () => {
 40 END
 `
       const result = await interpreter.execute(source)
-      
+
       // Should error or fall back to beginning
       // The behavior depends on implementation
       // For now, we check it doesn't crash
@@ -218,7 +218,7 @@ describe('RestoreExecutor', () => {
 40 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -238,7 +238,7 @@ describe('RestoreExecutor', () => {
 70 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -262,7 +262,7 @@ describe('RestoreExecutor', () => {
 90 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -273,4 +273,3 @@ describe('RestoreExecutor', () => {
     })
   })
 })
-

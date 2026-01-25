@@ -1,4 +1,4 @@
-import { type Ref,ref, watchEffect } from 'vue'
+import { type Ref, ref, watchEffect } from 'vue'
 
 import { renderScreenBuffer, type ScreenCell } from './canvasRenderer'
 
@@ -15,7 +15,7 @@ export function useScreenCanvasRenderer(
   function render(): void {
     const canvas = canvasRef.value
     if (!canvas) return
-    
+
     renderScreenBuffer(canvas, screenBuffer.value, paletteCode.value)
   }
 
@@ -28,6 +28,6 @@ export function useScreenCanvasRenderer(
 
   // Return render function for manual control
   return {
-    render
+    render,
   }
 }

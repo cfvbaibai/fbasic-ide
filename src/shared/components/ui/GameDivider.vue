@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * GameDivider component - A divider component for separating content sections.
- * 
+ *
  * @example
  * ```vue
  * <GameDivider direction="horizontal" content-position="center">
@@ -10,12 +10,12 @@
  * ```
  */
 defineOptions({
-  name: 'GameDivider'
+  name: 'GameDivider',
 })
 
 withDefaults(defineProps<Props>(), {
   direction: 'horizontal',
-  contentPosition: 'center'
+  contentPosition: 'center',
 })
 
 interface Props {
@@ -24,17 +24,10 @@ interface Props {
   /** Position of content text when provided */
   contentPosition?: 'left' | 'center' | 'right'
 }
-
 </script>
 
 <template>
-  <div
-    :class="[
-      'game-divider',
-      `game-divider-${direction}`,
-      { 'game-divider-with-text': $slots.default }
-    ]"
-  >
+  <div :class="['game-divider', `game-divider-${direction}`, { 'game-divider-with-text': $slots.default }]">
     <span v-if="$slots.default" class="game-divider-text" :class="`game-divider-text-${contentPosition}`">
       <slot />
     </span>

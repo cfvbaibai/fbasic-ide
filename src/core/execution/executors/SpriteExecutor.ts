@@ -15,7 +15,7 @@ import type { ExecutionContext } from '@/core/state/ExecutionContext'
 // Sprite screen dimensions
 const SPRITE_SCREEN = {
   MAX_X: 255,
-  MAX_Y: 239
+  MAX_Y: 239,
 }
 
 export class SpriteExecutor {
@@ -42,7 +42,7 @@ export class SpriteExecutor {
         this.context.addError({
           line: lineNumber ?? 0,
           message: 'SPRITE: Missing required parameters (n, X, Y)',
-          type: ERROR_TYPES.RUNTIME
+          type: ERROR_TYPES.RUNTIME,
         })
         return
       }
@@ -69,7 +69,7 @@ export class SpriteExecutor {
           this.context.addError({
             line: lineNumber ?? 0,
             message: `SPRITE: ${error instanceof Error ? error.message : String(error)}`,
-            type: ERROR_TYPES.RUNTIME
+            type: ERROR_TYPES.RUNTIME,
           })
           return
         }
@@ -82,7 +82,7 @@ export class SpriteExecutor {
       this.context.addError({
         line: lineNumber ?? 0,
         message: `SPRITE: ${error instanceof Error ? error.message : String(error)}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
     }
   }
@@ -90,15 +90,13 @@ export class SpriteExecutor {
   private evaluateNumber(expr: CstNode, paramName: string, lineNumber?: number): number | null {
     try {
       const value = this.evaluator.evaluateExpression(expr)
-      const num = typeof value === 'number'
-        ? Math.floor(value)
-        : Math.floor(parseFloat(String(value)) || 0)
+      const num = typeof value === 'number' ? Math.floor(value) : Math.floor(parseFloat(String(value)) || 0)
       return num
     } catch (error) {
       this.context.addError({
         line: lineNumber ?? 0,
         message: `SPRITE: Error evaluating ${paramName}: ${error instanceof Error ? error.message : String(error)}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return null
     }
@@ -109,7 +107,7 @@ export class SpriteExecutor {
       this.context.addError({
         line: lineNumber ?? 0,
         message: `SPRITE: Sprite number out of range (0-7), got ${num}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return false
     }
@@ -121,7 +119,7 @@ export class SpriteExecutor {
       this.context.addError({
         line: lineNumber ?? 0,
         message: `SPRITE: ${axis} coordinate out of range (0-${max}), got ${coord}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return false
     }

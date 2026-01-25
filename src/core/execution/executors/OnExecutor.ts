@@ -1,6 +1,6 @@
 /**
  * ON Statement Executor
- * 
+ *
  * Handles execution of ON statements from CST.
  * Jumps to line number based on expression value (1 = first, 2 = second, etc.)
  * Supports ON ... GOTO and ON ... GOSUB
@@ -10,7 +10,7 @@ import type { CstNode } from 'chevrotain'
 
 import { ERROR_TYPES } from '@/core/constants'
 import type { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
-import { getFirstCstNode,getFirstToken, getTokens } from '@/core/parser/cst-helpers'
+import { getFirstCstNode, getFirstToken, getTokens } from '@/core/parser/cst-helpers'
 import type { DataService } from '@/core/services/DataService'
 import type { ExecutionContext } from '@/core/state/ExecutionContext'
 
@@ -24,7 +24,7 @@ export class OnExecutor {
   /**
    * Execute an ON statement from CST
    * ON expression {GOTO | GOSUB} line number(, line number, ...)
-   * 
+   *
    * If expression value is 1, jumps to first line number
    * If expression value is 2, jumps to second line number
    * If expression value is 0 or exceeds the number of line numbers, proceeds to next line
@@ -36,7 +36,7 @@ export class OnExecutor {
       this.context.addError({
         line: lineNumber,
         message: 'ON: missing expression',
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }
@@ -48,7 +48,7 @@ export class OnExecutor {
       this.context.addError({
         line: lineNumber,
         message: `ON: failed to evaluate expression: ${error instanceof Error ? error.message : String(error)}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }
@@ -57,7 +57,7 @@ export class OnExecutor {
     // If it's a string, try to convert it
     const numericValue = typeof expressionValue === 'string' ? parseFloat(expressionValue) : Number(expressionValue)
     const index = Math.floor(numericValue)
-    
+
     // If index is 0 or negative, or exceeds the number of line numbers, proceed to next line
     if (index < 1) {
       if (this.context.config.enableDebugMode) {
@@ -72,7 +72,7 @@ export class OnExecutor {
       this.context.addError({
         line: lineNumber,
         message: 'ON: missing line number list',
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }
@@ -83,7 +83,7 @@ export class OnExecutor {
       this.context.addError({
         line: lineNumber,
         message: 'ON: no line numbers specified',
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }
@@ -91,7 +91,9 @@ export class OnExecutor {
     // If index exceeds the number of line numbers, proceed to next line
     if (index > lineNumberTokens.length) {
       if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(`ON: expression value ${index} exceeds number of line numbers (${lineNumberTokens.length}), proceeding to next line`)
+        this.context.addDebugOutput(
+          `ON: expression value ${index} exceeds number of line numbers (${lineNumberTokens.length}), proceeding to next line`
+        )
       }
       return // Proceed to next line
     }
@@ -102,7 +104,7 @@ export class OnExecutor {
       this.context.addError({
         line: lineNumber,
         message: `ON: invalid line number at index ${index}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }
@@ -112,7 +114,7 @@ export class OnExecutor {
       this.context.addError({
         line: lineNumber,
         message: `ON: invalid line number: ${targetLineNumberToken.image}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }
@@ -123,7 +125,7 @@ export class OnExecutor {
       this.context.addError({
         line: lineNumber,
         message: `ON: line number ${targetLineNumber} not found`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }
@@ -141,7 +143,9 @@ export class OnExecutor {
       this.context.gosubStack.push(returnStatementIndex)
 
       if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(`ON-GOSUB: jumping to line ${targetLineNumber} (statement index ${targetStatementIndex}), return address: ${returnStatementIndex}`)
+        this.context.addDebugOutput(
+          `ON-GOSUB: jumping to line ${targetLineNumber} (statement index ${targetStatementIndex}), return address: ${returnStatementIndex}`
+        )
       }
 
       // Jump to the target statement
@@ -149,7 +153,9 @@ export class OnExecutor {
     } else if (gotoToken) {
       // ON ... GOTO: simple jump
       if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(`ON-GOTO: jumping to line ${targetLineNumber} (statement index ${targetStatementIndex})`)
+        this.context.addDebugOutput(
+          `ON-GOTO: jumping to line ${targetLineNumber} (statement index ${targetStatementIndex})`
+        )
       }
 
       // Jump to the target statement
@@ -159,7 +165,9 @@ export class OnExecutor {
       // Similar to RETURN with line number, but selected from list based on expression
       // RETURN with line number doesn't require GOSUB - it just jumps to that line
       if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(`ON-RETURN: returning to line ${targetLineNumber} (statement index ${targetStatementIndex})`)
+        this.context.addDebugOutput(
+          `ON-RETURN: returning to line ${targetLineNumber} (statement index ${targetStatementIndex})`
+        )
       }
 
       // Jump to the target statement
@@ -170,7 +178,7 @@ export class OnExecutor {
         this.context.addError({
           line: lineNumber,
           message: 'ON-RESTORE: DataService not available',
-          type: ERROR_TYPES.RUNTIME
+          type: ERROR_TYPES.RUNTIME,
         })
         return
       }
@@ -186,9 +194,8 @@ export class OnExecutor {
       this.context.addError({
         line: lineNumber,
         message: 'ON: missing GOTO, GOSUB, RETURN, or RESTORE keyword',
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
     }
   }
 }
-

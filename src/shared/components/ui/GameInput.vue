@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import type { GameInputEmits,GameInputProps } from './GameInput.types'
+import type { GameInputEmits, GameInputProps } from './GameInput.types'
 
 /**
  * GameInput component - A styled input field with validation, clearable option, and size variants.
- * 
+ *
  * @example
  * ```vue
  * <GameInput
@@ -18,7 +18,7 @@ import type { GameInputEmits,GameInputProps } from './GameInput.types'
  * ```
  */
 defineOptions({
-  name: 'GameInput'
+  name: 'GameInput',
 })
 
 const props = withDefaults(defineProps<GameInputProps>(), {
@@ -26,14 +26,14 @@ const props = withDefaults(defineProps<GameInputProps>(), {
   placeholder: '',
   disabled: false,
   size: 'medium',
-  clearable: false
+  clearable: false,
 })
 
 const emit = defineEmits<GameInputEmits>()
 
 const inputValue = computed({
   get: () => props.modelValue,
-  set: (value: string | number) => emit('update:modelValue', value)
+  set: (value: string | number) => emit('update:modelValue', value),
 })
 
 const handleInput = (event: Event) => {
@@ -63,7 +63,7 @@ const inputClasses = computed(() => {
     'game-input': true,
     [`game-input-${props.size}`]: true,
     'game-input-disabled': props.disabled,
-    'game-input-clearable': props.clearable
+    'game-input-clearable': props.clearable,
   }
 })
 </script>
@@ -109,7 +109,7 @@ const inputClasses = computed(() => {
   border-radius: 8px;
   outline: none;
   transition: all 0.2s ease;
-  box-shadow: 
+  box-shadow:
     0 2px 4px var(--base-alpha-gray-00-30),
     inset 0 1px 0 var(--base-alpha-gray-100-10);
 }
@@ -121,7 +121,7 @@ const inputClasses = computed(() => {
 
 .game-input-inner:focus {
   border-color: var(--base-solid-primary);
-  box-shadow: 
+  box-shadow:
     0 0 12px var(--game-accent-glow),
     0 2px 4px var(--base-alpha-gray-00-30),
     inset 0 1px 0 var(--base-alpha-gray-100-10);

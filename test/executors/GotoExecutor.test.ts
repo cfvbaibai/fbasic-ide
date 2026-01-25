@@ -1,10 +1,10 @@
 /**
  * GOTO Executor Tests
- * 
+ *
  * Unit tests for the GotoExecutor class execution behavior.
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
@@ -20,7 +20,7 @@ describe('GotoExecutor', () => {
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
-      deviceAdapter: deviceAdapter
+      deviceAdapter: deviceAdapter,
     })
   })
 
@@ -34,7 +34,7 @@ describe('GotoExecutor', () => {
 60 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
@@ -52,7 +52,7 @@ describe('GotoExecutor', () => {
 60 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
@@ -70,7 +70,7 @@ describe('GotoExecutor', () => {
 50 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
@@ -90,7 +90,7 @@ describe('GotoExecutor', () => {
 110 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
@@ -106,7 +106,7 @@ describe('GotoExecutor', () => {
 40 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
@@ -122,12 +122,12 @@ describe('GotoExecutor', () => {
 40 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
     const errorMessages = result.errors.map(e => e.message).join(' ')
     expect(errorMessages).toEqual('GOTO: line number 999 not found')
-    
+
     // Verify that PRINT statements after the error are not executed
     // getAllOutputs() includes error output formatted as "RUNTIME: {message}" to match IDE format
     const outputs = deviceAdapter.getAllOutputs()
@@ -146,7 +146,7 @@ describe('GotoExecutor', () => {
 80 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
@@ -164,7 +164,7 @@ describe('GotoExecutor', () => {
 60 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
@@ -172,4 +172,3 @@ describe('GotoExecutor', () => {
     expect(outputs).toEqual('True branch\n')
   })
 })
-

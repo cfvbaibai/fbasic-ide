@@ -1,6 +1,6 @@
 /**
  * Test Device Adapter
- * 
+ *
  * A mock implementation of BasicDeviceAdapter for unit testing the BasicInterpreter.
  * Provides controlled behavior for testing without external dependencies.
  */
@@ -12,7 +12,7 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
   private joystickCount = 2
   private stickStates: Map<number, number> = new Map()
   private strigBuffer: Map<number, number[]> = new Map()
-  
+
   // === OUTPUT CAPTURE ===
   public printOutputs: string[] = []
   public debugOutputs: string[] = []
@@ -20,8 +20,14 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
   public clearScreenCalls = 0
   public cursorPosition: { x: number; y: number } = { x: 0, y: 0 }
   public colorPatternCalls: Array<{ x: number; y: number; pattern: number }> = []
-  public colorPaletteCalls: Array<{ bgPalette: number; spritePalette: number }> = []
-  public currentColorPalette: { bgPalette: number; spritePalette: number } = { bgPalette: 1, spritePalette: 1 }
+  public colorPaletteCalls: Array<{
+    bgPalette: number
+    spritePalette: number
+  }> = []
+  public currentColorPalette: { bgPalette: number; spritePalette: number } = {
+    bgPalette: 1,
+    spritePalette: 1,
+  }
   public backdropColorCalls: number[] = []
   public currentBackdropColor: number = 0 // Default backdrop color (0 = black)
   public cgenModeCalls: number[] = []
@@ -52,21 +58,29 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
     }
     const buffer = this.strigBuffer.get(joystickId)!
     buffer.push(state)
-    console.log('🧪 [TEST_DEVICE] STRIG state pushed:', { joystickId, state, bufferSize: buffer.length })
+    console.log('🧪 [TEST_DEVICE] STRIG state pushed:', {
+      joystickId,
+      state,
+      bufferSize: buffer.length,
+    })
   }
 
   consumeStrigState(joystickId: number): number {
     if (!this.strigBuffer.has(joystickId)) {
       return 0
     }
-    
+
     const buffer = this.strigBuffer.get(joystickId)!
     if (buffer.length === 0) {
       return 0
     }
-    
+
     const state = buffer.shift()!
-    console.log('🧪 [TEST_DEVICE] STRIG state consumed:', { joystickId, state, remaining: buffer.length })
+    console.log('🧪 [TEST_DEVICE] STRIG state consumed:', {
+      joystickId,
+      state,
+      remaining: buffer.length,
+    })
     return state
   }
 
@@ -116,7 +130,10 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
     }
     this.colorPaletteCalls.push({ bgPalette, spritePalette })
     this.currentColorPalette = { bgPalette, spritePalette }
-    console.log('🧪 [TEST_DEVICE] Set color palette:', { bgPalette, spritePalette })
+    console.log('🧪 [TEST_DEVICE] Set color palette:', {
+      bgPalette,
+      spritePalette,
+    })
   }
 
   setBackdropColor(colorCode: number): void {
@@ -201,11 +218,11 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
     const allOutputs = [
       ...this.printOutputs,
       ...this.debugOutputs.map(o => `DEBUG: ${o}`),
-      ...this.errorOutputs.map(o => `RUNTIME: ${o}`)
+      ...this.errorOutputs.map(o => `RUNTIME: ${o}`),
     ]
-    
+
     if (allOutputs.length === 0) return ''
-    
+
     // Concatenate outputs:
     // - Outputs ending with newline are kept as-is (they already have their newline)
     // - Outputs not ending with newline are concatenated directly (no separator)

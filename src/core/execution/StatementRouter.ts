@@ -1,12 +1,12 @@
 /**
  * Statement Router
- * 
+ *
  * Routes BASIC statements to their appropriate executors using CST.
  */
 
 import { ERROR_TYPES } from '@/core/constants'
 import type { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
-import { getCstNodes,getFirstCstNode, getFirstToken } from '@/core/parser/cst-helpers'
+import { getCstNodes, getFirstCstNode, getFirstToken } from '@/core/parser/cst-helpers'
 import type { DataService } from '@/core/services/DataService'
 import type { VariableService } from '@/core/services/VariableService'
 import type { ExecutionContext } from '@/core/state/ExecutionContext'
@@ -108,12 +108,12 @@ export class StatementRouter {
   async executeStatement(expandedStatement: ExpandedStatement): Promise<void> {
     const commandCst = expandedStatement.command
     const singleCommandCst = getFirstCstNode(commandCst.children.singleCommand)
-    
+
     if (!singleCommandCst) {
       this.context.addError({
         line: expandedStatement.lineNumber,
         message: 'Invalid command: missing single command',
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }
@@ -124,7 +124,7 @@ export class StatementRouter {
       if (ifThenStmtCst) {
         // Evaluate condition
         const conditionIsTrue = this.ifThenExecutor.evaluateCondition(ifThenStmtCst, expandedStatement.lineNumber)
-        
+
         // Execute THEN clause if condition is true
         if (conditionIsTrue) {
           // Check if it's a line number jump (IF ... THEN number or IF ... GOTO number)
@@ -136,40 +136,42 @@ export class StatementRouter {
                 this.context.addError({
                   line: expandedStatement.lineNumber,
                   message: `IF-THEN: line number ${targetLineNumber} not found`,
-                  type: ERROR_TYPES.RUNTIME
+                  type: ERROR_TYPES.RUNTIME,
                 })
               } else {
                 if (this.context.config.enableDebugMode) {
-                  this.context.addDebugOutput(`IF-THEN: jumping to line ${targetLineNumber} (statement index ${targetStatementIndex})`)
+                  this.context.addDebugOutput(
+                    `IF-THEN: jumping to line ${targetLineNumber} (statement index ${targetStatementIndex})`
+                  )
                 }
                 this.context.jumpToStatement(targetStatementIndex)
                 return // Don't advance to next statement
               }
             }
           }
-          
+
           // Otherwise, execute statements in THEN clause
           const thenCommandListCst = this.ifThenExecutor.getThenClause(ifThenStmtCst)
           if (thenCommandListCst) {
             // Get all commands from the command list (colon-separated commands)
             const thenCommands = getCstNodes(thenCommandListCst.children.command)
-            
+
             // Execute each command in the THEN clause sequentially
             // Use a local index counter to track position within THEN clause for FOR/NEXT loops
             let thenCommandIndex = 0
             while (thenCommandIndex < thenCommands.length) {
               const commandCst = thenCommands[thenCommandIndex]
               if (!commandCst) break
-              
+
               const thenStatement: ExpandedStatement = {
                 statementIndex: expandedStatement.statementIndex, // Keep same statement index
                 lineNumber: expandedStatement.lineNumber,
-                command: commandCst
+                command: commandCst,
               }
-              
+
               // Execute the command
               await this.executeStatement(thenStatement)
-              
+
               // Check if NEXT caused a jump back (loop continuation)
               // If so, we need to restart from the FOR statement in the THEN clause
               const singleCommandCst = getFirstCstNode(commandCst.children.singleCommand)
@@ -202,7 +204,7 @@ export class StatementRouter {
                   }
                 }
               }
-              
+
               // Move to next command
               thenCommandIndex++
             }
@@ -267,15 +269,15 @@ export class StatementRouter {
         this.forExecutor.execute(forStmtCst, expandedStatement.statementIndex, expandedStatement.lineNumber)
       }
     } else if (singleCommandCst.children.nextStatement) {
-        const nextStmtCst = getFirstCstNode(singleCommandCst.children.nextStatement)
-        if (nextStmtCst) {
-          // NEXT may modify statement index (jump back to FOR)
-          const shouldContinue = this.nextExecutor.execute(nextStmtCst, expandedStatement.lineNumber)
-          if (shouldContinue) {
-            // Loop continues - don't advance to next statement
-            return
-          }
+      const nextStmtCst = getFirstCstNode(singleCommandCst.children.nextStatement)
+      if (nextStmtCst) {
+        // NEXT may modify statement index (jump back to FOR)
+        const shouldContinue = this.nextExecutor.execute(nextStmtCst, expandedStatement.lineNumber)
+        if (shouldContinue) {
+          // Loop continues - don't advance to next statement
+          return
         }
+      }
     } else if (singleCommandCst.children.endStatement) {
       const endStmtCst = getFirstCstNode(singleCommandCst.children.endStatement)
       if (endStmtCst) {
@@ -375,7 +377,7 @@ export class StatementRouter {
       this.context.addError({
         line: expandedStatement.lineNumber,
         message: 'Unsupported statement type',
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
     }
   }

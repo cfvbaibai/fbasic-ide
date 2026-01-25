@@ -1,10 +1,10 @@
 /**
  * LOCATE Executor Tests
- * 
+ *
  * Unit tests for the LocateExecutor class execution behavior.
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
@@ -20,7 +20,7 @@ describe('LocateExecutor', () => {
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
-      deviceAdapter: deviceAdapter
+      deviceAdapter: deviceAdapter,
     })
   })
 
@@ -30,7 +30,7 @@ describe('LocateExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.cursorPosition).toEqual({ x: 10, y: 5 })
@@ -42,7 +42,7 @@ describe('LocateExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.cursorPosition).toEqual({ x: 0, y: 0 })
@@ -54,7 +54,7 @@ describe('LocateExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.cursorPosition).toEqual({ x: 27, y: 23 })
@@ -68,7 +68,7 @@ describe('LocateExecutor', () => {
 40 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.cursorPosition).toEqual({ x: 15, y: 10 })
@@ -80,7 +80,7 @@ describe('LocateExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.cursorPosition).toEqual({ x: 15, y: 6 })
@@ -93,7 +93,7 @@ describe('LocateExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.cursorPosition).toEqual({ x: 10, y: 5 })
@@ -105,7 +105,7 @@ describe('LocateExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
     expect(result.errors[0]?.message).toContain('X coordinate out of range')
@@ -117,7 +117,7 @@ describe('LocateExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
     expect(result.errors[0]?.message).toContain('X coordinate out of range')
@@ -129,7 +129,7 @@ describe('LocateExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
     expect(result.errors[0]?.message).toContain('Y coordinate out of range')
@@ -141,7 +141,7 @@ describe('LocateExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
     expect(result.errors[0]?.message).toContain('Y coordinate out of range')
@@ -153,7 +153,7 @@ describe('LocateExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.cursorPosition).toEqual({ x: 10, y: 5 })
@@ -167,7 +167,7 @@ describe('LocateExecutor', () => {
 40 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.cursorPosition).toEqual({ x: 15, y: 15 })
@@ -180,7 +180,7 @@ describe('LocateExecutor', () => {
 30 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     // LOCATE sets the cursor position, and PRINT should use it
@@ -197,7 +197,7 @@ describe('LocateExecutor', () => {
 40 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.cursorPosition).toEqual({ x: 5, y: 5 })
@@ -210,7 +210,7 @@ describe('LocateExecutor', () => {
 30 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.cursorPosition).toEqual({ x: 10, y: 5 })
@@ -222,7 +222,7 @@ describe('LocateExecutor', () => {
 20 END
 `
     const result = await interpreter.execute(source)
-    
+
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.cursorPosition).toEqual({ x: 10, y: 5 })

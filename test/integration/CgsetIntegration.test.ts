@@ -1,17 +1,17 @@
 /**
  * CGSET Integration Tests
- * 
+ *
  * Tests that verify CGSET command works correctly end-to-end:
  * 1. CGSET command execution
  * 2. Palette update message generation
  * 3. Message handler processing (simulated)
  * 4. Integration with PRINT to verify palette affects character rendering
- * 
+ *
  * This test verifies that CGSET 0, 1 sets the palette correctly and
  * characters are rendered with the correct colors from palette 0.
  */
 
-import { afterEach,beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { WebWorkerDeviceAdapter } from '@/core/devices/WebWorkerDeviceAdapter'
@@ -25,7 +25,9 @@ beforeEach(() => {
   capturedMessages = []
   // Mock self.postMessage for testing
   if (typeof self !== 'undefined') {
-    (self as typeof self & { postMessage: (message: AnyServiceWorkerMessage) => void }).postMessage = (message: AnyServiceWorkerMessage) => {
+    ;(self as typeof self & { postMessage: (message: AnyServiceWorkerMessage) => void }).postMessage = (
+      message: AnyServiceWorkerMessage
+    ) => {
       capturedMessages.push(message)
     }
   }
@@ -34,7 +36,7 @@ beforeEach(() => {
 afterEach(() => {
   // Restore original
   if (typeof self !== 'undefined' && originalPostMessage) {
-    (self as typeof self & { postMessage: typeof originalPostMessage }).postMessage = originalPostMessage
+    ;(self as typeof self & { postMessage: typeof originalPostMessage }).postMessage = originalPostMessage
   }
 })
 
@@ -45,7 +47,8 @@ afterEach(() => {
 function simulateMessageHandler(message: ScreenUpdateMessage, context: { bgPalette: number }): void {
   const update = message.data
 
-  // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check -- Test helper only handles specific update types
+  // -- Test helper only handles specific update types
+  // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
   switch (update.updateType) {
     case 'palette':
       // Handle palette update (this is the handler that was missing)
@@ -74,7 +77,7 @@ describe('CGSET Integration', () => {
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
-      deviceAdapter: deviceAdapter
+      deviceAdapter: deviceAdapter,
     })
     capturedMessages = []
   })
@@ -86,19 +89,17 @@ describe('CGSET Integration', () => {
 20 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      
+
       // Find palette update messages
       const paletteMessages = capturedMessages.filter(
-        (msg) => msg.type === 'SCREEN_UPDATE' && 
-                 'updateType' in msg.data && 
-                 msg.data.updateType === 'palette'
+        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'palette'
       )
-      
+
       expect(paletteMessages.length).toBeGreaterThan(0)
-      
+
       const paletteMessage = paletteMessages[0] as ScreenUpdateMessage
       expect(paletteMessage.data.updateType).toBe('palette')
       expect(paletteMessage.data.bgPalette).toBeDefined()
@@ -111,16 +112,14 @@ describe('CGSET Integration', () => {
 20 END
 `
       await interpreter.execute(source)
-      
+
       const paletteMessages = capturedMessages.filter(
-        (msg) => msg.type === 'SCREEN_UPDATE' && 
-                 'updateType' in msg.data && 
-                 msg.data.updateType === 'palette'
+        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'palette'
       )
-      
+
       expect(paletteMessages.length).toBeGreaterThan(0)
       const paletteMessage = paletteMessages[0] as ScreenUpdateMessage
-      
+
       expect(paletteMessage.data.bgPalette).toBe(0)
       expect(paletteMessage.data.spritePalette).toBe(1)
     })
@@ -133,23 +132,21 @@ describe('CGSET Integration', () => {
 40 END
 `
       await interpreter.execute(source)
-      
+
       const paletteMessages = capturedMessages.filter(
-        (msg) => msg.type === 'SCREEN_UPDATE' && 
-                 'updateType' in msg.data && 
-                 msg.data.updateType === 'palette'
+        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'palette'
       )
-      
+
       // Should have 3 palette update messages
       expect(paletteMessages.length).toBe(3)
-      
+
       // Verify each message has correct values
       expect((paletteMessages[0] as ScreenUpdateMessage).data.bgPalette).toBe(0)
       expect((paletteMessages[0] as ScreenUpdateMessage).data.spritePalette).toBe(0)
-      
+
       expect((paletteMessages[1] as ScreenUpdateMessage).data.bgPalette).toBe(1)
       expect((paletteMessages[1] as ScreenUpdateMessage).data.spritePalette).toBe(1)
-      
+
       expect((paletteMessages[2] as ScreenUpdateMessage).data.bgPalette).toBe(0)
       expect((paletteMessages[2] as ScreenUpdateMessage).data.spritePalette).toBe(2)
     })
@@ -160,16 +157,14 @@ describe('CGSET Integration', () => {
 20 END
 `
       await interpreter.execute(source)
-      
+
       const paletteMessages = capturedMessages.filter(
-        (msg) => msg.type === 'SCREEN_UPDATE' && 
-                 'updateType' in msg.data && 
-                 msg.data.updateType === 'palette'
+        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'palette'
       )
-      
+
       expect(paletteMessages.length).toBeGreaterThan(0)
       const paletteMessage = paletteMessages[0] as ScreenUpdateMessage
-      
+
       // Default values: m=1, n=1
       expect(paletteMessage.data.bgPalette).toBe(1)
       expect(paletteMessage.data.spritePalette).toBe(1)
@@ -180,7 +175,7 @@ describe('CGSET Integration', () => {
     it('should process palette update messages correctly (simulated handler)', () => {
       // Create a test context to track palette state
       const context = { bgPalette: 1 } // Start with default palette
-      
+
       // Create a palette update message (simulating what WebWorkerDeviceAdapter sends)
       const paletteMessage: ScreenUpdateMessage = {
         type: 'SCREEN_UPDATE',
@@ -191,20 +186,20 @@ describe('CGSET Integration', () => {
           updateType: 'palette',
           bgPalette: 0,
           spritePalette: 1,
-          timestamp: Date.now()
-        }
+          timestamp: Date.now(),
+        },
       }
-      
+
       // Process the message (simulating the handler)
       simulateMessageHandler(paletteMessage, context)
-      
+
       // Verify palette was updated
       expect(context.bgPalette).toBe(0)
     })
 
     it('should handle multiple palette updates in sequence', () => {
       const context = { bgPalette: 1 }
-      
+
       const messages: ScreenUpdateMessage[] = [
         {
           type: 'SCREEN_UPDATE',
@@ -215,8 +210,8 @@ describe('CGSET Integration', () => {
             updateType: 'palette',
             bgPalette: 0,
             spritePalette: 0,
-            timestamp: Date.now()
-          }
+            timestamp: Date.now(),
+          },
         },
         {
           type: 'SCREEN_UPDATE',
@@ -227,14 +222,14 @@ describe('CGSET Integration', () => {
             updateType: 'palette',
             bgPalette: 1,
             spritePalette: 2,
-            timestamp: Date.now()
-          }
-        }
+            timestamp: Date.now(),
+          },
+        },
       ]
-      
+
       // Process messages in sequence
       messages.forEach(msg => simulateMessageHandler(msg, context))
-      
+
       // Last message should be the current palette
       expect(context.bgPalette).toBe(1)
     })
@@ -248,29 +243,25 @@ describe('CGSET Integration', () => {
 30 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      
+
       // Find palette update message
       const paletteMessages = capturedMessages.filter(
-        (msg) => msg.type === 'SCREEN_UPDATE' && 
-                 'updateType' in msg.data && 
-                 msg.data.updateType === 'palette'
+        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'palette'
       )
-      
+
       expect(paletteMessages.length).toBeGreaterThan(0)
-      
+
       // Find full screen update (from PRINT)
       const screenMessages = capturedMessages.filter(
-        (msg) => msg.type === 'SCREEN_UPDATE' && 
-                 'updateType' in msg.data && 
-                 msg.data.updateType === 'full'
+        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
       )
-      
+
       expect(screenMessages.length).toBeGreaterThan(0)
       expect(paletteMessages.length).toBeGreaterThan(0)
-      
+
       // Verify palette update came before screen update
       const paletteMessage = paletteMessages[0]
       const screenMessage = screenMessages[screenMessages.length - 1]
@@ -279,7 +270,7 @@ describe('CGSET Integration', () => {
       }
       const paletteMessageIndex = capturedMessages.indexOf(paletteMessage)
       const screenMessageIndex = capturedMessages.indexOf(screenMessage)
-      
+
       // Palette should be set before printing
       expect(paletteMessageIndex).toBeLessThanOrEqual(screenMessageIndex)
     })
@@ -291,24 +282,22 @@ describe('CGSET Integration', () => {
 30 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      
+
       // Find palette update message
       const paletteMessages = capturedMessages.filter(
-        (msg) => msg.type === 'SCREEN_UPDATE' && 
-                 'updateType' in msg.data && 
-                 msg.data.updateType === 'palette'
+        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'palette'
       )
-      
+
       expect(paletteMessages.length).toBeGreaterThan(0)
       const paletteMessage = paletteMessages[0] as ScreenUpdateMessage
-      
+
       // Verify palette is set to 0 (which uses color 0x2C for first color in combination 0)
       expect(paletteMessage.data.bgPalette).toBe(0)
       expect(paletteMessage.data.spritePalette).toBe(1)
-      
+
       // The palette update message should be processable by the handler
       const context = { bgPalette: 1 }
       simulateMessageHandler(paletteMessage, context)
@@ -323,19 +312,17 @@ describe('CGSET Integration', () => {
 40 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      
+
       // Should have palette update message
       const paletteMessages = capturedMessages.filter(
-        (msg) => msg.type === 'SCREEN_UPDATE' && 
-                 'updateType' in msg.data && 
-                 msg.data.updateType === 'palette'
+        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'palette'
       )
-      
+
       expect(paletteMessages.length).toBeGreaterThan(0)
-      
+
       // Verify the palette update message is valid and processable
       const paletteMessage = paletteMessages[0] as ScreenUpdateMessage
       expect(paletteMessage.data.bgPalette).toBe(0)
@@ -350,18 +337,16 @@ describe('CGSET Integration', () => {
 20 END
 `
       await interpreter.execute(source)
-      
+
       const paletteMessages = capturedMessages.filter(
-        (msg) => msg.type === 'SCREEN_UPDATE' && 
-                 'updateType' in msg.data && 
-                 msg.data.updateType === 'palette'
+        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'palette'
       )
-      
+
       const paletteMessage = paletteMessages[0] as ScreenUpdateMessage
-      
+
       // Verify palette 0 is set
       expect(paletteMessage.data.bgPalette).toBe(0)
-      
+
       // Palette 0, combination 0 uses [0x00, 0x2C, 0x15, 0x07]
       // Character pixels (value 1, 2, 3) map to colors 0x2C, 0x15, 0x07
       // The first visible color for characters is 0x2C (index 1 in the combination)
@@ -377,19 +362,17 @@ describe('CGSET Integration', () => {
 50 END
 `
       await interpreter.execute(source)
-      
+
       const paletteMessages = capturedMessages.filter(
-        (msg) => msg.type === 'SCREEN_UPDATE' && 
-                 'updateType' in msg.data && 
-                 msg.data.updateType === 'palette'
+        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'palette'
       )
-      
+
       // Should have 2 palette updates
       expect(paletteMessages.length).toBe(2)
-      
+
       // First palette should be 0
       expect((paletteMessages[0] as ScreenUpdateMessage).data.bgPalette).toBe(0)
-      
+
       // Second palette should be 1
       expect((paletteMessages[1] as ScreenUpdateMessage).data.bgPalette).toBe(1)
     })

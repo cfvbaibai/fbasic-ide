@@ -3,7 +3,7 @@ import { computed } from 'vue'
 
 /**
  * GameTable component - A styled table component with columns, data, and various display options.
- * 
+ *
  * @example
  * ```vue
  * <GameTable
@@ -16,7 +16,7 @@ import { computed } from 'vue'
  * ```
  */
 defineOptions({
-  name: 'GameTable'
+  name: 'GameTable',
 })
 
 const props = withDefaults(defineProps<Props>(), {
@@ -24,7 +24,7 @@ const props = withDefaults(defineProps<Props>(), {
   stripe: false,
   border: false,
   size: 'medium',
-  highlightRow: true
+  highlightRow: true,
 })
 
 export interface Column {
@@ -49,7 +49,7 @@ const tableSize = computed(() => {
   const sizeMap = {
     small: '0.75rem',
     medium: '0.875rem',
-    large: '1rem'
+    large: '1rem',
   }
   return sizeMap[props.size]
 })
@@ -81,12 +81,7 @@ const tableSize = computed(() => {
             :key="column.prop"
             :class="['game-table-cell', `align-${column.align || 'left'}`]"
           >
-            <slot
-              :name="`cell-${column.prop}`"
-              :row="row"
-              :column="column"
-              :value="row[column.prop]"
-            >
+            <slot :name="`cell-${column.prop}`" :row="row" :column="column" :value="row[column.prop]">
               {{ column.formatter ? column.formatter(row, column, row[column.prop]) : row[column.prop] }}
             </slot>
           </td>

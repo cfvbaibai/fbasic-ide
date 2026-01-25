@@ -1,10 +1,10 @@
 /**
  * Error Handling Parser Tests
- * 
+ *
  * Tests for parser error handling and invalid syntax detection.
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { FBasicParser } from '@/core/parser/FBasicParser'
 
@@ -54,4 +54,3 @@ describe('Parser Error Handling', () => {
     })
   })
 })
-

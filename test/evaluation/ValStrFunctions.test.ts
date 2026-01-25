@@ -1,12 +1,12 @@
 /**
  * VAL and STR$ Functions Tests
- * 
+ *
  * Tests for Family BASIC conversion functions:
  * - VAL(string) - converts string to numerical value
  * - STR$(x) - converts numerical value to string
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
@@ -22,7 +22,7 @@ describe('VAL and STR$ Functions', () => {
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
-      deviceAdapter: deviceAdapter
+      deviceAdapter: deviceAdapter,
     })
   })
 
@@ -208,4 +208,3 @@ describe('VAL and STR$ Functions', () => {
     })
   })
 })
-

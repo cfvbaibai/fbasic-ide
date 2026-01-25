@@ -24,11 +24,7 @@ export function initializeScreenBuffer(): ScreenCell[][] {
 /**
  * Clear screen buffer
  */
-export function clearScreenBuffer(
-  screenBuffer: Ref<ScreenCell[][]>,
-  cursorX: Ref<number>,
-  cursorY: Ref<number>
-): void {
+export function clearScreenBuffer(screenBuffer: Ref<ScreenCell[][]>, cursorX: Ref<number>, cursorY: Ref<number>): void {
   for (let y = 0; y < 24; y++) {
     const row = screenBuffer.value[y]
     if (row) {

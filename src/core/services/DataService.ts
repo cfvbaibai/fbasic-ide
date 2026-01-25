@@ -1,6 +1,6 @@
 /**
  * Data Service
- * 
+ *
  * Handles DATA, READ, and RESTORE operations for storing and retrieving data.
  */
 
@@ -30,7 +30,7 @@ export class DataService {
       const value = this.evaluateDataConstant(constantCst)
       this.context.dataValues.push(value)
     }
-    
+
     if (this.context.config.enableDebugMode) {
       this.context.addDebugOutput(`DATA: Added ${constantCsts.length} values`)
     }
@@ -82,18 +82,18 @@ export class DataService {
       this.context.addError({
         line: 0,
         message: 'OD ERROR',
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return 0
     }
-    
+
     const value = this.context.dataValues[this.context.dataIndex]
     this.context.dataIndex++
-    
+
     if (this.context.config.enableDebugMode) {
       this.context.addDebugOutput(`READ: ${value}`)
     }
-    
+
     return value ?? 0
   }
 
@@ -110,14 +110,14 @@ export class DataService {
         this.context.addError({
           line: 0,
           message: `RESTORE target line ${lineNumber} not found`,
-          type: ERROR_TYPES.RUNTIME
+          type: ERROR_TYPES.RUNTIME,
         })
       }
     } else {
       // Restore to beginning
       this.context.dataIndex = 0
     }
-    
+
     if (this.context.config.enableDebugMode) {
       this.context.addDebugOutput(`RESTORE: Data index set to ${this.context.dataIndex}`)
     }
@@ -166,11 +166,11 @@ export class DataService {
     // Find the first DATA statement at or after the specified line
     // We need to search through expanded statements to find DATA statements
     let dataIndex = 0
-    
+
     for (const statement of this.context.statements) {
       const commandCst = statement.command
       const singleCommandCst = getFirstCstNode(commandCst.children.singleCommand)
-      
+
       if (singleCommandCst?.children.dataStatement) {
         // Found a DATA statement
         if (statement.lineNumber >= lineNumber) {
@@ -187,7 +187,7 @@ export class DataService {
         }
       }
     }
-    
+
     return -1 // Not found
   }
 
@@ -196,12 +196,12 @@ export class DataService {
    */
   preprocessDataStatements(): void {
     this.context.dataValues = []
-    
+
     // Process all DATA statements in order
     for (const statement of this.context.statements) {
       const commandCst = statement.command
       const singleCommandCst = getFirstCstNode(commandCst.children.singleCommand)
-      
+
       if (singleCommandCst?.children.dataStatement) {
         const dataStmtCst = getFirstCstNode(singleCommandCst.children.dataStatement)
         if (dataStmtCst) {
@@ -213,7 +213,7 @@ export class DataService {
         }
       }
     }
-    
+
     if (this.context.config.enableDebugMode) {
       this.context.addDebugOutput(`Preprocessed ${this.context.dataValues.length} data values`)
     }

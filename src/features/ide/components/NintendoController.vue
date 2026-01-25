@@ -6,7 +6,7 @@ import ManualActionButton from './ManualActionButton.vue'
  * NintendoController component - Full Nintendo controller component with D-pad and action buttons.
  */
 defineOptions({
-  name: 'NintendoController'
+  name: 'NintendoController',
 })
 
 defineProps<Props>()
@@ -40,40 +40,21 @@ const handleActionButton = (button: 'select' | 'start' | 'a' | 'b') => {
 <template>
   <div class="nintendo-controller">
     <!-- D-Pad (Cross) on the left -->
-    <Dpad
-      @dpad-start="handleDpadStart"
-      @dpad-stop="handleDpadStop"
-    />
+    <Dpad @dpad-start="handleDpadStart" @dpad-stop="handleDpadStop" />
 
     <!-- Select/Start buttons in the middle -->
     <div class="controller-section select-start-section">
       <div class="select-start-buttons">
-        <ManualActionButton
-          button="select"
-          :active="heldButtons[`${joystickId}-select`]"
-          @click="handleActionButton"
-        />
-        <ManualActionButton
-          button="start"
-          :active="heldButtons[`${joystickId}-start`]"
-          @click="handleActionButton"
-        />
+        <ManualActionButton button="select" :active="heldButtons[`${joystickId}-select`]" @click="handleActionButton" />
+        <ManualActionButton button="start" :active="heldButtons[`${joystickId}-start`]" @click="handleActionButton" />
       </div>
     </div>
 
     <!-- B/A buttons on the right -->
     <div class="controller-section action-buttons-section">
       <div class="action-buttons">
-        <ManualActionButton
-          button="b"
-          :active="heldButtons[`${joystickId}-b`]"
-          @click="handleActionButton"
-        />
-        <ManualActionButton
-          button="a"
-          :active="heldButtons[`${joystickId}-a`]"
-          @click="handleActionButton"
-        />
+        <ManualActionButton button="b" :active="heldButtons[`${joystickId}-b`]" @click="handleActionButton" />
+        <ManualActionButton button="a" :active="heldButtons[`${joystickId}-a`]" @click="handleActionButton" />
       </div>
     </div>
   </div>
@@ -140,5 +121,4 @@ const handleActionButton = (button: 'select' | 'start' | 'a' | 'b') => {
   gap: 0.5rem;
   align-items: center;
 }
-
 </style>

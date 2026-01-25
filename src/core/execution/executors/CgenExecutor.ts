@@ -1,6 +1,6 @@
 /**
  * CGEN Statement Executor
- * 
+ *
  * Handles execution of CGEN statements to set character generator mode.
  */
 
@@ -21,7 +21,7 @@ export class CgenExecutor {
    * Execute a CGEN statement from CST
    * Sets character generator mode (0-3)
    * Syntax: CGEN n
-   * 
+   *
    * Mode meanings:
    * - 0: Character table A on background screen, A on sprite screen
    * - 1: Character table A on background screen, B on sprite screen
@@ -31,12 +31,12 @@ export class CgenExecutor {
   execute(cgenStmtCst: CstNode, lineNumber?: number): void {
     // Get expression from CST (n)
     const expressionCst = getFirstCstNode(cgenStmtCst.children.expression)
-    
+
     if (!expressionCst) {
       this.context.addError({
         line: lineNumber ?? 0,
         message: 'CGEN: Missing mode parameter',
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }
@@ -45,14 +45,12 @@ export class CgenExecutor {
     let mode: number
     try {
       const modeValue = this.evaluator.evaluateExpression(expressionCst)
-      mode = typeof modeValue === 'number'
-        ? Math.floor(modeValue)
-        : Math.floor(parseFloat(String(modeValue)) || 0)  
+      mode = typeof modeValue === 'number' ? Math.floor(modeValue) : Math.floor(parseFloat(String(modeValue)) || 0)
     } catch (error) {
       this.context.addError({
         line: lineNumber ?? 0,
         message: `CGEN: Error evaluating mode: ${error instanceof Error ? error.message : String(error)}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }
@@ -62,7 +60,7 @@ export class CgenExecutor {
       this.context.addError({
         line: lineNumber ?? 0,
         message: `CGEN: Mode out of range (0-3), got ${mode}`,
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }

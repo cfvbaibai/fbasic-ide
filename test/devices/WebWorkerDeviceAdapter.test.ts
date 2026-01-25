@@ -1,11 +1,11 @@
 /**
  * WebWorkerDeviceAdapter Integration Tests
- * 
+ *
  * Tests for the actual device adapter behavior, especially cursor positioning
  * and screen buffer management.
  */
 
-import { afterEach,beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 import { WebWorkerDeviceAdapter } from '@/core/devices/WebWorkerDeviceAdapter'
 import type { AnyServiceWorkerMessage } from '@/core/interfaces'
@@ -20,7 +20,9 @@ beforeEach(() => {
   capturedMessages = []
   // Mock self.postMessage for testing
   if (typeof self !== 'undefined') {
-    (self as typeof self & { postMessage: (message: AnyServiceWorkerMessage) => void }).postMessage = (message: AnyServiceWorkerMessage) => {
+    ;(self as typeof self & { postMessage: (message: AnyServiceWorkerMessage) => void }).postMessage = (
+      message: AnyServiceWorkerMessage
+    ) => {
       capturedMessages.push(message)
     }
   }
@@ -29,7 +31,7 @@ beforeEach(() => {
 afterEach(() => {
   // Restore original
   if (typeof self !== 'undefined' && originalPostMessage) {
-    (self as typeof self & { postMessage: typeof originalPostMessage }).postMessage = originalPostMessage
+    ;(self as typeof self & { postMessage: typeof originalPostMessage }).postMessage = originalPostMessage
   }
 })
 
@@ -44,12 +46,12 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
 
   it('should set cursor position correctly', () => {
     adapter.setCursorPosition(10, 5)
-    
+
     // Check that a cursor update message was sent
     const cursorMessage = capturedMessages.find(
-      (msg) => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'cursor'
+      msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'cursor'
     )
-    
+
     expect(cursorMessage).toBeDefined()
     if (cursorMessage && 'data' in cursorMessage) {
       const data = cursorMessage.data as { cursorX?: number; cursorY?: number }
@@ -62,22 +64,23 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
     // Set cursor position
     adapter.setCursorPosition(10, 5)
     capturedMessages = [] // Clear messages
-    
+
     // Print text
     adapter.printOutput('HELLO')
-    
+
     // Check that screen update was sent
     const screenMessage = capturedMessages.find(
-      (msg) => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
+      msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
     )
-    
+
     expect(screenMessage).toBeDefined()
     expect(screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data).toBe(true)
-    
+
     // Check that characters were written at position (10, 5)
-    const screenBuffer = screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
-      ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
-      : undefined
+    const screenBuffer =
+      screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
+        ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
+        : undefined
     expect(screenBuffer).toBeDefined()
     expect(screenBuffer?.[5]).toBeDefined() // Row 5
     expect(screenBuffer?.[5]?.[10]?.character).toBe('H')
@@ -90,15 +93,16 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
   it('should write characters starting from (0, 0) by default', () => {
     // Don't set cursor position - should start at (0, 0)
     adapter.printOutput('TEST')
-    
+
     const screenMessage = capturedMessages.find(
-      (msg) => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
+      msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
     )
-    
+
     expect(screenMessage).toBeDefined()
-    const screenBuffer = screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
-      ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
-      : undefined
+    const screenBuffer =
+      screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
+        ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
+        : undefined
     expect(screenBuffer?.[0]).toBeDefined() // Row 0
     expect(screenBuffer?.[0]?.[0]?.character).toBe('T')
     expect(screenBuffer?.[0]?.[1]?.character).toBe('E')
@@ -109,34 +113,36 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
   it('should advance cursor after printing', () => {
     adapter.setCursorPosition(10, 5)
     capturedMessages = []
-    
+
     adapter.printOutput('HI')
-    
+
     // After printing "HI" at (10, 5), cursor should be at (12, 5)
     // Check the screen buffer to see where next character would go
     const screenMessage = capturedMessages.find(
-      (msg) => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
+      msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
     )
-    
-    const screenBuffer = screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
-      ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
-      : undefined
-    
+
+    const screenBuffer =
+      screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
+        ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
+        : undefined
+
     // Characters should be at (10,5) and (11,5)
     expect(screenBuffer?.[5]?.[10]?.character).toBe('H')
     expect(screenBuffer?.[5]?.[11]?.character).toBe('I')
-    
+
     // Next print should continue from (12, 5)
     capturedMessages = []
     adapter.printOutput('BYE')
-    
+
     const nextScreenMessage = capturedMessages.find(
-      (msg) => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
+      msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
     )
-    const nextScreenBuffer = nextScreenMessage && 'data' in nextScreenMessage && 'screenBuffer' in nextScreenMessage.data
-      ? (nextScreenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
-      : undefined
-    
+    const nextScreenBuffer =
+      nextScreenMessage && 'data' in nextScreenMessage && 'screenBuffer' in nextScreenMessage.data
+        ? (nextScreenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
+        : undefined
+
     // Should continue from where we left off
     expect(nextScreenBuffer?.[5]?.[12]?.character).toBe('B')
     expect(nextScreenBuffer?.[5]?.[13]?.character).toBe('Y')
@@ -147,18 +153,19 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
     // Simulate: LOCATE 10, 10: PRINT "I LOVE YOU"
     adapter.setCursorPosition(10, 10)
     capturedMessages = []
-    
+
     adapter.printOutput('I LOVE YOU')
-    
+
     const screenMessage = capturedMessages.find(
-      (msg) => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
+      msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
     )
-    
+
     expect(screenMessage).toBeDefined()
-    const screenBuffer = screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
-      ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
-      : undefined
-    
+    const screenBuffer =
+      screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
+        ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
+        : undefined
+
     // Check that text starts at position (10, 10)
     expect(screenBuffer?.[10]).toBeDefined()
     expect(screenBuffer?.[10]?.[10]?.character).toBe('I')
@@ -178,27 +185,29 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
     adapter.setCursorPosition(5, 5)
     capturedMessages = []
     adapter.printOutput('FIRST')
-    
+
     let screenMessage = capturedMessages.find(
-      (msg) => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
+      msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
     )
-    let screenBuffer = screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
-      ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
-      : undefined
+    let screenBuffer =
+      screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
+        ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
+        : undefined
     expect(screenBuffer?.[5]?.[5]?.character).toBe('F')
-    
+
     // LOCATE 15, 10: PRINT "SECOND"
     adapter.setCursorPosition(15, 10)
     capturedMessages = []
     adapter.printOutput('SECOND')
-    
+
     screenMessage = capturedMessages.find(
-      (msg) => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
+      msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
     )
-    screenBuffer = screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
-      ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
-      : undefined
-    
+    screenBuffer =
+      screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
+        ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
+        : undefined
+
     // First text should still be there
     expect(screenBuffer?.[5]?.[5]?.character).toBe('F')
     // Second text should be at new position
@@ -208,23 +217,24 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
   it('should handle newlines correctly', () => {
     adapter.setCursorPosition(10, 5)
     capturedMessages = []
-    
+
     adapter.printOutput('LINE1\nLINE2')
-    
+
     const screenMessage = capturedMessages.find(
-      (msg) => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
+      msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
     )
-    const screenBuffer = screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
-      ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
-      : undefined
-    
+    const screenBuffer =
+      screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
+        ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
+        : undefined
+
     // First line at (10, 5)
     expect(screenBuffer?.[5]?.[10]?.character).toBe('L')
     expect(screenBuffer?.[5]?.[11]?.character).toBe('I')
     expect(screenBuffer?.[5]?.[12]?.character).toBe('N')
     expect(screenBuffer?.[5]?.[13]?.character).toBe('E')
     expect(screenBuffer?.[5]?.[14]?.character).toBe('1')
-    
+
     // Second line should start at (0, 6) after newline
     expect(screenBuffer?.[6]?.[0]?.character).toBe('L')
     expect(screenBuffer?.[6]?.[1]?.character).toBe('I')
@@ -236,22 +246,23 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
   it('should wrap text at column 28', () => {
     adapter.setCursorPosition(25, 5)
     capturedMessages = []
-    
+
     // Print text that will wrap
     adapter.printOutput('ABCDEFGH')
-    
+
     const screenMessage = capturedMessages.find(
-      (msg) => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
+      msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
     )
-    const screenBuffer = screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
-      ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
-      : undefined
-    
+    const screenBuffer =
+      screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
+        ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
+        : undefined
+
     // First 3 characters at end of row 5
     expect(screenBuffer?.[5]?.[25]?.character).toBe('A')
     expect(screenBuffer?.[5]?.[26]?.character).toBe('B')
     expect(screenBuffer?.[5]?.[27]?.character).toBe('C')
-    
+
     // Next characters should wrap to row 6
     expect(screenBuffer?.[6]?.[0]?.character).toBe('D')
     expect(screenBuffer?.[6]?.[1]?.character).toBe('E')
@@ -262,26 +273,26 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
     adapter.printOutput('TEST')
     capturedMessages = []
 
-    
     // Clear screen
     adapter.clearScreen()
-    
+
     const clearMessage = capturedMessages.find(
-      (msg) => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'clear'
+      msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'clear'
     )
     expect(clearMessage).toBeDefined()
-    
+
     // After clear, cursor should be at (0, 0)
     capturedMessages = []
     adapter.printOutput('AFTER')
-    
+
     const screenMessage = capturedMessages.find(
-      (msg) => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
+      msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
     )
-    const screenBuffer = screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
-      ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
-      : undefined
-    
+    const screenBuffer =
+      screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
+        ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
+        : undefined
+
     // Should start at (0, 0)
     expect(screenBuffer?.[0]?.[0]?.character).toBe('A')
   })
@@ -301,7 +312,7 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
 
     // Verify clear message was sent
     const clearMessage = capturedMessages.find(
-      (msg) => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'clear'
+      msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'clear'
     )
     expect(clearMessage).toBeDefined()
 
@@ -310,11 +321,12 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
     adapter.printOutput('NEW')
 
     const screenMessage = capturedMessages.find(
-      (msg) => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
+      msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
     )
-    const screenBuffer = screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
-      ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
-      : undefined
+    const screenBuffer =
+      screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
+        ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
+        : undefined
 
     // New content should be at (0, 0)
     expect(screenBuffer?.[0]?.[0]?.character).toBe('N')
@@ -337,7 +349,7 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
 
     // Verify clear message was sent
     const clearMessage = capturedMessages.find(
-      (msg) => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'clear'
+      msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'clear'
     )
     expect(clearMessage).toBeDefined()
 
@@ -346,11 +358,12 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
     adapter.printOutput('RESET')
 
     const screenMessage = capturedMessages.find(
-      (msg) => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
+      msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
     )
-    const screenBuffer = screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
-      ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
-      : undefined
+    const screenBuffer =
+      screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
+        ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
+        : undefined
 
     // Should be at (0, 0), not at previous position (20, 15)
     expect(screenBuffer?.[0]?.[0]?.character).toBe('R')
@@ -365,7 +378,7 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
     // First clear
     adapter.clearScreen()
     let clearMessage = capturedMessages.find(
-      (msg) => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'clear'
+      msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'clear'
     )
     expect(clearMessage).toBeDefined()
 
@@ -377,7 +390,7 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
     // Second clear
     adapter.clearScreen()
     clearMessage = capturedMessages.find(
-      (msg) => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'clear'
+      msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'clear'
     )
     expect(clearMessage).toBeDefined()
 
@@ -386,11 +399,12 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
     adapter.printOutput('FINAL')
 
     const screenMessage = capturedMessages.find(
-      (msg) => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
+      msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
     )
-    const screenBuffer = screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
-      ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
-      : undefined
+    const screenBuffer =
+      screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
+        ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
+        : undefined
 
     // Should start at (0, 0)
     expect(screenBuffer?.[0]?.[0]?.character).toBe('F')
@@ -401,7 +415,7 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
     adapter.clearScreen()
 
     const clearMessage = capturedMessages.find(
-      (msg) => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'clear'
+      msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'clear'
     )
     expect(clearMessage).toBeDefined()
 
@@ -410,11 +424,12 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
     adapter.printOutput('EMPTY')
 
     const screenMessage = capturedMessages.find(
-      (msg) => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
+      msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
     )
-    const screenBuffer = screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
-      ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
-      : undefined
+    const screenBuffer =
+      screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
+        ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
+        : undefined
 
     expect(screenBuffer?.[0]?.[0]?.character).toBe('E')
   })

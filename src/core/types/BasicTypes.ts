@@ -1,10 +1,10 @@
 /**
  * BASIC Value Types
- * 
+ *
  * Defines the fundamental types that BASIC variables and constants can have.
  * According to BASIC specification, values can only be:
  * - Numbers
- * - Strings  
+ * - Strings
  * - Arrays of numbers or strings
  */
 

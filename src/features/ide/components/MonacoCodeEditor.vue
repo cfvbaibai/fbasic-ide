@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import * as monaco from 'monaco-editor';
-import { onBeforeUnmount, onDeactivated, onMounted, useTemplateRef, watch } from 'vue';
+import * as monaco from 'monaco-editor'
+import { onBeforeUnmount, onDeactivated, onMounted, useTemplateRef, watch } from 'vue'
 
 import { setupLiveErrorChecking, setupMonacoLanguage } from '@/features/ide/integrations/monaco-integration'
 
@@ -8,38 +8,38 @@ import { setupLiveErrorChecking, setupMonacoLanguage } from '@/features/ide/inte
  * MonacoCodeEditor component - Monaco Editor integration for F-BASIC code editing.
  */
 defineOptions({
-  name: 'MonacoCodeEditor'
+  name: 'MonacoCodeEditor',
 })
 
-const props = defineProps<Props>();
+const props = defineProps<Props>()
 
-const emit = defineEmits<Emits>();
+const emit = defineEmits<Emits>()
 
 interface Props {
-  modelValue: string;
+  modelValue: string
 }
 
 interface Emits {
-  (e: 'update:modelValue', value: string): void;
+  (e: 'update:modelValue', value: string): void
 }
 
-const editorContainer = useTemplateRef<HTMLElement>('editorContainer');
-let editor: monaco.editor.IStandaloneCodeEditor | null = null;
-let mutationObserver: MutationObserver | null = null;
+const editorContainer = useTemplateRef<HTMLElement>('editorContainer')
+let editor: monaco.editor.IStandaloneCodeEditor | null = null
+let mutationObserver: MutationObserver | null = null
 
 /**
  * Check if light theme is active
  */
 function isLightTheme(): boolean {
-  if (typeof document === 'undefined') return false;
-  return document.documentElement.classList.contains('light-theme');
+  if (typeof document === 'undefined') return false
+  return document.documentElement.classList.contains('light-theme')
 }
 
 /**
  * Get the appropriate theme name based on current theme
  */
 function getThemeName(): string {
-  return isLightTheme() ? 'fbasic-theme-light' : 'fbasic-theme';
+  return isLightTheme() ? 'fbasic-theme-light' : 'fbasic-theme'
 }
 
 /**
@@ -47,16 +47,16 @@ function getThemeName(): string {
  */
 function updateTheme(): void {
   if (editor) {
-    const themeName = getThemeName();
-    monaco.editor.setTheme(themeName);
+    const themeName = getThemeName()
+    monaco.editor.setTheme(themeName)
   }
 }
 
 onMounted(() => {
-  if (!editorContainer.value) return;
+  if (!editorContainer.value) return
 
   // Setup Monaco language support (this also sets up themes)
-  setupMonacoLanguage();
+  setupMonacoLanguage()
 
   // Create Monaco editor with initial theme
   editor = monaco.editor.create(editorContainer.value, {
@@ -71,57 +71,57 @@ onMounted(() => {
     roundedSelection: false,
     cursorStyle: 'line',
     wordWrap: 'on',
-    tabSize: 2
-  });
+    tabSize: 2,
+  })
 
   // Setup live error checking
   if (editor) {
-    setupLiveErrorChecking(editor);
+    setupLiveErrorChecking(editor)
   }
 
   // Listen for content changes
   editor?.onDidChangeModelContent(() => {
-    const value = editor?.getValue() || '';
-    emit('update:modelValue', value);
-  });
+    const value = editor?.getValue() || ''
+    emit('update:modelValue', value)
+  })
 
   // Watch for theme changes by observing the document element's class list
   if (typeof document !== 'undefined') {
     mutationObserver = new MutationObserver(() => {
-      updateTheme();
-    });
+      updateTheme()
+    })
     mutationObserver.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['class']
-    });
+      attributeFilter: ['class'],
+    })
   }
-});
+})
 
 // Watch for external value changes
 watch(
   () => props.modelValue,
-  (newValue) => {
+  newValue => {
     if (editor && editor.getValue() !== newValue) {
-      editor.setValue(newValue);
+      editor.setValue(newValue)
     }
   }
-);
+)
 
 // Cleanup function for editor and mutation observer
 const cleanup = () => {
   if (mutationObserver) {
-    mutationObserver.disconnect();
-    mutationObserver = null;
+    mutationObserver.disconnect()
+    mutationObserver = null
   }
   if (editor) {
-    editor.dispose();
-    editor = null;
+    editor.dispose()
+    editor = null
   }
-};
+}
 
 // Clean up on unmount AND deactivation (keep-alive support)
-onBeforeUnmount(cleanup);
-onDeactivated(cleanup);
+onBeforeUnmount(cleanup)
+onDeactivated(cleanup)
 </script>
 
 <template>
@@ -140,7 +140,8 @@ onDeactivated(cleanup);
   content: '';
   position: absolute;
   inset: -2px;
-  background: linear-gradient(135deg, 
+  background: linear-gradient(
+    135deg,
     var(--base-alpha-primary-10) 0%,
     transparent 30%,
     transparent 70%,
@@ -160,7 +161,8 @@ onDeactivated(cleanup);
 }
 
 @keyframes editor-glow {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0;
     transform: scale(1);
   }
@@ -171,4 +173,3 @@ onDeactivated(cleanup);
   }
 }
 </style>
-

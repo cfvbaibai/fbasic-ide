@@ -27,19 +27,23 @@ export interface OneTileSpriteDefinition extends BaseSprite {
   tiles: Tile
 }
 
-export type SpriteDefinition = EightTileSpriteDefinition | SixTileSpriteDefinition | FourTileSpriteDefinition | OneTileSpriteDefinition
+export type SpriteDefinition =
+  | EightTileSpriteDefinition
+  | SixTileSpriteDefinition
+  | FourTileSpriteDefinition
+  | OneTileSpriteDefinition
 
 export function isEightTileSprite(spriteDef: SpriteDefinition): spriteDef is EightTileSpriteDefinition {
   return Array.isArray(spriteDef.charCodes) && spriteDef.charCodes.length === 8
-} 
+}
 
 export function isSixTileSprite(spriteDef: SpriteDefinition): spriteDef is SixTileSpriteDefinition {
   return Array.isArray(spriteDef.charCodes) && spriteDef.charCodes.length === 6
-} 
+}
 
 export function isFourTileSprite(spriteDef: SpriteDefinition): spriteDef is FourTileSpriteDefinition {
   return Array.isArray(spriteDef.charCodes) && spriteDef.charCodes.length === 4
-} 
+}
 
 export function isOneTileSprite(spriteDef: SpriteDefinition): spriteDef is OneTileSpriteDefinition {
   return typeof spriteDef.charCodes === 'number'

@@ -1,4 +1,4 @@
-import { KANA_BG_ITEMS, LETTER_BG_ITEMS, NUMBER_BG_ITEMS, PICTURE_BG_ITEMS,SYMBOL_BG_ITEMS } from '@/shared/data/bg'
+import { KANA_BG_ITEMS, LETTER_BG_ITEMS, NUMBER_BG_ITEMS, PICTURE_BG_ITEMS, SYMBOL_BG_ITEMS } from '@/shared/data/bg'
 import type { BackgroundItem } from '@/shared/data/types'
 
 /**
@@ -9,7 +9,7 @@ const ALL_BG_ITEMS: BackgroundItem[] = [
   ...NUMBER_BG_ITEMS,
   ...SYMBOL_BG_ITEMS,
   ...KANA_BG_ITEMS,
-  ...PICTURE_BG_ITEMS
+  ...PICTURE_BG_ITEMS,
 ]
 
 /**
@@ -23,12 +23,12 @@ const BY_CODE = new Map<number, BackgroundItem>()
 const BY_CHAR = new Map<string, BackgroundItem>()
 
 // Build lookup maps
-ALL_BG_ITEMS.forEach((item) => {
+ALL_BG_ITEMS.forEach(item => {
   BY_CODE.set(item.code, item)
   if (item.char) {
     BY_CHAR.set(item.char, item)
   }
-  item.altChars?.forEach((alt) => {
+  item.altChars?.forEach(alt => {
     BY_CHAR.set(alt, item)
   })
 })

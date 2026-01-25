@@ -3,14 +3,14 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
-import { GameBlock,GameCard, GameLayout, GameSection, HeroSection } from '@/shared/components/ui'
+import { GameBlock, GameCard, GameLayout, GameSection, HeroSection } from '@/shared/components/ui'
 
 /**
  * HomePage component - The home/landing page of the application.
  * Displays feature cards and navigation to different sections.
  */
 defineOptions({
-  name: 'HomePage'
+  name: 'HomePage',
 })
 
 const router = useRouter()
@@ -30,29 +30,29 @@ const features = computed<FeatureCard[]>(() => [
     description: t('home.features.items.ide.description'),
     path: '/ide',
     icon: 'mdi:pencil',
-    color: 'var(--semantic-solid-success)'
+    color: 'var(--semantic-solid-success)',
   },
   {
     title: t('home.features.items.monaco.title'),
     description: t('home.features.items.monaco.description'),
     path: '/monaco',
     icon: 'mdi:pencil',
-    color: 'var(--semantic-solid-info)'
+    color: 'var(--semantic-solid-info)',
   },
   {
     title: t('home.features.items.imageAnalyzer.title'),
     description: t('home.features.items.imageAnalyzer.description'),
     path: '/image-analyzer',
     icon: 'mdi:image',
-    color: 'var(--semantic-solid-warning)'
+    color: 'var(--semantic-solid-warning)',
   },
   {
     title: t('home.features.items.spriteViewer.title'),
     description: t('home.features.items.spriteViewer.description'),
     path: '/character-sprite-viewer',
     icon: 'mdi:grid',
-    color: 'var(--semantic-solid-danger)'
-  }
+    color: 'var(--semantic-solid-danger)',
+  },
 ])
 
 const navigateTo = (path: string) => {

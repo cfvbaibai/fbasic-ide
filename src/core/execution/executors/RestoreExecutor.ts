@@ -1,6 +1,6 @@
 /**
  * RESTORE Statement Executor
- * 
+ *
  * Handles RESTORE statement execution for resetting the data pointer.
  */
 
@@ -18,7 +18,7 @@ export class RestoreExecutor {
    */
   execute(cst: CstNode): void {
     const numberLiteralToken = getFirstToken(cst.children.NumberLiteral)
-    
+
     if (numberLiteralToken) {
       // RESTORE with line number
       const lineNumber = parseInt(numberLiteralToken.image, 10)
@@ -29,4 +29,3 @@ export class RestoreExecutor {
     }
   }
 }
-

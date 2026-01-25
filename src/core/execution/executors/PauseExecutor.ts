@@ -1,6 +1,6 @@
 /**
  * Pause Statement Executor
- * 
+ *
  * Handles execution of PAUSE statements to delay program execution.
  */
 
@@ -24,12 +24,12 @@ export class PauseExecutor {
    */
   async execute(pauseStmtCst: CstNode): Promise<void> {
     const expressionCst = getFirstCstNode(pauseStmtCst.children.expression)
-    
+
     if (!expressionCst) {
       this.context.addError({
         line: 0,
         message: 'Invalid PAUSE statement: missing expression',
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }
@@ -37,9 +37,10 @@ export class PauseExecutor {
     // Evaluate the pause duration (in frames)
     const durationValue = this.evaluator.evaluateExpression(expressionCst)
     // Convert to number (handles both numeric and string values)
-    const frames = typeof durationValue === 'number'
-      ? Math.max(0, Math.floor(durationValue))
-      : Math.max(0, Math.floor(parseFloat(String(durationValue)) || 0))  
+    const frames =
+      typeof durationValue === 'number'
+        ? Math.max(0, Math.floor(durationValue))
+        : Math.max(0, Math.floor(parseFloat(String(durationValue)) || 0))
 
     // Convert frames to milliseconds (1 frame = 1000/30 ms = ~33.33ms)
     const durationMs = frames * TIMING.FRAME_DURATION_MS
@@ -54,4 +55,3 @@ export class PauseExecutor {
     }
   }
 }
-

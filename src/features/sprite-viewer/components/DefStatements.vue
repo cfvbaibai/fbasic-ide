@@ -2,14 +2,14 @@
 import { useI18n } from 'vue-i18n'
 
 import { useSpriteViewerStore } from '@/features/sprite-viewer/composables/useSpriteViewerStore'
-import { GameBlock, GameButton,GameCodeQuote } from '@/shared/components/ui'
+import { GameBlock, GameButton, GameCodeQuote } from '@/shared/components/ui'
 import { message } from '@/shared/utils/message'
 
 /**
  * DefStatements component - Displays and allows copying of DEF SPRITE and DEF MOVE statements.
  */
 defineOptions({
-  name: 'DefStatements'
+  name: 'DefStatements',
 })
 
 const { t } = useI18n()
@@ -17,11 +17,8 @@ const { t } = useI18n()
 const store = useSpriteViewerStore()
 
 const copyAllStatements = async () => {
-  const combined = [
-    store.defSpriteStatement.value,
-    store.defMoveStatement.value
-  ].filter(Boolean).join('\n\n')
-  
+  const combined = [store.defSpriteStatement.value, store.defMoveStatement.value].filter(Boolean).join('\n\n')
+
   if (combined) {
     try {
       await navigator.clipboard.writeText(combined)
@@ -84,4 +81,3 @@ const copyAllStatements = async () => {
   font-size: 1rem;
 }
 </style>
-

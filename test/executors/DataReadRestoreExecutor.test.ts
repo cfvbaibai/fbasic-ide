@@ -1,10 +1,10 @@
 /**
  * DATA, READ, RESTORE Executor Tests
- * 
+ *
  * Unit tests for DataExecutor, ReadExecutor, and RestoreExecutor classes.
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
 import { DataExecutor } from '@/core/execution/executors/DataExecutor'
@@ -28,13 +28,13 @@ describe('DataExecutor', () => {
       maxIterations: 1000,
       maxOutputLines: 100,
       enableDebugMode: false,
-      strictMode: false
+      strictMode: false,
     })
     evaluator = new ExpressionEvaluator(context)
     dataService = new DataService(context, evaluator)
     executor = new DataExecutor(dataService)
     parser = new FBasicParser()
-    
+
     // Clear data values before each test
     context.dataValues = []
     context.dataIndex = 0
@@ -43,22 +43,22 @@ describe('DataExecutor', () => {
   async function parseDataStatement(code: string) {
     const result = await parser.parse(code)
     if (!result.success || !result.cst) return null
-    
+
     const statements = result.cst.children.statement
     if (!Array.isArray(statements) || statements.length === 0) return null
-    
+
     const stmt = statements[0]
     if (!stmt || !('children' in stmt)) return null
-    
+
     const commandListCst = getFirstCstNode(stmt.children.commandList)
     if (!commandListCst) return null
-    
+
     const commandCst = getFirstCstNode(commandListCst.children.command)
     if (!commandCst) return null
-    
+
     const singleCommandCst = getFirstCstNode(commandCst.children.singleCommand)
     if (!singleCommandCst) return null
-    
+
     return getFirstCstNode(singleCommandCst.children.dataStatement)
   }
 
@@ -137,14 +137,14 @@ describe('ReadExecutor', () => {
       maxIterations: 1000,
       maxOutputLines: 100,
       enableDebugMode: false,
-      strictMode: false
+      strictMode: false,
     })
     evaluator = new ExpressionEvaluator(context)
     dataService = new DataService(context, evaluator)
     variableService = new VariableService(context, evaluator)
     executor = new ReadExecutor(dataService, variableService, evaluator)
     parser = new FBasicParser()
-    
+
     // Clear data values and variables before each test
     context.dataValues = []
     context.dataIndex = 0
@@ -154,22 +154,22 @@ describe('ReadExecutor', () => {
   async function parseReadStatement(code: string) {
     const result = await parser.parse(code)
     if (!result.success || !result.cst) return null
-    
+
     const statements = result.cst.children.statement
     if (!Array.isArray(statements) || statements.length === 0) return null
-    
+
     const stmt = statements[0]
     if (!stmt || !('children' in stmt)) return null
-    
+
     const commandListCst = getFirstCstNode(stmt.children.commandList)
     if (!commandListCst) return null
-    
+
     const commandCst = getFirstCstNode(commandListCst.children.command)
     if (!commandCst) return null
-    
+
     const singleCommandCst = getFirstCstNode(commandCst.children.singleCommand)
     if (!singleCommandCst) return null
-    
+
     return getFirstCstNode(singleCommandCst.children.readStatement)
   }
 
@@ -265,13 +265,13 @@ describe('RestoreExecutor', () => {
       maxIterations: 1000,
       maxOutputLines: 100,
       enableDebugMode: false,
-      strictMode: false
+      strictMode: false,
     })
     evaluator = new ExpressionEvaluator(context)
     dataService = new DataService(context, evaluator)
     executor = new RestoreExecutor(dataService)
     parser = new FBasicParser()
-    
+
     // Set up some data
     context.dataValues = [10, 20, 30, 40, 50]
     context.dataIndex = 3 // Start at index 3
@@ -280,22 +280,22 @@ describe('RestoreExecutor', () => {
   async function parseRestoreStatement(code: string) {
     const result = await parser.parse(code)
     if (!result.success || !result.cst) return null
-    
+
     const statements = result.cst.children.statement
     if (!Array.isArray(statements) || statements.length === 0) return null
-    
+
     const stmt = statements[0]
     if (!stmt || !('children' in stmt)) return null
-    
+
     const commandListCst = getFirstCstNode(stmt.children.commandList)
     if (!commandListCst) return null
-    
+
     const commandCst = getFirstCstNode(commandListCst.children.command)
     if (!commandCst) return null
-    
+
     const singleCommandCst = getFirstCstNode(commandCst.children.singleCommand)
     if (!singleCommandCst) return null
-    
+
     return getFirstCstNode(singleCommandCst.children.restoreStatement)
   }
 
@@ -323,4 +323,3 @@ describe('RestoreExecutor', () => {
     })
   })
 })
-

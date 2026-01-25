@@ -1,12 +1,12 @@
 /**
  * Logical Operators Tests
- * 
+ *
  * Tests for logical operators: NOT, AND, OR, XOR
  * These operators work on boolean values (non-zero = true, zero = false)
  * Return values: -1 for true, 0 for false (per Family BASIC spec)
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
@@ -22,7 +22,7 @@ describe('Logical Operators', () => {
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
-      deviceAdapter
+      deviceAdapter,
     })
   })
 
@@ -34,7 +34,7 @@ describe('Logical Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(deviceAdapter.getAllOutputs()).toEqual('')
@@ -47,7 +47,7 @@ describe('Logical Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
     })
@@ -58,7 +58,7 @@ describe('Logical Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
     })
@@ -71,7 +71,7 @@ describe('Logical Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('Both True\n')
     })
@@ -82,7 +82,7 @@ describe('Logical Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('')
     })
@@ -93,7 +93,7 @@ describe('Logical Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('')
     })
@@ -104,7 +104,7 @@ describe('Logical Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('')
     })
@@ -115,7 +115,7 @@ describe('Logical Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('All True\n')
     })
@@ -128,7 +128,7 @@ describe('Logical Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
     })
@@ -139,7 +139,7 @@ describe('Logical Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
     })
@@ -150,7 +150,7 @@ describe('Logical Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
     })
@@ -161,7 +161,7 @@ describe('Logical Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('')
     })
@@ -172,7 +172,7 @@ describe('Logical Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('At Least One True\n')
     })
@@ -185,7 +185,7 @@ describe('Logical Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('')
     })
@@ -196,7 +196,7 @@ describe('Logical Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
     })
@@ -207,7 +207,7 @@ describe('Logical Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
     })
@@ -218,7 +218,7 @@ describe('Logical Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('')
     })
@@ -232,7 +232,7 @@ describe('Logical Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       // (0 > 5) OR (5 > 0 AND 0 > 10) = false OR (true AND false) = false OR false = false
       expect(deviceAdapter.getAllOutputs()).toEqual('')
@@ -244,7 +244,7 @@ describe('Logical Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       // (NOT false) AND true = true AND true = true
       expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
@@ -258,11 +258,10 @@ describe('Logical Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       // (true OR false) XOR true = true XOR true = false
       expect(deviceAdapter.getAllOutputs()).toEqual('')
     })
   })
 })
-

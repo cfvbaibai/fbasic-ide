@@ -20,10 +20,7 @@ import { getSpriteTilesByCodes } from '@/shared/utils/spriteLookup'
  * @param size - Sprite size (0=8×8, 1=16×16)
  * @returns Array of tiles from Table A
  */
-export function convertCharacterSetToTiles(
-  characterSet: number[] | string,
-  size: 0 | 1
-): Tile[] {
+export function convertCharacterSetToTiles(characterSet: number[] | string, size: 0 | 1): Tile[] {
   const expectedCount = size === 1 ? 4 : 1
 
   // Convert to character codes
@@ -61,9 +58,7 @@ export function convertCharacterSetToTiles(
  */
 export function stringToCharCodes(str: string): number[] {
   // Remove quotes if present
-  const cleanStr = str.startsWith('"') && str.endsWith('"')
-    ? str.slice(1, -1)
-    : str
+  const cleanStr = str.startsWith('"') && str.endsWith('"') ? str.slice(1, -1) : str
 
   return Array.from(cleanStr).map(char => char.charCodeAt(0))
 }

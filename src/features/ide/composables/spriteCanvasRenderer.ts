@@ -3,8 +3,8 @@
  * Supports both static sprites (DEF SPRITE) and animated sprites (DEF MOVE)
  */
 
-import type { ColorCombination, MovementState,SpriteState } from '@/core/sprite/types'
-import { COLORS,SPRITE_PALETTES } from '@/shared/data/palette'
+import type { ColorCombination, MovementState, SpriteState } from '@/core/sprite/types'
+import { COLORS, SPRITE_PALETTES } from '@/shared/data/palette'
 import type { Tile } from '@/shared/data/types'
 
 /**
@@ -70,7 +70,7 @@ export async function renderSpriteTile(
 
     // Initialize all pixels to transparent (alpha = 0)
     for (let i = 0; i < 8 * 8 * 4; i += 4) {
-      data[i + 3] = 0  // Alpha = 0 (transparent)
+      data[i + 3] = 0 // Alpha = 0 (transparent)
     }
 
     for (let row = 0; row < 8; row++) {
@@ -104,13 +104,13 @@ export async function renderSpriteTile(
         data[idx] = r
         data[idx + 1] = g
         data[idx + 2] = b
-        data[idx + 3] = 255  // Opaque
+        data[idx + 3] = 255 // Opaque
       }
     }
 
     // Convert ImageData to ImageBitmap for proper alpha blending
     imageBitmap = await createImageBitmap(imageData)
-    
+
     // Cache the rendered tile
     spriteTileCache.set(cacheKey, imageBitmap)
   }
@@ -144,23 +144,58 @@ export async function renderStaticSprite(
     const tiles = spriteDef.tiles as [Tile, Tile, Tile, Tile]
 
     // Top-left (tile 0)
-    await renderSpriteTile(ctx, tiles[0], sprite.x, sprite.y,
-                     colorCombination, spriteDef.invertX === 1, spriteDef.invertY === 1)
+    await renderSpriteTile(
+      ctx,
+      tiles[0],
+      sprite.x,
+      sprite.y,
+      colorCombination,
+      spriteDef.invertX === 1,
+      spriteDef.invertY === 1
+    )
     // Top-right (tile 1)
-    await renderSpriteTile(ctx, tiles[1], sprite.x + 8, sprite.y,
-                     colorCombination, spriteDef.invertX === 1, spriteDef.invertY === 1)
+    await renderSpriteTile(
+      ctx,
+      tiles[1],
+      sprite.x + 8,
+      sprite.y,
+      colorCombination,
+      spriteDef.invertX === 1,
+      spriteDef.invertY === 1
+    )
     // Bottom-left (tile 2)
-    await renderSpriteTile(ctx, tiles[2], sprite.x, sprite.y + 8,
-                     colorCombination, spriteDef.invertX === 1, spriteDef.invertY === 1)
+    await renderSpriteTile(
+      ctx,
+      tiles[2],
+      sprite.x,
+      sprite.y + 8,
+      colorCombination,
+      spriteDef.invertX === 1,
+      spriteDef.invertY === 1
+    )
     // Bottom-right (tile 3)
-    await renderSpriteTile(ctx, tiles[3], sprite.x + 8, sprite.y + 8,
-                     colorCombination, spriteDef.invertX === 1, spriteDef.invertY === 1)
+    await renderSpriteTile(
+      ctx,
+      tiles[3],
+      sprite.x + 8,
+      sprite.y + 8,
+      colorCombination,
+      spriteDef.invertX === 1,
+      spriteDef.invertY === 1
+    )
   } else if (!is16x16 && spriteDef.tiles.length > 0) {
     // 8×8 sprite: single tile
     const tile = spriteDef.tiles[0]
     if (tile) {
-      await renderSpriteTile(ctx, tile, sprite.x, sprite.y,
-                       colorCombination, spriteDef.invertX === 1, spriteDef.invertY === 1)
+      await renderSpriteTile(
+        ctx,
+        tile,
+        sprite.x,
+        sprite.y,
+        colorCombination,
+        spriteDef.invertX === 1,
+        spriteDef.invertY === 1
+      )
     }
   }
 }
@@ -177,18 +212,18 @@ export async function renderAnimatedSprite(
 ): Promise<void> {
   // Phase 3: Basic rendering - just show movement position
   // Full sprite rendering with character types will come in Phase 4
-  
+
   const x = Math.floor(movement.currentX)
   const y = Math.floor(movement.currentY)
-  
+
   // Render a simple colored rectangle to indicate movement
   // Color based on action number for visual distinction
   const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#FFA500', '#800080']
   const color = colors[movement.actionNumber % colors.length] ?? '#FFFFFF'
-  
+
   ctx.fillStyle = color
   ctx.fillRect(x, y, 16, 16)
-  
+
   // Draw a border to make it more visible
   ctx.strokeStyle = '#FFFFFF'
   ctx.lineWidth = 1
@@ -215,17 +250,13 @@ export async function renderSprites(
 ): Promise<void> {
   // First, render static sprites (DEF SPRITE) - only if sprite display is enabled
   if (spriteEnabled) {
-    const sprites = spriteStates.filter(s =>
-      s.visible && s.priority === priority && s.definition
-    )
+    const sprites = spriteStates.filter(s => s.visible && s.priority === priority && s.definition)
 
     for (const spriteState of sprites) {
       // Check if this sprite is moving (has active movement state)
       // Note: In Family BASIC, action numbers and sprite numbers are separate
       // For now, we check if there's a movement with matching action number
-      const movement = movementStates.find(m =>
-        m.actionNumber === spriteState.spriteNumber && m.isActive
-      )
+      const movement = movementStates.find(m => m.actionNumber === spriteState.spriteNumber && m.isActive)
 
       if (!movement) {
         // Render static sprite (DEF SPRITE) - only if not moving

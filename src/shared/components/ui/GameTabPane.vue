@@ -1,18 +1,14 @@
 <script setup lang="ts">
 import type { ComputedRef } from 'vue'
-import { computed, h,onMounted, onUnmounted, useSlots } from 'vue'
+import { computed, h, onMounted, onUnmounted, useSlots } from 'vue'
 
-import {
-  ActiveTabKey,
-  injectStrict,
-  RegisterTabKey,
-  UnregisterTabKey} from './game-tabs-keys'
+import { ActiveTabKey, injectStrict, RegisterTabKey, UnregisterTabKey } from './game-tabs-keys'
 import GameTabButton from './GameTabButton.vue'
 
 /**
  * GameTabPane component - A pane that displays content for a specific tab.
  * Must be used within a GameTabs component.
- * 
+ *
  * @example
  * ```vue
  * <GameTabPane name="tab1" label="Tab 1" icon="mdi:home">
@@ -21,13 +17,13 @@ import GameTabButton from './GameTabButton.vue'
  * ```
  */
 defineOptions({
-  name: 'GameTabPane'
+  name: 'GameTabPane',
 })
 
 const props = withDefaults(defineProps<Props>(), {
   label: '',
   icon: null,
-  disabled: false
+  disabled: false,
 })
 
 interface Props {
@@ -50,12 +46,16 @@ const unregisterTab = injectStrict(UnregisterTabKey)
 
 // Render function for tab button - uses GameTabButton component
 const renderButton = () => {
-  return h(GameTabButton, {
-    name: props.name,
-    label: props.label,
-    icon: props.icon,
-    disabled: props.disabled
-  }, slots.label ? { label: slots.label } : {})
+  return h(
+    GameTabButton,
+    {
+      name: props.name,
+      label: props.label,
+      icon: props.icon,
+      disabled: props.disabled,
+    },
+    slots.label ? { label: slots.label } : {}
+  )
 }
 
 onMounted(() => {
@@ -70,10 +70,7 @@ const isActive = computed(() => activeTab.value === props.name)
 </script>
 
 <template>
-  <div
-    v-show="isActive"
-    :class="['game-tab-pane', { active: isActive }]"
-  >
+  <div v-show="isActive" :class="['game-tab-pane', { active: isActive }]">
     <div v-if="slots['tab-content-header']" class="game-tab-pane-header">
       <slot name="tab-content-header" />
     </div>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * GameSubBlock component - A sub-block component with title for nested content sections.
- * 
+ *
  * @example
  * ```vue
  * <GameSubBlock title="Sub Section">
@@ -10,7 +10,7 @@
  * ```
  */
 defineOptions({
-  name: 'GameSubBlock'
+  name: 'GameSubBlock',
 })
 
 defineProps<Props>()
@@ -19,7 +19,6 @@ interface Props {
   /** Title for the sub-block */
   title: string
 }
-
 </script>
 
 <template>
@@ -35,7 +34,7 @@ interface Props {
 .game-sub-block {
   border-radius: 10px;
   padding: 0.75rem;
-  box-shadow: 
+  box-shadow:
     inset 0 2px 4px var(--base-alpha-gray-00-30),
     0 2px 6px var(--base-alpha-gray-00-20);
   position: relative;
@@ -48,7 +47,7 @@ interface Props {
 
 .game-sub-block:hover {
   border-color: var(--base-solid-primary);
-  box-shadow: 
+  box-shadow:
     inset 0 2px 4px var(--base-alpha-gray-00-30),
     0 0 12px var(--base-alpha-primary-20);
 }

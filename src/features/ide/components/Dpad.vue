@@ -3,7 +3,7 @@
  * Dpad component - D-pad (directional pad) component for Nintendo controller.
  */
 defineOptions({
-  name: 'Dpad'
+  name: 'Dpad',
 })
 
 const emit = defineEmits<Emits>()
@@ -27,8 +27,8 @@ const handleDpadStop = (direction: 'up' | 'down' | 'left' | 'right') => {
     <div class="manual-cross">
       <div class="dpad-grid">
         <div class="dpad-spacer"></div>
-        <button 
-          class="manual-button up" 
+        <button
+          class="manual-button up"
           @mousedown="handleDpadStart('up')"
           @mouseup="handleDpadStop('up')"
           @mouseleave="handleDpadStop('up')"
@@ -37,8 +37,8 @@ const handleDpadStop = (direction: 'up' | 'down' | 'left' | 'right') => {
           ↑
         </button>
         <div class="dpad-spacer"></div>
-        <button 
-          class="manual-button left" 
+        <button
+          class="manual-button left"
           @mousedown="handleDpadStart('left')"
           @mouseup="handleDpadStop('left')"
           @mouseleave="handleDpadStop('left')"
@@ -47,8 +47,8 @@ const handleDpadStop = (direction: 'up' | 'down' | 'left' | 'right') => {
           ←
         </button>
         <div class="dpad-center"></div>
-        <button 
-          class="manual-button right" 
+        <button
+          class="manual-button right"
           @mousedown="handleDpadStart('right')"
           @mouseup="handleDpadStop('right')"
           @mouseleave="handleDpadStop('right')"
@@ -57,8 +57,8 @@ const handleDpadStop = (direction: 'up' | 'down' | 'left' | 'right') => {
           →
         </button>
         <div class="dpad-spacer"></div>
-        <button 
-          class="manual-button down" 
+        <button
+          class="manual-button down"
           @mousedown="handleDpadStart('down')"
           @mouseup="handleDpadStop('down')"
           @mouseleave="handleDpadStop('down')"
@@ -109,7 +109,7 @@ const handleDpadStop = (direction: 'up' | 'down' | 'left' | 'right') => {
   justify-content: center;
   border-radius: var(--game-radius-lg);
   padding: 0.5rem;
-  box-shadow: 
+  box-shadow:
     inset 0 2px 4px var(--base-alpha-gray-00-40),
     0 1px 2px var(--base-alpha-gray-00-20);
   border: 1px solid var(--game-surface-border);
@@ -146,7 +146,7 @@ const handleDpadStop = (direction: 'up' | 'down' | 'left' | 'right') => {
   font-weight: var(--game-font-weight-bold);
   color: var(--game-text-primary);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 
+  box-shadow:
     0 2px 4px var(--base-alpha-gray-00-30),
     inset 0 1px 2px var(--base-alpha-gray-100-10);
   outline: none;
@@ -193,7 +193,7 @@ const handleDpadStop = (direction: 'up' | 'down' | 'left' | 'right') => {
 .manual-button:hover {
   transform: translateY(-2px) scale(1.05);
   border-color: var(--game-surface-border-hover);
-  box-shadow: 
+  box-shadow:
     0 4px 8px var(--base-alpha-gray-00-40),
     0 0 12px var(--game-accent-glow),
     inset 0 1px 2px var(--base-alpha-gray-100-10);
@@ -205,7 +205,7 @@ const handleDpadStop = (direction: 'up' | 'down' | 'left' | 'right') => {
 .manual-button:active {
   transform: translateY(0) scale(0.98);
   border-color: var(--game-surface-border-hover);
-  box-shadow: 
+  box-shadow:
     0 1px 2px var(--base-alpha-gray-00-40),
     inset 0 2px 4px var(--base-alpha-gray-00-30),
     var(--game-shadow-glow);

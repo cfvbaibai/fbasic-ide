@@ -2,13 +2,13 @@
 import { computed, nextTick, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { GameIcon,GameTabPane } from '@/shared/components/ui'
+import { GameIcon, GameTabPane } from '@/shared/components/ui'
 
 /**
  * StdoutTab component - Displays standard output and errors in a tab pane format.
  */
 defineOptions({
-  name: 'StdoutTab'
+  name: 'StdoutTab',
 })
 
 const props = defineProps<{
@@ -50,23 +50,16 @@ watch(() => props.output.length, scrollToBottom)
       <GameIcon icon="mdi:file-document" size="small" />
       <span>{{ t('ide.output.stdout') }}</span>
     </template>
-    
+
     <div class="tab-content">
-      <div 
-        ref="outputRef"
-        class="output-content"
-      >
+      <div ref="outputRef" class="output-content">
         <div v-if="rollingOutput.length === 0 && !isRunning && (!errors || errors.length === 0)" class="empty-output">
           <GameIcon icon="mdi:file-document" size="large" />
           <p>{{ t('ide.output.empty') }}</p>
         </div>
         <div v-else>
           <div v-if="rollingOutput.length > 0" class="output-lines">
-            <div 
-              v-for="(line, index) in rollingOutput" 
-              :key="index" 
-              class="output-line"
-            >
+            <div v-for="(line, index) in rollingOutput" :key="index" class="output-line">
               {{ line }}
             </div>
           </div>
@@ -75,7 +68,9 @@ watch(() => props.output.length, scrollToBottom)
               <GameIcon icon="mdi:alert" size="small" />
               <span class="error-type">{{ error.type }}:</span>
               <span class="error-message">{{ error.message }}</span>
-              <span v-if="error.line > 0" class="error-line-number">({{ t('ide.output.errorLine', { line: error.line }) }})</span>
+              <span v-if="error.line > 0" class="error-line-number"
+                >({{ t('ide.output.errorLine', { line: error.line }) }})</span
+              >
             </div>
           </div>
         </div>

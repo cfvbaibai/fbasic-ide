@@ -1,10 +1,10 @@
 /**
  * PAUSE Statement Tests
- * 
+ *
  * Tests for the PAUSE statement in Family Basic.
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { FBasicParser } from '@/core/parser/FBasicParser'
@@ -17,7 +17,7 @@ describe('PAUSE Statement', () => {
       maxIterations: 1000,
       maxOutputLines: 100,
       enableDebugMode: false,
-      strictMode: false
+      strictMode: false,
     })
   })
 
@@ -25,7 +25,7 @@ describe('PAUSE Statement', () => {
     it('should parse PAUSE statement with numeric literal', async () => {
       const parser = new FBasicParser()
       const result = await parser.parse('10 PAUSE 1000')
-      
+
       expect(result.success).toBe(true)
       expect(result.cst).toBeDefined()
     })
@@ -33,7 +33,7 @@ describe('PAUSE Statement', () => {
     it('should parse PAUSE statement with expression', async () => {
       const parser = new FBasicParser()
       const result = await parser.parse('10 PAUSE 500 + 500')
-      
+
       expect(result.success).toBe(true)
       expect(result.cst).toBeDefined()
     })
@@ -42,7 +42,7 @@ describe('PAUSE Statement', () => {
       const parser = new FBasicParser()
       const result = await parser.parse(`10 LET X = 200
 20 PAUSE X`)
-      
+
       expect(result.success).toBe(true)
       expect(result.cst).toBeDefined()
     })
@@ -54,7 +54,7 @@ describe('PAUSE Statement', () => {
       const code = '10 PAUSE 3' // 3 frames = ~100ms
       const result = await interpreter.execute(code)
       const endTime = Date.now()
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       // Should have paused for approximately 3 frames = ~100ms (allow some tolerance)
@@ -67,7 +67,7 @@ describe('PAUSE Statement', () => {
       const code = '10 PAUSE 2' // 2 frames = ~67ms
       const result = await interpreter.execute(code)
       const endTime = Date.now()
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       // 2 frames = ~67ms, allow some tolerance
@@ -79,7 +79,7 @@ describe('PAUSE Statement', () => {
       const code = '10 PAUSE 1 + 1' // 2 frames = ~67ms
       const result = await interpreter.execute(code)
       const endTime = Date.now()
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       // 2 frames = ~67ms, allow some tolerance
@@ -92,7 +92,7 @@ describe('PAUSE Statement', () => {
 20 PAUSE DURATION` // 3 frames = ~100ms
       const result = await interpreter.execute(code)
       const endTime = Date.now()
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       // 3 frames = ~100ms, allow some tolerance
@@ -104,7 +104,7 @@ describe('PAUSE Statement', () => {
       const code = '10 PAUSE 0'
       const result = await interpreter.execute(code)
       const endTime = Date.now()
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       // Should complete almost immediately
@@ -116,7 +116,7 @@ describe('PAUSE Statement', () => {
       const code = '10 PAUSE -100'
       const result = await interpreter.execute(code)
       const endTime = Date.now()
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       // Negative duration should be clamped to 0
@@ -130,7 +130,7 @@ describe('PAUSE Statement', () => {
 30 PAUSE 1` // 3 frames total = ~100ms
       const result = await interpreter.execute(code)
       const endTime = Date.now()
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       // Should pause for approximately 3 frames = ~100ms total
@@ -144,7 +144,7 @@ describe('PAUSE Statement', () => {
 30 NEXT` // 3 iterations * 1 frame = 3 frames = ~100ms
       const result = await interpreter.execute(code)
       const endTime = Date.now()
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       // Should pause 3 times for 1 frame each = 3 frames = ~100ms
@@ -156,7 +156,7 @@ describe('PAUSE Statement', () => {
       const code = `10 PRINT "Before": PAUSE 2: PRINT "After"` // 2 frames = ~67ms
       const result = await interpreter.execute(code)
       const endTime = Date.now()
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       // 2 frames = ~67ms, allow some tolerance
@@ -169,7 +169,7 @@ describe('PAUSE Statement', () => {
 20 PAUSE DURATION$` // 3 frames = ~100ms
       const result = await interpreter.execute(code)
       const endTime = Date.now()
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       // String "3" should be converted to number 3 frames = ~100ms
@@ -179,7 +179,7 @@ describe('PAUSE Statement', () => {
     it('should reject floating point literals', async () => {
       const parser = new FBasicParser()
       const result = await parser.parse('10 PAUSE 50.7')
-      
+
       // Floating point literals should be rejected by the parser
       expect(result.success).toBe(false)
       expect(result.errors).toBeDefined()
@@ -187,4 +187,3 @@ describe('PAUSE Statement', () => {
     })
   })
 })
-

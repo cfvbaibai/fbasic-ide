@@ -13,7 +13,7 @@ export function useDefMoveStatement(
 
     const sprite = selectedSprite.value
     const characterType = sprite.moveCharacterCode
-    
+
     if (characterType === undefined) {
       return `REM Note: "${sprite.name}" does not have a moveCharacterCode defined\nREM DEF MOVE only supports character types 0-15:\nREM 0=Mario, 1=Lady, 2=Fighter Fly, 3=Achilles, 4=Penguin, 5=Fireball,\nREM 6=Car, 7=Spinner, 8=Star Killer, 9=Starship, 10=Explosion,\nREM 11=Smiley, 12=Laser, 13=Shell Creeper, 14=Side Stepper, 15=Nitpicker`
     }
@@ -29,7 +29,6 @@ export function useDefMoveStatement(
   })
 
   return {
-    defMoveStatement
+    defMoveStatement,
   }
 }
-

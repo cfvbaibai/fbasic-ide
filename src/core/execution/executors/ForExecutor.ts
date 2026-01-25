@@ -1,14 +1,14 @@
 /**
  * For Statement Executor
- * 
+ *
  * Handles execution of FOR statements for loop initialization from CST.
  */
 
 import type { CstNode } from 'chevrotain'
 
-import { DEFAULTS,ERROR_TYPES } from '@/core/constants'
+import { DEFAULTS, ERROR_TYPES } from '@/core/constants'
 import type { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
-import { getCstNodes,getFirstToken } from '@/core/parser/cst-helpers'
+import { getCstNodes, getFirstToken } from '@/core/parser/cst-helpers'
 import type { VariableService } from '@/core/services/VariableService'
 import type { LoopState } from '@/core/state/ExecutionContext'
 
@@ -26,17 +26,17 @@ export class ForExecutor {
    */
   execute(forStmtCst: CstNode, statementIndex: number, lineNumber: number): void {
     const identifierToken = getFirstToken(forStmtCst.children.Identifier)
-    
+
     // Get all expressions (start, end, and optionally step)
     const expressions = getCstNodes(forStmtCst.children.expression)
     const startExprCst = expressions[0]
     const endExprCst = expressions[1]
-    
+
     if (!identifierToken || !startExprCst || !endExprCst) {
       this.context.addError({
         line: lineNumber,
         message: 'Invalid FOR statement: missing variable or expressions',
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }
@@ -53,9 +53,7 @@ export class ForExecutor {
       // This happens when FOR, PRINT, and NEXT are on the same line
       // and NEXT jumps back to re-execute the statement
       if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(
-          `FOR: ${varName} loop already active, skipping re-initialization`
-        )
+        this.context.addDebugOutput(`FOR: ${varName} loop already active, skipping re-initialization`)
       }
       return
     }
@@ -69,7 +67,7 @@ export class ForExecutor {
       this.context.addError({
         line: lineNumber,
         message: 'FOR loop requires numeric values',
-        type: ERROR_TYPES.RUNTIME
+        type: ERROR_TYPES.RUNTIME,
       })
       return
     }
@@ -83,7 +81,7 @@ export class ForExecutor {
         this.context.addError({
           line: lineNumber,
           message: 'FOR STEP requires numeric value',
-          type: ERROR_TYPES.RUNTIME
+          type: ERROR_TYPES.RUNTIME,
         })
         return
       }
@@ -103,7 +101,7 @@ export class ForExecutor {
       stepValue,
       currentValue: startValue,
       statementIndex, // Jump back to the same statement index
-      shouldExecute: this.shouldExecuteLoop(startValue, endValue, stepValue)
+      shouldExecute: this.shouldExecuteLoop(startValue, endValue, stepValue),
     }
 
     // Push loop state onto stack
@@ -132,4 +130,3 @@ export class ForExecutor {
     }
   }
 }
-

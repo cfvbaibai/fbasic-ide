@@ -11,7 +11,7 @@ import SpriteSelector from './SpriteSelector.vue'
  * SpriteControls component - Container for sprite viewer controls (selector, display options, palette).
  */
 defineOptions({
-  name: 'SpriteControls'
+  name: 'SpriteControls',
 })
 
 const { t } = useI18n()
@@ -24,4 +24,3 @@ const { t } = useI18n()
     <PaletteSelector />
   </GameBlock>
 </template>
-

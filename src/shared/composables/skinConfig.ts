@@ -1,6 +1,6 @@
 /**
  * Skin Configuration
- * 
+ *
  * Defines metadata for available skins including theme type (light/dark).
  */
 
@@ -16,23 +16,23 @@ export interface SkinConfig {
  */
 export const skinConfigs: Record<SkinName, SkinConfig> = {
   default: {
-    isLightTheme: false
+    isLightTheme: false,
   },
   'retro-blue': {
-    isLightTheme: false
+    isLightTheme: false,
   },
   nintendo: {
-    isLightTheme: true
+    isLightTheme: true,
   },
   'classic-light': {
-    isLightTheme: true
+    isLightTheme: true,
   },
   'y2k-futuristic': {
-    isLightTheme: false
+    isLightTheme: false,
   },
   'sunset-vaporwave': {
-    isLightTheme: false
-  }
+    isLightTheme: false,
+  },
 }
 
 /**

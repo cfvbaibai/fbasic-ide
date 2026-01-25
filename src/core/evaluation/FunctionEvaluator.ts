@@ -1,6 +1,6 @@
 /**
  * Function Evaluator
- * 
+ *
  * Handles evaluation of all BASIC functions from CST nodes.
  * Separated from ExpressionEvaluator for better code organization.
  */
@@ -31,7 +31,7 @@ function toNumber(value: number | string | boolean | undefined): number {
 
 /**
  * Function Evaluator
- * 
+ *
  * Evaluates all BASIC functions: string functions, arithmetic functions, and controller input functions
  * String functions: LEN, LEFT$, RIGHT$, MID$, STR$, HEX$, CHR$, ASC
  * Arithmetic functions: ABS, SGN, RND, VAL
@@ -69,7 +69,7 @@ export class FunctionEvaluator {
     // Get arguments
     const expressionListCst = getFirstCstNode(cst.children.expressionList)
     const args: Array<number | string> = []
-    
+
     if (expressionListCst) {
       const expressions = getCstNodes(expressionListCst.children.expression)
       for (const exprCst of expressions) {
@@ -184,7 +184,7 @@ export class FunctionEvaluator {
     const str = String(args[0] ?? '')
     const start = Math.floor(toNumber(args[1]))
     const length = Math.floor(toNumber(args[2]))
-    
+
     // BASIC uses 1-based indexing
     // If start is <= 0, return empty string (invalid position)
     if (start <= 0 || length <= 0) {
@@ -223,7 +223,7 @@ export class FunctionEvaluator {
       throw new Error('HEX$ function requires exactly 1 argument')
     }
     const num = toNumber(args[0] ?? 0)
-    
+
     // Handle negative numbers: convert to unsigned 16-bit representation
     // For negative numbers, use two's complement representation
     let value: number
@@ -233,11 +233,11 @@ export class FunctionEvaluator {
     } else {
       value = num
     }
-    
+
     // Clamp to valid range (0 to 65535)
     if (value < 0) value = 0
     if (value > 65535) value = 65535
-    
+
     // Convert to hexadecimal string (uppercase, no prefix)
     return value.toString(16).toUpperCase()
   }
@@ -254,19 +254,19 @@ export class FunctionEvaluator {
       throw new Error('CHR$ function requires exactly 1 argument')
     }
     const num = toNumber(args[0] ?? 0)
-    
+
     // Clamp to valid range (0 to 255)
     let charCode = Math.trunc(num)
     if (charCode < 0) charCode = 0
     if (charCode > 255) charCode = 255
-    
+
     // Try to get character from background items mapping first
     // This ensures kana and other non-ASCII characters are properly mapped
     const mappedChar = getCharacterByCode(charCode)
     if (mappedChar !== null) {
       return mappedChar
     }
-    
+
     // Fallback to String.fromCharCode for codes without background items
     // (e.g., system codes 0-31, or special graphics 184-255)
     return String.fromCharCode(charCode)
@@ -275,27 +275,29 @@ export class FunctionEvaluator {
   /**
    * ASC(string) - converts first character of string to character code
    * Returns integer from 0 to 255
-   * Per manual page 83: "The character code of the first character of the character string becomes the value of this function"
-   * "Also, when the character string is a null string, 0 becomes the value of this function"
+   * Per manual page 83: "The character code of the first character of the
+   * character string becomes the value of this function"
+   * "Also, when the character string is a null string, 0 becomes the value
+   * of this function"
    */
   private evaluateAsc(args: Array<number | string>): number {
     if (args.length !== 1) {
       throw new Error('ASC function requires exactly 1 argument')
     }
     const str = String(args[0] ?? '')
-    
+
     // If empty string, return 0
     if (str.length === 0) {
       return 0
     }
-    
+
     // Get character code of first character
     const charCode = str.charCodeAt(0)
-    
+
     // Clamp to valid range (0 to 255)
     if (charCode < 0) return 0
     if (charCode > 255) return 255
-    
+
     return charCode
   }
 
@@ -339,17 +341,17 @@ export class FunctionEvaluator {
       throw new Error('RND function requires exactly 1 argument')
     }
     const x = toNumber(args[0] ?? 0)
-    
+
     // Validate argument range: 1 to 32767
     if (x < 1 || x > 32767) {
       throw new Error(`RND argument must be between 1 and 32767, got ${x}`)
     }
-    
+
     // Special case: RND(1) always returns 0
     if (x === 1) {
       return 0
     }
-    
+
     // Return random integer from 0 to (x-1)
     return Math.trunc(Math.random() * x)
   }
@@ -365,7 +367,7 @@ export class FunctionEvaluator {
       throw new Error('VAL function requires exactly 1 argument')
     }
     const str = String(args[0] ?? '').trim()
-    
+
     if (str.length === 0) {
       return 0
     }
@@ -472,4 +474,3 @@ export class FunctionEvaluator {
     return this.context.consumeStrigState(joystickId)
   }
 }
-

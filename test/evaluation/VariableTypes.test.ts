@@ -1,8 +1,8 @@
 /**
  * Variable Types Tests
- * 
+ *
  * Tests for how Family Basic handles numerical value variables and letter (string) variables.
- * 
+ *
  * Based on Family Basic Manual:
  * - Numerical value variables: Store integers only (no decimal/floating-point support)
  * - Letter variables: Use $ suffix (e.g., A$, XA$)
@@ -11,7 +11,7 @@
  * - Variable names: Up to 255 characters, but only first 2 are significant
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { FBasicParser } from '@/core/parser/FBasicParser'
@@ -24,7 +24,7 @@ describe('Variable Types', () => {
       maxIterations: 1000,
       maxOutputLines: 100,
       enableDebugMode: false,
-      strictMode: false
+      strictMode: false,
     })
   })
 
@@ -32,7 +32,7 @@ describe('Variable Types', () => {
     it('should store integer values', async () => {
       const code = '10 LET X = 100'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('X')?.value).toBe(100)
@@ -42,7 +42,7 @@ describe('Variable Types', () => {
     it('should store negative integer values', async () => {
       const code = '10 LET X = -200'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('X')?.value).toBe(-200)
@@ -53,7 +53,7 @@ describe('Variable Types', () => {
       const code = `10 LET X = 100
 20 LET Y = X`
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       // Y should get X's value (100), but if Y didn't exist, it would default to 0
@@ -65,7 +65,7 @@ describe('Variable Types', () => {
 20 LET XA = 200
 30 LET X1 = 300`
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('X')?.value).toBe(100)
@@ -76,7 +76,7 @@ describe('Variable Types', () => {
     it('should perform integer arithmetic', async () => {
       const code = '10 LET X = 5 + 3'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('X')?.value).toBe(8)
@@ -86,7 +86,7 @@ describe('Variable Types', () => {
     it('should handle integer multiplication', async () => {
       const code = '10 LET X = 7 * 6'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('X')?.value).toBe(42)
@@ -96,7 +96,7 @@ describe('Variable Types', () => {
     it('should handle integer division (may produce decimal in current implementation)', async () => {
       const code = '10 LET X = 7 / 2'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       // Note: Current implementation allows decimals, but Family Basic should truncate to integer
@@ -109,7 +109,7 @@ describe('Variable Types', () => {
     it('should store string values in letter variables', async () => {
       const code = '10 LET A$ = "MARIO SAMPLE"'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('A$')?.value).toBe('MARIO SAMPLE')
@@ -119,7 +119,7 @@ describe('Variable Types', () => {
     it('should store numeric strings in letter variables', async () => {
       const code = '10 LET XA$ = "100"'
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('XA$')?.value).toBe('100')
@@ -132,7 +132,7 @@ describe('Variable Types', () => {
       const code = `10 LET A = 100
 20 LET A$ = "HELLO"`
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('A')?.value).toBe(100)
@@ -146,7 +146,7 @@ describe('Variable Types', () => {
 20 LET XA$ = "SECOND"
 30 LET B$ = "THIRD"`
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('A$')?.value).toBe('FIRST')
@@ -158,7 +158,7 @@ describe('Variable Types', () => {
       const code = `10 LET A$ = "HELLO"
 20 PRINT A$`
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('A$')?.value).toBe('HELLO')
@@ -170,7 +170,7 @@ describe('Variable Types', () => {
       const code = `10 LET X = 100
 20 LET XA = 200`
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       // X and XA should be different variables (first 2 chars: "X" vs "XA")
@@ -183,7 +183,7 @@ describe('Variable Types', () => {
 20 LET XAXIS = 200
 30 LET X = XAPPLE`
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       // Note: Current implementation uses full variable name
       // Family Basic would treat XAPPLE and XAXIS as the same (both start with "XA")
@@ -197,7 +197,7 @@ describe('Variable Types', () => {
 20 LET AB$ = "SECOND"
 30 LET ABC$ = "THIRD"`
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       // A$ and AB$ should be different (first 2 chars: "A" vs "AB")
@@ -214,7 +214,7 @@ describe('Variable Types', () => {
 20 LET Y = 20
 30 LET Z1 = 30`
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('X')?.value).toBe(10)
@@ -227,7 +227,7 @@ describe('Variable Types', () => {
 20 LET X2 = 200
 30 LET X10 = 300`
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('X1')?.value).toBe(100)
@@ -236,10 +236,10 @@ describe('Variable Types', () => {
     })
 
     it('should handle long variable names (up to 255 chars)', async () => {
-      const longName = `A${  'B'.repeat(100)}` // Create a long name
+      const longName = `A${'B'.repeat(100)}` // Create a long name
       const code = `10 LET ${longName} = 999`
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get(longName)?.value).toBe(999)
@@ -250,7 +250,7 @@ describe('Variable Types', () => {
     it('should default numerical variables to 0 when accessed before assignment', async () => {
       const code = `10 LET X = Y`
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       // Y should default to 0
@@ -260,7 +260,7 @@ describe('Variable Types', () => {
     it('should default letter variables to empty string when accessed before assignment', async () => {
       const code = `10 LET A$ = B$`
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       // B$ should default to empty string
@@ -275,7 +275,7 @@ describe('Variable Types', () => {
 30 LET Y = 200
 40 LET B$ = "WORLD"`
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('X')?.value).toBe(100)
@@ -290,7 +290,7 @@ describe('Variable Types', () => {
 30 PRINT X
 40 PRINT A$`
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('X')?.value).toBe(42)
@@ -302,7 +302,7 @@ describe('Variable Types', () => {
     it('should reject decimal number literals', async () => {
       const parser = new FBasicParser()
       const result = await parser.parse('10 LET X = 3.14')
-      
+
       // Floating point literals should be rejected by the parser
       expect(result.success).toBe(false)
       expect(result.errors).toBeDefined()
@@ -312,7 +312,7 @@ describe('Variable Types', () => {
     it('should reject decimal arithmetic with literals', async () => {
       const parser = new FBasicParser()
       const result = await parser.parse('10 LET X = 1.5 + 2.3')
-      
+
       // Floating point literals should be rejected by the parser
       expect(result.success).toBe(false)
       expect(result.errors).toBeDefined()
@@ -320,4 +320,3 @@ describe('Variable Types', () => {
     })
   })
 })
-

@@ -9,7 +9,7 @@ import { GameBlock } from '@/shared/components/ui'
  * SpriteGrid component - Displays the sprite grid with color visualization.
  */
 defineOptions({
-  name: 'SpriteGrid'
+  name: 'SpriteGrid',
 })
 
 const { t } = useI18n()
@@ -20,7 +20,7 @@ const title = computed(() => {
     return t('spriteViewer.spriteGrid.titleWithSize', {
       name: store.selectedSprite.value.name,
       width: store.spriteSize.value.width,
-      height: store.spriteSize.value.height
+      height: store.spriteSize.value.height,
     })
   }
   return t('spriteViewer.spriteGrid.title')
@@ -29,29 +29,25 @@ const title = computed(() => {
 
 <template>
   <GameBlock :title="title">
-    <div 
-      class="grid-container" 
-      :class="{ 
+    <div
+      class="grid-container"
+      :class="{
         'grid-container-8x8': store.spriteSize.value.width === 8,
         'grid-container-16x32': store.spriteSize.value.width === 16 && store.spriteSize.value.height === 32,
-        'grid-container-48x8': store.spriteSize.value.width === 48 && store.spriteSize.value.height === 8
+        'grid-container-48x8': store.spriteSize.value.width === 48 && store.spriteSize.value.height === 8,
       }"
     >
-      <div
-        v-for="(row, rowIndex) in store.spriteGrid.value"
-        :key="rowIndex"
-        class="grid-row"
-      >
+      <div v-for="(row, rowIndex) in store.spriteGrid.value" :key="rowIndex" class="grid-row">
         <div
           v-for="(value, colIndex) in row"
           :key="colIndex"
           class="grid-cell"
-          :class="{ 
+          :class="{
             'grid-cell-bordered': store.displayOptions.value.showGridLines,
-            'grid-cell-transparent': store.getCellColor(value) === 'transparent'
+            'grid-cell-transparent': store.getCellColor(value) === 'transparent',
           }"
           :style="{
-            backgroundColor: store.getCellColor(value)
+            backgroundColor: store.getCellColor(value),
           }"
           :title="t('spriteViewer.spriteGrid.cellTooltip', { row: rowIndex, col: colIndex, value })"
         >
@@ -63,7 +59,6 @@ const title = computed(() => {
 </template>
 
 <style scoped>
-
 .grid-container {
   display: flex;
   flex-direction: column;
@@ -71,26 +66,30 @@ const title = computed(() => {
   background: var(--base-solid-gray-00);
 
   /* Checkerboard pattern for transparent cells (Adobe Photoshop style) */
-  background-image: 
+  background-image:
     linear-gradient(45deg, var(--base-alpha-gray-100-20) 25%, transparent 25%),
     linear-gradient(-45deg, var(--base-alpha-gray-100-20) 25%, transparent 25%),
     linear-gradient(45deg, transparent 75%, var(--base-alpha-gray-100-20) 75%),
     linear-gradient(-45deg, transparent 75%, var(--base-alpha-gray-100-20) 75%);
   background-size: 8px 8px;
-  background-position: 0 0, 0 4px, 4px -4px, -4px 0;
+  background-position:
+    0 0,
+    0 4px,
+    4px -4px,
+    -4px 0;
   padding: 0;
   border-radius: 4px;
   border: 8px solid var(--game-surface-border);
   width: fit-content;
   margin: 0 auto;
-  box-shadow: 
+  box-shadow:
     0 0 20px var(--base-alpha-gray-00-80),
     inset 0 0 20px var(--base-alpha-primary-10);
 }
 
 /* Adjust checkerboard colors for light theme */
 :global(.light-theme) .grid-container {
-  background-image: 
+  background-image:
     linear-gradient(45deg, var(--base-solid-gray-10) 25%, transparent 25%),
     linear-gradient(-45deg, var(--base-solid-gray-10) 25%, transparent 25%),
     linear-gradient(45deg, transparent 75%, var(--base-solid-gray-10) 75%),
@@ -148,10 +147,9 @@ const title = computed(() => {
   font-weight: 700;
   font-family: var(--game-font-family-mono);
   color: var(--game-text-primary);
-  text-shadow: 
+  text-shadow:
     1px 1px 2px var(--base-alpha-gray-00-80),
     0 0 4px var(--game-accent-glow);
   user-select: none;
 }
 </style>
-

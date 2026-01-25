@@ -1,19 +1,19 @@
 /**
  * Monaco Editor Integration for F-BASIC with Chevrotain Parser
- * 
+ *
  * This file shows how to integrate Chevrotain parser with Monaco Editor
  * for syntax highlighting (Monarch) and live error diagnostics.
- * 
+ *
  * Usage:
  * 1. Install: pnpm add monaco-editor
  * 2. Import and call setupMonacoLanguage() in your Monaco setup
  * 3. Use parseWithChevrotain from FBasicChevrotainParser.ts
  */
 
-import { useDebounceFn } from '@vueuse/core';
-import * as monaco from 'monaco-editor';
+import { useDebounceFn } from '@vueuse/core'
+import * as monaco from 'monaco-editor'
 
-import { parseWithChevrotain } from '@/core/parser/FBasicChevrotainParser';
+import { parseWithChevrotain } from '@/core/parser/FBasicChevrotainParser'
 
 // ============================================================================
 // STEP 1: Define Monarch Tokenizer for Syntax Highlighting
@@ -22,25 +22,42 @@ import { parseWithChevrotain } from '@/core/parser/FBasicChevrotainParser';
 const monarchLanguage: monaco.languages.IMonarchLanguage = {
   // Keywords
   keywords: [
-    'PRINT', 'LET', 'IF', 'THEN', 'ELSE', 'FOR', 'NEXT', 'TO', 'STEP',
-    'GOTO', 'GOSUB', 'RETURN', 'END', 'STOP', 'PAUSE',
-    'INPUT', 'DATA', 'READ', 'RESTORE', 'DIM',
-    'DEF', 'FN', 'REM', 'CLS', 'COLOR',
-    'PSET', 'LINE', 'CIRCLE', 'PAINT'
+    'PRINT',
+    'LET',
+    'IF',
+    'THEN',
+    'ELSE',
+    'FOR',
+    'NEXT',
+    'TO',
+    'STEP',
+    'GOTO',
+    'GOSUB',
+    'RETURN',
+    'END',
+    'STOP',
+    'PAUSE',
+    'INPUT',
+    'DATA',
+    'READ',
+    'RESTORE',
+    'DIM',
+    'DEF',
+    'FN',
+    'REM',
+    'CLS',
+    'COLOR',
+    'PSET',
+    'LINE',
+    'CIRCLE',
+    'PAINT',
   ],
 
   // Functions (Family BASIC supported functions)
-  functions: [
-    'ABS', 'SGN', 'RND', 'VAL', 'LEN', 'LEFT$', 'RIGHT$', 'MID$', 'STR$', 'HEX$',
-    'STICK', 'STRIG'
-  ],
+  functions: ['ABS', 'SGN', 'RND', 'VAL', 'LEN', 'LEFT$', 'RIGHT$', 'MID$', 'STR$', 'HEX$', 'STICK', 'STRIG'],
 
   // Operators (arithmetic, relational, logical)
-  operators: [
-    '+', '-', '*', '/', 'MOD',
-    '=', '<>', '<', '>', '<=', '>=',
-    'AND', 'OR', 'NOT', 'XOR'
-  ],
+  operators: ['+', '-', '*', '/', 'MOD', '=', '<>', '<', '>', '<=', '>=', 'AND', 'OR', 'NOT', 'XOR'],
 
   // Tokenizer rules (order matters - more specific patterns first)
   tokenizer: {
@@ -58,25 +75,16 @@ const monarchLanguage: monaco.languages.IMonarchLanguage = {
       // String functions with $ suffix (must come before identifiers)
       // Match function name followed by $ and then ( for function call
       // Pattern: LEFT$(, RIGHT$(, MID$(, STR$(, HEX$(
-      [
-        /\b(LEFT\$|RIGHT\$|MID\$|STR\$|HEX\$)(?=\s*\()/i,
-        'function'
-      ],
+      [/\b(LEFT\$|RIGHT\$|MID\$|STR\$|HEX\$)(?=\s*\()/i, 'function'],
 
       // Numeric functions (Family BASIC supported)
       // Match function name followed by ( for function call
       // Pattern: ABS(, SGN(, RND(, VAL(, LEN(, STICK(, STRIG(
-      [
-        /\b(ABS|SGN|RND|VAL|LEN|STICK|STRIG)(?=\s*\()/i,
-        'function'
-      ],
+      [/\b(ABS|SGN|RND|VAL|LEN|STICK|STRIG)(?=\s*\()/i, 'function'],
 
       // Keywords (case-insensitive)
       // Note: REM is excluded here since REM lines are handled above as comments
-      [
-        /\b(PRINT|LET|IF|THEN|FOR|NEXT|TO|STEP|GOTO|END|PAUSE|DIM|DATA|READ|RESTORE)\b/i,
-        'keyword'
-      ],
+      [/\b(PRINT|LET|IF|THEN|FOR|NEXT|TO|STEP|GOTO|END|PAUSE|DIM|DATA|READ|RESTORE)\b/i, 'keyword'],
 
       // Multi-character relational operators (must come before single-character operators)
       [/<>|<=|>=/, 'operator'],
@@ -101,10 +109,10 @@ const monarchLanguage: monaco.languages.IMonarchLanguage = {
       [/[(),:;]/, 'delimiter'],
 
       // Whitespace
-      [/\s+/, 'white']
-    ]
-  }
-};
+      [/\s+/, 'white'],
+    ],
+  },
+}
 
 // ============================================================================
 // STEP 2: Register Language with Monaco
@@ -112,10 +120,10 @@ const monarchLanguage: monaco.languages.IMonarchLanguage = {
 
 export function setupMonacoLanguage(): void {
   // Register the language
-  monaco.languages.register({ id: 'fbasic' });
+  monaco.languages.register({ id: 'fbasic' })
 
   // Set Monarch tokenizer for syntax highlighting
-  monaco.languages.setMonarchTokensProvider('fbasic', monarchLanguage);
+  monaco.languages.setMonarchTokensProvider('fbasic', monarchLanguage)
 
   // Define custom dark theme for F-BASIC with operator and function highlighting
   monaco.editor.defineTheme('fbasic-theme', {
@@ -130,10 +138,10 @@ export function setupMonacoLanguage(): void {
       { token: 'number', foreground: 'B5CEA8' }, // Light green for numbers
       { token: 'comment', foreground: '6A9955', fontStyle: 'italic' }, // Green for comments
       { token: 'identifier', foreground: '9CDCFE' }, // Light blue for identifiers
-      { token: 'delimiter', foreground: 'D4D4D4' } // Light gray for punctuation
+      { token: 'delimiter', foreground: 'D4D4D4' }, // Light gray for punctuation
     ],
-    colors: {}
-  });
+    colors: {},
+  })
 
   // Define custom light theme for F-BASIC
   monaco.editor.defineTheme('fbasic-theme-light', {
@@ -148,10 +156,10 @@ export function setupMonacoLanguage(): void {
       { token: 'number', foreground: '5A7C4A' }, // Green for numbers
       { token: 'comment', foreground: '6A9955', fontStyle: 'italic' }, // Green for comments
       { token: 'identifier', foreground: '1E1E1E' }, // Dark for identifiers
-      { token: 'delimiter', foreground: '333333' } // Dark gray for punctuation
+      { token: 'delimiter', foreground: '333333' }, // Dark gray for punctuation
     ],
-    colors: {}
-  });
+    colors: {},
+  })
 
   // ============================================================================
   // STEP 3: Set up Live Error Diagnostics Provider
@@ -161,43 +169,35 @@ export function setupMonacoLanguage(): void {
   monaco.languages.registerDocumentFormattingEditProvider('fbasic', {
     provideDocumentFormattingEdits: () => {
       // Optional: Add code formatting
-      return [];
-    }
-  });
+      return []
+    },
+  })
 
   // Register hover provider (optional)
   monaco.languages.registerHoverProvider('fbasic', {
     provideHover: async (model, position) => {
       // Use your Chevrotain parser to provide hover information
-      const word = model.getWordAtPosition(position);
+      const word = model.getWordAtPosition(position)
       if (word) {
         return {
-          range: new monaco.Range(
-            position.lineNumber,
-            word.startColumn,
-            position.lineNumber,
-            word.endColumn
-          ),
-          contents: [
-            { value: `**${word.word}**` },
-            { value: 'F-BASIC identifier' }
-          ]
-        };
+          range: new monaco.Range(position.lineNumber, word.startColumn, position.lineNumber, word.endColumn),
+          contents: [{ value: `**${word.word}**` }, { value: 'F-BASIC identifier' }],
+        }
       }
-      return null;
-    }
-  });
+      return null
+    },
+  })
 
   // Register completion provider (optional)
   monaco.languages.registerCompletionItemProvider('fbasic', {
     provideCompletionItems: (model, position) => {
-      const word = model.getWordUntilPosition(position);
+      const word = model.getWordUntilPosition(position)
       const range = {
         startLineNumber: position.lineNumber,
         endLineNumber: position.lineNumber,
         startColumn: word.startColumn,
-        endColumn: word.endColumn
-      };
+        endColumn: word.endColumn,
+      }
 
       const suggestions: monaco.languages.CompletionItem[] = [
         {
@@ -205,34 +205,34 @@ export function setupMonacoLanguage(): void {
           kind: monaco.languages.CompletionItemKind.Keyword,
           insertText: 'PRINT ',
           documentation: 'Print statement',
-          range
+          range,
         },
         {
           label: 'LET',
           kind: monaco.languages.CompletionItemKind.Keyword,
           insertText: 'LET ',
           documentation: 'Variable assignment',
-          range
+          range,
         },
         {
           label: 'IF',
           kind: monaco.languages.CompletionItemKind.Keyword,
           insertText: 'IF ',
           documentation: 'Conditional statement',
-          range
+          range,
         },
         {
           label: 'FOR',
           kind: monaco.languages.CompletionItemKind.Keyword,
           insertText: 'FOR ',
           documentation: 'For loop',
-          range
-        }
+          range,
+        },
         // Add more keywords...
-      ];
-      return { suggestions };
-    }
-  });
+      ]
+      return { suggestions }
+    },
+  })
 }
 
 // ============================================================================
@@ -243,14 +243,20 @@ export function setupMonacoLanguage(): void {
  * Convert parse errors to Monaco Editor diagnostics
  */
 export function convertToMonacoDiagnostics(
-  errors: Array<{ message: string; line?: number; column?: number; length?: number; location?: { start: { line?: number; column?: number } } }>,
+  errors: Array<{
+    message: string
+    line?: number
+    column?: number
+    length?: number
+    location?: { start: { line?: number; column?: number } }
+  }>,
   _model: monaco.editor.ITextModel
 ): monaco.editor.IMarkerData[] {
-  return errors.map((error) => {
+  return errors.map(error => {
     // Extract line/column from error (support both formats)
-    const line = error.line ?? error.location?.start?.line ?? 1;
-    const column = error.column ?? error.location?.start?.column ?? 1;
-    const length = error.length ?? 1;
+    const line = error.line ?? error.location?.start?.line ?? 1
+    const column = error.column ?? error.location?.start?.column ?? 1
+    const length = error.length ?? 1
 
     return {
       severity: monaco.MarkerSeverity.Error,
@@ -259,9 +265,9 @@ export function convertToMonacoDiagnostics(
       endLineNumber: line,
       endColumn: column + length,
       message: error.message,
-      source: 'F-BASIC Parser'
-    };
-  });
+      source: 'F-BASIC Parser',
+    }
+  })
 }
 
 // ============================================================================
@@ -272,39 +278,37 @@ export function convertToMonacoDiagnostics(
  * Set up live error checking for a Monaco editor instance
  * This will update diagnostics as the user types
  */
-export function setupLiveErrorChecking(
-  editor: monaco.editor.IStandaloneCodeEditor
-): void {
-  const model = editor.getModel();
-  if (!model) return;
+export function setupLiveErrorChecking(editor: monaco.editor.IStandaloneCodeEditor): void {
+  const model = editor.getModel()
+  if (!model) return
 
   // Function to update diagnostics
   const updateDiagnostics = () => {
-    const source = model.getValue();
-    
+    const source = model.getValue()
+
     // Use Chevrotain parser directly
-    const parseResult = parseWithChevrotain(source);
+    const parseResult = parseWithChevrotain(source)
 
     if (!parseResult.success && parseResult.errors) {
       // Convert errors to Monaco diagnostics
-      const diagnostics = convertToMonacoDiagnostics(parseResult.errors, model);
-      monaco.editor.setModelMarkers(model, 'fbasic', diagnostics);
+      const diagnostics = convertToMonacoDiagnostics(parseResult.errors, model)
+      monaco.editor.setModelMarkers(model, 'fbasic', diagnostics)
     } else {
       // Clear errors if parsing succeeds
-      monaco.editor.setModelMarkers(model, 'fbasic', []);
+      monaco.editor.setModelMarkers(model, 'fbasic', [])
     }
-  };
+  }
 
   // Use VueUse's useDebounceFn for debounced parsing
-  const debouncedUpdateDiagnostics = useDebounceFn(updateDiagnostics, 300);
+  const debouncedUpdateDiagnostics = useDebounceFn(updateDiagnostics, 300)
 
   // Listen for content changes
   model.onDidChangeContent(() => {
-    void debouncedUpdateDiagnostics();
-  });
+    void debouncedUpdateDiagnostics()
+  })
 
   // Initial parse
-  void updateDiagnostics();
+  void updateDiagnostics()
 }
 
 // ============================================================================
@@ -319,11 +323,11 @@ export function createMonacoEditor(
   initialValue: string = ''
 ): monaco.editor.IStandaloneCodeEditor {
   if (!container) {
-    throw new Error('Container element is required');
+    throw new Error('Container element is required')
   }
 
   // Setup language (call once)
-  setupMonacoLanguage();
+  setupMonacoLanguage()
 
   // Create editor
   const editor = monaco.editor.create(container, {
@@ -337,12 +341,11 @@ export function createMonacoEditor(
     lineNumbers: 'on',
     roundedSelection: false,
     cursorStyle: 'line',
-    wordWrap: 'on'
-  });
+    wordWrap: 'on',
+  })
 
   // Setup live error checking
-  setupLiveErrorChecking(editor);
+  setupLiveErrorChecking(editor)
 
-  return editor;
+  return editor
 }
-

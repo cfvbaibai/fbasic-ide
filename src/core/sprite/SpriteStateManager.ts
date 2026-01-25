@@ -3,7 +3,7 @@
  * Manages sprite definitions and states for DEF SPRITE and SPRITE commands
  */
 
-import type { DefSpriteDefinition,SpriteState } from './types'
+import type { DefSpriteDefinition, SpriteState } from './types'
 
 /**
  * SpriteStateManager - Manages 8 sprite slots (0-7)
@@ -22,7 +22,7 @@ export class SpriteStateManager {
         y: 0,
         visible: false,
         priority: 0,
-        definition: null
+        definition: null,
       })
     }
   }
@@ -120,7 +120,7 @@ export class SpriteStateManager {
         y: 0,
         visible: false,
         priority: 0,
-        definition: null
+        definition: null,
       })
     }
   }
@@ -135,7 +135,7 @@ export class SpriteStateManager {
       y: 0,
       visible: false,
       priority: 0,
-      definition: null
+      definition: null,
     })
   }
 }

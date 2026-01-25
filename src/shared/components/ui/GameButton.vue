@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import type { GameButtonEmits,GameButtonProps } from './GameButton.types'
+import type { GameButtonEmits, GameButtonProps } from './GameButton.types'
 import GameIcon from './GameIcon.vue'
 
 /**
  * GameButton component - A styled button component with multiple variants, sizes, and states.
- * 
+ *
  * @example
  * ```vue
  * <GameButton type="primary" size="medium" icon="mdi:play" @click="handleClick">
@@ -15,7 +15,7 @@ import GameIcon from './GameIcon.vue'
  * ```
  */
 defineOptions({
-  name: 'GameButton'
+  name: 'GameButton',
 })
 
 const props = withDefaults(defineProps<GameButtonProps>(), {
@@ -26,7 +26,7 @@ const props = withDefaults(defineProps<GameButtonProps>(), {
   loading: false,
   icon: undefined,
   iconPosition: 'left',
-  selected: false
+  selected: false,
 })
 
 const emit = defineEmits<GameButtonEmits>()
@@ -39,7 +39,7 @@ const buttonClasses = computed(() => {
     [`game-button-${props.variant}`]: true,
     'game-button-disabled': props.disabled || props.loading,
     'game-button-loading': props.loading,
-    'game-button-selected': props.selected
+    'game-button-selected': props.selected,
   }
 })
 
@@ -55,7 +55,7 @@ const getIconSize = computed(() => {
   const sizeMap: Record<string, number> = {
     small: 12,
     medium: 14,
-    large: 16
+    large: 16,
   }
   return sizeMap[props.size]
 })
@@ -107,7 +107,7 @@ const getIconSize = computed(() => {
   border-radius: 8px;
   transition: all 0.2s ease;
   min-width: 140px;
-  box-shadow: 
+  box-shadow:
     0 2px 4px var(--base-alpha-gray-00-30),
     inset 0 1px 0 var(--base-alpha-gray-100-10);
 }
@@ -123,7 +123,7 @@ const getIconSize = computed(() => {
   border-color: var(--game-surface-border);
   color: var(--game-text-primary);
   transform: translateY(-2px);
-  box-shadow: 
+  box-shadow:
     0 4px 8px var(--base-alpha-gray-00-40),
     0 2px 4px var(--base-alpha-gray-00-40),
     inset 0 1px 0 var(--base-alpha-gray-100-10);
@@ -131,7 +131,7 @@ const getIconSize = computed(() => {
 
 .game-button:active:not(.game-button-disabled) {
   transform: translateY(0);
-  box-shadow: 
+  box-shadow:
     0 2px 4px var(--base-alpha-gray-00-30),
     inset 0 1px 0 var(--base-alpha-gray-100-10);
 }
@@ -139,7 +139,7 @@ const getIconSize = computed(() => {
 /* Type variants - All buttons use the same base style, type affects hover/active states */
 .game-button-primary:hover:not(.game-button-disabled) {
   border-color: var(--game-surface-border);
-  box-shadow: 
+  box-shadow:
     0 4px 8px var(--base-alpha-gray-00-40),
     0 2px 4px var(--base-alpha-gray-00-40),
     inset 0 1px 0 var(--base-alpha-gray-100-10);
@@ -149,7 +149,7 @@ const getIconSize = computed(() => {
   background: linear-gradient(135deg, var(--base-solid-primary) 0%, var(--base-solid-primary) 100%);
   border-color: var(--game-surface-border);
   color: var(--game-text-contrast);
-  box-shadow: 
+  box-shadow:
     0 0 20px var(--game-accent-glow),
     0 4px 8px var(--base-alpha-gray-00-40),
     inset 0 1px 0 var(--base-alpha-gray-100-30);
@@ -157,7 +157,7 @@ const getIconSize = computed(() => {
 
 .game-button-success:hover:not(.game-button-disabled) {
   border-color: var(--semantic-solid-success);
-  box-shadow: 
+  box-shadow:
     0 4px 8px var(--semantic-alpha-success-40),
     0 2px 4px var(--base-alpha-gray-00-40),
     inset 0 1px 0 var(--base-alpha-gray-100-10);
@@ -167,7 +167,7 @@ const getIconSize = computed(() => {
   background: linear-gradient(135deg, var(--semantic-solid-success) 0%, var(--semantic-solid-success) 100%);
   border-color: var(--semantic-solid-success);
   color: var(--base-solid-gray-100);
-  box-shadow: 
+  box-shadow:
     0 0 12px var(--semantic-alpha-success-50),
     0 2px 4px var(--base-alpha-gray-00-30),
     inset 0 1px 0 var(--base-alpha-gray-100-20);
@@ -175,7 +175,7 @@ const getIconSize = computed(() => {
 
 .game-button-warning:hover:not(.game-button-disabled) {
   border-color: var(--semantic-solid-warning);
-  box-shadow: 
+  box-shadow:
     0 4px 8px var(--semantic-alpha-warning-40),
     0 2px 4px var(--base-alpha-gray-00-40),
     inset 0 1px 0 var(--base-alpha-gray-100-10);
@@ -185,7 +185,7 @@ const getIconSize = computed(() => {
   background: linear-gradient(135deg, var(--semantic-solid-warning) 0%, var(--semantic-solid-warning) 100%);
   border-color: var(--semantic-solid-warning);
   color: var(--base-solid-gray-100);
-  box-shadow: 
+  box-shadow:
     0 0 12px var(--semantic-alpha-warning-50),
     0 2px 4px var(--base-alpha-gray-00-30),
     inset 0 1px 0 var(--base-alpha-gray-100-20);
@@ -193,7 +193,7 @@ const getIconSize = computed(() => {
 
 .game-button-danger:hover:not(.game-button-disabled) {
   border-color: var(--semantic-solid-danger);
-  box-shadow: 
+  box-shadow:
     0 4px 8px var(--semantic-alpha-danger-40),
     0 2px 4px var(--base-alpha-gray-00-40),
     inset 0 1px 0 var(--base-alpha-gray-100-10);
@@ -203,7 +203,7 @@ const getIconSize = computed(() => {
   background: linear-gradient(135deg, var(--semantic-solid-danger) 0%, var(--semantic-solid-danger) 100%);
   border-color: var(--semantic-solid-danger);
   color: var(--base-solid-gray-100);
-  box-shadow: 
+  box-shadow:
     0 0 12px var(--semantic-alpha-danger-50),
     0 2px 4px var(--base-alpha-gray-00-30),
     inset 0 1px 0 var(--base-alpha-gray-100-20);
@@ -211,7 +211,7 @@ const getIconSize = computed(() => {
 
 .game-button-info:hover:not(.game-button-disabled) {
   border-color: var(--semantic-solid-info);
-  box-shadow: 
+  box-shadow:
     0 4px 8px var(--semantic-alpha-info-40),
     0 2px 4px var(--base-alpha-gray-00-40),
     inset 0 1px 0 var(--base-alpha-gray-100-10);
@@ -221,7 +221,7 @@ const getIconSize = computed(() => {
   background: linear-gradient(135deg, var(--semantic-solid-info) 0%, var(--semantic-solid-info) 100%);
   border-color: var(--semantic-solid-info);
   color: var(--base-solid-gray-100);
-  box-shadow: 
+  box-shadow:
     0 0 12px var(--semantic-alpha-info-50),
     0 2px 4px var(--base-alpha-gray-00-30),
     inset 0 1px 0 var(--base-alpha-gray-100-20);
@@ -249,7 +249,7 @@ const getIconSize = computed(() => {
   background: linear-gradient(135deg, var(--base-solid-primary) 0%, var(--base-solid-primary) 100%);
   border-color: var(--game-surface-border);
   color: var(--game-text-contrast);
-  box-shadow: 
+  box-shadow:
     0 0 20px var(--game-accent-glow),
     0 4px 8px var(--base-alpha-gray-00-40),
     inset 0 1px 0 var(--base-alpha-gray-100-30);
@@ -259,7 +259,7 @@ const getIconSize = computed(() => {
   background: linear-gradient(135deg, var(--base-solid-primary) 0%, var(--base-solid-primary) 100%);
   border-color: var(--game-surface-border);
   transform: translateY(-2px);
-  box-shadow: 
+  box-shadow:
     0 0 24px var(--game-accent-glow),
     0 6px 12px var(--base-alpha-gray-00-50),
     inset 0 1px 0 var(--base-alpha-gray-100-30);
@@ -267,7 +267,7 @@ const getIconSize = computed(() => {
 
 .game-button-toggle.game-button-selected:active:not(.game-button-disabled) {
   transform: translateY(0);
-  box-shadow: 
+  box-shadow:
     0 0 20px var(--game-accent-glow),
     0 4px 8px var(--base-alpha-gray-00-40),
     inset 0 1px 0 var(--base-alpha-gray-100-30);
@@ -278,7 +278,7 @@ const getIconSize = computed(() => {
   background: linear-gradient(135deg, var(--base-solid-primary) 0%, var(--base-solid-primary) 100%);
   border-color: var(--game-surface-border);
   color: var(--game-text-contrast);
-  box-shadow: 
+  box-shadow:
     0 0 20px var(--game-accent-glow),
     0 4px 8px var(--base-alpha-gray-00-40),
     inset 0 1px 0 var(--base-alpha-gray-100-30);
@@ -288,7 +288,7 @@ const getIconSize = computed(() => {
   background: linear-gradient(135deg, var(--base-solid-primary) 0%, var(--base-solid-primary) 100%);
   border-color: var(--game-surface-border);
   transform: translateY(-2px);
-  box-shadow: 
+  box-shadow:
     0 0 24px var(--game-accent-glow),
     0 6px 12px var(--base-alpha-gray-00-50),
     inset 0 1px 0 var(--base-alpha-gray-100-30);
@@ -296,7 +296,7 @@ const getIconSize = computed(() => {
 
 .game-button-action.game-button-selected:active:not(.game-button-disabled) {
   transform: translateY(0);
-  box-shadow: 
+  box-shadow:
     0 0 20px var(--game-accent-glow),
     0 4px 8px var(--base-alpha-gray-00-40),
     inset 0 1px 0 var(--base-alpha-gray-100-30);
@@ -325,7 +325,7 @@ const getIconSize = computed(() => {
 }
 
 .game-button-disabled:hover {
-  box-shadow: 
+  box-shadow:
     0 2px 4px var(--base-alpha-gray-00-30),
     inset 0 1px 0 var(--base-alpha-gray-100-10) !important;
 }
@@ -361,5 +361,4 @@ const getIconSize = computed(() => {
   height: 1em !important;
   font-size: inherit;
 }
-
 </style>

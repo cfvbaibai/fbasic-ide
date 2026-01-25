@@ -9,7 +9,7 @@ import type {
   AnyServiceWorkerMessage,
   ErrorMessage,
   ResultMessage,
-  ScreenCell
+  ScreenCell,
 } from '@/core/interfaces'
 import type { MovementState } from '@/core/sprite/types'
 
@@ -32,23 +32,20 @@ export interface MessageHandlerContext {
 /**
  * Handle output message from web worker
  */
-export function handleOutputMessage(
-  message: AnyServiceWorkerMessage,
-  context: MessageHandlerContext
-): void {
+export function handleOutputMessage(message: AnyServiceWorkerMessage, context: MessageHandlerContext): void {
   if (message.type !== 'OUTPUT') return
-  const { output: outputText, outputType } = (message).data
+  const { output: outputText, outputType } = message.data
   console.log('📤 [COMPOSABLE] Handling output:', outputType, outputText)
-  
+
   if (outputType === 'print') {
     context.output.value.push(outputText)
   } else if (outputType === 'debug') {
-    context.debugOutput.value += `${outputText  }\n`
+    context.debugOutput.value += `${outputText}\n`
   } else if (outputType === 'error') {
     context.errors.value.push({
       line: 0,
       message: outputText,
-      type: 'runtime'
+      type: 'runtime',
     })
   }
 }
@@ -56,28 +53,25 @@ export function handleOutputMessage(
 /**
  * Handle screen update message from web worker
  */
-export function handleScreenUpdateMessage(
-  message: AnyServiceWorkerMessage,
-  context: MessageHandlerContext
-): void {
+export function handleScreenUpdateMessage(message: AnyServiceWorkerMessage, context: MessageHandlerContext): void {
   if (message.type !== 'SCREEN_UPDATE') return
-  const update = (message).data
+  const update = message.data
   console.log('🖥️ [COMPOSABLE] Handling screen update:', update.updateType, update)
-  
+
   switch (update.updateType) {
     case 'character':
       if (update.x !== undefined && update.y !== undefined && update.character !== undefined) {
         const x = update.x
         const y = update.y
         const character = update.character
-        
+
         console.log('🖥️ [COMPOSABLE] Updating character:', {
           x,
           y,
           char: character,
-          currentBuffer: context.screenBuffer.value[y]?.[x]
+          currentBuffer: context.screenBuffer.value[y]?.[x],
         })
-        
+
         // Ensure row exists
         context.screenBuffer.value[y] ??= []
 
@@ -87,19 +81,19 @@ export function handleScreenUpdateMessage(
           character: ' ',
           colorPattern: 0,
           x,
-          y
+          y,
         }
-        
+
         // Update character - force reactivity by creating new object
         const currentCell = currentRow[x]
         const newCell: ScreenCell = {
           character,
           colorPattern: currentCell.colorPattern,
           x: currentCell.x,
-          y: currentCell.y
+          y: currentCell.y,
         }
         currentRow[x] = newCell
-        
+
         // Also trigger reactivity by reassigning the row
         context.screenBuffer.value[y] = [...currentRow]
       }
@@ -135,10 +129,10 @@ export function handleScreenUpdateMessage(
       // Update color pattern for cells specified in colorUpdates
       if (update.colorUpdates) {
         console.log('🖥️ [COMPOSABLE] Updating color patterns:', update.colorUpdates)
-        
+
         for (const colorUpdate of update.colorUpdates) {
           const { x, y, pattern } = colorUpdate
-          
+
           // Ensure row exists
           context.screenBuffer.value[y] ??= []
 
@@ -148,19 +142,19 @@ export function handleScreenUpdateMessage(
             character: ' ',
             colorPattern: 0,
             x,
-            y
+            y,
           }
-          
+
           // Update color pattern - force reactivity by creating new object
           const currentCell = currentRow[x]
           const newCell: ScreenCell = {
             character: currentCell.character,
             colorPattern: pattern,
             x: currentCell.x,
-            y: currentCell.y
+            y: currentCell.y,
           }
           currentRow[x] = newCell
-          
+
           // Also trigger reactivity by reassigning the row
           context.screenBuffer.value[y] = [...currentRow]
         }
@@ -200,14 +194,11 @@ export function handleScreenUpdateMessage(
 /**
  * Handle result message from web worker
  */
-export function handleResultMessage(
-  message: AnyServiceWorkerMessage,
-  context: MessageHandlerContext
-): void {
+export function handleResultMessage(message: AnyServiceWorkerMessage, context: MessageHandlerContext): void {
   const resultMessage = message as ResultMessage
   const result = resultMessage.data // message.data IS the ExecutionResult
   console.log('✅ [COMPOSABLE] Execution completed:', result.executionId, 'result:', result)
-  
+
   // Use message.id to look up the pending message (not executionId from data)
   const pending = context.webWorkerManager.pendingMessages.get(message.id)
   if (pending) {
@@ -222,13 +213,10 @@ export function handleResultMessage(
 /**
  * Handle error message from web worker
  */
-export function handleErrorMessage(
-  message: AnyServiceWorkerMessage,
-  context: MessageHandlerContext
-): void {
+export function handleErrorMessage(message: AnyServiceWorkerMessage, context: MessageHandlerContext): void {
   const errorMessage = message as ErrorMessage
   console.error('❌ [COMPOSABLE] Execution error:', errorMessage.data.executionId, errorMessage.data.message)
-  
+
   // Use message.id to look up the pending message (not executionId from data)
   const pending = context.webWorkerManager.pendingMessages.get(message.id)
   if (pending) {
@@ -243,12 +231,9 @@ export function handleErrorMessage(
 /**
  * Handle progress message from web worker
  */
-export function handleProgressMessage(
-  message: AnyServiceWorkerMessage,
-  _context: MessageHandlerContext
-): void {
+export function handleProgressMessage(message: AnyServiceWorkerMessage, _context: MessageHandlerContext): void {
   if (message.type !== 'PROGRESS') return
-  const { iterationCount, currentStatement } = (message).data
+  const { iterationCount, currentStatement } = message.data
   console.log('🔄 [COMPOSABLE] Progress:', iterationCount, currentStatement)
   // Could emit progress events here if needed
 }
@@ -257,18 +242,15 @@ export function handleProgressMessage(
  * Handle animation command message from web worker
  * These commands are sent immediately when MOVE is executed
  */
-export function handleAnimationCommandMessage(
-  message: AnyServiceWorkerMessage,
-  context: MessageHandlerContext
-): void {
+export function handleAnimationCommandMessage(message: AnyServiceWorkerMessage, context: MessageHandlerContext): void {
   if (message.type !== 'ANIMATION_COMMAND') return
   if (!context.movementStates) return
-  
+
   // TypeScript narrows message.data to AnimationCommand after type check
   const command: AnimationCommand = message.data
-  
+
   console.log('🎬 [COMPOSABLE] Handling animation command:', command.type, command)
-  
+
   switch (command.type) {
     case 'START_MOVEMENT': {
       // Create movement state immediately
@@ -286,27 +268,27 @@ export function handleAnimationCommandMessage(
         directionDeltaY: getDirectionDeltaY(command.definition.direction),
         isActive: true,
         currentFrameIndex: 0,
-        frameCounter: 0
+        frameCounter: 0,
       }
-      
+
       // Add or update movement state
       const existing = context.movementStates.value.findIndex(
         m => m.actionNumber === command.actionNumber
       )
-      
+
       if (existing >= 0) {
         context.movementStates.value[existing] = movementState
       } else {
         context.movementStates.value.push(movementState)
       }
-      
+
       // Force reactivity by creating new array
       context.movementStates.value = [...context.movementStates.value]
-      
+
       console.log('🎬 [COMPOSABLE] Started movement:', command.actionNumber, 'at', command.startX, command.startY)
       break
     }
-    
+
     case 'STOP_MOVEMENT': {
       // Mark movements as inactive but keep positions
       for (const actionNumber of command.actionNumbers) {
@@ -318,7 +300,7 @@ export function handleAnimationCommandMessage(
       context.movementStates.value = [...context.movementStates.value]
       break
     }
-    
+
     case 'ERASE_MOVEMENT': {
       // Remove movements completely
       context.movementStates.value = context.movementStates.value.filter(
@@ -326,7 +308,7 @@ export function handleAnimationCommandMessage(
       )
       break
     }
-    
+
     case 'UPDATE_MOVEMENT_POSITION': {
       // Update movement position (for future use if needed)
       const movement = context.movementStates.value.find(m => m.actionNumber === command.actionNumber)
@@ -345,9 +327,16 @@ export function handleAnimationCommandMessage(
  */
 function getDirectionDeltaX(direction: number): number {
   switch (direction) {
-    case 2: case 3: case 4: return 1  // Right directions
-    case 6: case 7: case 8: return -1 // Left directions
-    default: return 0
+    case 2:
+    case 3:
+    case 4:
+      return 1 // Right directions
+    case 6:
+    case 7:
+    case 8:
+      return -1 // Left directions
+    default:
+      return 0
   }
 }
 
@@ -356,22 +345,27 @@ function getDirectionDeltaX(direction: number): number {
  */
 function getDirectionDeltaY(direction: number): number {
   switch (direction) {
-    case 1: case 2: case 8: return -1 // Up directions
-    case 4: case 5: case 6: return 1  // Down directions
-    default: return 0
+    case 1:
+    case 2:
+    case 8:
+      return -1 // Up directions
+    case 4:
+    case 5:
+    case 6:
+      return 1 // Down directions
+    default:
+      return 0
   }
 }
 
 /**
  * Route message to appropriate handler
  */
-export function handleWorkerMessage(
-  message: AnyServiceWorkerMessage,
-  context: MessageHandlerContext
-): void {
+export function handleWorkerMessage(message: AnyServiceWorkerMessage, context: MessageHandlerContext): void {
   console.log('📨 [COMPOSABLE] Received message from worker:', message.type)
 
-  // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check -- Only handling response messages, request messages sent elsewhere
+  // -- Only handling response messages, request messages sent elsewhere
+  // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
   switch (message.type) {
     case 'OUTPUT':
       handleOutputMessage(message, context)

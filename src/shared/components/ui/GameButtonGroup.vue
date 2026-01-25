@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * GameButtonGroup component - A container for grouping buttons together.
- * 
+ *
  * @example
  * ```vue
  * <GameButtonGroup>
@@ -11,7 +11,7 @@
  * ```
  */
 defineOptions({
-  name: 'GameButtonGroup'
+  name: 'GameButtonGroup',
 })
 </script>
 
@@ -81,7 +81,7 @@ defineOptions({
 /* Hover effect for group container */
 .game-button-group:hover {
   border-color: var(--base-solid-primary);
-  box-shadow: 
+  box-shadow:
     0 0 12px var(--game-accent-glow),
     var(--game-shadow-base);
 }

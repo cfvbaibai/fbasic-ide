@@ -10,7 +10,7 @@ import ColorBox from './ColorBox.vue'
  * PaletteSelector component - Selector for choosing sprite palette codes.
  */
 defineOptions({
-  name: 'PaletteSelector'
+  name: 'PaletteSelector',
 })
 
 const { t } = useI18n()
@@ -92,4 +92,3 @@ const store = useSpriteViewerStore()
   box-shadow: 0 2px 4px var(--base-alpha-gray-00-30);
 }
 </style>
-

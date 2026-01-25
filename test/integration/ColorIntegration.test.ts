@@ -1,19 +1,19 @@
 /**
  * COLOR Integration Tests
- * 
+ *
  * Tests that verify COLOR command works correctly end-to-end:
  * 1. COLOR command execution
  * 2. Screen update message generation
  * 3. Message handler processing (simulated)
- * 
+ *
  * This test would have caught the bug where COLOR messages weren't being handled.
  */
 
-import { afterEach,beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { WebWorkerDeviceAdapter } from '@/core/devices/WebWorkerDeviceAdapter'
-import type { AnyServiceWorkerMessage, ScreenCell,ScreenUpdateMessage } from '@/core/interfaces'
+import type { AnyServiceWorkerMessage, ScreenCell, ScreenUpdateMessage } from '@/core/interfaces'
 
 // Mock self.postMessage to capture screen updates
 let capturedMessages: AnyServiceWorkerMessage[] = []
@@ -23,7 +23,9 @@ beforeEach(() => {
   capturedMessages = []
   // Mock self.postMessage for testing
   if (typeof self !== 'undefined') {
-    (self as typeof self & { postMessage: (message: AnyServiceWorkerMessage) => void }).postMessage = (message: AnyServiceWorkerMessage) => {
+    ;(self as typeof self & { postMessage: (message: AnyServiceWorkerMessage) => void }).postMessage = (
+      message: AnyServiceWorkerMessage
+    ) => {
       capturedMessages.push(message)
     }
   }
@@ -32,7 +34,7 @@ beforeEach(() => {
 afterEach(() => {
   // Restore original
   if (typeof self !== 'undefined' && originalPostMessage) {
-    (self as typeof self & { postMessage: typeof originalPostMessage }).postMessage = originalPostMessage
+    ;(self as typeof self & { postMessage: typeof originalPostMessage }).postMessage = originalPostMessage
   }
 })
 
@@ -43,7 +45,8 @@ afterEach(() => {
 function simulateMessageHandler(message: ScreenUpdateMessage, screenBuffer: ScreenCell[][]): void {
   const update = message.data
 
-  // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check -- Test helper only handles specific update types
+  // -- Test helper only handles specific update types
+  // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
   switch (update.updateType) {
     case 'color':
       // This is the handler that was missing - would catch the bug!
@@ -60,9 +63,9 @@ function simulateMessageHandler(message: ScreenUpdateMessage, screenBuffer: Scre
             character: ' ',
             colorPattern: 0,
             x,
-            y
+            y,
           }
-          
+
           // Update color pattern
           currentRow[x].colorPattern = pattern
         }
@@ -80,7 +83,7 @@ function simulateMessageHandler(message: ScreenUpdateMessage, screenBuffer: Scre
           character: ' ',
           colorPattern: 0,
           x: update.x,
-          y: update.y
+          y: update.y,
         }
         const cell = row[update.x]
         if (cell) {
@@ -105,7 +108,7 @@ describe('COLOR Integration', () => {
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
-      deviceAdapter: deviceAdapter
+      deviceAdapter: deviceAdapter,
     })
     capturedMessages = []
   })
@@ -117,19 +120,17 @@ describe('COLOR Integration', () => {
 20 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      
+
       // Find color update messages
       const colorMessages = capturedMessages.filter(
-        (msg) => msg.type === 'SCREEN_UPDATE' && 
-                 'updateType' in msg.data && 
-                 msg.data.updateType === 'color'
+        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'color'
       )
-      
+
       expect(colorMessages.length).toBeGreaterThan(0)
-      
+
       const colorMessage = colorMessages[0] as ScreenUpdateMessage
       expect(colorMessage.data.updateType).toBe('color')
       expect(colorMessage.data.colorUpdates).toBeDefined()
@@ -142,23 +143,21 @@ describe('COLOR Integration', () => {
 20 END
 `
       await interpreter.execute(source)
-      
+
       const colorMessages = capturedMessages.filter(
-        (msg) => msg.type === 'SCREEN_UPDATE' && 
-                 'updateType' in msg.data && 
-                 msg.data.updateType === 'color'
+        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'color'
       )
-      
+
       expect(colorMessages.length).toBeGreaterThan(0)
       const colorMessage = colorMessages[0] as ScreenUpdateMessage
       const colorUpdates = colorMessage.data.colorUpdates
-      
+
       expect(colorUpdates).toBeDefined()
       expect(colorUpdates?.length).toBeGreaterThan(0)
-      
+
       // COLOR affects a 2×2 area, so should have 4 updates
       expect(colorUpdates?.length).toBe(4)
-      
+
       // Verify all updates have the correct pattern
       colorUpdates?.forEach(update => {
         expect(update.pattern).toBe(2)
@@ -177,13 +176,11 @@ describe('COLOR Integration', () => {
 40 END
 `
       await interpreter.execute(source)
-      
+
       const colorMessages = capturedMessages.filter(
-        (msg) => msg.type === 'SCREEN_UPDATE' && 
-                 'updateType' in msg.data && 
-                 msg.data.updateType === 'color'
+        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'color'
       )
-      
+
       // Should have 3 color update messages
       expect(colorMessages.length).toBe(3)
     })
@@ -201,11 +198,11 @@ describe('COLOR Integration', () => {
             character: ' ',
             colorPattern: 0,
             x,
-            y
+            y,
           }
         }
       }
-      
+
       // Create a color update message (simulating what WebWorkerDeviceAdapter sends)
       const colorMessage: ScreenUpdateMessage = {
         type: 'SCREEN_UPDATE',
@@ -218,15 +215,15 @@ describe('COLOR Integration', () => {
             { x: 0, y: 0, pattern: 3 },
             { x: 1, y: 0, pattern: 3 },
             { x: 0, y: 1, pattern: 3 },
-            { x: 1, y: 1, pattern: 3 }
+            { x: 1, y: 1, pattern: 3 },
           ],
-          timestamp: Date.now()
-        }
+          timestamp: Date.now(),
+        },
       }
-      
+
       // Process the message (simulating the handler)
       simulateMessageHandler(colorMessage, screenBuffer)
-      
+
       // Verify color patterns were updated
       expect(screenBuffer[0]?.[0]?.colorPattern).toBe(3)
       expect(screenBuffer[0]?.[1]?.colorPattern).toBe(3)
@@ -244,11 +241,11 @@ describe('COLOR Integration', () => {
             character: x === 0 && y === 0 ? 'H' : ' ',
             colorPattern: 0,
             x,
-            y
+            y,
           }
         }
       }
-      
+
       const colorMessage: ScreenUpdateMessage = {
         type: 'SCREEN_UPDATE',
         id: 'test-color-2',
@@ -256,15 +253,13 @@ describe('COLOR Integration', () => {
         data: {
           executionId: 'test',
           updateType: 'color',
-          colorUpdates: [
-            { x: 0, y: 0, pattern: 2 }
-          ],
-          timestamp: Date.now()
-        }
+          colorUpdates: [{ x: 0, y: 0, pattern: 2 }],
+          timestamp: Date.now(),
+        },
       }
-      
+
       simulateMessageHandler(colorMessage, screenBuffer)
-      
+
       // Character should be preserved, color pattern should be updated
       expect(screenBuffer[0]?.[0]?.character).toBe('H')
       expect(screenBuffer[0]?.[0]?.colorPattern).toBe(2)
@@ -279,29 +274,25 @@ describe('COLOR Integration', () => {
 30 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      
+
       // Find color update message
       const colorMessages = capturedMessages.filter(
-        (msg) => msg.type === 'SCREEN_UPDATE' && 
-                 'updateType' in msg.data && 
-                 msg.data.updateType === 'color'
+        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'color'
       )
-      
+
       expect(colorMessages.length).toBeGreaterThan(0)
-      
+
       // Find full screen update (from PRINT)
       const screenMessages = capturedMessages.filter(
-        (msg) => msg.type === 'SCREEN_UPDATE' && 
-                 'updateType' in msg.data && 
-                 msg.data.updateType === 'full'
+        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
       )
-      
+
       expect(screenMessages.length).toBeGreaterThan(0)
       expect(colorMessages.length).toBeGreaterThan(0)
-      
+
       // Verify color update came before screen update
       const colorMessage = colorMessages[0]
       const screenMessage = screenMessages[screenMessages.length - 1]
@@ -310,7 +301,7 @@ describe('COLOR Integration', () => {
       }
       const colorMessageIndex = capturedMessages.indexOf(colorMessage)
       const screenMessageIndex = capturedMessages.indexOf(screenMessage)
-      
+
       // Color should be set before or around the same time as printing
       // (In practice, COLOR happens first, then PRINT)
       expect(colorMessageIndex).toBeLessThanOrEqual(screenMessageIndex)
@@ -323,19 +314,17 @@ describe('COLOR Integration', () => {
 30 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      
+
       // Should have both character updates (from PRINT) and color update (from COLOR)
       const colorMessages = capturedMessages.filter(
-        (msg) => msg.type === 'SCREEN_UPDATE' && 
-                 'updateType' in msg.data && 
-                 msg.data.updateType === 'color'
+        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'color'
       )
-      
+
       expect(colorMessages.length).toBeGreaterThan(0)
-      
+
       // Verify the color update message is valid and processable
       const colorMessage = colorMessages[0] as ScreenUpdateMessage
       expect(colorMessage.data.colorUpdates).toBeDefined()
@@ -350,18 +339,16 @@ describe('COLOR Integration', () => {
 20 END
 `
       await interpreter.execute(source)
-      
+
       const colorMessages = capturedMessages.filter(
-        (msg) => msg.type === 'SCREEN_UPDATE' && 
-                 'updateType' in msg.data && 
-                 msg.data.updateType === 'color'
+        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'color'
       )
-      
+
       const colorMessage = colorMessages[0] as ScreenUpdateMessage
       const colorUpdates = colorMessage.data.colorUpdates
-      
+
       expect(colorUpdates?.length).toBe(4)
-      
+
       // For COLOR 0, 0, 3:
       // areaX = Math.floor(0 / 2) * 2 = 0
       // areaY = 0
@@ -385,18 +372,16 @@ describe('COLOR Integration', () => {
 20 END
 `
       await interpreter.execute(source)
-      
+
       const colorMessages = capturedMessages.filter(
-        (msg) => msg.type === 'SCREEN_UPDATE' && 
-                 'updateType' in msg.data && 
-                 msg.data.updateType === 'color'
+        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'color'
       )
-      
+
       const colorMessage = colorMessages[0] as ScreenUpdateMessage
       const colorUpdates = colorMessage.data.colorUpdates
-      
+
       expect(colorUpdates?.length).toBe(4)
-      
+
       // For COLOR 10, 10, 2:
       // areaX = Math.floor(10 / 2) * 2 = 10
       // areaY = 10

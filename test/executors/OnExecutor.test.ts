@@ -1,10 +1,10 @@
 /**
  * ON Statement Executor Tests
- * 
+ *
  * Unit tests for the OnExecutor class execution behavior.
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
@@ -20,7 +20,7 @@ describe('OnExecutor', () => {
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
-      deviceAdapter: deviceAdapter
+      deviceAdapter: deviceAdapter,
     })
   })
 
@@ -39,7 +39,7 @@ describe('OnExecutor', () => {
 310 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -60,7 +60,7 @@ describe('OnExecutor', () => {
 310 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -81,7 +81,7 @@ describe('OnExecutor', () => {
 310 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -89,7 +89,9 @@ describe('OnExecutor', () => {
     })
 
     it('should proceed to next line when expression is 0', async () => {
-      // Manual: "When the value of the equation is 0 or when it exceeds the specified number of lines, it moves to the next sentence after the ON sentence."
+      // Manual: "When the value of the equation is 0 or when it exceeds the
+      // specified number of lines, it moves to the next sentence after the
+      // ON sentence."
       const source = `
 10 LET X = 0
 20 ON X GOTO 100, 200, 300
@@ -103,7 +105,7 @@ describe('OnExecutor', () => {
 310 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -111,7 +113,9 @@ describe('OnExecutor', () => {
     })
 
     it('should proceed to next line when expression exceeds number of lines', async () => {
-      // Manual: "When the value of the equation is 0 or when it exceeds the specified number of lines, it moves to the next sentence after the ON sentence."
+      // Manual: "When the value of the equation is 0 or when it exceeds the
+      // specified number of lines, it moves to the next sentence after the
+      // ON sentence."
       const source = `
 10 LET X = 5
 20 ON X GOTO 100, 200, 300
@@ -125,7 +129,7 @@ describe('OnExecutor', () => {
 310 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -146,7 +150,7 @@ describe('OnExecutor', () => {
 310 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -167,7 +171,7 @@ describe('OnExecutor', () => {
 310 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -189,7 +193,7 @@ describe('OnExecutor', () => {
 310 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -214,7 +218,7 @@ describe('OnExecutor', () => {
 310 RETURN
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -239,7 +243,7 @@ describe('OnExecutor', () => {
 600 X$="WEDDING": RETURN
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -267,7 +271,7 @@ describe('OnExecutor', () => {
 410 RETURN
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -291,7 +295,7 @@ describe('OnExecutor', () => {
 410 RETURN
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -313,7 +317,7 @@ describe('OnExecutor', () => {
 80 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -335,7 +339,7 @@ describe('OnExecutor', () => {
 80 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -355,7 +359,7 @@ describe('OnExecutor', () => {
 70 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       // Should read from default position (beginning): 10
@@ -374,12 +378,12 @@ describe('OnExecutor', () => {
 40 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(false)
       expect(result.errors.length).toBeGreaterThan(0)
       const errorMessages = result.errors.map(e => e.message).join(' ')
       expect(errorMessages).toEqual('ON: line number 999 not found')
-      
+
       // Verify that PRINT statements after the error are not executed
       const outputs = deviceAdapter.getAllOutputs()
       expect(outputs).toEqual('RUNTIME: ON: line number 999 not found')
@@ -397,12 +401,12 @@ describe('OnExecutor', () => {
 310 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(false)
       expect(result.errors.length).toBeGreaterThan(0)
       const errorMessages = result.errors.map(e => e.message).join(' ')
       expect(errorMessages).toEqual('ON: line number 999 not found')
-      
+
       // Verify that PRINT statements after the error are not executed
       const outputs = deviceAdapter.getAllOutputs()
       expect(outputs).toEqual('RUNTIME: ON: line number 999 not found')
@@ -435,7 +439,7 @@ describe('OnExecutor', () => {
 510 END
 `
       const result = await interpreter.execute(source)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
@@ -444,4 +448,3 @@ describe('OnExecutor', () => {
     })
   })
 })
-

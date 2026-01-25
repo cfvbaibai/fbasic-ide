@@ -1,11 +1,11 @@
 /**
  * Relational Operators Tests
- * 
+ *
  * Tests for relational/comparison operators: =, <>, <, >, <=, >=
  * These operators return -1 for true, 0 for false (per Family BASIC spec)
  */
 
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
@@ -21,7 +21,7 @@ describe('Relational Operators', () => {
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
-      deviceAdapter
+      deviceAdapter,
     })
   })
 
@@ -32,7 +32,7 @@ describe('Relational Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(deviceAdapter.getAllOutputs()).toEqual('-1\n')
@@ -44,7 +44,7 @@ describe('Relational Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('')
     })
@@ -56,7 +56,7 @@ describe('Relational Operators', () => {
 30 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('Match\n')
     })
@@ -69,7 +69,7 @@ describe('Relational Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
     })
@@ -80,7 +80,7 @@ describe('Relational Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('')
     })
@@ -93,7 +93,7 @@ describe('Relational Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
     })
@@ -104,7 +104,7 @@ describe('Relational Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('')
     })
@@ -117,7 +117,7 @@ describe('Relational Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
     })
@@ -128,7 +128,7 @@ describe('Relational Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('')
     })
@@ -141,7 +141,7 @@ describe('Relational Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
     })
@@ -152,7 +152,7 @@ describe('Relational Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
     })
@@ -163,7 +163,7 @@ describe('Relational Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('')
     })
@@ -176,7 +176,7 @@ describe('Relational Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
     })
@@ -187,7 +187,7 @@ describe('Relational Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
     })
@@ -198,7 +198,7 @@ describe('Relational Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('')
     })
@@ -211,7 +211,7 @@ describe('Relational Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('Less\n')
     })
@@ -222,10 +222,9 @@ describe('Relational Operators', () => {
 20 END
 `
       const result = await interpreter.execute(code)
-      
+
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('Equal\n')
     })
   })
 })
-
