@@ -286,27 +286,55 @@ This document outlines the remaining work needed to complete the Family Basic ID
 
 ---
 
-### Phase 5: Implement Sprite System (Future Enhancement)
+### Phase 5: Implement Sprite System (🚧 IN PROGRESS)
 
-**Estimated Effort**: 5-10 days  
-**Priority**: Low (advanced feature, can be added later)
+**Estimated Effort**: 5-10 days
+**Priority**: Medium (advanced feature, foundational work in progress)
+**Status**: 2/6 phases complete (33%)
 
-#### 5.1 Sprite Commands
-- [ ] DEF SPRITE (define sprite)
-- [ ] SPRITE (display sprite)
-- [ ] DEF MOVE (define sprite movement)
-- [ ] MOVE (execute sprite movement)
-- [ ] CUT (cut sprite)
-- [ ] ERA (erase sprite)
-- [ ] POSITION (sprite position)
-- [ ] XPOS, YPOS (sprite coordinates)
-- [ ] PALET (palette selection)
+**Detailed Plan**: See `docs/planning/sprite-animation-implementation-plan.md`
 
-**Note**: This is a complex feature requiring significant graphics implementation. Consider this a future enhancement rather than core functionality.
+#### 5.1 Sprite Commands - Progress Tracker
+- [x] **Phase 1**: Canvas Infrastructure ✅ (2026-01-25)
+  - Multi-layer canvas rendering
+  - Sprite tile rendering with caching
+  - Priority-based layering system
+- [x] **Phase 2**: Static Sprite Rendering ✅ (2026-01-25)
+  - DEF SPRITE (define sprite) ✅
+  - SPRITE (display sprite) ✅
+  - Character set to tile conversion ✅
+  - 8×8 and 16×16 sprite support ✅
+- [ ] **Phase 3**: Basic Animation (⏳ NEXT)
+  - DEF MOVE (define sprite movement)
+  - MOVE (execute sprite movement)
+  - Movement calculation and timing
+- [ ] **Phase 4**: Animation Sequences
+  - Frame cycling with CHARACTER_SPRITES data
+  - Direction-to-sequence mapping
+- [ ] **Phase 5**: Movement Control
+  - CUT (cut sprite)
+  - ERA (erase sprite)
+  - POSITION (sprite position)
+  - XPOS, YPOS (sprite coordinates)
+  - MOVE(n) status query
+- [ ] **Phase 6**: Integration & Polish
+  - Performance optimization
+  - Comprehensive testing
+  - Documentation
+
+**Files Created So Far**:
+- `src/core/sprite/types.ts` - Type definitions
+- `src/core/sprite/SpriteStateManager.ts` - State management
+- `src/core/sprite/characterSetConverter.ts` - Character conversion
+- `src/core/execution/executors/DefSpriteExecutor.ts` - DEF SPRITE
+- `src/core/execution/executors/SpriteExecutor.ts` - SPRITE
+- `src/features/ide/composables/spriteCanvasRenderer.ts` - Rendering
 
 **Reference Documentation**:
+- `docs/planning/sprite-animation-implementation-plan.md` - **Main implementation plan**
 - `.claude/skills/fbasic-reference/references/sprites.md`
 - `docs/reference/family-basic-manual/page-74.md` through `page-87.md`
+- `docs/device-models/screen/canvas-sprite-animation-design.md` - Design spec
 
 ---
 

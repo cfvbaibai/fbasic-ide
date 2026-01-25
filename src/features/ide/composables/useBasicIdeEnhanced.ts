@@ -22,10 +22,11 @@
  * @returns Object containing reactive state and methods for IDE functionality
  */
 
-import { ref, onUnmounted, onDeactivated } from 'vue'
+import { ref, watch, onUnmounted, onDeactivated } from 'vue'
 import { FBasicParser } from '../../../core/parser/FBasicParser'
 import { getSampleCode } from '../../../core/samples/sampleCodes'
 import type { ExecutionResult, ParserInfo, HighlighterInfo, BasicVariable, AnyServiceWorkerMessage } from '../../../core/interfaces'
+import type { SpriteState } from '../../../core/sprite/types'
 import { EXECUTION_LIMITS } from '../../../core/constants'
 import { initializeScreenBuffer, clearScreenBuffer } from './useBasicIdeScreenUtils'
 import { handleWorkerMessage, type MessageHandlerContext } from './useBasicIdeMessageHandlers'
@@ -52,7 +53,7 @@ export function useBasicIde() {
 40 FOR I=1 TO 3: PRINT "I="; I: NEXT
 50 END`)
 
-  const currentSampleType = ref<'basic' | 'gaming' | 'complex' | 'comprehensive' | 'pause' | 'allChars' | null>(null)
+  const currentSampleType = ref<'basic' | 'gaming' | 'complex' | 'comprehensive' | 'pause' | 'allChars' | 'spriteTest' | null>(null)
 
   const isRunning = ref(false)
   const output = ref<string[]>([])
@@ -68,6 +69,10 @@ export function useBasicIde() {
   const cursorY = ref(0)
   const bgPalette = ref(1) // Default background palette code is 1
   const backdropColor = ref(0) // Default backdrop color code (0 = black)
+  
+  // Sprite state
+  const spriteStates = ref<SpriteState[]>([])
+  const spriteEnabled = ref(false)
 
   // Parser instance
   const parser = new FBasicParser()
@@ -100,12 +105,6 @@ export function useBasicIde() {
         data: { joystickId, state }
       })
     }
-  }
-
-  // Helper function to check if code contains joystick functions
-  const _hasJoystickFunctions = (code: string): boolean => {
-    const joystickKeywords = ['STICK(', 'STRIG(']
-    return joystickKeywords.some(keyword => code.includes(keyword))
   }
 
   // Message handler context
@@ -210,13 +209,8 @@ export function useBasicIde() {
         return
       }
 
-    // Clear previous output
-    output.value = []
-    errors.value = []
-    debugOutput.value = ''
-    
-    // Clear screen
-    clearScreenBuffer(screenBuffer, cursorX, cursorY)
+      // Clear screen
+      clearScreenBuffer(screenBuffer, cursorX, cursorY)
 
       // Send execution message to web worker
       const result = await sendMessageToWorkerWrapper({
@@ -257,6 +251,14 @@ export function useBasicIde() {
         }
         
         variables.value = vars
+      }
+
+      // Update sprite states
+      if (result?.spriteStates) {
+        spriteStates.value = result.spriteStates
+      }
+      if (result?.spriteEnabled !== undefined) {
+        spriteEnabled.value = result.spriteEnabled
       }
 
     } catch (error) {
@@ -300,6 +302,10 @@ export function useBasicIde() {
     screenBuffer.value = initializeScreenBuffer()
     cursorX.value = 0
     cursorY.value = 0
+    
+    // Clear sprite states
+    spriteStates.value = []
+    spriteEnabled.value = false
   }
 
   /**
@@ -321,7 +327,7 @@ export function useBasicIde() {
   /**
    * Load sample code
    */
-  const loadSampleCode = (sampleType: 'basic' | 'gaming' | 'complex' | 'comprehensive' | 'pause' | 'allChars' = 'basic') => {
+  const loadSampleCode = (sampleType: 'basic' | 'gaming' | 'complex' | 'comprehensive' | 'pause' | 'allChars' | 'spriteTest' = 'basic') => {
     const sample = getSampleCode(sampleType)
     if (sample) {
       code.value = sample.code
@@ -356,9 +362,10 @@ export function useBasicIde() {
     return cst !== null
   }
 
-
-  // Initialize highlighting
-  void updateHighlighting()
+  // Watch code changes and update highlighting reactively
+  watch(code, () => {
+    void updateHighlighting()
+  }, { immediate: true })
 
   // Cleanup function for web worker
   const cleanupWebWorker = () => {
@@ -389,6 +396,8 @@ export function useBasicIde() {
     cursorY,
     bgPalette,
     backdropColor,
+    spriteStates,
+    spriteEnabled,
 
     // Methods
     runCode,

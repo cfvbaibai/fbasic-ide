@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { useTemplateRef, ref, watch, watchEffect, computed } from 'vue'
+import { useTemplateRef, ref, watch, computed } from 'vue'
 import type { ScreenCell } from '@/core/interfaces'
-import { renderScreenBuffer } from '../composables/canvasRenderer'
+import { renderScreenBuffer, renderScreenLayers } from '../composables/canvasRenderer'
+import type { SpriteState, MovementState } from '@/core/sprite/types'
 import GameButtonGroup from '@/shared/components/ui/GameButtonGroup.vue'
 import GameButton from '@/shared/components/ui/GameButton.vue'
 
@@ -28,7 +29,11 @@ const props = withDefaults(defineProps<Props>(), {
   cursorX: 0,
   cursorY: 0,
   bgPalette: 1,
-  backdropColor: 0
+  backdropColor: 0,
+  spritePalette: 1,
+  spriteStates: () => [],
+  movementStates: () => [],
+  spriteEnabled: false
 })
 
 interface Props {
@@ -37,6 +42,10 @@ interface Props {
   cursorY: number
   bgPalette?: number
   backdropColor?: number
+  spritePalette?: number
+  spriteStates?: SpriteState[]
+  movementStates?: MovementState[]
+  spriteEnabled?: boolean
 }
 
 // Canvas reference
@@ -71,17 +80,57 @@ function setZoom(level: 1 | 2 | 3 | 4): void {
 // Direct rendering function (no Vue reactivity overhead)
 function render(): void {
   if (!screenCanvas.value) return
-  renderScreenBuffer(
-    screenCanvas.value,
-    props.screenBuffer,
-    paletteCode.value,
-    props.backdropColor ?? 0
-  )
+
+  // Use multi-layer rendering when sprites are present
+  if (props.spriteStates && props.spriteStates.length > 0) {
+    // renderScreenLayers is async, but we call it without await to avoid blocking
+    void renderScreenLayers(
+      screenCanvas.value,
+      props.screenBuffer,
+      props.spriteStates,
+      props.movementStates ?? [],
+      paletteCode.value,
+      props.spritePalette ?? 1,
+      props.backdropColor ?? 0,
+      props.spriteEnabled ?? false
+    )
+  } else {
+    // Fallback to simple rendering when no sprites
+    renderScreenBuffer(
+      screenCanvas.value,
+      props.screenBuffer,
+      paletteCode.value,
+      props.backdropColor ?? 0
+    )
+  }
 }
 
-// Watch paletteCode and backdropColor changes to trigger re-render
+// Watch paletteCode, backdropColor, spritePalette, sprite states, and sprite enabled to trigger re-render
 // Combined watcher for better performance (Vue 3 best practice)
-watch([paletteCode, () => props.backdropColor], () => {
+// Use computed to extract sprite state fingerprint for efficient change detection
+const spriteStateFingerprint = computed(() => {
+  if (!props.spriteStates || props.spriteStates.length === 0) return ''
+  // Create a fingerprint from sprite properties we care about for rendering
+  return props.spriteStates.map(s => 
+    `${s.spriteNumber}:${s.x},${s.y},${s.visible ? '1' : '0'},${s.priority}`
+  ).join('|')
+})
+
+const movementStateFingerprint = computed(() => {
+  if (!props.movementStates || props.movementStates.length === 0) return ''
+  return props.movementStates.map(m => 
+    `${m.actionNumber}:${m.currentX},${m.currentY},${m.isActive ? '1' : '0'},${m.currentFrameIndex}`
+  ).join('|')
+})
+
+watch([
+  paletteCode,
+  () => props.backdropColor,
+  () => props.spritePalette,
+  spriteStateFingerprint,
+  movementStateFingerprint,
+  () => props.spriteEnabled
+], () => {
   scheduleRender()
 })
 
@@ -102,11 +151,12 @@ watch(() => props.screenBuffer, () => {
 }, { immediate: true })
 
 // Initial render when canvas becomes available
-watchEffect(() => {
-  if (screenCanvas.value) {
-    render()
+// Use watch instead of watchEffect to avoid conditional dependency tracking issues
+watch(screenCanvas, (canvas) => {
+  if (canvas) {
+    scheduleRender()
   }
-})
+}, { immediate: true })
 </script>
 
 <template>

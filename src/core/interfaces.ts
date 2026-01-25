@@ -5,6 +5,7 @@
 import type { VARIABLE_TYPES, ERROR_TYPES } from './constants'
 import type { ExecutionContext } from './state/ExecutionContext'
 import type { BasicArrayValue } from './types/BasicTypes'
+import type { SpriteState } from './sprite/types'
 
 /**
  * Represents a BASIC variable with its value and type
@@ -90,6 +91,8 @@ export interface ExecutionResult {
   variables: Map<string, BasicVariable>
   arrays?: Map<string, BasicArrayValue> // Arrays declared/used during execution
   executionTime: number
+  spriteStates?: SpriteState[] // Sprite states from DEF SPRITE and SPRITE commands
+  spriteEnabled?: boolean // Whether sprite display is enabled (SPRITE ON/OFF)
 }
 
 /**

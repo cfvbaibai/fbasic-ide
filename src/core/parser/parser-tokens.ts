@@ -31,6 +31,7 @@ export const Goto = createToken({ name: 'Goto', pattern: /\bGOTO\b/i });
 export const Gosub = createToken({ name: 'Gosub', pattern: /\bGOSUB\b/i });
 export const Return = createToken({ name: 'Return', pattern: /\bRETURN\b/i });
 export const On = createToken({ name: 'On', pattern: /\bON\b/i });
+export const Off = createToken({ name: 'Off', pattern: /\bOFF\b/i });
 export const Dim = createToken({ name: 'Dim', pattern: /\bDIM\b/i });
 export const Data = createToken({ name: 'Data', pattern: /\bDATA\b/i });
 export const Read = createToken({ name: 'Read', pattern: /\bREAD\b/i });
@@ -44,6 +45,11 @@ export const Cgen = createToken({ name: 'Cgen', pattern: /\bCGEN\b/i });
 export const Paletb = createToken({ name: 'Paletb', pattern: /\bPALETB\b/i });
 export const Palets = createToken({ name: 'Palets', pattern: /\bPALETS\b/i });
 export const Palet = createToken({ name: 'Palet', pattern: /\bPALET\b/i });
+
+// Sprite commands
+export const Def = createToken({ name: 'Def', pattern: /\bDEF\b/i });
+export const Sprite = createToken({ name: 'Sprite', pattern: /\bSPRITE\b/i });
+export const Move = createToken({ name: 'Move', pattern: /\bMOVE\b/i });
 
 // String function keywords (must be before Identifier)
 export const Len = createToken({ name: 'Len', pattern: /\bLEN\b/i });
@@ -143,7 +149,7 @@ export const Whitespace = createToken({
 export const allTokens = [
   Whitespace,
   // Keywords
-  Let, Print, For, To, Step, Next, End, Rem, Pause, If, Then, Goto, Gosub, Return, On, Dim, Data, Read, Restore, Cls, Locate, Color, Cgset, Cgen, Paletb, Palets, Palet,
+  Let, Print, For, To, Step, Next, End, Rem, Pause, If, Then, Goto, Gosub, Return, On, Off, Dim, Data, Read, Restore, Cls, Locate, Color, Cgset, Cgen, Paletb, Palets, Palet, Def, Sprite, Move,
   // String functions (must come before Identifier)
   Len, Left, Right, Mid, Str, Hex, Chr, Asc,
   // Arithmetic functions (must come before Identifier)

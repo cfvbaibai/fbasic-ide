@@ -5,6 +5,8 @@
 
 import { BACKGROUND_PALETTES, COLORS } from '@/shared/data/palette'
 import { getBackgroundItemByChar } from '@/shared/utils/backgroundLookup'
+import { renderSprites } from './spriteCanvasRenderer'
+import type { SpriteState, MovementState } from '@/core/sprite/types'
 
 interface ScreenCell {
   character: string
@@ -193,6 +195,88 @@ export function renderScreenBuffer(
       }
     }
   }
+}
+
+/**
+ * Render background screen (28×24 characters) at offset (16, 24)
+ * Used internally by renderScreenLayers
+ */
+function renderBackgroundScreen(
+  ctx: CanvasRenderingContext2D,
+  buffer: ScreenCell[][],
+  paletteCode: number
+): void {
+  for (let y = 0; y < ROWS; y++) {
+    const row = buffer[y]
+    if (!row) continue
+
+    for (let x = 0; x < COLS; x++) {
+      const cell = row[x]
+      if (cell) {
+        renderCell(
+          ctx,
+          x,
+          y,
+          cell.character || ' ',
+          cell.colorPattern,
+          paletteCode
+        )
+      }
+    }
+  }
+}
+
+/**
+ * Render all screen layers in correct order
+ * Implements Family BASIC multi-layer screen system:
+ * 1. Backdrop Screen (solid color)
+ * 2. Sprite Screen (Back) - sprites with priority E=1
+ * 3. Background Screen - PRINT content (28×24)
+ * 4. Sprite Screen (Front) - sprites with priority E=0
+ *
+ * @param canvas - Canvas element
+ * @param buffer - Background screen buffer
+ * @param spriteStates - Sprite states (DEF SPRITE + SPRITE)
+ * @param movementStates - Movement states (DEF MOVE + MOVE)
+ * @param bgPaletteCode - Background palette code (0-1)
+ * @param spritePaletteCode - Sprite palette code (0-2)
+ * @param backdropColor - Backdrop color code (0-60)
+ * @param spriteEnabled - Whether sprite display is enabled (SPRITE ON/OFF)
+ */
+export async function renderScreenLayers(
+  canvas: HTMLCanvasElement,
+  buffer: ScreenCell[][],
+  spriteStates: SpriteState[],
+  movementStates: MovementState[],
+  bgPaletteCode: number = 1,
+  spritePaletteCode: number = 1,
+  backdropColor: number = 0,
+  spriteEnabled: boolean = false
+): Promise<void> {
+  // Use alpha: true for sprite transparency support
+  const ctx = canvas.getContext('2d', { alpha: true })
+  if (!ctx) return
+
+  // Set canvas size to full backdrop/sprite screen dimensions
+  if (canvas.width !== CANVAS_WIDTH || canvas.height !== CANVAS_HEIGHT) {
+    canvas.width = CANVAS_WIDTH
+    canvas.height = CANVAS_HEIGHT
+    ctx.imageSmoothingEnabled = false
+  }
+
+  // 1. Render backdrop screen (32×30 characters, single color)
+  const backdropColorHex = COLORS[backdropColor] ?? COLORS[0] ?? '#000000'
+  ctx.fillStyle = backdropColorHex
+  ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+
+  // 2. Render back sprites (priority E=1)
+  await renderSprites(ctx, spriteStates, movementStates, 1, spritePaletteCode, spriteEnabled)
+
+  // 3. Render background screen (28×24 characters)
+  renderBackgroundScreen(ctx, buffer, bgPaletteCode)
+
+  // 4. Render front sprites (priority E=0)
+  await renderSprites(ctx, spriteStates, movementStates, 0, spritePaletteCode, spriteEnabled)
 }
 
 export type { ScreenCell }

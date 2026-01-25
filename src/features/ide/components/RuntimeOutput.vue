@@ -2,6 +2,7 @@
 import { ref, watch, nextTick, computed, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { BasicVariable, ScreenCell } from '../../../core/interfaces'
+import type { SpriteState } from '../../../core/sprite/types'
 import Screen from './Screen.vue'
 import { GameTabs, GameTabPane, GameTag, GameIcon } from '../../../shared/components/ui'
 
@@ -31,7 +32,9 @@ const props = withDefaults(defineProps<Props>(), {
   cursorX: 0,
   cursorY: 0,
   bgPalette: 1,
-  backdropColor: 0
+  backdropColor: 0,
+  spriteStates: () => [],
+  spriteEnabled: false
 })
 
 const { t } = useI18n()
@@ -48,6 +51,8 @@ interface Props {
   cursorY?: number
   bgPalette?: number
   backdropColor?: number
+  spriteStates?: SpriteState[]
+  spriteEnabled?: boolean
 }
 
 const outputRef = useTemplateRef<HTMLDivElement>('outputRef')
@@ -93,6 +98,8 @@ watch(() => props.output.length, scrollToBottom)
             :cursor-y="cursorY"
             :bg-palette="bgPalette"
             :backdrop-color="backdropColor"
+            :sprite-states="spriteStates"
+            :sprite-enabled="spriteEnabled"
           />
         </div>
       </GameTabPane>

@@ -5,14 +5,15 @@
  */
 
 import { ERROR_TYPES } from '../constants'
-import type { 
-  BasicVariable, 
-  BasicError, 
+import type {
+  BasicVariable,
+  BasicError,
   InterpreterConfig,
-  BasicDeviceAdapter 
+  BasicDeviceAdapter
 } from '../interfaces'
 import type { BasicScalarValue, BasicArrayValue } from '../types/BasicTypes'
 import type { ExpandedStatement } from '../execution/statement-expander'
+import type { SpriteStateManager } from '../sprite/SpriteStateManager'
 
 export interface LoopState {
   variableName: string
@@ -50,6 +51,7 @@ export class ExecutionContext {
   
   // Device integration
   public deviceAdapter?: BasicDeviceAdapter
+  public spriteStateManager?: SpriteStateManager
 
   private errors: BasicError[] = []
 

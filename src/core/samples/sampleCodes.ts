@@ -142,6 +142,51 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 20   PRINT CHR$(I);
 30 NEXT
 40 END`
+  },
+
+  spriteTest: {
+    name: 'Sprite测试',
+    description: 'Sprite system test - demonstrates DEF SPRITE and SPRITE commands',
+    code: `10 REM Sprite Test Program
+20 CLS
+30 PRINT "Sprite Test Program"
+40 PRINT "==================="
+50 PRINT ""
+60 PRINT "Testing sprite system..."
+70 PRINT ""
+80 REM Enable sprite screen
+90 SPRITE ON
+100 PRINT "SPRITE ON executed"
+110 PRINT ""
+120 REM Define sprite 0: 8x8 sprite with color combination 0
+130 DEF SPRITE 0, (0, 0, 0, 0, 0) = CHR$(0)
+140 PRINT "DEF SPRITE 0 defined (8x8, color 0)"
+150 REM Display sprite at position (120, 100)
+160 SPRITE 0, 120, 100
+170 PRINT "SPRITE 0 displayed at (120, 100)"
+180 PRINT ""
+190 REM Define sprite 1: 16x16 sprite with color combination 1
+200 DEF SPRITE 1, (1, 1, 0, 0, 0) = CHR$(0) + CHR$(1) + CHR$(2) + CHR$(3)
+210 PRINT "DEF SPRITE 1 defined (16x16, color 1)"
+220 REM Display sprite at position (150, 120)
+230 SPRITE 1, 150, 120
+240 PRINT "SPRITE 1 displayed at (150, 120)"
+250 PRINT ""
+260 REM Define sprite 2: 8x8 sprite with X-axis flip
+270 DEF SPRITE 2, (0, 0, 0, 1, 0) = CHR$(0)
+280 PRINT "DEF SPRITE 2 defined (8x8, X-flipped)"
+290 SPRITE 2, 100, 150
+300 PRINT "SPRITE 2 displayed at (100, 150)"
+310 PRINT ""
+320 REM Define sprite 3: 8x8 sprite with Y-axis flip
+330 DEF SPRITE 3, (0, 0, 0, 0, 1) = CHR$(0)
+340 PRINT "DEF SPRITE 3 defined (8x8, Y-flipped)"
+350 SPRITE 3, 180, 150
+360 PRINT "SPRITE 3 displayed at (180, 150)"
+370 PRINT ""
+380 PRINT "Sprite test completed!"
+390 PRINT "All sprites should be visible on screen"
+400 END`
   }
 }
 

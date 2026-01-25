@@ -33,6 +33,8 @@ const {
   cursorY,
   bgPalette,
   backdropColor,
+  spriteStates,
+  spriteEnabled,
   runCode,
   stopCode,
   clearOutput,
@@ -96,6 +98,10 @@ onMounted(() => {
                     @click="loadSampleCode('allChars')" size="small">
                     {{ t('ide.samples.allChars') }}
                   </GameButton>
+                  <GameButton variant="toggle" :selected="currentSampleType === 'spriteTest'"
+                    @click="loadSampleCode('spriteTest')" size="small">
+                    {{ t('ide.samples.spriteTest') }}
+                  </GameButton>
                 </GameButtonGroup>
               </div>
               <IdeControls 
@@ -117,7 +123,8 @@ onMounted(() => {
         <div class="output-panel">
           <RuntimeOutput :output="output" :is-running="isRunning" :errors="errors" :variables="variables"
             :debug-output="debugOutput" :debug-mode="debugMode" :screen-buffer="screenBuffer" :cursor-x="cursorX"
-            :cursor-y="cursorY" :bg-palette="bgPalette" :backdrop-color="backdropColor" />
+            :cursor-y="cursorY" :bg-palette="bgPalette" :backdrop-color="backdropColor"
+            :sprite-states="spriteStates" :sprite-enabled="spriteEnabled" />
         </div>
       </div>
 

@@ -126,11 +126,20 @@ class WebWorkerInterpreter {
         executionTime: result.executionTime
       })
 
+      // Get sprite states from interpreter
+      if (!this.interpreter) {
+        throw new Error('Interpreter not initialized')
+      }
+      const spriteStates = this.interpreter.getSpriteStates()
+      const spriteEnabled = this.interpreter.isSpriteEnabled()
+
       // Create enhanced result with execution metadata
       const enhancedResult: ResultMessage['data'] = {
         ...result,
         executionId: message.id,
-        workerId: 'web-worker-1'
+        workerId: 'web-worker-1',
+        spriteStates,
+        spriteEnabled
       }
 
       this.sendResult(message.id, enhancedResult)

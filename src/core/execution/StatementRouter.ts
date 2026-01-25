@@ -26,6 +26,9 @@ import { ColorExecutor } from './executors/ColorExecutor'
 import { CgsetExecutor } from './executors/CgsetExecutor'
 import { CgenExecutor } from './executors/CgenExecutor'
 import { PaletExecutor } from './executors/PaletExecutor'
+import { DefSpriteExecutor } from './executors/DefSpriteExecutor'
+import { SpriteExecutor } from './executors/SpriteExecutor'
+import { SpriteOnOffExecutor } from './executors/SpriteOnOffExecutor'
 import type { VariableService } from '../services/VariableService'
 import type { DataService } from '../services/DataService'
 import type { ExpressionEvaluator } from '../evaluation/ExpressionEvaluator'
@@ -55,6 +58,9 @@ export class StatementRouter {
   private cgsetExecutor: CgsetExecutor
   private cgenExecutor: CgenExecutor
   private paletExecutor: PaletExecutor
+  private defSpriteExecutor: DefSpriteExecutor
+  private spriteExecutor: SpriteExecutor
+  private spriteOnOffExecutor: SpriteOnOffExecutor
 
   constructor(
     private context: ExecutionContext,
@@ -83,6 +89,9 @@ export class StatementRouter {
     this.cgsetExecutor = new CgsetExecutor(context, evaluator)
     this.cgenExecutor = new CgenExecutor(context, evaluator)
     this.paletExecutor = new PaletExecutor(context, evaluator)
+    this.defSpriteExecutor = new DefSpriteExecutor(context, evaluator)
+    this.spriteExecutor = new SpriteExecutor(context, evaluator)
+    this.spriteOnOffExecutor = new SpriteOnOffExecutor(context)
   }
 
   /**
@@ -250,7 +259,7 @@ export class StatementRouter {
         // Pass current statement index and line number for loop tracking
         this.forExecutor.execute(forStmtCst, expandedStatement.statementIndex, expandedStatement.lineNumber)
       }
-      } else if (singleCommandCst.children.nextStatement) {
+    } else if (singleCommandCst.children.nextStatement) {
         const nextStmtCst = getFirstCstNode(singleCommandCst.children.nextStatement)
         if (nextStmtCst) {
           // NEXT may modify statement index (jump back to FOR)
@@ -328,6 +337,21 @@ export class StatementRouter {
       const paletStmtCst = getFirstCstNode(singleCommandCst.children.paletStatement)
       if (paletStmtCst) {
         this.paletExecutor.execute(paletStmtCst, expandedStatement.lineNumber)
+      }
+    } else if (singleCommandCst.children.defSpriteStatement) {
+      const defSpriteStmtCst = getFirstCstNode(singleCommandCst.children.defSpriteStatement)
+      if (defSpriteStmtCst) {
+        this.defSpriteExecutor.execute(defSpriteStmtCst, expandedStatement.lineNumber)
+      }
+    } else if (singleCommandCst.children.spriteStatement) {
+      const spriteStmtCst = getFirstCstNode(singleCommandCst.children.spriteStatement)
+      if (spriteStmtCst) {
+        this.spriteExecutor.execute(spriteStmtCst, expandedStatement.lineNumber)
+      }
+    } else if (singleCommandCst.children.spriteOnOffStatement) {
+      const spriteOnOffStmtCst = getFirstCstNode(singleCommandCst.children.spriteOnOffStatement)
+      if (spriteOnOffStmtCst) {
+        this.spriteOnOffExecutor.execute(spriteOnOffStmtCst, expandedStatement.lineNumber)
       }
     } else {
       // Other statement types not yet implemented

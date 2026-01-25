@@ -23,11 +23,12 @@ import type { CstNode } from 'chevrotain'
 import { FBasicParser } from './parser/FBasicParser'
 
 // Import refactored components
-import { 
-  ExecutionEngine, 
-  ExecutionContext 
+import {
+  ExecutionEngine,
+  ExecutionContext
 } from './execution'
 import { expandStatements } from './execution/statement-expander'
+import { SpriteStateManager } from './sprite/SpriteStateManager'
 
 /**
  * Main interpreter class for executing Family Basic programs
@@ -96,6 +97,8 @@ export class BasicInterpreter {
         if (this.config.deviceAdapter) {
           this.context.deviceAdapter = this.config.deviceAdapter
         }
+        // Initialize sprite state manager
+        this.context.spriteStateManager = new SpriteStateManager()
         this.executionEngine = new ExecutionEngine(this.context, this.config.deviceAdapter)
       } else {
         // Update existing ExecutionEngine with current output callback
@@ -197,5 +200,19 @@ export class BasicInterpreter {
    */
   getVariables(): Map<string, BasicVariable> {
     return this.context?.variables ?? new Map()
+  }
+
+  /**
+   * Get all sprite states
+   */
+  getSpriteStates() {
+    return this.context?.spriteStateManager?.getAllSpriteStates() ?? []
+  }
+
+  /**
+   * Check if sprite display is enabled
+   */
+  isSpriteEnabled(): boolean {
+    return this.context?.spriteStateManager?.isSpriteEnabled() ?? false
   }
 }

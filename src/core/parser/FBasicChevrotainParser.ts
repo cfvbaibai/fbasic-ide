@@ -21,7 +21,7 @@ import type {
 } from 'chevrotain';
 import {
   // Keywords
-  Let, Print, For, To, Step, Next, End, Pause, If, Then, Goto, Gosub, Return, On, Dim, Data, Read, Restore, Cls, Locate, Color, Cgset, Cgen, Palet, Paletb, Palets,
+  Let, Print, For, To, Step, Next, End, Pause, If, Then, Goto, Gosub, Return, On, Off, Dim, Data, Read, Restore, Cls, Locate, Color, Cgset, Cgen, Palet, Paletb, Palets, Def, Sprite, Move,
   // String functions
   Len, Left, Right, Mid, Str, Hex, Chr, Asc,
   // Arithmetic functions
@@ -85,6 +85,9 @@ class FBasicChevrotainParser extends CstParser {
   declare cgenStatement: () => CstNode;
   declare paletStatement: () => CstNode;
   declare paletParameterList: () => CstNode;
+  declare defSpriteStatement: () => CstNode;
+  declare spriteStatement: () => CstNode;
+  declare spriteOnOffStatement: () => CstNode;
   declare arrayDeclaration: () => CstNode;
   declare dimensionList: () => CstNode;
   declare expressionList: () => CstNode;
@@ -696,6 +699,58 @@ class FBasicChevrotainParser extends CstParser {
       ]);
     });
 
+    // DEF SPRITE n, (A, B, C, D, E) = character set
+    // n: sprite number (0-7)
+    // A: color combination (0-3)
+    // B: size (0=8×8, 1=16×16)
+    // C: priority (0=front, 1=behind background)
+    // D: horizontal inversion (0=normal, 1=inverted)
+    // E: vertical inversion (0=normal, 1=inverted)
+    // character set: CHR$(N) codes or string like "@ABC"
+    this.defSpriteStatement = this.RULE('defSpriteStatement', () => {
+      this.CONSUME(Def);
+      this.CONSUME(Sprite);
+      this.SUBRULE(this.expression, { LABEL: 'spriteNumber' }); // n
+      this.CONSUME(Comma);
+      this.CONSUME(LParen);
+      this.SUBRULE2(this.expression, { LABEL: 'colorCombination' }); // A
+      this.CONSUME2(Comma);
+      this.SUBRULE3(this.expression, { LABEL: 'size' }); // B
+      this.CONSUME3(Comma);
+      this.SUBRULE4(this.expression, { LABEL: 'priority' }); // C
+      this.CONSUME4(Comma);
+      this.SUBRULE5(this.expression, { LABEL: 'invertX' }); // D
+      this.CONSUME5(Comma);
+      this.SUBRULE6(this.expression, { LABEL: 'invertY' }); // E
+      this.CONSUME(RParen);
+      this.CONSUME(Equal);
+      // Character set can be a string literal or CHR$ expressions
+      // For now, we'll accept a general expression
+      this.SUBRULE7(this.expression, { LABEL: 'characterSet' });
+    });
+
+    // SPRITE n, X, Y
+    // n: sprite number (0-7)
+    // X, Y: position in pixels (X: 0-255, Y: 0-239)
+    this.spriteStatement = this.RULE('spriteStatement', () => {
+      this.CONSUME(Sprite);
+      this.SUBRULE(this.expression, { LABEL: 'spriteNumber' }); // n
+      this.CONSUME(Comma);
+      this.SUBRULE2(this.expression, { LABEL: 'x' }); // X
+      this.CONSUME2(Comma);
+      this.SUBRULE3(this.expression, { LABEL: 'y' }); // Y
+    });
+
+    // SPRITE ON | SPRITE OFF
+    // Enable or disable sprite display
+    this.spriteOnOffStatement = this.RULE('spriteOnOffStatement', () => {
+      this.CONSUME(Sprite);
+      this.OR([
+        { ALT: () => this.CONSUME(On, { LABEL: 'onOff' }) },
+        { ALT: () => this.CONSUME(Off, { LABEL: 'onOff' }) }
+      ]);
+    });
+
     // IF LogicalExpression THEN (CommandList | NumberLiteral)
     // IF LogicalExpression GOTO NumberLiteral
     // Executes the commands after THEN or jumps to line number if condition is true
@@ -820,6 +875,18 @@ class FBasicChevrotainParser extends CstParser {
         {
           GATE: () => this.LA(1).tokenType === Paletb || this.LA(1).tokenType === Palets || this.LA(1).tokenType === Palet,
           ALT: () => this.SUBRULE(this.paletStatement)
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Def,
+          ALT: () => this.SUBRULE(this.defSpriteStatement)
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Sprite && (this.LA(2).tokenType === On || this.LA(2).tokenType === Off),
+          ALT: () => this.SUBRULE(this.spriteOnOffStatement)
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Sprite,
+          ALT: () => this.SUBRULE(this.spriteStatement)
         },
         { ALT: () => this.SUBRULE(this.letStatement) } // Must be last since it can start with Identifier
       ]);
