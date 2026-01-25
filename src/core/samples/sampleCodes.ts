@@ -235,19 +235,19 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 410 REM Start movement 0 (right)
 420 MOVE 0
 430 PRINT "MOVE 0 started (moving right)"
-440 PAUSE 500
+440 PAUSE 50
 450 REM Start movement 1 (left)
 460 MOVE 1
 470 PRINT "MOVE 1 started (moving left)"
-480 PAUSE 500
+480 PAUSE 50
 490 REM Start movement 2 (up)
 500 MOVE 2
 510 PRINT "MOVE 2 started (moving up)"
-520 PAUSE 500
+520 PAUSE 50
 530 REM Start movement 3 (down)
 540 MOVE 3
 550 PRINT "MOVE 3 started (moving down)"
-560 PAUSE 500
+560 PAUSE 50
 570 REM Start movement 4 (diagonal)
 580 MOVE 4
 590 PRINT "MOVE 4 started (moving up-right)"

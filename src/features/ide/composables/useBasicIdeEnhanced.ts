@@ -214,6 +214,9 @@ export function useBasicIde() {
 
       // Clear screen
       clearScreenBuffer(screenBuffer, cursorX, cursorY)
+      
+      // Clear movement states before new execution
+      movementStates.value = []
 
       // Send execution message to web worker
       const result = await sendMessageToWorkerWrapper({

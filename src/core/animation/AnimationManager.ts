@@ -306,6 +306,7 @@ export class AnimationManager {
    */
   reset(): void {
     this.movementStates.clear()
+    this.moveDefinitions.clear()
     // Reset stored positions to defaults
     for (let i = 0; i < 8; i++) {
       this.storedPositions.set(i, { x: 120, y: 120 })

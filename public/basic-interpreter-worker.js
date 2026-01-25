@@ -262,6 +262,7 @@
      */
     reset() {
       this.movementStates.clear();
+      this.moveDefinitions.clear();
       for (let i = 0; i < 8; i++) {
         this.storedPositions.set(i, { x: 120, y: 120 });
       }
@@ -12455,6 +12456,12 @@
       this.arrays.clear();
       this.currentLineNumber = 0;
       this.errors = [];
+      if (this.spriteStateManager) {
+        this.spriteStateManager.clear();
+      }
+      if (this.animationManager) {
+        this.animationManager.reset();
+      }
     }
     /**
      * Add output to the context

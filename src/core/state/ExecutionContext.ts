@@ -78,6 +78,14 @@ export class ExecutionContext {
     this.arrays.clear()
     this.currentLineNumber = 0
     this.errors = []
+    
+    // Reset sprite and animation managers if they exist
+    if (this.spriteStateManager) {
+      this.spriteStateManager.clear()
+    }
+    if (this.animationManager) {
+      this.animationManager.reset()
+    }
   }
 
   /**
