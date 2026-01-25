@@ -3,7 +3,7 @@
  */
 
 import type { ERROR_TYPES,VARIABLE_TYPES } from './constants'
-import type { SpriteState } from './sprite/types'
+import type { MoveDefinition, MovementState, SpriteState } from './sprite/types'
 import type { ExecutionContext } from './state/ExecutionContext'
 import type { BasicArrayValue } from './types/BasicTypes'
 
@@ -69,7 +69,19 @@ export interface BasicDeviceAdapter {
   setColorPalette(bgPalette: number, spritePalette: number): void
   setBackdropColor(colorCode: number): void
   setCharacterGeneratorMode(mode: number): void
+  
+  // === ANIMATION COMMANDS ===
+  sendAnimationCommand?(command: AnimationCommand): void
 }
+
+/**
+ * Animation command types for real-time communication from web worker to main thread
+ */
+export type AnimationCommand =
+  | { type: 'START_MOVEMENT'; actionNumber: number; definition: MoveDefinition; startX: number; startY: number }
+  | { type: 'STOP_MOVEMENT'; actionNumbers: number[] }
+  | { type: 'ERASE_MOVEMENT'; actionNumbers: number[] }
+  | { type: 'UPDATE_MOVEMENT_POSITION'; actionNumber: number; x: number; y: number; remainingDistance: number }
 
 /**
  * Configuration for the BASIC interpreter
@@ -93,6 +105,7 @@ export interface ExecutionResult {
   executionTime: number
   spriteStates?: SpriteState[] // Sprite states from DEF SPRITE and SPRITE commands
   spriteEnabled?: boolean // Whether sprite display is enabled (SPRITE ON/OFF)
+  movementStates?: MovementState[] // Movement states from DEF MOVE and MOVE commands
 }
 
 /**
@@ -192,6 +205,7 @@ export type ServiceWorkerMessageType =
   | 'READY'
   | 'STRIG_EVENT'
   | 'STICK_EVENT'
+  | 'ANIMATION_COMMAND'
 
 // Execute message - sent from UI to service worker
 export interface ExecuteMessage extends ServiceWorkerMessage {
@@ -290,6 +304,12 @@ export interface StrigEventMessage extends ServiceWorkerMessage {
   }
 }
 
+// Animation command message - sent from web worker to main thread during execution
+export interface AnimationCommandMessage extends ServiceWorkerMessage {
+  type: 'ANIMATION_COMMAND'
+  data: AnimationCommand
+}
+
 // STICK event message - sent from main thread to service worker
 export interface StickEventMessage extends ServiceWorkerMessage {
   type: 'STICK_EVENT'
@@ -344,6 +364,7 @@ export type AnyServiceWorkerMessage =
   | ErrorMessage
   | InitMessage
   | ReadyMessage
+  | AnimationCommandMessage
 
 // Message handler interface for type-safe message handling
 export interface ServiceWorkerMessageHandler {

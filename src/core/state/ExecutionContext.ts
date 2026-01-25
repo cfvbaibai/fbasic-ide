@@ -4,6 +4,7 @@
  * Holds the state and context needed for BASIC program execution.
  */
 
+import type { AnimationManager } from '@/core/animation/AnimationManager'
 import { ERROR_TYPES } from '@/core/constants'
 import type { ExpandedStatement } from '@/core/execution/statement-expander'
 import type {
@@ -51,6 +52,7 @@ export class ExecutionContext {
   // Device integration
   public deviceAdapter?: BasicDeviceAdapter
   public spriteStateManager?: SpriteStateManager
+  public animationManager?: AnimationManager
 
   private errors: BasicError[] = []
 

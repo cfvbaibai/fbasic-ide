@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, useTemplateRef, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue'
 
 import type { ScreenCell } from '@/core/interfaces'
 import type { MovementState, SpriteState } from '@/core/sprite/types'
@@ -69,21 +69,25 @@ const canvasHeight = computed(() => BASE_HEIGHT * zoomLevel.value)
 function render(): void {
   if (!screenCanvas.value) return
 
-  // Use multi-layer rendering when sprites are present
-  if (props.spriteStates && props.spriteStates.length > 0) {
+  // Use local movement states (with updated positions) for rendering
+  const hasSprites = props.spriteStates && props.spriteStates.length > 0
+  const hasMovements = localMovementStates.value.length > 0 && 
+                       localMovementStates.value.some(m => m.isActive)
+  
+  if (hasSprites || hasMovements) {
     // renderScreenLayers is async, but we call it without await to avoid blocking
     void renderScreenLayers(
       screenCanvas.value,
       props.screenBuffer,
-      props.spriteStates,
-      props.movementStates ?? [],
+      props.spriteStates ?? [],
+      localMovementStates.value, // Use local updated states
       paletteCode.value,
       props.spritePalette ?? 1,
       props.backdropColor ?? 0,
       props.spriteEnabled ?? false
     )
   } else {
-    // Fallback to simple rendering when no sprites
+    // Fallback to simple rendering when no sprites or movements
     renderScreenBuffer(
       screenCanvas.value,
       props.screenBuffer,
@@ -92,6 +96,44 @@ function render(): void {
     )
   }
 }
+
+// Local mutable copy of movement states for animation updates
+// Must be declared before computed properties that use it
+const localMovementStates = ref<MovementState[]>([])
+
+// Update local movement states from props
+watch(() => props.movementStates, (newStates) => {
+  if (!newStates || newStates.length === 0) {
+    localMovementStates.value = []
+    return
+  }
+  
+  // Deep clone movement states to make them mutable
+  // Merge with existing states to preserve positions of active movements
+  const existingStates = new Map(localMovementStates.value.map(m => [m.actionNumber, m]))
+  
+  localMovementStates.value = newStates.map(m => {
+    const existing = existingStates.get(m.actionNumber)
+    if (existing && existing.isActive && m.isActive) {
+      // Preserve existing position if movement is still active
+      return {
+        ...m,
+        currentX: existing.currentX,
+        currentY: existing.currentY,
+        remainingDistance: existing.remainingDistance,
+        definition: { ...m.definition }
+      }
+    }
+    // New movement or movement was restarted - use new state
+    return {
+      ...m,
+      definition: { ...m.definition }
+    }
+  })
+  
+  // Trigger immediate render when new movements are added
+  scheduleRender()
+}, { immediate: true, deep: true })
 
 // Watch paletteCode, backdropColor, spritePalette, sprite states, and sprite enabled to trigger re-render
 // Combined watcher for better performance (Vue 3 best practice)
@@ -104,9 +146,10 @@ const spriteStateFingerprint = computed(() => {
   ).join('|')
 })
 
+// Watch local movement states for changes (positions update in animation loop)
 const movementStateFingerprint = computed(() => {
-  if (!props.movementStates || props.movementStates.length === 0) return ''
-  return props.movementStates.map(m => 
+  if (!localMovementStates.value || localMovementStates.value.length === 0) return ''
+  return localMovementStates.value.map(m => 
     `${m.actionNumber}:${m.currentX},${m.currentY},${m.isActive ? '1' : '0'},${m.currentFrameIndex}`
   ).join('|')
 })
@@ -123,6 +166,58 @@ watch([
   scheduleRender()
 })
 
+// Animation loop for updating movement positions
+let animationFrameId: number | null = null
+let lastFrameTime = 0
+
+function updateMovements(deltaTime: number): void {
+  for (const movement of localMovementStates.value) {
+    if (!movement.isActive || movement.remainingDistance <= 0) {
+      movement.isActive = false
+      continue
+    }
+
+    // Calculate distance per frame: speedDotsPerSecond × (deltaTime / 1000)
+    const dotsPerFrame = movement.speedDotsPerSecond * (deltaTime / 1000)
+    const distanceThisFrame = Math.min(dotsPerFrame, movement.remainingDistance)
+
+    // Update position
+    movement.currentX += movement.directionDeltaX * distanceThisFrame
+    movement.currentY += movement.directionDeltaY * distanceThisFrame
+    movement.remainingDistance -= distanceThisFrame
+
+    // Clamp to screen bounds
+    movement.currentX = Math.max(0, Math.min(255, movement.currentX))
+    movement.currentY = Math.max(0, Math.min(239, movement.currentY))
+
+    // Check if movement is complete
+    if (movement.remainingDistance <= 0) {
+      movement.isActive = false
+    }
+  }
+}
+
+function animationLoop(timestamp: number): void {
+  if (lastFrameTime === 0) {
+    lastFrameTime = timestamp
+  }
+
+  const deltaTime = timestamp - lastFrameTime
+  lastFrameTime = timestamp
+
+  // Update movements if there are any active ones
+  const hasActiveMovements = localMovementStates.value.some(m => m.isActive)
+  if (hasActiveMovements) {
+    updateMovements(deltaTime)
+    // Trigger re-render after updating positions
+    scheduleRender()
+  }
+
+  // Always continue animation loop (even when no active movements)
+  // This ensures movements appear immediately when they're added
+  animationFrameId = requestAnimationFrame(animationLoop)
+}
+
 // Use requestAnimationFrame for batching
 let pendingRender = false
 function scheduleRender(): void {
@@ -130,6 +225,7 @@ function scheduleRender(): void {
   pendingRender = true
   requestAnimationFrame(() => {
     pendingRender = false
+    // Use local movement states for rendering
     render()
   })
 }
@@ -146,6 +242,20 @@ watch(screenCanvas, (canvas) => {
     scheduleRender()
   }
 }, { immediate: true })
+
+// Start animation loop when component mounts
+onMounted(() => {
+  lastFrameTime = 0
+  animationFrameId = requestAnimationFrame(animationLoop)
+})
+
+// Stop animation loop when component unmounts
+onUnmounted(() => {
+  if (animationFrameId !== null) {
+    cancelAnimationFrame(animationFrameId)
+    animationFrameId = null
+  }
+})
 </script>
 
 <template>

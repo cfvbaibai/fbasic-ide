@@ -28,7 +28,7 @@ import { EXECUTION_LIMITS } from '@/core/constants'
 import type { AnyServiceWorkerMessage,BasicVariable, ExecutionResult, HighlighterInfo, ParserInfo } from '@/core/interfaces'
 import { FBasicParser } from '@/core/parser/FBasicParser'
 import { getSampleCode } from '@/core/samples/sampleCodes'
-import type { SpriteState } from '@/core/sprite/types'
+import type { MovementState, SpriteState } from '@/core/sprite/types'
 
 import { formatArrayForDisplay } from './useBasicIdeFormatting'
 import { handleWorkerMessage, type MessageHandlerContext } from './useBasicIdeMessageHandlers'
@@ -54,7 +54,7 @@ export function useBasicIde() {
 40 FOR I=1 TO 3: PRINT "I="; I: NEXT
 50 END`)
 
-  const currentSampleType = ref<'basic' | 'gaming' | 'complex' | 'comprehensive' | 'pause' | 'allChars' | 'spriteTest' | null>(null)
+  const currentSampleType = ref<'basic' | 'gaming' | 'complex' | 'comprehensive' | 'pause' | 'allChars' | 'spriteTest' | 'moveTest' | null>(null)
 
   const isRunning = ref(false)
   const output = ref<string[]>([])
@@ -74,6 +74,7 @@ export function useBasicIde() {
   // Sprite state
   const spriteStates = ref<SpriteState[]>([])
   const spriteEnabled = ref(false)
+  const movementStates = ref<MovementState[]>([])
 
   // Parser instance
   const parser = new FBasicParser()
@@ -118,6 +119,7 @@ export function useBasicIde() {
     cursorY,
     bgPalette,
     backdropColor,
+    movementStates,
     webWorkerManager
   }
 
@@ -261,6 +263,10 @@ export function useBasicIde() {
       if (result?.spriteEnabled !== undefined) {
         spriteEnabled.value = result.spriteEnabled
       }
+      // Update movement states
+      if (result?.movementStates) {
+        movementStates.value = result.movementStates
+      }
 
     } catch (error) {
       console.error('Execution error:', error)
@@ -328,7 +334,7 @@ export function useBasicIde() {
   /**
    * Load sample code
    */
-  const loadSampleCode = (sampleType: 'basic' | 'gaming' | 'complex' | 'comprehensive' | 'pause' | 'allChars' | 'spriteTest' = 'basic') => {
+  const loadSampleCode = (sampleType: 'basic' | 'gaming' | 'complex' | 'comprehensive' | 'pause' | 'allChars' | 'spriteTest' | 'moveTest' = 'basic') => {
     const sample = getSampleCode(sampleType)
     if (sample) {
       code.value = sample.code
@@ -399,6 +405,7 @@ export function useBasicIde() {
     backdropColor,
     spriteStates,
     spriteEnabled,
+    movementStates,
 
     // Methods
     runCode,

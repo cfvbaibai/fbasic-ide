@@ -26,7 +26,8 @@
     "complex": "複雜",
     "comprehensive": "完整示範",
     "allChars": "所有字元",
-    "spriteTest": "Sprite測試"
+    "spriteTest": "Sprite測試",
+    "moveTest": "移動測試"
   },
   "joystick": {
     "control": "搖桿控制",

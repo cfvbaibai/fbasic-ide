@@ -37,6 +37,7 @@ const {
   backdropColor,
   spriteStates,
   spriteEnabled,
+  movementStates,
   runCode,
   stopCode,
   clearOutput,
@@ -104,6 +105,10 @@ onMounted(() => {
                     @click="loadSampleCode('spriteTest')" size="small">
                     {{ t('ide.samples.spriteTest') }}
                   </GameButton>
+                  <GameButton variant="toggle" :selected="currentSampleType === 'moveTest'"
+                    @click="loadSampleCode('moveTest')" size="small">
+                    {{ t('ide.samples.moveTest') }}
+                  </GameButton>
                 </GameButtonGroup>
               </div>
               <IdeControls 
@@ -126,7 +131,7 @@ onMounted(() => {
           <RuntimeOutput :output="output" :is-running="isRunning" :errors="errors" :variables="variables"
             :debug-output="debugOutput" :debug-mode="debugMode" :screen-buffer="screenBuffer" :cursor-x="cursorX"
             :cursor-y="cursorY" :bg-palette="bgPalette" :backdrop-color="backdropColor"
-            :sprite-states="spriteStates" :sprite-enabled="spriteEnabled" />
+            :sprite-states="spriteStates" :sprite-enabled="spriteEnabled" :movement-states="movementStates" />
         </div>
       </div>
 

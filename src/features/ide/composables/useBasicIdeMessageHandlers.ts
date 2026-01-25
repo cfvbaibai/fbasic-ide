@@ -5,11 +5,13 @@
 import type { Ref } from 'vue'
 
 import type {
+  AnimationCommand,
   AnyServiceWorkerMessage,
   ErrorMessage,
   ResultMessage,
   ScreenCell
 } from '@/core/interfaces'
+import type { MovementState } from '@/core/sprite/types'
 
 import type { WebWorkerManager } from './useBasicIdeWebWorkerUtils'
 
@@ -23,6 +25,7 @@ export interface MessageHandlerContext {
   bgPalette: Ref<number>
   backdropColor?: Ref<number>
   cgenMode?: Ref<number>
+  movementStates?: Ref<MovementState[]>
   webWorkerManager: WebWorkerManager
 }
 
@@ -251,6 +254,115 @@ export function handleProgressMessage(
 }
 
 /**
+ * Handle animation command message from web worker
+ * These commands are sent immediately when MOVE is executed
+ */
+export function handleAnimationCommandMessage(
+  message: AnyServiceWorkerMessage,
+  context: MessageHandlerContext
+): void {
+  if (message.type !== 'ANIMATION_COMMAND') return
+  if (!context.movementStates) return
+  
+  // TypeScript narrows message.data to AnimationCommand after type check
+  const command: AnimationCommand = message.data
+  
+  console.log('🎬 [COMPOSABLE] Handling animation command:', command.type, command)
+  
+  switch (command.type) {
+    case 'START_MOVEMENT': {
+      // Create movement state immediately
+      const movementState: MovementState = {
+        actionNumber: command.actionNumber,
+        definition: command.definition,
+        startX: command.startX,
+        startY: command.startY,
+        currentX: command.startX,
+        currentY: command.startY,
+        remainingDistance: 2 * command.definition.distance,
+        totalDistance: 2 * command.definition.distance,
+        speedDotsPerSecond: command.definition.speed > 0 ? 60 / command.definition.speed : 0,
+        directionDeltaX: getDirectionDeltaX(command.definition.direction),
+        directionDeltaY: getDirectionDeltaY(command.definition.direction),
+        isActive: true,
+        currentFrameIndex: 0,
+        frameCounter: 0
+      }
+      
+      // Add or update movement state
+      const existing = context.movementStates.value.findIndex(
+        m => m.actionNumber === command.actionNumber
+      )
+      
+      if (existing >= 0) {
+        context.movementStates.value[existing] = movementState
+      } else {
+        context.movementStates.value.push(movementState)
+      }
+      
+      // Force reactivity by creating new array
+      context.movementStates.value = [...context.movementStates.value]
+      
+      console.log('🎬 [COMPOSABLE] Started movement:', command.actionNumber, 'at', command.startX, command.startY)
+      break
+    }
+    
+    case 'STOP_MOVEMENT': {
+      // Mark movements as inactive but keep positions
+      for (const actionNumber of command.actionNumbers) {
+        const movement = context.movementStates.value.find(m => m.actionNumber === actionNumber)
+        if (movement) {
+          movement.isActive = false
+        }
+      }
+      context.movementStates.value = [...context.movementStates.value]
+      break
+    }
+    
+    case 'ERASE_MOVEMENT': {
+      // Remove movements completely
+      context.movementStates.value = context.movementStates.value.filter(
+        m => !command.actionNumbers.includes(m.actionNumber)
+      )
+      break
+    }
+    
+    case 'UPDATE_MOVEMENT_POSITION': {
+      // Update movement position (for future use if needed)
+      const movement = context.movementStates.value.find(m => m.actionNumber === command.actionNumber)
+      if (movement) {
+        movement.currentX = command.x
+        movement.currentY = command.y
+        movement.remainingDistance = command.remainingDistance
+      }
+      break
+    }
+  }
+}
+
+/**
+ * Helper to get X delta from direction
+ */
+function getDirectionDeltaX(direction: number): number {
+  switch (direction) {
+    case 2: case 3: case 4: return 1  // Right directions
+    case 6: case 7: case 8: return -1 // Left directions
+    default: return 0
+  }
+}
+
+/**
+ * Helper to get Y delta from direction
+ */
+function getDirectionDeltaY(direction: number): number {
+  switch (direction) {
+    case 1: case 2: case 8: return -1 // Up directions
+    case 4: case 5: case 6: return 1  // Down directions
+    default: return 0
+  }
+}
+
+/**
  * Route message to appropriate handler
  */
 export function handleWorkerMessage(
@@ -266,6 +378,9 @@ export function handleWorkerMessage(
       break
     case 'SCREEN_UPDATE':
       handleScreenUpdateMessage(message, context)
+      break
+    case 'ANIMATION_COMMAND':
+      handleAnimationCommandMessage(message, context)
       break
     case 'RESULT':
       handleResultMessage(message, context)

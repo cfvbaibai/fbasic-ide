@@ -167,18 +167,32 @@ export async function renderStaticSprite(
 
 /**
  * Render animated sprite from DEF MOVE definition
- * (Placeholder for Phase 3 - will be implemented with AnimationManager)
+ * For Phase 3, renders a simple indicator at the movement position
+ * Full character sprite rendering will be implemented in Phase 4
  */
 export async function renderAnimatedSprite(
-  _ctx: CanvasRenderingContext2D,
-  _movement: MovementState,
+  ctx: CanvasRenderingContext2D,
+  movement: MovementState,
   _spritePaletteCode: number
 ): Promise<void> {
-  // TODO: Phase 3 - Implement animated sprite rendering
-  // Will need:
-  // - Character animation config lookup
-  // - Current frame from animation sequence
-  // - Direction-based inversion
+  // Phase 3: Basic rendering - just show movement position
+  // Full sprite rendering with character types will come in Phase 4
+  
+  const x = Math.floor(movement.currentX)
+  const y = Math.floor(movement.currentY)
+  
+  // Render a simple colored rectangle to indicate movement
+  // Color based on action number for visual distinction
+  const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#FFA500', '#800080']
+  const color = colors[movement.actionNumber % colors.length] ?? '#FFFFFF'
+  
+  ctx.fillStyle = color
+  ctx.fillRect(x, y, 16, 16)
+  
+  // Draw a border to make it more visible
+  ctx.strokeStyle = '#FFFFFF'
+  ctx.lineWidth = 1
+  ctx.strokeRect(x, y, 16, 16)
 }
 
 /**
@@ -199,29 +213,39 @@ export async function renderSprites(
   spritePaletteCode: number,
   spriteEnabled: boolean
 ): Promise<void> {
-  // Don't render if sprite display is disabled (SPRITE OFF)
-  if (!spriteEnabled) {
-    return
-  }
-
-  // Filter sprites by priority
-  const sprites = spriteStates.filter(s =>
-    s.visible && s.priority === priority
-  )
-
-  for (const spriteState of sprites) {
-    // Check if this sprite is moving (has active movement state)
-    const movement = movementStates.find(m =>
-      m.actionNumber === spriteState.spriteNumber && m.isActive
+  // First, render static sprites (DEF SPRITE) - only if sprite display is enabled
+  if (spriteEnabled) {
+    const sprites = spriteStates.filter(s =>
+      s.visible && s.priority === priority && s.definition
     )
 
-    if (movement) {
-      // Render animated sprite (DEF MOVE)
-      await renderAnimatedSprite(ctx, movement, spritePaletteCode)
-    } else if (spriteState.definition) {
-      // Render static sprite (DEF SPRITE)
-      await renderStaticSprite(ctx, spriteState, spritePaletteCode)
+    for (const spriteState of sprites) {
+      // Check if this sprite is moving (has active movement state)
+      // Note: In Family BASIC, action numbers and sprite numbers are separate
+      // For now, we check if there's a movement with matching action number
+      const movement = movementStates.find(m =>
+        m.actionNumber === spriteState.spriteNumber && m.isActive
+      )
+
+      if (!movement) {
+        // Render static sprite (DEF SPRITE) - only if not moving
+        await renderStaticSprite(ctx, spriteState, spritePaletteCode)
+      }
     }
+  }
+
+  // Second, render active movements (DEF MOVE) - these work independently of SPRITE ON/OFF
+  // Filter movements by priority and active status
+  const activeMovements = movementStates.filter(m => {
+    // Check if movement exists, is active, and has correct priority
+    if (!m?.isActive) return false
+    if (!m.definition) return false
+    return m.definition.priority === priority
+  })
+
+  for (const movement of activeMovements) {
+    // Render animated sprite (DEF MOVE)
+    await renderAnimatedSprite(ctx, movement, spritePaletteCode)
   }
 }
 

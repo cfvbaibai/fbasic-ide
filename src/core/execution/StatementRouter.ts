@@ -16,6 +16,7 @@ import { CgsetExecutor } from './executors/CgsetExecutor'
 import { ClsExecutor } from './executors/ClsExecutor'
 import { ColorExecutor } from './executors/ColorExecutor'
 import { DataExecutor } from './executors/DataExecutor'
+import { DefMoveExecutor } from './executors/DefMoveExecutor'
 import { DefSpriteExecutor } from './executors/DefSpriteExecutor'
 import { DimExecutor } from './executors/DimExecutor'
 import { EndExecutor } from './executors/EndExecutor'
@@ -25,6 +26,7 @@ import { GotoExecutor } from './executors/GotoExecutor'
 import { IfThenExecutor } from './executors/IfThenExecutor'
 import { LetExecutor } from './executors/LetExecutor'
 import { LocateExecutor } from './executors/LocateExecutor'
+import { MoveExecutor } from './executors/MoveExecutor'
 import { NextExecutor } from './executors/NextExecutor'
 import { OnExecutor } from './executors/OnExecutor'
 import { PaletExecutor } from './executors/PaletExecutor'
@@ -62,6 +64,8 @@ export class StatementRouter {
   private defSpriteExecutor: DefSpriteExecutor
   private spriteExecutor: SpriteExecutor
   private spriteOnOffExecutor: SpriteOnOffExecutor
+  private defMoveExecutor: DefMoveExecutor
+  private moveExecutor: MoveExecutor
 
   constructor(
     private context: ExecutionContext,
@@ -93,6 +97,8 @@ export class StatementRouter {
     this.defSpriteExecutor = new DefSpriteExecutor(context, evaluator)
     this.spriteExecutor = new SpriteExecutor(context, evaluator)
     this.spriteOnOffExecutor = new SpriteOnOffExecutor(context)
+    this.defMoveExecutor = new DefMoveExecutor(context, evaluator)
+    this.moveExecutor = new MoveExecutor(context, evaluator)
   }
 
   /**
@@ -353,6 +359,16 @@ export class StatementRouter {
       const spriteOnOffStmtCst = getFirstCstNode(singleCommandCst.children.spriteOnOffStatement)
       if (spriteOnOffStmtCst) {
         this.spriteOnOffExecutor.execute(spriteOnOffStmtCst, expandedStatement.lineNumber)
+      }
+    } else if (singleCommandCst.children.defMoveStatement) {
+      const defMoveStmtCst = getFirstCstNode(singleCommandCst.children.defMoveStatement)
+      if (defMoveStmtCst) {
+        this.defMoveExecutor.execute(defMoveStmtCst, expandedStatement.lineNumber)
+      }
+    } else if (singleCommandCst.children.moveStatement) {
+      const moveStmtCst = getFirstCstNode(singleCommandCst.children.moveStatement)
+      if (moveStmtCst) {
+        this.moveExecutor.execute(moveStmtCst, expandedStatement.lineNumber)
       }
     } else {
       // Other statement types not yet implemented

@@ -6,6 +6,7 @@
  */
 
 import type { 
+  AnimationCommand,
   AnyServiceWorkerMessage,
   BasicDeviceAdapter,
   ExecutionResult,
@@ -309,6 +310,23 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     // Send CGEN update message
     const updateMessage = this.screenStateManager.createCgenUpdateMessage()
     self.postMessage(updateMessage)
+  }
+
+  /**
+   * Send animation command to main thread immediately
+   * This allows movements to start as soon as MOVE is called
+   */
+  sendAnimationCommand(command: AnimationCommand): void {
+    console.log('🎬 [WEB_WORKER_DEVICE] Sending animation command:', command.type, command)
+    
+    const message: AnyServiceWorkerMessage = {
+      type: 'ANIMATION_COMMAND',
+      id: `anim-${Date.now()}-${Math.random()}`,
+      timestamp: Date.now(),
+      data: command
+    }
+    
+    self.postMessage(message)
   }
 
   /**

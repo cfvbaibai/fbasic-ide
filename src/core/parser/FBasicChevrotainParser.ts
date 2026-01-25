@@ -88,6 +88,8 @@ class FBasicChevrotainParser extends CstParser {
   declare defSpriteStatement: () => CstNode;
   declare spriteStatement: () => CstNode;
   declare spriteOnOffStatement: () => CstNode;
+  declare defMoveStatement: () => CstNode;
+  declare moveStatement: () => CstNode;
   declare arrayDeclaration: () => CstNode;
   declare dimensionList: () => CstNode;
   declare expressionList: () => CstNode;
@@ -751,6 +753,44 @@ class FBasicChevrotainParser extends CstParser {
       ]);
     });
 
+    // DEF MOVE(n) = SPRITE(A, B, C, D, E, F)
+    // n: action number (0-7)
+    // A: character type (0-15)
+    // B: direction (0-8)
+    // C: speed (1-255, 60/C dots per second)
+    // D: distance (1-255, total = 2×D dots)
+    // E: priority (0=front, 1=behind background)
+    // F: color combination (0-3)
+    this.defMoveStatement = this.RULE('defMoveStatement', () => {
+      this.CONSUME(Def);
+      this.CONSUME(Move);
+      this.CONSUME(LParen);
+      this.SUBRULE(this.expression, { LABEL: 'actionNumber' }); // n
+      this.CONSUME(RParen);
+      this.CONSUME(Equal);
+      this.CONSUME(Sprite);
+      this.CONSUME2(LParen);
+      this.SUBRULE2(this.expression, { LABEL: 'characterType' }); // A
+      this.CONSUME(Comma);
+      this.SUBRULE3(this.expression, { LABEL: 'direction' }); // B
+      this.CONSUME2(Comma);
+      this.SUBRULE4(this.expression, { LABEL: 'speed' }); // C
+      this.CONSUME3(Comma);
+      this.SUBRULE5(this.expression, { LABEL: 'distance' }); // D
+      this.CONSUME4(Comma);
+      this.SUBRULE6(this.expression, { LABEL: 'priority' }); // E
+      this.CONSUME5(Comma);
+      this.SUBRULE7(this.expression, { LABEL: 'colorCombination' }); // F
+      this.CONSUME2(RParen);
+    });
+
+    // MOVE n
+    // n: action number (0-7)
+    this.moveStatement = this.RULE('moveStatement', () => {
+      this.CONSUME(Move);
+      this.SUBRULE(this.expression, { LABEL: 'actionNumber' }); // n
+    });
+
     // IF LogicalExpression THEN (CommandList | NumberLiteral)
     // IF LogicalExpression GOTO NumberLiteral
     // Executes the commands after THEN or jumps to line number if condition is true
@@ -877,8 +917,16 @@ class FBasicChevrotainParser extends CstParser {
           ALT: () => this.SUBRULE(this.paletStatement)
         },
         {
+          GATE: () => this.LA(1).tokenType === Def && this.LA(2).tokenType === Move,
+          ALT: () => this.SUBRULE(this.defMoveStatement)
+        },
+        {
           GATE: () => this.LA(1).tokenType === Def,
           ALT: () => this.SUBRULE(this.defSpriteStatement)
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Move,
+          ALT: () => this.SUBRULE(this.moveStatement)
         },
         {
           GATE: () => this.LA(1).tokenType === Sprite && (this.LA(2).tokenType === On || this.LA(2).tokenType === Off),

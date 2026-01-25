@@ -26,7 +26,8 @@
     "complex": "Complex",
     "comprehensive": "Full Demo",
     "allChars": "All Chars",
-    "spriteTest": "Sprite Test"
+    "spriteTest": "Sprite Test",
+    "moveTest": "Move Test"
   },
   "joystick": {
     "control": "Joystick Control",

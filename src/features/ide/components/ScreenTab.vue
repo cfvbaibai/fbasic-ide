@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import type { ScreenCell } from '@/core/interfaces'
-import type { SpriteState } from '@/core/sprite/types'
+import type { MovementState, SpriteState } from '@/core/sprite/types'
 import { provideScreenZoom } from '@/features/ide/composables/useScreenZoom'
 import { GameButton, GameButtonGroup, GameIcon, GameTabPane } from '@/shared/components/ui'
 
@@ -26,6 +26,7 @@ const props = withDefaults(defineProps<{
   backdropColor?: number
   spriteStates?: SpriteState[]
   spriteEnabled?: boolean
+  movementStates?: MovementState[]
 }>(), {
   screenBuffer: () => {
     const grid: ScreenCell[][] = []
@@ -43,7 +44,8 @@ const props = withDefaults(defineProps<{
   bgPalette: 1,
   backdropColor: 0,
   spriteStates: () => [],
-  spriteEnabled: false
+  spriteEnabled: false,
+  movementStates: () => []
 })
 
 const { t } = useI18n()
@@ -96,6 +98,7 @@ const currentZoomLevel = computed(() => zoomLevel.value)
         :backdrop-color="backdropColor"
         :sprite-states="spriteStates"
         :sprite-enabled="spriteEnabled"
+        :movement-states="movementStates"
       />
     </div>
   </GameTabPane>

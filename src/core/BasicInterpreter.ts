@@ -10,6 +10,8 @@
 
 import type { CstNode } from 'chevrotain'
 
+// Import the FBasicParser
+import { AnimationManager } from './animation/AnimationManager'
 import { 
   ERROR_TYPES,
   EXECUTION_LIMITS, 
@@ -23,7 +25,6 @@ import type {
   BasicVariable, 
   ExecutionResult,
   InterpreterConfig} from './interfaces'
-// Import the FBasicParser
 import { FBasicParser } from './parser/FBasicParser'
 import { SpriteStateManager } from './sprite/SpriteStateManager'
 
@@ -96,6 +97,12 @@ export class BasicInterpreter {
         }
         // Initialize sprite state manager
         this.context.spriteStateManager = new SpriteStateManager()
+        // Initialize animation manager
+        this.context.animationManager = new AnimationManager()
+        // Set device adapter in animation manager for command sending
+        if (this.config.deviceAdapter) {
+          this.context.animationManager.setDeviceAdapter(this.config.deviceAdapter)
+        }
         this.executionEngine = new ExecutionEngine(this.context, this.config.deviceAdapter)
       } else {
         // Update existing ExecutionEngine with current output callback
@@ -211,5 +218,12 @@ export class BasicInterpreter {
    */
   isSpriteEnabled(): boolean {
     return this.context?.spriteStateManager?.isSpriteEnabled() ?? false
+  }
+
+  /**
+   * Get all movement states
+   */
+  getMovementStates() {
+    return this.context?.animationManager?.getAllMovementStates() ?? []
   }
 }

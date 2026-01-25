@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 
 import type { BasicVariable, ScreenCell } from '@/core/interfaces'
-import type { SpriteState } from '@/core/sprite/types'
+import type { MovementState, SpriteState } from '@/core/sprite/types'
 import { GameTabs } from '@/shared/components/ui'
 
 import DebugTab from './DebugTab.vue'
@@ -40,7 +40,8 @@ const props = withDefaults(defineProps<Props>(), {
   bgPalette: 1,
   backdropColor: 0,
   spriteStates: () => [],
-  spriteEnabled: false
+  spriteEnabled: false,
+  movementStates: () => []
 })
 
 
@@ -58,6 +59,7 @@ interface Props {
   backdropColor?: number
   spriteStates?: SpriteState[]
   spriteEnabled?: boolean
+  movementStates?: MovementState[]
 }
 
 const activeTab = ref('screen')
@@ -75,6 +77,7 @@ const activeTab = ref('screen')
         :backdrop-color="backdropColor"
         :sprite-states="spriteStates"
         :sprite-enabled="spriteEnabled"
+        :movement-states="movementStates"
       />
 
       <!-- STDOUT Tab -->

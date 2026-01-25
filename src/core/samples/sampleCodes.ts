@@ -187,6 +187,77 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 380 PRINT "Sprite test completed!"
 390 PRINT "All sprites should be visible on screen"
 400 END`
+  },
+
+  moveTest: {
+    name: 'Move Test',
+    description: 'Animation movement test - demonstrates DEF MOVE and MOVE commands',
+    code: `10 REM Move Test Program
+20 CLS
+30 PRINT "Move Test Program"
+40 PRINT "================="
+50 PRINT ""
+60 PRINT "Testing DEF MOVE and MOVE commands..."
+70 PRINT ""
+80 REM Enable sprite screen
+90 SPRITE ON
+100 PRINT "SPRITE ON executed"
+110 PRINT ""
+120 REM Define movement 0: Mario character, moving right, speed 10, distance 50
+130 REM DEF MOVE(n) = SPRITE(A, B, C, D, E, F)
+140 REM A: character type (0=Mario, 1=Lady, etc.)
+150 REM B: direction (0=none, 1=up, 2=up-right, 3=right, 4=down-right, 5=down, 6=down-left, 7=left, 8=up-left)
+160 REM C: speed (1-255, 60/C dots per second)
+170 REM D: distance (1-255, total = 2*D dots)
+180 REM E: priority (0=front, 1=behind background)
+190 REM F: color combination (0-3)
+200 DEF MOVE(0) = SPRITE(0, 3, 10, 50, 0, 0)
+210 PRINT "DEF MOVE(0) defined: Mario, Right, Speed 10, Distance 50"
+220 PRINT ""
+230 REM Define movement 1: Mario moving left
+240 DEF MOVE(1) = SPRITE(0, 7, 10, 50, 0, 0)
+250 PRINT "DEF MOVE(1) defined: Mario, Left, Speed 10, Distance 50"
+260 PRINT ""
+270 REM Define movement 2: Mario moving up
+280 DEF MOVE(2) = SPRITE(0, 1, 15, 30, 0, 0)
+290 PRINT "DEF MOVE(2) defined: Mario, Up, Speed 15, Distance 30"
+300 PRINT ""
+310 REM Define movement 3: Mario moving down
+320 DEF MOVE(3) = SPRITE(0, 5, 15, 30, 0, 0)
+330 PRINT "DEF MOVE(3) defined: Mario, Down, Speed 15, Distance 30"
+340 PRINT ""
+350 REM Define movement 4: Mario moving diagonally (up-right)
+360 DEF MOVE(4) = SPRITE(0, 2, 12, 40, 0, 0)
+370 PRINT "DEF MOVE(4) defined: Mario, Up-Right, Speed 12, Distance 40"
+380 PRINT ""
+390 PRINT "Starting movements..."
+400 PRINT ""
+410 REM Start movement 0 (right)
+420 MOVE 0
+430 PRINT "MOVE 0 started (moving right)"
+440 PAUSE 500
+450 REM Start movement 1 (left)
+460 MOVE 1
+470 PRINT "MOVE 1 started (moving left)"
+480 PAUSE 500
+490 REM Start movement 2 (up)
+500 MOVE 2
+510 PRINT "MOVE 2 started (moving up)"
+520 PAUSE 500
+530 REM Start movement 3 (down)
+540 MOVE 3
+550 PRINT "MOVE 3 started (moving down)"
+560 PAUSE 500
+570 REM Start movement 4 (diagonal)
+580 MOVE 4
+590 PRINT "MOVE 4 started (moving up-right)"
+600 PRINT ""
+610 PRINT "All movements started!"
+620 PRINT "Check the screen to see sprites moving"
+630 PRINT ""
+640 PRINT "Note: Full sprite rendering with character"
+650 PRINT "      animation will be implemented in Phase 4"
+660 END`
   }
 }
 
