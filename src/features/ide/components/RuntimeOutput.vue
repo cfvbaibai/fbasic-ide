@@ -4,7 +4,8 @@ import { useI18n } from 'vue-i18n'
 import type { BasicVariable, ScreenCell } from '../../../core/interfaces'
 import type { SpriteState } from '../../../core/sprite/types'
 import Screen from './Screen.vue'
-import { GameTabs, GameTabPane, GameTag, GameIcon } from '../../../shared/components/ui'
+import { GameTabs, GameTabPane, GameTag, GameIcon, GameButtonGroup, GameButton } from '../../../shared/components/ui'
+import { provideScreenZoom } from '../composables/useScreenZoom'
 
 /**
  * RuntimeOutput component - Displays runtime output, errors, variables, debug info, and screen buffer.
@@ -58,6 +59,20 @@ interface Props {
 const outputRef = useTemplateRef<HTMLDivElement>('outputRef')
 const activeTab = ref('screen')
 
+// Provide zoom state for child components (Screen) and use it for controls
+const { zoomLevel, setZoom } = provideScreenZoom()
+
+// Zoom level options
+const zoomLevels: Array<{ value: 1 | 2 | 3 | 4; label: string }> = [
+  { value: 1, label: '×1' },
+  { value: 2, label: '×2' },
+  { value: 3, label: '×3' },
+  { value: 4, label: '×4' }
+]
+
+// Computed property for template binding (Vue templates auto-unwrap refs, but this helps TypeScript)
+const currentZoomLevel = computed(() => zoomLevel.value)
+
 // Maximum number of lines to keep in the output buffer
 const MAX_OUTPUT_LINES = 1000
 
@@ -89,6 +104,23 @@ watch(() => props.output.length, scrollToBottom)
         <template #label>
           <GameIcon icon="mdi:monitor" size="small" />
           <span>{{ t('ide.output.screen') }}</span>
+        </template>
+        
+        <template #tab-content-header>
+          <div class="screen-controls">
+            <GameButtonGroup>
+              <GameButton
+                v-for="level in zoomLevels"
+                :key="level.value"
+                variant="toggle"
+                size="small"
+                :selected="currentZoomLevel === level.value"
+                @click="setZoom(level.value)"
+              >
+                {{ level.label }}
+              </GameButton>
+            </GameButtonGroup>
+          </div>
         </template>
         
         <div class="tab-content">
@@ -214,6 +246,12 @@ watch(() => props.output.length, scrollToBottom)
   flex-direction: column;
   min-height: 0;
   overflow: hidden;
+}
+
+.screen-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .tab-status-tag {

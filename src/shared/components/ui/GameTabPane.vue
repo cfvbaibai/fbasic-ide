@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, useSlots, watch, h } from 'vue'
+import { computed, onMounted, onUnmounted, useSlots, h } from 'vue'
 import type { ComputedRef } from 'vue'
 import GameTabButton from './GameTabButton.vue'
 import {
@@ -62,11 +62,6 @@ onMounted(() => {
   registerTab(props.name, renderButton)
 })
 
-// Watch for activeTab changes and re-register to update button state
-watch(() => activeTab.value, () => {
-  registerTab(props.name, renderButton)
-}, { immediate: false })
-
 onUnmounted(() => {
   unregisterTab(props.name)
 })
@@ -79,7 +74,12 @@ const isActive = computed(() => activeTab.value === props.name)
     v-show="isActive"
     :class="['game-tab-pane', { active: isActive }]"
   >
-    <slot />
+    <div v-if="slots['tab-content-header']" class="game-tab-pane-header">
+      <slot name="tab-content-header" />
+    </div>
+    <div class="game-tab-pane-body">
+      <slot />
+    </div>
   </div>
 </template>
 
@@ -92,10 +92,28 @@ const isActive = computed(() => activeTab.value === props.name)
   overflow: hidden;
 }
 
+.game-tab-pane-body {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.game-tab-pane-header {
+  flex-shrink: 0;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--game-surface-border);
+  background: var(--game-surface-bg-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* Border card pane styles */
 .game-tabs-border-card .game-tab-pane {
   border-top: 1px solid var(--game-surface-border);
-  padding: 1rem;
+  padding: 0;
   box-shadow: none;
   position: relative;
   overflow: hidden;
@@ -103,5 +121,10 @@ const isActive = computed(() => activeTab.value === props.name)
 
 .game-tabs-border-card .game-tab-pane::before {
   display: none;
+}
+
+.game-tabs-border-card .game-tab-pane-body {
+  padding: 1rem;
+  overflow: auto;
 }
 </style>

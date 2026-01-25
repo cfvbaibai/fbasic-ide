@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { useTemplateRef, ref, watch, computed } from 'vue'
+import { useTemplateRef, watch, computed } from 'vue'
 import type { ScreenCell } from '@/core/interfaces'
 import { renderScreenBuffer, renderScreenLayers } from '../composables/canvasRenderer'
 import type { SpriteState, MovementState } from '@/core/sprite/types'
-import GameButtonGroup from '@/shared/components/ui/GameButtonGroup.vue'
-import GameButton from '@/shared/components/ui/GameButton.vue'
+import { useScreenZoom } from '../composables/useScreenZoom'
 
 /**
  * Screen component - Renders the F-BASIC screen buffer on a canvas.
@@ -53,8 +52,8 @@ const screenCanvas = useTemplateRef<HTMLCanvasElement>('screenCanvas')
 // Use bgPalette from props instead of hardcoded value
 const paletteCode = computed(() => props.bgPalette ?? 1)
 
-// Zoom state - default to 2x (current scale)
-const zoomLevel = ref<1 | 2 | 3 | 4>(2)
+// Use shared zoom state composable
+const { zoomLevel } = useScreenZoom()
 
 // Base canvas dimensions (full backdrop/sprite screen: 256×240)
 const BASE_WIDTH = 256
@@ -63,18 +62,6 @@ const BASE_HEIGHT = 240
 // Computed canvas display dimensions based on zoom
 const canvasWidth = computed(() => BASE_WIDTH * zoomLevel.value)
 const canvasHeight = computed(() => BASE_HEIGHT * zoomLevel.value)
-
-// Zoom level options
-const zoomLevels: Array<{ value: 1 | 2 | 3 | 4; label: string }> = [
-  { value: 1, label: '×1' },
-  { value: 2, label: '×2' },
-  { value: 3, label: '×3' },
-  { value: 4, label: '×4' }
-]
-
-function setZoom(level: 1 | 2 | 3 | 4): void {
-  zoomLevel.value = level
-}
 
 
 // Direct rendering function (no Vue reactivity overhead)
@@ -129,7 +116,8 @@ watch([
   () => props.spritePalette,
   spriteStateFingerprint,
   movementStateFingerprint,
-  () => props.spriteEnabled
+  () => props.spriteEnabled,
+  zoomLevel
 ], () => {
   scheduleRender()
 })
@@ -161,20 +149,6 @@ watch(screenCanvas, (canvas) => {
 
 <template>
     <div class="screen-display">
-      <div class="screen-controls">
-        <GameButtonGroup>
-          <GameButton
-            v-for="level in zoomLevels"
-            :key="level.value"
-            variant="toggle"
-            size="small"
-            :selected="zoomLevel === level.value"
-            @click="setZoom(level.value)"
-          >
-            {{ level.label }}
-          </GameButton>
-        </GameButtonGroup>
-      </div>
       <div class="crt-bezel">
         <div class="crt-screen">
           <div class="crt-scanlines"></div>
@@ -224,12 +198,6 @@ watch(screenCanvas, (canvas) => {
   gap: 1rem;
 }
 
-.screen-controls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-}
 
 /* CRT Color Variables - Light Theme */
 .light-theme .screen-display {
