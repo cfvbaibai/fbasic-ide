@@ -290,7 +290,7 @@ This document outlines the remaining work needed to complete the Family Basic ID
 
 **Estimated Effort**: 5-10 days
 **Priority**: Medium (advanced feature, foundational work in progress)
-**Status**: 2/6 phases complete (33%)
+**Status**: 4/6 phases complete (67%)
 
 **Detailed Plan**: See `docs/planning/sprite-animation-implementation-plan.md`
 
@@ -304,14 +304,17 @@ This document outlines the remaining work needed to complete the Family Basic ID
   - SPRITE (display sprite) ✅
   - Character set to tile conversion ✅
   - 8×8 and 16×16 sprite support ✅
-- [ ] **Phase 3**: Basic Animation (⏳ NEXT)
-  - DEF MOVE (define sprite movement)
-  - MOVE (execute sprite movement)
-  - Movement calculation and timing
-- [ ] **Phase 4**: Animation Sequences
-  - Frame cycling with CHARACTER_SPRITES data
-  - Direction-to-sequence mapping
-- [ ] **Phase 5**: Movement Control
+- [x] **Phase 3**: Basic Animation ✅ (2026-01-25)
+  - DEF MOVE (define sprite movement) ✅
+  - MOVE (execute sprite movement) ✅
+  - Movement calculation and timing ✅
+  - Real-time animation commands ✅
+- [x] **Phase 4**: Animation Sequences ✅ (2026-01-25)
+  - Frame cycling with CHARACTER_SPRITES data ✅
+  - Direction-to-sequence mapping ✅
+  - **Explicit character sequence configuration** ✅
+  - **Per-frame sprite inversion support** ✅
+- [ ] **Phase 5**: Movement Control (⏳ NEXT)
   - CUT (cut sprite)
   - ERA (erase sprite)
   - POSITION (sprite position)
@@ -328,7 +331,12 @@ This document outlines the remaining work needed to complete the Family Basic ID
 - `src/core/sprite/characterSetConverter.ts` - Character conversion
 - `src/core/execution/executors/DefSpriteExecutor.ts` - DEF SPRITE
 - `src/core/execution/executors/SpriteExecutor.ts` - SPRITE
-- `src/features/ide/composables/spriteCanvasRenderer.ts` - Rendering
+- `src/core/animation/AnimationManager.ts` - Animation state management
+- `src/core/animation/CharacterAnimationBuilder.ts` - Animation config builder
+- `src/core/animation/characterSequenceConfig.ts` - Explicit character sequence configuration
+- `src/core/execution/executors/DefMoveExecutor.ts` - DEF MOVE
+- `src/core/execution/executors/MoveExecutor.ts` - MOVE
+- `src/features/ide/composables/useKonvaSpriteRenderer.ts` - Konva sprite rendering
 
 **Reference Documentation**:
 - `docs/planning/sprite-animation-implementation-plan.md` - **Main implementation plan**
@@ -435,7 +443,7 @@ This document outlines the remaining work needed to complete the Family Basic ID
 | Phase 1: Vue Best Practices | Low | 1 day | Low | None (mostly complete) |
 | Phase 4: Additional Commands | Medium | 2-4 days | Medium | None |
 | Phase 7: Documentation | Medium | 1-2 days | Medium | Phases 2-3 |
-| Phase 5: Sprite System | Low | 5-10 days | Low | Future |
+| Phase 5: Sprite System | Low | 5-10 days | Low | Future (4/6 phases complete: Phases 1-4 ✅) |
 
 ---
 
@@ -653,3 +661,28 @@ This document outlines the remaining work needed to complete the Family Basic ID
 - ✅ **JSDoc Verification**: Confirmed most components have comprehensive documentation
 
 **Reference**: See `docs/planning/vue-vueuse-best-practices-plan.md` for detailed implementation
+
+### Sprite System Progress (2026-01-25)
+
+**Phase 3: Basic Animation** ✅ Complete:
+- ✅ DEF MOVE and MOVE commands fully implemented
+- ✅ Real-time animation command communication
+- ✅ Movement calculation and timing
+- ✅ requestAnimationFrame animation loop
+
+**Phase 4: Animation Sequences** ✅ Complete:
+- ✅ Frame cycling with character sprites
+- ✅ **Explicit character sequence configuration** (`characterSequenceConfig.ts`)
+  - All 16 character types have explicit configs
+  - Direction-specific sprite lists with frame order
+  - Per-frame inversion flags (frameInversions)
+- ✅ **Per-frame sprite inversion support**
+  - FrameInversionConfig interface added
+  - Each frame can have its own inversion flags
+  - Sprite renderers support per-frame inversions with direction-level fallback
+- ✅ CharacterAnimationBuilder refactored to use config-based approach
+- ✅ Direction-to-sequence mapping with automatic inversion
+
+**Status**: 4/6 phases complete (67%). Phases 1-4 fully functional. Remaining: Movement Control (Phase 5) and Integration & Polish (Phase 6).
+
+**Reference**: See `docs/planning/sprite-animation-implementation-plan.md` for detailed implementation

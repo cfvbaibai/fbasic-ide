@@ -492,6 +492,15 @@ enum MoveCharacterCode {
   - Group sprites by moveCharacterCode
   - Extract sequence names from sprite names (e.g., "Mario (WALK1)" → "WALK")
   - Build AnimationSequence for each sequence
+- [x] **Create explicit character sequence configuration** (`characterSequenceConfig.ts`)
+  - Define explicit sprite sequences for all 16 character types
+  - Direction-specific sprite lists with frame order
+  - Per-frame inversion flags (frameInversions) for each sprite
+  - Frame rates and looping behavior per direction
+- [x] **Refactor CharacterAnimationBuilder to use config-based approach**
+  - `buildSequencesFromConfig()` - Build sequences from explicit config
+  - `buildDirectionMappingsFromConfig()` - Build direction mappings from config
+  - Fall back to old method for characters without config
 - [x] Implement sequence lookup
   - Map character type + direction → sequence name
   - Handle automatic inversion based on direction
@@ -525,16 +534,19 @@ enum MoveCharacterCode {
   - Get character animation config (cached)
   - Get direction mapping (sequence + inversion)
   - Get current frame from sequence (using modulo for looping)
-  - Render sprite tiles with proper inversion
+  - **Support per-frame inversions** - Use frameInversions array if available, fall back to direction-level inversions
+  - Render sprite tiles with proper inversion (per-frame or direction-level)
   - Apply color combination from DEF MOVE
   - Support 8×8 (1 tile) and 16×16 (4 tiles) sprites
 
 **Files Created**:
-- ✅ `src/core/animation/CharacterAnimationBuilder.ts` - Complete animation builder with caching
+- ✅ `src/core/animation/CharacterAnimationBuilder.ts` - Complete animation builder with caching and config-based approach
+- ✅ `src/core/animation/characterSequenceConfig.ts` - Explicit character sequence configuration for all 16 character types
 
 **Files Modified**:
-- ✅ `src/core/sprite/types.ts` - Updated AnimationSequence to use `frames: Tile[][]` instead of `sprites: Tile[]`
-- ✅ `src/features/ide/composables/spriteCanvasRenderer.ts` - Updated `renderAnimatedSprite()` to use actual sprite tiles
+- ✅ `src/core/sprite/types.ts` - Added `FrameInversionConfig` interface and `frameInversions` field to `AnimationSequence`
+- ✅ `src/features/ide/composables/useKonvaSpriteRenderer.ts` - Updated to support per-frame inversions with direction-level fallback
+- ✅ `src/features/konva-test/composables/useSpriteRendering.ts` - Updated to support per-frame inversions
 - ✅ `src/features/ide/components/Screen.vue` - Added frame animation logic to `updateMovements()`
 
 **Test Files**:
@@ -547,7 +559,9 @@ enum MoveCharacterCode {
 - [x] Frame rate matches 8 frames per sprite switch
 - [x] Direction determines sequence selection
 - [x] Automatic inversion works (left = walk + flip X)
-- [x] All 16 character types have proper configs (default mappings applied)
+- [x] **Explicit character sequence configuration** - All 16 character types have explicit configs with direction-specific sprite lists
+- [x] **Per-frame inversion support** - Each frame can have its own inversion flags (invertX, invertY)
+- [x] **Config-based approach** - CharacterAnimationBuilder uses explicit configs with fallback to old method
 - [x] Animations loop smoothly (using modulo for frame index)
 - [x] TypeScript type checking passes
 - [x] ESLint passes
@@ -737,7 +751,8 @@ src/
 ├── core/
 │   ├── animation/
 │   │   ├── AnimationManager.ts          # Main animation manager
-│   │   ├── CharacterAnimationBuilder.ts # Build animation configs
+│   │   ├── CharacterAnimationBuilder.ts # Build animation configs (config-based approach)
+│   │   ├── characterSequenceConfig.ts  # Explicit character sequence configuration
 │   │   └── types.ts                     # Animation type definitions
 │   ├── sprite/
 │   │   ├── types.ts                      # ✅ Sprite type definitions
@@ -977,13 +992,16 @@ test/
 
 **Phase 4 Achievements** (✅ Complete - 2026-01-25):
 - ✅ CharacterAnimationBuilder implemented with sequence extraction and direction mapping
-- ✅ Animation sequences built from CHARACTER_SPRITES data
+- ✅ **Explicit character sequence configuration** (`characterSequenceConfig.ts`) - All 16 character types have explicit configs
+- ✅ **Per-frame sprite inversion support** - FrameInversionConfig interface and frameInversions field added
+- ✅ Animation sequences built from explicit configs (with fallback to CHARACTER_SPRITES data)
 - ✅ Frame animation logic added to updateMovements() in Screen.vue
-- ✅ renderAnimatedSprite() updated to render actual character sprite tiles
+- ✅ renderAnimatedSprite() updated to render actual character sprite tiles with per-frame inversions
 - ✅ Direction-to-sequence mapping with automatic inversion (left = WALK + X inversion)
 - ✅ Character animation configs cached for performance
 - ✅ Support for 8×8 and 16×16 sprite frames
 - ✅ Frame looping using modulo operation
+- ✅ Sprite renderers (useKonvaSpriteRenderer, useSpriteRendering) support per-frame inversions
 - ✅ All TypeScript type checking passes
 - ✅ All ESLint checks pass
 
@@ -1085,5 +1103,27 @@ test/
 4. Implement MOVE(n) function - status query (-1=moving, 0=complete)
 5. Implement XPOS(n) and YPOS(n) functions - position queries
 6. Add tests for all control commands
+
+### Recent Updates (2026-01-25)
+
+**Explicit Character Sequence Configuration**:
+- ✅ Created `characterSequenceConfig.ts` with explicit sprite sequences for all 16 character types
+- ✅ Each character has direction-specific sprite lists (0-8) with exact sprite names in frame order
+- ✅ Per-frame inversion flags (frameInversions) - one per sprite name
+- ✅ Frame rates and looping behavior configured per direction
+- ✅ Example: MARIO direction 1 (Up) alternates between normal and X-inversed LADDER
+
+**Per-Frame Sprite Inversion Support**:
+- ✅ Added `FrameInversionConfig` interface to `types.ts`
+- ✅ Added `frameInversions?: FrameInversionConfig[]` field to `AnimationSequence`
+- ✅ Updated `useKonvaSpriteRenderer.ts` to use per-frame inversions with direction-level fallback
+- ✅ Updated `useSpriteRendering.ts` to support per-frame inversions
+- ✅ Each frame can now have its own inversion flags (invertX, invertY)
+
+**CharacterAnimationBuilder Refactoring**:
+- ✅ Refactored to use config-based approach (`buildSequencesFromConfig`, `buildDirectionMappingsFromConfig`)
+- ✅ Falls back to old method for characters without explicit config
+- ✅ Improved accuracy and maintainability of character animations
+- ✅ Fixed frame inversion count mismatch for MARIO and LADY direction 4
 
 **Last Updated**: 2026-01-25

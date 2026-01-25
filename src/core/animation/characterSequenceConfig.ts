@@ -68,26 +68,26 @@ export const CHARACTER_SEQUENCE_CONFIGS: CharacterSequenceConfig[] = [
   {
     characterType: 0, // MoveCharacterCode.MARIO
     directions: new Map([
-      [0, { spriteNames: ['Mario (DOWN)'], frameRate: 8, looping: true, frameInversions: createFrameInversions(1) }], // No movement
+      [0, { spriteNames: ['Mario (DOWN)'], frameRate: 8, looping: true, frameInversions: createFrameInversions(1) }],
       [1, { 
         spriteNames: ['Mario (LADDER)', 'Mario (LADDER)'], 
         frameRate: 8, 
         looping: true,
         frameInversions: [
-          { invertX: false, invertY: false }, // Frame 0: normal
-          { invertX: true, invertY: false }   // Frame 1: X-inversed
+          { invertX: false, invertY: false },
+          { invertX: true, invertY: false }
         ]
-      }], // Up: alternates between normal and X-inversed LADDER
-      [2, { spriteNames: ['Mario (JUMP)'], frameRate: 8, looping: false, frameInversions: createFrameInversions(1, true, false) }], // Up-right (base sprites face left, need flip to face right)
-      [3, { spriteNames: ['Mario (WALK1)', 'Mario (WALK2)', 'Mario (WALK3)'], frameRate: 8, looping: true, frameInversions: createFrameInversions(3, true, false) }], // Right: tile sequence [0, 1, 2, 3] x-flip=true (base faces left, need flip to face right)
-      [4, { spriteNames: ['Mario (JUMP)'], frameRate: 8, looping: false, frameInversions: createFrameInversions(1, true, false) }], // Down-right (base sprites face left, need flip to face right)
+      }],
+      [2, { spriteNames: ['Mario (JUMP)'], frameRate: 8, looping: false, frameInversions: createFrameInversions(1, true, false) }],
+      [3, { spriteNames: ['Mario (WALK1)', 'Mario (WALK2)', 'Mario (WALK3)'], frameRate: 8, looping: true, frameInversions: createFrameInversions(3, true, false) }],
+      [4, { spriteNames: ['Mario (JUMP)'], frameRate: 8, looping: false, frameInversions: createFrameInversions(1, true, false) }],
       [5, { spriteNames: ['Mario (LADDER)', 'Mario (LADDER)'], frameRate: 8, looping: false, frameInversions: [
         { invertX: false, invertY: false },
         { invertX: true, invertY: false }
       ] }], // Down
-      [6, { spriteNames: ['Mario (JUMP)'], frameRate: 8, looping: false, frameInversions: createFrameInversions(1) }], // Down-left (base sprites face left, no flip needed)
-      [7, { spriteNames: ['Mario (WALK1)', 'Mario (WALK2)', 'Mario (WALK3)'], frameRate: 8, looping: true, frameInversions: createFrameInversions(3) }], // Left: tile sequence [1, 0, 3, 2] x-flip=true
-      [8, { spriteNames: ['Mario (JUMP)'], frameRate: 8, looping: false, frameInversions: createFrameInversions(1) }], // Up-left (base sprites face left, no flip needed)
+      [6, { spriteNames: ['Mario (JUMP)'], frameRate: 8, looping: false, frameInversions: createFrameInversions(1) }],
+      [7, { spriteNames: ['Mario (WALK1)', 'Mario (WALK2)', 'Mario (WALK3)'], frameRate: 8, looping: true, frameInversions: createFrameInversions(3) }],
+      [8, { spriteNames: ['Mario (JUMP)'], frameRate: 8, looping: false, frameInversions: createFrameInversions(1) }],
     ]),
   },
 
@@ -95,26 +95,26 @@ export const CHARACTER_SEQUENCE_CONFIGS: CharacterSequenceConfig[] = [
   {
     characterType: 1, // MoveCharacterCode.LADY
     directions: new Map([
-      [0, { spriteNames: ['Lady (DOWN)'], frameRate: 8, looping: true, frameInversions: createFrameInversions(1) }], // No movement
+      [0, { spriteNames: ['Lady (DOWN)'], frameRate: 8, looping: true, frameInversions: createFrameInversions(1) }],
       [1, { 
         spriteNames: ['Lady (LADDER)', 'Lady (LADDER)'], 
         frameRate: 8, 
         looping: true,
         frameInversions: [
-          { invertX: false, invertY: false }, // Frame 0: normal
-          { invertX: true, invertY: false }   // Frame 1: X-inversed
+          { invertX: false, invertY: false },
+          { invertX: true, invertY: false }
         ]
-      }], // Up: alternates between normal and X-inversed LADDER
-      [2, { spriteNames: ['Lady (JUMP)'], frameRate: 8, looping: false, frameInversions: createFrameInversions(1, true, false) }], // Up-right (base sprites face left, need flip to face right)
-      [3, { spriteNames: ['Lady (WALK1)', 'Lady (WALK2)', 'Lady (WALK3)'], frameRate: 8, looping: true, frameInversions: createFrameInversions(3, true, false) }], // Right: tile sequence [0, 1, 2, 3] x-flip=true (base faces left, need flip to face right)
-      [4, { spriteNames: ['Lady (JUMP)'], frameRate: 8, looping: false, frameInversions: createFrameInversions(1, true, false) }], // Down-right (base sprites face left, need flip to face right)
+      }],
+      [2, { spriteNames: ['Lady (JUMP)'], frameRate: 8, looping: false, frameInversions: createFrameInversions(1, true, false) }],
+      [3, { spriteNames: ['Lady (WALK1)', 'Lady (WALK2)', 'Lady (WALK3)'], frameRate: 8, looping: true, frameInversions: createFrameInversions(3, true, false) }],
+      [4, { spriteNames: ['Lady (JUMP)'], frameRate: 8, looping: false, frameInversions: createFrameInversions(1, true, false) }],
       [5, { spriteNames: ['Lady (LADDER)', 'Lady (LADDER)'], frameRate: 8, looping: false, frameInversions: [
         { invertX: false, invertY: false },
         { invertX: true, invertY: false }
       ] }], // Down
-      [6, { spriteNames: ['Lady (JUMP)'], frameRate: 8, looping: false, frameInversions: createFrameInversions(1) }], // Down-left (base sprites face left, no flip needed)
-      [7, { spriteNames: ['Lady (WALK1)', 'Lady (WALK2)', 'Lady (WALK3)'], frameRate: 8, looping: true, frameInversions: createFrameInversions(3) }], // Left: tile sequence [1, 0, 3, 2] x-flip=true
-      [8, { spriteNames: ['Lady (JUMP)'], frameRate: 8, looping: false, frameInversions: createFrameInversions(1) }], // Up-left (base sprites face left, no flip needed)
+      [6, { spriteNames: ['Lady (JUMP)'], frameRate: 8, looping: false, frameInversions: createFrameInversions(1) }],
+      [7, { spriteNames: ['Lady (WALK1)', 'Lady (WALK2)', 'Lady (WALK3)'], frameRate: 8, looping: true, frameInversions: createFrameInversions(3) }],
+      [8, { spriteNames: ['Lady (JUMP)'], frameRate: 8, looping: false, frameInversions: createFrameInversions(1) }],
     ]),
   },
 
@@ -139,14 +139,14 @@ export const CHARACTER_SEQUENCE_CONFIGS: CharacterSequenceConfig[] = [
     characterType: 3, // MoveCharacterCode.ACHILLES
     directions: new Map([
       [0, { spriteNames: ['Achilles (LEFT1)', 'Achilles (LEFT2)'], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
-      [1, { spriteNames: ['Achilles (TOP1)', 'Achilles (TOP2)'], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }], // Up
-      [2, { spriteNames: ['Achilles (LEFTUP1)', 'Achilles (LEFTUP2)'], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, true) }], // Up-right
-      [3, { spriteNames: ['Achilles (LEFT1)', 'Achilles (LEFT2)'], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, true) }], // Right (inverted left)
-      [4, { spriteNames: ['Achilles (LEFTUP1)', 'Achilles (LEFTUP2)'], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, true, true) }], // Down-right
-      [5, { spriteNames: ['Achilles (TOP1)', 'Achilles (TOP2)'], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, false, true) }], // Down
-      [6, { spriteNames: ['Achilles (LEFTUP1)', 'Achilles (LEFTUP2)'], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, false, true) }], // Down-left
-      [7, { spriteNames: ['Achilles (LEFT1)', 'Achilles (LEFT2)'], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, true) }], // Left
-      [8, { spriteNames: ['Achilles (LEFTUP1)', 'Achilles (LEFTUP2)'], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }], // Up-left
+      [1, { spriteNames: ['Achilles (TOP1)', 'Achilles (TOP2)'], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+      [2, { spriteNames: ['Achilles (LEFTUP1)', 'Achilles (LEFTUP2)'], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, true) }],
+      [3, { spriteNames: ['Achilles (LEFT1)', 'Achilles (LEFT2)'], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, true) }],
+      [4, { spriteNames: ['Achilles (LEFTUP1)', 'Achilles (LEFTUP2)'], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, true, true) }],
+      [5, { spriteNames: ['Achilles (TOP1)', 'Achilles (TOP2)'], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, false, true) }],
+      [6, { spriteNames: ['Achilles (LEFTUP1)', 'Achilles (LEFTUP2)'], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, false, true) }],
+      [7, { spriteNames: ['Achilles (LEFT1)', 'Achilles (LEFT2)'], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, true) }],
+      [8, { spriteNames: ['Achilles (LEFTUP1)', 'Achilles (LEFTUP2)'], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
     ]),
   },
 
