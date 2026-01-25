@@ -21,9 +21,9 @@
       "name": "Sprite Viewer",
       "description": "View Character Sprites"
     },
-    "canvasPerformance": {
-      "name": "Canvas Performance",
-      "description": "Canvas Performance Test"
+    "konvaSpriteTest": {
+      "name": "Konva Sprite Test",
+      "description": "Konva Sprite Animation Test"
     }
   }
 }

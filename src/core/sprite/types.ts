@@ -76,7 +76,7 @@ export interface MovementState {
  */
 export interface AnimationSequence {
   name: string // "WALK", "LADDER", "JUMP", etc.
-  sprites: Tile[] // Frame tile data
+  frames: Tile[][] // Frame data: each frame is an array of tiles (1 tile for 8×8, 4 tiles for 16×16)
   frameRate: number // Frames per sprite switch (default: 8)
   looping: boolean // Whether sequence loops
 }

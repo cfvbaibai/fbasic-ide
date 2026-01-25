@@ -1,13 +1,23 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue'
+import Konva from 'konva'
+import { computed, onUnmounted, ref, useTemplateRef, watch } from 'vue'
 
 import type { ScreenCell } from '@/core/interfaces'
 import type { MovementState, SpriteState } from '@/core/sprite/types'
-import { renderScreenBuffer, renderScreenLayers } from '@/features/ide/composables/canvasRenderer'
+import { preInitializeBackgroundTiles } from '@/features/ide/composables/useKonvaBackgroundRenderer'
+import {
+  initializeKonvaLayers,
+  type KonvaScreenLayers,
+  renderAllScreenLayers,
+} from '@/features/ide/composables/useKonvaScreenRenderer'
+import { useRenderQueue } from '@/features/ide/composables/useRenderQueue'
+import { useScreenAnimationLoop } from '@/features/ide/composables/useScreenAnimationLoop'
 import { useScreenZoom } from '@/features/ide/composables/useScreenZoom'
+import { COLORS } from '@/shared/data/palette'
+import type { VueKonvaStageInstance } from '@/types/vue-konva'
 
 /**
- * Screen component - Renders the F-BASIC screen buffer on a canvas.
+ * Screen component - Renders the F-BASIC screen buffer using Konva.js
  */
 defineOptions({
   name: 'Screen',
@@ -48,45 +58,115 @@ interface Props {
   spriteEnabled?: boolean
 }
 
-// Canvas reference
-const screenCanvas = useTemplateRef<HTMLCanvasElement>('screenCanvas')
+// Konva Stage reference
+const stageRef = useTemplateRef<VueKonvaStageInstance>('stageRef')
+
 // Use bgPalette from props instead of hardcoded value
 const paletteCode = computed(() => props.bgPalette ?? 1)
+
+// Computed backdrop color hex
+const backdropColorHex = computed(() => {
+  const colorCode = props.backdropColor ?? 0
+  return COLORS[colorCode] ?? COLORS[0] ?? '#000000'
+})
 
 // Use shared zoom state composable
 const { zoomLevel } = useScreenZoom()
 
-// Base canvas dimensions (full backdrop/sprite screen: 256×240)
+// Base screen dimensions (full backdrop/sprite screen: 256×240)
 const BASE_WIDTH = 256
 const BASE_HEIGHT = 240
 
-// Computed canvas display dimensions based on zoom
-const canvasWidth = computed(() => BASE_WIDTH * zoomLevel.value)
-const canvasHeight = computed(() => BASE_HEIGHT * zoomLevel.value)
+// Computed stage display dimensions based on zoom (for CSS scaling)
+const stageDisplayWidth = computed(() => BASE_WIDTH * zoomLevel.value)
+const stageDisplayHeight = computed(() => BASE_HEIGHT * zoomLevel.value)
 
-// Direct rendering function (no Vue reactivity overhead)
-function render(): void {
-  if (!screenCanvas.value) return
+// Konva layers
+const layers = ref<KonvaScreenLayers>({
+  backdropLayer: null,
+  spriteBackLayer: null,
+  backgroundLayer: null,
+  spriteFrontLayer: null,
+})
 
-  // Use local movement states (with updated positions) for rendering
-  const hasSprites = props.spriteStates && props.spriteStates.length > 0
-  const hasMovements = localMovementStates.value.length > 0 && localMovementStates.value.some(m => m.isActive)
+// Sprite node maps for animated sprite updates
+const frontSpriteNodes = ref<Map<number, Konva.Image>>(new Map())
+const backSpriteNodes = ref<Map<number, Konva.Image>>(new Map())
 
-  if (hasSprites || hasMovements) {
-    // renderScreenLayers is async, but we call it without await to avoid blocking
-    void renderScreenLayers(
-      screenCanvas.value,
+// Track if a render is in progress to prevent overlapping renders
+let renderInProgress = false
+
+// Note: pendingBackgroundUpdate removed - static rendering happens immediately via watchers
+
+/**
+ * Initialize Konva Stage and layers
+ */
+async function initializeKonva(): Promise<void> {
+  if (!stageRef.value) return
+
+  // Get the Konva stage node from vue-konva ref
+  const stageNode = stageRef.value?.getNode() ?? stageRef.value?.getStage?.() ?? null
+  if (!stageNode) {
+    console.error('[Screen] Failed to get Konva stage node')
+    return
+  }
+
+  // Pre-initialize background tile images in the background (non-blocking)
+  // This ensures all tile images are ready before rendering
+  // Start immediately but don't wait - images will be created on-demand if not ready
+  void preInitializeBackgroundTiles().catch(err => {
+    console.warn('[Screen] Background tile pre-initialization failed:', err)
+  })
+
+  // Initialize layers (backdrop is managed by vue-konva template, so we don't need to access it)
+  layers.value = initializeKonvaLayers(stageNode)
+  // Backdrop layer is managed by template, so we leave it as null
+  layers.value.backdropLayer = null
+
+  // Initial render
+  await scheduleRender()
+}
+
+/**
+ * Render all screen layers using Konva
+ */
+async function render(): Promise<void> {
+  if (!stageRef.value || renderInProgress) return
+
+  renderInProgress = true
+  try {
+    // Determine if background should be cached (static when no active movements)
+    const hasActiveMovements = localMovementStates.value.some(m => m.isActive)
+    const backgroundShouldCache = !hasActiveMovements
+
+    // Render all layers (backdrop is managed by template, so we pass null)
+    const layersToRender: KonvaScreenLayers = {
+      backdropLayer: null, // Backdrop is managed by vue-konva template
+      spriteBackLayer: layers.value.spriteBackLayer as Konva.Layer | null,
+      backgroundLayer: layers.value.backgroundLayer as Konva.Layer | null,
+      spriteFrontLayer: layers.value.spriteFrontLayer as Konva.Layer | null,
+    }
+    const { frontSpriteNodes: frontNodes, backSpriteNodes: backNodes } = await renderAllScreenLayers(
+      layersToRender,
       props.screenBuffer,
       props.spriteStates ?? [],
-      localMovementStates.value, // Use local updated states
+      localMovementStates.value,
       paletteCode.value,
       props.spritePalette ?? 1,
       props.backdropColor ?? 0,
-      props.spriteEnabled ?? false
+      props.spriteEnabled ?? false,
+      backgroundShouldCache,
+      frontSpriteNodes.value as Map<number, Konva.Image>,
+      backSpriteNodes.value as Map<number, Konva.Image>
     )
-  } else {
-    // Fallback to simple rendering when no sprites or movements
-    renderScreenBuffer(screenCanvas.value, props.screenBuffer, paletteCode.value, props.backdropColor ?? 0)
+
+    // Update sprite node maps
+    frontSpriteNodes.value = frontNodes as Map<number, Konva.Image>
+    backSpriteNodes.value = backNodes as Map<number, Konva.Image>
+  } catch (error) {
+    console.error('[Screen] Error rendering screen layers:', error)
+  } finally {
+    renderInProgress = false
   }
 }
 
@@ -95,6 +175,7 @@ function render(): void {
 const localMovementStates = ref<MovementState[]>([])
 
 // Update local movement states from props
+// MOVE command states - animation loop handles rendering of these
 watch(
   () => props.movementStates,
   newStates => {
@@ -126,13 +207,15 @@ watch(
       }
     })
 
-    // Trigger immediate render when new movements are added
+    // When new MOVE commands are added, trigger a full render to show initial state
+    // After that, animation loop will handle updates
     scheduleRender()
   },
   { immediate: true, deep: true }
 )
 
 // Watch paletteCode, backdropColor, spritePalette, sprite states, and sprite enabled to trigger re-render
+// These are STATIC rendering changes (CGSET, COLOR, SPRITE, etc.) - render immediately
 // Combined watcher for better performance (Vue 3 best practice)
 // Use computed to extract sprite state fingerprint for efficient change detection
 const spriteStateFingerprint = computed(() => {
@@ -141,126 +224,70 @@ const spriteStateFingerprint = computed(() => {
   return props.spriteStates.map(s => `${s.spriteNumber}:${s.x},${s.y},${s.visible ? '1' : '0'},${s.priority}`).join('|')
 })
 
-// Watch local movement states for changes (positions update in animation loop)
-const movementStateFingerprint = computed(() => {
-  if (!localMovementStates.value || localMovementStates.value.length === 0) return ''
-  return localMovementStates.value
-    .map(m => `${m.actionNumber}:${m.currentX},${m.currentY},${m.isActive ? '1' : '0'},${m.currentFrameIndex}`)
-    .join('|')
-})
-
 watch(
   [
     paletteCode,
     () => props.backdropColor,
     () => props.spritePalette,
     spriteStateFingerprint,
-    movementStateFingerprint,
     () => props.spriteEnabled,
     zoomLevel,
   ],
   () => {
+    // Static rendering - execute immediately, no waiting
+    // Animation loop only handles MOVE animations, not static rendering
     scheduleRender()
   }
 )
 
-// Animation loop for updating movement positions
-let animationFrameId: number | null = null
-let lastFrameTime = 0
+// Render queue using requestAnimationFrame for optimal browser rendering alignment
+// This ensures updates are processed in order and aligned with browser refresh cycle
+const { schedule: scheduleRender, cleanup: cleanupRenderQueue } = useRenderQueue(async () => {
+  await render()
+})
 
-function updateMovements(deltaTime: number): void {
-  for (const movement of localMovementStates.value) {
-    if (!movement.isActive || movement.remainingDistance <= 0) {
-      movement.isActive = false
-      continue
-    }
-
-    // Calculate distance per frame: speedDotsPerSecond × (deltaTime / 1000)
-    const dotsPerFrame = movement.speedDotsPerSecond * (deltaTime / 1000)
-    const distanceThisFrame = Math.min(dotsPerFrame, movement.remainingDistance)
-
-    // Update position
-    movement.currentX += movement.directionDeltaX * distanceThisFrame
-    movement.currentY += movement.directionDeltaY * distanceThisFrame
-    movement.remainingDistance -= distanceThisFrame
-
-    // Clamp to screen bounds
-    movement.currentX = Math.max(0, Math.min(255, movement.currentX))
-    movement.currentY = Math.max(0, Math.min(239, movement.currentY))
-
-    // Check if movement is complete
-    if (movement.remainingDistance <= 0) {
-      movement.isActive = false
-    }
-  }
-}
-
-function animationLoop(timestamp: number): void {
-  if (lastFrameTime === 0) {
-    lastFrameTime = timestamp
-  }
-
-  const deltaTime = timestamp - lastFrameTime
-  lastFrameTime = timestamp
-
-  // Update movements if there are any active ones
-  const hasActiveMovements = localMovementStates.value.some(m => m.isActive)
-  if (hasActiveMovements) {
-    updateMovements(deltaTime)
-    // Trigger re-render after updating positions
-    scheduleRender()
-  }
-
-  // Always continue animation loop (even when no active movements)
-  // This ensures movements appear immediately when they're added
-  animationFrameId = requestAnimationFrame(animationLoop)
-}
-
-// Use requestAnimationFrame for batching
-let pendingRender = false
-function scheduleRender(): void {
-  if (pendingRender) return
-  pendingRender = true
-  requestAnimationFrame(() => {
-    pendingRender = false
-    // Use local movement states for rendering
-    render()
-  })
-}
-
-// Watch screenBuffer and render when it changes (shallow watch to reduce overhead)
+// Watch screenBuffer and render when it changes (PRINT command - static rendering)
+// Static rendering should execute immediately, no waiting for animation loop
+// Use deep watch to detect all cell changes (not just array reference changes)
+// Use flush: 'post' to ensure we render after all synchronous updates are complete
+// The scheduleRender function handles FIFO ordering and throttling
 watch(
   () => props.screenBuffer,
   () => {
+    // PRINT command changes - queue render with FIFO ordering and throttling
+    // Animation loop only handles MOVE animations, not static PRINT rendering
     scheduleRender()
   },
-  { immediate: true }
+  { immediate: true, deep: true, flush: 'post' }
 )
 
-// Initial render when canvas becomes available
-// Use watch instead of watchEffect to avoid conditional dependency tracking issues
+// Backdrop is managed by vue-konva template via backdropColorHex computed property
+
+// Initial render when stage becomes available
 watch(
-  screenCanvas,
-  canvas => {
-    if (canvas) {
-      scheduleRender()
+  stageRef,
+  async stage => {
+    if (stage) {
+      await initializeKonva()
     }
   },
   { immediate: true }
 )
 
-// Start animation loop when component mounts
-onMounted(() => {
-  lastFrameTime = 0
-  animationFrameId = requestAnimationFrame(animationLoop)
+// Setup animation loop - ONLY for MOVE command animations
+// Static rendering (PRINT, SPRITE, CGSET, COLOR) is handled by watchers above
+const stopAnimationLoop = useScreenAnimationLoop({
+  localMovementStates,
+  layers,
+  frontSpriteNodes,
+  backSpriteNodes,
+  spritePalette: computed(() => props.spritePalette ?? 1),
 })
 
-// Stop animation loop when component unmounts
+// Stop animation loop and cancel pending renders when component unmounts
 onUnmounted(() => {
-  if (animationFrameId !== null) {
-    cancelAnimationFrame(animationFrameId)
-    animationFrameId = null
-  }
+  stopAnimationLoop()
+  cleanupRenderQueue()
 })
 </script>
 
@@ -269,16 +296,41 @@ onUnmounted(() => {
     <div class="crt-bezel">
       <div class="crt-screen">
         <div class="crt-scanlines"></div>
-        <canvas
-          ref="screenCanvas"
-          class="screen-canvas"
-          :width="256"
-          :height="240"
+        <div
+          class="screen-stage-wrapper"
           :style="{
-            width: `${canvasWidth}px`,
-            height: `${canvasHeight}px`,
+            width: `${stageDisplayWidth}px`,
+            height: `${stageDisplayHeight}px`,
           }"
-        />
+        >
+          <v-stage
+            ref="stageRef"
+            class="screen-stage"
+            :config="{
+              width: BASE_WIDTH,
+              height: BASE_HEIGHT,
+            }"
+            :style="{
+              transform: `scale(${zoomLevel})`,
+              transformOrigin: 'top left',
+            }"
+          >
+          <v-layer>
+            <!-- Backdrop Screen (F-Basic layer 1: furthest back) -->
+            <!-- 32×30 characters = 256×240 pixels -->
+            <v-rect
+              :config="{
+                x: 0,
+                y: 0,
+                width: BASE_WIDTH,
+                height: BASE_HEIGHT,
+                fill: backdropColorHex,
+              }"
+            />
+            <!-- Additional layers (sprite back, background, sprite front) will be added programmatically -->
+          </v-layer>
+          </v-stage>
+        </div>
         <div class="crt-reflection"></div>
       </div>
     </div>
@@ -428,12 +480,15 @@ onUnmounted(() => {
   );
 }
 
-.screen-canvas {
-  display: block;
+.screen-stage-wrapper {
   position: relative;
   z-index: 0;
+  overflow: hidden;
+}
+
+.screen-stage {
+  display: block;
   image-rendering: pixelated;
-  image-rendering: crisp-edges;
   image-rendering: crisp-edges;
   filter: brightness(1.05) contrast(1.1);
 }

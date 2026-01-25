@@ -334,7 +334,7 @@
       MAX_Y: 29,
       // Maximum Y coordinate (0-29, 30 lines)
       COLUMNS: 32,
-      // Total columns  
+      // Total columns
       LINES: 30
       // Total lines
     },
@@ -5658,8 +5658,10 @@
     /**
      * ASC(string) - converts first character of string to character code
      * Returns integer from 0 to 255
-     * Per manual page 83: "The character code of the first character of the character string becomes the value of this function"
-     * "Also, when the character string is a null string, 0 becomes the value of this function"
+     * Per manual page 83: "The character code of the first character of the
+     * character string becomes the value of this function"
+     * "Also, when the character string is a null string, 0 becomes the value
+     * of this function"
      */
     evaluateAsc(args) {
       if (args.length !== 1) {
@@ -5826,10 +5828,7 @@
     constructor(context) {
       this.context = context;
       __publicField(this, "functionEvaluator");
-      this.functionEvaluator = new FunctionEvaluator(
-        context,
-        (exprCst) => this.evaluateExpression(exprCst)
-      );
+      this.functionEvaluator = new FunctionEvaluator(context, (exprCst) => this.evaluateExpression(exprCst));
     }
     /**
      * Evaluate a BASIC expression from CST
@@ -6111,7 +6110,8 @@
       return primaryValue;
     }
     /**
-     * Evaluate primary expression: NumberLiteral | StringLiteral | ArrayAccess | FunctionCall | Identifier | (LParen Expression RParen)
+     * Evaluate primary expression: 
+     * NumberLiteral | StringLiteral | ArrayAccess | FunctionCall | Identifier | (LParen Expression RParen)
      */
     evaluatePrimary(cst) {
       const arrayAccessCst = getFirstCstNode(cst.children.arrayAccess);
@@ -6455,7 +6455,9 @@
      * Set an array element from CST expression nodes
      */
     setArrayElementFromExpressionsCst(name, indexExpressionsCst, valueExpressionCst) {
-      const indices = indexExpressionsCst.map((exprCst) => this.toNumber(this.evaluator.evaluateExpression(exprCst)));
+      const indices = indexExpressionsCst.map(
+        (exprCst) => this.toNumber(this.evaluator.evaluateExpression(exprCst))
+      );
       const value = this.evaluator.evaluateExpression(valueExpressionCst);
       const basicValue = typeof value === "boolean" ? value ? 1 : 0 : value;
       this.setArrayElement(name, indices, basicValue);
@@ -6580,7 +6582,7 @@
      * Execute a CGEN statement from CST
      * Sets character generator mode (0-3)
      * Syntax: CGEN n
-     * 
+     *
      * Mode meanings:
      * - 0: Character table A on background screen, A on sprite screen
      * - 1: Character table A on background screen, B on sprite screen
@@ -7217,7 +7219,12 @@
       defaultPaletteCode: 2,
       defaultColorCombination: 1,
       charCodes: [72, 73, 74, 75],
-      tiles: [SPRITE_ACHILLES_LEFTUP1_72, SPRITE_ACHILLES_LEFTUP1_73, SPRITE_ACHILLES_LEFTUP1_74, SPRITE_ACHILLES_LEFTUP1_75]
+      tiles: [
+        SPRITE_ACHILLES_LEFTUP1_72,
+        SPRITE_ACHILLES_LEFTUP1_73,
+        SPRITE_ACHILLES_LEFTUP1_74,
+        SPRITE_ACHILLES_LEFTUP1_75
+      ]
     },
     {
       name: "Achilles (LEFTUP2)",
@@ -7225,7 +7232,12 @@
       defaultPaletteCode: 2,
       defaultColorCombination: 1,
       charCodes: [76, 77, 78, 79],
-      tiles: [SPRITE_ACHILLES_LEFTUP2_76, SPRITE_ACHILLES_LEFTUP2_77, SPRITE_ACHILLES_LEFTUP2_78, SPRITE_ACHILLES_LEFTUP2_79]
+      tiles: [
+        SPRITE_ACHILLES_LEFTUP2_76,
+        SPRITE_ACHILLES_LEFTUP2_77,
+        SPRITE_ACHILLES_LEFTUP2_78,
+        SPRITE_ACHILLES_LEFTUP2_79
+      ]
     },
     {
       name: "Achilles (TOP1)",
@@ -7664,14 +7676,28 @@
       defaultPaletteCode: 0,
       defaultColorCombination: 0,
       charCodes: [244, 245, 246, 247, 248, 249],
-      tiles: [SPRITE_COMPUTER_1_244, SPRITE_COMPUTER_2_245, SPRITE_COMPUTER_3_246, SPRITE_COMPUTER_4_247, SPRITE_COMPUTER_5_248, SPRITE_COMPUTER_6_249]
+      tiles: [
+        SPRITE_COMPUTER_1_244,
+        SPRITE_COMPUTER_2_245,
+        SPRITE_COMPUTER_3_246,
+        SPRITE_COMPUTER_4_247,
+        SPRITE_COMPUTER_5_248,
+        SPRITE_COMPUTER_6_249
+      ]
     },
     {
       name: "Operator",
       defaultPaletteCode: 0,
       defaultColorCombination: 0,
       charCodes: [250, 251, 252, 253, 254, 255],
-      tiles: [SPRITE_OPERATOR_1_250, SPRITE_OPERATOR_2_251, SPRITE_OPERATOR_3_252, SPRITE_OPERATOR_4_253, SPRITE_OPERATOR_5_254, SPRITE_OPERATOR_6_255]
+      tiles: [
+        SPRITE_OPERATOR_1_250,
+        SPRITE_OPERATOR_2_251,
+        SPRITE_OPERATOR_3_252,
+        SPRITE_OPERATOR_4_253,
+        SPRITE_OPERATOR_5_254,
+        SPRITE_OPERATOR_6_255
+      ]
     }
   ];
 
@@ -9283,7 +9309,12 @@
       defaultPaletteCode: 2,
       defaultColorCombination: 0,
       charCodes: [96, 97, 98, 99],
-      tiles: [SPRITE_PENGUIN_LEFTSTEP1_96, SPRITE_PENGUIN_LEFTSTEP1_97, SPRITE_PENGUIN_LEFTSTEP1_98, SPRITE_PENGUIN_LEFTSTEP1_99]
+      tiles: [
+        SPRITE_PENGUIN_LEFTSTEP1_96,
+        SPRITE_PENGUIN_LEFTSTEP1_97,
+        SPRITE_PENGUIN_LEFTSTEP1_98,
+        SPRITE_PENGUIN_LEFTSTEP1_99
+      ]
     },
     {
       name: "Penguin (LEFTSTEP2)",
@@ -9291,7 +9322,12 @@
       defaultPaletteCode: 2,
       defaultColorCombination: 0,
       charCodes: [100, 101, 102, 103],
-      tiles: [SPRITE_PENGUIN_LEFTSTEP2_100, SPRITE_PENGUIN_LEFTSTEP2_101, SPRITE_PENGUIN_LEFTSTEP2_102, SPRITE_PENGUIN_LEFTSTEP2_103]
+      tiles: [
+        SPRITE_PENGUIN_LEFTSTEP2_100,
+        SPRITE_PENGUIN_LEFTSTEP2_101,
+        SPRITE_PENGUIN_LEFTSTEP2_102,
+        SPRITE_PENGUIN_LEFTSTEP2_103
+      ]
     },
     {
       name: "Penguin (FRONT)",
@@ -10035,7 +10071,12 @@
       defaultPaletteCode: 1,
       defaultColorCombination: 1,
       charCodes: [152, 153, 154, 155],
-      tiles: [SPRITE_STARKILLER_LEFT_152, SPRITE_STARKILLER_LEFT_153, SPRITE_STARKILLER_LEFT_154, SPRITE_STARKILLER_LEFT_155]
+      tiles: [
+        SPRITE_STARKILLER_LEFT_152,
+        SPRITE_STARKILLER_LEFT_153,
+        SPRITE_STARKILLER_LEFT_154,
+        SPRITE_STARKILLER_LEFT_155
+      ]
     },
     {
       name: "Star Killer (LEFTUP)",
@@ -10043,7 +10084,12 @@
       defaultPaletteCode: 1,
       defaultColorCombination: 1,
       charCodes: [156, 157, 158, 159],
-      tiles: [SPRITE_STARKILLER_LEFTUP_156, SPRITE_STARKILLER_LEFTUP_157, SPRITE_STARKILLER_LEFTUP_158, SPRITE_STARKILLER_LEFTUP_159]
+      tiles: [
+        SPRITE_STARKILLER_LEFTUP_156,
+        SPRITE_STARKILLER_LEFTUP_157,
+        SPRITE_STARKILLER_LEFTUP_158,
+        SPRITE_STARKILLER_LEFTUP_159
+      ]
     },
     {
       name: "Star Killer (UP)",
@@ -10680,9 +10726,7 @@
       );
       if (existingLoop) {
         if (this.context.config.enableDebugMode) {
-          this.context.addDebugOutput(
-            `FOR: ${varName} loop already active, skipping re-initialization`
-          );
+          this.context.addDebugOutput(`FOR: ${varName} loop already active, skipping re-initialization`);
         }
         return;
       }
@@ -10782,7 +10826,9 @@
       const returnStatementIndex = this.context.currentStatementIndex + 1;
       this.context.gosubStack.push(returnStatementIndex);
       if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(`GOSUB: jumping to line ${targetLineNumber} (statement index ${targetStatementIndex}), return address: ${returnStatementIndex}`);
+        this.context.addDebugOutput(
+          `GOSUB: jumping to line ${targetLineNumber} (statement index ${targetStatementIndex}), return address: ${returnStatementIndex}`
+        );
       }
       this.context.jumpToStatement(targetStatementIndex);
     }
@@ -10879,7 +10925,7 @@
     /**
      * Check if IF-THEN has a line number (either THEN number or GOTO number)
      * Returns the line number if present, undefined otherwise
-     * 
+     *
      * Parser structure:
      * - IF ... THEN NumberLiteral -> children.NumberLiteral exists
      * - IF ... THEN CommandList -> children.commandList exists
@@ -11153,7 +11199,7 @@
      * Execute a NEXT statement from CST
      * Increments the loop variable and checks if loop should continue
      * Returns true if loop should continue, false if loop should exit
-     * 
+     *
      * Note: Family BASIC spec states that NEXT cannot have a variable name
      */
     execute(nextStmtCst, lineNumber) {
@@ -11168,11 +11214,7 @@
       const loopState = this.context.loopStack[this.context.loopStack.length - 1];
       loopState.currentValue += loopState.stepValue;
       this.variableService.setVariable(loopState.variableName, loopState.currentValue);
-      const shouldContinue = this.shouldContinueLoop(
-        loopState.currentValue,
-        loopState.endValue,
-        loopState.stepValue
-      );
+      const shouldContinue = this.shouldContinueLoop(loopState.currentValue, loopState.endValue, loopState.stepValue);
       if (this.context.config.enableDebugMode) {
         this.context.addDebugOutput(
           `NEXT: ${loopState.variableName} = ${loopState.currentValue} (shouldContinue: ${shouldContinue})`
@@ -11209,7 +11251,7 @@
     /**
      * Execute an ON statement from CST
      * ON expression {GOTO | GOSUB} line number(, line number, ...)
-     * 
+     *
      * If expression value is 1, jumps to first line number
      * If expression value is 2, jumps to second line number
      * If expression value is 0 or exceeds the number of line numbers, proceeds to next line
@@ -11263,7 +11305,9 @@
       }
       if (index > lineNumberTokens.length) {
         if (this.context.config.enableDebugMode) {
-          this.context.addDebugOutput(`ON: expression value ${index} exceeds number of line numbers (${lineNumberTokens.length}), proceeding to next line`);
+          this.context.addDebugOutput(
+            `ON: expression value ${index} exceeds number of line numbers (${lineNumberTokens.length}), proceeding to next line`
+          );
         }
         return;
       }
@@ -11302,17 +11346,23 @@
         const returnStatementIndex = this.context.currentStatementIndex + 1;
         this.context.gosubStack.push(returnStatementIndex);
         if (this.context.config.enableDebugMode) {
-          this.context.addDebugOutput(`ON-GOSUB: jumping to line ${targetLineNumber} (statement index ${targetStatementIndex}), return address: ${returnStatementIndex}`);
+          this.context.addDebugOutput(
+            `ON-GOSUB: jumping to line ${targetLineNumber} (statement index ${targetStatementIndex}), return address: ${returnStatementIndex}`
+          );
         }
         this.context.jumpToStatement(targetStatementIndex);
       } else if (gotoToken) {
         if (this.context.config.enableDebugMode) {
-          this.context.addDebugOutput(`ON-GOTO: jumping to line ${targetLineNumber} (statement index ${targetStatementIndex})`);
+          this.context.addDebugOutput(
+            `ON-GOTO: jumping to line ${targetLineNumber} (statement index ${targetStatementIndex})`
+          );
         }
         this.context.jumpToStatement(targetStatementIndex);
       } else if (returnToken) {
         if (this.context.config.enableDebugMode) {
-          this.context.addDebugOutput(`ON-RETURN: returning to line ${targetLineNumber} (statement index ${targetStatementIndex})`);
+          this.context.addDebugOutput(
+            `ON-RETURN: returning to line ${targetLineNumber} (statement index ${targetStatementIndex})`
+          );
         }
         this.context.jumpToStatement(targetStatementIndex);
       } else if (restoreToken) {
@@ -11350,7 +11400,7 @@
      * Syntax: PALET {B|S} n, C1, C2, C3, C4
      * or: PALETB n, C1, C2, C3, C4 (background, no space)
      * or: PALETS n, C1, C2, C3, C4 (sprites, no space)
-     * 
+     *
      * When target is B and n=0, C1 is the backdrop color.
      * C1, C2, C3, C4 are color codes (0-60).
      */
@@ -11607,7 +11657,7 @@
     }
     /**
      * Build output string from PRINT items, handling all PRINT semantics.
-     * 
+     *
      * This method separates two concerns:
      * 1. Building the string representation of each item (via toString method)
      * 2. Processing separators between items
@@ -11664,7 +11714,7 @@
     /**
      * Convert a printable value to its string representation.
      * This acts as the "toString" method for printable items.
-     * 
+     *
      * For numbers: always outputs a sign char (space for 0 and positive, dash for negative)
      * followed by the absolute value of the number.
      * For strings: outputs the string itself.
@@ -11814,7 +11864,9 @@
           return;
         }
         if (this.context.config.enableDebugMode) {
-          this.context.addDebugOutput(`RETURN: returning to line ${targetLineNumber} (statement index ${targetStatementIndex})`);
+          this.context.addDebugOutput(
+            `RETURN: returning to line ${targetLineNumber} (statement index ${targetStatementIndex})`
+          );
         }
         this.context.jumpToStatement(targetStatementIndex);
         return;
@@ -12073,7 +12125,9 @@
                   });
                 } else {
                   if (this.context.config.enableDebugMode) {
-                    this.context.addDebugOutput(`IF-THEN: jumping to line ${targetLineNumber} (statement index ${targetStatementIndex})`);
+                    this.context.addDebugOutput(
+                      `IF-THEN: jumping to line ${targetLineNumber} (statement index ${targetStatementIndex})`
+                    );
                   }
                   this.context.jumpToStatement(targetStatementIndex);
                   return;
@@ -12292,12 +12346,7 @@
       this.evaluator = new ExpressionEvaluator(this.context);
       this.variableService = new VariableService(this.context, this.evaluator);
       this.dataService = new DataService(this.context, this.evaluator);
-      this.statementRouter = new StatementRouter(
-        this.context,
-        this.evaluator,
-        this.variableService,
-        this.dataService
-      );
+      this.statementRouter = new StatementRouter(this.context, this.evaluator, this.variableService, this.dataService);
     }
     /**
      * Preprocess statements (statements are already expanded)
@@ -12330,7 +12379,9 @@
           this.context.setCurrentLineNumber(expandedStatement.lineNumber);
           const statementIndexBefore = this.context.currentStatementIndex;
           if (this.context.config.enableDebugMode) {
-            this.context.addDebugOutput(`Executing statement ${statementIndexBefore}: Line ${expandedStatement.lineNumber}`);
+            this.context.addDebugOutput(
+              `Executing statement ${statementIndexBefore}: Line ${expandedStatement.lineNumber}`
+            );
           }
           await this.statementRouter.executeStatement(expandedStatement);
           if (!this.context.isRunning) {
@@ -21893,8 +21944,14 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
   var GreaterThan = createToken({ name: "GreaterThan", pattern: />/ });
   var LessThan = createToken({ name: "LessThan", pattern: /</ });
   var NotEqual = createToken({ name: "NotEqual", pattern: /<>/ });
-  var GreaterThanOrEqual = createToken({ name: "GreaterThanOrEqual", pattern: />=/ });
-  var LessThanOrEqual = createToken({ name: "LessThanOrEqual", pattern: /<=/ });
+  var GreaterThanOrEqual = createToken({
+    name: "GreaterThanOrEqual",
+    pattern: />=/
+  });
+  var LessThanOrEqual = createToken({
+    name: "LessThanOrEqual",
+    pattern: /<=/
+  });
   var Equal = createToken({ name: "Equal", pattern: /=/ });
   var Plus = createToken({ name: "Plus", pattern: /\+/ });
   var Minus = createToken({ name: "Minus", pattern: /-/ });
@@ -22118,20 +22175,14 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       });
       this.unary = this.RULE("unary", () => {
         this.OPTION(() => {
-          this.OR([
-            { ALT: () => this.CONSUME(Plus) },
-            { ALT: () => this.CONSUME(Minus) }
-          ]);
+          this.OR([{ ALT: () => this.CONSUME(Plus) }, { ALT: () => this.CONSUME(Minus) }]);
         });
         this.SUBRULE(this.primary);
       });
       this.multiplicative = this.RULE("multiplicative", () => {
         this.SUBRULE(this.unary);
         this.MANY(() => {
-          this.OR([
-            { ALT: () => this.CONSUME(Multiply) },
-            { ALT: () => this.CONSUME(Divide) }
-          ]);
+          this.OR([{ ALT: () => this.CONSUME(Multiply) }, { ALT: () => this.CONSUME(Divide) }]);
           this.SUBRULE2(this.unary);
         });
       });
@@ -22145,10 +22196,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       this.additive = this.RULE("additive", () => {
         this.SUBRULE(this.modExpression);
         this.MANY(() => {
-          this.OR([
-            { ALT: () => this.CONSUME(Plus) },
-            { ALT: () => this.CONSUME(Minus) }
-          ]);
+          this.OR([{ ALT: () => this.CONSUME(Plus) }, { ALT: () => this.CONSUME(Minus) }]);
           this.SUBRULE2(this.modExpression);
         });
       });
@@ -22208,10 +22256,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       this.printList = this.RULE("printList", () => {
         this.SUBRULE(this.printItem);
         this.MANY(() => {
-          this.OR([
-            { ALT: () => this.CONSUME(Comma) },
-            { ALT: () => this.CONSUME(Semicolon) }
-          ]);
+          this.OR([{ ALT: () => this.CONSUME(Comma) }, { ALT: () => this.CONSUME(Semicolon) }]);
           this.OPTION(() => {
             this.SUBRULE2(this.printItem);
           });
@@ -22682,18 +22727,20 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       }
       const lexResult = lexer.tokenize(line);
       if (lexResult.errors.length > 0) {
-        allErrors.push(...lexResult.errors.map((err) => ({
-          message: err.message || "Lexical error",
-          line: lineIndex + 1,
-          column: err.column,
-          length: err.length,
-          location: {
-            start: {
-              line: lineIndex + 1,
-              column: err.column || 1
+        allErrors.push(
+          ...lexResult.errors.map((err) => ({
+            message: err.message || "Lexical error",
+            line: lineIndex + 1,
+            column: err.column,
+            length: err.length,
+            location: {
+              start: {
+                line: lineIndex + 1,
+                column: err.column || 1
+              }
             }
-          }
-        })));
+          }))
+        );
         continue;
       }
       parserInstance.input = lexResult.tokens;
@@ -22701,21 +22748,23 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       const parseErrors = [...parserInstance.errors];
       parserInstance.errors = [];
       if (parseErrors.length > 0) {
-        allErrors.push(...parseErrors.map((err) => {
-          const token = err.token;
-          return {
-            message: err.message || "Syntax error",
-            line: lineIndex + 1,
-            column: token?.startColumn,
-            length: token?.endOffset ? token.endOffset - token.startOffset : 1,
-            location: {
-              start: {
-                line: lineIndex + 1,
-                column: token?.startColumn || 1
+        allErrors.push(
+          ...parseErrors.map((err) => {
+            const token = err.token;
+            return {
+              message: err.message || "Syntax error",
+              line: lineIndex + 1,
+              column: token?.startColumn,
+              length: token?.endOffset ? token.endOffset - token.startOffset : 1,
+              location: {
+                start: {
+                  line: lineIndex + 1,
+                  column: token?.startColumn || 1
+                }
               }
-            }
-          };
-        }));
+            };
+          })
+        );
         continue;
       }
       if (cst) {
@@ -22746,7 +22795,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     }
     /**
      * Parse F-Basic source code into a CST
-     * 
+     *
      * @param source - The F-Basic source code to parse
      * @returns Parse result with CST or errors
      */
@@ -22771,13 +22820,15 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
                   column: (err.column ?? 1) + (err.length ?? 1)
                 }
               }
-            })) ?? [{
-              message: errorMessages,
-              location: {
-                start: { offset: 0, line: 1, column: 1 },
-                end: { offset: 0, line: 1, column: 1 }
+            })) ?? [
+              {
+                message: errorMessages,
+                location: {
+                  start: { offset: 0, line: 1, column: 1 },
+                  end: { offset: 0, line: 1, column: 1 }
+                }
               }
-            }]
+            ]
           };
         }
         if (!parseResult.cst) {
@@ -22791,19 +22842,21 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         const errorMessage = error instanceof Error ? error.message : "Parse error";
         return {
           success: false,
-          errors: [{
-            message: errorMessage,
-            location: {
-              start: { offset: 0, line: 1, column: 1 },
-              end: { offset: 0, line: 1, column: 1 }
+          errors: [
+            {
+              message: errorMessage,
+              location: {
+                start: { offset: 0, line: 1, column: 1 },
+                end: { offset: 0, line: 1, column: 1 }
+              }
             }
-          }]
+          ]
         };
       }
     }
     /**
      * Parse a single statement
-     * 
+     *
      * @param statementText - The statement text to parse
      * @returns Parsed statement CST or null
      */
@@ -22844,7 +22897,24 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           "System commands"
         ],
         features: ["ast-parsing", "error-reporting", "multi-statement", "chevrotain", "no-build-step"],
-        supportedStatements: ["PRINT", "LET", "IF", "FOR", "NEXT", "GOTO", "GOSUB", "RETURN", "END", "REM", "CLS", "DATA", "READ", "RESTORE", "DIM", "COLOR"],
+        supportedStatements: [
+          "PRINT",
+          "LET",
+          "IF",
+          "FOR",
+          "NEXT",
+          "GOTO",
+          "GOSUB",
+          "RETURN",
+          "END",
+          "REM",
+          "CLS",
+          "DATA",
+          "READ",
+          "RESTORE",
+          "DIM",
+          "COLOR"
+        ],
         supportedFunctions: ["ABS", "SGN", "RND", "VAL", "LEN", "LEFT$", "RIGHT$", "MID$", "STR$", "HEX$"],
         supportedOperators: ["+", "-", "*", "/", "^", "MOD", "=", "<>", "<", ">", "<=", ">=", "AND", "OR", "NOT"]
       };
@@ -23047,11 +23117,13 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       } catch (error) {
         return {
           success: false,
-          errors: [{
-            line: 0,
-            message: `Execution error: ${error}`,
-            type: ERROR_TYPES.RUNTIME
-          }],
+          errors: [
+            {
+              line: 0,
+              message: `Execution error: ${error}`,
+              type: ERROR_TYPES.RUNTIME
+            }
+          ],
           variables: /* @__PURE__ */ new Map(),
           arrays: /* @__PURE__ */ new Map(),
           executionTime: 0
@@ -23728,6 +23800,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
 
   // src/core/devices/WebWorkerDeviceAdapter.ts
   var WebWorkerDeviceAdapter = class {
+    // Maximum delay (2 frames) to prevent excessive lag
     constructor() {
       // === DEVICE STATE ===
       __publicField(this, "strigClickBuffer", /* @__PURE__ */ new Map());
@@ -23737,6 +23810,16 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       __publicField(this, "webWorkerManager");
       __publicField(this, "screenStateManager");
       __publicField(this, "messageHandler");
+      // === SCREEN UPDATE BATCHING ===
+      // FPS-based batching: batches screen updates to align with target frame rate
+      __publicField(this, "pendingScreenUpdate", false);
+      __publicField(this, "screenUpdateTimeout", null);
+      __publicField(this, "lastScreenUpdateTime", 0);
+      __publicField(this, "TARGET_FPS", 60);
+      // Target frames per second
+      __publicField(this, "FRAME_INTERVAL_MS", 1e3 / 60);
+      // ~16.67ms for 60 FPS
+      __publicField(this, "MAX_BATCH_DELAY_MS", 33);
       console.log("\u{1F50C} [WEB_WORKER_DEVICE] WebWorkerDeviceAdapter created");
       this.webWorkerManager = new WebWorkerManager();
       this.screenStateManager = new ScreenStateManager();
@@ -23833,11 +23916,17 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     }
     setStickState(joystickId, state) {
       this.stickStates.set(joystickId, state);
-      console.log("\u{1F50C} [WEB_WORKER_DEVICE] Stick state set:", { joystickId, state });
+      console.log("\u{1F50C} [WEB_WORKER_DEVICE] Stick state set:", {
+        joystickId,
+        state
+      });
     }
     pushStrigState(joystickId, state) {
       if (!this.isEnabled) return;
-      console.log("\u{1F50C} [WEB_WORKER_DEVICE] pushStrigState called:", { joystickId, state });
+      console.log("\u{1F50C} [WEB_WORKER_DEVICE] pushStrigState called:", {
+        joystickId,
+        state
+      });
       if (state > 0) {
         if (!this.strigClickBuffer.has(joystickId)) {
           this.strigClickBuffer.set(joystickId, []);
@@ -23863,7 +23952,9 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         return 0;
       }
       const clickValue = buffer.shift();
-      console.log(`\u{1F50C} [WEB_WORKER_DEVICE] consumeStrigState: consumed STRIG event for joystick ${joystickId}, value=${clickValue}, remaining=${buffer.length}`);
+      console.log(
+        `\u{1F50C} [WEB_WORKER_DEVICE] consumeStrigState: consumed STRIG event for joystick ${joystickId}, value=${clickValue}, remaining=${buffer.length}`
+      );
       return clickValue;
     }
     // === TEXT OUTPUT METHODS ===
@@ -23883,8 +23974,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       for (const char of output) {
         this.screenStateManager.writeCharacter(char);
       }
-      const updateMessage = this.screenStateManager.createFullScreenUpdateMessage();
-      self.postMessage(updateMessage);
+      this.scheduleScreenUpdate();
     }
     debugOutput(output) {
       console.log("\u{1F50C} [WEB_WORKER_DEVICE] Debug output:", output);
@@ -23919,6 +24009,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       this.screenStateManager.initializeScreen();
       const updateMessage = this.screenStateManager.createClearScreenUpdateMessage();
       self.postMessage(updateMessage);
+      this.cancelPendingScreenUpdate();
     }
     setCursorPosition(x, y) {
       console.log("\u{1F50C} [WEB_WORKER_DEVICE] Set cursor position:", { x, y });
@@ -23933,7 +24024,10 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       self.postMessage(updateMessage);
     }
     setColorPalette(bgPalette, spritePalette) {
-      console.log("\u{1F50C} [WEB_WORKER_DEVICE] Set color palette:", { bgPalette, spritePalette });
+      console.log("\u{1F50C} [WEB_WORKER_DEVICE] Set color palette:", {
+        bgPalette,
+        spritePalette
+      });
       this.screenStateManager.setColorPalette(bgPalette, spritePalette);
       const updateMessage = this.screenStateManager.createPaletteUpdateMessage();
       self.postMessage(updateMessage);
@@ -23973,6 +24067,9 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         this.screenStateManager.initializeScreen();
         const updateMessage = this.screenStateManager.createClearScreenUpdateMessage();
         self.postMessage(updateMessage);
+        this.cancelPendingScreenUpdate();
+      } else {
+        this.flushScreenUpdate();
       }
     }
     // === PRIVATE METHODS ===
@@ -24011,6 +24108,66 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         outputType: message.data.outputType,
         outputLength: message.data.output.length
       });
+    }
+    /**
+     * Schedule a batched screen update with FPS-based timing
+     * This batches multiple screen updates together to align with target frame rate
+     * and reduce message volume and Vue reactivity overhead on the receiving side
+     * 
+     * Strategy:
+     * - Calculate time since last update
+     * - If enough time has passed (>= frame interval), send immediately
+     * - Otherwise, schedule for the next frame boundary
+     * - This ensures updates are sent at consistent FPS intervals
+     */
+    scheduleScreenUpdate() {
+      this.pendingScreenUpdate = true;
+      if (this.screenUpdateTimeout !== null) {
+        return;
+      }
+      const now = performance.now();
+      const timeSinceLastUpdate = now - this.lastScreenUpdateTime;
+      if (timeSinceLastUpdate >= this.FRAME_INTERVAL_MS) {
+        this.flushScreenUpdate();
+        return;
+      }
+      const delayUntilNextFrame = this.FRAME_INTERVAL_MS - timeSinceLastUpdate;
+      const delay = Math.min(delayUntilNextFrame, this.MAX_BATCH_DELAY_MS);
+      this.screenUpdateTimeout = self.setTimeout(() => {
+        this.flushScreenUpdate();
+      }, delay);
+    }
+    /**
+     * Cancel any pending screen update
+     */
+    cancelPendingScreenUpdate() {
+      if (this.screenUpdateTimeout !== null) {
+        self.clearTimeout(this.screenUpdateTimeout);
+        this.screenUpdateTimeout = null;
+      }
+      this.pendingScreenUpdate = false;
+    }
+    /**
+     * Flush the pending screen update immediately
+     * Updates the last update time to maintain FPS-based timing
+     */
+    flushScreenUpdate() {
+      this.screenUpdateTimeout = null;
+      if (!this.pendingScreenUpdate) {
+        return;
+      }
+      this.pendingScreenUpdate = false;
+      this.lastScreenUpdateTime = performance.now();
+      const postStartTime = performance.now();
+      const updateMessage = this.screenStateManager.createFullScreenUpdateMessage();
+      const createTime = performance.now() - postStartTime;
+      self.postMessage(updateMessage);
+      const postTime = performance.now() - postStartTime;
+      if (postTime > 1) {
+        console.log(
+          `\u23F1\uFE0F [POST] Screen update message: create=${createTime.toFixed(2)}ms, post=${postTime.toFixed(2)}ms, bufferSize=${updateMessage.data.screenBuffer?.length ?? 0}`
+        );
+      }
     }
   };
 

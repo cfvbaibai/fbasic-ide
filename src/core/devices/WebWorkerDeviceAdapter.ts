@@ -31,6 +31,15 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   private screenStateManager: ScreenStateManager
   private messageHandler: MessageHandler
 
+  // === SCREEN UPDATE BATCHING ===
+  // FPS-based batching: batches screen updates to align with target frame rate
+  private pendingScreenUpdate: boolean = false
+  private screenUpdateTimeout: number | null = null
+  private lastScreenUpdateTime: number = 0
+  private readonly TARGET_FPS = 60 // Target frames per second
+  private readonly FRAME_INTERVAL_MS = 1000 / 60 // ~16.67ms for 60 FPS
+  private readonly MAX_BATCH_DELAY_MS = 33 // Maximum delay (2 frames) to prevent excessive lag
+
   constructor() {
     console.log('🔌 [WEB_WORKER_DEVICE] WebWorkerDeviceAdapter created')
     this.webWorkerManager = new WebWorkerManager()
@@ -223,9 +232,9 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       this.screenStateManager.writeCharacter(char)
     }
 
-    // Send a single 'full' screen buffer update after processing all characters
-    const updateMessage = this.screenStateManager.createFullScreenUpdateMessage()
-    self.postMessage(updateMessage)
+    // Batch screen updates to avoid sending too many messages
+    // This significantly reduces Vue reactivity overhead on the receiving side
+    this.scheduleScreenUpdate()
   }
 
   debugOutput(output: string): void {
@@ -265,9 +274,11 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     // Clear screen buffer
     this.screenStateManager.initializeScreen()
 
-    // Send clear update
+    // Send clear update immediately (not batched, as it's a special operation)
     const updateMessage = this.screenStateManager.createClearScreenUpdateMessage()
     self.postMessage(updateMessage)
+    // Cancel any pending batched update since we just sent a clear
+    this.cancelPendingScreenUpdate()
   }
 
   setCursorPosition(x: number, y: number): void {
@@ -350,6 +361,11 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       this.screenStateManager.initializeScreen()
       const updateMessage = this.screenStateManager.createClearScreenUpdateMessage()
       self.postMessage(updateMessage)
+      // Cancel any pending batched update since we just sent a clear
+      this.cancelPendingScreenUpdate()
+    } else {
+      // Execution ended - flush any pending screen updates to ensure final state is sent
+      this.flushScreenUpdate()
     }
   }
 
@@ -396,5 +412,86 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
 
     // Output is now handled by the device adapter in the web worker
     // No need to forward to main thread callbacks
+  }
+
+  /**
+   * Schedule a batched screen update with FPS-based timing
+   * This batches multiple screen updates together to align with target frame rate
+   * and reduce message volume and Vue reactivity overhead on the receiving side
+   * 
+   * Strategy:
+   * - Calculate time since last update
+   * - If enough time has passed (>= frame interval), send immediately
+   * - Otherwise, schedule for the next frame boundary
+   * - This ensures updates are sent at consistent FPS intervals
+   */
+  private scheduleScreenUpdate(): void {
+    // Mark that we have a pending update
+    this.pendingScreenUpdate = true
+
+    // If there's already a scheduled update, don't schedule another one
+    // The existing scheduled update will pick up this pending change
+    if (this.screenUpdateTimeout !== null) {
+      return
+    }
+
+    const now = performance.now()
+    const timeSinceLastUpdate = now - this.lastScreenUpdateTime
+
+    // If enough time has passed since last update, send immediately
+    // This ensures we don't delay unnecessarily when updates are sparse
+    if (timeSinceLastUpdate >= this.FRAME_INTERVAL_MS) {
+      // Send immediately - we're already past the frame boundary
+      this.flushScreenUpdate()
+      return
+    }
+
+    // Calculate delay to next frame boundary
+    // This aligns updates with FPS intervals for smoother rendering
+    const delayUntilNextFrame = this.FRAME_INTERVAL_MS - timeSinceLastUpdate
+    
+    // Cap the delay to prevent excessive lag (max 2 frames)
+    const delay = Math.min(delayUntilNextFrame, this.MAX_BATCH_DELAY_MS)
+
+    // Schedule the update to be sent at the next frame boundary
+    // This batches multiple rapid updates together while maintaining FPS alignment
+    this.screenUpdateTimeout = self.setTimeout(() => {
+      this.flushScreenUpdate()
+    }, delay)
+  }
+
+  /**
+   * Cancel any pending screen update
+   */
+  private cancelPendingScreenUpdate(): void {
+    if (this.screenUpdateTimeout !== null) {
+      self.clearTimeout(this.screenUpdateTimeout)
+      this.screenUpdateTimeout = null
+    }
+    this.pendingScreenUpdate = false
+  }
+
+  /**
+   * Flush the pending screen update immediately
+   * Updates the last update time to maintain FPS-based timing
+   */
+  private flushScreenUpdate(): void {
+    // Clear the timeout
+    this.screenUpdateTimeout = null
+
+    // Only send if there's actually a pending update
+    if (!this.pendingScreenUpdate) {
+      return
+    }
+
+    // Reset the flag
+    this.pendingScreenUpdate = false
+
+    // Update last update time for FPS-based timing
+    this.lastScreenUpdateTime = performance.now()
+
+    // Send the full screen update
+    const updateMessage = this.screenStateManager.createFullScreenUpdateMessage()
+    self.postMessage(updateMessage)
   }
 }

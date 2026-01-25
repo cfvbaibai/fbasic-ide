@@ -3,7 +3,6 @@ import './vue-i18n.d.ts'
 
 import { createI18n } from 'vue-i18n'
 
-import enCanvasPerf from './locales/en/canvas-perf.json'
 import enCommon from './locales/en/common.json'
 import enHome from './locales/en/home.json'
 import enIde from './locales/en/ide.json'
@@ -11,7 +10,6 @@ import enImageAnalyzer from './locales/en/image-analyzer.json'
 import enMonacoEditor from './locales/en/monaco-editor.json'
 import enNavigation from './locales/en/navigation.json'
 import enSpriteViewer from './locales/en/sprite-viewer.json'
-import jaCanvasPerf from './locales/ja/canvas-perf.json'
 import jaCommon from './locales/ja/common.json'
 import jaHome from './locales/ja/home.json'
 import jaIde from './locales/ja/ide.json'
@@ -19,7 +17,6 @@ import jaImageAnalyzer from './locales/ja/image-analyzer.json'
 import jaMonacoEditor from './locales/ja/monaco-editor.json'
 import jaNavigation from './locales/ja/navigation.json'
 import jaSpriteViewer from './locales/ja/sprite-viewer.json'
-import zhCNCanvasPerf from './locales/zh-CN/canvas-perf.json'
 import zhCNCommon from './locales/zh-CN/common.json'
 import zhCNHome from './locales/zh-CN/home.json'
 import zhCNIde from './locales/zh-CN/ide.json'
@@ -27,7 +24,6 @@ import zhCNImageAnalyzer from './locales/zh-CN/image-analyzer.json'
 import zhCNMonacoEditor from './locales/zh-CN/monaco-editor.json'
 import zhCNNavigation from './locales/zh-CN/navigation.json'
 import zhCNSpriteViewer from './locales/zh-CN/sprite-viewer.json'
-import zhTWCanvasPerf from './locales/zh-TW/canvas-perf.json'
 import zhTWCommon from './locales/zh-TW/common.json'
 import zhTWHome from './locales/zh-TW/home.json'
 import zhTWIde from './locales/zh-TW/ide.json'
@@ -72,7 +68,6 @@ const i18n = createI18n<{ message: MessageSchema }, Locale>({
       spriteViewer: enSpriteViewer,
       imageAnalyzer: enImageAnalyzer,
       monacoEditor: enMonacoEditor,
-      canvasPerf: enCanvasPerf,
     },
     ja: {
       navigation: jaNavigation,
@@ -82,7 +77,6 @@ const i18n = createI18n<{ message: MessageSchema }, Locale>({
       spriteViewer: jaSpriteViewer,
       imageAnalyzer: jaImageAnalyzer,
       monacoEditor: jaMonacoEditor,
-      canvasPerf: jaCanvasPerf,
     },
     'zh-CN': {
       navigation: zhCNNavigation,
@@ -92,7 +86,6 @@ const i18n = createI18n<{ message: MessageSchema }, Locale>({
       spriteViewer: zhCNSpriteViewer,
       imageAnalyzer: zhCNImageAnalyzer,
       monacoEditor: zhCNMonacoEditor,
-      canvasPerf: zhCNCanvasPerf,
     },
     'zh-TW': {
       navigation: zhTWNavigation,
@@ -102,7 +95,6 @@ const i18n = createI18n<{ message: MessageSchema }, Locale>({
       spriteViewer: zhTWSpriteViewer,
       imageAnalyzer: zhTWImageAnalyzer,
       monacoEditor: zhTWMonacoEditor,
-      canvasPerf: zhTWCanvasPerf,
     },
   },
 })

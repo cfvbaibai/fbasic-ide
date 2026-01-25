@@ -27,11 +27,13 @@
         "@vueuse/core": "^14.1.0",
         "chevrotain": "^11.0.3",
         "decimal.js": "^10.6.0",
+        "konva": "^10.2.0",
         "lodash-es": "^4.17.21",
         "monaco-editor": "^0.55.1",
         "peggy": "^3.0.2",
         "vue": "^3.5.22",
         "vue-i18n": "^11.2.8",
+        "vue-konva": "^3.3.0",
         "vue-router": "^4.6.3"
     },
     "devDependencies": {

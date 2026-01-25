@@ -4,6 +4,7 @@ import './shared/styles/utilities.css'
 import './shared/styles/skins/index.css'
 
 import { createApp } from 'vue'
+import VueKonva from 'vue-konva'
 
 import App from './App.vue'
 import router from './router/index'
@@ -50,5 +51,16 @@ const app = createApp(App)
 
 app.use(router)
 app.use(i18n)
+app.use(VueKonva)
+
+// Pre-initialize background tile images early (non-blocking)
+// This ensures images are ready when the IDE page loads
+if (typeof window !== 'undefined') {
+  void import('@/features/ide/composables/useKonvaBackgroundRenderer').then(({ preInitializeBackgroundTiles }) => {
+    void preInitializeBackgroundTiles().catch(err => {
+      console.warn('[App] Background tile pre-initialization failed:', err)
+    })
+  })
+}
 
 app.mount('#app')

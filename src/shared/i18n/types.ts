@@ -5,7 +5,6 @@
  * The types are derived from the English locale files (master schema).
  */
 
-import type enCanvasPerf from './locales/en/canvas-perf.json'
 import type enCommon from './locales/en/common.json'
 import type enHome from './locales/en/home.json'
 import type enIde from './locales/en/ide.json'
@@ -23,7 +22,6 @@ export type MessageSchema = {
   spriteViewer: typeof enSpriteViewer
   imageAnalyzer: typeof enImageAnalyzer
   monacoEditor: typeof enMonacoEditor
-  canvasPerf: typeof enCanvasPerf
 }
 
 // Define available locales

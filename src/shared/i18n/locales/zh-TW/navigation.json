@@ -21,9 +21,9 @@
       "name": "精靈檢視器",
       "description": "檢視角色精靈"
     },
-    "canvasPerformance": {
-      "name": "Canvas 效能",
-      "description": "Canvas 效能測試"
+    "konvaSpriteTest": {
+      "name": "Konva 精靈測試",
+      "description": "Konva 精靈動畫測試"
     }
   }
 }

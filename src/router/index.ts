@@ -51,12 +51,13 @@ const routes: RouteRecordRaw[] = [
     },
   },
   {
-    path: '/canvas-test',
-    name: 'CanvasPerformanceTest',
-    component: () => import('@/features/canvas-perf/CanvasPerformanceTest.vue'),
+    path: '/konva-test',
+    name: 'KonvaSpriteTest',
+    component: () => import('@/features/konva-test/KonvaSpriteTestPage.vue'),
     meta: {
-      title: 'Canvas Performance Test',
-      showInNav: false,
+      title: 'Konva Sprite Test',
+      showInNav: true,
+      icon: 'mdi:animation',
     },
   },
 ]

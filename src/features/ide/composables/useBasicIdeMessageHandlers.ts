@@ -15,6 +15,60 @@ import type { MovementState } from '@/core/sprite/types'
 
 import type { WebWorkerManager } from './useBasicIdeWebWorkerUtils'
 
+/**
+ * Message queue for non-critical messages
+ * Processed during requestAnimationFrame to align with rendering
+ */
+interface QueuedMessage {
+  message: AnyServiceWorkerMessage
+  context: MessageHandlerContext
+}
+
+const messageQueue: QueuedMessage[] = []
+let isProcessingQueue = false
+let queueAnimationFrame: number | null = null
+
+/**
+ * Process queued messages during animation frame
+ * This ensures state updates happen in sync with rendering
+ */
+function processMessageQueue(): void {
+  if (messageQueue.length === 0) {
+    isProcessingQueue = false
+    queueAnimationFrame = null
+    return
+  }
+
+  // Process all queued messages in this frame
+  // This batches multiple updates together
+  const messagesToProcess = messageQueue.splice(0)
+  isProcessingQueue = false
+  queueAnimationFrame = null
+
+  for (const { message, context } of messagesToProcess) {
+    processMessage(message, context)
+  }
+
+  // If more messages arrived while processing, schedule another frame
+  if (messageQueue.length > 0) {
+    scheduleQueueProcessing()
+  }
+}
+
+/**
+ * Schedule message queue processing in the next animation frame
+ */
+function scheduleQueueProcessing(): void {
+  if (isProcessingQueue || queueAnimationFrame !== null) {
+    return // Already scheduled
+  }
+
+  isProcessingQueue = true
+  queueAnimationFrame = requestAnimationFrame(() => {
+    processMessageQueue()
+  })
+}
+
 export interface MessageHandlerContext {
   output: Ref<string[]>
   errors: Ref<Array<{ line: number; message: string; type: string }>>
@@ -55,8 +109,8 @@ export function handleOutputMessage(message: AnyServiceWorkerMessage, context: M
  */
 export function handleScreenUpdateMessage(message: AnyServiceWorkerMessage, context: MessageHandlerContext): void {
   if (message.type !== 'SCREEN_UPDATE') return
+  
   const update = message.data
-  console.log('🖥️ [COMPOSABLE] Handling screen update:', update.updateType, update)
 
   switch (update.updateType) {
     case 'character':
@@ -64,13 +118,6 @@ export function handleScreenUpdateMessage(message: AnyServiceWorkerMessage, cont
         const x = update.x
         const y = update.y
         const character = update.character
-
-        console.log('🖥️ [COMPOSABLE] Updating character:', {
-          x,
-          y,
-          char: character,
-          currentBuffer: context.screenBuffer.value[y]?.[x],
-        })
 
         // Ensure row exists
         context.screenBuffer.value[y] ??= []
@@ -128,8 +175,6 @@ export function handleScreenUpdateMessage(message: AnyServiceWorkerMessage, cont
     case 'color':
       // Update color pattern for cells specified in colorUpdates
       if (update.colorUpdates) {
-        console.log('🖥️ [COMPOSABLE] Updating color patterns:', update.colorUpdates)
-
         for (const colorUpdate of update.colorUpdates) {
           const { x, y, pattern } = colorUpdate
 
@@ -360,8 +405,43 @@ function getDirectionDeltaY(direction: number): number {
 
 /**
  * Route message to appropriate handler
+ * 
+ * Event loop execution order in browsers:
+ * 1. Execute macrotask (worker.onmessage callback) - WE ARE HERE
+ * 2. Execute all microtasks (Promise.then, queueMicrotask)
+ * 3. Execute requestAnimationFrame callbacks (rendering phase)
+ * 4. Browser rendering (paint)
+ * 5. Execute requestIdleCallback (idle time)
+ * 
+ * Strategy:
+ * - Critical messages (RESULT, ERROR): Process immediately (synchronously)
+ * - Non-critical messages (SCREEN_UPDATE, OUTPUT): Queue for processing in requestAnimationFrame
+ * 
+ * This ensures:
+ * - Vue state updates happen in the same frame as rendering
+ * - State updates and rendering are synchronized
+ * - No blocking of the current event loop iteration
+ * - Messages are batched per frame for efficiency
  */
 export function handleWorkerMessage(message: AnyServiceWorkerMessage, context: MessageHandlerContext): void {
+  // Critical messages must be handled immediately (they resolve promises, etc.)
+  const isCritical = message.type === 'RESULT' || message.type === 'ERROR'
+  
+  if (isCritical) {
+    // Handle critical messages synchronously - they're needed for execution flow
+    processMessage(message, context)
+  } else {
+    // Queue non-critical messages for processing in requestAnimationFrame
+    // This ensures Vue state updates happen in sync with rendering
+    messageQueue.push({ message, context })
+    scheduleQueueProcessing()
+  }
+}
+
+/**
+ * Process a message (internal function)
+ */
+function processMessage(message: AnyServiceWorkerMessage, context: MessageHandlerContext): void {
   console.log('📨 [COMPOSABLE] Received message from worker:', message.type)
 
   // -- Only handling response messages, request messages sent elsewhere

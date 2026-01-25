@@ -21,9 +21,9 @@
       "name": "スプライトビューア",
       "description": "キャラクタースプライトを表示"
     },
-    "canvasPerformance": {
-      "name": "Canvasパフォーマンス",
-      "description": "Canvasパフォーマンステスト"
+    "konvaSpriteTest": {
+      "name": "Konvaスプライトテスト",
+      "description": "Konvaスプライトアニメーションテスト"
     }
   }
 }

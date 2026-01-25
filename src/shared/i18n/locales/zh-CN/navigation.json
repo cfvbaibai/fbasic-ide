@@ -21,9 +21,9 @@
       "name": "精灵查看器",
       "description": "查看角色精灵"
     },
-    "canvasPerformance": {
-      "name": "Canvas 性能",
-      "description": "Canvas 性能测试"
+    "konvaSpriteTest": {
+      "name": "Konva 精灵测试",
+      "description": "Konva 精灵动画测试"
     }
   }
 }

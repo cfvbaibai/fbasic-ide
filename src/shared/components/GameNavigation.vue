@@ -71,10 +71,10 @@ const navItems = computed<NavItem[]>(() => [
     description: t('navigation.items.spriteViewer.description'),
   },
   {
-    name: t('navigation.items.canvasPerformance.name'),
-    path: '/canvas-test',
-    icon: 'mdi:speedometer',
-    description: t('navigation.items.canvasPerformance.description'),
+    name: t('navigation.items.konvaSpriteTest.name'),
+    path: '/konva-test',
+    icon: 'mdi:animation',
+    description: t('navigation.items.konvaSpriteTest.description'),
   },
 ])
 
