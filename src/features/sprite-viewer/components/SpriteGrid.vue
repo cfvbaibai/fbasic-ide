@@ -45,7 +45,10 @@ const title = computed(() => {
           v-for="(value, colIndex) in row"
           :key="colIndex"
           class="grid-cell"
-          :class="{ 'grid-cell-bordered': store.displayOptions.value.showGridLines }"
+          :class="{ 
+            'grid-cell-bordered': store.displayOptions.value.showGridLines,
+            'grid-cell-transparent': store.getCellColor(value) === 'transparent'
+          }"
           :style="{
             backgroundColor: store.getCellColor(value)
           }"
@@ -65,6 +68,15 @@ const title = computed(() => {
   flex-direction: column;
   gap: 0;
   background: var(--base-solid-gray-00);
+
+  /* Checkerboard pattern for transparent cells (Adobe Photoshop style) */
+  background-image: 
+    linear-gradient(45deg, var(--base-alpha-gray-100-20) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--base-alpha-gray-100-20) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--base-alpha-gray-100-20) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--base-alpha-gray-100-20) 75%);
+  background-size: 8px 8px;
+  background-position: 0 0, 0 4px, 4px -4px, -4px 0;
   padding: 0;
   border-radius: 4px;
   border: 8px solid var(--game-surface-border);
@@ -73,6 +85,16 @@ const title = computed(() => {
   box-shadow: 
     0 0 20px var(--base-alpha-gray-00-80),
     inset 0 0 20px var(--base-alpha-primary-10);
+}
+
+/* Adjust checkerboard colors for light theme */
+:global(.light-theme) .grid-container {
+  background-image: 
+    linear-gradient(45deg, var(--base-solid-gray-10) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--base-solid-gray-10) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--base-solid-gray-10) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--base-solid-gray-10) 75%);
+  background-color: var(--base-solid-gray-00);
 }
 
 .grid-container-8x8 {
@@ -106,6 +128,11 @@ const title = computed(() => {
 
 .grid-cell-bordered {
   border: 1px solid var(--game-surface-border);
+}
+
+/* Transparent cells show the checkerboard pattern from the container */
+.grid-cell-transparent {
+  background-color: transparent;
 }
 
 .grid-cell:hover {
