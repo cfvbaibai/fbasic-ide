@@ -290,7 +290,7 @@ This document outlines the remaining work needed to complete the Family Basic ID
 
 **Estimated Effort**: 5-10 days
 **Priority**: Medium (advanced feature, foundational work in progress)
-**Status**: 4/6 phases complete (67%)
+**Status**: 5/6 phases complete (83%)
 
 **Detailed Plan**: See `docs/planning/sprite-animation-implementation-plan.md`
 
@@ -314,12 +314,13 @@ This document outlines the remaining work needed to complete the Family Basic ID
   - Direction-to-sequence mapping ✅
   - **Explicit character sequence configuration** ✅
   - **Per-frame sprite inversion support** ✅
-- [ ] **Phase 5**: Movement Control (⏳ NEXT)
-  - CUT (cut sprite)
-  - ERA (erase sprite)
-  - POSITION (sprite position)
-  - XPOS, YPOS (sprite coordinates)
-  - MOVE(n) status query
+- [x] **Phase 5**: Movement Control ✅ (2026-01-25)
+  - CUT (cut sprite) ✅
+  - ERA (erase sprite) ✅
+  - POSITION (sprite position) ✅
+  - XPOS, YPOS (sprite coordinates) ✅
+  - MOVE(n) status query ✅
+  - Position preservation fix for CUT command ✅
 - [ ] **Phase 6**: Integration & Polish
   - Performance optimization
   - Comprehensive testing
@@ -336,7 +337,11 @@ This document outlines the remaining work needed to complete the Family Basic ID
 - `src/core/animation/characterSequenceConfig.ts` - Explicit character sequence configuration
 - `src/core/execution/executors/DefMoveExecutor.ts` - DEF MOVE
 - `src/core/execution/executors/MoveExecutor.ts` - MOVE
+- `src/core/execution/executors/CutExecutor.ts` - CUT command
+- `src/core/execution/executors/EraExecutor.ts` - ERA command
+- `src/core/execution/executors/PositionExecutor.ts` - POSITION command
 - `src/features/ide/composables/useKonvaSpriteRenderer.ts` - Konva sprite rendering
+- `src/features/ide/composables/useMovementStateSync.ts` - Movement state synchronization
 
 **Reference Documentation**:
 - `docs/planning/sprite-animation-implementation-plan.md` - **Main implementation plan**
@@ -683,6 +688,15 @@ This document outlines the remaining work needed to complete the Family Basic ID
 - ✅ CharacterAnimationBuilder refactored to use config-based approach
 - ✅ Direction-to-sequence mapping with automatic inversion
 
-**Status**: 4/6 phases complete (67%). Phases 1-4 fully functional. Remaining: Movement Control (Phase 5) and Integration & Polish (Phase 6).
+**Phase 5: Movement Control** ✅ Complete:
+- ✅ CUT command - stops movement, preserves position
+- ✅ ERA command - erases sprite completely
+- ✅ POSITION command - sets initial position for next MOVE
+- ✅ MOVE(n) function - returns movement status (-1=moving, 0=complete)
+- ✅ XPOS(n) function - returns current X position
+- ✅ YPOS(n) function - returns current Y position
+- ✅ **Position preservation fix** - CUT command now correctly preserves animated positions using Konva sprite node references
+
+**Status**: 5/6 phases complete (83%). Phases 1-5 fully functional. Remaining: Integration & Polish (Phase 6).
 
 **Reference**: See `docs/planning/sprite-animation-implementation-plan.md` for detailed implementation

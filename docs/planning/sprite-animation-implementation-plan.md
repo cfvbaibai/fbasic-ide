@@ -2,7 +2,7 @@
 
 **Date Started**: 2026-01-24
 **Last Updated**: 2026-01-25
-**Status**: 🚧 In Progress - Phase 3 Complete (basic animation with real-time communication)
+**Status**: 🚧 In Progress - Phase 5 Complete (movement control commands with position preservation fix)
 **Purpose**: Detailed implementation plan for SPRITE rendering and MOVE animation system
 
 ## Progress Summary
@@ -15,7 +15,7 @@
 | Phase 2: Static Sprite Rendering | ✅ Complete | 2026-01-25 | Including SPRITE ON/OFF |
 | Phase 3: Basic Animation | ✅ Complete | 2026-01-25 | Real-time animation commands |
 | Phase 4: Animation Sequences | ✅ Complete | 2026-01-25 | Frame cycling with character sprites |
-| Phase 5: Movement Control | ✅ Complete | 2026-01-25 | CUT, ERA, POSITION, MOVE(n), XPOS(n), YPOS(n) |
+| Phase 5: Movement Control | ✅ Complete | 2026-01-25 | CUT, ERA, POSITION, MOVE(n), XPOS(n), YPOS(n) + position fix |
 | Phase 6: Integration & Polish | ⏳ Pending | - | - |
 
 ## Executive Summary
@@ -1132,6 +1132,7 @@ test/
 - ✅ POSITION command implemented - sets initial position for next MOVE
 - ✅ MOVE(n) function implemented - returns -1 if moving, 0 if complete
 - ✅ XPOS(n) function implemented - returns current X position
+- ✅ YPOS(n) function implemented - returns current Y position
 
 **Bug Fix - CUT Position Preservation** (2026-01-25):
 - 🐛 **Fixed**: MOVE after CUT was resetting sprite to original position instead of preserving CUT position
@@ -1141,21 +1142,29 @@ test/
   - Worker never updates positions (no updateMovements calls)
   - Worker was saving stale positions to storedPositions on CUT
   - Next MOVE used stale stored position
-- **Solution**: Position sync-back architecture
-  1. Frontend sends `UPDATE_ANIMATION_POSITIONS` message to worker when STOP_MOVEMENT received
-  2. Worker receives message and updates `AnimationManager.storedPositions` with current positions from frontend
-  3. Next MOVE uses updated stored position
+- **Solution**: Multi-layer position retrieval system
+  1. Added sprite node refs to IDE composable (`frontSpriteNodes`, `backSpriteNodes`)
+  2. Screen component syncs Konva sprite nodes to external refs after rendering
+  3. STOP_MOVEMENT handler retrieves positions from Konva nodes (most accurate) before falling back to movement states
+  4. Frontend sends `UPDATE_ANIMATION_POSITIONS` message to worker with actual positions
+  5. Worker updates `AnimationManager.storedPositions` with current positions from frontend
+  6. Next MOVE uses updated stored position
 - **Files Changed**:
   - `src/core/interfaces.ts`: Added `UpdateAnimationPositionsMessage` type
   - `src/core/animation/AnimationManager.ts`: Added `updateStoredPositions()` method, removed stale position saving from `stopMovement()`
   - `src/core/BasicInterpreter.ts`: Added `getAnimationManager()` method
-  - `src/features/ide/composables/useBasicIdeMessageHandlers.ts`: Added position sync-back in STOP_MOVEMENT handler
+  - `src/features/ide/composables/useBasicIdeEnhanced.ts`: Added sprite node refs
+  - `src/features/ide/composables/useBasicIdeMessageHandlers.ts`: Updated position retrieval to use Konva nodes
+  - `src/features/ide/components/Screen.vue`: Added external sprite node sync
+  - `src/features/ide/components/ScreenTab.vue`: Pass through sprite node props
+  - `src/features/ide/components/RuntimeOutput.vue`: Pass through sprite node props
+  - `src/features/ide/IdePage.vue`: Connect composable to components
   - `public/basic-interpreter-worker.js`: Added UPDATE_ANIMATION_POSITIONS message handler
-- **Impact**: MOVE after CUT now correctly continues from where sprite was cut
-- ✅ YPOS(n) function implemented - returns current Y position
+- **Impact**: MOVE after CUT now correctly continues from where sprite was cut, even after animation has occurred
 - ✅ All executors registered in StatementRouter
 - ✅ Function evaluation methods added to FunctionEvaluator
 - ✅ Parser rules added with proper lookahead for MOVE statement vs MOVE(n) function
+- ✅ useMovementStateSync composable created for movement state synchronization
 - ✅ All TypeScript type checking passes
 - ✅ All ESLint checks pass
 
@@ -1164,5 +1173,6 @@ test/
 - **Function Integration**: MOVE(n), XPOS(n), YPOS(n) added to FunctionEvaluator alongside STICK and STRIG
 - **AnimationManager Methods**: All required methods (stopMovement, eraseMovement, setPosition, getMovementStatus, getSpritePosition) were already implemented in Phase 3
 - **Multiple Action Support**: CUT and ERA support variable arguments (n1, n2, ...) for controlling multiple sprites simultaneously
+- **Position Preservation**: Multi-layer position retrieval system using Konva sprite node references ensures accurate position preservation when CUT is executed after animation
 
-**Last Updated**: 2026-01-25
+**Last Updated**: 2026-01-25 (Phase 5 complete with position preservation fix)
