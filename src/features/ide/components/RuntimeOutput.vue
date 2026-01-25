@@ -4,7 +4,8 @@ import { useI18n } from 'vue-i18n'
 import type { BasicVariable, ScreenCell } from '../../../core/interfaces'
 import type { SpriteState } from '../../../core/sprite/types'
 import Screen from './Screen.vue'
-import { GameTabs, GameTabPane, GameTag, GameIcon, GameButtonGroup, GameButton } from '../../../shared/components/ui'
+import VariablesTab from './VariablesTab.vue'
+import { GameTabs, GameTabPane, GameIcon, GameButtonGroup, GameButton } from '../../../shared/components/ui'
 import { provideScreenZoom } from '../composables/useScreenZoom'
 
 /**
@@ -190,32 +191,7 @@ watch(() => props.output.length, scrollToBottom)
       </GameTabPane>
 
       <!-- Variables Tab -->
-      <GameTabPane name="variables" :disabled="Object.keys(variables).length === 0">
-        <template #label>
-          <GameIcon icon="mdi:view-dashboard" size="small" />
-          <span>{{ t('ide.output.variables') }}</span>
-          <span class="tab-status-tag">
-            <GameTag :class="{ 'tag-hidden': Object.keys(variables).length === 0 }" type="success" size="small">
-              {{ Object.keys(variables).length }}
-            </GameTag>
-          </span>
-        </template>
-        
-        <div class="tab-content">
-          <div class="variables-content bg-game-surface">
-            <div class="variable-list">
-              <div 
-                v-for="(variable, name) in variables" 
-                :key="name" 
-                class="variable-item"
-              >
-                <span class="variable-name">{{ name }}</span>
-                <span class="variable-value bg-game-surface border-game-surface text-game-primary">{{ variable.value }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </GameTabPane>
+      <VariablesTab :variables="variables" />
     </GameTabs>
   </div>
 </template>
@@ -254,31 +230,6 @@ watch(() => props.output.length, scrollToBottom)
   justify-content: center;
 }
 
-.tab-status-tag {
-  display: inline-flex;
-  align-items: center;
-  margin-left: 0.25rem;
-  vertical-align: middle;
-  min-height: 1.5rem; /* Reserve vertical space */
-
-  /* Reserve horizontal space - adjust based on typical tag width */
-  min-width: 3rem;
-  justify-content: flex-start;
-}
-
-.tab-status-tag :deep(.game-tag) {
-  display: inline-flex;
-  align-items: center;
-  white-space: nowrap;
-}
-
-.tab-status-tag :deep(.game-tag.tag-hidden) {
-  visibility: hidden;
-  opacity: 0;
-  pointer-events: none;
-
-  /* Keep dimensions to prevent layout shift */
-}
 
 .output-content {
   flex: 1 1 0;
@@ -407,45 +358,5 @@ watch(() => props.output.length, scrollToBottom)
 .graphics-placeholder small {
   font-size: 0.8rem;
   opacity: 0.7;
-}
-
-.variables-content {
-  flex: 1;
-  padding: 1rem;
-  overflow-y: auto;
-}
-
-.variable-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 0.5rem;
-}
-
-.variable-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem;
-  border-radius: 6px;
-  font-family: var(--game-font-family-mono);
-  font-size: 0.9rem;
-  box-shadow: 0 2px 4px var(--base-alpha-gray-00-20);
-  transition: all 0.2s ease;
-}
-
-.variable-item:hover {
-  border-color: var(--base-solid-primary);
-  box-shadow: 0 0 8px var(--game-accent-glow);
-}
-
-.variable-name {
-  font-weight: bold;
-}
-
-.variable-value {
-  padding: 0.2rem 0.4rem;
-  border-radius: 4px;
-  font-weight: 500;
-  box-shadow: inset 0 1px 2px var(--base-alpha-gray-00-30);
 }
 </style>
