@@ -47,6 +47,9 @@ export const Palet = createToken({ name: 'Palet', pattern: /\bPALET\b/i })
 export const Def = createToken({ name: 'Def', pattern: /\bDEF\b/i })
 export const Sprite = createToken({ name: 'Sprite', pattern: /\bSPRITE\b/i })
 export const Move = createToken({ name: 'Move', pattern: /\bMOVE\b/i })
+export const Cut = createToken({ name: 'Cut', pattern: /\bCUT\b/i })
+export const Era = createToken({ name: 'Era', pattern: /\bERA\b/i })
+export const Position = createToken({ name: 'Position', pattern: /\bPOSITION\b/i })
 
 // String function keywords (must be before Identifier)
 export const Len = createToken({ name: 'Len', pattern: /\bLEN\b/i })
@@ -68,6 +71,9 @@ export const Val = createToken({ name: 'Val', pattern: /\bVAL\b/i })
 // Controller input function keywords (must be before Identifier)
 export const Stick = createToken({ name: 'Stick', pattern: /\bSTICK\b/i })
 export const Strig = createToken({ name: 'Strig', pattern: /\bSTRIG\b/i })
+// Sprite query function keywords (must be before Identifier)
+export const Xpos = createToken({ name: 'Xpos', pattern: /\bXPOS\b/i })
+export const Ypos = createToken({ name: 'Ypos', pattern: /\bYPOS\b/i })
 
 // Logical operators (must be before Identifier)
 export const And = createToken({ name: 'And', pattern: /\bAND\b/i })
@@ -183,6 +189,9 @@ export const allTokens = [
   Def,
   Sprite,
   Move,
+  Cut,
+  Era,
+  Position,
   // String functions (must come before Identifier)
   Len,
   Left,
@@ -201,6 +210,9 @@ export const allTokens = [
   // Controller input function keywords (must come before Identifier)
   Stick,
   Strig,
+  // Sprite query function keywords (must come before Identifier)
+  Xpos,
+  Ypos,
   // Logical operators (must come before Identifier)
   And,
   Or,

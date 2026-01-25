@@ -62,7 +62,7 @@ export function useBasicIde() {
 50 END`)
 
   const currentSampleType = ref<
-    'basic' | 'gaming' | 'complex' | 'comprehensive' | 'pause' | 'allChars' | 'spriteTest' | 'moveTest' | null
+    'basic' | 'gaming' | 'complex' | 'comprehensive' | 'pause' | 'allChars' | 'spriteTest' | 'moveTest' | 'testMoveControl' | null
   >(null)
 
   const isRunning = ref(false)
@@ -84,6 +84,11 @@ export function useBasicIde() {
   const spriteStates = ref<SpriteState[]>([])
   const spriteEnabled = ref(false)
   const movementStates = ref<MovementState[]>([])
+
+  // Sprite node maps (for getting actual rendered positions)
+  // These will be updated by Screen component
+  const frontSpriteNodes = ref<Map<number, unknown>>(new Map())
+  const backSpriteNodes = ref<Map<number, unknown>>(new Map())
 
   // Parser instance
   const parser = new FBasicParser()
@@ -129,6 +134,8 @@ export function useBasicIde() {
     bgPalette,
     backdropColor,
     movementStates,
+    frontSpriteNodes,
+    backSpriteNodes,
     webWorkerManager,
   }
 
@@ -277,8 +284,44 @@ export function useBasicIde() {
         spriteEnabled.value = result.spriteEnabled
       }
       // Update movement states
+      // Merge with existing states to preserve current animated positions
+      // This is important for CUT command - stopped movements should keep their positions
       if (result?.movementStates) {
-        movementStates.value = result.movementStates
+        const existingStates = new Map(movementStates.value.map(m => [m.actionNumber, m]))
+        
+        movementStates.value = result.movementStates.map(m => {
+          const existing = existingStates.get(m.actionNumber)
+          if (existing) {
+            // Always preserve existing position if movement is stopped (CUT)
+            // This ensures CUT positions are preserved even after execution completes
+            if (!m.isActive && !existing.isActive) {
+              // Both are stopped - preserve existing animated position
+              return {
+                ...m,
+                currentX: existing.currentX,
+                currentY: existing.currentY,
+                remainingDistance: existing.remainingDistance,
+              }
+            } else if (existing.isActive && m.isActive && existing.actionNumber === m.actionNumber) {
+              // Both are active - preserve existing animated position
+              return {
+                ...m,
+                currentX: existing.currentX,
+                currentY: existing.currentY,
+                remainingDistance: existing.remainingDistance,
+              }
+            }
+          }
+          return m
+        })
+        
+        // Also preserve any stopped movements that aren't in the result
+        // (web worker might not include stopped movements in result)
+        for (const existing of existingStates.values()) {
+          if (!existing.isActive && !movementStates.value.find(m => m.actionNumber === existing.actionNumber)) {
+            movementStates.value.push(existing)
+          }
+        }
       }
     } catch (error) {
       console.error('Execution error:', error)
@@ -357,7 +400,8 @@ export function useBasicIde() {
       | 'pause'
       | 'allChars'
       | 'spriteTest'
-      | 'moveTest' = 'basic'
+      | 'moveTest'
+      | 'testMoveControl' = 'basic'
   ) => {
     const sample = getSampleCode(sampleType)
     if (sample) {
@@ -434,6 +478,8 @@ export function useBasicIde() {
     spriteStates,
     spriteEnabled,
     movementStates,
+    frontSpriteNodes,
+    backSpriteNodes,
 
     // Methods
     runCode,

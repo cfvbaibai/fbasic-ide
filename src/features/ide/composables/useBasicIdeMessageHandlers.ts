@@ -80,6 +80,8 @@ export interface MessageHandlerContext {
   backdropColor?: Ref<number>
   cgenMode?: Ref<number>
   movementStates?: Ref<MovementState[]>
+  frontSpriteNodes?: Ref<Map<number, unknown>>
+  backSpriteNodes?: Ref<Map<number, unknown>>
   webWorkerManager: WebWorkerManager
 }
 
@@ -298,22 +300,52 @@ export function handleAnimationCommandMessage(message: AnyServiceWorkerMessage, 
 
   switch (command.type) {
     case 'START_MOVEMENT': {
+      // Check if there's an existing movement (including stopped ones from CUT)
+      // If so, use its current position instead of the start position from web worker
+      // This ensures MOVE after CUT continues from the stopped position
+      const existingMovement = context.movementStates.value.find(
+        m => m.actionNumber === command.actionNumber
+      )
+
+      // Use existing position if available (from stopped movement), otherwise use start position
+      // Frontend has the real current positions since it runs the animation loop
+      // Worker's positions are stale because updateMovements() never runs there
+      // Now worker sends UPDATE_ANIMATION_POSITIONS back with current positions when CUT happens
+      const startX = existingMovement ? existingMovement.currentX : command.startX
+      const startY = existingMovement ? existingMovement.currentY : command.startY
+
+      if (existingMovement) {
+        console.log('🎬 [COMPOSABLE] Found existing movement:', {
+          actionNumber: existingMovement.actionNumber,
+          isActive: existingMovement.isActive,
+          currentX: existingMovement.currentX,
+          currentY: existingMovement.currentY,
+          webWorkerX: command.startX,
+          webWorkerY: command.startY,
+          usingPosition: `(${startX}, ${startY}) from frontend (up-to-date)`,
+        })
+      }
+      // Preserve remaining distance if movement was stopped (CUT), otherwise use full distance
+      const remainingDistance = existingMovement && !existingMovement.isActive
+        ? existingMovement.remainingDistance
+        : 2 * command.definition.distance
+
       // Create movement state immediately
       const movementState: MovementState = {
         actionNumber: command.actionNumber,
         definition: command.definition,
-        startX: command.startX,
-        startY: command.startY,
-        currentX: command.startX,
-        currentY: command.startY,
-        remainingDistance: 2 * command.definition.distance,
+        startX,
+        startY,
+        currentX: startX,
+        currentY: startY,
+        remainingDistance,
         totalDistance: 2 * command.definition.distance,
         speedDotsPerSecond: command.definition.speed > 0 ? 60 / command.definition.speed : 0,
         directionDeltaX: getDirectionDeltaX(command.definition.direction),
         directionDeltaY: getDirectionDeltaY(command.definition.direction),
         isActive: true,
-        currentFrameIndex: 0,
-        frameCounter: 0,
+        currentFrameIndex: existingMovement?.currentFrameIndex ?? 0,
+        frameCounter: existingMovement?.frameCounter ?? 0,
       }
 
       // Add or update movement state
@@ -330,18 +362,92 @@ export function handleAnimationCommandMessage(message: AnyServiceWorkerMessage, 
       // Force reactivity by creating new array
       context.movementStates.value = [...context.movementStates.value]
 
-      console.log('🎬 [COMPOSABLE] Started movement:', command.actionNumber, 'at', command.startX, command.startY)
+      console.log('🎬 [COMPOSABLE] Started movement:', command.actionNumber, 'at', startX, startY, existingMovement ? '(restarted)' : '(new)')
       break
     }
 
     case 'STOP_MOVEMENT': {
       // Mark movements as inactive but keep positions
-      for (const actionNumber of command.actionNumbers) {
-        const movement = context.movementStates.value.find(m => m.actionNumber === actionNumber)
-        if (movement) {
-          movement.isActive = false
+      // IMPORTANT: Send current positions back to worker so it can update storedPositions
+      const currentPositions: Array<{ actionNumber: number; x: number; y: number }> = []
+
+      if (command.positions) {
+        for (const pos of command.positions) {
+          const movement = context.movementStates.value.find(m => m.actionNumber === pos.actionNumber)
+          if (movement) {
+            movement.isActive = false
+            movement.currentX = pos.x
+            movement.currentY = pos.y
+            movement.remainingDistance = pos.remainingDistance
+            currentPositions.push({ actionNumber: pos.actionNumber, x: pos.x, y: pos.y })
+          }
+        }
+      } else {
+        // No positions provided - get position from Konva nodes or movement states
+        for (const actionNumber of command.actionNumbers) {
+          const movement = context.movementStates.value.find(m => m.actionNumber === actionNumber)
+          if (movement) {
+            // Try to get position from Konva sprite node (actual rendered position)
+            // This is the most accurate source since animation loop updates these
+            let actualX = movement.currentX
+            let actualY = movement.currentY
+
+            // Check front sprite layer first
+            if (context.frontSpriteNodes?.value) {
+              const frontNode = context.frontSpriteNodes.value.get(actionNumber)
+              if (frontNode && typeof frontNode === 'object' && 'x' in frontNode && 'y' in frontNode) {
+                actualX = typeof frontNode.x === 'function' ? (frontNode.x as () => number)() : movement.currentX
+                actualY = typeof frontNode.y === 'function' ? (frontNode.y as () => number)() : movement.currentY
+                console.log(`🎬 [COMPOSABLE] Got position from front sprite node ${actionNumber}: (${actualX}, ${actualY})`)
+              }
+            }
+
+            // Check back sprite layer if not found in front
+            if (actualX === movement.currentX && actualY === movement.currentY && context.backSpriteNodes?.value) {
+              const backNode = context.backSpriteNodes.value.get(actionNumber)
+              if (backNode && typeof backNode === 'object' && 'x' in backNode && 'y' in backNode) {
+                actualX = typeof backNode.x === 'function' ? (backNode.x as () => number)() : movement.currentX
+                actualY = typeof backNode.y === 'function' ? (backNode.y as () => number)() : movement.currentY
+                console.log(`🎬 [COMPOSABLE] Got position from back sprite node ${actionNumber}: (${actualX}, ${actualY})`)
+              }
+            }
+
+            // If we still have the initial position, use movement state as fallback
+            if (actualX === movement.currentX && actualY === movement.currentY) {
+              console.log(`🎬 [COMPOSABLE] Using movement state position for ${actionNumber}: (${actualX}, ${actualY})`)
+            }
+
+            // Preserve current position - don't update it, just mark as inactive
+            movement.isActive = false
+            // Update movement state with actual position if we got it from Konva
+            if (actualX !== movement.currentX || actualY !== movement.currentY) {
+              movement.currentX = actualX
+              movement.currentY = actualY
+            }
+            // Collect current position to send back to worker
+            currentPositions.push({
+              actionNumber: movement.actionNumber,
+              x: actualX,
+              y: actualY,
+            })
+          }
         }
       }
+
+      // Send current positions back to worker so it can update its storedPositions
+      // Worker's updateMovements() never runs, so it doesn't know the real current positions
+      if (currentPositions.length > 0 && context.webWorkerManager?.worker) {
+        context.webWorkerManager.worker.postMessage({
+          type: 'UPDATE_ANIMATION_POSITIONS',
+          id: crypto.randomUUID(),
+          timestamp: Date.now(),
+          data: {
+            positions: currentPositions,
+          },
+        })
+        console.log('🎬 [COMPOSABLE] Sent positions to worker:', currentPositions)
+      }
+
       context.movementStates.value = [...context.movementStates.value]
       break
     }

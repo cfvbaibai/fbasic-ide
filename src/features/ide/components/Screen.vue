@@ -10,6 +10,7 @@ import {
   type KonvaScreenLayers,
   renderAllScreenLayers,
 } from '@/features/ide/composables/useKonvaScreenRenderer'
+import { useMovementStateSync } from '@/features/ide/composables/useMovementStateSync'
 import { useRenderQueue } from '@/features/ide/composables/useRenderQueue'
 import { useScreenAnimationLoop } from '@/features/ide/composables/useScreenAnimationLoop'
 import { useScreenZoom } from '@/features/ide/composables/useScreenZoom'
@@ -56,6 +57,9 @@ interface Props {
   spriteStates?: SpriteState[]
   movementStates?: MovementState[]
   spriteEnabled?: boolean
+  // External sprite node maps (for message handler to get actual positions)
+  externalFrontSpriteNodes?: Map<number, unknown>
+  externalBackSpriteNodes?: Map<number, unknown>
 }
 
 // Konva Stage reference
@@ -163,6 +167,20 @@ async function render(): Promise<void> {
     // Update sprite node maps
     frontSpriteNodes.value = frontNodes as Map<number, Konva.Image>
     backSpriteNodes.value = backNodes as Map<number, Konva.Image>
+
+    // Sync with external sprite node maps (for message handler access)
+    if (props.externalFrontSpriteNodes) {
+      props.externalFrontSpriteNodes.clear()
+      for (const [key, value] of frontNodes.entries()) {
+        props.externalFrontSpriteNodes.set(key, value)
+      }
+    }
+    if (props.externalBackSpriteNodes) {
+      props.externalBackSpriteNodes.clear()
+      for (const [key, value] of backNodes.entries()) {
+        props.externalBackSpriteNodes.set(key, value)
+      }
+    }
   } catch (error) {
     console.error('[Screen] Error rendering screen layers:', error)
   } finally {
@@ -170,49 +188,12 @@ async function render(): Promise<void> {
   }
 }
 
-// Local mutable copy of movement states for animation updates
-// Must be declared before computed properties that use it
-const localMovementStates = ref<MovementState[]>([])
-
-// Update local movement states from props
-// MOVE command states - animation loop handles rendering of these
-watch(
-  () => props.movementStates,
-  newStates => {
-    if (!newStates || newStates.length === 0) {
-      localMovementStates.value = []
-      return
-    }
-
-    // Deep clone movement states to make them mutable
-    // Merge with existing states to preserve positions of active movements
-    const existingStates = new Map(localMovementStates.value.map(m => [m.actionNumber, m]))
-
-    localMovementStates.value = newStates.map(m => {
-      const existing = existingStates.get(m.actionNumber)
-      if (existing && existing.isActive && m.isActive) {
-        // Preserve existing position if movement is still active
-        return {
-          ...m,
-          currentX: existing.currentX,
-          currentY: existing.currentY,
-          remainingDistance: existing.remainingDistance,
-          definition: { ...m.definition },
-        }
-      }
-      // New movement or movement was restarted - use new state
-      return {
-        ...m,
-        definition: { ...m.definition },
-      }
-    })
-
-    // When new MOVE commands are added, trigger a full render to show initial state
-    // After that, animation loop will handle updates
-    scheduleRender()
-  },
-  { immediate: true, deep: true }
-)
+// Synchronize movement states from parent (with local mutable copy for animation)
+// When new MOVE commands are added, trigger a full render to show initial state
+const { localMovementStates } = useMovementStateSync({
+  movementStates: computed(() => props.movementStates),
+  onSync: () => scheduleRender(),
+})
 
 // Watch paletteCode, backdropColor, spritePalette, sprite states, and sprite enabled to trigger re-render
 // These are STATIC rendering changes (CGSET, COLOR, SPRITE, etc.) - render immediately

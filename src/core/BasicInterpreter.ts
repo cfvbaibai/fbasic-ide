@@ -220,4 +220,11 @@ export class BasicInterpreter {
   getMovementStates() {
     return this.context?.animationManager?.getAllMovementStates() ?? []
   }
+
+  /**
+   * Get AnimationManager instance for updating stored positions from frontend
+   */
+  getAnimationManager() {
+    return this.context?.animationManager ?? null
+  }
 }

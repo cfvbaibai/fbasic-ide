@@ -59,6 +59,8 @@ interface Props {
   spriteStates?: SpriteState[]
   spriteEnabled?: boolean
   movementStates?: MovementState[]
+  externalFrontSpriteNodes?: Map<number, unknown>
+  externalBackSpriteNodes?: Map<number, unknown>
 }
 
 const activeTab = ref('screen')
@@ -77,6 +79,8 @@ const activeTab = ref('screen')
         :sprite-states="spriteStates"
         :sprite-enabled="spriteEnabled"
         :movement-states="movementStates"
+        :external-front-sprite-nodes="externalFrontSpriteNodes"
+        :external-back-sprite-nodes="externalBackSpriteNodes"
       />
 
       <!-- STDOUT Tab -->

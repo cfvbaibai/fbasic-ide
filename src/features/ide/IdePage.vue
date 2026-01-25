@@ -38,6 +38,8 @@ const {
   spriteStates,
   spriteEnabled,
   movementStates,
+  frontSpriteNodes,
+  backSpriteNodes,
   runCode,
   stopCode,
   clearOutput,
@@ -140,6 +142,14 @@ onMounted(() => {
                   >
                     {{ t('ide.samples.moveTest') }}
                   </GameButton>
+                  <GameButton
+                    variant="toggle"
+                    :selected="currentSampleType === 'testMoveControl'"
+                    @click="loadSampleCode('testMoveControl')"
+                    size="small"
+                  >
+                    {{ t('ide.samples.testMoveControl') }}
+                  </GameButton>
                 </GameButtonGroup>
               </div>
               <IdeControls
@@ -174,6 +184,8 @@ onMounted(() => {
             :sprite-states="spriteStates"
             :sprite-enabled="spriteEnabled"
             :movement-states="movementStates"
+            :external-front-sprite-nodes="frontSpriteNodes"
+            :external-back-sprite-nodes="backSpriteNodes"
           />
         </div>
       </div>

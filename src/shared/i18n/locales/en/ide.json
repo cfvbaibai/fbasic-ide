@@ -27,7 +27,8 @@
     "comprehensive": "Full Demo",
     "allChars": "All Chars",
     "spriteTest": "Sprite Test",
-    "moveTest": "Move Test"
+    "moveTest": "Move Test",
+    "testMoveControl": "Move Control Test"
   },
   "joystick": {
     "control": "Joystick Control",

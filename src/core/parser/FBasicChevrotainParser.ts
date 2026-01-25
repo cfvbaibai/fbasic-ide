@@ -45,6 +45,9 @@ import {
   Def,
   Sprite,
   Move,
+  Cut,
+  Era,
+  Position,
   // String functions
   Len,
   Left,
@@ -62,6 +65,8 @@ import {
   // Controller input functions
   Stick,
   Strig,
+  Xpos,
+  Ypos,
   // Logical operators
   And,
   Or,
@@ -142,6 +147,9 @@ class FBasicChevrotainParser extends CstParser {
   declare spriteOnOffStatement: () => CstNode
   declare defMoveStatement: () => CstNode
   declare moveStatement: () => CstNode
+  declare cutStatement: () => CstNode
+  declare eraStatement: () => CstNode
+  declare positionStatement: () => CstNode
   declare arrayDeclaration: () => CstNode
   declare dimensionList: () => CstNode
   declare expressionList: () => CstNode
@@ -192,6 +200,10 @@ class FBasicChevrotainParser extends CstParser {
         // Controller input functions
         { ALT: () => this.CONSUME(Stick) },
         { ALT: () => this.CONSUME(Strig) },
+        // Sprite query functions
+        { ALT: () => this.CONSUME(Move) }, // MOVE(n) - status query function
+        { ALT: () => this.CONSUME(Xpos) },
+        { ALT: () => this.CONSUME(Ypos) },
       ])
       this.CONSUME(LParen)
       this.OPTION(() => {
@@ -218,9 +230,11 @@ class FBasicChevrotainParser extends CstParser {
         },
         { ALT: () => this.CONSUME(NumberLiteral) },
         {
-          // Function call: String functions and arithmetic functions
+          // Function call: String functions, arithmetic functions, controller input functions, and sprite query functions
           // Family BASIC arithmetic functions: ABS, SGN, RND, VAL
           // String functions: LEN, LEFT$, RIGHT$, MID$, STR$, HEX$, CHR$, ASC
+          // Controller input functions: STICK, STRIG
+          // Sprite query functions: MOVE(n), XPOS(n), YPOS(n)
           GATE: () =>
             this.LA(1).tokenType === Len ||
             this.LA(1).tokenType === Left ||
@@ -235,7 +249,10 @@ class FBasicChevrotainParser extends CstParser {
             this.LA(1).tokenType === Rnd ||
             this.LA(1).tokenType === Val ||
             this.LA(1).tokenType === Stick ||
-            this.LA(1).tokenType === Strig,
+            this.LA(1).tokenType === Strig ||
+            (this.LA(1).tokenType === Move && this.LA(2).tokenType === LParen) ||
+            this.LA(1).tokenType === Xpos ||
+            this.LA(1).tokenType === Ypos,
           ALT: () => this.SUBRULE(this.functionCall),
         },
         {
@@ -823,6 +840,31 @@ class FBasicChevrotainParser extends CstParser {
       this.SUBRULE(this.expression, { LABEL: 'actionNumber' }) // n
     })
 
+    // CUT n1[, n2, ...]
+    // Stop movement, keep sprite visible at current position
+    this.cutStatement = this.RULE('cutStatement', () => {
+      this.CONSUME(Cut)
+      this.SUBRULE(this.expressionList, { LABEL: 'actionNumbers' }) // n1, n2, ...
+    })
+
+    // ERA n1[, n2, ...]
+    // Erase sprite (stop movement and hide)
+    this.eraStatement = this.RULE('eraStatement', () => {
+      this.CONSUME(Era)
+      this.SUBRULE(this.expressionList, { LABEL: 'actionNumbers' }) // n1, n2, ...
+    })
+
+    // POSITION n, X, Y
+    // Set initial position for next MOVE command
+    this.positionStatement = this.RULE('positionStatement', () => {
+      this.CONSUME(Position)
+      this.SUBRULE(this.expression, { LABEL: 'actionNumber' }) // n
+      this.CONSUME(Comma)
+      this.SUBRULE2(this.expression, { LABEL: 'x' }) // X
+      this.CONSUME2(Comma)
+      this.SUBRULE3(this.expression, { LABEL: 'y' }) // Y
+    })
+
     // IF LogicalExpression THEN (CommandList | NumberLiteral)
     // IF LogicalExpression GOTO NumberLiteral
     // Executes the commands after THEN or jumps to line number if condition is true
@@ -958,7 +1000,19 @@ class FBasicChevrotainParser extends CstParser {
           ALT: () => this.SUBRULE(this.defSpriteStatement),
         },
         {
-          GATE: () => this.LA(1).tokenType === Move,
+          GATE: () => this.LA(1).tokenType === Position,
+          ALT: () => this.SUBRULE(this.positionStatement),
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Cut,
+          ALT: () => this.SUBRULE(this.cutStatement),
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Era,
+          ALT: () => this.SUBRULE(this.eraStatement),
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Move && this.LA(2).tokenType !== LParen,
           ALT: () => this.SUBRULE(this.moveStatement),
         },
         {

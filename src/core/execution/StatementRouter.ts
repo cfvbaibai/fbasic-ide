@@ -15,11 +15,13 @@ import { CgenExecutor } from './executors/CgenExecutor'
 import { CgsetExecutor } from './executors/CgsetExecutor'
 import { ClsExecutor } from './executors/ClsExecutor'
 import { ColorExecutor } from './executors/ColorExecutor'
+import { CutExecutor } from './executors/CutExecutor'
 import { DataExecutor } from './executors/DataExecutor'
 import { DefMoveExecutor } from './executors/DefMoveExecutor'
 import { DefSpriteExecutor } from './executors/DefSpriteExecutor'
 import { DimExecutor } from './executors/DimExecutor'
 import { EndExecutor } from './executors/EndExecutor'
+import { EraExecutor } from './executors/EraExecutor'
 import { ForExecutor } from './executors/ForExecutor'
 import { GosubExecutor } from './executors/GosubExecutor'
 import { GotoExecutor } from './executors/GotoExecutor'
@@ -31,6 +33,7 @@ import { NextExecutor } from './executors/NextExecutor'
 import { OnExecutor } from './executors/OnExecutor'
 import { PaletExecutor } from './executors/PaletExecutor'
 import { PauseExecutor } from './executors/PauseExecutor'
+import { PositionExecutor } from './executors/PositionExecutor'
 import { PrintExecutor } from './executors/PrintExecutor'
 import { ReadExecutor } from './executors/ReadExecutor'
 import { RestoreExecutor } from './executors/RestoreExecutor'
@@ -66,6 +69,9 @@ export class StatementRouter {
   private spriteOnOffExecutor: SpriteOnOffExecutor
   private defMoveExecutor: DefMoveExecutor
   private moveExecutor: MoveExecutor
+  private cutExecutor: CutExecutor
+  private eraExecutor: EraExecutor
+  private positionExecutor: PositionExecutor
 
   constructor(
     private context: ExecutionContext,
@@ -99,6 +105,9 @@ export class StatementRouter {
     this.spriteOnOffExecutor = new SpriteOnOffExecutor(context)
     this.defMoveExecutor = new DefMoveExecutor(context, evaluator)
     this.moveExecutor = new MoveExecutor(context, evaluator)
+    this.cutExecutor = new CutExecutor(context, evaluator)
+    this.eraExecutor = new EraExecutor(context, evaluator)
+    this.positionExecutor = new PositionExecutor(context, evaluator)
   }
 
   /**
@@ -371,6 +380,21 @@ export class StatementRouter {
       const moveStmtCst = getFirstCstNode(singleCommandCst.children.moveStatement)
       if (moveStmtCst) {
         this.moveExecutor.execute(moveStmtCst, expandedStatement.lineNumber)
+      }
+    } else if (singleCommandCst.children.cutStatement) {
+      const cutStmtCst = getFirstCstNode(singleCommandCst.children.cutStatement)
+      if (cutStmtCst) {
+        this.cutExecutor.execute(cutStmtCst, expandedStatement.lineNumber)
+      }
+    } else if (singleCommandCst.children.eraStatement) {
+      const eraStmtCst = getFirstCstNode(singleCommandCst.children.eraStatement)
+      if (eraStmtCst) {
+        this.eraExecutor.execute(eraStmtCst, expandedStatement.lineNumber)
+      }
+    } else if (singleCommandCst.children.positionStatement) {
+      const positionStmtCst = getFirstCstNode(singleCommandCst.children.positionStatement)
+      if (positionStmtCst) {
+        this.positionExecutor.execute(positionStmtCst, expandedStatement.lineNumber)
       }
     } else {
       // Other statement types not yet implemented

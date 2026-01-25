@@ -267,6 +267,123 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 730 PRINT "     C=0: Mario, C=1: Lady, C=2: Fighter Fly, etc."
 740 END`,
   },
+
+  testMoveControl: {
+    name: 'Move Control Test',
+    description: 'Movement control commands test - demonstrates CUT, ERA, POSITION, MOVE(n), XPOS(n), YPOS(n)',
+    code: `10 REM Move Control Test Program
+20 CLS
+30 PRINT "Move Control Test Program"
+40 PRINT "=========================="
+50 PRINT ""
+60 PRINT "Testing movement control commands:"
+70 PRINT "  CUT, ERA, POSITION, MOVE(n), XPOS(n), YPOS(n)"
+80 PRINT ""
+90 REM Enable sprite screen
+100 SPRITE ON
+110 PRINT "SPRITE ON executed"
+120 PRINT ""
+130 REM Character type (0=Mario)
+140 LET C = 0
+150 PRINT "Character type: "; C; " (Mario)"
+160 PRINT ""
+170 REM Define movement for action 0: move right
+180 DEF MOVE(0) = SPRITE(C, 3, 15, 60, 0, 0)
+190 PRINT "DEF MOVE(0) defined: Direction 3 (right), Speed 15, Distance 60"
+200 PRINT ""
+210 REM Test 1: POSITION command
+220 PRINT "Test 1: POSITION command"
+230 POSITION 0, 50, 100
+240 PRINT "POSITION 0, 50, 100 executed"
+250 PRINT "  Initial position set to (50, 100)"
+260 PRINT ""
+270 REM Test 2: Start movement and query status
+280 PRINT "Test 2: Start movement and query status"
+290 MOVE 0
+300 PRINT "MOVE 0 executed"
+310 PRINT "  MOVE(0) status: "; MOVE(0); " (-1=moving, 0=complete)"
+320 PRINT "  XPOS(0) = "; XPOS(0)
+330 PRINT "  YPOS(0) = "; YPOS(0)
+340 PRINT ""
+350 REM Wait a bit for movement to progress
+360 PAUSE 500
+370 PRINT "After 500ms pause:"
+380 PRINT "  MOVE(0) status: "; MOVE(0); " (-1=moving, 0=complete)"
+390 PRINT "  XPOS(0) = "; XPOS(0)
+400 PRINT "  YPOS(0) = "; YPOS(0)
+410 PRINT ""
+420 REM Test 3: CUT command (stop movement, keep position)
+430 PRINT "Test 3: CUT command (stop movement, keep position)"
+440 CUT 0
+450 PRINT "CUT 0 executed"
+460 PRINT "  MOVE(0) status: "; MOVE(0); " (should be 0=stopped)"
+470 PRINT "  XPOS(0) = "; XPOS(0); " (position preserved)"
+480 PRINT "  YPOS(0) = "; YPOS(0); " (position preserved)"
+490 PRINT ""
+500 REM Test 4: Start new movement from stopped position
+510 PRINT "Test 4: Start new movement from stopped position"
+520 DEF MOVE(1) = SPRITE(C, 5, 15, 40, 0, 0)
+530 PRINT "DEF MOVE(1) defined: Direction 5 (down), Speed 15, Distance 40"
+540 MOVE 1
+550 PRINT "MOVE 1 executed (should start from current position)"
+560 PRINT "  MOVE(1) status: "; MOVE(1)
+570 PRINT "  XPOS(1) = "; XPOS(1)
+580 PRINT "  YPOS(1) = "; YPOS(1)
+590 PRINT ""
+600 REM Wait for movement
+610 PAUSE 500
+620 PRINT "After 500ms pause:"
+630 PRINT "  MOVE(1) status: "; MOVE(1)
+640 PRINT "  XPOS(1) = "; XPOS(1)
+650 PRINT "  YPOS(1) = "; YPOS(1)
+660 PRINT ""
+670 REM Test 5: ERA command (erase sprite)
+680 PRINT "Test 5: ERA command (erase sprite)"
+690 ERA 1
+700 PRINT "ERA 1 executed"
+710 PRINT "  Movement 1 erased"
+720 PRINT ""
+730 REM Test 6: POSITION with multiple actions
+740 PRINT "Test 6: POSITION with multiple actions"
+750 POSITION 2, 100, 50
+760 POSITION 3, 150, 80
+770 PRINT "POSITION 2, 100, 50 executed"
+780 PRINT "POSITION 3, 150, 80 executed"
+790 DEF MOVE(2) = SPRITE(C, 1, 12, 50, 0, 0)
+800 DEF MOVE(3) = SPRITE(C, 7, 12, 50, 0, 0)
+810 PRINT "DEF MOVE(2) defined: Direction 1 (up)"
+820 PRINT "DEF MOVE(3) defined: Direction 7 (left)"
+830 MOVE 2
+840 MOVE 3
+850 PRINT "MOVE 2 and MOVE 3 executed"
+860 PRINT "  XPOS(2) = "; XPOS(2); ", YPOS(2) = "; YPOS(2)
+870 PRINT "  XPOS(3) = "; XPOS(3); ", YPOS(3) = "; YPOS(3)
+880 PRINT ""
+890 REM Test 7: CUT multiple actions
+900 PRINT "Test 7: CUT multiple actions"
+910 PAUSE 500
+920 CUT 2, 3
+930 PRINT "CUT 2, 3 executed"
+940 PRINT "  MOVE(2) status: "; MOVE(2); " (should be 0)"
+950 PRINT "  MOVE(3) status: "; MOVE(3); " (should be 0)"
+960 PRINT ""
+970 REM Test 8: ERA multiple actions
+980 PRINT "Test 8: ERA multiple actions"
+990 ERA 0, 2
+1000 PRINT "ERA 0, 2 executed"
+1010 PRINT "  Movements 0 and 2 erased"
+1020 PRINT ""
+1030 PRINT "Move Control Test completed!"
+1040 PRINT ""
+1050 PRINT "Summary:"
+1060 PRINT "  - POSITION sets initial coordinates"
+1070 PRINT "  - MOVE(n) returns -1 if moving, 0 if stopped"
+1080 PRINT "  - XPOS(n) and YPOS(n) return current positions"
+1090 PRINT "  - CUT stops movement but keeps sprite visible"
+1100 PRINT "  - ERA erases sprite completely"
+1110 PRINT "  - Multiple actions can be controlled with CUT/ERA"
+1120 END`,
+  },
 }
 
 /**

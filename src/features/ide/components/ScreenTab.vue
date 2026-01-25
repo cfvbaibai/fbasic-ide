@@ -28,6 +28,8 @@ const props = withDefaults(
     spriteStates?: SpriteState[]
     spriteEnabled?: boolean
     movementStates?: MovementState[]
+    externalFrontSpriteNodes?: Map<number, unknown>
+    externalBackSpriteNodes?: Map<number, unknown>
   }>(),
   {
     screenBuffer: () => {
@@ -102,6 +104,8 @@ const currentZoomLevel = computed(() => zoomLevel.value)
         :sprite-states="spriteStates"
         :sprite-enabled="spriteEnabled"
         :movement-states="movementStates"
+        :external-front-sprite-nodes="externalFrontSpriteNodes"
+        :external-back-sprite-nodes="externalBackSpriteNodes"
       />
     </div>
   </GameTabPane>

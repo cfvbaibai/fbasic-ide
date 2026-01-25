@@ -16,6 +16,7 @@ import type {
   StickEventMessage,
   StopMessage,
   StrigEventMessage,
+  UpdateAnimationPositionsMessage,
 } from '@/core/interfaces'
 
 // Web Worker Interpreter Implementation
@@ -74,6 +75,10 @@ class WebWorkerInterpreter {
         case 'STICK_EVENT':
           console.log('🎮 [WORKER] Handling STICK_EVENT message')
           this.handleStickEvent(message)
+          break
+        case 'UPDATE_ANIMATION_POSITIONS':
+          console.log('🎬 [WORKER] Handling UPDATE_ANIMATION_POSITIONS message')
+          this.handleUpdateAnimationPositions(message)
           break
 
         default:
@@ -188,6 +193,23 @@ class WebWorkerInterpreter {
       this.webWorkerDeviceAdapter.setStickState(joystickId, state)
     } else {
       console.log('🎮 [WORKER] No WebWorkerDeviceAdapter available for STICK event')
+    }
+  }
+
+  handleUpdateAnimationPositions(message: UpdateAnimationPositionsMessage) {
+    const { positions } = message.data
+    console.log('🎬 [WORKER] Updating animation positions:', positions)
+
+    if (this.interpreter) {
+      const animationManager = this.interpreter.getAnimationManager()
+      if (animationManager) {
+        animationManager.updateStoredPositions(positions)
+        console.log('✅ [WORKER] Animation positions updated in AnimationManager')
+      } else {
+        console.log('⚠️ [WORKER] No AnimationManager available')
+      }
+    } else {
+      console.log('⚠️ [WORKER] No interpreter available for updating positions')
     }
   }
 

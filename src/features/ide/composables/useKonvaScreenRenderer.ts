@@ -163,16 +163,16 @@ export async function renderSpriteLayer(
     }
   }
 
-  // Second, render active movements (DEF MOVE) - these work independently of SPRITE ON/OFF
-  // Filter movements by priority and active status
-  const activeMovements = movementStates.filter(m => {
-    if (!m?.isActive) return false
-    if (!m.definition) return false
+  // Second, render movements (DEF MOVE) - both active and stopped (CUT)
+  // These work independently of SPRITE ON/OFF
+  // Filter movements by priority (include both active and inactive for CUT command)
+  const movementsToRender = movementStates.filter(m => {
+    if (!m?.definition) return false
     return m.definition.priority === priority
   })
 
-  for (const movement of activeMovements) {
-    // Render animated sprite (DEF MOVE)
+  for (const movement of movementsToRender) {
+    // Render animated sprite (DEF MOVE) - both active and stopped movements
     const konvaImage = await createAnimatedSpriteKonvaImage(movement, spritePaletteCode)
     if (konvaImage) {
       layer.add(konvaImage)
@@ -199,26 +199,32 @@ export async function updateAnimatedSprites(
   backSpriteNodes: Map<number, Konva.Image>
 ): Promise<void> {
   // Update sprites on front layer (priority E=0)
+  // Include both active and stopped movements (stopped movements need position updates)
   for (const movement of movementStates) {
-    if (!movement.isActive || movement.definition.priority !== 0) continue
+    if (!movement.definition || movement.definition.priority !== 0) continue
 
     const spriteNode = frontSpriteNodes.get(movement.actionNumber)
     if (spriteNode) {
+      // Update position for both active and stopped movements
+      // Active movements: full update (position + frame)
+      // Stopped movements: position only (to ensure correct location after CUT)
       await updateAnimatedSpriteKonvaImage(movement, spriteNode, spritePaletteCode)
     }
   }
 
   // Update sprites on back layer (priority E=1)
+  // Include both active and stopped movements
   for (const movement of movementStates) {
-    if (!movement.isActive || movement.definition.priority !== 1) continue
+    if (!movement.definition || movement.definition.priority !== 1) continue
 
     const spriteNode = backSpriteNodes.get(movement.actionNumber)
     if (spriteNode) {
+      // Update position for both active and stopped movements
       await updateAnimatedSpriteKonvaImage(movement, spriteNode, spritePaletteCode)
     }
   }
 
-  // Redraw layers if they have active sprites
+  // Redraw layers if they have sprites (active or stopped)
   if (spriteFrontLayer && frontSpriteNodes.size > 0) {
     spriteFrontLayer.draw()
   }

@@ -96,6 +96,14 @@ export class AnimationManager {
     const initialX = startX ?? storedPos?.x ?? 120
     const initialY = startY ?? storedPos?.y ?? 120
 
+    console.log(`🎯 [AnimationManager] startMovement(${actionNumber}):`, {
+      startX,
+      startY,
+      storedPos,
+      initialX,
+      initialY,
+    })
+
     // Calculate direction deltas
     const { deltaX, deltaY } = this.getDirectionDeltas(definition.direction)
 
@@ -177,18 +185,40 @@ export class AnimationManager {
   /**
    * Stop movement (CUT command)
    * Stops movement but keeps sprite visible at current position
+   * NOTE: Position is NOT saved here - frontend will send current positions back via UPDATE_ANIMATION_POSITIONS
    */
   stopMovement(actionNumbers: number[]): void {
     for (const actionNumber of actionNumbers) {
       const movement = this.movementStates.get(actionNumber)
       if (movement) {
         movement.isActive = false
-        // Update stored position
-        this.storedPositions.set(actionNumber, {
-          x: movement.currentX,
-          y: movement.currentY,
-        })
+        // DON'T save position here - worker's positions are stale since updateMovements() never runs
+        // Frontend will send actual current positions via UPDATE_ANIMATION_POSITIONS message
       }
+    }
+
+    // Send animation command to main thread to stop movements
+    if (this.deviceAdapter?.sendAnimationCommand) {
+      const command: AnimationCommand = {
+        type: 'STOP_MOVEMENT',
+        actionNumbers,
+      }
+      this.deviceAdapter.sendAnimationCommand(command)
+    }
+  }
+
+  /**
+   * Update stored positions (called from frontend via UPDATE_ANIMATION_POSITIONS message)
+   * Frontend has the real current positions since it runs the animation loop
+   */
+  updateStoredPositions(positions: Array<{ actionNumber: number; x: number; y: number }>): void {
+    console.log('📍 [AnimationManager] updateStoredPositions called:', positions)
+    for (const pos of positions) {
+      this.storedPositions.set(pos.actionNumber, {
+        x: pos.x,
+        y: pos.y,
+      })
+      console.log(`  ✓ Updated storedPositions[${pos.actionNumber}] = (${pos.x}, ${pos.y})`)
     }
   }
 
@@ -204,6 +234,15 @@ export class AnimationManager {
       }
       // Remove movement state
       this.movementStates.delete(actionNumber)
+    }
+
+    // Send animation command to main thread to erase movements
+    if (this.deviceAdapter?.sendAnimationCommand) {
+      const command: AnimationCommand = {
+        type: 'ERASE_MOVEMENT',
+        actionNumbers,
+      }
+      this.deviceAdapter.sendAnimationCommand(command)
     }
   }
 

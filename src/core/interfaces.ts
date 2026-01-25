@@ -85,7 +85,11 @@ export type AnimationCommand =
       startX: number
       startY: number
     }
-  | { type: 'STOP_MOVEMENT'; actionNumbers: number[] }
+  | {
+      type: 'STOP_MOVEMENT'
+      actionNumbers: number[]
+      positions?: Array<{ actionNumber: number; x: number; y: number; remainingDistance: number }>
+    }
   | { type: 'ERASE_MOVEMENT'; actionNumbers: number[] }
   | {
       type: 'UPDATE_MOVEMENT_POSITION'
@@ -218,6 +222,7 @@ export type ServiceWorkerMessageType =
   | 'STRIG_EVENT'
   | 'STICK_EVENT'
   | 'ANIMATION_COMMAND'
+  | 'UPDATE_ANIMATION_POSITIONS'
 
 // Execute message - sent from UI to service worker
 export interface ExecuteMessage extends ServiceWorkerMessage {
@@ -363,6 +368,19 @@ export interface ReadyMessage extends ServiceWorkerMessage {
   }
 }
 
+// Update animation positions message - sent from main thread to service worker
+// to sync frontend's current animation positions back to worker's AnimationManager
+export interface UpdateAnimationPositionsMessage extends ServiceWorkerMessage {
+  type: 'UPDATE_ANIMATION_POSITIONS'
+  data: {
+    positions: Array<{
+      actionNumber: number
+      x: number
+      y: number
+    }>
+  }
+}
+
 // Union type for all possible messages
 export type AnyServiceWorkerMessage =
   | ExecuteMessage
@@ -377,6 +395,7 @@ export type AnyServiceWorkerMessage =
   | InitMessage
   | ReadyMessage
   | AnimationCommandMessage
+  | UpdateAnimationPositionsMessage
 
 // Message handler interface for type-safe message handling
 export interface ServiceWorkerMessageHandler {

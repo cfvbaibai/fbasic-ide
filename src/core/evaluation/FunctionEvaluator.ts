@@ -65,6 +65,9 @@ export class FunctionEvaluator {
     const valToken = getFirstToken(cst.children.Val)
     const stickToken = getFirstToken(cst.children.Stick)
     const strigToken = getFirstToken(cst.children.Strig)
+    const moveToken = getFirstToken(cst.children.Move)
+    const xposToken = getFirstToken(cst.children.Xpos)
+    const yposToken = getFirstToken(cst.children.Ypos)
 
     // Get arguments
     const expressionListCst = getFirstCstNode(cst.children.expressionList)
@@ -123,6 +126,17 @@ export class FunctionEvaluator {
     }
     if (strigToken) {
       return this.evaluateStrig(args)
+    }
+
+    // Sprite query functions
+    if (moveToken) {
+      return this.evaluateMove(args)
+    }
+    if (xposToken) {
+      return this.evaluateXpos(args)
+    }
+    if (yposToken) {
+      return this.evaluateYpos(args)
     }
 
     throw new Error('Unknown function call')
@@ -472,5 +486,68 @@ export class FunctionEvaluator {
       throw new Error('STRIG joystickId must be 0 or 1')
     }
     return this.context.consumeStrigState(joystickId)
+  }
+
+  // ============================================================================
+  // Sprite Query Functions
+  // ============================================================================
+
+  /**
+   * MOVE(n) - returns movement status
+   * n: action number (0-7)
+   * Returns: -1 if movement is active, 0 if complete or not started
+   */
+  private evaluateMove(args: Array<number | string>): number {
+    if (args.length !== 1) {
+      throw new Error('MOVE function requires exactly 1 argument')
+    }
+    const actionNumber = Math.floor(toNumber(args[0] ?? 0))
+    if (actionNumber < 0 || actionNumber > 7) {
+      throw new Error('MOVE action number must be 0-7')
+    }
+    if (!this.context.animationManager) {
+      return 0
+    }
+    return this.context.animationManager.getMovementStatus(actionNumber)
+  }
+
+  /**
+   * XPOS(n) - returns current X position
+   * n: action number (0-7)
+   * Returns: X coordinate (0-255) or 0 if no movement/position set
+   */
+  private evaluateXpos(args: Array<number | string>): number {
+    if (args.length !== 1) {
+      throw new Error('XPOS function requires exactly 1 argument')
+    }
+    const actionNumber = Math.floor(toNumber(args[0] ?? 0))
+    if (actionNumber < 0 || actionNumber > 7) {
+      throw new Error('XPOS action number must be 0-7')
+    }
+    if (!this.context.animationManager) {
+      return 0
+    }
+    const position = this.context.animationManager.getSpritePosition(actionNumber)
+    return position?.x ?? 0
+  }
+
+  /**
+   * YPOS(n) - returns current Y position
+   * n: action number (0-7)
+   * Returns: Y coordinate (0-239) or 0 if no movement/position set
+   */
+  private evaluateYpos(args: Array<number | string>): number {
+    if (args.length !== 1) {
+      throw new Error('YPOS function requires exactly 1 argument')
+    }
+    const actionNumber = Math.floor(toNumber(args[0] ?? 0))
+    if (actionNumber < 0 || actionNumber > 7) {
+      throw new Error('YPOS action number must be 0-7')
+    }
+    if (!this.context.animationManager) {
+      return 0
+    }
+    const position = this.context.animationManager.getSpritePosition(actionNumber)
+    return position?.y ?? 0
   }
 }

@@ -85,6 +85,13 @@
       const storedPos = this.storedPositions.get(actionNumber);
       const initialX = startX ?? storedPos?.x ?? 120;
       const initialY = startY ?? storedPos?.y ?? 120;
+      console.log(`\u{1F3AF} [AnimationManager] startMovement(${actionNumber}):`, {
+        startX,
+        startY,
+        storedPos,
+        initialX,
+        initialY
+      });
       const { deltaX, deltaY } = this.getDirectionDeltas(definition.direction);
       const speedDotsPerSecond = definition.speed > 0 ? 60 / definition.speed : 0;
       const totalDistance = 2 * definition.distance;
@@ -145,17 +152,35 @@
     /**
      * Stop movement (CUT command)
      * Stops movement but keeps sprite visible at current position
+     * NOTE: Position is NOT saved here - frontend will send current positions back via UPDATE_ANIMATION_POSITIONS
      */
     stopMovement(actionNumbers) {
       for (const actionNumber of actionNumbers) {
         const movement = this.movementStates.get(actionNumber);
         if (movement) {
           movement.isActive = false;
-          this.storedPositions.set(actionNumber, {
-            x: movement.currentX,
-            y: movement.currentY
-          });
         }
+      }
+      if (this.deviceAdapter?.sendAnimationCommand) {
+        const command = {
+          type: "STOP_MOVEMENT",
+          actionNumbers
+        };
+        this.deviceAdapter.sendAnimationCommand(command);
+      }
+    }
+    /**
+     * Update stored positions (called from frontend via UPDATE_ANIMATION_POSITIONS message)
+     * Frontend has the real current positions since it runs the animation loop
+     */
+    updateStoredPositions(positions) {
+      console.log("\u{1F4CD} [AnimationManager] updateStoredPositions called:", positions);
+      for (const pos of positions) {
+        this.storedPositions.set(pos.actionNumber, {
+          x: pos.x,
+          y: pos.y
+        });
+        console.log(`  \u2713 Updated storedPositions[${pos.actionNumber}] = (${pos.x}, ${pos.y})`);
       }
     }
     /**
@@ -169,6 +194,13 @@
           movement.isActive = false;
         }
         this.movementStates.delete(actionNumber);
+      }
+      if (this.deviceAdapter?.sendAnimationCommand) {
+        const command = {
+          type: "ERASE_MOVEMENT",
+          actionNumbers
+        };
+        this.deviceAdapter.sendAnimationCommand(command);
       }
     }
     /**
@@ -5487,6 +5519,9 @@
       const valToken = getFirstToken(cst.children.Val);
       const stickToken = getFirstToken(cst.children.Stick);
       const strigToken = getFirstToken(cst.children.Strig);
+      const moveToken = getFirstToken(cst.children.Move);
+      const xposToken = getFirstToken(cst.children.Xpos);
+      const yposToken = getFirstToken(cst.children.Ypos);
       const expressionListCst = getFirstCstNode(cst.children.expressionList);
       const args = [];
       if (expressionListCst) {
@@ -5536,6 +5571,15 @@
       }
       if (strigToken) {
         return this.evaluateStrig(args);
+      }
+      if (moveToken) {
+        return this.evaluateMove(args);
+      }
+      if (xposToken) {
+        return this.evaluateXpos(args);
+      }
+      if (yposToken) {
+        return this.evaluateYpos(args);
       }
       throw new Error("Unknown function call");
     }
@@ -5820,6 +5864,65 @@
         throw new Error("STRIG joystickId must be 0 or 1");
       }
       return this.context.consumeStrigState(joystickId);
+    }
+    // ============================================================================
+    // Sprite Query Functions
+    // ============================================================================
+    /**
+     * MOVE(n) - returns movement status
+     * n: action number (0-7)
+     * Returns: -1 if movement is active, 0 if complete or not started
+     */
+    evaluateMove(args) {
+      if (args.length !== 1) {
+        throw new Error("MOVE function requires exactly 1 argument");
+      }
+      const actionNumber = Math.floor(toNumber(args[0] ?? 0));
+      if (actionNumber < 0 || actionNumber > 7) {
+        throw new Error("MOVE action number must be 0-7");
+      }
+      if (!this.context.animationManager) {
+        return 0;
+      }
+      return this.context.animationManager.getMovementStatus(actionNumber);
+    }
+    /**
+     * XPOS(n) - returns current X position
+     * n: action number (0-7)
+     * Returns: X coordinate (0-255) or 0 if no movement/position set
+     */
+    evaluateXpos(args) {
+      if (args.length !== 1) {
+        throw new Error("XPOS function requires exactly 1 argument");
+      }
+      const actionNumber = Math.floor(toNumber(args[0] ?? 0));
+      if (actionNumber < 0 || actionNumber > 7) {
+        throw new Error("XPOS action number must be 0-7");
+      }
+      if (!this.context.animationManager) {
+        return 0;
+      }
+      const position = this.context.animationManager.getSpritePosition(actionNumber);
+      return position?.x ?? 0;
+    }
+    /**
+     * YPOS(n) - returns current Y position
+     * n: action number (0-7)
+     * Returns: Y coordinate (0-239) or 0 if no movement/position set
+     */
+    evaluateYpos(args) {
+      if (args.length !== 1) {
+        throw new Error("YPOS function requires exactly 1 argument");
+      }
+      const actionNumber = Math.floor(toNumber(args[0] ?? 0));
+      if (actionNumber < 0 || actionNumber > 7) {
+        throw new Error("YPOS action number must be 0-7");
+      }
+      if (!this.context.animationManager) {
+        return 0;
+      }
+      const position = this.context.animationManager.getSpritePosition(actionNumber);
+      return position?.y ?? 0;
     }
   };
 
@@ -6829,6 +6932,98 @@
     }
   };
 
+  // src/core/execution/executors/CutExecutor.ts
+  var CutExecutor = class {
+    constructor(context, evaluator) {
+      this.context = context;
+      this.evaluator = evaluator;
+    }
+    /**
+     * Execute a CUT statement from CST
+     * CUT n1[, n2, ...]
+     * n: action numbers (0-7)
+     */
+    execute(cutStmtCst, lineNumber) {
+      try {
+        const expressionListCst = getFirstCstNode(cutStmtCst.children.actionNumbers);
+        if (!expressionListCst) {
+          this.context.addError({
+            line: lineNumber ?? 0,
+            message: "CUT: Missing action numbers",
+            type: ERROR_TYPES.RUNTIME
+          });
+          return;
+        }
+        const expressions = getCstNodes(expressionListCst.children.expression);
+        const actionNumbers = [];
+        for (const exprCst of expressions) {
+          const actionNumber = this.evaluateNumber(exprCst, lineNumber);
+          if (actionNumber === null) {
+            return;
+          }
+          if (!this.validateRange(actionNumber, 0, 7, lineNumber)) {
+            return;
+          }
+          actionNumbers.push(actionNumber);
+        }
+        if (actionNumbers.length === 0) {
+          this.context.addError({
+            line: lineNumber ?? 0,
+            message: "CUT: At least one action number required",
+            type: ERROR_TYPES.RUNTIME
+          });
+          return;
+        }
+        if (this.context.animationManager) {
+          try {
+            this.context.animationManager.stopMovement(actionNumbers);
+          } catch (error) {
+            this.context.addError({
+              line: lineNumber ?? 0,
+              message: `CUT: ${error instanceof Error ? error.message : String(error)}`,
+              type: ERROR_TYPES.RUNTIME
+            });
+            return;
+          }
+        }
+        if (this.context.config.enableDebugMode) {
+          this.context.addDebugOutput(`CUT: Stopped movements for actions ${actionNumbers.join(", ")}`);
+        }
+      } catch (error) {
+        this.context.addError({
+          line: lineNumber ?? 0,
+          message: `CUT: ${error instanceof Error ? error.message : String(error)}`,
+          type: ERROR_TYPES.RUNTIME
+        });
+      }
+    }
+    evaluateNumber(expr, lineNumber) {
+      try {
+        const value = this.evaluator.evaluateExpression(expr);
+        const num = typeof value === "number" ? Math.floor(value) : Math.floor(parseFloat(String(value)) || 0);
+        return num;
+      } catch (error) {
+        this.context.addError({
+          line: lineNumber ?? 0,
+          message: `CUT: Error evaluating action number: ${error instanceof Error ? error.message : String(error)}`,
+          type: ERROR_TYPES.RUNTIME
+        });
+        return null;
+      }
+    }
+    validateRange(num, min2, max2, lineNumber) {
+      if (num < min2 || num > max2) {
+        this.context.addError({
+          line: lineNumber ?? 0,
+          message: `CUT: Action number out of range (${min2}-${max2}), got ${num}`,
+          type: ERROR_TYPES.RUNTIME
+        });
+        return false;
+      }
+      return true;
+    }
+  };
+
   // src/core/execution/executors/DefMoveExecutor.ts
   var DefMoveExecutor = class {
     constructor(context, evaluator) {
@@ -7785,6 +7980,7 @@
   var EXPLOSION_SPRITES = [
     {
       name: "Explosion (1)",
+      moveCharacterCode: 10 /* EXPLOSION */,
       defaultPaletteCode: 1,
       defaultColorCombination: 3,
       charCodes: [176, 177, 178, 179],
@@ -7792,6 +7988,7 @@
     },
     {
       name: "Explosion (2)",
+      moveCharacterCode: 10 /* EXPLOSION */,
       defaultPaletteCode: 1,
       defaultColorCombination: 3,
       charCodes: [180, 181, 182, 183],
@@ -10677,6 +10874,98 @@
     }
   };
 
+  // src/core/execution/executors/EraExecutor.ts
+  var EraExecutor = class {
+    constructor(context, evaluator) {
+      this.context = context;
+      this.evaluator = evaluator;
+    }
+    /**
+     * Execute an ERA statement from CST
+     * ERA n1[, n2, ...]
+     * n: action numbers (0-7)
+     */
+    execute(eraStmtCst, lineNumber) {
+      try {
+        const expressionListCst = getFirstCstNode(eraStmtCst.children.actionNumbers);
+        if (!expressionListCst) {
+          this.context.addError({
+            line: lineNumber ?? 0,
+            message: "ERA: Missing action numbers",
+            type: ERROR_TYPES.RUNTIME
+          });
+          return;
+        }
+        const expressions = getCstNodes(expressionListCst.children.expression);
+        const actionNumbers = [];
+        for (const exprCst of expressions) {
+          const actionNumber = this.evaluateNumber(exprCst, lineNumber);
+          if (actionNumber === null) {
+            return;
+          }
+          if (!this.validateRange(actionNumber, 0, 7, lineNumber)) {
+            return;
+          }
+          actionNumbers.push(actionNumber);
+        }
+        if (actionNumbers.length === 0) {
+          this.context.addError({
+            line: lineNumber ?? 0,
+            message: "ERA: At least one action number required",
+            type: ERROR_TYPES.RUNTIME
+          });
+          return;
+        }
+        if (this.context.animationManager) {
+          try {
+            this.context.animationManager.eraseMovement(actionNumbers);
+          } catch (error) {
+            this.context.addError({
+              line: lineNumber ?? 0,
+              message: `ERA: ${error instanceof Error ? error.message : String(error)}`,
+              type: ERROR_TYPES.RUNTIME
+            });
+            return;
+          }
+        }
+        if (this.context.config.enableDebugMode) {
+          this.context.addDebugOutput(`ERA: Erased movements for actions ${actionNumbers.join(", ")}`);
+        }
+      } catch (error) {
+        this.context.addError({
+          line: lineNumber ?? 0,
+          message: `ERA: ${error instanceof Error ? error.message : String(error)}`,
+          type: ERROR_TYPES.RUNTIME
+        });
+      }
+    }
+    evaluateNumber(expr, lineNumber) {
+      try {
+        const value = this.evaluator.evaluateExpression(expr);
+        const num = typeof value === "number" ? Math.floor(value) : Math.floor(parseFloat(String(value)) || 0);
+        return num;
+      } catch (error) {
+        this.context.addError({
+          line: lineNumber ?? 0,
+          message: `ERA: Error evaluating action number: ${error instanceof Error ? error.message : String(error)}`,
+          type: ERROR_TYPES.RUNTIME
+        });
+        return null;
+      }
+    }
+    validateRange(num, min2, max2, lineNumber) {
+      if (num < min2 || num > max2) {
+        this.context.addError({
+          line: lineNumber ?? 0,
+          message: `ERA: Action number out of range (${min2}-${max2}), got ${num}`,
+          type: ERROR_TYPES.RUNTIME
+        });
+        return false;
+      }
+      return true;
+    }
+  };
+
   // src/core/execution/executors/EndExecutor.ts
   var EndExecutor = class {
     constructor(context) {
@@ -11238,6 +11527,97 @@
       } else {
         return false;
       }
+    }
+  };
+
+  // src/core/execution/executors/PositionExecutor.ts
+  var PositionExecutor = class {
+    constructor(context, evaluator) {
+      this.context = context;
+      this.evaluator = evaluator;
+    }
+    /**
+     * Execute a POSITION statement from CST
+     * POSITION n, X, Y
+     * n: action number (0-7)
+     * X: X coordinate (0-255)
+     * Y: Y coordinate (0-239)
+     */
+    execute(positionStmtCst, lineNumber) {
+      try {
+        const actionNumberExpr = getFirstCstNode(positionStmtCst.children.actionNumber);
+        const xExpr = getFirstCstNode(positionStmtCst.children.x);
+        const yExpr = getFirstCstNode(positionStmtCst.children.y);
+        if (!actionNumberExpr || !xExpr || !yExpr) {
+          this.context.addError({
+            line: lineNumber ?? 0,
+            message: "POSITION: Missing parameters",
+            type: ERROR_TYPES.RUNTIME
+          });
+          return;
+        }
+        const actionNumber = this.evaluateNumber(actionNumberExpr, "action number", lineNumber);
+        if (actionNumber === null) {
+          return;
+        }
+        const x = this.evaluateNumber(xExpr, "X coordinate", lineNumber);
+        if (x === null) {
+          return;
+        }
+        const y = this.evaluateNumber(yExpr, "Y coordinate", lineNumber);
+        if (y === null) {
+          return;
+        }
+        if (!this.validateRange(actionNumber, 0, 7, "action number", lineNumber)) return;
+        if (!this.validateRange(x, 0, 255, "X coordinate", lineNumber)) return;
+        if (!this.validateRange(y, 0, 239, "Y coordinate", lineNumber)) return;
+        if (this.context.animationManager) {
+          try {
+            this.context.animationManager.setPosition(actionNumber, x, y);
+          } catch (error) {
+            this.context.addError({
+              line: lineNumber ?? 0,
+              message: `POSITION: ${error instanceof Error ? error.message : String(error)}`,
+              type: ERROR_TYPES.RUNTIME
+            });
+            return;
+          }
+        }
+        if (this.context.config.enableDebugMode) {
+          this.context.addDebugOutput(`POSITION: Set position for action ${actionNumber} to (${x}, ${y})`);
+        }
+      } catch (error) {
+        this.context.addError({
+          line: lineNumber ?? 0,
+          message: `POSITION: ${error instanceof Error ? error.message : String(error)}`,
+          type: ERROR_TYPES.RUNTIME
+        });
+      }
+    }
+    evaluateNumber(expr, paramName, lineNumber) {
+      try {
+        const value = this.evaluator.evaluateExpression(expr);
+        const num = typeof value === "number" ? Math.floor(value) : Math.floor(parseFloat(String(value)) || 0);
+        return num;
+      } catch (error) {
+        this.context.addError({
+          line: lineNumber ?? 0,
+          message: `POSITION: Error evaluating ${paramName}: ${error instanceof Error ? error.message : String(error)}`,
+          type: ERROR_TYPES.RUNTIME
+        });
+        return null;
+      }
+    }
+    validateRange(num, min2, max2, paramName, lineNumber) {
+      if (num < min2 || num > max2) {
+        this.context.addError({
+          line: lineNumber ?? 0,
+          message: `POSITION: ${paramName} out of range (${min2}-${max2}), got ${num}`,
+          type: ERROR_TYPES.RUNTIME
+        });
+        return false;
+      }
+      return true;
     }
   };
 
@@ -12066,6 +12446,9 @@
       __publicField(this, "spriteOnOffExecutor");
       __publicField(this, "defMoveExecutor");
       __publicField(this, "moveExecutor");
+      __publicField(this, "cutExecutor");
+      __publicField(this, "eraExecutor");
+      __publicField(this, "positionExecutor");
       this.printExecutor = new PrintExecutor(context, evaluator);
       this.letExecutor = new LetExecutor(variableService);
       this.forExecutor = new ForExecutor(context, evaluator, variableService);
@@ -12092,6 +12475,9 @@
       this.spriteOnOffExecutor = new SpriteOnOffExecutor(context);
       this.defMoveExecutor = new DefMoveExecutor(context, evaluator);
       this.moveExecutor = new MoveExecutor(context, evaluator);
+      this.cutExecutor = new CutExecutor(context, evaluator);
+      this.eraExecutor = new EraExecutor(context, evaluator);
+      this.positionExecutor = new PositionExecutor(context, evaluator);
     }
     /**
      * Route an expanded statement to its appropriate executor
@@ -12323,6 +12709,21 @@
         const moveStmtCst = getFirstCstNode(singleCommandCst.children.moveStatement);
         if (moveStmtCst) {
           this.moveExecutor.execute(moveStmtCst, expandedStatement.lineNumber);
+        }
+      } else if (singleCommandCst.children.cutStatement) {
+        const cutStmtCst = getFirstCstNode(singleCommandCst.children.cutStatement);
+        if (cutStmtCst) {
+          this.cutExecutor.execute(cutStmtCst, expandedStatement.lineNumber);
+        }
+      } else if (singleCommandCst.children.eraStatement) {
+        const eraStmtCst = getFirstCstNode(singleCommandCst.children.eraStatement);
+        if (eraStmtCst) {
+          this.eraExecutor.execute(eraStmtCst, expandedStatement.lineNumber);
+        }
+      } else if (singleCommandCst.children.positionStatement) {
+        const positionStmtCst = getFirstCstNode(singleCommandCst.children.positionStatement);
+        if (positionStmtCst) {
+          this.positionExecutor.execute(positionStmtCst, expandedStatement.lineNumber);
         }
       } else {
         this.context.addError({
@@ -21923,6 +22324,9 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
   var Def = createToken({ name: "Def", pattern: /\bDEF\b/i });
   var Sprite = createToken({ name: "Sprite", pattern: /\bSPRITE\b/i });
   var Move = createToken({ name: "Move", pattern: /\bMOVE\b/i });
+  var Cut = createToken({ name: "Cut", pattern: /\bCUT\b/i });
+  var Era = createToken({ name: "Era", pattern: /\bERA\b/i });
+  var Position = createToken({ name: "Position", pattern: /\bPOSITION\b/i });
   var Len = createToken({ name: "Len", pattern: /\bLEN\b/i });
   var Left = createToken({ name: "Left", pattern: /\bLEFT\$/i });
   var Right = createToken({ name: "Right", pattern: /\bRIGHT\$/i });
@@ -21937,6 +22341,8 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
   var Val = createToken({ name: "Val", pattern: /\bVAL\b/i });
   var Stick = createToken({ name: "Stick", pattern: /\bSTICK\b/i });
   var Strig = createToken({ name: "Strig", pattern: /\bSTRIG\b/i });
+  var Xpos = createToken({ name: "Xpos", pattern: /\bXPOS\b/i });
+  var Ypos = createToken({ name: "Ypos", pattern: /\bYPOS\b/i });
   var And = createToken({ name: "And", pattern: /\bAND\b/i });
   var Or = createToken({ name: "Or", pattern: /\bOR\b/i });
   var Xor = createToken({ name: "Xor", pattern: /\bXOR\b/i });
@@ -22030,6 +22436,9 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     Def,
     Sprite,
     Move,
+    Cut,
+    Era,
+    Position,
     // String functions (must come before Identifier)
     Len,
     Left,
@@ -22048,6 +22457,9 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     // Controller input function keywords (must come before Identifier)
     Stick,
     Strig,
+    // Sprite query function keywords (must come before Identifier)
+    Xpos,
+    Ypos,
     // Logical operators (must come before Identifier)
     And,
     Or,
@@ -22129,7 +22541,12 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           { ALT: () => this.CONSUME(Val) },
           // Controller input functions
           { ALT: () => this.CONSUME(Stick) },
-          { ALT: () => this.CONSUME(Strig) }
+          { ALT: () => this.CONSUME(Strig) },
+          // Sprite query functions
+          { ALT: () => this.CONSUME(Move) },
+          // MOVE(n) - status query function
+          { ALT: () => this.CONSUME(Xpos) },
+          { ALT: () => this.CONSUME(Ypos) }
         ]);
         this.CONSUME(LParen);
         this.OPTION(() => {
@@ -22151,10 +22568,12 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           },
           { ALT: () => this.CONSUME(NumberLiteral) },
           {
-            // Function call: String functions and arithmetic functions
+            // Function call: String functions, arithmetic functions, controller input functions, and sprite query functions
             // Family BASIC arithmetic functions: ABS, SGN, RND, VAL
             // String functions: LEN, LEFT$, RIGHT$, MID$, STR$, HEX$, CHR$, ASC
-            GATE: () => this.LA(1).tokenType === Len || this.LA(1).tokenType === Left || this.LA(1).tokenType === Right || this.LA(1).tokenType === Mid || this.LA(1).tokenType === Str || this.LA(1).tokenType === Hex || this.LA(1).tokenType === Chr || this.LA(1).tokenType === Asc || this.LA(1).tokenType === Abs || this.LA(1).tokenType === Sgn || this.LA(1).tokenType === Rnd || this.LA(1).tokenType === Val || this.LA(1).tokenType === Stick || this.LA(1).tokenType === Strig,
+            // Controller input functions: STICK, STRIG
+            // Sprite query functions: MOVE(n), XPOS(n), YPOS(n)
+            GATE: () => this.LA(1).tokenType === Len || this.LA(1).tokenType === Left || this.LA(1).tokenType === Right || this.LA(1).tokenType === Mid || this.LA(1).tokenType === Str || this.LA(1).tokenType === Hex || this.LA(1).tokenType === Chr || this.LA(1).tokenType === Asc || this.LA(1).tokenType === Abs || this.LA(1).tokenType === Sgn || this.LA(1).tokenType === Rnd || this.LA(1).tokenType === Val || this.LA(1).tokenType === Stick || this.LA(1).tokenType === Strig || this.LA(1).tokenType === Move && this.LA(2).tokenType === LParen || this.LA(1).tokenType === Xpos || this.LA(1).tokenType === Ypos,
             ALT: () => this.SUBRULE(this.functionCall)
           },
           {
@@ -22557,6 +22976,22 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         this.CONSUME(Move);
         this.SUBRULE(this.expression, { LABEL: "actionNumber" });
       });
+      this.cutStatement = this.RULE("cutStatement", () => {
+        this.CONSUME(Cut);
+        this.SUBRULE(this.expressionList, { LABEL: "actionNumbers" });
+      });
+      this.eraStatement = this.RULE("eraStatement", () => {
+        this.CONSUME(Era);
+        this.SUBRULE(this.expressionList, { LABEL: "actionNumbers" });
+      });
+      this.positionStatement = this.RULE("positionStatement", () => {
+        this.CONSUME(Position);
+        this.SUBRULE(this.expression, { LABEL: "actionNumber" });
+        this.CONSUME(Comma);
+        this.SUBRULE2(this.expression, { LABEL: "x" });
+        this.CONSUME2(Comma);
+        this.SUBRULE3(this.expression, { LABEL: "y" });
+      });
       this.ifThenStatement = this.RULE("ifThenStatement", () => {
         this.CONSUME(If);
         this.SUBRULE(this.logicalExpression);
@@ -22679,7 +23114,19 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
             ALT: () => this.SUBRULE(this.defSpriteStatement)
           },
           {
-            GATE: () => this.LA(1).tokenType === Move,
+            GATE: () => this.LA(1).tokenType === Position,
+            ALT: () => this.SUBRULE(this.positionStatement)
+          },
+          {
+            GATE: () => this.LA(1).tokenType === Cut,
+            ALT: () => this.SUBRULE(this.cutStatement)
+          },
+          {
+            GATE: () => this.LA(1).tokenType === Era,
+            ALT: () => this.SUBRULE(this.eraStatement)
+          },
+          {
+            GATE: () => this.LA(1).tokenType === Move && this.LA(2).tokenType !== LParen,
             ALT: () => this.SUBRULE(this.moveStatement)
           },
           {
@@ -23193,6 +23640,12 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
      */
     getMovementStates() {
       return this.context?.animationManager?.getAllMovementStates() ?? [];
+    }
+    /**
+     * Get AnimationManager instance for updating stored positions from frontend
+     */
+    getAnimationManager() {
+      return this.context?.animationManager ?? null;
     }
   };
 
@@ -24158,16 +24611,8 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       }
       this.pendingScreenUpdate = false;
       this.lastScreenUpdateTime = performance.now();
-      const postStartTime = performance.now();
       const updateMessage = this.screenStateManager.createFullScreenUpdateMessage();
-      const createTime = performance.now() - postStartTime;
       self.postMessage(updateMessage);
-      const postTime = performance.now() - postStartTime;
-      if (postTime > 1) {
-        console.log(
-          `\u23F1\uFE0F [POST] Screen update message: create=${createTime.toFixed(2)}ms, post=${postTime.toFixed(2)}ms, bufferSize=${updateMessage.data.screenBuffer?.length ?? 0}`
-        );
-      }
     }
   };
 
@@ -24219,6 +24664,10 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           case "STICK_EVENT":
             console.log("\u{1F3AE} [WORKER] Handling STICK_EVENT message");
             this.handleStickEvent(message);
+            break;
+          case "UPDATE_ANIMATION_POSITIONS":
+            console.log("\u{1F3AC} [WORKER] Handling UPDATE_ANIMATION_POSITIONS message");
+            this.handleUpdateAnimationPositions(message);
             break;
           default:
             console.log("\u26A0\uFE0F [WORKER] Unexpected message type:", message.type);
@@ -24309,6 +24758,21 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         this.webWorkerDeviceAdapter.setStickState(joystickId, state);
       } else {
         console.log("\u{1F3AE} [WORKER] No WebWorkerDeviceAdapter available for STICK event");
+      }
+    }
+    handleUpdateAnimationPositions(message) {
+      const { positions } = message.data;
+      console.log("\u{1F3AC} [WORKER] Updating animation positions:", positions);
+      if (this.interpreter) {
+        const animationManager = this.interpreter.getAnimationManager();
+        if (animationManager) {
+          animationManager.updateStoredPositions(positions);
+          console.log("\u2705 [WORKER] Animation positions updated in AnimationManager");
+        } else {
+          console.log("\u26A0\uFE0F [WORKER] No AnimationManager available");
+        }
+      } else {
+        console.log("\u26A0\uFE0F [WORKER] No interpreter available for updating positions");
       }
     }
     sendOutput(output, outputType) {
