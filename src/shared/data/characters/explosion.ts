@@ -1,4 +1,4 @@
-import type { SpriteDefinition } from '@/shared/data/types'
+import { MoveCharacterCode, type SpriteDefinition } from '@/shared/data/types'
 
 const SPRITE_EXPLOSION_1_176 = [
   [0, 0, 0, 0, 0, 0, 0, 0],
@@ -91,6 +91,7 @@ const SPRITE_EXPLOSION_2_183 = [
 export const EXPLOSION_SPRITES: SpriteDefinition[] = [
   {
     name: 'Explosion (1)',
+    moveCharacterCode: MoveCharacterCode.EXPLOSION,
     defaultPaletteCode: 1,
     defaultColorCombination: 3,
     charCodes: [176, 177, 178, 179],
@@ -98,6 +99,7 @@ export const EXPLOSION_SPRITES: SpriteDefinition[] = [
   },
   {
     name: 'Explosion (2)',
+    moveCharacterCode: MoveCharacterCode.EXPLOSION,
     defaultPaletteCode: 1,
     defaultColorCombination: 3,
     charCodes: [180, 181, 182, 183],

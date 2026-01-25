@@ -10,7 +10,9 @@ const SPRITE_SCALE = 3
 const spriteImageCache = new Map<string, HTMLImageElement>()
 
 // Cache for frame images per movement
-const frameImageCache = new Map<number, HTMLImageElement[]>()
+// Key: `${actionNumber}-${characterType}-${direction}-${colorCombination}` -> HTMLImageElement[]
+// Includes character type to prevent using wrong frames when action is redefined
+const frameImageCache = new Map<string, HTMLImageElement[]>()
 
 // Animation configs (cached)
 let animationConfigs: ReturnType<typeof buildAllCharacterAnimationConfigs> | null = null
@@ -45,11 +47,28 @@ async function createSpriteImage(
 
   if (frameTiles.length === 4) {
     // 16×16 sprite: 4 tiles in 2×2 grid
-    const tiles = frameTiles as [number[][], number[][], number[][], number[][]]
+    // Tile layout: [0] [1] / [2] [3]
+    const tileArray = frameTiles as [number[][], number[][], number[][], number[][]]
+    
+    // Apply tile reordering for inversions
+    // X-inversion: [0,1,2,3] → [1,0,3,2] (swaps left-right in each row)
+    // Y-inversion: [0,1,2,3] → [2,3,0,1] (swaps top-bottom rows)
+    // Both: apply Y first, then X → [2,3,0,1] → [3,2,1,0]
+    let reorderedTiles = tileArray
+    if (invertY && invertX) {
+      // Both inversions: [0,1,2,3] → [3,2,1,0]
+      reorderedTiles = [tileArray[3], tileArray[2], tileArray[1], tileArray[0]]
+    } else if (invertY) {
+      // Y-inversion only: [0,1,2,3] → [2,3,0,1]
+      reorderedTiles = [tileArray[2], tileArray[3], tileArray[0], tileArray[1]]
+    } else if (invertX) {
+      // X-inversion only: [0,1,2,3] → [1,0,3,2]
+      reorderedTiles = [tileArray[1], tileArray[0], tileArray[3], tileArray[2]]
+    }
     
     // Render each tile
     for (let tileIdx = 0; tileIdx < 4; tileIdx++) {
-      const tile = tiles[tileIdx]
+      const tile = reorderedTiles[tileIdx]
       if (!tile) continue
       
       const tileX = (tileIdx % 2) * 8
@@ -57,6 +76,8 @@ async function createSpriteImage(
       
       for (let row = 0; row < 8; row++) {
         for (let col = 0; col < 8; col++) {
+          // Calculate source coordinates (with inversion)
+          // Note: tiles are already reordered above, so we still flip pixels within each tile
           const srcRow = invertY ? 7 - row : row
           const srcCol = invertX ? 7 - col : col
           const pixelValue = tile[srcRow]?.[srcCol] ?? 0
@@ -131,20 +152,29 @@ export async function createKonvaImage(movement: MovementState): Promise<Konva.I
   const spritePalette = SPRITE_PALETTES[1] ?? SPRITE_PALETTES[0]
   const colorCombination = spritePalette[movement.definition.colorCombination] ?? spritePalette[0]
 
+  // Create cache key that includes character type, direction, and color combination
+  // This ensures correct frames are used even if action number is redefined
+  const cacheKey = `${movement.actionNumber}-${movement.definition.characterType}-${movement.definition.direction}-${movement.definition.colorCombination}`
+
   // Load all frame images for this movement (cache them)
-  if (!frameImageCache.has(movement.actionNumber)) {
+  if (!frameImageCache.has(cacheKey)) {
     const frameImages: HTMLImageElement[] = []
     for (let i = 0; i < sequence.frames.length; i++) {
       const frameTiles = sequence.frames[i]
       if (frameTiles) {
-        const frameImg = await createSpriteImage(frameTiles, colorCombination, invertX, invertY)
+        // Use per-frame inversions if available, otherwise fall back to direction-level inversions
+        const frameInversion = sequence.frameInversions?.[i]
+        const frameInvertX = frameInversion?.invertX ?? invertX
+        const frameInvertY = frameInversion?.invertY ?? invertY
+        
+        const frameImg = await createSpriteImage(frameTiles, colorCombination, frameInvertX, frameInvertY)
         frameImages.push(frameImg)
       }
     }
-    frameImageCache.set(movement.actionNumber, frameImages)
+    frameImageCache.set(cacheKey, frameImages)
   }
 
-  const frameImages = frameImageCache.get(movement.actionNumber)!
+  const frameImages = frameImageCache.get(cacheKey)!
   if (frameImages.length === 0) return null
 
   // Get current frame
@@ -193,7 +223,9 @@ export async function updateSprites(
     )
 
     if (sequence && sequence.frames.length > 0) {
-      const frameImages = frameImageCache.get(movement.actionNumber)
+      // Create cache key that matches the one used in createKonvaImage
+      const cacheKey = `${movement.actionNumber}-${movement.definition.characterType}-${movement.definition.direction}-${movement.definition.colorCombination}`
+      const frameImages = frameImageCache.get(cacheKey)
       if (frameImages && frameImages.length > 0) {
         const frameIndex = movement.currentFrameIndex % frameImages.length
         const newFrameImage = frameImages[frameIndex]

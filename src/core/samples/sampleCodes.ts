@@ -199,65 +199,73 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 50 PRINT ""
 60 PRINT "Testing DEF MOVE and MOVE commands..."
 70 PRINT ""
-80 REM Enable sprite screen
-90 SPRITE ON
-100 PRINT "SPRITE ON executed"
+80 REM Character type variable (0=Mario, 1=Lady, 2=Fighter Fly, etc.)
+90 LET C = 0
+100 PRINT "Character type: "; C; " (Change C to switch characters)"
 110 PRINT ""
-120 REM Define movement 0: Mario character, moving right, speed 10, distance 50
-130 REM DEF MOVE(n) = SPRITE(A, B, C, D, E, F)
-140 REM A: character type (0=Mario, 1=Lady, etc.)
-150 REM B: direction (0=none, 1=up, 2=up-right, 3=right, 4=down-right, 5=down, 6=down-left, 7=left, 8=up-left)
-160 REM C: speed (1-255, 60/C dots per second)
-170 REM D: distance (1-255, total = 2*D dots)
-180 REM E: priority (0=front, 1=behind background)
-190 REM F: color combination (0-3)
-200 DEF MOVE(0) = SPRITE(0, 3, 10, 50, 0, 0)
-210 PRINT "DEF MOVE(0) defined: Mario, Right, Speed 10, Distance 50"
-220 PRINT ""
-230 REM Define movement 1: Mario moving left
-240 DEF MOVE(1) = SPRITE(0, 7, 10, 50, 0, 0)
-250 PRINT "DEF MOVE(1) defined: Mario, Left, Speed 10, Distance 50"
-260 PRINT ""
-270 REM Define movement 2: Mario moving up
-280 DEF MOVE(2) = SPRITE(0, 1, 15, 30, 0, 0)
-290 PRINT "DEF MOVE(2) defined: Mario, Up, Speed 15, Distance 30"
-300 PRINT ""
-310 REM Define movement 3: Mario moving down
-320 DEF MOVE(3) = SPRITE(0, 5, 15, 30, 0, 0)
-330 PRINT "DEF MOVE(3) defined: Mario, Down, Speed 15, Distance 30"
-340 PRINT ""
-350 REM Define movement 4: Mario moving diagonally (up-right)
-360 DEF MOVE(4) = SPRITE(0, 2, 12, 40, 0, 0)
-370 PRINT "DEF MOVE(4) defined: Mario, Up-Right, Speed 12, Distance 40"
-380 PRINT ""
-390 PRINT "Starting movements..."
-400 PRINT ""
-410 REM Start movement 0 (right)
-420 MOVE 0
-430 PRINT "MOVE 0 started (moving right)"
-440 PAUSE 50
-450 REM Start movement 1 (left)
-460 MOVE 1
-470 PRINT "MOVE 1 started (moving left)"
-480 PAUSE 50
-490 REM Start movement 2 (up)
-500 MOVE 2
-510 PRINT "MOVE 2 started (moving up)"
-520 PAUSE 50
-530 REM Start movement 3 (down)
-540 MOVE 3
-550 PRINT "MOVE 3 started (moving down)"
-560 PAUSE 50
-570 REM Start movement 4 (diagonal)
-580 MOVE 4
-590 PRINT "MOVE 4 started (moving up-right)"
-600 PRINT ""
-610 PRINT "All movements started!"
-620 PRINT "Check the screen to see sprites moving"
-630 PRINT ""
-640 PRINT "Note: Full sprite rendering with character"
-650 PRINT "      animation will be implemented in Phase 4"
-660 END`,
+120 REM Enable sprite screen
+130 SPRITE ON
+140 PRINT "SPRITE ON executed"
+150 PRINT ""
+160 REM Define movements for all 8 directions (0-7)
+170 REM DEF MOVE(n) = SPRITE(A, B, C, D, E, F)
+180 REM A: character type (0=Mario, 1=Lady, etc.)
+190 REM B: direction (0=none, 1=up, 2=up-right, 3=right, 4=down-right, 5=down, 6=down-left, 7=left, 8=up-left)
+200 REM C: speed (1-255, 60/C dots per second)
+210 REM D: distance (1-255, total = 2*D dots)
+220 REM E: priority (0=front, 1=behind background)
+230 REM F: color combination (0-3)
+240 REM Action 0: Direction 0 (none)
+250 DEF MOVE(0) = SPRITE(C, 0, 10, 50, 0, 0)
+260 PRINT "DEF MOVE(0) defined: Direction 0 (none), Speed 10, Distance 50"
+270 REM Action 1: Direction 1 (up)
+280 DEF MOVE(1) = SPRITE(C, 1, 10, 50, 0, 0)
+290 PRINT "DEF MOVE(1) defined: Direction 1 (up), Speed 10, Distance 50"
+300 REM Action 2: Direction 2 (up-right)
+310 DEF MOVE(2) = SPRITE(C, 2, 10, 50, 0, 0)
+320 PRINT "DEF MOVE(2) defined: Direction 2 (up-right), Speed 10, Distance 50"
+330 REM Action 3: Direction 3 (right)
+340 DEF MOVE(3) = SPRITE(C, 3, 10, 50, 0, 0)
+350 PRINT "DEF MOVE(3) defined: Direction 3 (right), Speed 10, Distance 50"
+360 REM Action 4: Direction 4 (down-right)
+370 DEF MOVE(4) = SPRITE(C, 4, 10, 50, 0, 0)
+380 PRINT "DEF MOVE(4) defined: Direction 4 (down-right), Speed 10, Distance 50"
+390 REM Action 5: Direction 5 (down)
+400 DEF MOVE(5) = SPRITE(C, 5, 10, 50, 0, 0)
+410 PRINT "DEF MOVE(5) defined: Direction 5 (down), Speed 10, Distance 50"
+420 REM Action 6: Direction 6 (down-left)
+430 DEF MOVE(6) = SPRITE(C, 6, 10, 50, 0, 0)
+440 PRINT "DEF MOVE(6) defined: Direction 6 (down-left), Speed 10, Distance 50"
+450 REM Action 7: Direction 7 (left)
+460 DEF MOVE(7) = SPRITE(C, 7, 10, 50, 0, 0)
+470 PRINT "DEF MOVE(7) defined: Direction 7 (left), Speed 10, Distance 50"
+480 PRINT ""
+490 PRINT "Starting movements for all 8 directions..."
+500 PRINT ""
+510 REM Start all movements (0-7)
+520 MOVE 0
+530 PRINT "MOVE 0 started (direction 0: none)"
+540 MOVE 1
+550 PRINT "MOVE 1 started (direction 1: up)"
+560 MOVE 2
+570 PRINT "MOVE 2 started (direction 2: up-right)"
+580 MOVE 3
+590 PRINT "MOVE 3 started (direction 3: right)"
+600 MOVE 4
+610 PRINT "MOVE 4 started (direction 4: down-right)"
+620 MOVE 5
+630 PRINT "MOVE 5 started (direction 5: down)"
+640 MOVE 6
+650 PRINT "MOVE 6 started (direction 6: down-left)"
+660 MOVE 7
+670 PRINT "MOVE 7 started (direction 7: left)"
+680 PRINT ""
+690 PRINT "All movements started!"
+700 PRINT "Check the screen to see sprites moving"
+710 PRINT ""
+720 PRINT "Tip: Change variable C (line 90) to test different characters"
+730 PRINT "     C=0: Mario, C=1: Lady, C=2: Fighter Fly, etc."
+740 END`,
   },
 }
 

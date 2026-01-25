@@ -72,6 +72,14 @@ export interface MovementState {
 }
 
 /**
+ * Per-frame inversion configuration
+ */
+export interface FrameInversionConfig {
+  invertX?: boolean
+  invertY?: boolean
+}
+
+/**
  * Animation sequence for a character
  */
 export interface AnimationSequence {
@@ -79,6 +87,7 @@ export interface AnimationSequence {
   frames: Tile[][] // Frame data: each frame is an array of tiles (1 tile for 8×8, 4 tiles for 16×16)
   frameRate: number // Frames per sprite switch (default: 8)
   looping: boolean // Whether sequence loops
+  frameInversions?: FrameInversionConfig[] // Per-frame inversion flags (one per frame)
 }
 
 /**

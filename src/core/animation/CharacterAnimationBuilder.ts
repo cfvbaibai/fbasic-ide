@@ -1,8 +1,12 @@
 /**
  * Character Animation Builder
- * Builds animation sequences and direction mappings from CHARACTER_SPRITES data
+ * Builds animation sequences and direction mappings from characterSequenceConfig
  */
 
+import {
+  type CharacterSequenceConfig,
+  getCharacterSequenceConfig,
+} from '@/core/animation/characterSequenceConfig'
 import type {
   AnimationSequence,
   CharacterAnimationConfig,
@@ -107,93 +111,136 @@ function buildSequencesForCharacter(
 }
 
 /**
- * Build direction mappings for a character type
+ * Find sprite by name in CHARACTER_SPRITES
+ */
+function findSpriteByName(spriteName: string, characterCode: MoveCharacterCode): SpriteDefinition | null {
+  return CHARACTER_SPRITES.find(
+    sprite => sprite.name === spriteName && sprite.moveCharacterCode === characterCode
+  ) ?? null
+}
+
+/**
+ * Build direction mappings from characterSequenceConfig
  * Maps movement directions (0-8) to sequence names and inversion flags
  */
-function buildDirectionMappings(
-  characterCode: MoveCharacterCode,
-  sequences: Map<string, AnimationSequence>
+function buildDirectionMappingsFromConfig(
+  _characterCode: MoveCharacterCode,
+  config: CharacterSequenceConfig,
+  _sequences: Map<string, AnimationSequence>
 ): Map<number, DirectionMapping> {
   const mappings = new Map<number, DirectionMapping>()
 
-  // Default mappings for common character types
-  // These can be customized per character type
-  const hasWalk = sequences.has('WALK')
-  const hasLadder = sequences.has('LADDER')
-  const hasDown = sequences.has('DOWN')
+  // Build mappings from config
+  for (const [direction, directionConfig] of config.directions.entries()) {
+    // Create a unique sequence name for this direction
+    // Format: "DIR{0-8}" to avoid conflicts
+    const sequenceName = `DIR${direction}`
+    
+    // Use the first frame's inversion as the direction-level inversion
+    // (Per-frame inversions can be handled later in rendering if needed)
+    const firstFrameInversion = directionConfig.frameInversions[0]
+    const invertX = firstFrameInversion?.invertX ?? false
+    const invertY = firstFrameInversion?.invertY ?? false
 
-  // Direction 0: None - use first available sequence or WALK
-  if (hasWalk) {
-    mappings.set(0, { sequence: 'WALK', invertX: false, invertY: false })
-  } else if (sequences.size > 0) {
-    const firstSequence = Array.from(sequences.keys())[0]
-    if (firstSequence) {
-      mappings.set(0, { sequence: firstSequence, invertX: false, invertY: false })
-    }
-  }
-
-  // Direction 1: Up
-  if (hasLadder) {
-    mappings.set(1, { sequence: 'LADDER', invertX: false, invertY: false })
-  } else if (hasWalk) {
-    mappings.set(1, { sequence: 'WALK', invertX: false, invertY: false })
-  }
-
-  // Direction 2: Up-right
-  if (hasWalk) {
-    mappings.set(2, { sequence: 'WALK', invertX: false, invertY: false })
-  }
-
-  // Direction 3: Right
-  if (hasWalk) {
-    mappings.set(3, { sequence: 'WALK', invertX: false, invertY: false })
-  }
-
-  // Direction 4: Down-right
-  if (hasWalk) {
-    mappings.set(4, { sequence: 'WALK', invertX: false, invertY: false })
-  }
-
-  // Direction 5: Down
-  if (hasDown) {
-    mappings.set(5, { sequence: 'DOWN', invertX: false, invertY: false })
-  } else if (hasWalk) {
-    mappings.set(5, { sequence: 'WALK', invertX: false, invertY: false })
-  }
-
-  // Direction 6: Down-left
-  if (hasWalk) {
-    mappings.set(6, { sequence: 'WALK', invertX: true, invertY: false })
-  }
-
-  // Direction 7: Left
-  if (hasWalk) {
-    mappings.set(7, { sequence: 'WALK', invertX: true, invertY: false })
-  }
-
-  // Direction 8: Up-left
-  if (hasLadder) {
-    mappings.set(8, { sequence: 'LADDER', invertX: true, invertY: false })
-  } else if (hasWalk) {
-    mappings.set(8, { sequence: 'WALK', invertX: true, invertY: false })
+    mappings.set(direction, {
+      sequence: sequenceName,
+      invertX,
+      invertY,
+    })
   }
 
   return mappings
 }
 
 /**
+ * Build sequences from characterSequenceConfig
+ * Creates AnimationSequence objects from the sprite names in the config
+ */
+function buildSequencesFromConfig(
+  characterCode: MoveCharacterCode,
+  config: CharacterSequenceConfig
+): Map<string, AnimationSequence> {
+  const sequences = new Map<string, AnimationSequence>()
+
+  // Build a sequence for each direction
+  for (const [direction, directionConfig] of config.directions.entries()) {
+    const sequenceName = `DIR${direction}`
+    const frames: Tile[][] = []
+
+    // Look up each sprite by name and extract tiles
+    for (const spriteName of directionConfig.spriteNames) {
+      const sprite = findSpriteByName(spriteName, characterCode)
+      if (!sprite) {
+        console.warn(`[CharacterAnimationBuilder] Sprite not found: ${spriteName} for character ${characterCode}`)
+        continue
+      }
+
+      const tiles = extractTilesFromSprite(sprite)
+      if (tiles.length > 0) {
+        frames.push(tiles)
+      }
+    }
+
+    if (frames.length > 0) {
+      sequences.set(sequenceName, {
+        name: sequenceName,
+        frames,
+        frameRate: directionConfig.frameRate ?? 8,
+        looping: directionConfig.looping ?? true,
+        frameInversions: directionConfig.frameInversions, // Store per-frame inversions
+      })
+    }
+  }
+
+  return sequences
+}
+
+/**
  * Build character animation configuration for a character type
+ * Uses characterSequenceConfig if available, otherwise falls back to old method
  */
 export function buildCharacterAnimationConfig(
   characterCode: MoveCharacterCode
 ): CharacterAnimationConfig | null {
+  // Try to use characterSequenceConfig first
+  const config = getCharacterSequenceConfig(characterCode)
+  
+  if (config) {
+    // Use config-based approach
+    const sequences = buildSequencesFromConfig(characterCode, config)
+    
+    if (sequences.size === 0) {
+      return null
+    }
+
+    const directionMappings = buildDirectionMappingsFromConfig(characterCode, config, sequences)
+
+    return {
+      characterType: characterCode,
+      sequences,
+      directionMappings,
+    }
+  }
+
+  // Fallback to old method for characters without config
   const sequences = buildSequencesForCharacter(characterCode, CHARACTER_SPRITES)
 
   if (sequences.size === 0) {
     return null
   }
 
-  const directionMappings = buildDirectionMappings(characterCode, sequences)
+  // For fallback, create simple mappings (this should rarely be used)
+  const directionMappings = new Map<number, DirectionMapping>()
+  const firstSequence = Array.from(sequences.keys())[0]
+  if (firstSequence) {
+    for (let dir = 0; dir <= 8; dir++) {
+      directionMappings.set(dir, {
+        sequence: firstSequence,
+        invertX: false,
+        invertY: false,
+      })
+    }
+  }
 
   return {
     characterType: characterCode,
