@@ -342,7 +342,7 @@ This document outlines the remaining work needed to complete the Family Basic ID
 - `docs/planning/sprite-animation-implementation-plan.md` - **Main implementation plan**
 - `.claude/skills/fbasic-reference/references/sprites.md`
 - `docs/reference/family-basic-manual/page-74.md` through `page-87.md`
-- `docs/device-models/screen/canvas-sprite-animation-design.md` - Design spec
+- `docs/archive/device-models/screen/canvas-sprite-animation-design.md` - Historical canvas-based design (superseded by Konva.js)
 
 ---
 

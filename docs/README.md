@@ -11,7 +11,10 @@ Developer guides and how-to documentation:
 - `color-usage-review.md` - Color usage review and guidelines
 
 ### 📊 `analysis/`
-Analysis documents and reports (currently empty - analysis documents are archived after completion)
+Current analysis documents and reports:
+- `screen-model-manual-comparison.md` - Screen model verification against manual
+
+**Note**: Historical analysis documents are archived in `archive/analysis/`
 
 ### 🎮 `device-models/`
 Device model specifications and architecture:
@@ -19,8 +22,9 @@ Device model specifications and architecture:
   - `screen.md` - Screen layer architecture and specifications
   - `architecture.md` - Screen device integration architecture
   - `animation.md` - Animation frame system and timing
-  - `canvas-sprite-animation-design.md` - Canvas-based sprite animation design
 - `joystick.md` - Joystick/input device model
+
+**Note**: Historical design documents are archived in `archive/device-models/`
 
 ### 📚 `reference/`
 Reference material:
@@ -29,8 +33,17 @@ Reference material:
 
 
 ### 📋 `planning/`
-Planning and refactoring documents:
+Active planning and refactoring documents:
 - `remaining-work-plan.md` - Comprehensive plan for remaining project work
+- `sprite-animation-implementation-plan.md` - Sprite animation system implementation plan
+
+**Note**: Completed planning documents are archived in `archive/planning/`
+
+### 📦 `archive/`
+Historical documentation preserved for reference:
+- `planning/` - Completed planning documents
+- `analysis/` - Historical analysis and status reports
+- `device-models/` - Superseded design documents
 
 ## Quick Links
 

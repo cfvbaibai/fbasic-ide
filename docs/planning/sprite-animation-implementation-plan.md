@@ -942,10 +942,10 @@ test/
 ## Reference Documentation
 
 ### Design Documents
-- `docs/device-models/screen/canvas-sprite-animation-design.md` - Primary design spec
 - `docs/device-models/screen/animation.md` - Animation frame system
 - `docs/device-models/screen/architecture.md` - Screen architecture
 - `docs/device-models/screen/screen.md` - Screen specifications
+- `docs/archive/device-models/screen/canvas-sprite-animation-design.md` - Historical canvas-based design (superseded by Konva.js)
 
 ### Family BASIC Manual
 - `docs/reference/family-basic-manual/page-74.md` - DEF MOVE command

@@ -351,4 +351,4 @@ STICK and STRIG inputs are **polled** by the BASIC program, not automatically sy
 
 - [Screen Specification](./screen.md) - Detailed screen layer architecture and specifications
 - [Animation System](./animation.md) - Animation frame system and timing details
-- [Canvas Sprite Animation Design](./canvas-sprite-animation-design.md) - Canvas-based sprite animation implementation design
+- [Canvas Sprite Animation Design](../../archive/device-models/screen/canvas-sprite-animation-design.md) - Historical canvas-based design (superseded by Konva.js implementation)
