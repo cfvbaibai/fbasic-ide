@@ -16,12 +16,13 @@ This document outlines the architectural design for integrating SCREEN device fu
    - Core: ExecutionEngine, AnimationManager, DeviceAdapter interface
    - Web Shell: WebWorkerDeviceAdapter, web worker execution, DOM/CSS rendering
 
-3. **Animation System**: 
+3. **Animation System**:
    - AnimationManager runs in web worker (same as ExecutionEngine)
-   - Frame rate: ~30 FPS
+   - Frame rate: ~30 FPS (requestAnimationFrame on main thread)
    - Command-based communication (not pixel data per frame)
    - Device has knowledge of SpriteDefinition and MoveDefinition data
-   - Main thread executes animation commands using CSS/DOM APIs
+   - Main thread executes animation commands using Konva.js canvas rendering
+   - **Position updates happen on main thread** - worker sends initial state, frontend handles frame-by-frame updates
 
 4. **Input Synchronization**: STICK and STRIG are **polled** by the program, not automatically frame-synchronized
 
@@ -111,10 +112,12 @@ graph TB
 - `STICK(n)` / `STRIG(n)` → `deviceAdapter.getStickState()` / `consumeStrigState()` → returns current state
 
 **Animation Commands:**
-- `MOVE` → `AnimationManager.startMovement()` → sends `START_MOVEMENT` and `START_SPRITE_ANIMATION` commands → `postMessage({type: 'ANIMATION_COMMAND'})` → DOM executes with CSS animations
-- Position movement: CSS transition handles smooth movement from start to end position
-- Sprite frame animation: CSS sprite sheet animation handles frame cycling
+- `MOVE` → `AnimationManager.startMovement()` → sends `START_MOVEMENT` command → `postMessage({type: 'ANIMATION_COMMAND'})` → Frontend animation loop starts
+- Position movement: requestAnimationFrame loop updates Konva sprite nodes each frame
+- Sprite frame animation: Frame index updated each ~8 frames, sprite image re-rendered with new frame
+- `CUT`/`ERA` → Frontend syncs actual positions to worker via `UPDATE_ANIMATION_POSITIONS` message
 - `MOVE(n)` → `AnimationManager.getMovementStatus()` → returns -1 (moving) or 0 (complete)
+- `XPOS(n)`/`YPOS(n)` → `AnimationManager.getSpritePosition()` → returns stored position (synced from frontend on CUT/ERA)
 
 ### Core Interfaces
 
@@ -263,13 +266,17 @@ STICK and STRIG inputs are **polled** by the BASIC program, not automatically sy
 - Sends `START_SPRITE_ANIMATION` command with sprite sheet URL and animation parameters
 - Tracks movement state internally for `MOVE(n)` queries
 
-**DOM Animation Executor (Main Thread):**
+**Konva Animation Executor (Main Thread):**
 - Receives animation commands via postMessage
-- For `START_MOVEMENT`: Creates sprite element, applies CSS transition for position movement
-- For `START_SPRITE_ANIMATION`: Applies CSS sprite sheet animation for frame cycling
-- Position movement: CSS transition handles smooth movement (`duration = (2×D×C)/60` seconds)
-- Sprite frame animation: CSS `@keyframes` with `steps()` handles discrete frame switching
-- Both animations run independently via CSS (GPU-accelerated)
+- For `START_MOVEMENT`: Creates/updates MovementState with initial position
+- Animation loop (requestAnimationFrame) updates positions each frame:
+  - Calculates distance per frame based on speed formula (60/C dots per second)
+  - Updates currentX/currentY in localMovementStates
+  - Updates Konva sprite node positions directly
+  - Updates frame index every ~8 frames for sprite animation
+- Sprite rendering: Konva.Image nodes updated with current frame from sequence
+- Per-frame or direction-level sprite inversions applied
+- On CUT/ERA: Syncs actual positions from Konva nodes back to worker
 - Tracks animation status for query responses
 
 **Key Design Principles:**
@@ -283,6 +290,10 @@ STICK and STRIG inputs are **polled** by the BASIC program, not automatically sy
 **Message Types:**
 - `PRINT_OUTPUT`: Text output from PRINT statements
 - `ANIMATION_COMMAND`: Animation commands from AnimationManager
+  - `START_MOVEMENT`: Start sprite movement with initial position
+  - `STOP_MOVEMENT`: Stop movement (CUT command)
+  - `ERASE_MOVEMENT`: Erase sprite (ERA command)
+- `UPDATE_ANIMATION_POSITIONS`: Frontend → Worker position sync (on CUT/ERA)
 - `SCREEN_UPDATE`: Screen state changes (cursor, color, etc.)
 - `INPUT_EVENT`: User input events (STICK/STRIG)
 - `QUERY_ANIMATION_STATUS`: Query movement status

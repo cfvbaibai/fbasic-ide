@@ -36,6 +36,7 @@ This document outlines the remaining work needed to complete the Family Basic ID
 - ✅ **Keep-Alive Cleanup**: Added `onDeactivated` cleanup to composables using timers/intervals
 - ✅ **Component Type Extraction**: 10 components now have extracted prop/emit types
 - ✅ **Enhanced Error Messages**: Improved error messages in stores with context
+- ✅ **Props Reactivity Loss**: Fixed `Screen.vue` props reactivity loss by using `toValue()` wrapper
 
 **Status**: Critical and high-priority items completed. Remaining items are low priority.
 
@@ -83,8 +84,9 @@ This document outlines the remaining work needed to complete the Family Basic ID
 - [x] Enhanced error messages in stores
 - [x] Review CSS v-bind usage for reactivity issues
 - [x] Document safe CSS v-bind patterns
+- [x] **Fixed props reactivity loss** - Screen.vue props properly wrapped with `toValue()` (2026-01-26)
 
-**Status**: ✅ Complete - All items including CSS v-bind review completed
+**Status**: ✅ Complete - All items including CSS v-bind review and props reactivity fixes completed
 
 **Completed Work Summary**:
 - ✅ Template refs migrated: MonacoCodeEditor, Screen, CodeEditor, GameSelect, GameUpload
@@ -92,6 +94,7 @@ This document outlines the remaining work needed to complete the Family Basic ID
 - ✅ Type extraction: 10 components with exported types
 - ✅ Error messages: useSpriteViewerStore enhanced
 - ✅ CSS v-bind review: Reviewed all usage, documented safe patterns, migrated 5 components (GameCard, GameTextarea, GameSelect, GameIcon, ColorBox) from `:style` to CSS v-bind
+- ✅ Props reactivity: Fixed Screen.vue onPositionSync prop access to preserve reactivity
 
 ---
 
@@ -431,6 +434,8 @@ This document outlines the remaining work needed to complete the Family Basic ID
 ### Code Quality Standards
 
 - **File Size**: Keep files under 500 lines (300 for `.ts`, 500 for `.vue`)
+  - ✅ **Recent Improvement**: Refactored `KonvaSpriteTestPage.vue` from 514 to 266 lines (2026-01-26)
+  - ✅ **Extracted Composables**: Created `useSpriteAnimation.ts` (107 lines) and `useKonvaStage.ts` (173 lines)
 - **Type Safety**: No `any` types, use proper TypeScript types
 - **Testing**: All new executors must have tests
 - **Error Handling**: Graceful error handling with clear messages
@@ -536,10 +541,30 @@ This document outlines the remaining work needed to complete the Family Basic ID
 
 ---
 
-**Last Updated**: 2026-01-24  
+**Last Updated**: 2026-01-26
 **Next Review**: After Phase 2 completion (VIEW command, PALET B command)
 
 ## Recent Updates
+
+### Vue 3 Reactivity Fixes & Code Quality Improvements (2026-01-26)
+- ✅ **Props Reactivity Loss Fix**:
+  - Fixed `Screen.vue` props reactivity loss by wrapping `onPositionSync` access with `toValue()`
+  - Prevents loss of reactivity when passing props to composables
+- ✅ **KonvaSpriteTestPage Refactoring**:
+  - Reduced main component from 514 to 266 lines (52% reduction)
+  - Extracted animation loop logic to `useSpriteAnimation.ts` (107 lines)
+  - Extracted Konva stage initialization to `useKonvaStage.ts` (173 lines)
+  - Improved maintainability and separation of concerns
+- ✅ **TypeScript Type Safety**:
+  - Fixed type inference issues with Konva.Image refs
+  - Added explicit Ref type imports and assertions
+  - Resolved useTemplateRef type compatibility
+- ✅ **Code Quality**:
+  - All files now respect 500-line limit
+  - Removed unused SPRITE_SCALE variable
+  - All ESLint, TypeScript, and Stylelint checks pass
+
+**Status**: Vue 3 best practices fully addressed. All code quality standards met.
 
 ### Backdrop Screen Implementation (2026-01-24)
 - ✅ **Canvas Dimensions**: Extended canvas from 240×208 to 256×240 pixels (full backdrop/sprite screen size)
@@ -658,12 +683,13 @@ This document outlines the remaining work needed to complete the Family Basic ID
 
 **Status**: LOCATE command fully implemented and tested. Cursor positioning works correctly with PRINT statements.
 
-### Vue Best Practices Improvements (2026-01-22)
-- ✅ **Template Refs**: Migrated 6 components to Vue 3.5+ `useTemplateRef` pattern
-- ✅ **Keep-Alive Support**: Added `onDeactivated` cleanup to prevent memory leaks
-- ✅ **Type Extraction**: Created type files for 10 UI components with proper exports
-- ✅ **Error Messages**: Enhanced store error messages with descriptive context
-- ✅ **JSDoc Verification**: Confirmed most components have comprehensive documentation
+### Vue Best Practices Improvements (2026-01-22 to 2026-01-26)
+- ✅ **Template Refs**: Migrated 6 components to Vue 3.5+ `useTemplateRef` pattern (2026-01-22)
+- ✅ **Keep-Alive Support**: Added `onDeactivated` cleanup to prevent memory leaks (2026-01-22)
+- ✅ **Type Extraction**: Created type files for 10 UI components with proper exports (2026-01-22)
+- ✅ **Error Messages**: Enhanced store error messages with descriptive context (2026-01-22)
+- ✅ **JSDoc Verification**: Confirmed most components have comprehensive documentation (2026-01-22)
+- ✅ **Props Reactivity**: Fixed Screen.vue props reactivity loss with `toValue()` wrapper (2026-01-26)
 
 **Reference**: See `docs/planning/vue-vueuse-best-practices-plan.md` for detailed implementation
 

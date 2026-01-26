@@ -4,6 +4,7 @@
 
 - **Base Frame Rate**: ~30 FPS (approximately 1/30 second per frame)
 - **Frame Duration**: ~33.33ms per frame
+- **Implementation**: `requestAnimationFrame` on main thread
 
 **Speed Control (Parameter C in DEF MOVE):**
 - **Range**: 0-255
@@ -19,6 +20,19 @@
 - Sprites move asynchronously to BASIC program execution
 - Sprites continue moving even if the program ends
 - Movement status: `MOVE(n)` returns `-1` (moving) or `0` (complete)
+
+### Position State Management
+
+**Dual-State Architecture:**
+- **Web Worker**: Manages movement definitions, sends START_MOVEMENT commands
+- **Main Thread**: Handles actual position updates via animation loop
+
+**Position Update Flow:**
+1. MOVE command executes in worker → creates initial MovementState
+2. START_MOVEMENT command sent to frontend
+3. Frontend animation loop updates positions each frame (requestAnimationFrame)
+4. Konva sprite nodes updated with new positions
+5. On CUT/ERA: positions synced back to worker via UPDATE_ANIMATION_POSITIONS message
 
 ---
 
@@ -218,105 +232,115 @@ class AnimationManager {
 
 ---
 
-## CSS Sprite Sheet Implementation
+## Konva.js Sprite Rendering Implementation
 
-### Sprite Sheet Concept
+### Current Implementation (Konva-based)
 
-A single image file containing multiple animation frames arranged horizontally:
-```
-[Frame 1] [Frame 2] [Frame 3] [Frame 4]
-```
+The sprite animation system uses **Konva.js** for canvas-based rendering, replacing the earlier CSS animation approach.
 
-### CSS Animation
+**Key Architecture:**
+- **Konva Layers**: Multi-layer canvas rendering (backdrop → sprite back → background → sprite front)
+- **Sprite Nodes**: Konva.Image nodes for each sprite, updated each frame
+- **Animation Loop**: `requestAnimationFrame` loop updates sprite positions and frame indices
+- **Tile Caching**: Sprite tiles cached as ImageBitmap for performance
 
-Use CSS `@keyframes` with `steps()` for discrete frame switching:
+### Position Update Flow
 
-```css
-.mario-walk {
-    width: 64px;
-    height: 64px;
-    background-image: url('mario-walk-sheet.png');
-    background-size: 200% 100%; /* 2 frames = 200% width */
-    animation: mario-walk-cycle 0.5s steps(2) infinite;
-}
-
-.mario-walk[data-direction="left"] {
-    transform: scaleX(-1); /* Horizontal flip */
-}
-
-@keyframes mario-walk-cycle {
-    from { background-position: 0 0; }
-    to { background-position: -100% 0; }
-}
-```
-
-**Key CSS Properties:**
-- `background-size: N×100%` where N = number of frames
-- `steps(N)` creates discrete frame switching
-- `background-position: -(N-1)×100%` to cycle through all frames
-- `transform: scaleX(-1)` for horizontal inversion
-
-### Implementation Steps
-
-**1. Create Sprite Sheets**
-- One image per character sequence (e.g., `mario-walk-sheet.png`)
-- Frames arranged horizontally side-by-side
-
-**2. Define CSS Classes**
-```css
-.mario-walk {
-    background-image: url('sprites/mario-walk-sheet.png');
-    background-size: 200% 100%;
-    animation: mario-walk-cycle 0.5s steps(2) infinite;
-}
-
-.sprite-left { transform: scaleX(-1); }
-.sprite-up { transform: scaleY(-1); }
-```
-
-**3. Main Thread Execution**
+**Main Thread Animation Loop** (`useScreenAnimationLoop.ts`):
 ```typescript
-class DOMAnimationExecutor {
-  handleAnimationCommand(command: SpriteAnimationCommand): void {
-    const sprite = this.getSpriteElement(command.actionNumber)
-    sprite.style.backgroundImage = `url('${command.spriteSheet}')`
-    sprite.style.backgroundSize = `${command.frameCount * 100}% 100%`
-    
-    if (command.invertX) sprite.classList.add('sprite-left')
-    if (command.invertY) sprite.classList.add('sprite-up')
-    
-    // CSS animation handles frame cycling automatically
+function updateMovements(deltaTime: number): void {
+  for (const movement of localMovementStates) {
+    if (!movement.isActive) continue
+
+    // Calculate distance this frame
+    const dotsPerFrame = movement.speedDotsPerSecond * (deltaTime / 1000)
+    const distanceThisFrame = Math.min(dotsPerFrame, movement.remainingDistance)
+    movement.remainingDistance -= distanceThisFrame
+
+    // Update position
+    const distanceTraveled = movement.totalDistance - movement.remainingDistance
+    let currentX = movement.startX + movement.directionDeltaX * distanceTraveled
+    let currentY = movement.startY + movement.directionDeltaY * distanceTraveled
+
+    // Clamp to screen bounds
+    currentX = Math.max(0, Math.min(255 - spriteSize, currentX))
+    currentY = Math.max(0, Math.min(239 - spriteSize, currentY))
+
+    // Update Konva sprite node position
+    const sprite = spriteRefs.get(movement.actionNumber)
+    if (sprite) {
+      sprite.x(currentX * CANVAS_SCALE)
+      sprite.y(currentY * CANVAS_SCALE)
+    }
+
+    // Update frame animation
+    movement.frameCounter++
+    if (movement.frameCounter >= 8) {
+      movement.frameCounter = 0
+      movement.currentFrameIndex++
+    }
   }
 }
 ```
 
-### Combined Position + Sprite Animation
+### Sprite Rendering
 
-Position movement and sprite animation run independently via CSS:
+**Konva Sprite Rendering** (`useKonvaSpriteRenderer.ts`):
+- Creates Konva.Image nodes for each sprite
+- Updates sprite image each frame based on currentFrameIndex
+- Applies per-frame or direction-level inversions
+- Handles 8×8 and 16×16 sprite sizes
+- Uses tile caching for performance
 
-```css
-.moving-sprite {
-    animation: 
-        sprite-walk-cycle 0.5s steps(2) infinite,  /* Frame animation */
-        move-right 3s linear forwards;              /* Position movement */
-}
-```
-
-**Two independent CSS animations:**
-1. Sprite frame cycling (walk-cycle)
-2. Position movement (move-right)
-
-Both are GPU-accelerated and run simultaneously.
-
-### Frame Rate Calculation
-
+**Frame Animation:**
 ```typescript
-// sequence.frameRate = frames per sprite switch (e.g., 8 frames)
-// Base frame rate = 30 FPS
-// Animation duration = (frameRate / 30) seconds
+// Get current frame from sequence
+const frameIndex = movement.currentFrameIndex % sequence.sprites.length
+const currentSprite = sequence.sprites[frameIndex]
 
-const animationDuration = sequence.frameRate / 30  // e.g., 8/30 = 0.267s
+// Apply per-frame inversions (if defined) or direction-level inversions
+const inversions = sequence.frameInversions?.[frameIndex] ?? {
+  invertX: directionMapping.invertX,
+  invertY: directionMapping.invertY
+}
+
+// Render sprite with inversions
+renderSpriteToKonva(sprite, currentSprite, inversions, colorCombination)
 ```
+
+### Position State Synchronization
+
+**Worker → Frontend (Movement Start):**
+```typescript
+// Worker: AnimationManager.startMovement()
+this.deviceAdapter.sendAnimationCommand({
+  type: 'START_MOVEMENT',
+  actionNumber,
+  definition: moveDefinition,
+  startX, startY
+})
+```
+
+**Frontend → Worker (Position Sync):**
+```typescript
+// On CUT/ERA: Sync actual positions back to worker
+const frontNode = frontSpriteNodes.get(actionNumber)
+if (frontNode && typeof frontNode.x === 'function') {
+  actualX = frontNode.x() / CANVAS_SCALE
+  actualY = frontNode.y() / CANVAS_SCALE
+}
+
+// Send UPDATE_ANIMATION_POSITIONS message
+workerRef.postMessage({
+  type: 'UPDATE_ANIMATION_POSITIONS',
+  positions: [{ actionNumber, x: actualX, y: actualY }]
+})
+```
+
+**Multi-Layer Position Retrieval Priority:**
+1. **Konva sprite nodes** (frontSpriteNodes/backSpriteNodes) - Most accurate
+2. **Movement state** (localMovementStates) - Fallback
+3. **Stored positions** (worker storedPositions) - For stopped movements
 
 ### Complete Flow Example
 
@@ -326,8 +350,12 @@ MOVE 0
 ```
 
 **Implementation:**
-1. AnimationManager looks up Mario config, finds WALK sequence for direction 3
-2. Sends `START_SPRITE_ANIMATION` command with sprite sheet URL and parameters
-3. Main thread applies CSS classes, browser handles animation
-4. Position movement starts via CSS transition (separate animation)
-5. Both animations run independently via CSS (GPU-accelerated)
+1. Worker's AnimationManager creates MovementState with initial position
+2. Sends START_MOVEMENT command to frontend
+3. Frontend creates/updates localMovementStates
+4. Animation loop starts (requestAnimationFrame)
+   - Updates position each frame
+   - Updates Konva sprite node position
+   - Updates frame index for animation
+5. On CUT: Frontend syncs position to worker via UPDATE_ANIMATION_POSITIONS
+6. Next MOVE uses synced position from worker's storedPositions

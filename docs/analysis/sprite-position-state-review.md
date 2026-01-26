@@ -1,7 +1,8 @@
 # Sprite Position State Management Review
 
-**Date**: 2026-01-26  
-**Reviewer**: Code Review  
+**Date**: 2026-01-26
+**Last Updated**: 2026-01-26 (added code quality improvements section)
+**Reviewer**: Code Review
 **Scope**: Position state management for MOVEing sprites
 
 ## Executive Summary
@@ -251,3 +252,56 @@ private evaluateXpos(args: Array<number | string>): number {
 The position state management system works correctly for the primary use case (MOVE → CUT → MOVE), but has a **critical issue** with XPOS/YPOS functions returning stale positions during active movement. The recommended fix is to implement periodic position sync from frontend to worker, allowing XPOS/YPOS to query accurate positions while maintaining the current architecture.
 
 The multi-layer position retrieval system is well-designed for handling edge cases, but could benefit from better documentation and more comprehensive error handling.
+
+---
+
+## Recent Code Quality Improvements (2026-01-26)
+
+### Refactoring & Best Practices
+
+**Konva Test Page Refactoring:**
+- Reduced `KonvaSpriteTestPage.vue` from 514 to 266 lines (52% reduction)
+- Extracted animation loop logic to `useSpriteAnimation.ts` (107 lines)
+- Extracted Konva stage initialization to `useKonvaStage.ts` (173 lines)
+- Improved separation of concerns and maintainability
+
+**Vue 3 Best Practices:**
+- Fixed props reactivity loss in `Screen.vue` by wrapping `onPositionSync` prop access with `toValue()`
+- Prevents loss of reactivity when passing props to composables
+- All TypeScript type checks pass
+- All ESLint and Stylelint checks pass
+
+**File Organization:**
+- All files now respect 500-line limit
+- Clear composable boundaries for animation, stage, and rendering concerns
+- Improved testability through smaller, focused modules
+
+### Architecture Clarity
+
+The refactoring improves understanding of the position state management system:
+
+1. **useSpriteAnimation.ts** - Clearly shows animation loop implementation
+2. **useKonvaStage.ts** - Clearly shows Konva initialization and cleanup
+3. **useScreenAnimationLoop.ts** - Main thread position update logic
+4. **useMovementStateSync.ts** - Movement state synchronization logic
+
+This separation makes it easier to identify where position updates happen and how they flow through the system.
+
+### Next Steps for Position State
+
+Based on this review, recommended improvements:
+
+1. **Implement XPOS/YPOS fix** (Priority 1)
+   - Add periodic position sync from frontend to worker
+   - Update worker's `movementStates` with current positions
+   - Ensure XPOS/YPOS return accurate positions during movement
+
+2. **Add comprehensive tests** (Priority 2)
+   - Test XPOS/YPOS during active movement
+   - Test position preservation after CUT
+   - Test position sync timing and accuracy
+
+3. **Improve documentation** (Priority 3)
+   - Add inline comments explaining position flow
+   - Document why worker states are never updated by updateMovements()
+   - Create sequence diagrams for position sync flow
