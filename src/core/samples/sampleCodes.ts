@@ -384,6 +384,48 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 1110 PRINT "  - Multiple actions can be controlled with CUT/ERA"
 1120 END`,
   },
+
+  xposYposTest: {
+    name: 'XPOS/YPOS Test',
+    description: 'Test XPOS/YPOS functions return accurate positions during active movement',
+    code: `10 REM XPOS/YPOS Test - Verify positions during active movement
+20 CLS
+30 SPRITE ON
+40 PRINT "XPOS/YPOS Test Program"
+50 PRINT "======================"
+60 PRINT ""
+70 REM Define movement: Mario moving right at speed 15, distance 60
+80 DEF MOVE(0) = SPRITE(0, 3, 15, 60, 0, 0)
+90 PRINT "DEF MOVE(0) = SPRITE(0, 3, 15, 60, 0, 0)"
+100 PRINT "  Direction 3 (right), Speed 15, Distance 60"
+110 PRINT ""
+120 REM Set initial position
+130 POSITION 0, 50, 100
+140 PRINT "POSITION 0, 50, 100"
+150 PRINT "  Initial position: (50, 100)"
+160 PRINT ""
+170 REM Start movement
+180 MOVE 0
+190 PRINT "MOVE 0 executed"
+200 PRINT ""
+210 PRINT "Querying positions during movement..."
+220 PRINT "(XPOS should increase, YPOS should stay at 100)"
+230 PRINT ""
+240 REM Query positions during movement (should update as sprite moves)
+250 FOR I = 1 TO 10
+260   PRINT "Frame "; I; ":"
+270   PRINT "  XPOS(0) = "; XPOS(0)
+280   PRINT "  YPOS(0) = "; YPOS(0)
+290   PRINT "  MOVE(0) = "; MOVE(0); " (-1=moving, 0=stopped)"
+300   PAUSE 200
+310 NEXT
+320 PRINT ""
+330 PRINT "Test complete!"
+340 PRINT ""
+350 PRINT "Expected: XPOS should increase from ~50 to ~170"
+360 PRINT "          YPOS should stay at ~100"
+370 END`,
+  },
 }
 
 /**

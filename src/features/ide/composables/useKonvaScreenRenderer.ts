@@ -135,6 +135,12 @@ export async function renderSpriteLayer(
 
   if (!layer) return nodeMap
 
+  // Preserve existing node positions before destroying (to maintain position during re-render)
+  const preservedPositions = new Map<number, { x: number; y: number }>()
+  for (const [actionNumber, node] of nodeMap.entries()) {
+    preservedPositions.set(actionNumber, { x: node.x(), y: node.y() })
+  }
+
   // Clear existing sprites
   layer.destroyChildren()
   nodeMap.clear()
@@ -175,6 +181,12 @@ export async function renderSpriteLayer(
     // Render animated sprite (DEF MOVE) - both active and stopped movements
     const konvaImage = await createAnimatedSpriteKonvaImage(movement, spritePaletteCode)
     if (konvaImage) {
+      // Restore preserved position if available (maintains position during re-render)
+      const preservedPos = preservedPositions.get(movement.actionNumber)
+      if (preservedPos) {
+        konvaImage.x(preservedPos.x)
+        konvaImage.y(preservedPos.y)
+      }
       layer.add(konvaImage)
       nodeMap.set(movement.actionNumber, konvaImage)
     }

@@ -84,6 +84,13 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
     return state
   }
 
+  // === SPRITE POSITION QUERY ===
+
+  getSpritePosition(_actionNumber: number): { x: number; y: number } | null {
+    // Test adapter doesn't track sprite positions
+    return null
+  }
+
   // === TEXT OUTPUT METHODS ===
 
   printOutput(output: string): void {

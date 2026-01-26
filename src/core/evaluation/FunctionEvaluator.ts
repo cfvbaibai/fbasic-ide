@@ -515,6 +515,8 @@ export class FunctionEvaluator {
    * XPOS(n) - returns current X position
    * n: action number (0-7)
    * Returns: X coordinate (0-255) or 0 if no movement/position set
+   * 
+   * Position is cached in WebWorkerDeviceAdapter, synced from Konva nodes in frontend.
    */
   private evaluateXpos(args: Array<number | string>): number {
     if (args.length !== 1) {
@@ -524,10 +526,7 @@ export class FunctionEvaluator {
     if (actionNumber < 0 || actionNumber > 7) {
       throw new Error('XPOS action number must be 0-7')
     }
-    if (!this.context.animationManager) {
-      return 0
-    }
-    const position = this.context.animationManager.getSpritePosition(actionNumber)
+    const position = this.context.getSpritePosition(actionNumber)
     return position?.x ?? 0
   }
 
@@ -535,6 +534,8 @@ export class FunctionEvaluator {
    * YPOS(n) - returns current Y position
    * n: action number (0-7)
    * Returns: Y coordinate (0-239) or 0 if no movement/position set
+   * 
+   * Position is cached in WebWorkerDeviceAdapter, synced from Konva nodes in frontend.
    */
   private evaluateYpos(args: Array<number | string>): number {
     if (args.length !== 1) {
@@ -544,10 +545,7 @@ export class FunctionEvaluator {
     if (actionNumber < 0 || actionNumber > 7) {
       throw new Error('YPOS action number must be 0-7')
     }
-    if (!this.context.animationManager) {
-      return 0
-    }
-    const position = this.context.animationManager.getSpritePosition(actionNumber)
+    const position = this.context.getSpritePosition(actionNumber)
     return position?.y ?? 0
   }
 }

@@ -198,18 +198,12 @@ class WebWorkerInterpreter {
 
   handleUpdateAnimationPositions(message: UpdateAnimationPositionsMessage) {
     const { positions } = message.data
-    console.log('🎬 [WORKER] Updating animation positions:', positions)
 
-    if (this.interpreter) {
-      const animationManager = this.interpreter.getAnimationManager()
-      if (animationManager) {
-        animationManager.updateStoredPositions(positions)
-        console.log('✅ [WORKER] Animation positions updated in AnimationManager')
-      } else {
-        console.log('⚠️ [WORKER] No AnimationManager available')
+    // Update cached positions in WebWorkerDeviceAdapter for XPOS/YPOS queries
+    if (this.webWorkerDeviceAdapter) {
+      for (const pos of positions) {
+        this.webWorkerDeviceAdapter.updateSpritePosition(pos.actionNumber, pos.x, pos.y)
       }
-    } else {
-      console.log('⚠️ [WORKER] No interpreter available for updating positions')
     }
   }
 

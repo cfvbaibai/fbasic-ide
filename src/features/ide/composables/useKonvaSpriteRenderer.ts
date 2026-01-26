@@ -252,9 +252,10 @@ export async function createAnimatedSpriteKonvaImage(
   if (!currentFrameImage) return null
 
   // Create Konva Image (no scaling, native 1:1)
+  // Position will be set from Konva node if it exists, otherwise use start position
   const konvaImage = new Konva.Image({
-    x: movement.currentX,
-    y: movement.currentY,
+    x: movement.startX,
+    y: movement.startY,
     image: currentFrameImage,
     scaleX: 1,
     scaleY: 1,
@@ -265,7 +266,7 @@ export async function createAnimatedSpriteKonvaImage(
 
 /**
  * Update existing Konva.Image node for animated sprite
- * Updates position and frame image
+ * Updates frame image only (position is updated by animation loop)
  */
 export async function updateAnimatedSpriteKonvaImage(
   movement: MovementState,
@@ -275,9 +276,7 @@ export async function updateAnimatedSpriteKonvaImage(
   // Build animation configs if not already built
   animationConfigs ??= buildAllCharacterAnimationConfigs()
 
-  // Update position
-  konvaImage.x(movement.currentX)
-  konvaImage.y(movement.currentY)
+  // Position is managed by animation loop, don't update it here
 
   // Get sequence for this movement
   const { sequence } = getSequenceForMovement(

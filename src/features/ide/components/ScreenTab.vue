@@ -30,6 +30,7 @@ const props = withDefaults(
     movementStates?: MovementState[]
     externalFrontSpriteNodes?: Map<number, unknown>
     externalBackSpriteNodes?: Map<number, unknown>
+    onPositionSync?: (positions: Array<{ actionNumber: number; x: number; y: number }>) => void
   }>(),
   {
     screenBuffer: () => {
@@ -106,6 +107,7 @@ const currentZoomLevel = computed(() => zoomLevel.value)
         :movement-states="movementStates"
         :external-front-sprite-nodes="externalFrontSpriteNodes"
         :external-back-sprite-nodes="externalBackSpriteNodes"
+        :on-position-sync="onPositionSync"
       />
     </div>
   </GameTabPane>

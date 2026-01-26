@@ -292,23 +292,23 @@ export function useBasicIde() {
         movementStates.value = result.movementStates.map(m => {
           const existing = existingStates.get(m.actionNumber)
           if (existing) {
-            // Always preserve existing position if movement is stopped (CUT)
-            // This ensures CUT positions are preserved even after execution completes
+            // Preserve remaining distance and frame state
+            // Position is stored in Konva nodes, not in state
             if (!m.isActive && !existing.isActive) {
-              // Both are stopped - preserve existing animated position
+              // Both are stopped - preserve remaining distance
               return {
                 ...m,
-                currentX: existing.currentX,
-                currentY: existing.currentY,
                 remainingDistance: existing.remainingDistance,
+                currentFrameIndex: existing.currentFrameIndex,
+                frameCounter: existing.frameCounter,
               }
             } else if (existing.isActive && m.isActive && existing.actionNumber === m.actionNumber) {
-              // Both are active - preserve existing animated position
+              // Both are active - preserve remaining distance and frame state
               return {
                 ...m,
-                currentX: existing.currentX,
-                currentY: existing.currentY,
                 remainingDistance: existing.remainingDistance,
+                currentFrameIndex: existing.currentFrameIndex,
+                frameCounter: existing.frameCounter,
               }
             }
           }
@@ -456,6 +456,22 @@ export function useBasicIde() {
     rejectAllPendingMessages(webWorkerManager, 'Component unmounted')
   }
 
+  /**
+   * Sync sprite positions to worker for XPOS/YPOS queries
+   */
+  const syncSpritePositions = (positions: Array<{ actionNumber: number; x: number; y: number }>): void => {
+    if (webWorkerManager.worker && positions.length > 0) {
+      webWorkerManager.worker.postMessage({
+        type: 'UPDATE_ANIMATION_POSITIONS',
+        id: crypto.randomUUID(),
+        timestamp: Date.now(),
+        data: {
+          positions,
+        },
+      })
+    }
+  }
+
   // Clean up on unmount AND deactivation (keep-alive)
   onUnmounted(cleanupWebWorker)
   onDeactivated(cleanupWebWorker)
@@ -497,5 +513,6 @@ export function useBasicIde() {
     // Web worker communication
     sendStickEvent,
     sendStrigEvent,
+    syncSpritePositions,
   }
 }

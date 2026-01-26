@@ -300,44 +300,57 @@ export function handleAnimationCommandMessage(message: AnyServiceWorkerMessage, 
 
   switch (command.type) {
     case 'START_MOVEMENT': {
-      // Check if there's an existing movement (including stopped ones from CUT)
-      // If so, use its current position instead of the start position from web worker
-      // This ensures MOVE after CUT continues from the stopped position
+      // Get start position from Konva node if it exists (from previous CUT), otherwise use command position
+      let startX = command.startX
+      let startY = command.startY
+
+      // Check if there's an existing Konva node with a position
+      const existingNode =
+        command.definition.priority === 0
+          ? context.frontSpriteNodes?.value?.get(command.actionNumber)
+          : context.backSpriteNodes?.value?.get(command.actionNumber)
+
+      if (existingNode && typeof existingNode === 'object' && 'x' in existingNode && 'y' in existingNode) {
+        const nodeX = typeof existingNode.x === 'function' ? (existingNode.x as () => number)() : command.startX
+        const nodeY = typeof existingNode.y === 'function' ? (existingNode.y as () => number)() : command.startY
+        startX = nodeX
+        startY = nodeY
+      }
+
+      // Check if there's an existing movement (for remaining distance)
       const existingMovement = context.movementStates.value.find(
         m => m.actionNumber === command.actionNumber
       )
 
-      // Use existing position if available (from stopped movement), otherwise use start position
-      // Frontend has the real current positions since it runs the animation loop
-      // Worker's positions are stale because updateMovements() never runs there
-      // Now worker sends UPDATE_ANIMATION_POSITIONS back with current positions when CUT happens
-      const startX = existingMovement ? existingMovement.currentX : command.startX
-      const startY = existingMovement ? existingMovement.currentY : command.startY
-
-      if (existingMovement) {
-        console.log('🎬 [COMPOSABLE] Found existing movement:', {
-          actionNumber: existingMovement.actionNumber,
-          isActive: existingMovement.isActive,
-          currentX: existingMovement.currentX,
-          currentY: existingMovement.currentY,
-          webWorkerX: command.startX,
-          webWorkerY: command.startY,
-          usingPosition: `(${startX}, ${startY}) from frontend (up-to-date)`,
-        })
-      }
       // Preserve remaining distance if movement was stopped (CUT), otherwise use full distance
       const remainingDistance = existingMovement && !existingMovement.isActive
         ? existingMovement.remainingDistance
         : 2 * command.definition.distance
 
-      // Create movement state immediately
+      // Only set position on Konva node if movement was stopped (CUT) and we're restarting
+      // If movement is already active, don't reset position - animation loop manages it
+      if (existingNode && typeof existingNode === 'object' && 'x' in existingNode && 'y' in existingNode) {
+        if (typeof existingNode.x === 'function' && typeof existingNode.y === 'function') {
+          // Only update position if movement was stopped (restarting from CUT position)
+          // or if this is a new movement (node doesn't have a valid position yet)
+          const isNewMovement = !existingMovement
+          const isRestartingFromCut = existingMovement && !existingMovement.isActive
+          
+          if (isNewMovement || isRestartingFromCut) {
+            // New movement or restarting from CUT - use the start position we determined
+            ;(existingNode.x as (x: number) => void)(startX)
+            ;(existingNode.y as (y: number) => void)(startY)
+          }
+          // If movement is already active, don't touch the position - animation loop manages it
+        }
+      }
+
+      // Create movement state immediately (without currentX/currentY - position is in Konva)
       const movementState: MovementState = {
         actionNumber: command.actionNumber,
         definition: command.definition,
         startX,
         startY,
-        currentX: startX,
-        currentY: startY,
         remainingDistance,
         totalDistance: 2 * command.definition.distance,
         speedDotsPerSecond: command.definition.speed > 0 ? 60 / command.definition.speed : 0,
@@ -362,90 +375,48 @@ export function handleAnimationCommandMessage(message: AnyServiceWorkerMessage, 
       // Force reactivity by creating new array
       context.movementStates.value = [...context.movementStates.value]
 
-      console.log('🎬 [COMPOSABLE] Started movement:', command.actionNumber, 'at', startX, startY, existingMovement ? '(restarted)' : '(new)')
-      break
-    }
-
-    case 'STOP_MOVEMENT': {
-      // Mark movements as inactive but keep positions
-      // IMPORTANT: Send current positions back to worker so it can update storedPositions
-      const currentPositions: Array<{ actionNumber: number; x: number; y: number }> = []
-
-      if (command.positions) {
-        for (const pos of command.positions) {
-          const movement = context.movementStates.value.find(m => m.actionNumber === pos.actionNumber)
-          if (movement) {
-            movement.isActive = false
-            movement.currentX = pos.x
-            movement.currentY = pos.y
-            movement.remainingDistance = pos.remainingDistance
-            currentPositions.push({ actionNumber: pos.actionNumber, x: pos.x, y: pos.y })
-          }
-        }
-      } else {
-        // No positions provided - get position from Konva nodes or movement states
-        for (const actionNumber of command.actionNumbers) {
-          const movement = context.movementStates.value.find(m => m.actionNumber === actionNumber)
-          if (movement) {
-            // Try to get position from Konva sprite node (actual rendered position)
-            // This is the most accurate source since animation loop updates these
-            let actualX = movement.currentX
-            let actualY = movement.currentY
-
-            // Check front sprite layer first
-            if (context.frontSpriteNodes?.value) {
-              const frontNode = context.frontSpriteNodes.value.get(actionNumber)
-              if (frontNode && typeof frontNode === 'object' && 'x' in frontNode && 'y' in frontNode) {
-                actualX = typeof frontNode.x === 'function' ? (frontNode.x as () => number)() : movement.currentX
-                actualY = typeof frontNode.y === 'function' ? (frontNode.y as () => number)() : movement.currentY
-                console.log(`🎬 [COMPOSABLE] Got position from front sprite node ${actionNumber}: (${actualX}, ${actualY})`)
-              }
-            }
-
-            // Check back sprite layer if not found in front
-            if (actualX === movement.currentX && actualY === movement.currentY && context.backSpriteNodes?.value) {
-              const backNode = context.backSpriteNodes.value.get(actionNumber)
-              if (backNode && typeof backNode === 'object' && 'x' in backNode && 'y' in backNode) {
-                actualX = typeof backNode.x === 'function' ? (backNode.x as () => number)() : movement.currentX
-                actualY = typeof backNode.y === 'function' ? (backNode.y as () => number)() : movement.currentY
-                console.log(`🎬 [COMPOSABLE] Got position from back sprite node ${actionNumber}: (${actualX}, ${actualY})`)
-              }
-            }
-
-            // If we still have the initial position, use movement state as fallback
-            if (actualX === movement.currentX && actualY === movement.currentY) {
-              console.log(`🎬 [COMPOSABLE] Using movement state position for ${actionNumber}: (${actualX}, ${actualY})`)
-            }
-
-            // Preserve current position - don't update it, just mark as inactive
-            movement.isActive = false
-            // Update movement state with actual position if we got it from Konva
-            if (actualX !== movement.currentX || actualY !== movement.currentY) {
-              movement.currentX = actualX
-              movement.currentY = actualY
-            }
-            // Collect current position to send back to worker
-            currentPositions.push({
-              actionNumber: movement.actionNumber,
-              x: actualX,
-              y: actualY,
-            })
-          }
-        }
-      }
-
-      // Send current positions back to worker so it can update its storedPositions
-      // Worker's updateMovements() never runs, so it doesn't know the real current positions
-      if (currentPositions.length > 0 && context.webWorkerManager?.worker) {
+      // Immediately sync position to worker for XPOS/YPOS queries
+      // This ensures XPOS/YPOS works even before animation loop starts syncing
+      if (context.webWorkerManager?.worker) {
         context.webWorkerManager.worker.postMessage({
           type: 'UPDATE_ANIMATION_POSITIONS',
           id: crypto.randomUUID(),
           timestamp: Date.now(),
           data: {
-            positions: currentPositions,
+            positions: [{ actionNumber: command.actionNumber, x: startX, y: startY }],
           },
         })
-        console.log('🎬 [COMPOSABLE] Sent positions to worker:', currentPositions)
+      }
+      break
+    }
+
+    case 'STOP_MOVEMENT': {
+      // Mark movements as inactive
+      // Position is stored in Konva nodes, no need to sync back to worker
+      if (command.positions) {
+        for (const pos of command.positions) {
+          const movement = context.movementStates.value.find(m => m.actionNumber === pos.actionNumber)
+          if (movement) {
+            movement.isActive = false
+            movement.remainingDistance = pos.remainingDistance
+          }
+        }
+      } else {
+        // Get position from Konva nodes (single source of truth)
+        for (const actionNumber of command.actionNumbers) {
+          const movement = context.movementStates.value.find(m => m.actionNumber === actionNumber)
+          if (movement) {
+            // Get position from Konva sprite node (actual rendered position)
+            const _spriteNode =
+              movement.definition.priority === 0
+                ? context.frontSpriteNodes?.value?.get(actionNumber)
+                : context.backSpriteNodes?.value?.get(actionNumber)
+
+
+            // Mark as inactive - position stays in Konva node
+            movement.isActive = false
+          }
+        }
       }
 
       context.movementStates.value = [...context.movementStates.value]
@@ -460,12 +431,50 @@ export function handleAnimationCommandMessage(message: AnyServiceWorkerMessage, 
       break
     }
 
+    case 'SET_POSITION': {
+      // Set position on Konva node
+      const spriteNode =
+        context.frontSpriteNodes?.value?.get(command.actionNumber) ??
+        context.backSpriteNodes?.value?.get(command.actionNumber)
+
+      if (spriteNode && typeof spriteNode === 'object' && 'x' in spriteNode && 'y' in spriteNode) {
+        if (typeof spriteNode.x === 'function' && typeof spriteNode.y === 'function') {
+          ;(spriteNode.x as (x: number) => void)(command.x)
+          ;(spriteNode.y as (y: number) => void)(command.y)
+          
+          // Immediately sync position to worker for XPOS/YPOS queries
+          if (context.webWorkerManager?.worker) {
+            context.webWorkerManager.worker.postMessage({
+              type: 'UPDATE_ANIMATION_POSITIONS',
+              id: crypto.randomUUID(),
+              timestamp: Date.now(),
+              data: {
+                positions: [{ actionNumber: command.actionNumber, x: command.x, y: command.y }],
+              },
+            })
+          }
+        }
+      } else {
+        // Node doesn't exist yet - cache position in worker anyway so XPOS/YPOS works
+        // The position will be set on the node when it's created
+        if (context.webWorkerManager?.worker) {
+          context.webWorkerManager.worker.postMessage({
+            type: 'UPDATE_ANIMATION_POSITIONS',
+            id: crypto.randomUUID(),
+            timestamp: Date.now(),
+            data: {
+              positions: [{ actionNumber: command.actionNumber, x: command.x, y: command.y }],
+            },
+          })
+        }
+      }
+      break
+    }
+
     case 'UPDATE_MOVEMENT_POSITION': {
-      // Update movement position (for future use if needed)
+      // Update movement remaining distance (position is in Konva node)
       const movement = context.movementStates.value.find(m => m.actionNumber === command.actionNumber)
       if (movement) {
-        movement.currentX = command.x
-        movement.currentY = command.y
         movement.remainingDistance = command.remainingDistance
       }
       break

@@ -13,7 +13,6 @@ import type { MoveDefinition, MovementState } from '@/core/sprite/types'
 export class AnimationManager {
   private moveDefinitions: Map<number, MoveDefinition> = new Map()
   private movementStates: Map<number, MovementState> = new Map()
-  private storedPositions: Map<number, { x: number; y: number }> = new Map()
   private deviceAdapter?: BasicDeviceAdapter
 
   /**
@@ -24,21 +23,8 @@ export class AnimationManager {
   }
 
   constructor() {
-    // Initialize 8 action slots with different default positions to avoid overlap
-    // Spread them out in a grid pattern
-    const defaultPositions = [
-      { x: 80, y: 80 }, // Action 0: top-left
-      { x: 176, y: 80 }, // Action 1: top-right
-      { x: 80, y: 160 }, // Action 2: bottom-left
-      { x: 176, y: 160 }, // Action 3: bottom-right
-      { x: 128, y: 60 }, // Action 4: top-center
-      { x: 128, y: 180 }, // Action 5: bottom-center
-      { x: 50, y: 120 }, // Action 6: left-center
-      { x: 206, y: 120 }, // Action 7: right-center
-    ]
-    for (let i = 0; i < 8; i++) {
-      this.storedPositions.set(i, defaultPositions[i] ?? { x: 120, y: 120 })
-    }
+    // Position is now managed by Konva nodes in the frontend
+    // No need to store default positions here
   }
 
   /**
@@ -84,6 +70,7 @@ export class AnimationManager {
   /**
    * Start movement (MOVE command)
    * Initializes movement state and begins animation
+   * Position will be retrieved from Konva nodes in the frontend
    */
   startMovement(actionNumber: number, startX?: number, startY?: number): void {
     const definition = this.moveDefinitions.get(actionNumber)
@@ -91,17 +78,17 @@ export class AnimationManager {
       throw new Error(`No movement definition for action number ${actionNumber} (use DEF MOVE first)`)
     }
 
-    // Use stored position or provided position, or default to (120, 120)
-    const storedPos = this.storedPositions.get(actionNumber)
-    const initialX = startX ?? storedPos?.x ?? 120
-    const initialY = startY ?? storedPos?.y ?? 120
+    // Use provided position or default to (120, 120)
+    // Frontend will get actual position from Konva nodes if available
+    const initialX = startX ?? 120
+    const initialY = startY ?? 120
 
     console.log(`🎯 [AnimationManager] startMovement(${actionNumber}):`, {
       startX,
       startY,
-      storedPos,
       initialX,
       initialY,
+      note: 'Frontend will get actual position from Konva nodes',
     })
 
     // Calculate direction deltas
@@ -113,14 +100,12 @@ export class AnimationManager {
     // Calculate total distance: 2×D dots
     const totalDistance = 2 * definition.distance
 
-    // Create movement state
+    // Create movement state (without currentX/currentY - position is in Konva nodes)
     const movementState: MovementState = {
       actionNumber,
       definition,
       startX: initialX,
       startY: initialY,
-      currentX: initialX,
-      currentY: initialY,
       remainingDistance: totalDistance,
       totalDistance,
       speedDotsPerSecond,
@@ -148,52 +133,32 @@ export class AnimationManager {
 
   /**
    * Update all active movements (called each frame)
-   * @param deltaTime - Time elapsed since last frame in milliseconds
+   * NOTE: This method is never called in the worker - animation happens on main thread.
+   * Position updates happen in the frontend animation loop using Konva nodes.
+   * @param _deltaTime - Time elapsed since last frame in milliseconds
    */
-  updateMovements(deltaTime: number): void {
+  updateMovements(_deltaTime: number): void {
+    // This method is a placeholder - actual position updates happen in frontend
+    // via useScreenAnimationLoop which reads/writes Konva node positions
     for (const movement of this.movementStates.values()) {
       if (!movement.isActive || movement.remainingDistance <= 0) {
         movement.isActive = false
         continue
       }
-
-      // Calculate distance per frame: speedDotsPerSecond × (deltaTime / 1000)
-      const dotsPerFrame = movement.speedDotsPerSecond * (deltaTime / 1000)
-      const distanceThisFrame = Math.min(dotsPerFrame, movement.remainingDistance)
-
-      // Update position
-      movement.currentX += movement.directionDeltaX * distanceThisFrame
-      movement.currentY += movement.directionDeltaY * distanceThisFrame
-      movement.remainingDistance -= distanceThisFrame
-
-      // Clamp to screen bounds
-      movement.currentX = Math.max(0, Math.min(255, movement.currentX))
-      movement.currentY = Math.max(0, Math.min(239, movement.currentY))
-
-      // Check if movement is complete
-      if (movement.remainingDistance <= 0) {
-        movement.isActive = false
-        // Update stored position for next movement
-        this.storedPositions.set(movement.actionNumber, {
-          x: movement.currentX,
-          y: movement.currentY,
-        })
-      }
+      // Position updates are handled in frontend animation loop
     }
   }
 
   /**
    * Stop movement (CUT command)
    * Stops movement but keeps sprite visible at current position
-   * NOTE: Position is NOT saved here - frontend will send current positions back via UPDATE_ANIMATION_POSITIONS
+   * Position is stored in Konva nodes, no need to sync back to worker
    */
   stopMovement(actionNumbers: number[]): void {
     for (const actionNumber of actionNumbers) {
       const movement = this.movementStates.get(actionNumber)
       if (movement) {
         movement.isActive = false
-        // DON'T save position here - worker's positions are stale since updateMovements() never runs
-        // Frontend will send actual current positions via UPDATE_ANIMATION_POSITIONS message
       }
     }
 
@@ -204,21 +169,6 @@ export class AnimationManager {
         actionNumbers,
       }
       this.deviceAdapter.sendAnimationCommand(command)
-    }
-  }
-
-  /**
-   * Update stored positions (called from frontend via UPDATE_ANIMATION_POSITIONS message)
-   * Frontend has the real current positions since it runs the animation loop
-   */
-  updateStoredPositions(positions: Array<{ actionNumber: number; x: number; y: number }>): void {
-    console.log('📍 [AnimationManager] updateStoredPositions called:', positions)
-    for (const pos of positions) {
-      this.storedPositions.set(pos.actionNumber, {
-        x: pos.x,
-        y: pos.y,
-      })
-      console.log(`  ✓ Updated storedPositions[${pos.actionNumber}] = (${pos.x}, ${pos.y})`)
     }
   }
 
@@ -248,7 +198,7 @@ export class AnimationManager {
 
   /**
    * Set initial position (POSITION command)
-   * Stores position for next MOVE command
+   * Sends command to frontend to set Konva node position
    */
   setPosition(actionNumber: number, x: number, y: number): void {
     if (actionNumber < 0 || actionNumber > 7) {
@@ -261,7 +211,16 @@ export class AnimationManager {
       throw new Error(`Invalid Y coordinate: ${y} (must be 0-239)`)
     }
 
-    this.storedPositions.set(actionNumber, { x, y })
+    // Send command to frontend to set Konva node position
+    if (this.deviceAdapter?.sendAnimationCommand) {
+      const command: AnimationCommand = {
+        type: 'SET_POSITION',
+        actionNumber,
+        x,
+        y,
+      }
+      this.deviceAdapter.sendAnimationCommand(command)
+    }
   }
 
   /**
@@ -278,20 +237,12 @@ export class AnimationManager {
 
   /**
    * Get sprite position (XPOS/YPOS functions)
+   * NOTE: Position is stored in Konva nodes in frontend, not in worker.
+   * This method returns null - frontend should query Konva nodes directly.
    */
-  getSpritePosition(actionNumber: number): { x: number; y: number } | null {
-    const movement = this.movementStates.get(actionNumber)
-    if (movement) {
-      return {
-        x: movement.currentX,
-        y: movement.currentY,
-      }
-    }
-    // Return stored position if no active movement
-    const stored = this.storedPositions.get(actionNumber)
-    if (stored) {
-      return stored
-    }
+  getSpritePosition(_actionNumber: number): { x: number; y: number } | null {
+    // Position is in Konva nodes, not in worker state
+    // Frontend will query Konva nodes for XPOS/YPOS
     return null
   }
 
@@ -349,9 +300,6 @@ export class AnimationManager {
   reset(): void {
     this.movementStates.clear()
     this.moveDefinitions.clear()
-    // Reset stored positions to defaults
-    for (let i = 0; i < 8; i++) {
-      this.storedPositions.set(i, { x: 120, y: 120 })
-    }
+    // Position is managed by Konva nodes in frontend, no need to reset here
   }
 }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Konva from 'konva'
-import { computed, onUnmounted, ref, useTemplateRef, watch } from 'vue'
+import { computed, onUnmounted, ref, toValue, useTemplateRef, watch } from 'vue'
 
 import type { ScreenCell } from '@/core/interfaces'
 import type { MovementState, SpriteState } from '@/core/sprite/types'
@@ -60,6 +60,8 @@ interface Props {
   // External sprite node maps (for message handler to get actual positions)
   externalFrontSpriteNodes?: Map<number, unknown>
   externalBackSpriteNodes?: Map<number, unknown>
+  // Function to sync positions to worker for XPOS/YPOS queries
+  onPositionSync?: (positions: Array<{ actionNumber: number; x: number; y: number }>) => void
 }
 
 // Konva Stage reference
@@ -263,6 +265,8 @@ const stopAnimationLoop = useScreenAnimationLoop({
   frontSpriteNodes,
   backSpriteNodes,
   spritePalette: computed(() => props.spritePalette ?? 1),
+
+  onPositionSync: toValue(() => props.onPositionSync),
 })
 
 // Stop animation loop and cancel pending renders when component unmounts

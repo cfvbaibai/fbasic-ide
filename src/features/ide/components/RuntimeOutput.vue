@@ -61,6 +61,7 @@ interface Props {
   movementStates?: MovementState[]
   externalFrontSpriteNodes?: Map<number, unknown>
   externalBackSpriteNodes?: Map<number, unknown>
+  onPositionSync?: (positions: Array<{ actionNumber: number; x: number; y: number }>) => void
 }
 
 const activeTab = ref('screen')
@@ -81,6 +82,7 @@ const activeTab = ref('screen')
         :movement-states="movementStates"
         :external-front-sprite-nodes="externalFrontSpriteNodes"
         :external-back-sprite-nodes="externalBackSpriteNodes"
+        :on-position-sync="onPositionSync"
       />
 
       <!-- STDOUT Tab -->

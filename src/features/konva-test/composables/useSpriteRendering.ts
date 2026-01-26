@@ -185,8 +185,8 @@ export async function createKonvaImage(movement: MovementState): Promise<Konva.I
   // Canvas is displayed at 2x scale, so positions need to be scaled by 2
   const CANVAS_SCALE = 2
   const konvaImage = new Konva.Image({
-    x: movement.currentX * CANVAS_SCALE,
-    y: movement.currentY * CANVAS_SCALE,
+    x: movement.startX * CANVAS_SCALE,
+    y: movement.startY * CANVAS_SCALE,
     image: currentFrameImage,
     scaleX: SPRITE_SCALE,
     scaleY: SPRITE_SCALE,
@@ -210,10 +210,14 @@ export async function updateSprites(
     const sprite = spriteRefs.get(movement.actionNumber)
     if (!sprite) continue
 
-    // Update position (scale by 2 to match canvas display scale)
+    // Update position based on movement progress
+    // Calculate current position from start position and remaining distance
     const CANVAS_SCALE = 2
-    sprite.x(movement.currentX * CANVAS_SCALE)
-    sprite.y(movement.currentY * CANVAS_SCALE)
+    const distanceTraveled = movement.totalDistance - movement.remainingDistance
+    const currentX = movement.startX + movement.directionDeltaX * distanceTraveled
+    const currentY = movement.startY + movement.directionDeltaY * distanceTraveled
+    sprite.x(currentX * CANVAS_SCALE)
+    sprite.y(currentY * CANVAS_SCALE)
 
     // Update frame image
     const { sequence } = getSequenceForMovement(

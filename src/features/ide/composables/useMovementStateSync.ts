@@ -40,21 +40,20 @@ export function useMovementStateSync(options: UseMovementStateSyncOptions) {
         const existing = existingStates.get(m.actionNumber)
         if (existing) {
           if (existing.isActive && m.isActive) {
-            // Preserve existing position if movement is still active
+            // Preserve remaining distance if movement is still active
+            // Position is in Konva nodes, not in state
             return {
               ...m,
-              currentX: existing.currentX,
-              currentY: existing.currentY,
               remainingDistance: existing.remainingDistance,
+              currentFrameIndex: existing.currentFrameIndex,
+              frameCounter: existing.frameCounter,
               definition: { ...m.definition },
             }
-          } else if (!m.isActive && existing.currentX !== undefined && existing.currentY !== undefined) {
-            // Movement was stopped (CUT) - preserve current position from local state
-            // The web worker state might have stale positions, so use the animated position
+          } else if (!m.isActive) {
+            // Movement was stopped (CUT) - preserve remaining distance
+            // Position is in Konva nodes, not in state
             return {
               ...m,
-              currentX: existing.currentX,
-              currentY: existing.currentY,
               remainingDistance: existing.remainingDistance,
               definition: { ...m.definition },
             }

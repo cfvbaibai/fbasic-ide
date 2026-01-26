@@ -9,29 +9,7 @@
     constructor() {
       __publicField(this, "moveDefinitions", /* @__PURE__ */ new Map());
       __publicField(this, "movementStates", /* @__PURE__ */ new Map());
-      __publicField(this, "storedPositions", /* @__PURE__ */ new Map());
       __publicField(this, "deviceAdapter");
-      const defaultPositions = [
-        { x: 80, y: 80 },
-        // Action 0: top-left
-        { x: 176, y: 80 },
-        // Action 1: top-right
-        { x: 80, y: 160 },
-        // Action 2: bottom-left
-        { x: 176, y: 160 },
-        // Action 3: bottom-right
-        { x: 128, y: 60 },
-        // Action 4: top-center
-        { x: 128, y: 180 },
-        // Action 5: bottom-center
-        { x: 50, y: 120 },
-        // Action 6: left-center
-        { x: 206, y: 120 }
-        // Action 7: right-center
-      ];
-      for (let i = 0; i < 8; i++) {
-        this.storedPositions.set(i, defaultPositions[i] ?? { x: 120, y: 120 });
-      }
     }
     /**
      * Set device adapter for sending animation commands
@@ -76,21 +54,21 @@
     /**
      * Start movement (MOVE command)
      * Initializes movement state and begins animation
+     * Position will be retrieved from Konva nodes in the frontend
      */
     startMovement(actionNumber, startX, startY) {
       const definition = this.moveDefinitions.get(actionNumber);
       if (!definition) {
         throw new Error(`No movement definition for action number ${actionNumber} (use DEF MOVE first)`);
       }
-      const storedPos = this.storedPositions.get(actionNumber);
-      const initialX = startX ?? storedPos?.x ?? 120;
-      const initialY = startY ?? storedPos?.y ?? 120;
+      const initialX = startX ?? 120;
+      const initialY = startY ?? 120;
       console.log(`\u{1F3AF} [AnimationManager] startMovement(${actionNumber}):`, {
         startX,
         startY,
-        storedPos,
         initialX,
-        initialY
+        initialY,
+        note: "Frontend will get actual position from Konva nodes"
       });
       const { deltaX, deltaY } = this.getDirectionDeltas(definition.direction);
       const speedDotsPerSecond = definition.speed > 0 ? 60 / definition.speed : 0;
@@ -100,8 +78,6 @@
         definition,
         startX: initialX,
         startY: initialY,
-        currentX: initialX,
-        currentY: initialY,
         remainingDistance: totalDistance,
         totalDistance,
         speedDotsPerSecond,
@@ -125,34 +101,22 @@
     }
     /**
      * Update all active movements (called each frame)
-     * @param deltaTime - Time elapsed since last frame in milliseconds
+     * NOTE: This method is never called in the worker - animation happens on main thread.
+     * Position updates happen in the frontend animation loop using Konva nodes.
+     * @param _deltaTime - Time elapsed since last frame in milliseconds
      */
-    updateMovements(deltaTime) {
+    updateMovements(_deltaTime) {
       for (const movement of this.movementStates.values()) {
         if (!movement.isActive || movement.remainingDistance <= 0) {
           movement.isActive = false;
           continue;
-        }
-        const dotsPerFrame = movement.speedDotsPerSecond * (deltaTime / 1e3);
-        const distanceThisFrame = Math.min(dotsPerFrame, movement.remainingDistance);
-        movement.currentX += movement.directionDeltaX * distanceThisFrame;
-        movement.currentY += movement.directionDeltaY * distanceThisFrame;
-        movement.remainingDistance -= distanceThisFrame;
-        movement.currentX = Math.max(0, Math.min(255, movement.currentX));
-        movement.currentY = Math.max(0, Math.min(239, movement.currentY));
-        if (movement.remainingDistance <= 0) {
-          movement.isActive = false;
-          this.storedPositions.set(movement.actionNumber, {
-            x: movement.currentX,
-            y: movement.currentY
-          });
         }
       }
     }
     /**
      * Stop movement (CUT command)
      * Stops movement but keeps sprite visible at current position
-     * NOTE: Position is NOT saved here - frontend will send current positions back via UPDATE_ANIMATION_POSITIONS
+     * Position is stored in Konva nodes, no need to sync back to worker
      */
     stopMovement(actionNumbers) {
       for (const actionNumber of actionNumbers) {
@@ -167,20 +131,6 @@
           actionNumbers
         };
         this.deviceAdapter.sendAnimationCommand(command);
-      }
-    }
-    /**
-     * Update stored positions (called from frontend via UPDATE_ANIMATION_POSITIONS message)
-     * Frontend has the real current positions since it runs the animation loop
-     */
-    updateStoredPositions(positions) {
-      console.log("\u{1F4CD} [AnimationManager] updateStoredPositions called:", positions);
-      for (const pos of positions) {
-        this.storedPositions.set(pos.actionNumber, {
-          x: pos.x,
-          y: pos.y
-        });
-        console.log(`  \u2713 Updated storedPositions[${pos.actionNumber}] = (${pos.x}, ${pos.y})`);
       }
     }
     /**
@@ -205,7 +155,7 @@
     }
     /**
      * Set initial position (POSITION command)
-     * Stores position for next MOVE command
+     * Sends command to frontend to set Konva node position
      */
     setPosition(actionNumber, x, y) {
       if (actionNumber < 0 || actionNumber > 7) {
@@ -217,7 +167,15 @@
       if (y < 0 || y > 239) {
         throw new Error(`Invalid Y coordinate: ${y} (must be 0-239)`);
       }
-      this.storedPositions.set(actionNumber, { x, y });
+      if (this.deviceAdapter?.sendAnimationCommand) {
+        const command = {
+          type: "SET_POSITION",
+          actionNumber,
+          x,
+          y
+        };
+        this.deviceAdapter.sendAnimationCommand(command);
+      }
     }
     /**
      * Get movement status (MOVE(n) function)
@@ -232,19 +190,10 @@
     }
     /**
      * Get sprite position (XPOS/YPOS functions)
+     * NOTE: Position is stored in Konva nodes in frontend, not in worker.
+     * This method returns null - frontend should query Konva nodes directly.
      */
-    getSpritePosition(actionNumber) {
-      const movement = this.movementStates.get(actionNumber);
-      if (movement) {
-        return {
-          x: movement.currentX,
-          y: movement.currentY
-        };
-      }
-      const stored = this.storedPositions.get(actionNumber);
-      if (stored) {
-        return stored;
-      }
+    getSpritePosition(_actionNumber) {
       return null;
     }
     /**
@@ -295,9 +244,6 @@
     reset() {
       this.movementStates.clear();
       this.moveDefinitions.clear();
-      for (let i = 0; i < 8; i++) {
-        this.storedPositions.set(i, { x: 120, y: 120 });
-      }
     }
   };
 
@@ -5890,6 +5836,8 @@
      * XPOS(n) - returns current X position
      * n: action number (0-7)
      * Returns: X coordinate (0-255) or 0 if no movement/position set
+     * 
+     * Position is cached in WebWorkerDeviceAdapter, synced from Konva nodes in frontend.
      */
     evaluateXpos(args) {
       if (args.length !== 1) {
@@ -5899,16 +5847,15 @@
       if (actionNumber < 0 || actionNumber > 7) {
         throw new Error("XPOS action number must be 0-7");
       }
-      if (!this.context.animationManager) {
-        return 0;
-      }
-      const position = this.context.animationManager.getSpritePosition(actionNumber);
+      const position = this.context.getSpritePosition(actionNumber);
       return position?.x ?? 0;
     }
     /**
      * YPOS(n) - returns current Y position
      * n: action number (0-7)
      * Returns: Y coordinate (0-239) or 0 if no movement/position set
+     * 
+     * Position is cached in WebWorkerDeviceAdapter, synced from Konva nodes in frontend.
      */
     evaluateYpos(args) {
       if (args.length !== 1) {
@@ -5918,10 +5865,7 @@
       if (actionNumber < 0 || actionNumber > 7) {
         throw new Error("YPOS action number must be 0-7");
       }
-      if (!this.context.animationManager) {
-        return 0;
-      }
-      const position = this.context.animationManager.getSpritePosition(actionNumber);
+      const position = this.context.getSpritePosition(actionNumber);
       return position?.y ?? 0;
     }
   };
@@ -6913,25 +6857,6 @@
     }
   };
 
-  // src/core/execution/executors/DataExecutor.ts
-  var DataExecutor = class {
-    constructor(dataService) {
-      this.dataService = dataService;
-    }
-    /**
-     * Execute DATA statement (preprocessing phase)
-     * DATA DataConstantList
-     */
-    execute(cst) {
-      const dataConstantListCst = getFirstCstNode(cst.children.dataConstantList);
-      if (!dataConstantListCst) {
-        return;
-      }
-      const constants = getCstNodes(dataConstantListCst.children.dataConstant);
-      this.dataService.addDataValuesCst(constants);
-    }
-  };
-
   // src/core/execution/executors/CutExecutor.ts
   var CutExecutor = class {
     constructor(context, evaluator) {
@@ -7021,6 +6946,25 @@
         return false;
       }
       return true;
+    }
+  };
+
+  // src/core/execution/executors/DataExecutor.ts
+  var DataExecutor = class {
+    constructor(dataService) {
+      this.dataService = dataService;
+    }
+    /**
+     * Execute DATA statement (preprocessing phase)
+     * DATA DataConstantList
+     */
+    execute(cst) {
+      const dataConstantListCst = getFirstCstNode(cst.children.dataConstantList);
+      if (!dataConstantListCst) {
+        return;
+      }
+      const constants = getCstNodes(dataConstantListCst.children.dataConstant);
+      this.dataService.addDataValuesCst(constants);
     }
   };
 
@@ -10874,6 +10818,24 @@
     }
   };
 
+  // src/core/execution/executors/EndExecutor.ts
+  var EndExecutor = class {
+    constructor(context) {
+      this.context = context;
+    }
+    /**
+     * Execute an END statement from CST
+     * Stops program execution immediately
+     */
+    execute(_endStmtCst) {
+      this.context.shouldStop = true;
+      this.context.isRunning = false;
+      if (this.context.config.enableDebugMode) {
+        this.context.addDebugOutput("END: Program terminated");
+      }
+    }
+  };
+
   // src/core/execution/executors/EraExecutor.ts
   var EraExecutor = class {
     constructor(context, evaluator) {
@@ -10963,24 +10925,6 @@
         return false;
       }
       return true;
-    }
-  };
-
-  // src/core/execution/executors/EndExecutor.ts
-  var EndExecutor = class {
-    constructor(context) {
-      this.context = context;
-    }
-    /**
-     * Execute an END statement from CST
-     * Stops program execution immediately
-     */
-    execute(_endStmtCst) {
-      this.context.shouldStop = true;
-      this.context.isRunning = false;
-      if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput("END: Program terminated");
-      }
     }
   };
 
@@ -11530,97 +11474,6 @@
     }
   };
 
-  // src/core/execution/executors/PositionExecutor.ts
-  var PositionExecutor = class {
-    constructor(context, evaluator) {
-      this.context = context;
-      this.evaluator = evaluator;
-    }
-    /**
-     * Execute a POSITION statement from CST
-     * POSITION n, X, Y
-     * n: action number (0-7)
-     * X: X coordinate (0-255)
-     * Y: Y coordinate (0-239)
-     */
-    execute(positionStmtCst, lineNumber) {
-      try {
-        const actionNumberExpr = getFirstCstNode(positionStmtCst.children.actionNumber);
-        const xExpr = getFirstCstNode(positionStmtCst.children.x);
-        const yExpr = getFirstCstNode(positionStmtCst.children.y);
-        if (!actionNumberExpr || !xExpr || !yExpr) {
-          this.context.addError({
-            line: lineNumber ?? 0,
-            message: "POSITION: Missing parameters",
-            type: ERROR_TYPES.RUNTIME
-          });
-          return;
-        }
-        const actionNumber = this.evaluateNumber(actionNumberExpr, "action number", lineNumber);
-        if (actionNumber === null) {
-          return;
-        }
-        const x = this.evaluateNumber(xExpr, "X coordinate", lineNumber);
-        if (x === null) {
-          return;
-        }
-        const y = this.evaluateNumber(yExpr, "Y coordinate", lineNumber);
-        if (y === null) {
-          return;
-        }
-        if (!this.validateRange(actionNumber, 0, 7, "action number", lineNumber)) return;
-        if (!this.validateRange(x, 0, 255, "X coordinate", lineNumber)) return;
-        if (!this.validateRange(y, 0, 239, "Y coordinate", lineNumber)) return;
-        if (this.context.animationManager) {
-          try {
-            this.context.animationManager.setPosition(actionNumber, x, y);
-          } catch (error) {
-            this.context.addError({
-              line: lineNumber ?? 0,
-              message: `POSITION: ${error instanceof Error ? error.message : String(error)}`,
-              type: ERROR_TYPES.RUNTIME
-            });
-            return;
-          }
-        }
-        if (this.context.config.enableDebugMode) {
-          this.context.addDebugOutput(`POSITION: Set position for action ${actionNumber} to (${x}, ${y})`);
-        }
-      } catch (error) {
-        this.context.addError({
-          line: lineNumber ?? 0,
-          message: `POSITION: ${error instanceof Error ? error.message : String(error)}`,
-          type: ERROR_TYPES.RUNTIME
-        });
-      }
-    }
-    evaluateNumber(expr, paramName, lineNumber) {
-      try {
-        const value = this.evaluator.evaluateExpression(expr);
-        const num = typeof value === "number" ? Math.floor(value) : Math.floor(parseFloat(String(value)) || 0);
-        return num;
-      } catch (error) {
-        this.context.addError({
-          line: lineNumber ?? 0,
-          message: `POSITION: Error evaluating ${paramName}: ${error instanceof Error ? error.message : String(error)}`,
-          type: ERROR_TYPES.RUNTIME
-        });
-        return null;
-      }
-    }
-    validateRange(num, min2, max2, paramName, lineNumber) {
-      if (num < min2 || num > max2) {
-        this.context.addError({
-          line: lineNumber ?? 0,
-          message: `POSITION: ${paramName} out of range (${min2}-${max2}), got ${num}`,
-          type: ERROR_TYPES.RUNTIME
-        });
-        return false;
-      }
-      return true;
-    }
-  };
-
   // src/core/execution/executors/OnExecutor.ts
   var OnExecutor = class {
     constructor(context, evaluator, dataService) {
@@ -11943,6 +11796,97 @@
       if (this.context.config.enableDebugMode) {
         this.context.addDebugOutput(`PAUSE: ${frames} frames (${Math.round(durationMs)}ms)`);
       }
+    }
+  };
+
+  // src/core/execution/executors/PositionExecutor.ts
+  var PositionExecutor = class {
+    constructor(context, evaluator) {
+      this.context = context;
+      this.evaluator = evaluator;
+    }
+    /**
+     * Execute a POSITION statement from CST
+     * POSITION n, X, Y
+     * n: action number (0-7)
+     * X: X coordinate (0-255)
+     * Y: Y coordinate (0-239)
+     */
+    execute(positionStmtCst, lineNumber) {
+      try {
+        const actionNumberExpr = getFirstCstNode(positionStmtCst.children.actionNumber);
+        const xExpr = getFirstCstNode(positionStmtCst.children.x);
+        const yExpr = getFirstCstNode(positionStmtCst.children.y);
+        if (!actionNumberExpr || !xExpr || !yExpr) {
+          this.context.addError({
+            line: lineNumber ?? 0,
+            message: "POSITION: Missing parameters",
+            type: ERROR_TYPES.RUNTIME
+          });
+          return;
+        }
+        const actionNumber = this.evaluateNumber(actionNumberExpr, "action number", lineNumber);
+        if (actionNumber === null) {
+          return;
+        }
+        const x = this.evaluateNumber(xExpr, "X coordinate", lineNumber);
+        if (x === null) {
+          return;
+        }
+        const y = this.evaluateNumber(yExpr, "Y coordinate", lineNumber);
+        if (y === null) {
+          return;
+        }
+        if (!this.validateRange(actionNumber, 0, 7, "action number", lineNumber)) return;
+        if (!this.validateRange(x, 0, 255, "X coordinate", lineNumber)) return;
+        if (!this.validateRange(y, 0, 239, "Y coordinate", lineNumber)) return;
+        if (this.context.animationManager) {
+          try {
+            this.context.animationManager.setPosition(actionNumber, x, y);
+          } catch (error) {
+            this.context.addError({
+              line: lineNumber ?? 0,
+              message: `POSITION: ${error instanceof Error ? error.message : String(error)}`,
+              type: ERROR_TYPES.RUNTIME
+            });
+            return;
+          }
+        }
+        if (this.context.config.enableDebugMode) {
+          this.context.addDebugOutput(`POSITION: Set position for action ${actionNumber} to (${x}, ${y})`);
+        }
+      } catch (error) {
+        this.context.addError({
+          line: lineNumber ?? 0,
+          message: `POSITION: ${error instanceof Error ? error.message : String(error)}`,
+          type: ERROR_TYPES.RUNTIME
+        });
+      }
+    }
+    evaluateNumber(expr, paramName, lineNumber) {
+      try {
+        const value = this.evaluator.evaluateExpression(expr);
+        const num = typeof value === "number" ? Math.floor(value) : Math.floor(parseFloat(String(value)) || 0);
+        return num;
+      } catch (error) {
+        this.context.addError({
+          line: lineNumber ?? 0,
+          message: `POSITION: Error evaluating ${paramName}: ${error instanceof Error ? error.message : String(error)}`,
+          type: ERROR_TYPES.RUNTIME
+        });
+        return null;
+      }
+    }
+    validateRange(num, min2, max2, paramName, lineNumber) {
+      if (num < min2 || num > max2) {
+        this.context.addError({
+          line: lineNumber ?? 0,
+          message: `POSITION: ${paramName} out of range (${min2}-${max2}), got ${num}`,
+          type: ERROR_TYPES.RUNTIME
+        });
+        return false;
+      }
+      return true;
     }
   };
 
@@ -13035,6 +12979,15 @@
         }
       }
       return 0;
+    }
+    /**
+     * Get sprite position (XPOS/YPOS functions)
+     */
+    getSpritePosition(actionNumber) {
+      if (this.deviceAdapter) {
+        return this.deviceAdapter.getSpritePosition(actionNumber);
+      }
+      return null;
     }
   };
 
@@ -24258,6 +24211,8 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       // === DEVICE STATE ===
       __publicField(this, "strigClickBuffer", /* @__PURE__ */ new Map());
       __publicField(this, "stickStates", /* @__PURE__ */ new Map());
+      __publicField(this, "spritePositions", /* @__PURE__ */ new Map());
+      // Cached sprite positions from Konva nodes
       __publicField(this, "isEnabled", true);
       // === MANAGERS ===
       __publicField(this, "webWorkerManager");
@@ -24393,15 +24348,19 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         });
       }
     }
+    // === SPRITE POSITION QUERY ===
+    getSpritePosition(actionNumber) {
+      return this.spritePositions.get(actionNumber) ?? null;
+    }
+    /**
+     * Update cached sprite position (called from frontend via UPDATE_ANIMATION_POSITIONS message)
+     */
+    updateSpritePosition(actionNumber, x, y) {
+      this.spritePositions.set(actionNumber, { x, y });
+    }
     consumeStrigState(joystickId) {
-      if (!this.isEnabled) {
-        return 0;
-      }
-      if (!this.strigClickBuffer.has(joystickId)) {
-        return 0;
-      }
       const buffer = this.strigClickBuffer.get(joystickId);
-      if (buffer.length === 0) {
+      if (!buffer || buffer.length === 0) {
         return 0;
       }
       const clickValue = buffer.shift();
@@ -24762,17 +24721,10 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     }
     handleUpdateAnimationPositions(message) {
       const { positions } = message.data;
-      console.log("\u{1F3AC} [WORKER] Updating animation positions:", positions);
-      if (this.interpreter) {
-        const animationManager = this.interpreter.getAnimationManager();
-        if (animationManager) {
-          animationManager.updateStoredPositions(positions);
-          console.log("\u2705 [WORKER] Animation positions updated in AnimationManager");
-        } else {
-          console.log("\u26A0\uFE0F [WORKER] No AnimationManager available");
+      if (this.webWorkerDeviceAdapter) {
+        for (const pos of positions) {
+          this.webWorkerDeviceAdapter.updateSpritePosition(pos.actionNumber, pos.x, pos.y);
         }
-      } else {
-        console.log("\u26A0\uFE0F [WORKER] No interpreter available for updating positions");
       }
     }
     sendOutput(output, outputType) {

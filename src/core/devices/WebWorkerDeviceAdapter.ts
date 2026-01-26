@@ -24,6 +24,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   // === DEVICE STATE ===
   private strigClickBuffer: Map<number, number[]> = new Map()
   private stickStates: Map<number, number> = new Map()
+  private spritePositions: Map<number, { x: number; y: number }> = new Map() // Cached sprite positions from Konva nodes
   private isEnabled = true
 
   // === MANAGERS ===
@@ -187,17 +188,22 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     }
   }
 
+  // === SPRITE POSITION QUERY ===
+
+  getSpritePosition(actionNumber: number): { x: number; y: number } | null {
+    return this.spritePositions.get(actionNumber) ?? null
+  }
+
+  /**
+   * Update cached sprite position (called from frontend via UPDATE_ANIMATION_POSITIONS message)
+   */
+  updateSpritePosition(actionNumber: number, x: number, y: number): void {
+    this.spritePositions.set(actionNumber, { x, y })
+  }
+
   consumeStrigState(joystickId: number): number {
-    if (!this.isEnabled) {
-      return 0
-    }
-
-    if (!this.strigClickBuffer.has(joystickId)) {
-      return 0
-    }
-
-    const buffer = this.strigClickBuffer.get(joystickId)!
-    if (buffer.length === 0) {
+    const buffer = this.strigClickBuffer.get(joystickId)
+    if (!buffer || buffer.length === 0) {
       return 0
     }
 

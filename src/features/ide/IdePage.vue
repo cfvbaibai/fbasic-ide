@@ -50,6 +50,7 @@ const {
   toggleDebugMode,
   sendStickEvent,
   sendStrigEvent,
+  syncSpritePositions,
 } = useBasicIdeEnhanced()
 
 // Computed properties for backward compatibility
@@ -170,6 +171,7 @@ onMounted(() => {
         <!-- Right Panel - Runtime Output -->
         <div class="output-panel">
           <RuntimeOutput
+            :on-position-sync="syncSpritePositions"
             :output="output"
             :is-running="isRunning"
             :errors="errors"

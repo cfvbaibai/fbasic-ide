@@ -13,26 +13,51 @@ import { updateAnimatedSprites } from './useKonvaScreenRenderer'
 
 /**
  * Update movement positions and frame indices
+ * Positions are read from and written to Konva nodes (single source of truth)
  */
-function updateMovements(movements: MovementState[], deltaTime: number): void {
+function updateMovements(
+  movements: MovementState[],
+  deltaTime: number,
+  frontSpriteNodes: Map<number, Konva.Image>,
+  backSpriteNodes: Map<number, Konva.Image>
+): void {
   for (const movement of movements) {
     if (!movement.isActive || movement.remainingDistance <= 0) {
       movement.isActive = false
       continue
     }
 
+    // Get current position from Konva node (single source of truth)
+    const spriteNode =
+      movement.definition.priority === 0
+        ? frontSpriteNodes.get(movement.actionNumber)
+        : backSpriteNodes.get(movement.actionNumber)
+
+    if (!spriteNode) {
+      // Node doesn't exist yet, skip this frame
+      continue
+    }
+
+    // Read current position from Konva node
+    let currentX = spriteNode.x()
+    let currentY = spriteNode.y()
+
     // Calculate distance per frame: speedDotsPerSecond × (deltaTime / 1000)
     const dotsPerFrame = movement.speedDotsPerSecond * (deltaTime / 1000)
     const distanceThisFrame = Math.min(dotsPerFrame, movement.remainingDistance)
 
-    // Update position
-    movement.currentX += movement.directionDeltaX * distanceThisFrame
-    movement.currentY += movement.directionDeltaY * distanceThisFrame
+    // Calculate new position
+    currentX += movement.directionDeltaX * distanceThisFrame
+    currentY += movement.directionDeltaY * distanceThisFrame
     movement.remainingDistance -= distanceThisFrame
 
     // Clamp to screen bounds
-    movement.currentX = Math.max(0, Math.min(255, movement.currentX))
-    movement.currentY = Math.max(0, Math.min(239, movement.currentY))
+    currentX = Math.max(0, Math.min(255, currentX))
+    currentY = Math.max(0, Math.min(239, currentY))
+
+    // Write position back to Konva node
+    spriteNode.x(currentX)
+    spriteNode.y(currentY)
 
     // Update frame animation (Phase 4)
     // Frame counter increments each frame, advances sprite every 8 frames
@@ -59,6 +84,7 @@ export interface UseScreenAnimationLoopOptions {
   frontSpriteNodes: Ref<Map<number, Konva.Image> | Map<number, unknown>>
   backSpriteNodes: Ref<Map<number, Konva.Image> | Map<number, unknown>>
   spritePalette: Ref<number> | number
+  onPositionSync?: (positions: Array<{ actionNumber: number; x: number; y: number }>) => void
 }
 
 /**
@@ -76,6 +102,7 @@ export function useScreenAnimationLoop(
     frontSpriteNodes,
     backSpriteNodes,
     spritePalette,
+    onPositionSync,
   } = options
 
   let animationFrameId: number | null = null
@@ -102,7 +129,12 @@ export function useScreenAnimationLoop(
 
     // Active movements - update positions and frames ONLY
     // This loop does NOT handle static rendering (PRINT, SPRITE, etc.)
-    updateMovements(localMovementStates.value, deltaTime)
+    updateMovements(
+      localMovementStates.value,
+      deltaTime,
+      frontSpriteNodes.value as Map<number, Konva.Image>,
+      backSpriteNodes.value as Map<number, Konva.Image>
+    )
 
     // Update animated sprite Konva nodes (positions and frames)
     // This only updates the MOVE sprites, not static sprites
@@ -114,6 +146,53 @@ export function useScreenAnimationLoop(
       frontSpriteNodes.value as Map<number, Konva.Image>,
       backSpriteNodes.value as Map<number, Konva.Image>
     )
+
+    // Sync positions to worker for XPOS/YPOS queries (every frame)
+    // Sync positions for ALL sprite nodes that exist, not just active movements
+    // This ensures XPOS/YPOS works for stopped movements (CUT) and movements that haven't started yet
+    if (onPositionSync) {
+      const positions: Array<{ actionNumber: number; x: number; y: number }> = []
+      const syncedActionNumbers = new Set<number>()
+      
+      // First, sync positions for movements in localMovementStates (active and stopped)
+      for (const movement of localMovementStates.value) {
+        // Get position from Konva node (single source of truth)
+        const spriteNode =
+          movement.definition.priority === 0
+            ? (frontSpriteNodes.value as Map<number, Konva.Image>).get(movement.actionNumber)
+            : (backSpriteNodes.value as Map<number, Konva.Image>).get(movement.actionNumber)
+
+        if (spriteNode) {
+          const x = spriteNode.x()
+          const y = spriteNode.y()
+          positions.push({ actionNumber: movement.actionNumber, x, y })
+          syncedActionNumbers.add(movement.actionNumber)
+        }
+      }
+      
+      // Also sync positions for any other sprite nodes that exist (e.g., from POSITION command before MOVE)
+      // Check both front and back sprite nodes
+      for (const [actionNumber, spriteNode] of (frontSpriteNodes.value as Map<number, Konva.Image>).entries()) {
+        if (!syncedActionNumbers.has(actionNumber) && spriteNode) {
+          const x = spriteNode.x()
+          const y = spriteNode.y()
+          positions.push({ actionNumber, x, y })
+          syncedActionNumbers.add(actionNumber)
+        }
+      }
+      
+      for (const [actionNumber, spriteNode] of (backSpriteNodes.value as Map<number, Konva.Image>).entries()) {
+        if (!syncedActionNumbers.has(actionNumber) && spriteNode) {
+          const x = spriteNode.x()
+          const y = spriteNode.y()
+          positions.push({ actionNumber, x, y })
+        }
+      }
+      
+      if (positions.length > 0) {
+        onPositionSync(positions)
+      }
+    }
 
     // Continue animation loop
     animationFrameId = requestAnimationFrame(animationLoop)

@@ -59,6 +59,9 @@ export interface BasicDeviceAdapter {
   pushStrigState(joystickId: number, state: number): void
   consumeStrigState(joystickId: number): number
 
+  // === SPRITE POSITION QUERY ===
+  getSpritePosition(actionNumber: number): { x: number; y: number } | null
+
   // === TEXT OUTPUT ===
   printOutput(output: string): void
   debugOutput(output: string): void
@@ -97,6 +100,12 @@ export type AnimationCommand =
       x: number
       y: number
       remainingDistance: number
+    }
+  | {
+      type: 'SET_POSITION'
+      actionNumber: number
+      x: number
+      y: number
     }
 
 /**

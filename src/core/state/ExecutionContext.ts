@@ -228,4 +228,14 @@ export class ExecutionContext {
     }
     return 0
   }
+
+  /**
+   * Get sprite position (XPOS/YPOS functions)
+   */
+  getSpritePosition(actionNumber: number): { x: number; y: number } | null {
+    if (this.deviceAdapter) {
+      return this.deviceAdapter.getSpritePosition(actionNumber)
+    }
+    return null
+  }
 }

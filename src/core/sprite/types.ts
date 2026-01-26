@@ -53,14 +53,14 @@ export interface MoveDefinition {
 
 /**
  * Movement state (active animation)
+ * Position is stored in Konva sprite nodes, not in this state object.
+ * This state only tracks movement parameters and animation frames.
  */
 export interface MovementState {
   actionNumber: number
   definition: MoveDefinition
-  startX: number // Starting X position
-  startY: number // Starting Y position
-  currentX: number // Current X position (updated each frame)
-  currentY: number // Current Y position (updated each frame)
+  startX: number // Starting X position (for reference, actual position in Konva)
+  startY: number // Starting Y position (for reference, actual position in Konva)
   remainingDistance: number // Remaining distance in dots
   totalDistance: number // Total distance (2×D)
   speedDotsPerSecond: number // 60/C dots per second

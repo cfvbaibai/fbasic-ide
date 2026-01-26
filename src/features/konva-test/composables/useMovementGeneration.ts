@@ -74,8 +74,6 @@ export function generateMovements(count: number, speed: number): MovementState[]
       },
       startX: clampedX,
       startY: clampedY,
-      currentX: clampedX,
-      currentY: clampedY,
       remainingDistance: 100,
       totalDistance: 100,
       speedDotsPerSecond,
