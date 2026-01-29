@@ -503,7 +503,7 @@ export class FunctionEvaluator {
     }
     const actionNumber = Math.floor(toNumber(args[0] ?? 0))
     if (actionNumber < 0 || actionNumber > 7) {
-      throw new Error('MOVE action number must be 0-7')
+      throw new Error(`MOVE action number out of range (0-7), got ${actionNumber}`)
     }
     if (!this.context.animationManager) {
       return 0
@@ -524,7 +524,7 @@ export class FunctionEvaluator {
     }
     const actionNumber = Math.floor(toNumber(args[0] ?? 0))
     if (actionNumber < 0 || actionNumber > 7) {
-      throw new Error('XPOS action number must be 0-7')
+      throw new Error(`XPOS action number out of range (0-7), got ${actionNumber}`)
     }
     const position = this.context.getSpritePosition(actionNumber)
     return position?.x ?? 0
@@ -543,7 +543,7 @@ export class FunctionEvaluator {
     }
     const actionNumber = Math.floor(toNumber(args[0] ?? 0))
     if (actionNumber < 0 || actionNumber > 7) {
-      throw new Error('YPOS action number must be 0-7')
+      throw new Error(`YPOS action number out of range (0-7), got ${actionNumber}`)
     }
     const position = this.context.getSpritePosition(actionNumber)
     return position?.y ?? 0

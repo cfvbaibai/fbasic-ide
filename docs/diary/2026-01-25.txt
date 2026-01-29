@@ -1,0 +1,204 @@
+### Recent Updates (2026-01-25)
+
+**Explicit Character Sequence Configuration**:
+- ✅ Created `characterSequenceConfig.ts` with explicit sprite sequences for all 16 character types
+- ✅ Each character has direction-specific sprite lists (0-8) with exact sprite names in frame order
+- ✅ Per-frame inversion flags (frameInversions) - one per sprite name
+- ✅ Frame rates and looping behavior configured per direction
+- ✅ Example: MARIO direction 1 (Up) alternates between normal and X-inversed LADDER
+
+**Per-Frame Sprite Inversion Support**:
+- ✅ Added `FrameInversionConfig` interface to `types.ts`
+- ✅ Added `frameInversions?: FrameInversionConfig[]` field to `AnimationSequence`
+- ✅ Updated `useKonvaSpriteRenderer.ts` to use per-frame inversions with direction-level fallback
+- ✅ Updated `useSpriteRendering.ts` to support per-frame inversions
+- ✅ Each frame can now have its own inversion flags (invertX, invertY)
+
+**CharacterAnimationBuilder Refactoring**:
+- ✅ Refactored to use config-based approach (`buildSequencesFromConfig`, `buildDirectionMappingsFromConfig`)
+- ✅ Falls back to old method for characters without explicit config
+- ✅ Improved accuracy and maintainability of character animations
+- ✅ Fixed frame inversion count mismatch for MARIO and LADY direction 4
+
+**Phase 5 - Movement Control Commands Complete** (2026-01-25):
+- ✅ CUT command implemented - stops movement, keeps sprite visible
+- ✅ ERA command implemented - erases sprite completely
+- ✅ POSITION command implemented - sets initial position for next MOVE
+- ✅ MOVE(n) function implemented - returns -1 if moving, 0 if complete
+- ✅ XPOS(n) function implemented - returns current X position
+- ✅ YPOS(n) function implemented - returns current Y position
+
+**Bug Fix - CUT Position Preservation** (2026-01-25):
+- 🐛 **Fixed**: MOVE after CUT was resetting sprite to original position instead of preserving CUT position
+- **Root Cause**: Worker's `AnimationManager.updateMovements()` is never called, so worker has stale positions. When CUT saved positions, they were initial positions, not current animated positions
+- **Architecture Issue**:
+  - Frontend runs animation loop and has current positions
+  - Worker never updates positions (no updateMovements calls)
+  - Worker was saving stale positions to storedPositions on CUT
+  - Next MOVE used stale stored position
+- **Solution**: Multi-layer position retrieval system
+  1. Added sprite node refs to IDE composable (`frontSpriteNodes`, `backSpriteNodes`)
+  2. Screen component syncs Konva sprite nodes to external refs after rendering
+  3. STOP_MOVEMENT handler retrieves positions from Konva nodes (most accurate) before falling back to movement states
+  4. Frontend sends `UPDATE_ANIMATION_POSITIONS` message to worker with actual positions
+  5. Worker updates `AnimationManager.storedPositions` with current positions from frontend
+  6. Next MOVE uses updated stored position
+- **Files Changed**:
+  - `src/core/interfaces.ts`: Added `UpdateAnimationPositionsMessage` type
+  - `src/core/animation/AnimationManager.ts`: Added `updateStoredPositions()` method, removed stale position saving from `stopMovement()`
+  - `src/core/BasicInterpreter.ts`: Added `getAnimationManager()` method
+  - `src/features/ide/composables/useBasicIdeEnhanced.ts`: Added sprite node refs
+  - `src/features/ide/composables/useBasicIdeMessageHandlers.ts`: Updated position retrieval to use Konva nodes
+  - `src/features/ide/components/Screen.vue`: Added external sprite node sync
+  - `src/features/ide/components/ScreenTab.vue`: Pass through sprite node props
+  - `src/features/ide/components/RuntimeOutput.vue`: Pass through sprite node props
+  - `src/features/ide/IdePage.vue`: Connect composable to components
+  - `public/basic-interpreter-worker.js`: Added UPDATE_ANIMATION_POSITIONS message handler
+- **Impact**: MOVE after CUT now correctly continues from where sprite was cut, even after animation has occurred
+- ✅ All executors registered in StatementRouter
+- ✅ Function evaluation methods added to FunctionEvaluator
+- ✅ Parser rules added with proper lookahead for MOVE statement vs MOVE(n) function
+- ✅ useMovementStateSync composable created for movement state synchronization
+- ✅ All TypeScript type checking passes
+- ✅ All ESLint checks pass
+
+**Key Implementation Details**:
+- **Parser Lookahead**: MOVE statement (MOVE n) distinguished from MOVE(n) function using lookahead gate (`LA(2) !== LParen`)
+- **Function Integration**: MOVE(n), XPOS(n), YPOS(n) added to FunctionEvaluator alongside STICK and STRIG
+- **AnimationManager Methods**: All required methods (stopMovement, eraseMovement, setPosition, getMovementStatus, getSpritePosition) were already implemented in Phase 3
+- **Multiple Action Support**: CUT and ERA support variable arguments (n1, n2, ...) for controlling multiple sprites simultaneously
+- **Position Preservation**: Multi-layer position retrieval system using Konva sprite node references ensures accurate position preservation when CUT is executed after animation
+
+### Completed (2026-01-25)
+
+**Phase 1 Achievements** (✅ Complete):
+- ✅ Canvas infrastructure fully extended with multi-layer rendering
+- ✅ Sprite type definitions complete with all necessary interfaces
+- ✅ Tile caching implemented for performance optimization
+
+**Phase 2 Achievements** (✅ Complete):
+- ✅ Sprite state manager handles 8 sprite slots efficiently
+- ✅ Character set to tile conversion working correctly
+- ✅ DEF SPRITE and SPRITE executors implemented with full validation
+- ✅ Parser rules added and integrated into statement router
+- ✅ Rendering pipeline supports static sprites with priority layering
+- ✅ SPRITE ON/OFF commands implemented (visibility control)
+- ✅ Sprite operations work independently of SPRITE ON/OFF state
+- ✅ Rendering layer checks sprite enabled flag before drawing
+- ✅ SPRITE OFF stops rendering but preserves sprite state
+- ✅ **Table A lookup implemented** - CHR$(n) correctly uses sprite table, not background table
+- ✅ **CHR$ expression parsing** - Handles `CHR$(0)+CHR$(1)+...` correctly
+- ✅ **Transparency support** - Value 0 pixels render as transparent using ImageBitmap + drawImage
+- ✅ **Sprite state synchronization** - States passed from web worker to main thread
+- ✅ All TypeScript type checking passes
+- ✅ All ESLint checks pass
+
+**Key Accomplishments**:
+- No technical debt introduced
+- Clean separation of concerns maintained
+- All files respect 500-line limit
+- Full type safety throughout
+
+**Phase 4 Achievements** (✅ Complete - 2026-01-25):
+- ✅ CharacterAnimationBuilder implemented with sequence extraction and direction mapping
+- ✅ **Explicit character sequence configuration** (`characterSequenceConfig.ts`) - All 16 character types have explicit configs
+- ✅ **Per-frame sprite inversion support** - FrameInversionConfig interface and frameInversions field added
+- ✅ Animation sequences built from explicit configs (with fallback to CHARACTER_SPRITES data)
+- ✅ Frame animation logic added to updateMovements() in Screen.vue
+- ✅ renderAnimatedSprite() updated to render actual character sprite tiles with per-frame inversions
+- ✅ Direction-to-sequence mapping with automatic inversion (left = WALK + X inversion)
+- ✅ Character animation configs cached for performance
+- ✅ Support for 8×8 and 16×16 sprite frames
+- ✅ Frame looping using modulo operation
+- ✅ Sprite renderers (useKonvaSpriteRenderer, useSpriteRendering) support per-frame inversions
+- ✅ All TypeScript type checking passes
+- ✅ All ESLint checks pass
+
+**Phase 3 Achievements** (✅ Complete - 2026-01-25):
+- ✅ AnimationManager implemented with real-time command communication
+- ✅ DEF MOVE and MOVE commands fully functional
+- ✅ Real-time animation command messaging between worker and main thread
+- ✅ requestAnimationFrame animation loop for smooth movement
+- ✅ Sequential movement execution with PAUSE timing support
+- ✅ Movement state synchronization and merging
+- ✅ Visual feedback with colored rectangles (placeholder for Phase 4)
+- ✅ Unique starting positions for each action slot
+- ✅ Screen bounds clamping for movements
+- ✅ Sample test program (moveTest) demonstrating sequential movements
+- ✅ All TypeScript type checking passes
+- ✅ All ESLint checks pass
+
+**Issues Resolved** (2026-01-25):
+
+1. **Sprite States Not Displaying**
+   - **Problem**: Sprites defined in web worker but not visible on screen
+   - **Root Cause**: Sprite states not passed from web worker to main thread
+   - **Solution**: 
+     - Added `spriteStates` and `spriteEnabled` to `ExecutionResult` interface
+     - Updated `WebWorkerInterpreter` to extract sprite states from context
+     - Updated `useBasicIdeEnhanced` to receive and manage sprite states
+     - Passed sprite states through component hierarchy
+
+2. **Table A vs Table B Lookup Issue**
+   - **Problem**: `CHR$(0)` was looking up tiles from background table (Table B) instead of sprite table (Table A)
+   - **Root Cause**: `convertCharacterSetToTiles()` used `getBackgroundItemByCode()` which looks up Table B
+   - **Solution**:
+     - Created `src/shared/utils/spriteLookup.ts` with sprite-specific lookup functions
+     - `getSpriteTileByCode()` - Finds sprite tiles from CHARACTER_SPRITES array
+     - `getSpriteTilesByCodes()` - Handles multi-tile sprites with exact matching
+     - Updated `convertCharacterSetToTiles()` to use sprite lookup
+
+3. **CHR$ Expression Parsing**
+   - **Problem**: `CHR$(0)+CHR$(1)+CHR$(2)+CHR$(3)` evaluated as string concatenation, producing invalid codes
+   - **Root Cause**: Expression evaluator treated CHR$ expressions as string concatenation
+   - **Solution**:
+     - Added `extractChrCodesFromExpression()` method in `DefSpriteExecutor`
+     - Recursively traverses expression CST to extract CHR$ function calls
+     - Directly extracts character codes from CHR$ arguments
+     - Falls back to normal evaluation if no CHR$ expressions found
+
+4. **Transparency Not Working (Black Pixels)**
+   - **Problem**: Sprite pixels with value 0 rendered as black instead of transparent
+   - **Root Cause**: 
+     - Canvas context used `alpha: false`, which doesn't support transparency
+     - `putImageData()` doesn't perform alpha blending - directly replaces pixels
+   - **Solution**:
+     - Changed canvas context to `alpha: true` in `renderScreenLayers()`
+     - Switched from `ImageData` + `putImageData()` to `ImageBitmap` + `drawImage()`
+     - `drawImage()` properly supports alpha blending for transparent pixels
+     - Initialize all pixels to transparent (alpha = 0) before rendering
+     - Updated all rendering functions to async for `createImageBitmap()`
+
+5. **Movements Appearing Simultaneously Instead of Sequentially**
+   - **Problem**: All movements appeared at once after all MOVE commands completed, ignoring PAUSE timing
+   - **Root Cause**: Movement states were only sent to main thread after entire program execution completed
+   - **Solution**:
+     - Implemented real-time `AnimationCommand` messaging via `sendAnimationCommand()` in device adapter
+     - `AnimationManager.startMovement()` sends `START_MOVEMENT` command immediately when MOVE executes
+     - Main thread processes commands in real-time via `handleAnimationCommandMessage()`
+     - Movements now appear and start sequentially as each MOVE command executes, respecting PAUSE delays
+
+**Technical Solutions Summary**:
+- ✅ Created `spriteLookup.ts` for Table A sprite tile lookup
+- ✅ Enhanced `DefSpriteExecutor` with CHR$ expression extraction
+- ✅ Updated rendering to use ImageBitmap with alpha support
+- ✅ Added sprite state fields to ExecutionResult interface
+- ✅ Implemented async rendering pipeline for ImageBitmap creation
+- ✅ Updated sprite state synchronization across web worker and main thread
+- ✅ Correct SPRITE ON/OFF semantics (visibility control, not operation gating)
+- ✅ Implemented real-time animation command communication architecture
+- ✅ Created AnimationManager with command-based state management
+- ✅ Added requestAnimationFrame animation loop for smooth movement
+- ✅ Implemented movement state merging to preserve active movement positions
+- Ready for Phase 4: Animation Sequences (frame cycling)
+
+**Important Design Decisions**:
+- **SPRITE ON/OFF controls visibility only**, not whether sprite operations can execute
+- DEF SPRITE and SPRITE commands work regardless of SPRITE ON/OFF state
+- Sprites can be defined and positioned when SPRITE OFF
+- SPRITE ON makes them visible, SPRITE OFF hides them
+- This matches Family BASIC behavior where sprite state persists independently of display state
+
+- **Real-time Animation Commands**: Movements are sent as commands from web worker to main thread immediately when MOVE executes, not batched after program completion. This enables sequential execution with proper PAUSE timing.
+- **Main Thread Animation Loop**: Position updates happen on the main thread using requestAnimationFrame for smooth rendering, while movement definitions and triggers remain in the web worker.
+- **State Merging**: When new movement states arrive from the worker, they are merged with existing local states to preserve current positions of active movements.

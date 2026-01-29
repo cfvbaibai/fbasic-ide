@@ -13,6 +13,9 @@ export default {
         'stylelint-value-no-unknown-custom-properties'
     ],
     rules: {
+        // Disabled: Prettier (format on save) removes blank lines between declarations;
+        // this rule would require them and cause save-time conflicts (e.g. screen-crt.css).
+        'declaration-empty-line-before': null,
         'color-no-hex': true,
         'color-named': 'never',
         'function-disallowed-list': ['rgb', 'rgba', 'hsl', 'hsla'],

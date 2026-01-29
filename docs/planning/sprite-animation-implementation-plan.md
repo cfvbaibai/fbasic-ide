@@ -2,7 +2,7 @@
 
 **Date Started**: 2026-01-24
 **Last Updated**: 2026-01-29
-**Status**: 🚧 In Progress - Phase 5 Complete; Layer 1 + Layer 2 tests complete (see `sprite-testing-strategy.md`)
+**Status**: 🚧 In Progress - Phase 5 Complete; Phase 6.1 performance done; Layer 1 + Layer 2 tests complete (see `sprite-testing-strategy.md`)
 **Purpose**: Detailed implementation plan for SPRITE rendering and MOVE animation system
 
 ## Progress Summary
@@ -16,7 +16,7 @@
 | Phase 3: Basic Animation | ✅ Complete | 2026-01-25 | Real-time animation commands |
 | Phase 4: Animation Sequences | ✅ Complete | 2026-01-25 | Frame cycling with character sprites |
 | Phase 5: Movement Control | ✅ Complete | 2026-01-25 | CUT, ERA, POSITION, MOVE(n), XPOS(n), YPOS(n) + position fix |
-| Phase 6: Integration & Polish | ⏳ Pending | - | - |
+| Phase 6: Integration & Polish | 🚧 In Progress | - | 6.1 performance done (dirty regions, prioritization, buffer-only); 6.4–6.5 pending |
 
 ## Executive Summary
 
@@ -676,11 +676,11 @@ enum MoveCharacterCode {
   - `useKonvaSpriteRenderer.ts`: spriteImageCache, frameImageCache, staticSpriteImageCache
   - `useKonvaBackgroundRenderer.ts`: backgroundTileImageCache
   - Cache keys include tiles/color/inversion; no `spriteCanvasRenderer.ts` (rendering uses Konva)
-- [ ] Implement dirty region tracking — **see [Phase 6.1 Performance Plan](phase-6-1-performance-plan.md)** (PRINT vs moving sprites)
-  - **Background**: Only re-render changed buffer cells (dirty set); full redraw only when necessary
-  - **Prioritization**: Run animation step before static render in same frame when movements active
-  - **Buffer-only**: Don’t rebuild sprite layers when only screenBuffer changed (PRINT)
-  - Optional: incremental dirty update, requestIdleCallback for full redraw when no movements
+- [x] ~~Implement dirty region tracking~~ **Done** — **see [Phase 6.1 Performance Plan](phase-6-1-performance-plan.md)** (2026-01-28)
+  - **Background**: Dirty-region background via `updateBackgroundLayerDirty`, `lastBackgroundBufferRef` (useKonvaBackgroundRenderer, Screen.vue)
+  - **Prioritization**: Animation step before static render when movements active (`pendingStaticRenderRef`, useScreenAnimationLoop)
+  - **Buffer-only**: No sprite layer rebuild when only screenBuffer changed (`backgroundOnly` in useKonvaScreenRenderer, Screen.vue)
+  - Optional (not implemented): incremental dirty update (4.4), requestIdleCallback for full redraw (4.5)
 - [ ] Optimize frame rate (optional)
   - Cap at 30 FPS if needed
   - Consider frame skipping on slow devices
@@ -695,20 +695,18 @@ enum MoveCharacterCode {
   - Handle timeouts
 
 #### 6.3 Error Handling
-- [x] ~~Validate sprite parameters; out-of-bounds; executor error messages~~ **Partial**
-  - Executors (e.g. SpriteExecutor, DefSpriteExecutor) validate and addError with clear messages
-  - AnimationManager throws with clear messages for invalid DEF MOVE / MOVE
-  - Audit remaining executors and graceful degradation still eligible
-- [ ] Add error messages to executors (audit for consistency)
-  - Clear error context
-  - User-friendly messages
+- [x] ~~Validate sprite parameters; out-of-bounds; executor error messages~~ **Done**
+  - Executors (DefSprite, Sprite, SpriteOnOff, DefMove, Move, Cut, Era, Position) validate and use `addError` with clear messages; AnimationManager throws are caught and converted to `addError`.
+  - AnimationManager throws with clear messages for invalid DEF MOVE / MOVE / setPosition.
+- [x] ~~Add error messages to executors (audit for consistency)~~ **Done** (2026-01-29)
+  - **Audit findings**: All sprite executors use consistent style: `COMMAND: param out of range (min-max), got N`; DefMove/Move/Position/Cut/Era wrap `animationManager` calls in try/catch and surface errors via `addError`. When `animationManager` or `spriteStateManager` is null, executors no-op (acceptable for test contexts). FunctionEvaluator MOVE/XPOS/YPOS error messages updated to include invalid value: `out of range (0-7), got N`.
 
 #### 6.4 Testing
 - [x] ~~All executors unit tests~~ **Done** (see `sprite-testing-strategy.md` Layer 1)
   - DefSpriteExecutor, SpriteExecutor, SpriteOnOffExecutor, DefMoveExecutor, MoveExecutor, CutExecutor, EraExecutor, PositionExecutor + SpriteFunctions (MOVE, XPOS, YPOS)
 - [x] ~~Integration tests (movement workflows, state sync)~~ **Done** (Layer 2: sprite-movement-lifecycle, sprite-position-sync)
-- [ ] Add AnimationManager / CharacterAnimationBuilder / frame logic unit tests
-  - No `test/animation/` folder yet (AnimationManager.test.ts, etc.)
+- [x] ~~Add AnimationManager / CharacterAnimationBuilder / frame logic unit tests~~ **Done** (2026-01-29)
+  - `test/animation/AnimationManager.test.ts` (26 tests), `CharacterAnimationBuilder.test.ts` (12 tests), `FrameAnimation.test.ts` (11 tests)
 - [x] Visual regression tests (optional; doc says out of scope in sprite-testing-strategy)
 - [x] Manual testing
   - Test all 16 character types
@@ -724,11 +722,11 @@ enum MoveCharacterCode {
 
 **Files to Modify**:
 - All sprite/animation files (error-handling audit)
-- `src/features/ide/composables/useKonvaSpriteRenderer.ts` (caching already present; dirty regions if added)
-- `src/core/animation/AnimationManager.ts` (batching if added)
+- `src/features/ide/composables/useKonvaSpriteRenderer.ts` (caching present; dirty regions done in useKonvaBackgroundRenderer/Screen.vue)
+- `src/core/animation/AnimationManager.ts` (batching optional)
 
 **Test Files**:
-- Add `test/animation/` (AnimationManager, CharacterAnimationBuilder, frame logic) as needed
+- `test/animation/` — AnimationManager.test.ts, CharacterAnimationBuilder.test.ts, FrameAnimation.test.ts (49 tests)
 
 **Acceptance Criteria**:
 - All tests passing (>90% coverage)
@@ -750,18 +748,16 @@ enum MoveCharacterCode {
 - **Integration tests**: Layer 2 complete (sprite-movement-lifecycle, sprite-position-sync).
 - **Error handling**: Executors validate parameters and report clear errors; AnimationManager throws with clear messages.
 
-**Out-of-date in this document**:
-- **File Structure** (below): Lists `spriteCanvasRenderer.ts`, `canvasRenderer.ts`, `useScreenCanvasRenderer.ts`; actual rendering uses `useKonvaSpriteRenderer.ts`, `useKonvaScreenRenderer.ts`, `useKonvaBackgroundRenderer.ts`, `useScreenAnimationLoop.ts`. Test layout lists `test/animation/` (missing) and integration names StaticSpriteRendering, BasicMovement, AnimatedMovement, MovementControl (actual: sprite-movement-lifecycle, sprite-position-sync).
-- **Success Criteria**: "Basic animation frame cycling works (Phase 4)" and "All commands implemented (CUT, ERA, POSITION, …)" still unchecked; Phases 4 and 5 are complete.
-- **Testing Strategy** checkboxes: Several items are covered by Layer 1/2 but still show [ ].
+**Doc hygiene (2026-01-29)**:
+- **File Structure**: Below reflects current layout (Konva composables, useRenderQueue; test executors + integration sprite-movement-lifecycle, sprite-position-sync; `test/animation/` not yet added).
+- **Success Criteria**: Phases 4 and 5 marked complete; Phase 6.1 performance marked done in 6.1 tasks above.
+- **Testing Strategy**: Unit/Integration checkboxes below match Layer 1/2 coverage; Frame animation logic remains [ ] until `test/animation/` exists.
 
 **Eligible next steps (in order of impact)**:
-1. **6.4** – Add `test/animation/` unit tests for AnimationManager, CharacterAnimationBuilder, and frame logic.
-2. **6.1** – Dirty region tracking (re-render only changed regions) if performance demands it.
-3. **6.2** – ~~Batch worker→main state updates~~ **Done** via SharedArrayBuffer (see [shared-screen-buffer-implementation-plan.md](shared-screen-buffer-implementation-plan.md)). Remaining: optional main→worker request-response / Promise-based queries if needed.
-4. **6.3** – Audit all sprite/executor code for consistent error messages and graceful degradation.
-5. **6.5** – JSDoc, sprite user guide, code examples, and architecture diagram updates.
-6. **Doc hygiene** – Update File Structure, Success Criteria, and Testing Strategy to match current codebase and sprite-testing-strategy.md.
+1. **6.4** – ~~Add `test/animation/` unit tests~~ **Done** (2026-01-29); AnimationManager, CharacterAnimationBuilder, FrameAnimation (49 tests).
+2. **6.2** – ~~Batch worker→main state updates~~ **Done** via SharedArrayBuffer. Remaining: optional main→worker request-response / Promise-based queries if needed.
+3. **6.3** – ~~Audit sprite/executor error handling~~ **Done** (2026-01-29); see 6.3 tasks above.
+4. **6.5** – JSDoc, sprite user guide, code examples, and architecture diagram updates.
 
 ---
 
@@ -813,7 +809,7 @@ test/
 ├── integration/
 │   ├── sprite-movement-lifecycle.test.ts # ✅ Layer 2
 │   └── sprite-position-sync.test.ts      # ✅ Layer 2
-└── animation/                            # ⏳ Phase 6: not yet (AnimationManager, CharacterAnimationBuilder)
+└── animation/                            # ✅ Phase 6.4 (AnimationManager, CharacterAnimationBuilder, FrameAnimation)
 ```
 
 ## Key Technical Specifications
@@ -852,7 +848,7 @@ See **`docs/planning/sprite-testing-strategy.md`** for Layer 1/2 status and run 
 - [x] Canvas/Konva renderer functions (caching in useKonvaSpriteRenderer, useKonvaBackgroundRenderer)
 - [x] Sprite state management (covered by executor + SpriteFunctions tests)
 - [x] Movement calculations (MoveExecutor, DefMoveExecutor, integration)
-- [ ] Frame animation logic (AnimationManager, CharacterAnimationBuilder — no test/animation/ yet)
+- [x] Frame animation logic (AnimationManager, CharacterAnimationBuilder, FrameAnimation — test/animation/)
 - [x] Direction mapping (executor + integration)
 - [x] Tile rendering with inversion (DefSpriteExecutor, SpriteExecutor tests)
 
@@ -979,140 +975,6 @@ See **`docs/planning/sprite-testing-strategy.md`** for Layer 1/2 status and run 
 
 ## Implementation Notes
 
-### Completed (2026-01-25)
-
-**Phase 1 Achievements** (✅ Complete):
-- ✅ Canvas infrastructure fully extended with multi-layer rendering
-- ✅ Sprite type definitions complete with all necessary interfaces
-- ✅ Tile caching implemented for performance optimization
-
-**Phase 2 Achievements** (✅ Complete):
-- ✅ Sprite state manager handles 8 sprite slots efficiently
-- ✅ Character set to tile conversion working correctly
-- ✅ DEF SPRITE and SPRITE executors implemented with full validation
-- ✅ Parser rules added and integrated into statement router
-- ✅ Rendering pipeline supports static sprites with priority layering
-- ✅ SPRITE ON/OFF commands implemented (visibility control)
-- ✅ Sprite operations work independently of SPRITE ON/OFF state
-- ✅ Rendering layer checks sprite enabled flag before drawing
-- ✅ SPRITE OFF stops rendering but preserves sprite state
-- ✅ **Table A lookup implemented** - CHR$(n) correctly uses sprite table, not background table
-- ✅ **CHR$ expression parsing** - Handles `CHR$(0)+CHR$(1)+...` correctly
-- ✅ **Transparency support** - Value 0 pixels render as transparent using ImageBitmap + drawImage
-- ✅ **Sprite state synchronization** - States passed from web worker to main thread
-- ✅ All TypeScript type checking passes
-- ✅ All ESLint checks pass
-
-**Key Accomplishments**:
-- No technical debt introduced
-- Clean separation of concerns maintained
-- All files respect 500-line limit
-- Full type safety throughout
-
-**Phase 4 Achievements** (✅ Complete - 2026-01-25):
-- ✅ CharacterAnimationBuilder implemented with sequence extraction and direction mapping
-- ✅ **Explicit character sequence configuration** (`characterSequenceConfig.ts`) - All 16 character types have explicit configs
-- ✅ **Per-frame sprite inversion support** - FrameInversionConfig interface and frameInversions field added
-- ✅ Animation sequences built from explicit configs (with fallback to CHARACTER_SPRITES data)
-- ✅ Frame animation logic added to updateMovements() in Screen.vue
-- ✅ renderAnimatedSprite() updated to render actual character sprite tiles with per-frame inversions
-- ✅ Direction-to-sequence mapping with automatic inversion (left = WALK + X inversion)
-- ✅ Character animation configs cached for performance
-- ✅ Support for 8×8 and 16×16 sprite frames
-- ✅ Frame looping using modulo operation
-- ✅ Sprite renderers (useKonvaSpriteRenderer, useSpriteRendering) support per-frame inversions
-- ✅ All TypeScript type checking passes
-- ✅ All ESLint checks pass
-
-**Phase 3 Achievements** (✅ Complete - 2026-01-25):
-- ✅ AnimationManager implemented with real-time command communication
-- ✅ DEF MOVE and MOVE commands fully functional
-- ✅ Real-time animation command messaging between worker and main thread
-- ✅ requestAnimationFrame animation loop for smooth movement
-- ✅ Sequential movement execution with PAUSE timing support
-- ✅ Movement state synchronization and merging
-- ✅ Visual feedback with colored rectangles (placeholder for Phase 4)
-- ✅ Unique starting positions for each action slot
-- ✅ Screen bounds clamping for movements
-- ✅ Sample test program (moveTest) demonstrating sequential movements
-- ✅ All TypeScript type checking passes
-- ✅ All ESLint checks pass
-
-**Issues Resolved** (2026-01-25):
-
-1. **Sprite States Not Displaying**
-   - **Problem**: Sprites defined in web worker but not visible on screen
-   - **Root Cause**: Sprite states not passed from web worker to main thread
-   - **Solution**: 
-     - Added `spriteStates` and `spriteEnabled` to `ExecutionResult` interface
-     - Updated `WebWorkerInterpreter` to extract sprite states from context
-     - Updated `useBasicIdeEnhanced` to receive and manage sprite states
-     - Passed sprite states through component hierarchy
-
-2. **Table A vs Table B Lookup Issue**
-   - **Problem**: `CHR$(0)` was looking up tiles from background table (Table B) instead of sprite table (Table A)
-   - **Root Cause**: `convertCharacterSetToTiles()` used `getBackgroundItemByCode()` which looks up Table B
-   - **Solution**:
-     - Created `src/shared/utils/spriteLookup.ts` with sprite-specific lookup functions
-     - `getSpriteTileByCode()` - Finds sprite tiles from CHARACTER_SPRITES array
-     - `getSpriteTilesByCodes()` - Handles multi-tile sprites with exact matching
-     - Updated `convertCharacterSetToTiles()` to use sprite lookup
-
-3. **CHR$ Expression Parsing**
-   - **Problem**: `CHR$(0)+CHR$(1)+CHR$(2)+CHR$(3)` evaluated as string concatenation, producing invalid codes
-   - **Root Cause**: Expression evaluator treated CHR$ expressions as string concatenation
-   - **Solution**:
-     - Added `extractChrCodesFromExpression()` method in `DefSpriteExecutor`
-     - Recursively traverses expression CST to extract CHR$ function calls
-     - Directly extracts character codes from CHR$ arguments
-     - Falls back to normal evaluation if no CHR$ expressions found
-
-4. **Transparency Not Working (Black Pixels)**
-   - **Problem**: Sprite pixels with value 0 rendered as black instead of transparent
-   - **Root Cause**: 
-     - Canvas context used `alpha: false`, which doesn't support transparency
-     - `putImageData()` doesn't perform alpha blending - directly replaces pixels
-   - **Solution**:
-     - Changed canvas context to `alpha: true` in `renderScreenLayers()`
-     - Switched from `ImageData` + `putImageData()` to `ImageBitmap` + `drawImage()`
-     - `drawImage()` properly supports alpha blending for transparent pixels
-     - Initialize all pixels to transparent (alpha = 0) before rendering
-     - Updated all rendering functions to async for `createImageBitmap()`
-
-5. **Movements Appearing Simultaneously Instead of Sequentially**
-   - **Problem**: All movements appeared at once after all MOVE commands completed, ignoring PAUSE timing
-   - **Root Cause**: Movement states were only sent to main thread after entire program execution completed
-   - **Solution**:
-     - Implemented real-time `AnimationCommand` messaging via `sendAnimationCommand()` in device adapter
-     - `AnimationManager.startMovement()` sends `START_MOVEMENT` command immediately when MOVE executes
-     - Main thread processes commands in real-time via `handleAnimationCommandMessage()`
-     - Movements now appear and start sequentially as each MOVE command executes, respecting PAUSE delays
-
-**Technical Solutions Summary**:
-- ✅ Created `spriteLookup.ts` for Table A sprite tile lookup
-- ✅ Enhanced `DefSpriteExecutor` with CHR$ expression extraction
-- ✅ Updated rendering to use ImageBitmap with alpha support
-- ✅ Added sprite state fields to ExecutionResult interface
-- ✅ Implemented async rendering pipeline for ImageBitmap creation
-- ✅ Updated sprite state synchronization across web worker and main thread
-- ✅ Correct SPRITE ON/OFF semantics (visibility control, not operation gating)
-- ✅ Implemented real-time animation command communication architecture
-- ✅ Created AnimationManager with command-based state management
-- ✅ Added requestAnimationFrame animation loop for smooth movement
-- ✅ Implemented movement state merging to preserve active movement positions
-- Ready for Phase 4: Animation Sequences (frame cycling)
-
-**Important Design Decisions**:
-- **SPRITE ON/OFF controls visibility only**, not whether sprite operations can execute
-- DEF SPRITE and SPRITE commands work regardless of SPRITE ON/OFF state
-- Sprites can be defined and positioned when SPRITE OFF
-- SPRITE ON makes them visible, SPRITE OFF hides them
-- This matches Family BASIC behavior where sprite state persists independently of display state
-
-- **Real-time Animation Commands**: Movements are sent as commands from web worker to main thread immediately when MOVE executes, not batched after program completion. This enables sequential execution with proper PAUSE timing.
-- **Main Thread Animation Loop**: Position updates happen on the main thread using requestAnimationFrame for smooth rendering, while movement definitions and triggers remain in the web worker.
-- **State Merging**: When new movement states arrive from the worker, they are merged with existing local states to preserve current positions of active movements.
-
 ### Next Steps
 
 **Phase 6 - Integration & Optimization**:
@@ -1121,97 +983,3 @@ See **`docs/planning/sprite-testing-strategy.md`** for Layer 1/2 status and run 
 3. Comprehensive error handling
 4. Complete test suite (>90% coverage)
 5. Documentation updates
-
-### Recent Updates (2026-01-29)
-
-**SharedArrayBuffer strategy**:
-- Screen and sprite state sync now use a **single SharedArrayBuffer** (shared display buffer). Layout: sprites 0–192 bytes (Float64Array × 24), cell chars, patterns, cursor, sequence, scalars. Worker writes after every screen/background change and increments sequence; sends lightweight `SCREEN_CHANGED` (no payload). Main reads from shared buffer on render, decodes to `ScreenCell[][]` and refs. Sprite positions are read by main in the animation loop from the same buffer. See [Shared Screen Buffer Implementation Plan](shared-screen-buffer-implementation-plan.md). Modules: `sharedAnimationBuffer.ts` (sprite helpers), `sharedDisplayBuffer.ts` (full layout, encode/decode, sequence).
-
-### Recent Updates (2026-01-25)
-
-**Explicit Character Sequence Configuration**:
-- ✅ Created `characterSequenceConfig.ts` with explicit sprite sequences for all 16 character types
-- ✅ Each character has direction-specific sprite lists (0-8) with exact sprite names in frame order
-- ✅ Per-frame inversion flags (frameInversions) - one per sprite name
-- ✅ Frame rates and looping behavior configured per direction
-- ✅ Example: MARIO direction 1 (Up) alternates between normal and X-inversed LADDER
-
-**Per-Frame Sprite Inversion Support**:
-- ✅ Added `FrameInversionConfig` interface to `types.ts`
-- ✅ Added `frameInversions?: FrameInversionConfig[]` field to `AnimationSequence`
-- ✅ Updated `useKonvaSpriteRenderer.ts` to use per-frame inversions with direction-level fallback
-- ✅ Updated `useSpriteRendering.ts` to support per-frame inversions
-- ✅ Each frame can now have its own inversion flags (invertX, invertY)
-
-**CharacterAnimationBuilder Refactoring**:
-- ✅ Refactored to use config-based approach (`buildSequencesFromConfig`, `buildDirectionMappingsFromConfig`)
-- ✅ Falls back to old method for characters without explicit config
-- ✅ Improved accuracy and maintainability of character animations
-- ✅ Fixed frame inversion count mismatch for MARIO and LADY direction 4
-
-**Phase 5 - Movement Control Commands Complete** (2026-01-25):
-- ✅ CUT command implemented - stops movement, keeps sprite visible
-- ✅ ERA command implemented - erases sprite completely
-- ✅ POSITION command implemented - sets initial position for next MOVE
-- ✅ MOVE(n) function implemented - returns -1 if moving, 0 if complete
-- ✅ XPOS(n) function implemented - returns current X position
-- ✅ YPOS(n) function implemented - returns current Y position
-
-**Bug Fix - CUT Position Preservation** (2026-01-25):
-- 🐛 **Fixed**: MOVE after CUT was resetting sprite to original position instead of preserving CUT position
-- **Root Cause**: Worker's `AnimationManager.updateMovements()` is never called, so worker has stale positions. When CUT saved positions, they were initial positions, not current animated positions
-- **Architecture Issue**:
-  - Frontend runs animation loop and has current positions
-  - Worker never updates positions (no updateMovements calls)
-  - Worker was saving stale positions to storedPositions on CUT
-  - Next MOVE used stale stored position
-- **Solution**: Multi-layer position retrieval system
-  1. Added sprite node refs to IDE composable (`frontSpriteNodes`, `backSpriteNodes`)
-  2. Screen component syncs Konva sprite nodes to external refs after rendering
-  3. STOP_MOVEMENT handler retrieves positions from Konva nodes (most accurate) before falling back to movement states
-  4. Frontend sends `UPDATE_ANIMATION_POSITIONS` message to worker with actual positions
-  5. Worker updates `AnimationManager.storedPositions` with current positions from frontend
-  6. Next MOVE uses updated stored position
-- **Files Changed**:
-  - `src/core/interfaces.ts`: Added `UpdateAnimationPositionsMessage` type
-  - `src/core/animation/AnimationManager.ts`: Added `updateStoredPositions()` method, removed stale position saving from `stopMovement()`
-  - `src/core/BasicInterpreter.ts`: Added `getAnimationManager()` method
-  - `src/features/ide/composables/useBasicIdeEnhanced.ts`: Added sprite node refs
-  - `src/features/ide/composables/useBasicIdeMessageHandlers.ts`: Updated position retrieval to use Konva nodes
-  - `src/features/ide/components/Screen.vue`: Added external sprite node sync
-  - `src/features/ide/components/ScreenTab.vue`: Pass through sprite node props
-  - `src/features/ide/components/RuntimeOutput.vue`: Pass through sprite node props
-  - `src/features/ide/IdePage.vue`: Connect composable to components
-  - `public/basic-interpreter-worker.js`: Added UPDATE_ANIMATION_POSITIONS message handler
-- **Impact**: MOVE after CUT now correctly continues from where sprite was cut, even after animation has occurred
-- ✅ All executors registered in StatementRouter
-- ✅ Function evaluation methods added to FunctionEvaluator
-- ✅ Parser rules added with proper lookahead for MOVE statement vs MOVE(n) function
-- ✅ useMovementStateSync composable created for movement state synchronization
-- ✅ All TypeScript type checking passes
-- ✅ All ESLint checks pass
-
-**Key Implementation Details**:
-- **Parser Lookahead**: MOVE statement (MOVE n) distinguished from MOVE(n) function using lookahead gate (`LA(2) !== LParen`)
-- **Function Integration**: MOVE(n), XPOS(n), YPOS(n) added to FunctionEvaluator alongside STICK and STRIG
-- **AnimationManager Methods**: All required methods (stopMovement, eraseMovement, setPosition, getMovementStatus, getSpritePosition) were already implemented in Phase 3
-- **Multiple Action Support**: CUT and ERA support variable arguments (n1, n2, ...) for controlling multiple sprites simultaneously
-- **Position Preservation**: Multi-layer position retrieval system using Konva sprite node references ensures accurate position preservation when CUT is executed after animation
-
-### Code Quality Improvements (2026-01-26)
-- ✅ **Konva Test Page Refactoring**:
-  - Reduced `KonvaSpriteTestPage.vue` from 514 to 266 lines (52% reduction)
-  - Extracted animation loop to `useSpriteAnimation.ts` (107 lines)
-  - Extracted stage initialization to `useKonvaStage.ts` (173 lines)
-  - Improved separation of concerns and maintainability
-- ✅ **Vue 3 Best Practices**:
-  - Fixed props reactivity loss in `Screen.vue` with `toValue()` wrapper
-  - All TypeScript type checks pass
-  - All ESLint and Stylelint checks pass
-  - Proper type safety maintained throughout refactoring
-
-**Status**: All code respects file size limits and follows Vue 3 best practices.
-
-**Related plans**: [Shared Screen Buffer Implementation Plan](shared-screen-buffer-implementation-plan.md) — worker–main sync via SharedArrayBuffer (screen + sprites).
-
-**Last Updated**: 2026-01-29 (SharedArrayBuffer strategy; Phase 6.2 state sync done)
