@@ -35,6 +35,8 @@ import {
   Read,
   Restore,
   Cls,
+  Swap,
+  Clear,
   Locate,
   Color,
   Cgset,
@@ -136,6 +138,9 @@ class FBasicChevrotainParser extends CstParser {
   declare readStatement: () => CstNode
   declare restoreStatement: () => CstNode
   declare clsStatement: () => CstNode
+  declare swapStatement: () => CstNode
+  declare swapTarget: () => CstNode
+  declare clearStatement: () => CstNode
   declare locateStatement: () => CstNode
   declare colorStatement: () => CstNode
   declare cgsetStatement: () => CstNode
@@ -651,6 +656,35 @@ class FBasicChevrotainParser extends CstParser {
       this.CONSUME(Cls)
     })
 
+    // SWAP variable1, variable2
+    // Swaps the contents of two variables (same type: both numeric or both string)
+    // Example: SWAP A, B or SWAP A(I), A(J)
+    this.swapTarget = this.RULE('swapTarget', () => {
+      this.OR([
+        {
+          GATE: () => this.LA(1).tokenType === Identifier && this.LA(2).tokenType === LParen,
+          ALT: () => this.SUBRULE(this.arrayAccess),
+        },
+        { ALT: () => this.CONSUME(Identifier) },
+      ])
+    })
+    this.swapStatement = this.RULE('swapStatement', () => {
+      this.CONSUME(Swap)
+      this.SUBRULE(this.swapTarget)
+      this.CONSUME(Comma)
+      this.SUBRULE2(this.swapTarget)
+    })
+
+    // CLEAR (expression)?
+    // Clears all variables and arrays; optional address is ignored in emulator (no memory map)
+    // Example: CLEAR or CLEAR &H7600
+    this.clearStatement = this.RULE('clearStatement', () => {
+      this.CONSUME(Clear)
+      this.OPTION(() => {
+        this.SUBRULE(this.expression)
+      })
+    })
+
     // LOCATE
     // Moves cursor to specified position
     // Example: LOCATE X, Y
@@ -969,6 +1003,14 @@ class FBasicChevrotainParser extends CstParser {
         {
           GATE: () => this.LA(1).tokenType === Cls,
           ALT: () => this.SUBRULE(this.clsStatement),
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Swap,
+          ALT: () => this.SUBRULE(this.swapStatement),
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Clear,
+          ALT: () => this.SUBRULE(this.clearStatement),
         },
         {
           GATE: () => this.LA(1).tokenType === Locate,

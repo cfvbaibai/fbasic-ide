@@ -46,6 +46,8 @@ const monarchLanguage: monaco.languages.IMonarchLanguage = {
     'FN',
     'REM',
     'CLS',
+    'SWAP',
+    'CLEAR',
     'COLOR',
     'PSET',
     'LINE',
@@ -84,7 +86,7 @@ const monarchLanguage: monaco.languages.IMonarchLanguage = {
 
       // Keywords (case-insensitive)
       // Note: REM is excluded here since REM lines are handled above as comments
-      [/\b(PRINT|LET|IF|THEN|FOR|NEXT|TO|STEP|GOTO|END|PAUSE|DIM|DATA|READ|RESTORE)\b/i, 'keyword'],
+      [/\b(PRINT|LET|IF|THEN|FOR|NEXT|TO|STEP|GOTO|END|PAUSE|DIM|DATA|READ|RESTORE|SWAP|CLEAR)\b/i, 'keyword'],
 
       // Multi-character relational operators (must come before single-character operators)
       [/<>|<=|>=/, 'operator'],

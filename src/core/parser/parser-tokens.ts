@@ -34,6 +34,8 @@ export const Data = createToken({ name: 'Data', pattern: /\bDATA\b/i })
 export const Read = createToken({ name: 'Read', pattern: /\bREAD\b/i })
 export const Restore = createToken({ name: 'Restore', pattern: /\bRESTORE\b/i })
 export const Cls = createToken({ name: 'Cls', pattern: /\bCLS\b/i })
+export const Swap = createToken({ name: 'Swap', pattern: /\bSWAP\b/i })
+export const Clear = createToken({ name: 'Clear', pattern: /\bCLEAR\b/i })
 export const Locate = createToken({ name: 'Locate', pattern: /\bLOCATE\b/i })
 export const Color = createToken({ name: 'Color', pattern: /\bCOLOR\b/i })
 export const Cgset = createToken({ name: 'Cgset', pattern: /\bCGSET\b/i })
@@ -179,6 +181,8 @@ export const allTokens = [
   Read,
   Restore,
   Cls,
+  Swap,
+  Clear,
   Locate,
   Color,
   Cgset,

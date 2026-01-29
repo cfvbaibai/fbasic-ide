@@ -167,6 +167,8 @@ export class FBasicParser {
         'END',
         'REM',
         'CLS',
+        'SWAP',
+        'CLEAR',
         'DATA',
         'READ',
         'RESTORE',

@@ -543,6 +543,7 @@ This document outlines the remaining work needed to complete the Family Basic ID
 - [F-BASIC Reference Skill](../.claude/skills/fbasic-reference/SKILL.md)
 - [Family BASIC Manual](../reference/family-basic-manual/)
 - [Screen Architecture](../device-models/screen/architecture.md)
+- [Remaining Commands – Emulator Compatibility](../analysis/remaining-commands-emulator-compatibility.md) — Review of whether VIEW, INPUT, LINPUT, STOP, CONT, SWAP, CLEAR, POKE are compatible with the current web-based emulator.
 
 ---
 

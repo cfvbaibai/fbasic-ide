@@ -13,6 +13,7 @@ import type { ExecutionContext } from '@/core/state/ExecutionContext'
 
 import { CgenExecutor } from './executors/CgenExecutor'
 import { CgsetExecutor } from './executors/CgsetExecutor'
+import { ClearExecutor } from './executors/ClearExecutor'
 import { ClsExecutor } from './executors/ClsExecutor'
 import { ColorExecutor } from './executors/ColorExecutor'
 import { CutExecutor } from './executors/CutExecutor'
@@ -40,6 +41,7 @@ import { RestoreExecutor } from './executors/RestoreExecutor'
 import { ReturnExecutor } from './executors/ReturnExecutor'
 import { SpriteExecutor } from './executors/SpriteExecutor'
 import { SpriteOnOffExecutor } from './executors/SpriteOnOffExecutor'
+import { SwapExecutor } from './executors/SwapExecutor'
 import type { ExpandedStatement } from './statement-expander'
 
 export class StatementRouter {
@@ -59,6 +61,8 @@ export class StatementRouter {
   private readExecutor: ReadExecutor
   private restoreExecutor: RestoreExecutor
   private clsExecutor: ClsExecutor
+  private swapExecutor: SwapExecutor
+  private clearExecutor: ClearExecutor
   private locateExecutor: LocateExecutor
   private colorExecutor: ColorExecutor
   private cgsetExecutor: CgsetExecutor
@@ -95,6 +99,8 @@ export class StatementRouter {
     this.readExecutor = new ReadExecutor(dataService, variableService, evaluator)
     this.restoreExecutor = new RestoreExecutor(dataService)
     this.clsExecutor = new ClsExecutor(context)
+    this.swapExecutor = new SwapExecutor(variableService)
+    this.clearExecutor = new ClearExecutor(variableService)
     this.locateExecutor = new LocateExecutor(context, evaluator)
     this.colorExecutor = new ColorExecutor(context, evaluator)
     this.cgsetExecutor = new CgsetExecutor(context, evaluator)
@@ -330,6 +336,16 @@ export class StatementRouter {
       const clsStmtCst = getFirstCstNode(singleCommandCst.children.clsStatement)
       if (clsStmtCst) {
         this.clsExecutor.execute(clsStmtCst)
+      }
+    } else if (singleCommandCst.children.swapStatement) {
+      const swapStmtCst = getFirstCstNode(singleCommandCst.children.swapStatement)
+      if (swapStmtCst) {
+        this.swapExecutor.execute(swapStmtCst, expandedStatement.lineNumber)
+      }
+    } else if (singleCommandCst.children.clearStatement) {
+      const clearStmtCst = getFirstCstNode(singleCommandCst.children.clearStatement)
+      if (clearStmtCst) {
+        this.clearExecutor.execute(clearStmtCst)
       }
     } else if (singleCommandCst.children.locateStatement) {
       const locateStmtCst = getFirstCstNode(singleCommandCst.children.locateStatement)
