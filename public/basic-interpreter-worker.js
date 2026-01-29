@@ -281,6 +281,3845 @@
     }
   });
 
+  // src/shared/logger.ts
+  var import_loglevel = __toESM(require_loglevel(), 1);
+  var defaultLevel = "warn";
+  import_loglevel.default.setDefaultLevel(defaultLevel);
+  var logIdeMessages = import_loglevel.default.getLogger("ide-messages");
+  logIdeMessages.setDefaultLevel(defaultLevel);
+  var logScreen = import_loglevel.default.getLogger("screen");
+  logScreen.setDefaultLevel(defaultLevel);
+  var logWorker = import_loglevel.default.getLogger("worker");
+  logWorker.setDefaultLevel(defaultLevel);
+  var logDevice = import_loglevel.default.getLogger("device");
+  logDevice.setDefaultLevel(defaultLevel);
+  var logComposable = import_loglevel.default.getLogger("composable");
+  logComposable.setDefaultLevel(defaultLevel);
+  var logInterpreter = import_loglevel.default.getLogger("interpreter");
+  logInterpreter.setDefaultLevel(defaultLevel);
+  var logCore = import_loglevel.default.getLogger("core");
+  logCore.setDefaultLevel(defaultLevel);
+  var logApp = import_loglevel.default.getLogger("app");
+  logApp.setDefaultLevel(defaultLevel);
+
+  // src/core/animation/characterSequenceConfig.ts
+  function createFrameInversions(count, invertX = false, invertY = false) {
+    return Array(count).fill(null).map(() => ({ invertX, invertY }));
+  }
+  var CHARACTER_SEQUENCE_CONFIGS = [
+    // MARIO (0)
+    {
+      characterType: 0,
+      // MoveCharacterCode.MARIO
+      directions: /* @__PURE__ */ new Map([
+        [0, { spriteNames: ["Mario (DOWN)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(1) }],
+        [1, {
+          spriteNames: ["Mario (LADDER)", "Mario (LADDER)"],
+          frameRate: 8,
+          looping: true,
+          frameInversions: [
+            { invertX: false, invertY: false },
+            { invertX: true, invertY: false }
+          ]
+        }],
+        [2, { spriteNames: ["Mario (JUMP)"], frameRate: 8, looping: false, frameInversions: createFrameInversions(1, true, false) }],
+        [3, { spriteNames: ["Mario (WALK1)", "Mario (WALK2)", "Mario (WALK3)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(3, true, false) }],
+        [4, { spriteNames: ["Mario (JUMP)"], frameRate: 8, looping: false, frameInversions: createFrameInversions(1, true, false) }],
+        [5, { spriteNames: ["Mario (LADDER)", "Mario (LADDER)"], frameRate: 8, looping: false, frameInversions: [
+          { invertX: false, invertY: false },
+          { invertX: true, invertY: false }
+        ] }],
+        // Down
+        [6, { spriteNames: ["Mario (JUMP)"], frameRate: 8, looping: false, frameInversions: createFrameInversions(1) }],
+        [7, { spriteNames: ["Mario (WALK1)", "Mario (WALK2)", "Mario (WALK3)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(3) }],
+        [8, { spriteNames: ["Mario (JUMP)"], frameRate: 8, looping: false, frameInversions: createFrameInversions(1) }]
+      ])
+    },
+    // LADY (1)
+    {
+      characterType: 1,
+      // MoveCharacterCode.LADY
+      directions: /* @__PURE__ */ new Map([
+        [0, { spriteNames: ["Lady (DOWN)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(1) }],
+        [1, {
+          spriteNames: ["Lady (LADDER)", "Lady (LADDER)"],
+          frameRate: 8,
+          looping: true,
+          frameInversions: [
+            { invertX: false, invertY: false },
+            { invertX: true, invertY: false }
+          ]
+        }],
+        [2, { spriteNames: ["Lady (JUMP)"], frameRate: 8, looping: false, frameInversions: createFrameInversions(1, true, false) }],
+        [3, { spriteNames: ["Lady (WALK1)", "Lady (WALK2)", "Lady (WALK3)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(3, true, false) }],
+        [4, { spriteNames: ["Lady (JUMP)"], frameRate: 8, looping: false, frameInversions: createFrameInversions(1, true, false) }],
+        [5, { spriteNames: ["Lady (LADDER)", "Lady (LADDER)"], frameRate: 8, looping: false, frameInversions: [
+          { invertX: false, invertY: false },
+          { invertX: true, invertY: false }
+        ] }],
+        // Down
+        [6, { spriteNames: ["Lady (JUMP)"], frameRate: 8, looping: false, frameInversions: createFrameInversions(1) }],
+        [7, { spriteNames: ["Lady (WALK1)", "Lady (WALK2)", "Lady (WALK3)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(3) }],
+        [8, { spriteNames: ["Lady (JUMP)"], frameRate: 8, looping: false, frameInversions: createFrameInversions(1) }]
+      ])
+    },
+    // FIGHTER_FLY (2)
+    {
+      characterType: 2,
+      // MoveCharacterCode.FIGHTER_FLY
+      directions: /* @__PURE__ */ new Map([
+        [0, { spriteNames: ["Fighter Fly (1)", "Fighter Fly (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [1, { spriteNames: ["Fighter Fly (1)", "Fighter Fly (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [2, { spriteNames: ["Fighter Fly (1)", "Fighter Fly (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [3, { spriteNames: ["Fighter Fly (1)", "Fighter Fly (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [4, { spriteNames: ["Fighter Fly (1)", "Fighter Fly (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [5, { spriteNames: ["Fighter Fly (1)", "Fighter Fly (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [6, { spriteNames: ["Fighter Fly (1)", "Fighter Fly (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, true) }],
+        [7, { spriteNames: ["Fighter Fly (1)", "Fighter Fly (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, true) }],
+        [8, { spriteNames: ["Fighter Fly (1)", "Fighter Fly (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, true) }]
+      ])
+    },
+    // ACHILLES (3)
+    {
+      characterType: 3,
+      // MoveCharacterCode.ACHILLES
+      directions: /* @__PURE__ */ new Map([
+        [0, { spriteNames: ["Achilles (LEFT1)", "Achilles (LEFT2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [1, { spriteNames: ["Achilles (TOP1)", "Achilles (TOP2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [2, { spriteNames: ["Achilles (LEFTUP1)", "Achilles (LEFTUP2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, true) }],
+        [3, { spriteNames: ["Achilles (LEFT1)", "Achilles (LEFT2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, true) }],
+        [4, { spriteNames: ["Achilles (LEFTUP1)", "Achilles (LEFTUP2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, true, true) }],
+        [5, { spriteNames: ["Achilles (TOP1)", "Achilles (TOP2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, false, true) }],
+        [6, { spriteNames: ["Achilles (LEFTUP1)", "Achilles (LEFTUP2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, false, true) }],
+        [7, { spriteNames: ["Achilles (LEFT1)", "Achilles (LEFT2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, true) }],
+        [8, { spriteNames: ["Achilles (LEFTUP1)", "Achilles (LEFTUP2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }]
+      ])
+    },
+    // PENGUIN (4)
+    {
+      characterType: 4,
+      // MoveCharacterCode.PENGUIN
+      directions: /* @__PURE__ */ new Map([
+        [0, { spriteNames: ["Penguin (FRONT)"], frameRate: 8, looping: false, frameInversions: createFrameInversions(1) }],
+        [1, { spriteNames: ["Penguin (BACK)", "Penguin (BACK)"], frameRate: 8, looping: true, frameInversions: [
+          { invertX: false, invertY: false },
+          { invertX: true, invertY: false }
+        ] }],
+        [2, { spriteNames: ["Penguin (LEFTSTEP1)", "Penguin (LEFTSTEP2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, true) }],
+        [3, { spriteNames: ["Penguin (LEFTSTEP1)", "Penguin (LEFTSTEP2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, true) }],
+        [4, { spriteNames: ["Penguin (LEFTSTEP1)", "Penguin (LEFTSTEP2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, true) }],
+        [5, { spriteNames: ["Penguin (FRONT)", "Penguin (FRONT)"], frameRate: 8, looping: true, frameInversions: [
+          { invertX: false, invertY: false },
+          { invertX: true, invertY: false }
+        ] }],
+        [6, { spriteNames: ["Penguin (LEFTSTEP1)", "Penguin (LEFTSTEP2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [7, { spriteNames: ["Penguin (LEFTSTEP1)", "Penguin (LEFTSTEP2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [8, { spriteNames: ["Penguin (LEFTSTEP1)", "Penguin (LEFTSTEP2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }]
+      ])
+    },
+    // FIREBALL (5)
+    {
+      characterType: 5,
+      // MoveCharacterCode.FIREBALL
+      directions: /* @__PURE__ */ new Map([
+        [0, { spriteNames: ["Fireball (1)", "Fireball (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [1, { spriteNames: ["Fireball (1)", "Fireball (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [2, { spriteNames: ["Fireball (1)", "Fireball (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [3, { spriteNames: ["Fireball (1)", "Fireball (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [4, { spriteNames: ["Fireball (1)", "Fireball (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [5, { spriteNames: ["Fireball (1)", "Fireball (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [6, { spriteNames: ["Fireball (1)", "Fireball (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [7, { spriteNames: ["Fireball (1)", "Fireball (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [8, { spriteNames: ["Fireball (1)", "Fireball (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }]
+      ])
+    },
+    // CAR (6)
+    {
+      characterType: 6,
+      // MoveCharacterCode.CAR
+      directions: /* @__PURE__ */ new Map([
+        [0, { spriteNames: ["Car (LEFT1)", "Car (LEFT2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [1, { spriteNames: ["Car (UP1)", "Car (UP2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [2, { spriteNames: ["Car (LEFTUP1)", "Car (LEFTUP2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, true) }],
+        [3, { spriteNames: ["Car (LEFT1)", "Car (LEFT2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, true) }],
+        [4, { spriteNames: ["Car (LEFTUP1)", "Car (LEFTUP2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, true, true) }],
+        [5, { spriteNames: ["Car (UP1)", "Car (UP2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, false, true) }],
+        [6, { spriteNames: ["Car (LEFTUP1)", "Car (LEFTUP2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, false, true) }],
+        [7, { spriteNames: ["Car (LEFT1)", "Car (LEFT2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, true) }],
+        [8, { spriteNames: ["Car (LEFTUP1)", "Car (LEFTUP2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }]
+      ])
+    },
+    // SPINNER (7)
+    {
+      characterType: 7,
+      // MoveCharacterCode.SPINNER
+      directions: /* @__PURE__ */ new Map([
+        [0, { spriteNames: ["Spinner (1)", "Spinner (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [1, { spriteNames: ["Spinner (1)", "Spinner (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [2, { spriteNames: ["Spinner (1)", "Spinner (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [3, { spriteNames: ["Spinner (1)", "Spinner (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [4, { spriteNames: ["Spinner (1)", "Spinner (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [5, { spriteNames: ["Spinner (1)", "Spinner (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [6, { spriteNames: ["Spinner (1)", "Spinner (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [7, { spriteNames: ["Spinner (1)", "Spinner (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [8, { spriteNames: ["Spinner (1)", "Spinner (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }]
+      ])
+    },
+    // STAR_KILLER (8)
+    {
+      characterType: 8,
+      // MoveCharacterCode.STAR_KILLER
+      directions: /* @__PURE__ */ new Map([
+        [0, { spriteNames: ["Star Killer (LEFT)"], frameRate: 8, looping: false, frameInversions: createFrameInversions(1) }],
+        [1, { spriteNames: ["Star Killer (UP)"], frameRate: 8, looping: false, frameInversions: createFrameInversions(1) }],
+        [2, { spriteNames: ["Star Killer (LEFTUP)"], frameRate: 8, looping: false, frameInversions: createFrameInversions(1, true) }],
+        [3, { spriteNames: ["Star Killer (LEFT)"], frameRate: 8, looping: false, frameInversions: createFrameInversions(1, true) }],
+        [4, { spriteNames: ["Star Killer (LEFTUP)"], frameRate: 8, looping: false, frameInversions: createFrameInversions(1, true, true) }],
+        [5, { spriteNames: ["Star Killer (UP)"], frameRate: 8, looping: false, frameInversions: createFrameInversions(1, false, true) }],
+        [6, { spriteNames: ["Star Killer (LEFTUP)"], frameRate: 8, looping: false, frameInversions: createFrameInversions(1, false, true) }],
+        [7, { spriteNames: ["Star Killer (LEFT)"], frameRate: 8, looping: false, frameInversions: createFrameInversions(1) }],
+        [8, { spriteNames: ["Star Killer (LEFTUP)"], frameRate: 8, looping: false, frameInversions: createFrameInversions(1) }]
+      ])
+    },
+    // STARSHIP (9)
+    {
+      characterType: 9,
+      // MoveCharacterCode.STARSHIP
+      directions: /* @__PURE__ */ new Map([
+        [0, { spriteNames: ["Starship (LEFT)"], frameRate: 8, looping: false, frameInversions: createFrameInversions(1) }],
+        [1, { spriteNames: ["Starship (UP)"], frameRate: 8, looping: false, frameInversions: createFrameInversions(1) }],
+        [2, { spriteNames: ["Starship (LEFTUP)"], frameRate: 8, looping: false, frameInversions: createFrameInversions(1, true) }],
+        [3, { spriteNames: ["Starship (LEFT)"], frameRate: 8, looping: false, frameInversions: createFrameInversions(1, true) }],
+        [4, { spriteNames: ["Starship (LEFTUP)"], frameRate: 8, looping: false, frameInversions: createFrameInversions(1, true, true) }],
+        [5, { spriteNames: ["Starship (UP)"], frameRate: 8, looping: false, frameInversions: createFrameInversions(1, false, true) }],
+        [6, { spriteNames: ["Starship (LEFTUP)"], frameRate: 8, looping: false, frameInversions: createFrameInversions(1, false, true) }],
+        [7, { spriteNames: ["Starship (LEFT)"], frameRate: 8, looping: false, frameInversions: createFrameInversions(1) }],
+        [8, { spriteNames: ["Starship (LEFTUP)"], frameRate: 8, looping: false, frameInversions: createFrameInversions(1) }]
+      ])
+    },
+    // EXPLOSION (10)
+    {
+      characterType: 10,
+      // MoveCharacterCode.EXPLOSION
+      directions: /* @__PURE__ */ new Map([
+        [0, { spriteNames: ["Explosion (1)", "Explosion (2)"], frameRate: 4, looping: false, frameInversions: createFrameInversions(2) }],
+        [1, { spriteNames: ["Explosion (1)", "Explosion (2)"], frameRate: 4, looping: false, frameInversions: createFrameInversions(2) }],
+        [2, { spriteNames: ["Explosion (1)", "Explosion (2)"], frameRate: 4, looping: false, frameInversions: createFrameInversions(2) }],
+        [3, { spriteNames: ["Explosion (1)", "Explosion (2)"], frameRate: 4, looping: false, frameInversions: createFrameInversions(2) }],
+        [4, { spriteNames: ["Explosion (1)", "Explosion (2)"], frameRate: 4, looping: false, frameInversions: createFrameInversions(2) }],
+        [5, { spriteNames: ["Explosion (1)", "Explosion (2)"], frameRate: 4, looping: false, frameInversions: createFrameInversions(2) }],
+        [6, { spriteNames: ["Explosion (1)", "Explosion (2)"], frameRate: 4, looping: false, frameInversions: createFrameInversions(2) }],
+        [7, { spriteNames: ["Explosion (1)", "Explosion (2)"], frameRate: 4, looping: false, frameInversions: createFrameInversions(2) }],
+        [8, { spriteNames: ["Explosion (1)", "Explosion (2)"], frameRate: 4, looping: false, frameInversions: createFrameInversions(2) }]
+      ])
+    },
+    // SMILEY (11)
+    {
+      characterType: 11,
+      // MoveCharacterCode.SMILEY
+      directions: /* @__PURE__ */ new Map([
+        [0, { spriteNames: ["Smiley (1)", "Smiley (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [1, { spriteNames: ["Smiley (1)", "Smiley (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [2, { spriteNames: ["Smiley (1)", "Smiley (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [3, { spriteNames: ["Smiley (1)", "Smiley (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [4, { spriteNames: ["Smiley (1)", "Smiley (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [5, { spriteNames: ["Smiley (1)", "Smiley (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [6, { spriteNames: ["Smiley (1)", "Smiley (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [7, { spriteNames: ["Smiley (1)", "Smiley (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [8, { spriteNames: ["Smiley (1)", "Smiley (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }]
+      ])
+    },
+    // LASER (12)
+    {
+      characterType: 12,
+      // MoveCharacterCode.LASER
+      directions: /* @__PURE__ */ new Map([
+        [0, { spriteNames: ["Laser (HORIZONTAL1)", "Laser (HORIZONTAL2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [1, { spriteNames: ["Laser (VERTICAL1)", "Laser (VERTICAL2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [2, { spriteNames: ["Laser (DIAGONAL1)", "Laser (DIAGONAL2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, true) }],
+        [3, { spriteNames: ["Laser (HORIZONTAL1)", "Laser (HORIZONTAL2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, true) }],
+        [4, { spriteNames: ["Laser (DIAGONAL1)", "Laser (DIAGONAL2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, true, true) }],
+        [5, { spriteNames: ["Laser (VERTICAL1)", "Laser (VERTICAL2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, false, true) }],
+        [6, { spriteNames: ["Laser (DIAGONAL1)", "Laser (DIAGONAL2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, false, true) }],
+        [7, { spriteNames: ["Laser (HORIZONTAL1)", "Laser (HORIZONTAL2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [8, { spriteNames: ["Laser (DIAGONAL1)", "Laser (DIAGONAL2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }]
+      ])
+    },
+    // SHELL_CREEPER (13)
+    {
+      characterType: 13,
+      // MoveCharacterCode.SHELL_CREEPER
+      directions: /* @__PURE__ */ new Map([
+        [0, { spriteNames: ["Shell Creeper (1)", "Shell Creeper (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [1, { spriteNames: ["Shell Creeper (1)", "Shell Creeper (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [2, { spriteNames: ["Shell Creeper (1)", "Shell Creeper (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, true) }],
+        [3, { spriteNames: ["Shell Creeper (1)", "Shell Creeper (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, true) }],
+        [4, { spriteNames: ["Shell Creeper (1)", "Shell Creeper (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, true) }],
+        [5, { spriteNames: ["Shell Creeper (1)", "Shell Creeper (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [6, { spriteNames: ["Shell Creeper (1)", "Shell Creeper (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [7, { spriteNames: ["Shell Creeper (1)", "Shell Creeper (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [8, { spriteNames: ["Shell Creeper (1)", "Shell Creeper (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }]
+      ])
+    },
+    // SIDE_STEPPER (14)
+    {
+      characterType: 14,
+      // MoveCharacterCode.SIDE_STEPPER
+      directions: /* @__PURE__ */ new Map([
+        [0, { spriteNames: ["Side Stepper (1)", "Side Stepper (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [1, { spriteNames: ["Side Stepper (1)", "Side Stepper (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [2, { spriteNames: ["Side Stepper (1)", "Side Stepper (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [3, { spriteNames: ["Side Stepper (1)", "Side Stepper (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [4, { spriteNames: ["Side Stepper (1)", "Side Stepper (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [5, { spriteNames: ["Side Stepper (1)", "Side Stepper (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [6, { spriteNames: ["Side Stepper (1)", "Side Stepper (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [7, { spriteNames: ["Side Stepper (1)", "Side Stepper (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [8, { spriteNames: ["Side Stepper (1)", "Side Stepper (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }]
+      ])
+    },
+    // NITPICKER (15)
+    {
+      characterType: 15,
+      // MoveCharacterCode.NITPICKER
+      directions: /* @__PURE__ */ new Map([
+        [0, { spriteNames: ["Nit Picker (1)", "Nit Picker (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [1, { spriteNames: ["Nit Picker (1)", "Nit Picker (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [2, { spriteNames: ["Nit Picker (1)", "Nit Picker (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, true) }],
+        [3, { spriteNames: ["Nit Picker (1)", "Nit Picker (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, true) }],
+        [4, { spriteNames: ["Nit Picker (1)", "Nit Picker (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2, true) }],
+        [5, { spriteNames: ["Nit Picker (1)", "Nit Picker (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [6, { spriteNames: ["Nit Picker (1)", "Nit Picker (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [7, { spriteNames: ["Nit Picker (1)", "Nit Picker (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }],
+        [8, { spriteNames: ["Nit Picker (1)", "Nit Picker (2)"], frameRate: 8, looping: true, frameInversions: createFrameInversions(2) }]
+      ])
+    }
+  ];
+  function getCharacterSequenceConfig(characterType) {
+    return CHARACTER_SEQUENCE_CONFIGS.find((config2) => config2.characterType === characterType) ?? null;
+  }
+
+  // src/shared/data/types.ts
+  function isEightTileSprite(spriteDef) {
+    return Array.isArray(spriteDef.charCodes) && spriteDef.charCodes.length === 8;
+  }
+  function isSixTileSprite(spriteDef) {
+    return Array.isArray(spriteDef.charCodes) && spriteDef.charCodes.length === 6;
+  }
+  function isFourTileSprite(spriteDef) {
+    return Array.isArray(spriteDef.charCodes) && spriteDef.charCodes.length === 4;
+  }
+  function isOneTileSprite(spriteDef) {
+    return typeof spriteDef.charCodes === "number";
+  }
+
+  // src/shared/data/characters/achilles.ts
+  var SPRITE_ACHILLES_LEFT1_64 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 3, 3, 3],
+    [0, 0, 0, 0, 3, 1, 3, 3],
+    [0, 0, 0, 3, 1, 1, 1, 3],
+    [0, 0, 0, 3, 1, 1, 1, 3],
+    [0, 0, 3, 3, 2, 1, 1, 3],
+    [1, 2, 3, 3, 2, 1, 1, 3]
+  ];
+  var SPRITE_ACHILLES_LEFT1_65 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 1, 1, 1, 1],
+    [3, 3, 1, 1, 3, 3, 3, 0],
+    [3, 3, 1, 1, 1, 1, 0, 0],
+    [3, 1, 1, 3, 3, 3, 0, 0],
+    [3, 1, 1, 1, 1, 0, 0, 0],
+    [1, 1, 1, 3, 3, 0, 0, 0],
+    [1, 1, 3, 3, 3, 0, 0, 0]
+  ];
+  var SPRITE_ACHILLES_LEFT1_66 = [
+    [2, 2, 3, 3, 3, 1, 3, 3],
+    [0, 0, 3, 3, 3, 3, 3, 3],
+    [0, 0, 0, 3, 3, 3, 3, 3],
+    [0, 0, 0, 3, 3, 3, 3, 3],
+    [0, 0, 0, 0, 3, 3, 3, 3],
+    [0, 0, 0, 0, 0, 3, 3, 3],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_ACHILLES_LEFT1_67 = [
+    [3, 3, 3, 2, 2, 0, 0, 0],
+    [3, 3, 2, 1, 1, 0, 0, 0],
+    [3, 3, 2, 1, 1, 1, 2, 2],
+    [3, 3, 3, 2, 1, 1, 2, 3],
+    [3, 3, 3, 0, 0, 0, 3, 2],
+    [3, 3, 0, 0, 0, 0, 2, 2],
+    [0, 0, 0, 0, 0, 0, 0, 2],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_ACHILLES_LEFT2_68 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 3, 3, 3],
+    [0, 0, 0, 0, 3, 1, 3, 3],
+    [0, 0, 0, 3, 1, 1, 1, 3],
+    [0, 0, 0, 3, 1, 1, 1, 3],
+    [0, 0, 3, 3, 2, 1, 1, 3],
+    [1, 2, 3, 3, 2, 1, 1, 3],
+    [2, 2, 3, 3, 3, 1, 3, 3]
+  ];
+  var SPRITE_ACHILLES_LEFT2_69 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [3, 3, 0, 0, 0, 0, 0, 0],
+    [3, 3, 3, 0, 0, 0, 0, 0],
+    [3, 3, 3, 3, 0, 0, 0, 0],
+    [3, 3, 3, 3, 0, 0, 0, 0],
+    [3, 3, 3, 3, 3, 0, 0, 0],
+    [1, 1, 3, 3, 3, 0, 0, 0],
+    [1, 1, 3, 3, 2, 0, 2, 2]
+  ];
+  var SPRITE_ACHILLES_LEFT2_70 = [
+    [0, 0, 3, 3, 3, 3, 3, 3],
+    [0, 0, 0, 3, 3, 3, 3, 3],
+    [0, 0, 0, 3, 3, 3, 3, 3],
+    [0, 0, 0, 0, 3, 3, 3, 3],
+    [0, 0, 0, 0, 0, 3, 3, 3],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_ACHILLES_LEFT2_71 = [
+    [1, 1, 1, 2, 1, 1, 2, 3],
+    [1, 1, 1, 2, 1, 1, 3, 2],
+    [1, 1, 1, 1, 0, 0, 2, 2],
+    [3, 1, 1, 1, 1, 0, 0, 2],
+    [3, 1, 1, 3, 3, 0, 0, 0],
+    [0, 0, 1, 1, 1, 1, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_ACHILLES_LEFTUP1_72 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 1, 2, 0, 1, 1, 1],
+    [0, 0, 2, 2, 3, 2, 1, 1],
+    [0, 0, 0, 3, 3, 3, 2, 1],
+    [0, 0, 0, 2, 3, 3, 3, 1],
+    [0, 0, 1, 1, 2, 3, 3, 3],
+    [0, 0, 1, 1, 1, 1, 3, 3]
+  ];
+  var SPRITE_ACHILLES_LEFTUP1_73 = [
+    [0, 0, 0, 1, 1, 1, 0, 0],
+    [0, 0, 1, 1, 1, 1, 1, 0],
+    [3, 3, 1, 1, 1, 1, 1, 1],
+    [1, 3, 3, 1, 0, 0, 0, 0],
+    [1, 3, 3, 3, 0, 0, 0, 0],
+    [1, 3, 3, 3, 0, 0, 0, 0],
+    [3, 3, 3, 3, 3, 0, 0, 0],
+    [3, 3, 3, 3, 3, 0, 0, 0]
+  ];
+  var SPRITE_ACHILLES_LEFTUP1_74 = [
+    [0, 0, 3, 1, 1, 1, 3, 3],
+    [0, 0, 3, 3, 3, 3, 3, 3],
+    [0, 0, 1, 3, 3, 3, 3, 3],
+    [1, 1, 1, 1, 3, 3, 3, 3],
+    [1, 1, 1, 1, 3, 3, 3, 3],
+    [1, 1, 1, 0, 0, 3, 3, 3],
+    [0, 1, 1, 0, 0, 0, 0, 0],
+    [0, 0, 1, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_ACHILLES_LEFTUP1_75 = [
+    [3, 3, 3, 3, 3, 0, 0, 0],
+    [3, 3, 3, 3, 3, 1, 2, 2],
+    [3, 3, 3, 3, 1, 2, 2, 3],
+    [3, 3, 3, 3, 0, 2, 3, 0],
+    [3, 3, 3, 1, 0, 0, 0, 0],
+    [3, 3, 1, 2, 2, 0, 0, 0],
+    [0, 0, 2, 2, 3, 0, 0, 0],
+    [0, 0, 2, 3, 0, 0, 0, 0]
+  ];
+  var SPRITE_ACHILLES_LEFTUP2_76 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 1, 2, 0, 1, 1, 1],
+    [0, 0, 2, 2, 3, 2, 1, 1],
+    [0, 0, 0, 3, 3, 3, 2, 1],
+    [0, 0, 0, 2, 3, 3, 3, 1],
+    [0, 0, 1, 1, 2, 3, 3, 3],
+    [0, 0, 1, 1, 1, 1, 3, 3],
+    [0, 0, 3, 1, 1, 1, 3, 3]
+  ];
+  var SPRITE_ACHILLES_LEFTUP2_77 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [3, 3, 0, 0, 0, 0, 0, 0],
+    [1, 3, 3, 1, 1, 0, 0, 0],
+    [1, 3, 3, 3, 1, 1, 0, 0],
+    [1, 3, 3, 3, 1, 1, 1, 0],
+    [3, 3, 3, 3, 3, 0, 1, 0],
+    [3, 3, 3, 3, 3, 0, 0, 0],
+    [3, 3, 3, 3, 3, 0, 0, 0]
+  ];
+  var SPRITE_ACHILLES_LEFTUP2_78 = [
+    [0, 0, 3, 3, 3, 3, 3, 3],
+    [0, 0, 0, 3, 3, 3, 3, 3],
+    [0, 0, 0, 3, 3, 3, 3, 3],
+    [0, 0, 0, 1, 3, 3, 3, 3],
+    [0, 0, 0, 1, 1, 3, 3, 3],
+    [0, 0, 0, 1, 1, 1, 0, 0],
+    [0, 0, 0, 0, 1, 1, 0, 0],
+    [0, 0, 0, 0, 0, 1, 1, 0]
+  ];
+  var SPRITE_ACHILLES_LEFTUP2_79 = [
+    [3, 3, 3, 3, 3, 1, 2, 2],
+    [3, 3, 3, 3, 1, 1, 2, 3],
+    [3, 3, 3, 3, 1, 2, 3, 0],
+    [3, 3, 3, 0, 0, 2, 3, 0],
+    [3, 3, 1, 0, 0, 0, 0, 0],
+    [0, 1, 1, 2, 0, 0, 0, 0],
+    [0, 2, 2, 3, 0, 0, 0, 0],
+    [0, 2, 3, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_ACHILLES_TOP1_80 = [
+    [0, 0, 0, 0, 0, 0, 0, 2],
+    [0, 0, 0, 0, 0, 0, 0, 2],
+    [1, 1, 0, 0, 0, 0, 1, 3],
+    [1, 1, 1, 0, 0, 1, 2, 3],
+    [0, 1, 1, 0, 3, 1, 2, 3],
+    [0, 0, 1, 1, 3, 1, 1, 3],
+    [0, 0, 1, 1, 3, 1, 3, 3],
+    [0, 0, 0, 1, 3, 3, 3, 3]
+  ];
+  var SPRITE_ACHILLES_TOP1_81 = [
+    [1, 0, 0, 0, 0, 0, 0, 0],
+    [2, 0, 0, 0, 0, 0, 0, 0],
+    [3, 1, 0, 0, 0, 0, 1, 1],
+    [3, 2, 1, 0, 0, 1, 1, 1],
+    [3, 2, 1, 3, 0, 1, 1, 0],
+    [3, 1, 1, 3, 1, 1, 0, 0],
+    [3, 3, 1, 3, 1, 1, 0, 0],
+    [3, 3, 3, 3, 1, 0, 0, 0]
+  ];
+  var SPRITE_ACHILLES_TOP1_82 = [
+    [0, 0, 0, 3, 3, 3, 3, 3],
+    [0, 0, 0, 3, 3, 3, 3, 3],
+    [0, 0, 0, 0, 3, 3, 3, 3],
+    [0, 0, 0, 0, 3, 3, 3, 3],
+    [0, 0, 0, 0, 1, 3, 3, 3],
+    [0, 0, 0, 0, 0, 1, 3, 3],
+    [0, 0, 0, 0, 2, 2, 2, 0],
+    [0, 0, 0, 0, 2, 3, 3, 0]
+  ];
+  var SPRITE_ACHILLES_TOP1_83 = [
+    [3, 3, 3, 3, 3, 0, 0, 0],
+    [3, 3, 3, 3, 3, 0, 0, 0],
+    [3, 3, 3, 3, 0, 0, 0, 0],
+    [3, 3, 3, 3, 0, 0, 0, 0],
+    [3, 3, 3, 1, 0, 0, 0, 0],
+    [3, 3, 1, 0, 0, 0, 0, 0],
+    [0, 2, 2, 2, 0, 0, 0, 0],
+    [0, 3, 3, 2, 0, 0, 0, 0]
+  ];
+  var SPRITE_ACHILLES_TOP2_84 = [
+    [0, 0, 0, 0, 0, 0, 0, 2],
+    [0, 0, 0, 0, 0, 0, 0, 2],
+    [0, 0, 0, 0, 0, 0, 1, 3],
+    [0, 0, 0, 0, 0, 1, 2, 3],
+    [0, 0, 0, 0, 3, 1, 2, 3],
+    [0, 0, 0, 0, 3, 1, 1, 3],
+    [0, 0, 0, 3, 3, 1, 3, 3],
+    [0, 0, 1, 3, 3, 3, 3, 3]
+  ];
+  var SPRITE_ACHILLES_TOP2_85 = [
+    [1, 0, 0, 0, 0, 0, 0, 0],
+    [2, 0, 0, 0, 0, 0, 0, 0],
+    [3, 1, 0, 0, 0, 0, 0, 0],
+    [3, 2, 1, 0, 0, 0, 0, 0],
+    [3, 2, 1, 3, 0, 0, 0, 0],
+    [3, 1, 1, 3, 0, 0, 0, 0],
+    [3, 3, 1, 3, 3, 0, 0, 0],
+    [3, 3, 3, 3, 3, 1, 0, 0]
+  ];
+  var SPRITE_ACHILLES_TOP2_86 = [
+    [0, 1, 1, 3, 3, 3, 3, 3],
+    [1, 1, 1, 3, 3, 3, 3, 3],
+    [1, 3, 1, 0, 3, 3, 3, 3],
+    [1, 3, 0, 0, 3, 3, 3, 3],
+    [1, 3, 0, 0, 1, 3, 3, 3],
+    [1, 0, 0, 2, 2, 1, 3, 3],
+    [0, 0, 3, 3, 2, 2, 0, 0],
+    [0, 0, 0, 3, 3, 3, 0, 0]
+  ];
+  var SPRITE_ACHILLES_TOP2_87 = [
+    [3, 3, 3, 3, 3, 1, 1, 0],
+    [3, 3, 3, 3, 3, 1, 1, 1],
+    [3, 3, 3, 3, 0, 1, 3, 1],
+    [3, 3, 3, 3, 0, 0, 3, 1],
+    [3, 3, 3, 1, 0, 0, 3, 1],
+    [3, 3, 1, 2, 2, 0, 0, 1],
+    [0, 0, 2, 2, 3, 3, 0, 0],
+    [0, 0, 3, 3, 3, 0, 0, 0]
+  ];
+  var ACHILLES_SPRITES = [
+    {
+      name: "Achilles (LEFT1)",
+      moveCharacterCode: 3 /* ACHILLES */,
+      defaultPaletteCode: 2,
+      defaultColorCombination: 1,
+      charCodes: [64, 65, 66, 67],
+      tiles: [SPRITE_ACHILLES_LEFT1_64, SPRITE_ACHILLES_LEFT1_65, SPRITE_ACHILLES_LEFT1_66, SPRITE_ACHILLES_LEFT1_67]
+    },
+    {
+      name: "Achilles (LEFT2)",
+      moveCharacterCode: 3 /* ACHILLES */,
+      defaultPaletteCode: 2,
+      defaultColorCombination: 1,
+      charCodes: [68, 69, 70, 71],
+      tiles: [SPRITE_ACHILLES_LEFT2_68, SPRITE_ACHILLES_LEFT2_69, SPRITE_ACHILLES_LEFT2_70, SPRITE_ACHILLES_LEFT2_71]
+    },
+    {
+      name: "Achilles (LEFTUP1)",
+      moveCharacterCode: 3 /* ACHILLES */,
+      defaultPaletteCode: 2,
+      defaultColorCombination: 1,
+      charCodes: [72, 73, 74, 75],
+      tiles: [
+        SPRITE_ACHILLES_LEFTUP1_72,
+        SPRITE_ACHILLES_LEFTUP1_73,
+        SPRITE_ACHILLES_LEFTUP1_74,
+        SPRITE_ACHILLES_LEFTUP1_75
+      ]
+    },
+    {
+      name: "Achilles (LEFTUP2)",
+      moveCharacterCode: 3 /* ACHILLES */,
+      defaultPaletteCode: 2,
+      defaultColorCombination: 1,
+      charCodes: [76, 77, 78, 79],
+      tiles: [
+        SPRITE_ACHILLES_LEFTUP2_76,
+        SPRITE_ACHILLES_LEFTUP2_77,
+        SPRITE_ACHILLES_LEFTUP2_78,
+        SPRITE_ACHILLES_LEFTUP2_79
+      ]
+    },
+    {
+      name: "Achilles (TOP1)",
+      moveCharacterCode: 3 /* ACHILLES */,
+      defaultPaletteCode: 2,
+      defaultColorCombination: 1,
+      charCodes: [80, 81, 82, 83],
+      tiles: [SPRITE_ACHILLES_TOP1_80, SPRITE_ACHILLES_TOP1_81, SPRITE_ACHILLES_TOP1_82, SPRITE_ACHILLES_TOP1_83]
+    },
+    {
+      name: "Achilles (TOP2)",
+      moveCharacterCode: 3 /* ACHILLES */,
+      defaultPaletteCode: 2,
+      defaultColorCombination: 1,
+      charCodes: [84, 85, 86, 87],
+      tiles: [SPRITE_ACHILLES_TOP2_84, SPRITE_ACHILLES_TOP2_85, SPRITE_ACHILLES_TOP2_86, SPRITE_ACHILLES_TOP2_87]
+    }
+  ];
+
+  // src/shared/data/characters/car.ts
+  var SPRITE_CAR_LEFT1_120 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 1, 3, 3, 0, 0, 0],
+    [0, 0, 1, 3, 3, 0, 0, 0],
+    [0, 0, 1, 3, 3, 0, 0, 0],
+    [0, 0, 0, 1, 0, 0, 2, 2],
+    [0, 0, 2, 2, 2, 2, 1, 1],
+    [0, 2, 3, 2, 2, 1, 1, 3]
+  ];
+  var SPRITE_CAR_LEFT1_121 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [1, 3, 3, 3, 3, 0, 0, 0],
+    [1, 3, 3, 3, 3, 0, 0, 0],
+    [1, 3, 3, 3, 1, 1, 1, 0],
+    [0, 0, 1, 0, 1, 1, 1, 0],
+    [2, 2, 2, 2, 1, 1, 1, 0],
+    [2, 1, 2, 1, 1, 1, 1, 0],
+    [2, 3, 3, 3, 1, 1, 1, 0]
+  ];
+  var SPRITE_CAR_LEFT1_122 = [
+    [0, 2, 3, 2, 2, 1, 1, 3],
+    [0, 2, 3, 2, 2, 1, 1, 3],
+    [0, 0, 2, 2, 2, 2, 1, 1],
+    [0, 0, 0, 1, 0, 0, 2, 2],
+    [0, 0, 1, 3, 3, 0, 0, 0],
+    [0, 0, 1, 3, 3, 0, 0, 0],
+    [0, 0, 1, 3, 3, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_CAR_LEFT1_123 = [
+    [2, 3, 3, 3, 1, 1, 1, 0],
+    [2, 3, 3, 3, 1, 1, 1, 0],
+    [2, 1, 2, 1, 1, 1, 1, 0],
+    [2, 2, 2, 2, 1, 1, 1, 0],
+    [0, 0, 1, 0, 1, 1, 1, 0],
+    [1, 3, 3, 3, 1, 1, 1, 0],
+    [1, 3, 3, 3, 3, 0, 0, 0],
+    [1, 3, 3, 3, 3, 0, 0, 0]
+  ];
+  var SPRITE_CAR_LEFT2_124 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 3, 3, 1, 0, 0, 0],
+    [0, 0, 3, 3, 1, 0, 0, 0],
+    [0, 0, 3, 3, 1, 0, 0, 0],
+    [0, 0, 0, 1, 0, 0, 2, 2],
+    [0, 0, 2, 2, 2, 2, 1, 1],
+    [0, 2, 3, 2, 2, 1, 1, 3]
+  ];
+  var SPRITE_CAR_LEFT2_125 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [3, 1, 1, 3, 3, 0, 0, 0],
+    [3, 1, 1, 3, 3, 0, 0, 0],
+    [3, 1, 1, 3, 1, 1, 1, 0],
+    [0, 0, 1, 0, 1, 1, 1, 0],
+    [2, 2, 2, 2, 1, 1, 1, 0],
+    [2, 1, 2, 1, 1, 1, 1, 0],
+    [2, 3, 3, 3, 1, 1, 1, 0]
+  ];
+  var SPRITE_CAR_LEFT2_126 = [
+    [0, 2, 3, 2, 2, 1, 1, 3],
+    [0, 2, 3, 2, 2, 1, 1, 3],
+    [0, 0, 2, 2, 2, 2, 1, 1],
+    [0, 0, 0, 1, 0, 0, 2, 2],
+    [0, 0, 3, 3, 1, 0, 0, 0],
+    [0, 0, 3, 3, 1, 0, 0, 0],
+    [0, 0, 3, 3, 1, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_CAR_LEFT2_127 = [
+    [2, 3, 3, 3, 1, 1, 1, 0],
+    [2, 3, 3, 3, 1, 1, 1, 0],
+    [2, 1, 2, 1, 1, 1, 1, 0],
+    [2, 2, 2, 2, 1, 1, 1, 0],
+    [0, 0, 1, 0, 1, 1, 1, 0],
+    [3, 1, 1, 3, 1, 1, 1, 0],
+    [3, 1, 1, 3, 3, 0, 0, 0],
+    [3, 1, 1, 3, 3, 0, 0, 0]
+  ];
+  var SPRITE_CAR_LEFTUP1_128 = [
+    [0, 0, 0, 0, 0, 0, 0, 1],
+    [0, 0, 0, 0, 0, 0, 1, 3],
+    [0, 0, 0, 2, 2, 2, 0, 3],
+    [0, 0, 2, 2, 3, 2, 2, 0],
+    [0, 0, 2, 3, 2, 2, 2, 2],
+    [0, 0, 2, 2, 2, 1, 1, 1],
+    [0, 1, 0, 2, 2, 1, 1, 3],
+    [1, 3, 3, 0, 2, 1, 3, 3]
+  ];
+  var SPRITE_CAR_LEFTUP1_129 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [3, 0, 0, 0, 0, 0, 0, 0],
+    [3, 3, 0, 0, 0, 0, 0, 0],
+    [3, 0, 0, 0, 1, 1, 0, 0],
+    [0, 0, 0, 1, 1, 3, 3, 0],
+    [2, 2, 0, 1, 3, 3, 3, 3],
+    [1, 2, 2, 0, 3, 3, 3, 3],
+    [2, 2, 2, 2, 0, 1, 3, 0]
+  ];
+  var SPRITE_CAR_LEFTUP1_130 = [
+    [0, 3, 3, 3, 0, 2, 1, 2],
+    [0, 0, 3, 0, 0, 2, 2, 2],
+    [0, 0, 0, 0, 0, 0, 2, 2],
+    [0, 0, 0, 0, 1, 1, 0, 2],
+    [0, 0, 0, 1, 1, 3, 3, 0],
+    [0, 0, 0, 1, 3, 3, 3, 1],
+    [0, 0, 0, 0, 3, 3, 3, 3],
+    [0, 0, 0, 0, 0, 3, 3, 0]
+  ];
+  var SPRITE_CAR_LEFTUP1_131 = [
+    [2, 3, 1, 2, 1, 1, 1, 0],
+    [3, 3, 3, 1, 1, 1, 1, 1],
+    [1, 3, 1, 1, 1, 1, 1, 0],
+    [2, 1, 1, 1, 1, 1, 0, 0],
+    [1, 1, 1, 1, 1, 0, 0, 0],
+    [1, 1, 1, 1, 0, 0, 0, 0],
+    [1, 1, 1, 0, 0, 0, 0, 0],
+    [0, 1, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_CAR_LEFTUP2_132 = [
+    [0, 0, 0, 0, 0, 0, 0, 3],
+    [0, 0, 0, 0, 0, 0, 3, 3],
+    [0, 0, 0, 2, 2, 2, 0, 3],
+    [0, 0, 2, 2, 3, 2, 2, 0],
+    [0, 0, 2, 3, 2, 2, 2, 2],
+    [0, 0, 2, 2, 2, 1, 1, 1],
+    [0, 3, 0, 2, 2, 1, 1, 3],
+    [3, 3, 3, 0, 2, 1, 3, 3]
+  ];
+  var SPRITE_CAR_LEFTUP2_133 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [3, 0, 0, 0, 0, 0, 0, 0],
+    [3, 1, 0, 0, 0, 0, 0, 0],
+    [1, 0, 0, 0, 3, 3, 0, 0],
+    [0, 0, 0, 3, 3, 1, 1, 0],
+    [2, 2, 0, 3, 1, 1, 3, 3],
+    [1, 2, 2, 0, 1, 3, 3, 3],
+    [2, 2, 2, 2, 0, 1, 3, 0]
+  ];
+  var SPRITE_CAR_LEFTUP2_134 = [
+    [0, 3, 3, 1, 0, 2, 1, 2],
+    [0, 0, 1, 0, 0, 2, 2, 2],
+    [0, 0, 0, 0, 0, 0, 2, 2],
+    [0, 0, 0, 0, 3, 3, 0, 2],
+    [0, 0, 0, 3, 3, 1, 1, 0],
+    [0, 0, 0, 3, 1, 1, 3, 1],
+    [0, 0, 0, 0, 1, 3, 3, 3],
+    [0, 0, 0, 0, 0, 3, 3, 0]
+  ];
+  var SPRITE_CAR_LEFTUP2_135 = [
+    [2, 3, 1, 2, 1, 1, 1, 0],
+    [3, 3, 3, 1, 1, 1, 1, 1],
+    [1, 3, 1, 1, 1, 1, 1, 0],
+    [2, 1, 1, 1, 1, 1, 0, 0],
+    [1, 1, 1, 1, 1, 0, 0, 0],
+    [1, 1, 1, 1, 0, 0, 0, 0],
+    [1, 1, 1, 0, 0, 0, 0, 0],
+    [0, 1, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_CAR_UP1_136 = [
+    [0, 0, 0, 0, 0, 0, 0, 2],
+    [0, 0, 0, 1, 1, 0, 2, 2],
+    [0, 0, 0, 3, 3, 1, 2, 3],
+    [0, 0, 0, 3, 3, 1, 2, 2],
+    [0, 0, 0, 3, 3, 0, 2, 2],
+    [0, 0, 0, 0, 0, 0, 2, 1],
+    [0, 0, 0, 0, 0, 2, 1, 1],
+    [0, 0, 0, 0, 0, 2, 1, 3]
+  ];
+  var SPRITE_CAR_UP1_137 = [
+    [2, 0, 0, 0, 0, 0, 0, 0],
+    [2, 2, 0, 1, 1, 0, 0, 0],
+    [3, 2, 1, 3, 3, 0, 0, 0],
+    [2, 2, 1, 3, 3, 0, 0, 0],
+    [2, 2, 0, 3, 3, 0, 0, 0],
+    [1, 2, 0, 0, 0, 0, 0, 0],
+    [1, 1, 2, 0, 0, 0, 0, 0],
+    [3, 1, 2, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_CAR_UP1_138 = [
+    [0, 1, 1, 1, 0, 2, 1, 3],
+    [0, 3, 3, 3, 0, 2, 2, 2],
+    [0, 3, 3, 3, 1, 2, 1, 3],
+    [0, 3, 3, 3, 1, 2, 2, 3],
+    [0, 3, 3, 3, 0, 2, 1, 3],
+    [0, 3, 3, 1, 1, 1, 1, 1],
+    [0, 0, 0, 1, 1, 1, 1, 1],
+    [0, 0, 0, 1, 1, 1, 1, 1]
+  ];
+  var SPRITE_CAR_UP1_139 = [
+    [3, 1, 2, 0, 1, 1, 1, 0],
+    [2, 2, 2, 0, 3, 3, 3, 0],
+    [3, 1, 2, 1, 3, 3, 3, 0],
+    [3, 2, 2, 1, 3, 3, 3, 0],
+    [3, 1, 2, 0, 3, 3, 3, 0],
+    [1, 1, 1, 1, 1, 3, 3, 0],
+    [1, 1, 1, 1, 1, 0, 0, 0],
+    [1, 1, 1, 1, 1, 0, 0, 0]
+  ];
+  var SPRITE_CAR_UP2_140 = [
+    [0, 0, 0, 0, 0, 0, 0, 2],
+    [0, 0, 0, 3, 3, 0, 2, 2],
+    [0, 0, 0, 3, 3, 1, 2, 3],
+    [0, 0, 0, 3, 3, 1, 2, 2],
+    [0, 0, 0, 1, 1, 0, 2, 2],
+    [0, 0, 0, 0, 0, 0, 2, 1],
+    [0, 0, 0, 0, 0, 2, 1, 1],
+    [0, 0, 0, 0, 0, 2, 1, 3]
+  ];
+  var SPRITE_CAR_UP2_141 = [
+    [2, 0, 0, 0, 0, 0, 0, 0],
+    [2, 2, 0, 3, 3, 0, 0, 0],
+    [3, 2, 1, 3, 3, 0, 0, 0],
+    [2, 2, 1, 3, 3, 0, 0, 0],
+    [2, 2, 0, 1, 1, 0, 0, 0],
+    [1, 2, 0, 0, 0, 0, 0, 0],
+    [1, 1, 2, 0, 0, 0, 0, 0],
+    [3, 1, 2, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_CAR_UP2_142 = [
+    [0, 3, 3, 3, 0, 2, 1, 3],
+    [0, 1, 1, 1, 0, 2, 2, 2],
+    [0, 1, 1, 1, 1, 2, 1, 3],
+    [0, 3, 3, 3, 1, 2, 2, 3],
+    [0, 3, 3, 3, 0, 2, 1, 3],
+    [0, 3, 3, 1, 1, 1, 1, 1],
+    [0, 0, 0, 1, 1, 1, 1, 1],
+    [0, 0, 0, 1, 1, 1, 1, 1]
+  ];
+  var SPRITE_CAR_UP2_143 = [
+    [3, 1, 2, 0, 3, 3, 3, 0],
+    [2, 2, 2, 0, 1, 1, 1, 0],
+    [3, 1, 2, 1, 1, 1, 1, 0],
+    [3, 2, 2, 1, 3, 3, 3, 0],
+    [3, 1, 2, 0, 3, 3, 3, 0],
+    [1, 1, 1, 1, 1, 3, 3, 0],
+    [1, 1, 1, 1, 1, 0, 0, 0],
+    [1, 1, 1, 1, 1, 0, 0, 0]
+  ];
+  var CAR_SPRITES = [
+    {
+      name: "Car (LEFT1)",
+      moveCharacterCode: 6 /* CAR */,
+      defaultPaletteCode: 1,
+      defaultColorCombination: 0,
+      charCodes: [120, 121, 122, 123],
+      tiles: [SPRITE_CAR_LEFT1_120, SPRITE_CAR_LEFT1_121, SPRITE_CAR_LEFT1_122, SPRITE_CAR_LEFT1_123]
+    },
+    {
+      name: "Car (LEFT2)",
+      moveCharacterCode: 6 /* CAR */,
+      defaultPaletteCode: 1,
+      defaultColorCombination: 0,
+      charCodes: [124, 125, 126, 127],
+      tiles: [SPRITE_CAR_LEFT2_124, SPRITE_CAR_LEFT2_125, SPRITE_CAR_LEFT2_126, SPRITE_CAR_LEFT2_127]
+    },
+    {
+      name: "Car (LEFTUP1)",
+      moveCharacterCode: 6 /* CAR */,
+      defaultPaletteCode: 1,
+      defaultColorCombination: 0,
+      charCodes: [128, 129, 130, 131],
+      tiles: [SPRITE_CAR_LEFTUP1_128, SPRITE_CAR_LEFTUP1_129, SPRITE_CAR_LEFTUP1_130, SPRITE_CAR_LEFTUP1_131]
+    },
+    {
+      name: "Car (LEFTUP2)",
+      moveCharacterCode: 6 /* CAR */,
+      defaultPaletteCode: 1,
+      defaultColorCombination: 0,
+      charCodes: [132, 133, 134, 135],
+      tiles: [SPRITE_CAR_LEFTUP2_132, SPRITE_CAR_LEFTUP2_133, SPRITE_CAR_LEFTUP2_134, SPRITE_CAR_LEFTUP2_135]
+    },
+    {
+      name: "Car (UP1)",
+      moveCharacterCode: 6 /* CAR */,
+      defaultPaletteCode: 1,
+      defaultColorCombination: 2,
+      charCodes: [136, 137, 138, 139],
+      tiles: [SPRITE_CAR_UP1_136, SPRITE_CAR_UP1_137, SPRITE_CAR_UP1_138, SPRITE_CAR_UP1_139]
+    },
+    {
+      name: "Car (UP2)",
+      moveCharacterCode: 6 /* CAR */,
+      defaultPaletteCode: 1,
+      defaultColorCombination: 2,
+      charCodes: [140, 141, 142, 143],
+      tiles: [SPRITE_CAR_UP2_140, SPRITE_CAR_UP2_141, SPRITE_CAR_UP2_142, SPRITE_CAR_UP2_143]
+    }
+  ];
+
+  // src/shared/data/characters/com-opr.ts
+  var SPRITE_COMPUTER_1_244 = [
+    [2, 2, 2, 2, 2, 2, 2, 2],
+    [2, 2, 3, 3, 3, 3, 2, 3],
+    [2, 2, 3, 3, 2, 2, 2, 3],
+    [2, 2, 3, 3, 2, 2, 2, 3],
+    [2, 2, 3, 3, 2, 2, 2, 3],
+    [2, 2, 3, 3, 3, 3, 2, 3],
+    [2, 2, 3, 3, 3, 3, 2, 3],
+    [2, 2, 2, 2, 2, 2, 2, 2]
+  ];
+  var SPRITE_COMPUTER_2_245 = [
+    [2, 2, 2, 2, 2, 2, 2, 2],
+    [3, 3, 3, 3, 2, 3, 2, 2],
+    [3, 2, 3, 3, 2, 3, 3, 2],
+    [3, 2, 3, 3, 2, 3, 3, 3],
+    [3, 2, 3, 3, 2, 3, 3, 2],
+    [3, 3, 3, 3, 2, 3, 3, 2],
+    [3, 3, 3, 3, 2, 3, 3, 2],
+    [2, 2, 2, 2, 2, 2, 2, 2]
+  ];
+  var SPRITE_COMPUTER_3_246 = [
+    [2, 2, 2, 2, 2, 2, 2, 2],
+    [2, 3, 2, 3, 3, 3, 3, 2],
+    [3, 3, 2, 3, 3, 2, 3, 3],
+    [3, 3, 2, 3, 3, 3, 3, 3],
+    [3, 3, 2, 3, 3, 3, 3, 2],
+    [3, 3, 2, 3, 3, 2, 2, 2],
+    [3, 3, 2, 3, 3, 2, 2, 2],
+    [2, 2, 2, 2, 2, 2, 2, 2]
+  ];
+  var SPRITE_COMPUTER_4_247 = [
+    [2, 2, 2, 2, 2, 2, 2, 2],
+    [2, 3, 3, 2, 3, 3, 2, 3],
+    [2, 3, 3, 2, 3, 3, 2, 2],
+    [2, 3, 3, 2, 3, 3, 2, 2],
+    [2, 3, 3, 2, 3, 3, 2, 2],
+    [2, 3, 3, 3, 3, 3, 2, 2],
+    [2, 3, 3, 3, 3, 3, 2, 2],
+    [2, 2, 2, 2, 2, 2, 2, 2]
+  ];
+  var SPRITE_COMPUTER_5_248 = [
+    [2, 2, 2, 2, 2, 2, 2, 2],
+    [3, 3, 3, 2, 3, 3, 3, 3],
+    [3, 3, 2, 2, 3, 3, 2, 2],
+    [3, 3, 2, 2, 3, 3, 3, 3],
+    [3, 3, 2, 2, 3, 3, 2, 2],
+    [3, 3, 2, 2, 3, 3, 3, 3],
+    [3, 3, 2, 2, 3, 3, 3, 3],
+    [2, 2, 2, 2, 2, 2, 2, 2]
+  ];
+  var SPRITE_COMPUTER_6_249 = [
+    [2, 2, 2, 2, 2, 2, 2, 2],
+    [2, 3, 3, 3, 3, 2, 2, 2],
+    [2, 3, 3, 2, 3, 3, 2, 2],
+    [2, 3, 3, 3, 3, 3, 2, 2],
+    [2, 3, 3, 3, 3, 2, 2, 2],
+    [2, 3, 3, 2, 3, 3, 2, 2],
+    [2, 3, 3, 2, 2, 3, 2, 2],
+    [2, 2, 2, 2, 2, 2, 2, 2]
+  ];
+  var SPRITE_OPERATOR_1_250 = [
+    [2, 2, 2, 2, 2, 2, 2, 2],
+    [2, 2, 3, 3, 3, 3, 3, 2],
+    [2, 2, 3, 3, 2, 3, 3, 2],
+    [2, 2, 3, 3, 2, 3, 3, 2],
+    [2, 2, 3, 3, 2, 3, 3, 2],
+    [2, 2, 3, 3, 3, 3, 3, 2],
+    [2, 2, 3, 3, 3, 3, 3, 2],
+    [2, 2, 2, 2, 2, 2, 2, 2]
+  ];
+  var SPRITE_OPERATOR_2_251 = [
+    [2, 2, 2, 2, 2, 2, 2, 2],
+    [3, 3, 3, 3, 2, 2, 3, 3],
+    [3, 3, 2, 3, 3, 2, 3, 3],
+    [3, 3, 3, 3, 3, 2, 3, 3],
+    [3, 3, 3, 3, 2, 2, 3, 3],
+    [3, 3, 2, 2, 2, 2, 3, 3],
+    [3, 3, 2, 2, 2, 2, 3, 3],
+    [2, 2, 2, 2, 2, 2, 2, 2]
+  ];
+  var SPRITE_OPERATOR_3_252 = [
+    [2, 2, 2, 2, 2, 2, 2, 2],
+    [3, 3, 2, 3, 3, 3, 3, 2],
+    [2, 2, 2, 3, 3, 2, 3, 3],
+    [3, 3, 2, 3, 3, 3, 3, 3],
+    [2, 2, 2, 3, 3, 3, 3, 2],
+    [3, 3, 2, 3, 3, 2, 3, 3],
+    [3, 3, 2, 3, 3, 2, 2, 3],
+    [2, 2, 2, 2, 2, 2, 2, 2]
+  ];
+  var SPRITE_OPERATOR_4_253 = [
+    [2, 2, 2, 2, 2, 2, 2, 2],
+    [2, 2, 3, 3, 3, 2, 2, 3],
+    [2, 3, 3, 2, 3, 3, 2, 2],
+    [2, 3, 3, 2, 3, 3, 2, 2],
+    [2, 3, 3, 3, 3, 3, 2, 2],
+    [2, 3, 3, 3, 3, 3, 2, 2],
+    [2, 3, 3, 2, 3, 3, 2, 2],
+    [2, 2, 2, 2, 2, 2, 2, 2]
+  ];
+  var SPRITE_OPERATOR_5_254 = [
+    [2, 2, 2, 2, 2, 2, 2, 2],
+    [3, 3, 3, 2, 3, 3, 3, 3],
+    [3, 3, 2, 2, 3, 3, 2, 3],
+    [3, 3, 2, 2, 3, 3, 2, 3],
+    [3, 3, 2, 2, 3, 3, 2, 3],
+    [3, 3, 2, 2, 3, 3, 3, 3],
+    [3, 3, 2, 2, 3, 3, 3, 3],
+    [2, 2, 2, 2, 2, 2, 2, 2]
+  ];
+  var SPRITE_OPERATOR_6_255 = [
+    [2, 2, 2, 2, 2, 2, 2, 2],
+    [3, 2, 3, 3, 3, 3, 2, 2],
+    [3, 2, 3, 3, 2, 3, 3, 2],
+    [3, 2, 3, 3, 3, 3, 3, 2],
+    [3, 2, 3, 3, 3, 3, 2, 2],
+    [3, 2, 3, 3, 2, 3, 3, 2],
+    [3, 2, 3, 3, 2, 2, 3, 2],
+    [2, 2, 2, 2, 2, 2, 2, 2]
+  ];
+  var COMPUTEROPERATOR_SPRITES = [
+    {
+      name: "Computer",
+      defaultPaletteCode: 0,
+      defaultColorCombination: 0,
+      charCodes: [244, 245, 246, 247, 248, 249],
+      tiles: [
+        SPRITE_COMPUTER_1_244,
+        SPRITE_COMPUTER_2_245,
+        SPRITE_COMPUTER_3_246,
+        SPRITE_COMPUTER_4_247,
+        SPRITE_COMPUTER_5_248,
+        SPRITE_COMPUTER_6_249
+      ]
+    },
+    {
+      name: "Operator",
+      defaultPaletteCode: 0,
+      defaultColorCombination: 0,
+      charCodes: [250, 251, 252, 253, 254, 255],
+      tiles: [
+        SPRITE_OPERATOR_1_250,
+        SPRITE_OPERATOR_2_251,
+        SPRITE_OPERATOR_3_252,
+        SPRITE_OPERATOR_4_253,
+        SPRITE_OPERATOR_5_254,
+        SPRITE_OPERATOR_6_255
+      ]
+    }
+  ];
+
+  // src/shared/data/characters/explosion.ts
+  var SPRITE_EXPLOSION_1_176 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 2, 0, 0, 0],
+    [0, 0, 0, 2, 0, 0, 0, 1],
+    [0, 0, 0, 0, 0, 2, 2, 1],
+    [0, 0, 0, 0, 2, 2, 1, 1],
+    [0, 0, 1, 1, 1, 1, 1, 1]
+  ];
+  var SPRITE_EXPLOSION_1_177 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 2, 0, 0, 0, 0, 0],
+    [0, 0, 0, 2, 0, 0, 0, 0],
+    [2, 2, 0, 0, 0, 0, 0, 0],
+    [1, 2, 2, 0, 0, 0, 0, 0],
+    [1, 1, 1, 1, 1, 0, 0, 0]
+  ];
+  var SPRITE_EXPLOSION_1_178 = [
+    [0, 0, 0, 0, 2, 2, 1, 1],
+    [0, 0, 0, 0, 0, 2, 2, 1],
+    [0, 0, 0, 2, 0, 0, 0, 1],
+    [0, 0, 0, 0, 2, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_EXPLOSION_1_179 = [
+    [1, 2, 2, 0, 0, 0, 0, 0],
+    [2, 2, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 2, 0, 0, 0, 0],
+    [0, 0, 2, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_EXPLOSION_2_180 = [
+    [0, 0, 0, 3, 3, 0, 0, 0],
+    [3, 0, 3, 3, 0, 0, 1, 0],
+    [0, 0, 3, 0, 0, 0, 1, 2],
+    [0, 0, 0, 2, 0, 2, 1, 2],
+    [0, 1, 0, 0, 2, 2, 1, 1],
+    [0, 0, 1, 1, 2, 2, 1, 1],
+    [0, 3, 0, 1, 1, 1, 1, 1],
+    [3, 0, 2, 2, 1, 1, 1, 1]
+  ];
+  var SPRITE_EXPLOSION_2_181 = [
+    [0, 3, 3, 0, 0, 0, 0, 0],
+    [3, 3, 3, 3, 0, 1, 0, 0],
+    [0, 0, 0, 3, 1, 0, 0, 0],
+    [2, 0, 2, 1, 1, 0, 0, 0],
+    [2, 2, 1, 1, 2, 0, 3, 0],
+    [2, 1, 1, 2, 0, 0, 3, 3],
+    [1, 1, 1, 2, 2, 0, 0, 3],
+    [1, 1, 1, 1, 2, 0, 3, 0]
+  ];
+  var SPRITE_EXPLOSION_2_182 = [
+    [3, 0, 2, 1, 1, 1, 1, 1],
+    [3, 2, 2, 1, 1, 1, 1, 1],
+    [0, 3, 2, 1, 1, 2, 1, 1],
+    [0, 3, 1, 1, 1, 1, 1, 1],
+    [0, 0, 1, 1, 2, 1, 2, 1],
+    [0, 1, 1, 2, 0, 2, 2, 1],
+    [1, 0, 0, 0, 3, 0, 0, 3],
+    [0, 0, 3, 0, 0, 3, 3, 0]
+  ];
+  var SPRITE_EXPLOSION_2_183 = [
+    [1, 2, 1, 1, 1, 0, 0, 3],
+    [1, 1, 1, 2, 2, 0, 3, 0],
+    [1, 1, 1, 1, 2, 2, 0, 0],
+    [1, 1, 2, 1, 1, 2, 1, 0],
+    [1, 2, 1, 2, 0, 0, 0, 0],
+    [1, 0, 2, 0, 0, 3, 0, 0],
+    [1, 0, 0, 3, 0, 3, 3, 0],
+    [1, 0, 0, 0, 3, 3, 0, 0]
+  ];
+  var EXPLOSION_SPRITES = [
+    {
+      name: "Explosion (1)",
+      moveCharacterCode: 10 /* EXPLOSION */,
+      defaultPaletteCode: 1,
+      defaultColorCombination: 3,
+      charCodes: [176, 177, 178, 179],
+      tiles: [SPRITE_EXPLOSION_1_176, SPRITE_EXPLOSION_1_177, SPRITE_EXPLOSION_1_178, SPRITE_EXPLOSION_1_179]
+    },
+    {
+      name: "Explosion (2)",
+      moveCharacterCode: 10 /* EXPLOSION */,
+      defaultPaletteCode: 1,
+      defaultColorCombination: 3,
+      charCodes: [180, 181, 182, 183],
+      tiles: [SPRITE_EXPLOSION_2_180, SPRITE_EXPLOSION_2_181, SPRITE_EXPLOSION_2_182, SPRITE_EXPLOSION_2_183]
+    }
+  ];
+
+  // src/shared/data/characters/fighter-fly.ts
+  var SPRITE_FIGHTERFLY_1_56 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 1, 2, 2, 0, 0, 0],
+    [0, 1, 1, 1, 0, 2, 0, 2],
+    [0, 1, 1, 1, 1, 0, 3, 3],
+    [0, 0, 1, 1, 1, 3, 1, 3],
+    [0, 0, 1, 1, 1, 3, 3, 3],
+    [0, 0, 0, 0, 1, 3, 3, 2]
+  ];
+  var SPRITE_FIGHTERFLY_1_57 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 2, 2, 1, 0],
+    [2, 2, 0, 2, 0, 1, 1, 1],
+    [2, 3, 3, 0, 1, 1, 1, 1],
+    [2, 3, 1, 3, 1, 1, 1, 1],
+    [2, 3, 3, 3, 1, 1, 1, 0],
+    [2, 2, 3, 3, 1, 0, 0, 0]
+  ];
+  var SPRITE_FIGHTERFLY_1_58 = [
+    [0, 0, 0, 0, 0, 2, 2, 1],
+    [0, 0, 0, 0, 2, 1, 3, 1],
+    [0, 0, 0, 3, 2, 1, 3, 1],
+    [0, 0, 3, 0, 0, 2, 2, 2],
+    [0, 0, 0, 0, 1, 1, 3, 3],
+    [0, 0, 2, 2, 1, 0, 3, 3],
+    [0, 2, 2, 2, 2, 0, 0, 3],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_FIGHTERFLY_1_59 = [
+    [3, 1, 2, 2, 0, 0, 0, 0],
+    [3, 1, 3, 1, 2, 0, 0, 0],
+    [3, 1, 3, 1, 2, 3, 0, 0],
+    [2, 2, 2, 2, 0, 0, 3, 0],
+    [3, 3, 3, 1, 0, 0, 0, 0],
+    [3, 3, 3, 0, 1, 0, 0, 0],
+    [3, 3, 0, 1, 2, 2, 0, 0],
+    [0, 0, 0, 2, 2, 2, 2, 0]
+  ];
+  var SPRITE_FIGHTERFLY_2_60 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 2, 2, 0, 0, 0],
+    [0, 0, 0, 0, 0, 2, 0, 2],
+    [0, 0, 0, 0, 0, 0, 3, 3],
+    [0, 0, 0, 0, 0, 3, 1, 3],
+    [0, 0, 0, 1, 1, 3, 3, 3],
+    [0, 0, 1, 1, 1, 3, 3, 2]
+  ];
+  var SPRITE_FIGHTERFLY_2_61 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 2, 2, 0, 0],
+    [2, 2, 0, 2, 0, 0, 0, 0],
+    [2, 3, 3, 0, 0, 0, 0, 0],
+    [2, 3, 1, 3, 0, 0, 0, 0],
+    [2, 3, 3, 3, 1, 1, 0, 0],
+    [2, 2, 3, 3, 1, 1, 1, 0]
+  ];
+  var SPRITE_FIGHTERFLY_2_62 = [
+    [0, 1, 1, 1, 1, 2, 2, 1],
+    [0, 1, 1, 1, 2, 1, 3, 1],
+    [0, 0, 1, 3, 2, 1, 3, 1],
+    [0, 0, 3, 0, 0, 2, 2, 2],
+    [0, 0, 0, 0, 0, 1, 3, 3],
+    [0, 0, 0, 0, 1, 0, 3, 3],
+    [0, 0, 0, 2, 2, 1, 0, 3],
+    [0, 0, 2, 2, 2, 2, 0, 0]
+  ];
+  var SPRITE_FIGHTERFLY_2_63 = [
+    [3, 1, 2, 2, 1, 1, 1, 1],
+    [3, 1, 3, 1, 2, 1, 1, 1],
+    [3, 1, 3, 1, 2, 3, 1, 0],
+    [2, 2, 2, 2, 0, 0, 3, 0],
+    [3, 3, 3, 1, 1, 0, 0, 0],
+    [3, 3, 3, 0, 1, 2, 2, 0],
+    [3, 3, 0, 0, 2, 2, 2, 2],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var FIGHTERFLY_SPRITES = [
+    {
+      name: "Fighter Fly (1)",
+      moveCharacterCode: 2 /* FIGHTER_FLY */,
+      defaultPaletteCode: 2,
+      defaultColorCombination: 1,
+      charCodes: [56, 57, 58, 59],
+      tiles: [SPRITE_FIGHTERFLY_1_56, SPRITE_FIGHTERFLY_1_57, SPRITE_FIGHTERFLY_1_58, SPRITE_FIGHTERFLY_1_59]
+    },
+    {
+      name: "Fighter Fly (2)",
+      moveCharacterCode: 2 /* FIGHTER_FLY */,
+      defaultPaletteCode: 2,
+      defaultColorCombination: 1,
+      charCodes: [60, 61, 62, 63],
+      tiles: [SPRITE_FIGHTERFLY_2_60, SPRITE_FIGHTERFLY_2_61, SPRITE_FIGHTERFLY_2_62, SPRITE_FIGHTERFLY_2_63]
+    }
+  ];
+
+  // src/shared/data/characters/fireball.ts
+  var SPRITE_FIREBALL_1_112 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 3, 3, 3, 3, 0],
+    [0, 0, 3, 3, 2, 2, 3, 3],
+    [0, 3, 3, 2, 2, 2, 2, 2],
+    [0, 3, 2, 2, 0, 1, 0, 1],
+    [0, 3, 2, 2, 0, 1, 0, 1],
+    [0, 3, 2, 2, 1, 1, 1, 1]
+  ];
+  var SPRITE_FIREBALL_1_113 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 3, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [3, 0, 0, 3, 0, 0, 0, 0],
+    [3, 3, 0, 0, 0, 0, 0, 0],
+    [2, 3, 0, 0, 3, 0, 0, 3],
+    [2, 3, 0, 0, 3, 0, 0, 0],
+    [2, 3, 0, 0, 3, 3, 0, 0]
+  ];
+  var SPRITE_FIREBALL_1_114 = [
+    [0, 0, 3, 2, 1, 1, 1, 2],
+    [0, 0, 3, 2, 2, 1, 2, 2],
+    [0, 3, 3, 2, 2, 2, 2, 2],
+    [0, 3, 3, 2, 2, 2, 2, 2],
+    [0, 3, 3, 3, 2, 2, 2, 2],
+    [0, 0, 3, 3, 3, 3, 2, 2],
+    [0, 0, 0, 3, 3, 3, 3, 3],
+    [0, 0, 0, 0, 0, 3, 3, 3]
+  ];
+  var SPRITE_FIREBALL_1_115 = [
+    [3, 3, 0, 3, 3, 3, 0, 0],
+    [3, 0, 3, 3, 2, 3, 0, 0],
+    [2, 3, 3, 2, 3, 3, 0, 0],
+    [2, 2, 2, 2, 3, 0, 0, 0],
+    [2, 2, 2, 3, 3, 0, 0, 0],
+    [2, 2, 3, 3, 3, 0, 0, 0],
+    [2, 2, 3, 3, 0, 0, 0, 0],
+    [3, 3, 3, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_FIREBALL_2_116 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 3, 3, 3, 3, 3],
+    [0, 0, 3, 3, 2, 2, 2, 3],
+    [0, 3, 3, 2, 2, 2, 2, 2],
+    [0, 3, 2, 1, 0, 1, 0, 1],
+    [0, 3, 2, 1, 0, 1, 0, 1],
+    [0, 0, 3, 2, 1, 1, 1, 1]
+  ];
+  var SPRITE_FIREBALL_2_117 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [3, 0, 0, 0, 0, 0, 0, 0],
+    [3, 0, 0, 0, 0, 0, 0, 0],
+    [3, 3, 0, 0, 0, 0, 0, 0],
+    [2, 3, 0, 0, 0, 0, 0, 0],
+    [2, 3, 0, 0, 0, 0, 3, 0]
+  ];
+  var SPRITE_FIREBALL_2_118 = [
+    [0, 3, 3, 2, 1, 1, 1, 1],
+    [0, 3, 2, 2, 1, 1, 1, 1],
+    [3, 3, 2, 2, 2, 1, 1, 2],
+    [3, 3, 2, 2, 2, 2, 2, 2],
+    [3, 3, 2, 2, 2, 2, 2, 2],
+    [3, 3, 3, 2, 2, 2, 2, 2],
+    [0, 3, 3, 3, 2, 2, 2, 2],
+    [0, 0, 0, 3, 3, 3, 3, 3]
+  ];
+  var SPRITE_FIREBALL_2_119 = [
+    [2, 3, 0, 0, 0, 3, 3, 0],
+    [2, 3, 0, 3, 3, 3, 3, 0],
+    [2, 3, 3, 3, 3, 3, 0, 0],
+    [2, 3, 3, 2, 2, 3, 0, 0],
+    [2, 2, 2, 2, 3, 0, 0, 0],
+    [2, 2, 2, 3, 3, 0, 0, 0],
+    [2, 3, 3, 3, 0, 0, 0, 0],
+    [3, 3, 0, 0, 0, 0, 0, 0]
+  ];
+  var FIREBALL_SPRITES = [
+    {
+      name: "Fireball (1)",
+      moveCharacterCode: 5 /* FIREBALL */,
+      defaultPaletteCode: 0,
+      defaultColorCombination: 3,
+      charCodes: [112, 113, 114, 115],
+      tiles: [SPRITE_FIREBALL_1_112, SPRITE_FIREBALL_1_113, SPRITE_FIREBALL_1_114, SPRITE_FIREBALL_1_115]
+    },
+    {
+      name: "Fireball (2)",
+      moveCharacterCode: 5 /* FIREBALL */,
+      defaultPaletteCode: 0,
+      defaultColorCombination: 3,
+      charCodes: [116, 117, 118, 119],
+      tiles: [SPRITE_FIREBALL_2_116, SPRITE_FIREBALL_2_117, SPRITE_FIREBALL_2_118, SPRITE_FIREBALL_2_119]
+    }
+  ];
+
+  // src/shared/data/characters/lady.ts
+  var SPRITE_LADY_WALK1_28 = [
+    [0, 0, 0, 0, 0, 0, 3, 3],
+    [0, 0, 0, 0, 3, 3, 3, 3],
+    [0, 0, 0, 0, 0, 1, 1, 1],
+    [0, 0, 0, 0, 1, 1, 3, 1],
+    [0, 0, 0, 0, 0, 1, 1, 1],
+    [0, 0, 0, 0, 0, 0, 1, 1],
+    [0, 0, 0, 0, 0, 0, 0, 1],
+    [0, 0, 0, 1, 1, 0, 2, 2]
+  ];
+  var SPRITE_LADY_WALK1_29 = [
+    [3, 0, 0, 0, 0, 0, 0, 0],
+    [3, 3, 0, 0, 0, 0, 0, 0],
+    [3, 3, 0, 0, 0, 0, 0, 0],
+    [3, 3, 0, 0, 3, 0, 0, 0],
+    [1, 3, 3, 3, 0, 0, 0, 0],
+    [3, 3, 3, 3, 3, 0, 0, 0],
+    [2, 3, 3, 3, 0, 0, 0, 0],
+    [2, 2, 3, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_LADY_WALK1_30 = [
+    [0, 0, 0, 1, 1, 2, 2, 2],
+    [0, 0, 0, 0, 0, 0, 3, 3],
+    [0, 0, 0, 0, 0, 2, 2, 2],
+    [0, 0, 3, 2, 2, 2, 2, 2],
+    [0, 0, 0, 3, 2, 2, 2, 2],
+    [0, 0, 0, 3, 3, 2, 2, 2],
+    [0, 0, 0, 0, 3, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_LADY_WALK1_31 = [
+    [2, 0, 0, 0, 0, 0, 0, 0],
+    [3, 1, 0, 0, 0, 0, 0, 0],
+    [2, 1, 0, 0, 0, 0, 0, 0],
+    [2, 0, 0, 0, 0, 0, 0, 0],
+    [2, 2, 0, 0, 0, 0, 0, 0],
+    [2, 2, 2, 0, 0, 0, 0, 0],
+    [0, 3, 3, 0, 0, 0, 0, 0],
+    [3, 3, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_LADY_WALK2_32 = [
+    [0, 0, 0, 0, 0, 0, 3, 3],
+    [0, 0, 0, 0, 3, 3, 3, 3],
+    [0, 0, 0, 0, 0, 1, 1, 1],
+    [0, 0, 0, 0, 1, 1, 3, 1],
+    [0, 0, 0, 0, 0, 1, 1, 1],
+    [0, 0, 0, 0, 0, 0, 1, 1],
+    [0, 0, 0, 0, 0, 0, 0, 1],
+    [0, 0, 0, 0, 0, 0, 2, 2]
+  ];
+  var SPRITE_LADY_WALK2_33 = [
+    [3, 0, 0, 0, 0, 0, 0, 0],
+    [3, 3, 0, 0, 0, 0, 0, 0],
+    [3, 3, 0, 0, 0, 0, 0, 0],
+    [3, 3, 0, 0, 3, 0, 0, 0],
+    [1, 3, 3, 3, 0, 0, 0, 0],
+    [3, 3, 3, 3, 3, 0, 0, 0],
+    [2, 3, 3, 3, 0, 0, 0, 0],
+    [2, 2, 3, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_LADY_WALK2_34 = [
+    [0, 0, 0, 0, 0, 2, 2, 2],
+    [0, 0, 0, 0, 0, 1, 3, 3],
+    [0, 0, 0, 0, 0, 0, 2, 1],
+    [0, 0, 0, 0, 0, 0, 2, 1],
+    [0, 0, 0, 0, 0, 2, 2, 2],
+    [0, 0, 0, 0, 2, 2, 2, 2],
+    [0, 0, 0, 0, 3, 3, 2, 2],
+    [0, 0, 0, 0, 0, 0, 0, 3]
+  ];
+  var SPRITE_LADY_WALK2_35 = [
+    [3, 2, 0, 0, 0, 0, 0, 0],
+    [2, 2, 0, 0, 0, 0, 0, 0],
+    [2, 0, 0, 0, 0, 0, 0, 0],
+    [1, 2, 0, 0, 0, 0, 0, 0],
+    [2, 2, 0, 0, 0, 0, 0, 0],
+    [2, 2, 2, 0, 0, 0, 0, 0],
+    [2, 2, 2, 0, 0, 0, 0, 0],
+    [3, 3, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_LADY_WALK3_36 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 3, 3, 3],
+    [0, 0, 0, 3, 3, 3, 3, 3],
+    [0, 0, 0, 0, 1, 1, 1, 3],
+    [0, 0, 0, 1, 1, 3, 1, 3],
+    [0, 0, 0, 0, 1, 1, 1, 1],
+    [0, 0, 0, 0, 0, 1, 1, 3],
+    [0, 0, 0, 0, 0, 0, 1, 2]
+  ];
+  var SPRITE_LADY_WALK3_37 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [3, 0, 0, 0, 0, 0, 0, 0],
+    [3, 0, 0, 0, 0, 0, 0, 0],
+    [3, 0, 0, 3, 0, 0, 0, 0],
+    [3, 3, 3, 0, 0, 0, 0, 0],
+    [3, 3, 3, 3, 0, 0, 0, 0],
+    [3, 3, 3, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_LADY_WALK3_38 = [
+    [0, 0, 0, 0, 0, 2, 2, 2],
+    [0, 0, 0, 0, 2, 2, 2, 2],
+    [0, 0, 1, 1, 2, 0, 3, 3],
+    [0, 0, 0, 1, 0, 0, 2, 2],
+    [0, 0, 0, 0, 0, 0, 2, 2],
+    [0, 0, 0, 0, 0, 2, 2, 2],
+    [0, 0, 0, 0, 0, 2, 2, 2],
+    [0, 0, 0, 0, 3, 3, 3, 0]
+  ];
+  var SPRITE_LADY_WALK3_39 = [
+    [2, 3, 0, 0, 0, 0, 0, 0],
+    [2, 2, 0, 0, 0, 0, 0, 0],
+    [1, 2, 0, 2, 0, 0, 0, 0],
+    [1, 1, 2, 0, 0, 0, 0, 0],
+    [2, 2, 2, 3, 0, 0, 0, 0],
+    [2, 2, 3, 3, 0, 0, 0, 0],
+    [0, 0, 0, 3, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_LADY_JUMP_40 = [
+    [0, 0, 0, 1, 1, 0, 0, 3],
+    [0, 0, 0, 1, 1, 3, 3, 3],
+    [0, 0, 0, 1, 1, 0, 1, 1],
+    [0, 0, 0, 2, 2, 1, 1, 3],
+    [0, 0, 0, 0, 2, 2, 1, 1],
+    [0, 0, 0, 0, 2, 2, 0, 1],
+    [0, 0, 0, 0, 0, 2, 2, 2],
+    [0, 0, 0, 0, 0, 0, 2, 2]
+  ];
+  var SPRITE_LADY_JUMP_41 = [
+    [3, 3, 0, 0, 0, 0, 0, 0],
+    [3, 3, 3, 0, 0, 0, 0, 0],
+    [1, 3, 3, 0, 0, 0, 0, 0],
+    [1, 3, 3, 0, 0, 3, 0, 0],
+    [1, 1, 3, 3, 3, 0, 0, 0],
+    [1, 3, 3, 3, 3, 3, 0, 0],
+    [1, 2, 2, 3, 3, 0, 0, 0],
+    [2, 2, 2, 2, 0, 0, 0, 0]
+  ];
+  var SPRITE_LADY_JUMP_42 = [
+    [0, 0, 0, 0, 0, 0, 0, 2],
+    [0, 0, 3, 0, 0, 0, 0, 3],
+    [0, 0, 3, 3, 2, 2, 2, 2],
+    [0, 0, 0, 3, 2, 2, 2, 2],
+    [0, 0, 0, 3, 3, 2, 2, 2],
+    [0, 0, 0, 0, 0, 0, 2, 2],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_LADY_JUMP_43 = [
+    [2, 2, 0, 2, 1, 0, 0, 0],
+    [3, 3, 0, 1, 1, 0, 0, 0],
+    [2, 2, 0, 0, 0, 0, 0, 0],
+    [2, 2, 0, 2, 0, 0, 0, 0],
+    [2, 2, 2, 0, 0, 0, 0, 0],
+    [2, 2, 3, 3, 0, 0, 0, 0],
+    [1, 1, 1, 3, 3, 0, 0, 0],
+    [0, 1, 0, 0, 3, 0, 0, 0]
+  ];
+  var SPRITE_LADY_SLIP_44 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 3],
+    [0, 0, 0, 0, 0, 3, 3, 3],
+    [0, 0, 0, 0, 0, 0, 1, 1],
+    [0, 0, 0, 0, 0, 1, 1, 3],
+    [0, 0, 0, 0, 0, 0, 1, 1],
+    [0, 0, 0, 0, 0, 0, 0, 1],
+    [0, 0, 0, 0, 0, 1, 0, 0]
+  ];
+  var SPRITE_LADY_SLIP_45 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [3, 3, 0, 0, 0, 0, 0, 0],
+    [3, 3, 3, 0, 0, 0, 0, 0],
+    [1, 3, 3, 0, 0, 0, 0, 0],
+    [1, 3, 3, 0, 0, 3, 0, 0],
+    [1, 1, 3, 3, 3, 0, 0, 0],
+    [1, 3, 3, 3, 3, 3, 0, 0],
+    [1, 2, 2, 3, 3, 0, 0, 0]
+  ];
+  var SPRITE_LADY_SLIP_46 = [
+    [0, 0, 0, 0, 0, 1, 1, 2],
+    [0, 0, 0, 0, 0, 0, 2, 2],
+    [0, 0, 0, 0, 0, 0, 0, 3],
+    [0, 0, 0, 0, 0, 0, 2, 2],
+    [0, 0, 0, 3, 0, 3, 2, 2],
+    [0, 0, 0, 3, 2, 3, 3, 2],
+    [0, 0, 0, 0, 3, 2, 3, 2],
+    [0, 0, 0, 0, 3, 0, 3, 0]
+  ];
+  var SPRITE_LADY_SLIP_47 = [
+    [2, 2, 2, 2, 0, 0, 0, 0],
+    [2, 2, 0, 2, 1, 0, 0, 0],
+    [3, 3, 0, 1, 1, 0, 0, 0],
+    [2, 2, 0, 0, 0, 0, 0, 0],
+    [2, 2, 2, 0, 0, 0, 0, 0],
+    [2, 2, 2, 2, 0, 0, 1, 0],
+    [2, 2, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 0, 0, 0, 0]
+  ];
+  var SPRITE_LADY_LADDER_48 = [
+    [0, 0, 0, 0, 0, 0, 3, 3],
+    [0, 0, 0, 0, 0, 3, 3, 3],
+    [0, 0, 0, 0, 0, 3, 3, 3],
+    [0, 0, 0, 0, 0, 3, 3, 3],
+    [0, 0, 0, 0, 0, 3, 3, 3],
+    [0, 0, 0, 0, 0, 0, 3, 3],
+    [0, 0, 0, 1, 1, 3, 3, 2],
+    [0, 0, 0, 2, 1, 2, 2, 2]
+  ];
+  var SPRITE_LADY_LADDER_49 = [
+    [3, 0, 0, 0, 0, 0, 0, 0],
+    [3, 3, 0, 0, 0, 0, 0, 0],
+    [3, 3, 0, 1, 0, 0, 0, 0],
+    [3, 3, 1, 1, 0, 0, 0, 0],
+    [3, 3, 0, 2, 0, 0, 0, 0],
+    [3, 0, 2, 2, 0, 0, 0, 0],
+    [3, 2, 2, 0, 0, 0, 0, 0],
+    [2, 2, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_LADY_LADDER_50 = [
+    [0, 0, 0, 2, 2, 2, 2, 2],
+    [0, 0, 0, 0, 2, 0, 3, 3],
+    [0, 0, 0, 0, 0, 0, 2, 2],
+    [0, 0, 0, 0, 0, 2, 2, 2],
+    [0, 0, 0, 0, 2, 2, 2, 2],
+    [0, 0, 0, 0, 2, 2, 2, 2],
+    [0, 0, 0, 0, 0, 3, 3, 0],
+    [0, 0, 0, 0, 3, 3, 0, 0]
+  ];
+  var SPRITE_LADY_LADDER_51 = [
+    [2, 0, 0, 0, 0, 0, 0, 0],
+    [3, 2, 0, 0, 0, 0, 0, 0],
+    [2, 2, 2, 0, 0, 0, 0, 0],
+    [2, 2, 2, 0, 0, 0, 0, 0],
+    [2, 2, 3, 3, 0, 0, 0, 0],
+    [2, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_LADY_DOWN_52 = [
+    [0, 0, 0, 0, 0, 0, 3, 3],
+    [0, 0, 0, 0, 0, 3, 3, 3],
+    [0, 0, 0, 0, 0, 3, 1, 3],
+    [0, 0, 3, 0, 3, 1, 1, 3],
+    [0, 0, 0, 3, 3, 3, 1, 1],
+    [0, 0, 2, 2, 2, 3, 1, 0],
+    [0, 1, 2, 2, 2, 2, 1, 0],
+    [1, 1, 1, 0, 2, 2, 2, 1]
+  ];
+  var SPRITE_LADY_DOWN_53 = [
+    [3, 3, 0, 3, 0, 0, 0, 0],
+    [3, 3, 3, 0, 0, 1, 0, 0],
+    [1, 1, 3, 0, 0, 1, 1, 0],
+    [1, 3, 1, 0, 2, 1, 1, 1],
+    [1, 1, 3, 2, 2, 2, 0, 0],
+    [0, 1, 2, 2, 2, 0, 0, 0],
+    [0, 1, 2, 2, 0, 0, 0, 0],
+    [1, 2, 2, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_LADY_DOWN_54 = [
+    [0, 0, 1, 0, 0, 0, 2, 2],
+    [0, 0, 0, 0, 0, 0, 3, 3],
+    [0, 0, 0, 0, 2, 2, 2, 2],
+    [0, 0, 0, 2, 2, 2, 2, 2],
+    [0, 3, 3, 3, 2, 2, 2, 2],
+    [0, 0, 0, 3, 3, 0, 2, 2],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_LADY_DOWN_55 = [
+    [2, 2, 0, 0, 0, 0, 0, 0],
+    [3, 3, 0, 0, 0, 0, 0, 0],
+    [2, 2, 2, 0, 0, 0, 0, 0],
+    [2, 2, 2, 2, 0, 0, 0, 0],
+    [2, 2, 2, 2, 0, 0, 0, 0],
+    [2, 2, 2, 2, 2, 0, 0, 0],
+    [0, 0, 3, 3, 3, 3, 0, 0],
+    [0, 0, 3, 3, 0, 0, 0, 0]
+  ];
+  var LADY_SPRITES = [
+    {
+      name: "Lady (WALK1)",
+      moveCharacterCode: 1 /* LADY */,
+      defaultPaletteCode: 0,
+      defaultColorCombination: 2,
+      charCodes: [28, 29, 30, 31],
+      tiles: [SPRITE_LADY_WALK1_28, SPRITE_LADY_WALK1_29, SPRITE_LADY_WALK1_30, SPRITE_LADY_WALK1_31]
+    },
+    {
+      name: "Lady (WALK2)",
+      moveCharacterCode: 1 /* LADY */,
+      defaultPaletteCode: 0,
+      defaultColorCombination: 2,
+      charCodes: [32, 33, 34, 35],
+      tiles: [SPRITE_LADY_WALK2_32, SPRITE_LADY_WALK2_33, SPRITE_LADY_WALK2_34, SPRITE_LADY_WALK2_35]
+    },
+    {
+      name: "Lady (WALK3)",
+      moveCharacterCode: 1 /* LADY */,
+      defaultPaletteCode: 0,
+      defaultColorCombination: 2,
+      charCodes: [36, 37, 38, 39],
+      tiles: [SPRITE_LADY_WALK3_36, SPRITE_LADY_WALK3_37, SPRITE_LADY_WALK3_38, SPRITE_LADY_WALK3_39]
+    },
+    {
+      name: "Lady (JUMP)",
+      moveCharacterCode: 1 /* LADY */,
+      defaultPaletteCode: 0,
+      defaultColorCombination: 2,
+      charCodes: [40, 41, 42, 43],
+      tiles: [SPRITE_LADY_JUMP_40, SPRITE_LADY_JUMP_41, SPRITE_LADY_JUMP_42, SPRITE_LADY_JUMP_43]
+    },
+    {
+      name: "Lady (SLIP)",
+      moveCharacterCode: 1 /* LADY */,
+      defaultPaletteCode: 0,
+      defaultColorCombination: 2,
+      charCodes: [44, 45, 46, 47],
+      tiles: [SPRITE_LADY_SLIP_44, SPRITE_LADY_SLIP_45, SPRITE_LADY_SLIP_46, SPRITE_LADY_SLIP_47]
+    },
+    {
+      name: "Lady (LADDER)",
+      moveCharacterCode: 1 /* LADY */,
+      defaultPaletteCode: 0,
+      defaultColorCombination: 2,
+      charCodes: [48, 49, 50, 51],
+      tiles: [SPRITE_LADY_LADDER_48, SPRITE_LADY_LADDER_49, SPRITE_LADY_LADDER_50, SPRITE_LADY_LADDER_51]
+    },
+    {
+      name: "Lady (DOWN)",
+      moveCharacterCode: 1 /* LADY */,
+      defaultPaletteCode: 0,
+      defaultColorCombination: 2,
+      charCodes: [52, 53, 54, 55],
+      tiles: [SPRITE_LADY_DOWN_52, SPRITE_LADY_DOWN_53, SPRITE_LADY_DOWN_54, SPRITE_LADY_DOWN_55]
+    }
+  ];
+
+  // src/shared/data/characters/laser.ts
+  var SPRITE_LASER_HORIZONTAL1_208 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 2, 2, 0, 0, 0],
+    [0, 0, 2, 1, 1, 2, 0, 0],
+    [0, 0, 0, 2, 2, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_LASER_HORIZONTAL2_209 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 3, 3, 3, 3, 0, 0],
+    [0, 3, 2, 2, 2, 2, 3, 0],
+    [3, 2, 1, 1, 1, 1, 2, 3],
+    [0, 3, 2, 2, 2, 2, 3, 0],
+    [0, 0, 3, 3, 3, 3, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_LASER_DIAGONAL1_210 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 2, 2, 0, 0, 0, 0],
+    [0, 0, 2, 1, 2, 0, 0, 0],
+    [0, 0, 0, 2, 1, 2, 0, 0],
+    [0, 0, 0, 0, 2, 2, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_LASER_DIAGONAL2_211 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 2, 3, 3, 3, 0, 0, 0],
+    [0, 3, 1, 2, 2, 3, 0, 0],
+    [0, 3, 2, 1, 1, 2, 3, 0],
+    [0, 3, 2, 1, 1, 2, 3, 0],
+    [0, 0, 3, 2, 2, 1, 3, 0],
+    [0, 0, 0, 3, 3, 3, 2, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_LASER_VERTICAL1_212 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 2, 0, 0, 0, 0],
+    [0, 0, 2, 1, 2, 0, 0, 0],
+    [0, 0, 2, 1, 2, 0, 0, 0],
+    [0, 0, 0, 2, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_LASER_VERTICAL2_213 = [
+    [0, 0, 0, 3, 0, 0, 0, 0],
+    [0, 0, 3, 2, 3, 0, 0, 0],
+    [0, 3, 2, 1, 2, 3, 0, 0],
+    [0, 3, 2, 1, 2, 3, 0, 0],
+    [0, 3, 2, 1, 2, 3, 0, 0],
+    [0, 3, 2, 1, 2, 3, 0, 0],
+    [0, 0, 3, 2, 3, 0, 0, 0],
+    [0, 0, 0, 3, 0, 0, 0, 0]
+  ];
+  var LASER_SPRITES = [
+    {
+      name: "Laser (HORIZONTAL1)",
+      moveCharacterCode: 12 /* LASER */,
+      defaultPaletteCode: 1,
+      defaultColorCombination: 0,
+      charCodes: 208,
+      tiles: SPRITE_LASER_HORIZONTAL1_208
+    },
+    {
+      name: "Laser (HORIZONTAL2)",
+      moveCharacterCode: 12 /* LASER */,
+      defaultPaletteCode: 1,
+      defaultColorCombination: 0,
+      charCodes: 209,
+      tiles: SPRITE_LASER_HORIZONTAL2_209
+    },
+    {
+      name: "Laser (DIAGONAL1)",
+      moveCharacterCode: 12 /* LASER */,
+      defaultPaletteCode: 1,
+      defaultColorCombination: 0,
+      charCodes: 210,
+      tiles: SPRITE_LASER_DIAGONAL1_210
+    },
+    {
+      name: "Laser (DIAGONAL2)",
+      moveCharacterCode: 12 /* LASER */,
+      defaultPaletteCode: 1,
+      defaultColorCombination: 0,
+      charCodes: 211,
+      tiles: SPRITE_LASER_DIAGONAL2_211
+    },
+    {
+      name: "Laser (VERTICAL1)",
+      moveCharacterCode: 12 /* LASER */,
+      defaultPaletteCode: 1,
+      defaultColorCombination: 0,
+      charCodes: 212,
+      tiles: SPRITE_LASER_VERTICAL1_212
+    },
+    {
+      name: "Laser (VERTICAL2)",
+      moveCharacterCode: 12 /* LASER */,
+      defaultPaletteCode: 1,
+      defaultColorCombination: 0,
+      charCodes: 213,
+      tiles: SPRITE_LASER_VERTICAL2_213
+    }
+  ];
+
+  // src/shared/data/characters/mario.ts
+  var SPRITE_MARIO_WALK1_0 = [
+    [0, 0, 0, 0, 0, 0, 2, 2],
+    [0, 0, 0, 0, 2, 2, 2, 2],
+    [0, 0, 0, 0, 0, 1, 1, 1],
+    [0, 0, 0, 1, 1, 1, 3, 1],
+    [0, 0, 1, 1, 1, 3, 1, 1],
+    [0, 0, 0, 3, 3, 3, 3, 1],
+    [0, 0, 0, 0, 1, 1, 1, 1],
+    [0, 0, 1, 1, 0, 0, 2, 2]
+  ];
+  var SPRITE_MARIO_WALK1_1 = [
+    [2, 2, 0, 0, 0, 0, 0, 0],
+    [2, 2, 2, 0, 0, 0, 0, 0],
+    [3, 3, 3, 0, 0, 0, 0, 0],
+    [1, 3, 1, 3, 0, 0, 0, 0],
+    [3, 3, 1, 3, 0, 0, 0, 0],
+    [1, 1, 3, 3, 0, 0, 0, 0],
+    [1, 1, 0, 0, 0, 0, 0, 0],
+    [2, 3, 2, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_MARIO_WALK1_2 = [
+    [0, 0, 1, 1, 2, 2, 2, 2],
+    [0, 0, 0, 2, 2, 2, 2, 2],
+    [0, 0, 2, 0, 0, 3, 2, 2],
+    [0, 0, 2, 2, 3, 3, 3, 3],
+    [0, 0, 2, 2, 3, 3, 3, 3],
+    [0, 0, 2, 2, 3, 3, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_MARIO_WALK1_3 = [
+    [2, 3, 2, 2, 1, 0, 0, 0],
+    [2, 3, 2, 1, 1, 0, 0, 0],
+    [3, 3, 3, 0, 0, 0, 0, 0],
+    [3, 3, 3, 0, 0, 0, 0, 0],
+    [3, 3, 3, 3, 0, 0, 0, 0],
+    [3, 3, 3, 2, 2, 0, 0, 0],
+    [0, 0, 2, 2, 0, 0, 0, 0],
+    [0, 2, 2, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_MARIO_WALK2_4 = [
+    [0, 0, 0, 0, 0, 0, 2, 2],
+    [0, 0, 0, 0, 2, 2, 2, 2],
+    [0, 0, 0, 0, 0, 1, 1, 1],
+    [0, 0, 0, 1, 1, 1, 3, 1],
+    [0, 0, 1, 1, 1, 3, 1, 1],
+    [0, 0, 0, 3, 3, 3, 3, 1],
+    [0, 0, 0, 0, 1, 1, 1, 1],
+    [0, 0, 0, 0, 0, 0, 2, 2]
+  ];
+  var SPRITE_MARIO_WALK2_5 = [
+    [2, 2, 0, 0, 0, 0, 0, 0],
+    [2, 2, 2, 0, 0, 0, 0, 0],
+    [3, 3, 3, 0, 0, 0, 0, 0],
+    [1, 3, 1, 3, 0, 0, 0, 0],
+    [3, 3, 1, 3, 0, 0, 0, 0],
+    [1, 1, 3, 3, 0, 0, 0, 0],
+    [1, 1, 0, 0, 0, 0, 0, 0],
+    [3, 2, 2, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_MARIO_WALK2_6 = [
+    [0, 0, 0, 0, 0, 2, 2, 3],
+    [0, 0, 0, 1, 2, 2, 2, 3],
+    [0, 0, 0, 1, 3, 3, 3, 3],
+    [0, 0, 0, 0, 3, 3, 3, 1],
+    [0, 0, 0, 0, 0, 3, 3, 1],
+    [0, 0, 0, 0, 0, 2, 2, 3],
+    [0, 0, 0, 0, 2, 2, 2, 0],
+    [0, 0, 0, 0, 0, 0, 0, 2]
+  ];
+  var SPRITE_MARIO_WALK2_7 = [
+    [2, 2, 2, 0, 0, 0, 0, 0],
+    [3, 2, 2, 0, 0, 0, 0, 0],
+    [1, 2, 2, 0, 0, 0, 0, 0],
+    [1, 2, 3, 0, 0, 0, 0, 0],
+    [1, 3, 3, 0, 0, 0, 0, 0],
+    [3, 3, 0, 0, 0, 0, 0, 0],
+    [2, 2, 0, 0, 0, 0, 0, 0],
+    [2, 2, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_MARIO_WALK3_8 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 2, 2, 2],
+    [0, 0, 0, 2, 2, 2, 2, 2],
+    [0, 0, 0, 0, 1, 1, 1, 3],
+    [0, 0, 1, 1, 1, 3, 1, 1],
+    [0, 1, 1, 1, 3, 1, 1, 3],
+    [0, 0, 3, 3, 3, 3, 1, 1],
+    [0, 0, 0, 1, 1, 1, 1, 1]
+  ];
+  var SPRITE_MARIO_WALK3_9 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [2, 0, 0, 0, 0, 0, 0, 0],
+    [2, 2, 0, 0, 0, 0, 0, 0],
+    [3, 3, 0, 0, 0, 0, 0, 0],
+    [3, 1, 3, 0, 0, 0, 0, 0],
+    [3, 1, 3, 0, 0, 0, 0, 0],
+    [1, 3, 3, 0, 0, 0, 0, 0],
+    [1, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_MARIO_WALK3_10 = [
+    [0, 0, 0, 0, 0, 2, 2, 3],
+    [0, 0, 0, 0, 2, 2, 3, 2],
+    [0, 1, 1, 2, 2, 3, 3, 2],
+    [0, 1, 1, 2, 3, 3, 1, 3],
+    [0, 0, 0, 0, 3, 3, 3, 3],
+    [0, 0, 0, 0, 0, 3, 3, 3],
+    [0, 0, 0, 0, 0, 0, 2, 2],
+    [0, 0, 0, 0, 0, 2, 2, 2]
+  ];
+  var SPRITE_MARIO_WALK3_11 = [
+    [2, 2, 0, 0, 0, 0, 0, 0],
+    [2, 2, 2, 0, 0, 0, 0, 0],
+    [2, 2, 1, 1, 0, 0, 0, 0],
+    [3, 3, 1, 1, 0, 0, 0, 0],
+    [3, 3, 3, 2, 0, 0, 0, 0],
+    [0, 3, 3, 2, 2, 0, 0, 0],
+    [0, 0, 0, 0, 2, 0, 0, 0]
+  ];
+  var SPRITE_MARIO_JUMP_12 = [
+    [0, 0, 1, 1, 1, 0, 0, 0],
+    [0, 0, 1, 1, 1, 0, 2, 2],
+    [0, 0, 1, 1, 0, 0, 0, 1],
+    [0, 0, 2, 2, 0, 1, 1, 1],
+    [0, 0, 2, 2, 1, 1, 1, 3],
+    [0, 0, 2, 2, 2, 3, 3, 3],
+    [0, 0, 0, 2, 2, 2, 1, 1],
+    [0, 0, 0, 0, 2, 2, 3, 2]
+  ];
+  var SPRITE_MARIO_JUMP_13 = [
+    [2, 2, 2, 2, 0, 0, 0, 0],
+    [2, 2, 2, 2, 2, 0, 0, 0],
+    [1, 1, 3, 3, 3, 0, 0, 0],
+    [3, 1, 1, 3, 1, 3, 0, 0],
+    [1, 1, 3, 3, 1, 3, 0, 0],
+    [3, 1, 1, 1, 3, 3, 0, 0],
+    [1, 1, 1, 1, 0, 0, 0, 0],
+    [2, 3, 2, 2, 2, 0, 0, 0]
+  ];
+  var SPRITE_MARIO_JUMP_14 = [
+    [0, 0, 0, 0, 0, 3, 2, 2],
+    [0, 0, 2, 0, 0, 3, 2, 2],
+    [0, 0, 2, 2, 3, 3, 3, 3],
+    [0, 0, 2, 2, 3, 3, 3, 1],
+    [0, 0, 2, 2, 3, 3, 3, 3],
+    [0, 0, 0, 0, 0, 0, 3, 3],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_MARIO_JUMP_15 = [
+    [3, 2, 2, 2, 2, 2, 0, 0],
+    [3, 2, 2, 2, 2, 1, 1, 0],
+    [3, 2, 3, 0, 0, 1, 1, 0],
+    [3, 3, 3, 2, 2, 0, 0, 0],
+    [3, 3, 3, 3, 2, 2, 0, 0],
+    [3, 3, 3, 3, 2, 2, 0, 0],
+    [3, 3, 3, 0, 0, 2, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_MARIO_SLIP_16 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 2],
+    [0, 0, 0, 0, 0, 2, 2, 2],
+    [0, 0, 0, 0, 0, 0, 1, 1],
+    [0, 0, 0, 0, 1, 1, 1, 3],
+    [0, 0, 0, 1, 1, 1, 3, 1],
+    [0, 0, 0, 0, 3, 3, 3, 3],
+    [0, 0, 0, 0, 0, 1, 1, 1]
+  ];
+  var SPRITE_MARIO_SLIP_17 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [2, 2, 2, 2, 0, 0, 0, 0],
+    [2, 2, 2, 2, 2, 0, 0, 0],
+    [1, 1, 3, 3, 3, 0, 0, 0],
+    [3, 1, 1, 3, 1, 3, 0, 0],
+    [1, 1, 3, 3, 1, 3, 0, 0],
+    [3, 1, 1, 1, 3, 3, 0, 0],
+    [1, 1, 1, 1, 0, 0, 0, 0]
+  ];
+  var SPRITE_MARIO_SLIP_18 = [
+    [0, 0, 0, 1, 1, 0, 3, 2],
+    [0, 0, 0, 1, 1, 3, 2, 2],
+    [0, 0, 0, 1, 2, 3, 2, 3],
+    [0, 0, 0, 2, 3, 3, 3, 1],
+    [0, 0, 2, 0, 2, 3, 3, 3],
+    [0, 0, 2, 3, 2, 2, 3, 3],
+    [0, 0, 2, 2, 3, 2, 2, 3],
+    [0, 0, 0, 2, 2, 0, 2, 0]
+  ];
+  var SPRITE_MARIO_SLIP_19 = [
+    [2, 2, 3, 2, 2, 0, 0, 0],
+    [2, 3, 2, 2, 2, 2, 0, 0],
+    [3, 3, 2, 2, 2, 2, 2, 0],
+    [1, 3, 3, 3, 0, 2, 1, 0],
+    [3, 3, 3, 3, 0, 1, 1, 0],
+    [3, 3, 3, 3, 0, 0, 0, 0],
+    [3, 3, 0, 0, 0, 0, 1, 0],
+    [0, 0, 0, 0, 1, 0, 0, 0]
+  ];
+  var SPRITE_MARIO_LADDER_20 = [
+    [0, 0, 0, 0, 0, 0, 2, 2],
+    [0, 0, 0, 0, 0, 2, 2, 2],
+    [0, 0, 0, 0, 0, 2, 2, 2],
+    [0, 0, 0, 0, 1, 3, 2, 2],
+    [0, 0, 0, 0, 1, 3, 3, 3],
+    [0, 0, 0, 0, 3, 3, 3, 3],
+    [0, 0, 0, 1, 0, 1, 1, 1],
+    [0, 0, 1, 2, 2, 3, 2, 2]
+  ];
+  var SPRITE_MARIO_LADDER_21 = [
+    [2, 2, 0, 0, 0, 0, 0, 0],
+    [2, 2, 2, 0, 1, 0, 0, 0],
+    [2, 2, 2, 0, 1, 1, 0, 0],
+    [2, 2, 3, 1, 2, 2, 0, 0],
+    [3, 3, 3, 1, 2, 2, 0, 0],
+    [3, 3, 3, 3, 2, 2, 0, 0],
+    [1, 1, 1, 2, 2, 0, 0, 0],
+    [2, 2, 3, 2, 2, 0, 0, 0]
+  ];
+  var SPRITE_MARIO_LADDER_22 = [
+    [0, 0, 2, 2, 2, 3, 2, 2],
+    [0, 0, 2, 2, 2, 3, 3, 2],
+    [0, 0, 0, 0, 0, 3, 3, 3],
+    [0, 0, 0, 0, 3, 3, 3, 3],
+    [0, 0, 0, 0, 3, 3, 3, 3],
+    [0, 0, 0, 0, 3, 3, 3, 3],
+    [0, 0, 0, 0, 0, 3, 3, 3],
+    [0, 0, 0, 0, 2, 2, 2, 0]
+  ];
+  var SPRITE_MARIO_LADDER_23 = [
+    [2, 2, 3, 2, 0, 0, 0, 0],
+    [2, 3, 3, 0, 0, 0, 0, 0],
+    [3, 3, 3, 3, 0, 0, 0, 0],
+    [3, 3, 3, 3, 0, 0, 0, 0],
+    [3, 3, 3, 2, 2, 0, 0, 0],
+    [0, 0, 2, 2, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_MARIO_DOWN_24 = [
+    [0, 0, 0, 0, 0, 0, 2, 2],
+    [0, 0, 0, 0, 0, 2, 2, 2],
+    [0, 0, 0, 0, 0, 3, 1, 3],
+    [0, 0, 0, 0, 1, 1, 1, 3],
+    [0, 0, 0, 0, 1, 3, 1, 1],
+    [0, 0, 0, 0, 3, 1, 3, 3],
+    [0, 1, 2, 2, 2, 1, 1, 0],
+    [1, 1, 2, 2, 2, 1, 0, 0]
+  ];
+  var SPRITE_MARIO_DOWN_25 = [
+    [2, 2, 0, 0, 0, 0, 0, 0],
+    [2, 2, 2, 0, 0, 0, 0, 0],
+    [1, 1, 3, 0, 0, 0, 0, 0],
+    [1, 3, 1, 1, 0, 1, 0, 0],
+    [1, 1, 3, 1, 0, 1, 1, 0],
+    [3, 3, 1, 3, 2, 1, 1, 1],
+    [0, 1, 1, 2, 2, 2, 1, 0],
+    [0, 0, 1, 2, 2, 0, 0, 0]
+  ];
+  var SPRITE_MARIO_DOWN_26 = [
+    [1, 0, 1, 0, 2, 2, 1, 1],
+    [0, 0, 0, 0, 0, 2, 3, 2],
+    [0, 0, 2, 2, 0, 3, 1, 3],
+    [0, 0, 1, 2, 3, 3, 3, 3],
+    [0, 0, 1, 2, 2, 3, 3, 3],
+    [0, 0, 0, 1, 2, 3, 3, 3],
+    [0, 0, 0, 0, 1, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_MARIO_DOWN_27 = [
+    [1, 1, 2, 2, 0, 0, 0, 0],
+    [2, 3, 2, 0, 0, 0, 0, 0],
+    [3, 1, 3, 0, 0, 0, 0, 0],
+    [3, 3, 3, 0, 0, 0, 0, 0],
+    [3, 3, 3, 3, 3, 0, 0, 0],
+    [3, 3, 3, 3, 2, 2, 0, 0],
+    [0, 3, 3, 2, 2, 1, 0, 0],
+    [0, 0, 0, 2, 1, 0, 0, 0]
+  ];
+  var MARIO_SPRITES = [
+    {
+      name: "Mario (WALK1)",
+      moveCharacterCode: 0 /* MARIO */,
+      defaultPaletteCode: 0,
+      defaultColorCombination: 0,
+      charCodes: [0, 1, 2, 3],
+      tiles: [SPRITE_MARIO_WALK1_0, SPRITE_MARIO_WALK1_1, SPRITE_MARIO_WALK1_2, SPRITE_MARIO_WALK1_3]
+    },
+    {
+      name: "Mario (WALK2)",
+      moveCharacterCode: 0 /* MARIO */,
+      defaultPaletteCode: 0,
+      defaultColorCombination: 0,
+      charCodes: [4, 5, 6, 7],
+      tiles: [SPRITE_MARIO_WALK2_4, SPRITE_MARIO_WALK2_5, SPRITE_MARIO_WALK2_6, SPRITE_MARIO_WALK2_7]
+    },
+    {
+      name: "Mario (WALK3)",
+      moveCharacterCode: 0 /* MARIO */,
+      defaultPaletteCode: 0,
+      defaultColorCombination: 0,
+      charCodes: [8, 9, 10, 11],
+      tiles: [SPRITE_MARIO_WALK3_8, SPRITE_MARIO_WALK3_9, SPRITE_MARIO_WALK3_10, SPRITE_MARIO_WALK3_11]
+    },
+    {
+      name: "Mario (JUMP)",
+      moveCharacterCode: 0 /* MARIO */,
+      defaultPaletteCode: 0,
+      defaultColorCombination: 0,
+      charCodes: [12, 13, 14, 15],
+      tiles: [SPRITE_MARIO_JUMP_12, SPRITE_MARIO_JUMP_13, SPRITE_MARIO_JUMP_14, SPRITE_MARIO_JUMP_15]
+    },
+    {
+      name: "Mario (SLIP)",
+      moveCharacterCode: 0 /* MARIO */,
+      defaultPaletteCode: 0,
+      defaultColorCombination: 0,
+      charCodes: [16, 17, 18, 19],
+      tiles: [SPRITE_MARIO_SLIP_16, SPRITE_MARIO_SLIP_17, SPRITE_MARIO_SLIP_18, SPRITE_MARIO_SLIP_19]
+    },
+    {
+      name: "Mario (LADDER)",
+      moveCharacterCode: 0 /* MARIO */,
+      defaultPaletteCode: 0,
+      defaultColorCombination: 0,
+      charCodes: [20, 21, 22, 23],
+      tiles: [SPRITE_MARIO_LADDER_20, SPRITE_MARIO_LADDER_21, SPRITE_MARIO_LADDER_22, SPRITE_MARIO_LADDER_23]
+    },
+    {
+      name: "Mario (DOWN)",
+      moveCharacterCode: 0 /* MARIO */,
+      defaultPaletteCode: 0,
+      defaultColorCombination: 0,
+      charCodes: [24, 25, 26, 27],
+      tiles: [SPRITE_MARIO_DOWN_24, SPRITE_MARIO_DOWN_25, SPRITE_MARIO_DOWN_26, SPRITE_MARIO_DOWN_27]
+    }
+  ];
+  var LUIGI_SPRITES = MARIO_SPRITES.map((sprite) => ({
+    ...sprite,
+    name: sprite.name.replace("Mario", "Luigi"),
+    defaultColorCombination: 1
+  }));
+
+  // src/shared/data/characters/misc.ts
+  var SPRITE_PAINTCOLOR_1_214 = [
+    [1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1]
+  ];
+  var SPRITE_PAINTCOLOR_2_215 = [
+    [2, 2, 2, 2, 2, 2, 2, 2],
+    [2, 2, 2, 2, 2, 2, 2, 2],
+    [2, 2, 2, 2, 2, 2, 2, 2],
+    [2, 2, 2, 2, 2, 2, 2, 2],
+    [2, 2, 2, 2, 2, 2, 2, 2],
+    [2, 2, 2, 2, 2, 2, 2, 2],
+    [2, 2, 2, 2, 2, 2, 2, 2],
+    [2, 2, 2, 2, 2, 2, 2, 2]
+  ];
+  var SPRITE_PAINTCOLOR_3_216 = [
+    [3, 3, 3, 3, 3, 3, 3, 3],
+    [3, 3, 3, 3, 3, 3, 3, 3],
+    [3, 3, 3, 3, 3, 3, 3, 3],
+    [3, 3, 3, 3, 3, 3, 3, 3],
+    [3, 3, 3, 3, 3, 3, 3, 3],
+    [3, 3, 3, 3, 3, 3, 3, 3],
+    [3, 3, 3, 3, 3, 3, 3, 3],
+    [3, 3, 3, 3, 3, 3, 3, 3]
+  ];
+  var SPRITE_MUSICBOARDCURSOR_1_217 = [
+    [1, 0, 0, 0, 0, 0, 0, 0],
+    [1, 0, 0, 0, 0, 0, 0, 0],
+    [1, 0, 0, 0, 0, 0, 0, 0],
+    [1, 0, 0, 0, 0, 0, 0, 0],
+    [1, 0, 0, 0, 0, 0, 0, 0],
+    [1, 0, 0, 0, 0, 0, 0, 0],
+    [1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 1, 1, 1, 1, 1, 1]
+  ];
+  var SPRITE_MUSICBOARDCURSOR_2_218 = [
+    [1, 1, 1, 1, 1, 1, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 1],
+    [0, 0, 0, 0, 0, 0, 0, 1],
+    [0, 0, 0, 0, 0, 0, 0, 1],
+    [0, 0, 0, 0, 0, 0, 0, 1],
+    [0, 0, 0, 0, 0, 0, 0, 1],
+    [0, 0, 0, 0, 0, 0, 0, 1],
+    [0, 0, 0, 0, 0, 0, 0, 1]
+  ];
+  var SPRITE_MUSICBOARDCURSOR_3_219 = [
+    [1, 1, 1, 1, 1, 1, 1, 0],
+    [1, 1, 1, 1, 1, 1, 1, 0],
+    [1, 0, 0, 0, 0, 0, 1, 0],
+    [1, 0, 0, 0, 0, 0, 1, 0],
+    [1, 0, 0, 0, 0, 0, 1, 0],
+    [1, 1, 1, 1, 1, 1, 1, 0],
+    [1, 1, 1, 1, 1, 1, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_FIRSTCURSOR_220 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [1, 1, 1, 1, 1, 1, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_SECONDCURSOR_221 = [
+    [1, 1, 1, 1, 1, 1, 1, 0],
+    [1, 1, 1, 1, 1, 1, 1, 0],
+    [1, 1, 1, 1, 1, 1, 1, 0],
+    [1, 1, 1, 1, 1, 1, 1, 0],
+    [1, 1, 1, 1, 1, 1, 1, 0],
+    [1, 1, 1, 1, 1, 1, 1, 0],
+    [1, 1, 1, 1, 1, 1, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_LAMP_1_222 = [
+    [0, 0, 3, 3, 3, 3, 0, 0],
+    [0, 0, 3, 2, 2, 3, 0, 0],
+    [0, 0, 3, 2, 2, 3, 0, 0],
+    [0, 0, 3, 2, 2, 3, 0, 0],
+    [0, 0, 3, 2, 2, 3, 0, 0],
+    [0, 0, 3, 3, 3, 3, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_LAMP_2_223 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 2, 2, 0, 0, 0],
+    [0, 0, 2, 1, 2, 2, 0, 0],
+    [0, 0, 2, 2, 2, 2, 0, 0],
+    [0, 0, 0, 2, 2, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var MISC_SPRITES = [
+    {
+      name: "Paint Color (1)",
+      defaultPaletteCode: 0,
+      defaultColorCombination: 0,
+      charCodes: 214,
+      tiles: SPRITE_PAINTCOLOR_1_214
+    },
+    {
+      name: "Paint Color (2)",
+      defaultPaletteCode: 0,
+      defaultColorCombination: 0,
+      charCodes: 215,
+      tiles: SPRITE_PAINTCOLOR_2_215
+    },
+    {
+      name: "Paint Color (3)",
+      defaultPaletteCode: 0,
+      defaultColorCombination: 0,
+      charCodes: 216,
+      tiles: SPRITE_PAINTCOLOR_3_216
+    },
+    {
+      name: "Music Board Cursor (1)",
+      defaultPaletteCode: 0,
+      defaultColorCombination: 0,
+      charCodes: 217,
+      tiles: SPRITE_MUSICBOARDCURSOR_1_217
+    },
+    {
+      name: "Music Board Cursor (2)",
+      defaultPaletteCode: 0,
+      defaultColorCombination: 0,
+      charCodes: 218,
+      tiles: SPRITE_MUSICBOARDCURSOR_2_218
+    },
+    {
+      name: "Music Board Cursor (3)",
+      defaultPaletteCode: 0,
+      defaultColorCombination: 0,
+      charCodes: 219,
+      tiles: SPRITE_MUSICBOARDCURSOR_3_219
+    },
+    {
+      name: "1st Cursor",
+      defaultPaletteCode: 0,
+      defaultColorCombination: 0,
+      charCodes: 220,
+      tiles: SPRITE_FIRSTCURSOR_220
+    },
+    {
+      name: "2nd Cursor",
+      defaultPaletteCode: 0,
+      defaultColorCombination: 0,
+      charCodes: 221,
+      tiles: SPRITE_SECONDCURSOR_221
+    },
+    {
+      name: "Lamp (1)",
+      defaultPaletteCode: 0,
+      defaultColorCombination: 0,
+      charCodes: 222,
+      tiles: SPRITE_LAMP_1_222
+    },
+    {
+      name: "Lamp (2)",
+      defaultPaletteCode: 0,
+      defaultColorCombination: 0,
+      charCodes: 223,
+      tiles: SPRITE_LAMP_2_223
+    }
+  ];
+
+  // src/shared/data/characters/nitpicker.ts
+  var SPRITE_NITPICKER_1_200 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 1],
+    [0, 0, 0, 0, 0, 0, 1, 1],
+    [0, 0, 0, 0, 3, 3, 1, 0],
+    [0, 0, 0, 2, 2, 3, 1, 0],
+    [0, 0, 2, 2, 0, 2, 1, 0],
+    [0, 2, 2, 2, 2, 2, 3, 1]
+  ];
+  var SPRITE_NITPICKER_1_201 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [1, 0, 0, 0, 0, 0, 0, 0],
+    [1, 1, 0, 0, 0, 0, 0, 0],
+    [1, 1, 3, 3, 0, 0, 0, 0],
+    [1, 1, 3, 3, 3, 3, 0, 3],
+    [1, 1, 3, 3, 3, 3, 3, 3],
+    [1, 3, 3, 3, 3, 3, 3, 3]
+  ];
+  var SPRITE_NITPICKER_1_202 = [
+    [2, 2, 2, 2, 2, 2, 3, 3],
+    [0, 0, 0, 0, 2, 2, 3, 3],
+    [0, 2, 2, 2, 2, 2, 3, 1],
+    [0, 0, 0, 2, 2, 3, 3, 3],
+    [0, 0, 0, 0, 0, 3, 3, 3],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_NITPICKER_1_203 = [
+    [3, 3, 1, 1, 3, 3, 3, 3],
+    [3, 3, 3, 3, 3, 3, 3, 3],
+    [3, 3, 3, 1, 1, 3, 3, 0],
+    [1, 3, 3, 3, 3, 3, 2, 2],
+    [3, 1, 3, 3, 1, 1, 1, 0],
+    [0, 0, 3, 3, 3, 3, 3, 3],
+    [0, 0, 0, 0, 3, 3, 3, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_NITPICKER_2_204 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 1],
+    [0, 0, 0, 0, 0, 0, 1, 1],
+    [2, 2, 2, 2, 3, 3, 1, 0],
+    [0, 2, 2, 2, 2, 3, 1, 0],
+    [0, 0, 2, 2, 0, 2, 1, 0]
+  ];
+  var SPRITE_NITPICKER_2_205 = [
+    [0, 0, 0, 3, 3, 3, 3, 0],
+    [0, 0, 3, 3, 3, 3, 3, 3],
+    [0, 3, 3, 3, 3, 1, 1, 1],
+    [1, 3, 3, 3, 3, 3, 3, 0],
+    [1, 1, 3, 3, 1, 1, 0, 0],
+    [1, 1, 3, 3, 3, 3, 0, 3],
+    [1, 1, 3, 3, 3, 3, 0, 3],
+    [1, 1, 3, 3, 3, 3, 3, 3]
+  ];
+  var SPRITE_NITPICKER_2_206 = [
+    [0, 0, 0, 2, 2, 2, 3, 1],
+    [0, 0, 0, 0, 2, 2, 3, 3],
+    [0, 0, 0, 2, 2, 2, 3, 3],
+    [0, 0, 2, 2, 2, 3, 3, 3],
+    [0, 2, 2, 2, 3, 3, 3, 3],
+    [0, 0, 0, 0, 0, 0, 3, 3],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_NITPICKER_2_207 = [
+    [1, 3, 3, 3, 3, 3, 3, 3],
+    [3, 3, 3, 3, 3, 3, 3, 3],
+    [3, 3, 3, 3, 3, 3, 3, 0],
+    [3, 3, 3, 3, 2, 2, 2, 2],
+    [3, 3, 3, 3, 3, 0, 2, 0],
+    [3, 3, 3, 3, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var NITPICKER_SPRITES = [
+    {
+      name: "Nit Picker (1)",
+      moveCharacterCode: 15 /* NITPICKER */,
+      defaultPaletteCode: 2,
+      defaultColorCombination: 0,
+      charCodes: [200, 201, 202, 203],
+      tiles: [SPRITE_NITPICKER_1_200, SPRITE_NITPICKER_1_201, SPRITE_NITPICKER_1_202, SPRITE_NITPICKER_1_203]
+    },
+    {
+      name: "Nit Picker (2)",
+      moveCharacterCode: 15 /* NITPICKER */,
+      defaultPaletteCode: 2,
+      defaultColorCombination: 0,
+      charCodes: [204, 205, 206, 207],
+      tiles: [SPRITE_NITPICKER_2_204, SPRITE_NITPICKER_2_205, SPRITE_NITPICKER_2_206, SPRITE_NITPICKER_2_207]
+    }
+  ];
+
+  // src/shared/data/characters/number.ts
+  var SPRITE_NUMBER_1_240 = [
+    [0, 1, 1, 1, 0, 0, 0, 0],
+    [0, 1, 1, 1, 0, 0, 0, 0],
+    [0, 0, 1, 1, 0, 0, 0, 0],
+    [0, 0, 1, 1, 0, 0, 0, 0],
+    [0, 0, 1, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_NUMBER_2_241 = [
+    [0, 1, 1, 1, 1, 0, 0, 0],
+    [0, 0, 0, 1, 1, 0, 0, 0],
+    [0, 1, 1, 1, 1, 0, 0, 0],
+    [0, 1, 1, 0, 0, 0, 0, 0],
+    [0, 1, 1, 1, 1, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_NUMBER_3_242 = [
+    [0, 1, 1, 1, 1, 0, 0, 0],
+    [0, 0, 0, 1, 1, 0, 0, 0],
+    [0, 1, 1, 1, 1, 0, 0, 0],
+    [0, 0, 0, 1, 1, 0, 0, 0],
+    [0, 1, 1, 1, 1, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_NUMBER_4_243 = [
+    [1, 0, 1, 1, 0, 0, 0, 0],
+    [1, 0, 1, 1, 0, 0, 0, 0],
+    [1, 0, 1, 1, 0, 0, 0, 0],
+    [1, 1, 1, 1, 1, 0, 0, 0],
+    [0, 0, 1, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var NUMBER_SPRITES = [
+    {
+      name: "Number (1)",
+      defaultPaletteCode: 0,
+      defaultColorCombination: 0,
+      charCodes: 240,
+      tiles: SPRITE_NUMBER_1_240
+    },
+    {
+      name: "Number (2)",
+      defaultPaletteCode: 0,
+      defaultColorCombination: 0,
+      charCodes: 241,
+      tiles: SPRITE_NUMBER_2_241
+    },
+    {
+      name: "Number (3)",
+      defaultPaletteCode: 0,
+      defaultColorCombination: 0,
+      charCodes: 242,
+      tiles: SPRITE_NUMBER_3_242
+    },
+    {
+      name: "Number (4)",
+      defaultPaletteCode: 0,
+      defaultColorCombination: 0,
+      charCodes: 243,
+      tiles: SPRITE_NUMBER_4_243
+    }
+  ];
+
+  // src/shared/data/characters/penguin.ts
+  var SPRITE_PENGUIN_LEFTSTEP1_96 = [
+    [0, 0, 0, 0, 3, 3, 3, 3],
+    [0, 0, 0, 3, 1, 1, 3, 3],
+    [0, 0, 0, 1, 1, 1, 1, 3],
+    [0, 0, 1, 1, 1, 1, 1, 1],
+    [0, 0, 1, 0, 1, 1, 1, 1],
+    [0, 0, 1, 0, 1, 1, 1, 3],
+    [0, 2, 2, 2, 2, 2, 3, 3],
+    [2, 2, 2, 2, 2, 2, 2, 3]
+  ];
+  var SPRITE_PENGUIN_LEFTSTEP1_97 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [3, 0, 0, 0, 0, 0, 0, 0],
+    [3, 3, 0, 0, 0, 0, 0, 0],
+    [3, 3, 0, 0, 0, 0, 0, 0],
+    [3, 3, 3, 0, 0, 0, 0, 0],
+    [3, 3, 3, 0, 0, 0, 0, 0],
+    [3, 3, 3, 0, 0, 0, 0, 0],
+    [3, 3, 3, 3, 0, 0, 0, 0]
+  ];
+  var SPRITE_PENGUIN_LEFTSTEP1_98 = [
+    [0, 0, 1, 2, 2, 2, 1, 3],
+    [0, 0, 1, 1, 1, 1, 1, 1],
+    [0, 0, 1, 1, 1, 1, 1, 1],
+    [0, 0, 1, 1, 1, 1, 1, 1],
+    [0, 0, 1, 1, 1, 2, 2, 2],
+    [0, 0, 0, 1, 1, 1, 2, 2],
+    [0, 0, 0, 2, 2, 1, 1, 1],
+    [0, 2, 2, 2, 2, 2, 2, 0]
+  ];
+  var SPRITE_PENGUIN_LEFTSTEP1_99 = [
+    [3, 3, 3, 3, 3, 3, 3, 0],
+    [3, 3, 3, 3, 3, 3, 0, 0],
+    [1, 3, 3, 3, 3, 0, 0, 0],
+    [1, 3, 3, 3, 0, 0, 0, 0],
+    [1, 3, 3, 3, 0, 0, 0, 0],
+    [2, 3, 3, 3, 3, 0, 0, 0],
+    [2, 2, 3, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_PENGUIN_LEFTSTEP2_100 = [
+    [0, 0, 0, 0, 0, 0, 0, 3],
+    [0, 0, 0, 0, 0, 0, 1, 1],
+    [0, 0, 0, 0, 0, 1, 1, 1],
+    [0, 0, 0, 0, 1, 1, 0, 1],
+    [0, 0, 0, 0, 1, 0, 1, 1],
+    [0, 0, 2, 2, 2, 2, 1, 1],
+    [0, 0, 0, 2, 2, 2, 2, 2],
+    [0, 0, 0, 0, 2, 2, 2, 2]
+  ];
+  var SPRITE_PENGUIN_LEFTSTEP2_101 = [
+    [3, 3, 0, 0, 0, 0, 0, 0],
+    [3, 3, 3, 0, 0, 0, 0, 0],
+    [1, 3, 3, 3, 0, 0, 0, 0],
+    [1, 1, 3, 3, 0, 0, 0, 0],
+    [1, 1, 3, 3, 0, 0, 0, 0],
+    [1, 3, 3, 3, 0, 0, 0, 0],
+    [3, 3, 3, 3, 0, 0, 0, 0],
+    [3, 3, 3, 3, 3, 0, 0, 0]
+  ];
+  var SPRITE_PENGUIN_LEFTSTEP2_102 = [
+    [0, 0, 0, 1, 1, 1, 2, 3],
+    [0, 0, 0, 1, 1, 1, 1, 1],
+    [0, 0, 1, 1, 1, 1, 1, 1],
+    [0, 0, 1, 1, 1, 1, 1, 1],
+    [0, 0, 0, 1, 1, 1, 1, 1],
+    [0, 2, 2, 2, 1, 1, 1, 1],
+    [0, 0, 2, 2, 2, 1, 1, 1],
+    [0, 0, 0, 0, 0, 0, 0, 2]
+  ];
+  var SPRITE_PENGUIN_LEFTSTEP2_103 = [
+    [3, 3, 3, 3, 3, 0, 0, 0],
+    [3, 3, 3, 3, 3, 3, 0, 0],
+    [1, 3, 3, 3, 3, 3, 3, 0],
+    [1, 3, 3, 3, 3, 3, 3, 0],
+    [1, 3, 3, 3, 0, 0, 0, 0],
+    [3, 3, 3, 3, 0, 0, 0, 0],
+    [3, 3, 3, 3, 3, 0, 0, 0],
+    [2, 2, 2, 3, 0, 0, 0, 0]
+  ];
+  var SPRITE_PENGUIN_FRONT_104 = [
+    [0, 0, 0, 0, 0, 3, 3, 3],
+    [0, 0, 0, 0, 3, 3, 3, 3],
+    [0, 0, 0, 0, 3, 1, 1, 3],
+    [0, 0, 0, 3, 3, 1, 1, 1],
+    [0, 0, 0, 3, 1, 1, 0, 1],
+    [0, 0, 0, 3, 1, 1, 0, 1],
+    [0, 0, 0, 3, 1, 1, 2, 2],
+    [0, 0, 3, 3, 2, 2, 2, 2]
+  ];
+  var SPRITE_PENGUIN_FRONT_105 = [
+    [3, 3, 0, 0, 0, 0, 0, 0],
+    [3, 3, 3, 0, 0, 0, 0, 0],
+    [1, 1, 3, 0, 0, 0, 0, 0],
+    [1, 1, 1, 3, 0, 0, 0, 0],
+    [0, 1, 1, 3, 0, 0, 0, 0],
+    [0, 1, 1, 3, 0, 0, 0, 0],
+    [2, 1, 3, 3, 3, 3, 0, 0],
+    [2, 2, 2, 3, 3, 3, 3, 0]
+  ];
+  var SPRITE_PENGUIN_FRONT_106 = [
+    [0, 0, 3, 3, 3, 2, 2, 2],
+    [0, 3, 3, 3, 3, 1, 1, 1],
+    [0, 3, 3, 3, 3, 1, 1, 1],
+    [3, 3, 3, 0, 3, 1, 1, 1],
+    [0, 0, 0, 0, 1, 1, 1, 1],
+    [0, 0, 0, 0, 1, 1, 1, 1],
+    [0, 0, 0, 2, 2, 2, 2, 1],
+    [0, 0, 2, 2, 2, 2, 2, 2]
+  ];
+  var SPRITE_PENGUIN_FRONT_107 = [
+    [2, 2, 3, 3, 3, 3, 3, 3],
+    [1, 1, 1, 3, 3, 0, 0, 0],
+    [1, 1, 1, 1, 3, 0, 0, 0],
+    [1, 1, 1, 1, 1, 0, 0, 0],
+    [1, 1, 1, 1, 1, 2, 2, 0],
+    [1, 1, 1, 2, 2, 2, 0, 0],
+    [1, 2, 2, 2, 2, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_PENGUIN_BACK_108 = [
+    [0, 0, 0, 0, 0, 3, 3, 3],
+    [0, 0, 0, 0, 3, 3, 3, 3],
+    [0, 0, 0, 0, 3, 3, 3, 3],
+    [0, 0, 0, 3, 3, 3, 3, 3],
+    [0, 0, 0, 3, 3, 3, 3, 3],
+    [0, 0, 0, 3, 3, 3, 3, 3],
+    [0, 0, 0, 3, 3, 3, 3, 3],
+    [0, 0, 3, 3, 3, 3, 3, 3]
+  ];
+  var SPRITE_PENGUIN_BACK_109 = [
+    [3, 3, 0, 0, 0, 0, 0, 0],
+    [3, 3, 3, 0, 0, 0, 0, 0],
+    [3, 3, 3, 0, 0, 0, 0, 0],
+    [3, 3, 3, 3, 0, 0, 0, 0],
+    [3, 3, 3, 3, 0, 0, 0, 0],
+    [3, 3, 3, 3, 0, 0, 0, 0],
+    [3, 3, 3, 3, 3, 3, 0, 0],
+    [3, 3, 3, 3, 3, 3, 3, 0]
+  ];
+  var SPRITE_PENGUIN_BACK_110 = [
+    [0, 0, 3, 3, 3, 3, 3, 3],
+    [0, 3, 3, 3, 3, 3, 3, 3],
+    [0, 3, 3, 3, 3, 3, 3, 3],
+    [3, 3, 3, 0, 3, 3, 3, 3],
+    [0, 0, 0, 0, 3, 3, 3, 3],
+    [0, 0, 0, 0, 3, 3, 3, 3],
+    [0, 0, 0, 2, 2, 3, 3, 3],
+    [0, 0, 2, 2, 2, 2, 2, 0]
+  ];
+  var SPRITE_PENGUIN_BACK_111 = [
+    [3, 3, 3, 3, 3, 3, 3, 3],
+    [3, 3, 3, 3, 3, 0, 0, 0],
+    [3, 3, 3, 3, 3, 0, 0, 0],
+    [3, 3, 3, 3, 3, 0, 0, 0],
+    [3, 3, 3, 3, 3, 2, 2, 0],
+    [3, 3, 3, 3, 2, 2, 0, 0],
+    [3, 3, 2, 2, 2, 0, 0, 0],
+    [3, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var PENGUIN_SPRITES = [
+    {
+      name: "Penguin (LEFTSTEP1)",
+      moveCharacterCode: 4 /* PENGUIN */,
+      defaultPaletteCode: 2,
+      defaultColorCombination: 0,
+      charCodes: [96, 97, 98, 99],
+      tiles: [
+        SPRITE_PENGUIN_LEFTSTEP1_96,
+        SPRITE_PENGUIN_LEFTSTEP1_97,
+        SPRITE_PENGUIN_LEFTSTEP1_98,
+        SPRITE_PENGUIN_LEFTSTEP1_99
+      ]
+    },
+    {
+      name: "Penguin (LEFTSTEP2)",
+      moveCharacterCode: 4 /* PENGUIN */,
+      defaultPaletteCode: 2,
+      defaultColorCombination: 0,
+      charCodes: [100, 101, 102, 103],
+      tiles: [
+        SPRITE_PENGUIN_LEFTSTEP2_100,
+        SPRITE_PENGUIN_LEFTSTEP2_101,
+        SPRITE_PENGUIN_LEFTSTEP2_102,
+        SPRITE_PENGUIN_LEFTSTEP2_103
+      ]
+    },
+    {
+      name: "Penguin (FRONT)",
+      moveCharacterCode: 4 /* PENGUIN */,
+      defaultPaletteCode: 2,
+      defaultColorCombination: 0,
+      charCodes: [104, 105, 106, 107],
+      tiles: [SPRITE_PENGUIN_FRONT_104, SPRITE_PENGUIN_FRONT_105, SPRITE_PENGUIN_FRONT_106, SPRITE_PENGUIN_FRONT_107]
+    },
+    {
+      name: "Penguin (BACK)",
+      moveCharacterCode: 4 /* PENGUIN */,
+      defaultPaletteCode: 2,
+      defaultColorCombination: 0,
+      charCodes: [108, 109, 110, 111],
+      tiles: [SPRITE_PENGUIN_BACK_108, SPRITE_PENGUIN_BACK_109, SPRITE_PENGUIN_BACK_110, SPRITE_PENGUIN_BACK_111]
+    }
+  ];
+
+  // src/shared/data/characters/quill.ts
+  var SPRITE_QUILL1_1_224 = [
+    [2, 2, 0, 0, 0, 0, 0, 0],
+    [0, 2, 2, 0, 0, 0, 0, 0],
+    [0, 0, 2, 2, 0, 0, 0, 0],
+    [0, 0, 0, 2, 0, 0, 0, 0],
+    [0, 0, 0, 2, 2, 0, 0, 0],
+    [0, 0, 0, 0, 2, 2, 0, 0],
+    [0, 0, 0, 0, 0, 2, 0, 0],
+    [0, 0, 0, 0, 0, 2, 2, 0]
+  ];
+  var SPRITE_QUILL1_2_225 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_QUILL1_3_226 = [
+    [0, 0, 0, 0, 0, 1, 2, 1],
+    [0, 0, 0, 0, 0, 1, 2, 2],
+    [0, 0, 0, 0, 1, 1, 1, 2],
+    [0, 0, 0, 0, 1, 1, 1, 1],
+    [0, 0, 0, 0, 1, 1, 1, 1],
+    [0, 0, 0, 0, 0, 1, 1, 1],
+    [0, 0, 0, 0, 0, 1, 1, 1],
+    [0, 0, 0, 0, 0, 1, 1, 1]
+  ];
+  var SPRITE_QUILL1_4_227 = [
+    [1, 0, 0, 0, 0, 0, 0, 0],
+    [1, 1, 0, 0, 0, 0, 0, 0],
+    [1, 1, 1, 0, 0, 0, 0, 0],
+    [2, 1, 1, 1, 0, 0, 0, 0],
+    [2, 1, 1, 1, 1, 0, 0, 0],
+    [1, 2, 3, 1, 1, 0, 0, 0],
+    [1, 2, 1, 3, 3, 1, 0, 0],
+    [3, 1, 2, 1, 1, 3, 0, 0]
+  ];
+  var SPRITE_QUILL1_5_228 = [
+    [0, 0, 0, 0, 0, 0, 1, 1],
+    [0, 0, 0, 0, 0, 0, 1, 1],
+    [0, 0, 0, 0, 0, 0, 1, 3],
+    [0, 0, 0, 0, 0, 0, 0, 3],
+    [0, 0, 0, 0, 0, 0, 0, 3],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_QUILL1_6_229 = [
+    [3, 1, 2, 1, 1, 1, 0, 0],
+    [3, 1, 1, 2, 3, 1, 1, 0],
+    [1, 1, 1, 2, 1, 3, 1, 0],
+    [1, 1, 3, 1, 2, 1, 3, 0],
+    [1, 1, 3, 1, 2, 1, 1, 1],
+    [1, 1, 3, 1, 2, 3, 1, 1],
+    [0, 3, 1, 1, 3, 2, 3, 1],
+    [0, 3, 1, 1, 3, 2, 3, 1]
+  ];
+  var SPRITE_QUILL1_7_230 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_QUILL1_8_231 = [
+    [0, 0, 1, 1, 3, 2, 3, 3],
+    [0, 0, 0, 3, 3, 2, 3, 3],
+    [0, 0, 0, 3, 3, 3, 3, 3],
+    [0, 0, 0, 0, 3, 3, 3, 3],
+    [0, 0, 0, 0, 3, 3, 3, 3],
+    [0, 0, 0, 0, 0, 3, 3, 3],
+    [0, 0, 0, 0, 0, 3, 3, 0],
+    [0, 0, 0, 0, 0, 0, 3, 0]
+  ];
+  var SPRITE_QUILL2_1_232 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 3],
+    [0, 0, 0, 0, 0, 0, 1, 3]
+  ];
+  var SPRITE_QUILL2_2_233 = [
+    [0, 0, 0, 0, 0, 0, 3, 3],
+    [0, 0, 0, 0, 3, 3, 3, 3],
+    [0, 0, 0, 3, 3, 3, 3, 0],
+    [0, 0, 3, 3, 3, 3, 3, 0],
+    [0, 1, 3, 3, 2, 3, 3, 0],
+    [1, 1, 3, 2, 3, 3, 3, 0],
+    [1, 1, 2, 3, 3, 3, 0, 0],
+    [1, 1, 2, 1, 1, 1, 0, 0]
+  ];
+  var SPRITE_QUILL2_3_234 = [
+    [0, 0, 0, 0, 0, 1, 1, 3],
+    [0, 0, 0, 0, 0, 1, 1, 3],
+    [0, 0, 0, 0, 3, 1, 1, 1],
+    [0, 0, 0, 0, 3, 1, 1, 1],
+    [0, 0, 0, 1, 1, 3, 1, 2],
+    [0, 0, 0, 1, 1, 3, 1, 2],
+    [0, 0, 0, 1, 1, 1, 2, 2],
+    [0, 0, 1, 1, 1, 1, 2, 1]
+  ];
+  var SPRITE_QUILL2_4_235 = [
+    [1, 2, 1, 1, 1, 1, 0, 0],
+    [1, 2, 1, 1, 1, 0, 0, 0],
+    [2, 3, 3, 3, 3, 0, 0, 0],
+    [2, 1, 1, 1, 0, 0, 0, 0],
+    [1, 1, 1, 1, 0, 0, 0, 0],
+    [1, 1, 1, 1, 0, 0, 0, 0],
+    [3, 3, 3, 0, 0, 0, 0, 0],
+    [1, 1, 1, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_QUILL2_5_236 = [
+    [0, 0, 1, 1, 1, 2, 2, 1],
+    [0, 0, 1, 1, 1, 2, 1, 1],
+    [0, 0, 1, 1, 2, 2, 1, 1],
+    [0, 0, 1, 1, 2, 1, 1, 1],
+    [0, 0, 1, 2, 2, 1, 1, 1],
+    [0, 0, 0, 2, 1, 1, 1, 0],
+    [0, 0, 0, 2, 0, 0, 0, 0],
+    [0, 0, 2, 2, 0, 0, 0, 0]
+  ];
+  var SPRITE_QUILL2_6_237 = [
+    [1, 1, 1, 0, 0, 0, 0, 0],
+    [1, 1, 0, 0, 0, 0, 0, 0],
+    [1, 1, 0, 0, 0, 0, 0, 0],
+    [1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_QUILL2_7_238 = [
+    [0, 0, 2, 0, 0, 0, 0, 0],
+    [0, 0, 2, 0, 0, 0, 0, 0],
+    [0, 2, 2, 0, 0, 0, 0, 0],
+    [0, 2, 0, 0, 0, 0, 0, 0],
+    [0, 2, 0, 0, 0, 0, 0, 0],
+    [2, 2, 0, 0, 0, 0, 0, 0],
+    [2, 0, 0, 0, 0, 0, 0, 0],
+    [2, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_QUILL2_8_239 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var QUILL_SPRITES = [
+    {
+      name: "Quill (1)",
+      defaultPaletteCode: 0,
+      defaultColorCombination: 0,
+      charCodes: [224, 225, 226, 227, 228, 229, 230, 231],
+      tiles: [
+        SPRITE_QUILL1_1_224,
+        SPRITE_QUILL1_2_225,
+        SPRITE_QUILL1_3_226,
+        SPRITE_QUILL1_4_227,
+        SPRITE_QUILL1_5_228,
+        SPRITE_QUILL1_6_229,
+        SPRITE_QUILL1_7_230,
+        SPRITE_QUILL1_8_231
+      ]
+    },
+    {
+      name: "Quill (2)",
+      defaultPaletteCode: 0,
+      defaultColorCombination: 0,
+      charCodes: [232, 233, 234, 235, 236, 237, 238, 239],
+      tiles: [
+        SPRITE_QUILL2_1_232,
+        SPRITE_QUILL2_2_233,
+        SPRITE_QUILL2_3_234,
+        SPRITE_QUILL2_4_235,
+        SPRITE_QUILL2_5_236,
+        SPRITE_QUILL2_6_237,
+        SPRITE_QUILL2_7_238,
+        SPRITE_QUILL2_8_239
+      ]
+    }
+  ];
+
+  // src/shared/data/characters/shell-creeper.ts
+  var SPRITE_SHELLCREEPER_1_184 = [
+    [0, 0, 0, 0, 1, 0, 0, 0],
+    [0, 0, 0, 1, 1, 1, 0, 0],
+    [0, 0, 2, 1, 1, 1, 0, 0],
+    [0, 2, 2, 0, 1, 1, 2, 0],
+    [0, 2, 2, 0, 1, 1, 2, 0],
+    [2, 0, 2, 1, 1, 2, 2, 0],
+    [2, 2, 2, 2, 2, 2, 2, 0],
+    [2, 2, 2, 2, 2, 2, 0, 0]
+  ];
+  var SPRITE_SHELLCREEPER_1_185 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 3, 3, 3, 1, 0, 0, 0],
+    [3, 0, 3, 3, 0, 1, 0, 0],
+    [3, 3, 0, 0, 3, 3, 1, 0]
+  ];
+  var SPRITE_SHELLCREEPER_1_186 = [
+    [2, 2, 0, 0, 2, 2, 0, 3],
+    [0, 0, 0, 0, 2, 2, 1, 3],
+    [0, 0, 0, 2, 2, 2, 1, 0],
+    [0, 0, 2, 2, 2, 2, 1, 3],
+    [0, 0, 0, 0, 2, 2, 1, 1],
+    [0, 0, 0, 0, 0, 0, 2, 1],
+    [0, 0, 0, 0, 2, 2, 2, 2],
+    [0, 0, 0, 2, 2, 2, 2, 0]
+  ];
+  var SPRITE_SHELLCREEPER_1_187 = [
+    [3, 0, 3, 3, 0, 3, 1, 0],
+    [0, 3, 3, 3, 3, 0, 3, 0],
+    [3, 0, 3, 3, 0, 3, 0, 2],
+    [3, 3, 0, 0, 3, 3, 3, 0],
+    [3, 0, 3, 3, 0, 3, 1, 1],
+    [1, 3, 3, 3, 3, 1, 1, 0],
+    [1, 1, 1, 1, 1, 1, 2, 0],
+    [0, 0, 0, 0, 0, 2, 2, 2]
+  ];
+  var SPRITE_SHELLCREEPER_2_188 = [
+    [0, 0, 0, 0, 1, 0, 0, 0],
+    [0, 0, 0, 1, 1, 1, 0, 0],
+    [0, 0, 2, 1, 1, 1, 0, 0],
+    [0, 2, 2, 0, 1, 1, 2, 0],
+    [0, 2, 2, 0, 1, 1, 2, 0],
+    [2, 0, 2, 1, 1, 2, 2, 0],
+    [2, 2, 2, 2, 2, 2, 2, 0],
+    [2, 2, 2, 0, 2, 2, 0, 3]
+  ];
+  var SPRITE_SHELLCREEPER_2_189 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 3, 3, 3, 1, 0, 0, 0],
+    [3, 0, 3, 3, 0, 1, 0, 0],
+    [3, 3, 0, 0, 3, 3, 1, 0],
+    [3, 0, 3, 3, 0, 3, 1, 0]
+  ];
+  var SPRITE_SHELLCREEPER_2_190 = [
+    [2, 2, 0, 2, 2, 2, 1, 3],
+    [0, 0, 2, 2, 2, 2, 1, 0],
+    [0, 0, 0, 2, 2, 2, 1, 3],
+    [0, 0, 0, 0, 2, 2, 1, 1],
+    [0, 0, 0, 0, 0, 0, 0, 1],
+    [0, 0, 0, 0, 0, 0, 2, 2],
+    [0, 0, 0, 0, 0, 0, 2, 2],
+    [0, 0, 0, 0, 0, 0, 0, 2]
+  ];
+  var SPRITE_SHELLCREEPER_2_191 = [
+    [0, 3, 3, 3, 3, 0, 3, 0],
+    [3, 0, 3, 3, 0, 3, 0, 2],
+    [3, 3, 0, 0, 3, 3, 3, 0],
+    [3, 0, 3, 3, 0, 3, 1, 1],
+    [1, 3, 3, 3, 3, 1, 1, 0],
+    [1, 1, 1, 1, 1, 1, 2, 0],
+    [2, 0, 0, 0, 2, 2, 0, 0],
+    [2, 2, 0, 2, 2, 2, 0, 0]
+  ];
+  var SHELLCREEPER_SPRITES = [
+    {
+      name: "Shell Creeper (1)",
+      moveCharacterCode: 13 /* SHELL_CREEPER */,
+      defaultPaletteCode: 2,
+      defaultColorCombination: 3,
+      charCodes: [184, 185, 186, 187],
+      tiles: [SPRITE_SHELLCREEPER_1_184, SPRITE_SHELLCREEPER_1_185, SPRITE_SHELLCREEPER_1_186, SPRITE_SHELLCREEPER_1_187]
+    },
+    {
+      name: "Shell Creeper (2)",
+      moveCharacterCode: 13 /* SHELL_CREEPER */,
+      defaultPaletteCode: 0,
+      defaultColorCombination: 3,
+      charCodes: [188, 189, 190, 191],
+      tiles: [SPRITE_SHELLCREEPER_2_188, SPRITE_SHELLCREEPER_2_189, SPRITE_SHELLCREEPER_2_190, SPRITE_SHELLCREEPER_2_191]
+    }
+  ];
+
+  // src/shared/data/characters/side-stepper.ts
+  var SPRITE_SIDESTEPPER_1_192 = [
+    [0, 0, 3, 3, 0, 0, 0, 0],
+    [0, 3, 3, 0, 0, 1, 1, 0],
+    [3, 3, 0, 3, 0, 1, 1, 0],
+    [3, 3, 0, 3, 0, 1, 2, 0],
+    [3, 3, 3, 3, 0, 1, 2, 0],
+    [3, 3, 3, 0, 0, 1, 1, 0],
+    [3, 3, 0, 0, 0, 0, 3, 0],
+    [0, 3, 0, 0, 0, 3, 3, 3]
+  ];
+  var SPRITE_SIDESTEPPER_1_193 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [1, 1, 0, 0, 0, 0, 0, 0],
+    [1, 1, 0, 0, 1, 1, 0, 0],
+    [2, 1, 0, 0, 3, 3, 1, 0],
+    [2, 1, 0, 3, 0, 3, 3, 1],
+    [1, 1, 0, 3, 3, 0, 3, 1],
+    [3, 0, 0, 3, 3, 3, 3, 3],
+    [3, 3, 0, 0, 3, 3, 3, 3]
+  ];
+  var SPRITE_SIDESTEPPER_1_194 = [
+    [0, 3, 3, 0, 0, 3, 2, 3],
+    [0, 0, 3, 3, 2, 3, 3, 3],
+    [0, 0, 0, 0, 2, 3, 3, 3],
+    [0, 2, 3, 3, 2, 3, 3, 3],
+    [0, 3, 0, 0, 2, 2, 3, 3],
+    [0, 3, 0, 3, 0, 2, 2, 2],
+    [0, 3, 0, 3, 0, 3, 0, 0],
+    [0, 3, 0, 3, 0, 3, 0, 0]
+  ];
+  var SPRITE_SIDESTEPPER_1_195 = [
+    [2, 1, 0, 0, 0, 0, 3, 3],
+    [3, 3, 1, 3, 3, 3, 3, 0],
+    [3, 3, 3, 0, 0, 0, 0, 0],
+    [3, 3, 3, 3, 3, 2, 0, 0],
+    [3, 3, 2, 0, 0, 0, 3, 0],
+    [2, 2, 0, 3, 3, 0, 3, 0],
+    [0, 0, 3, 0, 3, 0, 0, 0],
+    [0, 0, 3, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_SIDESTEPPER_2_196 = [
+    [0, 0, 0, 0, 0, 1, 1, 0],
+    [0, 0, 0, 0, 0, 1, 1, 0],
+    [0, 0, 3, 3, 0, 1, 2, 0],
+    [0, 3, 3, 0, 0, 1, 2, 0],
+    [3, 3, 0, 3, 0, 1, 1, 0],
+    [3, 3, 0, 3, 0, 0, 3, 0],
+    [3, 3, 3, 3, 0, 3, 3, 3],
+    [3, 3, 3, 0, 0, 3, 2, 3]
+  ];
+  var SPRITE_SIDESTEPPER_2_197 = [
+    [1, 1, 0, 1, 1, 1, 0, 0],
+    [1, 1, 0, 0, 3, 3, 1, 0],
+    [2, 1, 0, 3, 0, 3, 1, 0],
+    [2, 1, 0, 3, 3, 0, 3, 1],
+    [1, 1, 0, 3, 3, 3, 3, 1],
+    [3, 0, 0, 0, 3, 3, 3, 3],
+    [3, 3, 0, 0, 0, 0, 3, 3],
+    [2, 1, 0, 0, 0, 3, 3, 0]
+  ];
+  var SPRITE_SIDESTEPPER_2_198 = [
+    [3, 3, 0, 3, 2, 3, 3, 3],
+    [0, 3, 3, 0, 2, 3, 3, 3],
+    [0, 0, 2, 3, 2, 3, 3, 3],
+    [0, 3, 0, 0, 2, 2, 3, 3],
+    [3, 3, 0, 3, 0, 2, 2, 2],
+    [3, 0, 3, 0, 3, 0, 0, 0],
+    [0, 0, 0, 0, 3, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_SIDESTEPPER_2_199 = [
+    [3, 3, 1, 3, 3, 3, 0, 0],
+    [3, 3, 3, 0, 0, 0, 0, 0],
+    [3, 3, 3, 3, 3, 0, 0, 0],
+    [3, 3, 2, 0, 3, 2, 0, 0],
+    [2, 2, 0, 3, 0, 3, 0, 0],
+    [0, 3, 0, 3, 0, 3, 0, 0],
+    [0, 3, 0, 3, 0, 3, 0, 0],
+    [3, 0, 0, 3, 0, 3, 0, 0]
+  ];
+  var SIDESTEPPER_SPRITES = [
+    {
+      name: "Side Stepper (1)",
+      moveCharacterCode: 14 /* SIDE_STEPPER */,
+      defaultPaletteCode: 2,
+      defaultColorCombination: 2,
+      charCodes: [192, 193, 194, 195],
+      tiles: [SPRITE_SIDESTEPPER_1_192, SPRITE_SIDESTEPPER_1_193, SPRITE_SIDESTEPPER_1_194, SPRITE_SIDESTEPPER_1_195]
+    },
+    {
+      name: "Side Stepper (2)",
+      moveCharacterCode: 14 /* SIDE_STEPPER */,
+      defaultPaletteCode: 2,
+      defaultColorCombination: 2,
+      charCodes: [188, 189, 190, 191],
+      tiles: [SPRITE_SIDESTEPPER_2_196, SPRITE_SIDESTEPPER_2_197, SPRITE_SIDESTEPPER_2_198, SPRITE_SIDESTEPPER_2_199]
+    }
+  ];
+
+  // src/shared/data/characters/smiley.ts
+  var SPRITE_SMILEY_1_88 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 1, 1, 3],
+    [0, 0, 0, 0, 3, 1, 1, 3],
+    [0, 0, 0, 3, 3, 1, 1, 3],
+    [0, 0, 3, 1, 3, 1, 2, 3],
+    [0, 0, 1, 1, 3, 1, 2, 3],
+    [0, 3, 1, 3, 3, 1, 1, 3],
+    [1, 3, 3, 3, 3, 3, 3, 3]
+  ];
+  var SPRITE_SMILEY_1_89 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [3, 1, 1, 0, 0, 0, 0, 0],
+    [3, 1, 1, 3, 0, 0, 0, 0],
+    [3, 1, 1, 3, 3, 0, 0, 0],
+    [3, 2, 1, 3, 3, 3, 0, 0],
+    [3, 2, 1, 3, 3, 3, 0, 0],
+    [3, 1, 1, 3, 3, 3, 3, 0],
+    [3, 3, 3, 3, 3, 3, 3, 1]
+  ];
+  var SPRITE_SMILEY_1_90 = [
+    [1, 3, 3, 3, 3, 1, 0, 1],
+    [2, 3, 3, 0, 1, 1, 0, 1],
+    [2, 3, 1, 0, 1, 1, 0, 1],
+    [2, 2, 3, 0, 1, 1, 0, 1],
+    [0, 0, 3, 3, 1, 1, 0, 1],
+    [0, 0, 0, 3, 3, 1, 0, 1],
+    [0, 0, 0, 0, 3, 3, 3, 3],
+    [0, 0, 0, 0, 0, 3, 3, 3]
+  ];
+  var SPRITE_SMILEY_1_91 = [
+    [1, 0, 1, 3, 3, 3, 3, 1],
+    [1, 0, 1, 1, 0, 3, 3, 2],
+    [1, 0, 1, 1, 0, 1, 3, 2],
+    [1, 0, 1, 1, 0, 3, 2, 2],
+    [1, 0, 1, 1, 3, 3, 0, 0],
+    [1, 0, 1, 3, 3, 0, 0, 0],
+    [3, 3, 3, 3, 0, 0, 0, 0],
+    [3, 3, 3, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_SMILEY_2_92 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 1, 1, 3],
+    [0, 0, 0, 0, 3, 1, 2, 3],
+    [0, 0, 0, 3, 3, 1, 2, 3],
+    [0, 0, 3, 1, 3, 1, 1, 3],
+    [0, 0, 1, 1, 3, 1, 1, 3],
+    [0, 3, 1, 3, 3, 1, 1, 3],
+    [1, 3, 3, 3, 3, 3, 3, 3]
+  ];
+  var SPRITE_SMILEY_2_93 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [3, 1, 1, 0, 0, 0, 0, 0],
+    [3, 2, 1, 3, 0, 0, 0, 0],
+    [3, 2, 1, 3, 3, 0, 0, 0],
+    [3, 1, 1, 3, 3, 3, 0, 0],
+    [3, 1, 1, 3, 3, 3, 0, 0],
+    [3, 1, 1, 3, 3, 3, 3, 0],
+    [3, 3, 3, 3, 3, 3, 3, 1]
+  ];
+  var SPRITE_SMILEY_2_94 = [
+    [1, 3, 3, 3, 3, 1, 0, 1],
+    [2, 3, 3, 0, 1, 1, 0, 1],
+    [2, 3, 1, 0, 1, 3, 3, 3],
+    [2, 2, 1, 3, 3, 3, 3, 3],
+    [0, 0, 3, 3, 3, 3, 3, 3],
+    [0, 0, 0, 3, 3, 3, 3, 3],
+    [0, 0, 0, 0, 3, 3, 3, 3],
+    [0, 0, 0, 0, 0, 3, 3, 3]
+  ];
+  var SPRITE_SMILEY_2_95 = [
+    [1, 0, 1, 3, 3, 3, 3, 1],
+    [1, 0, 1, 1, 0, 3, 3, 2],
+    [3, 3, 3, 1, 0, 1, 3, 2],
+    [3, 3, 3, 3, 3, 1, 2, 2],
+    [3, 3, 3, 3, 3, 3, 0, 0],
+    [3, 3, 3, 3, 3, 0, 0, 0],
+    [3, 3, 3, 3, 0, 0, 0, 0],
+    [3, 3, 3, 0, 0, 0, 0, 0]
+  ];
+  var SMILEY_SPRITES = [
+    {
+      name: "Smiley (1)",
+      moveCharacterCode: 11 /* SMILEY */,
+      defaultPaletteCode: 2,
+      defaultColorCombination: 1,
+      charCodes: [88, 89, 90, 91],
+      tiles: [SPRITE_SMILEY_1_88, SPRITE_SMILEY_1_89, SPRITE_SMILEY_1_90, SPRITE_SMILEY_1_91]
+    },
+    {
+      name: "Smiley (2)",
+      moveCharacterCode: 11 /* SMILEY */,
+      defaultPaletteCode: 2,
+      defaultColorCombination: 2,
+      charCodes: [92, 93, 94, 95],
+      tiles: [SPRITE_SMILEY_2_92, SPRITE_SMILEY_2_93, SPRITE_SMILEY_2_94, SPRITE_SMILEY_2_95]
+    }
+  ];
+
+  // src/shared/data/characters/spinner.ts
+  var SPRITE_SPINNER_1_144 = [
+    [0, 0, 0, 0, 0, 3, 3, 3],
+    [0, 0, 0, 0, 0, 2, 2, 2],
+    [0, 0, 0, 0, 0, 0, 2, 2],
+    [0, 0, 0, 0, 0, 0, 0, 3],
+    [0, 0, 0, 0, 0, 0, 0, 3],
+    [3, 1, 0, 0, 0, 2, 2, 2],
+    [3, 1, 1, 0, 0, 2, 2, 1],
+    [3, 1, 1, 3, 3, 2, 1, 3]
+  ];
+  var SPRITE_SPINNER_1_145 = [
+    [3, 3, 3, 0, 0, 0, 0, 0],
+    [2, 2, 2, 0, 0, 0, 0, 0],
+    [2, 2, 0, 0, 0, 0, 0, 0],
+    [3, 0, 0, 0, 0, 0, 0, 0],
+    [3, 0, 0, 0, 0, 0, 0, 0],
+    [2, 2, 2, 0, 0, 0, 1, 3],
+    [1, 2, 2, 0, 0, 1, 1, 3],
+    [3, 1, 2, 3, 3, 1, 1, 3]
+  ];
+  var SPRITE_SPINNER_1_146 = [
+    [3, 1, 2, 3, 3, 2, 1, 3],
+    [3, 2, 2, 0, 0, 2, 2, 1],
+    [3, 2, 0, 0, 0, 2, 2, 2],
+    [0, 0, 0, 0, 0, 0, 0, 3],
+    [0, 0, 0, 0, 0, 0, 0, 3],
+    [0, 0, 0, 0, 0, 0, 1, 1],
+    [0, 0, 0, 0, 0, 1, 1, 1],
+    [0, 0, 0, 0, 0, 3, 3, 3]
+  ];
+  var SPRITE_SPINNER_1_147 = [
+    [3, 1, 2, 3, 3, 2, 1, 3],
+    [1, 2, 2, 0, 0, 2, 2, 3],
+    [2, 2, 2, 0, 0, 0, 2, 3],
+    [3, 0, 0, 0, 0, 0, 0, 0],
+    [3, 0, 0, 0, 0, 0, 0, 0],
+    [1, 1, 0, 0, 0, 0, 0, 0],
+    [1, 1, 1, 0, 0, 0, 0, 0],
+    [3, 3, 3, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_SPINNER_2_148 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 3, 0, 0, 0, 0],
+    [0, 0, 3, 1, 1, 0, 0, 0],
+    [0, 3, 1, 1, 1, 0, 0, 0],
+    [3, 2, 1, 1, 3, 0, 0, 2],
+    [0, 2, 2, 3, 3, 3, 2, 2],
+    [0, 0, 0, 0, 3, 2, 2, 1],
+    [0, 0, 0, 0, 2, 2, 1, 3]
+  ];
+  var SPRITE_SPINNER_2_149 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 3, 0, 0, 0, 0],
+    [0, 0, 1, 1, 3, 0, 0, 0],
+    [0, 0, 1, 1, 1, 3, 0, 0],
+    [0, 0, 3, 1, 1, 2, 3, 0],
+    [2, 3, 3, 3, 2, 2, 0, 0],
+    [2, 2, 3, 0, 0, 0, 0, 0],
+    [1, 2, 2, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_SPINNER_2_150 = [
+    [0, 0, 0, 2, 2, 1, 3, 3],
+    [0, 0, 0, 0, 2, 2, 1, 3],
+    [0, 0, 0, 0, 3, 2, 2, 1],
+    [0, 1, 1, 3, 3, 3, 2, 2],
+    [3, 1, 1, 1, 3, 0, 0, 2],
+    [0, 3, 1, 2, 2, 0, 0, 0],
+    [0, 0, 3, 2, 2, 0, 0, 0],
+    [0, 0, 0, 3, 0, 0, 0, 0]
+  ];
+  var SPRITE_SPINNER_2_151 = [
+    [3, 1, 2, 2, 0, 0, 0, 0],
+    [1, 2, 2, 0, 0, 0, 0, 0],
+    [2, 2, 3, 0, 0, 0, 0, 0],
+    [2, 3, 3, 3, 1, 1, 0, 0],
+    [0, 0, 3, 1, 1, 1, 3, 0],
+    [0, 0, 2, 2, 1, 3, 0, 0],
+    [0, 0, 2, 2, 3, 0, 0, 0],
+    [0, 0, 0, 3, 0, 0, 0, 0]
+  ];
+  var SPINNER_SPRITES = [
+    {
+      name: "Spinner (1)",
+      moveCharacterCode: 7 /* SPINNER */,
+      defaultPaletteCode: 1,
+      defaultColorCombination: 1,
+      charCodes: [144, 145, 146, 147],
+      tiles: [SPRITE_SPINNER_1_144, SPRITE_SPINNER_1_145, SPRITE_SPINNER_1_146, SPRITE_SPINNER_1_147]
+    },
+    {
+      name: "Spinner (2)",
+      moveCharacterCode: 7 /* SPINNER */,
+      defaultPaletteCode: 1,
+      defaultColorCombination: 1,
+      charCodes: [148, 149, 150, 151],
+      tiles: [SPRITE_SPINNER_2_148, SPRITE_SPINNER_2_149, SPRITE_SPINNER_2_150, SPRITE_SPINNER_2_151]
+    }
+  ];
+
+  // src/shared/data/characters/star-killer.ts
+  var SPRITE_STARKILLER_LEFT_152 = [
+    [0, 0, 0, 0, 0, 0, 1, 3],
+    [0, 0, 0, 0, 0, 1, 1, 3],
+    [0, 0, 0, 0, 0, 1, 1, 3],
+    [0, 0, 0, 0, 3, 3, 3, 3],
+    [0, 0, 0, 1, 1, 1, 1, 1],
+    [0, 0, 1, 1, 3, 3, 3, 1],
+    [0, 1, 1, 3, 1, 3, 1, 1],
+    [0, 1, 1, 3, 3, 3, 1, 1]
+  ];
+  var SPRITE_STARKILLER_LEFT_153 = [
+    [1, 1, 1, 0, 0, 0, 0, 0],
+    [1, 1, 1, 1, 1, 0, 0, 0],
+    [1, 1, 1, 1, 1, 1, 0, 0],
+    [3, 3, 3, 3, 3, 3, 0, 0],
+    [1, 1, 1, 1, 1, 1, 1, 0],
+    [1, 2, 2, 2, 2, 2, 2, 0],
+    [1, 3, 3, 3, 3, 3, 3, 0],
+    [1, 3, 2, 3, 2, 3, 2, 0]
+  ];
+  var SPRITE_STARKILLER_LEFT_154 = [
+    [0, 1, 1, 3, 3, 3, 1, 1],
+    [0, 2, 1, 3, 3, 3, 2, 1],
+    [0, 0, 2, 1, 3, 3, 3, 2],
+    [0, 0, 0, 2, 2, 2, 2, 2],
+    [0, 0, 0, 0, 3, 3, 3, 3],
+    [0, 0, 0, 0, 0, 1, 1, 3],
+    [0, 0, 0, 0, 0, 2, 2, 3],
+    [0, 0, 0, 0, 0, 0, 2, 3]
+  ];
+  var SPRITE_STARKILLER_LEFT_155 = [
+    [1, 3, 2, 3, 2, 3, 2, 0],
+    [1, 3, 3, 3, 3, 3, 3, 0],
+    [2, 1, 1, 1, 1, 1, 1, 0],
+    [2, 2, 2, 2, 2, 2, 2, 0],
+    [3, 3, 3, 3, 3, 3, 0, 0],
+    [1, 1, 1, 1, 1, 1, 0, 0],
+    [2, 2, 2, 2, 2, 0, 0, 0],
+    [2, 2, 2, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_STARKILLER_LEFTUP_156 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 1, 1, 1, 3],
+    [0, 0, 0, 1, 1, 1, 1, 1],
+    [0, 0, 1, 1, 1, 1, 3, 3],
+    [0, 0, 2, 1, 1, 3, 1, 3],
+    [0, 0, 2, 1, 3, 3, 3, 1],
+    [0, 0, 2, 2, 3, 3, 1, 1],
+    [0, 0, 3, 2, 2, 3, 1, 1]
+  ];
+  var SPRITE_STARKILLER_LEFTUP_157 = [
+    [1, 1, 1, 1, 0, 0, 0, 0],
+    [3, 1, 1, 1, 3, 0, 0, 0],
+    [1, 3, 1, 3, 1, 1, 0, 0],
+    [1, 1, 3, 1, 1, 1, 0, 0],
+    [3, 1, 1, 3, 1, 1, 1, 0],
+    [1, 1, 1, 1, 3, 1, 1, 0],
+    [1, 1, 2, 1, 1, 3, 1, 0],
+    [1, 2, 3, 2, 1, 1, 3, 0]
+  ];
+  var SPRITE_STARKILLER_LEFTUP_158 = [
+    [0, 2, 1, 3, 2, 2, 2, 1],
+    [0, 2, 1, 3, 2, 2, 2, 2],
+    [0, 2, 2, 1, 3, 2, 2, 1],
+    [0, 2, 2, 3, 1, 3, 2, 2],
+    [0, 0, 3, 2, 2, 1, 3, 2],
+    [0, 0, 0, 2, 2, 2, 1, 3],
+    [0, 0, 0, 0, 2, 2, 2, 1],
+    [0, 0, 0, 0, 0, 0, 2, 2]
+  ];
+  var SPRITE_STARKILLER_LEFTUP_159 = [
+    [2, 3, 3, 3, 2, 1, 1, 0],
+    [3, 3, 3, 2, 3, 2, 1, 0],
+    [3, 3, 2, 3, 2, 3, 2, 0],
+    [1, 3, 3, 2, 3, 3, 2, 0],
+    [2, 1, 3, 3, 3, 2, 0, 0],
+    [2, 2, 1, 3, 2, 0, 0, 0],
+    [3, 2, 2, 1, 0, 0, 0, 0],
+    [1, 3, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_STARKILLER_UP_160 = [
+    [0, 0, 0, 0, 0, 0, 2, 1],
+    [0, 0, 0, 0, 0, 2, 1, 1],
+    [0, 0, 0, 0, 0, 2, 1, 1],
+    [0, 0, 0, 0, 2, 1, 3, 3],
+    [0, 0, 1, 3, 2, 3, 3, 3],
+    [0, 2, 1, 3, 2, 3, 3, 3],
+    [0, 2, 1, 3, 2, 3, 2, 1],
+    [0, 3, 3, 3, 2, 2, 1, 1]
+  ];
+  var SPRITE_STARKILLER_UP_161 = [
+    [1, 1, 0, 0, 0, 0, 0, 0],
+    [1, 1, 1, 0, 0, 0, 0, 0],
+    [1, 1, 1, 0, 0, 0, 0, 0],
+    [3, 3, 1, 1, 0, 0, 0, 0],
+    [3, 1, 3, 1, 3, 1, 0, 0],
+    [3, 3, 3, 1, 3, 1, 1, 0],
+    [1, 1, 3, 1, 3, 1, 1, 0],
+    [1, 1, 1, 1, 3, 3, 3, 0]
+  ];
+  var SPRITE_STARKILLER_UP_162 = [
+    [0, 2, 1, 3, 2, 2, 1, 1],
+    [0, 2, 1, 3, 2, 1, 3, 3],
+    [0, 2, 1, 3, 2, 1, 3, 3],
+    [0, 2, 1, 3, 2, 1, 3, 2],
+    [0, 0, 1, 3, 2, 1, 3, 3],
+    [0, 0, 1, 3, 2, 1, 3, 2],
+    [0, 0, 0, 3, 2, 1, 3, 3],
+    [0, 0, 0, 0, 0, 1, 3, 2]
+  ];
+  var SPRITE_STARKILLER_UP_163 = [
+    [1, 1, 1, 1, 3, 1, 1, 0],
+    [3, 3, 2, 1, 3, 1, 1, 0],
+    [3, 3, 2, 1, 3, 1, 1, 0],
+    [2, 3, 2, 1, 3, 1, 1, 0],
+    [3, 3, 2, 1, 3, 1, 0, 0],
+    [2, 3, 2, 1, 3, 1, 0, 0],
+    [3, 3, 2, 1, 3, 0, 0, 0],
+    [2, 3, 2, 0, 0, 0, 0, 0]
+  ];
+  var STARKILLER_SPRITES = [
+    {
+      name: "Star Killer (LEFT)",
+      moveCharacterCode: 8 /* STAR_KILLER */,
+      defaultPaletteCode: 1,
+      defaultColorCombination: 1,
+      charCodes: [152, 153, 154, 155],
+      tiles: [
+        SPRITE_STARKILLER_LEFT_152,
+        SPRITE_STARKILLER_LEFT_153,
+        SPRITE_STARKILLER_LEFT_154,
+        SPRITE_STARKILLER_LEFT_155
+      ]
+    },
+    {
+      name: "Star Killer (LEFTUP)",
+      moveCharacterCode: 8 /* STAR_KILLER */,
+      defaultPaletteCode: 1,
+      defaultColorCombination: 1,
+      charCodes: [156, 157, 158, 159],
+      tiles: [
+        SPRITE_STARKILLER_LEFTUP_156,
+        SPRITE_STARKILLER_LEFTUP_157,
+        SPRITE_STARKILLER_LEFTUP_158,
+        SPRITE_STARKILLER_LEFTUP_159
+      ]
+    },
+    {
+      name: "Star Killer (UP)",
+      moveCharacterCode: 8 /* STAR_KILLER */,
+      defaultPaletteCode: 1,
+      defaultColorCombination: 2,
+      charCodes: [160, 161, 162, 163],
+      tiles: [SPRITE_STARKILLER_UP_160, SPRITE_STARKILLER_UP_161, SPRITE_STARKILLER_UP_162, SPRITE_STARKILLER_UP_163]
+    }
+  ];
+
+  // src/shared/data/characters/starship.ts
+  var SPRITE_STARSHIP_LEFT_164 = [
+    [0, 0, 0, 0, 0, 0, 1, 1],
+    [0, 0, 0, 0, 0, 1, 1, 1],
+    [0, 0, 0, 0, 0, 0, 0, 3],
+    [0, 0, 0, 0, 0, 0, 0, 1],
+    [0, 0, 0, 0, 0, 0, 3, 3],
+    [0, 0, 0, 0, 2, 1, 1, 1],
+    [0, 0, 1, 1, 1, 3, 3, 1],
+    [0, 1, 1, 3, 3, 3, 1, 1]
+  ];
+  var SPRITE_STARSHIP_LEFT_165 = [
+    [2, 1, 1, 0, 0, 0, 0, 0],
+    [2, 1, 1, 1, 0, 0, 0, 0],
+    [3, 3, 0, 0, 0, 0, 0, 0],
+    [1, 1, 1, 0, 0, 0, 0, 0],
+    [3, 3, 3, 3, 0, 0, 0, 0],
+    [1, 1, 1, 3, 3, 2, 3, 0],
+    [1, 1, 1, 1, 3, 2, 3, 0],
+    [1, 2, 2, 2, 2, 2, 3, 0]
+  ];
+  var SPRITE_STARSHIP_LEFT_166 = [
+    [0, 1, 1, 3, 3, 3, 1, 1],
+    [0, 0, 1, 1, 1, 3, 3, 1],
+    [0, 0, 0, 0, 2, 1, 1, 1],
+    [0, 0, 0, 0, 0, 0, 3, 3],
+    [0, 0, 0, 0, 0, 0, 0, 1],
+    [0, 0, 0, 0, 0, 0, 0, 3],
+    [0, 0, 0, 0, 0, 1, 1, 1],
+    [0, 0, 0, 0, 0, 0, 1, 1]
+  ];
+  var SPRITE_STARSHIP_LEFT_167 = [
+    [1, 2, 2, 2, 2, 2, 3, 0],
+    [1, 1, 1, 1, 3, 2, 3, 0],
+    [1, 1, 1, 3, 3, 2, 3, 0],
+    [3, 3, 3, 3, 0, 0, 0, 0],
+    [1, 1, 1, 0, 0, 0, 0, 0],
+    [3, 3, 0, 0, 0, 0, 0, 0],
+    [2, 1, 1, 1, 0, 0, 0, 0],
+    [2, 1, 1, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_STARSHIP_LEFTUP_168 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 1, 1, 1, 0, 0, 0],
+    [0, 0, 1, 1, 1, 1, 2, 0],
+    [0, 0, 1, 1, 3, 3, 1, 1],
+    [0, 0, 0, 1, 3, 3, 3, 3],
+    [0, 0, 0, 1, 3, 3, 1, 1],
+    [0, 0, 0, 2, 1, 3, 1, 1]
+  ];
+  var SPRITE_STARSHIP_LEFTUP_169 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 1, 1, 0, 0, 0, 0],
+    [0, 0, 1, 1, 1, 0, 0, 0],
+    [0, 0, 3, 1, 2, 2, 0, 0],
+    [3, 1, 1, 3, 2, 1, 1, 0],
+    [1, 3, 1, 1, 3, 1, 1, 0],
+    [1, 1, 3, 1, 0, 0, 1, 0],
+    [2, 1, 1, 3, 0, 0, 0, 0]
+  ];
+  var SPRITE_STARSHIP_UP_170 = [
+    [0, 0, 0, 0, 1, 3, 1, 2],
+    [0, 0, 0, 0, 3, 1, 1, 2],
+    [0, 1, 0, 0, 1, 3, 1, 1],
+    [0, 1, 1, 3, 1, 1, 3, 1],
+    [0, 1, 1, 1, 3, 1, 1, 3],
+    [0, 0, 1, 2, 2, 3, 1, 1],
+    [0, 0, 0, 2, 1, 1, 0, 0],
+    [0, 0, 0, 0, 1, 1, 1, 0]
+  ];
+  var SPRITE_STARSHIP_UP_171 = [
+    [2, 2, 1, 3, 3, 0, 0, 0],
+    [2, 2, 2, 3, 2, 0, 0, 0],
+    [2, 2, 2, 2, 2, 2, 0, 0],
+    [1, 2, 2, 2, 2, 3, 0, 0],
+    [3, 3, 2, 2, 3, 0, 0, 0],
+    [3, 2, 2, 3, 0, 0, 0, 0],
+    [0, 0, 3, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+  var SPRITE_STARSHIP_UP_172 = [
+    [0, 0, 0, 0, 0, 0, 0, 1],
+    [0, 0, 0, 0, 0, 0, 0, 1],
+    [0, 0, 0, 0, 0, 0, 1, 1],
+    [0, 0, 0, 0, 0, 0, 1, 3],
+    [0, 0, 0, 0, 0, 2, 1, 3],
+    [0, 1, 0, 0, 0, 1, 3, 3],
+    [1, 1, 0, 0, 3, 1, 3, 3],
+    [1, 1, 3, 1, 3, 1, 3, 1]
+  ];
+  var SPRITE_STARSHIP_UP_173 = [
+    [1, 0, 0, 0, 0, 0, 0, 0],
+    [1, 0, 0, 0, 0, 0, 0, 0],
+    [1, 1, 0, 0, 0, 0, 0, 0],
+    [3, 1, 0, 0, 0, 0, 0, 0],
+    [3, 1, 2, 0, 0, 0, 0, 0],
+    [3, 3, 1, 0, 0, 0, 1, 0],
+    [3, 3, 1, 3, 0, 0, 1, 1],
+    [1, 3, 1, 3, 1, 3, 1, 1]
+  ];
+  var SPRITE_STARSHIP_UP_174 = [
+    [1, 1, 3, 1, 3, 1, 1, 1],
+    [2, 2, 3, 1, 3, 1, 1, 2],
+    [1, 1, 3, 1, 3, 1, 1, 2],
+    [1, 1, 0, 1, 3, 1, 1, 2],
+    [0, 1, 0, 0, 3, 3, 1, 2],
+    [0, 0, 0, 0, 0, 3, 3, 2],
+    [0, 0, 0, 0, 0, 2, 2, 2],
+    [0, 0, 0, 0, 0, 3, 3, 3]
+  ];
+  var SPRITE_STARSHIP_UP_175 = [
+    [1, 1, 1, 3, 1, 3, 1, 1],
+    [2, 1, 1, 3, 1, 3, 2, 2],
+    [2, 1, 1, 3, 1, 3, 1, 1],
+    [2, 1, 1, 3, 1, 0, 1, 1],
+    [2, 1, 3, 3, 0, 0, 1, 0],
+    [2, 3, 3, 0, 0, 0, 0, 0],
+    [2, 2, 2, 0, 0, 0, 0, 0],
+    [3, 3, 3, 0, 0, 0, 0, 0]
+  ];
+  var STARSHIP_SPRITES = [
+    {
+      name: "Starship (LEFT)",
+      moveCharacterCode: 9 /* STARSHIP */,
+      defaultPaletteCode: 1,
+      defaultColorCombination: 0,
+      charCodes: [164, 165, 166, 167],
+      tiles: [SPRITE_STARSHIP_LEFT_164, SPRITE_STARSHIP_LEFT_165, SPRITE_STARSHIP_LEFT_166, SPRITE_STARSHIP_LEFT_167]
+    },
+    {
+      name: "Starship (LEFTUP)",
+      moveCharacterCode: 9 /* STARSHIP */,
+      defaultPaletteCode: 1,
+      defaultColorCombination: 0,
+      charCodes: [168, 169, 170, 171],
+      tiles: [SPRITE_STARSHIP_LEFTUP_168, SPRITE_STARSHIP_LEFTUP_169, SPRITE_STARSHIP_UP_170, SPRITE_STARSHIP_UP_171]
+    },
+    {
+      name: "Starship (UP)",
+      moveCharacterCode: 9 /* STARSHIP */,
+      defaultPaletteCode: 1,
+      defaultColorCombination: 0,
+      charCodes: [172, 173, 174, 175],
+      tiles: [SPRITE_STARSHIP_UP_172, SPRITE_STARSHIP_UP_173, SPRITE_STARSHIP_UP_174, SPRITE_STARSHIP_UP_175]
+    }
+  ];
+
+  // src/shared/data/sprites.ts
+  var CHARACTER_SPRITES = [
+    ...MARIO_SPRITES,
+    ...LUIGI_SPRITES,
+    ...LADY_SPRITES,
+    ...FIGHTERFLY_SPRITES,
+    ...ACHILLES_SPRITES,
+    ...SMILEY_SPRITES,
+    ...PENGUIN_SPRITES,
+    ...FIREBALL_SPRITES,
+    ...CAR_SPRITES,
+    ...SPINNER_SPRITES,
+    ...STARKILLER_SPRITES,
+    ...STARSHIP_SPRITES,
+    ...EXPLOSION_SPRITES,
+    ...SHELLCREEPER_SPRITES,
+    ...SIDESTEPPER_SPRITES,
+    ...NITPICKER_SPRITES,
+    ...LASER_SPRITES,
+    ...MISC_SPRITES,
+    ...QUILL_SPRITES,
+    ...NUMBER_SPRITES,
+    ...COMPUTEROPERATOR_SPRITES
+  ];
+  var TILE_LIST = CHARACTER_SPRITES.flatMap((sprite) => sprite.tiles);
+
+  // src/core/animation/CharacterAnimationBuilder.ts
+  function extractSequenceName(spriteName) {
+    const match = spriteName.match(/\((\w+)/);
+    if (match?.[1]) {
+      return match[1].replace(/\d+$/, "");
+    }
+    return "";
+  }
+  function extractTilesFromSprite(sprite) {
+    if (isOneTileSprite(sprite)) {
+      return [sprite.tiles];
+    } else if (isFourTileSprite(sprite)) {
+      return sprite.tiles;
+    } else if (isSixTileSprite(sprite)) {
+      return sprite.tiles;
+    } else if (isEightTileSprite(sprite)) {
+      return sprite.tiles;
+    }
+    return [];
+  }
+  function buildSequencesForCharacter(characterCode, allSprites) {
+    const characterSprites = allSprites.filter(
+      (sprite) => sprite.moveCharacterCode === characterCode
+    );
+    const sequenceGroups = /* @__PURE__ */ new Map();
+    for (const sprite of characterSprites) {
+      const sequenceName = extractSequenceName(sprite.name);
+      if (!sequenceName) continue;
+      const existing = sequenceGroups.get(sequenceName) ?? [];
+      existing.push(sprite);
+      sequenceGroups.set(sequenceName, existing);
+    }
+    const sequences = /* @__PURE__ */ new Map();
+    for (const [sequenceName, sprites] of sequenceGroups.entries()) {
+      const sortedSprites = sprites.sort((a, b) => {
+        return a.name.localeCompare(b.name);
+      });
+      const frames = [];
+      for (const sprite of sortedSprites) {
+        const tiles = extractTilesFromSprite(sprite);
+        frames.push(tiles);
+      }
+      sequences.set(sequenceName, {
+        name: sequenceName,
+        frames,
+        frameRate: 8,
+        // Default: 8 frames per sprite switch
+        looping: true
+        // Most sequences loop
+      });
+    }
+    return sequences;
+  }
+  function findSpriteByName(spriteName, characterCode) {
+    return CHARACTER_SPRITES.find(
+      (sprite) => sprite.name === spriteName && sprite.moveCharacterCode === characterCode
+    ) ?? null;
+  }
+  function buildDirectionMappingsFromConfig(_characterCode, config2, _sequences) {
+    const mappings = /* @__PURE__ */ new Map();
+    for (const [direction, directionConfig] of config2.directions.entries()) {
+      const sequenceName = `DIR${direction}`;
+      const firstFrameInversion = directionConfig.frameInversions[0];
+      const invertX = firstFrameInversion?.invertX ?? false;
+      const invertY = firstFrameInversion?.invertY ?? false;
+      mappings.set(direction, {
+        sequence: sequenceName,
+        invertX,
+        invertY
+      });
+    }
+    return mappings;
+  }
+  function buildSequencesFromConfig(characterCode, config2) {
+    const sequences = /* @__PURE__ */ new Map();
+    for (const [direction, directionConfig] of config2.directions.entries()) {
+      const sequenceName = `DIR${direction}`;
+      const frames = [];
+      for (const spriteName of directionConfig.spriteNames) {
+        const sprite = findSpriteByName(spriteName, characterCode);
+        if (!sprite) {
+          logCore.warn(`[CharacterAnimationBuilder] Sprite not found: ${spriteName} for character ${characterCode}`);
+          continue;
+        }
+        const tiles = extractTilesFromSprite(sprite);
+        if (tiles.length > 0) {
+          frames.push(tiles);
+        }
+      }
+      if (frames.length > 0) {
+        sequences.set(sequenceName, {
+          name: sequenceName,
+          frames,
+          frameRate: directionConfig.frameRate ?? 8,
+          looping: directionConfig.looping ?? true,
+          frameInversions: directionConfig.frameInversions
+          // Store per-frame inversions
+        });
+      }
+    }
+    return sequences;
+  }
+  function buildCharacterAnimationConfig(characterCode) {
+    const config2 = getCharacterSequenceConfig(characterCode);
+    if (config2) {
+      const sequences2 = buildSequencesFromConfig(characterCode, config2);
+      if (sequences2.size === 0) {
+        return null;
+      }
+      const directionMappings2 = buildDirectionMappingsFromConfig(characterCode, config2, sequences2);
+      return {
+        characterType: characterCode,
+        sequences: sequences2,
+        directionMappings: directionMappings2
+      };
+    }
+    const sequences = buildSequencesForCharacter(characterCode, CHARACTER_SPRITES);
+    if (sequences.size === 0) {
+      return null;
+    }
+    const directionMappings = /* @__PURE__ */ new Map();
+    const firstSequence = Array.from(sequences.keys())[0];
+    if (firstSequence) {
+      for (let dir = 0; dir <= 8; dir++) {
+        directionMappings.set(dir, {
+          sequence: firstSequence,
+          invertX: false,
+          invertY: false
+        });
+      }
+    }
+    return {
+      characterType: characterCode,
+      sequences,
+      directionMappings
+    };
+  }
+  var cachedConfigs = null;
+  function buildAllCharacterAnimationConfigs() {
+    if (cachedConfigs) {
+      return cachedConfigs;
+    }
+    const configs = /* @__PURE__ */ new Map();
+    for (let code = 0; code <= 15; code++) {
+      const config2 = buildCharacterAnimationConfig(code);
+      if (config2) {
+        configs.set(code, config2);
+      }
+    }
+    cachedConfigs = configs;
+    return configs;
+  }
+  function getSequenceForMovement(characterCode, direction, configs) {
+    const config2 = configs.get(characterCode);
+    if (!config2) {
+      return { sequence: null, invertX: false, invertY: false };
+    }
+    const mapping = config2.directionMappings.get(direction);
+    if (!mapping) {
+      const firstSequence = Array.from(config2.sequences.values())[0];
+      return {
+        sequence: firstSequence ?? null,
+        invertX: false,
+        invertY: false
+      };
+    }
+    const sequence = config2.sequences.get(mapping.sequence);
+    return {
+      sequence: sequence ?? null,
+      invertX: mapping.invertX,
+      invertY: mapping.invertY
+    };
+  }
+  function getSpriteSizeForMoveDefinition(definition) {
+    const configs = buildAllCharacterAnimationConfigs();
+    const { sequence } = getSequenceForMovement(
+      definition.characterType,
+      definition.direction,
+      configs
+    );
+    if (!sequence?.frames?.length) return 8;
+    const firstFrame = sequence.frames[0];
+    if (!firstFrame) return 8;
+    return firstFrame.length === 4 ? 16 : 8;
+  }
+
   // src/core/animation/sharedAnimationBuffer.ts
   var MAX_SPRITES = 8;
   var FLOATS_PER_SPRITE = 3;
@@ -386,7 +4225,7 @@
       // Total width in dots
       HEIGHT: 240,
       // Total height in dots
-      /** Default position when POSITION not set: center of screen (256×240) */
+      /** Screen center (256×240). When POSITION not set, sprite is placed so its center is here. */
       DEFAULT_X: 128,
       DEFAULT_Y: 120
     }
@@ -505,8 +4344,11 @@
       if (!definition) {
         throw new Error(`No movement definition for action number ${actionNumber} (use DEF MOVE first)`);
       }
-      const initialX = startX ?? SCREEN_DIMENSIONS.SPRITE.DEFAULT_X;
-      const initialY = startY ?? SCREEN_DIMENSIONS.SPRITE.DEFAULT_Y;
+      const screenCenterX = SCREEN_DIMENSIONS.SPRITE.DEFAULT_X;
+      const screenCenterY = SCREEN_DIMENSIONS.SPRITE.DEFAULT_Y;
+      const halfSize = startX === void 0 || startY === void 0 ? getSpriteSizeForMoveDefinition(definition) / 2 : 0;
+      const initialX = startX ?? screenCenterX - halfSize;
+      const initialY = startY ?? screenCenterY - halfSize;
       const { deltaX, deltaY } = this.getDirectionDeltas(definition.direction);
       const speedDotsPerSecond = definition.speed > 0 ? 60 / definition.speed : 0;
       const totalDistance = 2 * definition.distance;
@@ -697,27 +4539,6 @@
       this.moveDefinitions.clear();
     }
   };
-
-  // src/shared/logger.ts
-  var import_loglevel = __toESM(require_loglevel(), 1);
-  var defaultLevel = "warn";
-  import_loglevel.default.setDefaultLevel(defaultLevel);
-  var logIdeMessages = import_loglevel.default.getLogger("ide-messages");
-  logIdeMessages.setDefaultLevel(defaultLevel);
-  var logScreen = import_loglevel.default.getLogger("screen");
-  logScreen.setDefaultLevel(defaultLevel);
-  var logWorker = import_loglevel.default.getLogger("worker");
-  logWorker.setDefaultLevel(defaultLevel);
-  var logDevice = import_loglevel.default.getLogger("device");
-  logDevice.setDefaultLevel(defaultLevel);
-  var logComposable = import_loglevel.default.getLogger("composable");
-  logComposable.setDefaultLevel(defaultLevel);
-  var logInterpreter = import_loglevel.default.getLogger("interpreter");
-  logInterpreter.setDefaultLevel(defaultLevel);
-  var logCore = import_loglevel.default.getLogger("core");
-  logCore.setDefaultLevel(defaultLevel);
-  var logApp = import_loglevel.default.getLogger("app");
-  logApp.setDefaultLevel(defaultLevel);
 
   // node_modules/.pnpm/decimal.js@10.6.0/node_modules/decimal.js/decimal.mjs
   var EXP_LIMIT = 9e15;
@@ -7478,3342 +11299,6 @@
       return true;
     }
   };
-
-  // src/shared/data/types.ts
-  function isEightTileSprite(spriteDef) {
-    return Array.isArray(spriteDef.charCodes) && spriteDef.charCodes.length === 8;
-  }
-  function isSixTileSprite(spriteDef) {
-    return Array.isArray(spriteDef.charCodes) && spriteDef.charCodes.length === 6;
-  }
-  function isFourTileSprite(spriteDef) {
-    return Array.isArray(spriteDef.charCodes) && spriteDef.charCodes.length === 4;
-  }
-  function isOneTileSprite(spriteDef) {
-    return typeof spriteDef.charCodes === "number";
-  }
-
-  // src/shared/data/characters/achilles.ts
-  var SPRITE_ACHILLES_LEFT1_64 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 3, 3, 3],
-    [0, 0, 0, 0, 3, 1, 3, 3],
-    [0, 0, 0, 3, 1, 1, 1, 3],
-    [0, 0, 0, 3, 1, 1, 1, 3],
-    [0, 0, 3, 3, 2, 1, 1, 3],
-    [1, 2, 3, 3, 2, 1, 1, 3]
-  ];
-  var SPRITE_ACHILLES_LEFT1_65 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 1, 1, 1, 1, 1],
-    [3, 3, 1, 1, 3, 3, 3, 0],
-    [3, 3, 1, 1, 1, 1, 0, 0],
-    [3, 1, 1, 3, 3, 3, 0, 0],
-    [3, 1, 1, 1, 1, 0, 0, 0],
-    [1, 1, 1, 3, 3, 0, 0, 0],
-    [1, 1, 3, 3, 3, 0, 0, 0]
-  ];
-  var SPRITE_ACHILLES_LEFT1_66 = [
-    [2, 2, 3, 3, 3, 1, 3, 3],
-    [0, 0, 3, 3, 3, 3, 3, 3],
-    [0, 0, 0, 3, 3, 3, 3, 3],
-    [0, 0, 0, 3, 3, 3, 3, 3],
-    [0, 0, 0, 0, 3, 3, 3, 3],
-    [0, 0, 0, 0, 0, 3, 3, 3],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_ACHILLES_LEFT1_67 = [
-    [3, 3, 3, 2, 2, 0, 0, 0],
-    [3, 3, 2, 1, 1, 0, 0, 0],
-    [3, 3, 2, 1, 1, 1, 2, 2],
-    [3, 3, 3, 2, 1, 1, 2, 3],
-    [3, 3, 3, 0, 0, 0, 3, 2],
-    [3, 3, 0, 0, 0, 0, 2, 2],
-    [0, 0, 0, 0, 0, 0, 0, 2],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_ACHILLES_LEFT2_68 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 3, 3, 3],
-    [0, 0, 0, 0, 3, 1, 3, 3],
-    [0, 0, 0, 3, 1, 1, 1, 3],
-    [0, 0, 0, 3, 1, 1, 1, 3],
-    [0, 0, 3, 3, 2, 1, 1, 3],
-    [1, 2, 3, 3, 2, 1, 1, 3],
-    [2, 2, 3, 3, 3, 1, 3, 3]
-  ];
-  var SPRITE_ACHILLES_LEFT2_69 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [3, 3, 0, 0, 0, 0, 0, 0],
-    [3, 3, 3, 0, 0, 0, 0, 0],
-    [3, 3, 3, 3, 0, 0, 0, 0],
-    [3, 3, 3, 3, 0, 0, 0, 0],
-    [3, 3, 3, 3, 3, 0, 0, 0],
-    [1, 1, 3, 3, 3, 0, 0, 0],
-    [1, 1, 3, 3, 2, 0, 2, 2]
-  ];
-  var SPRITE_ACHILLES_LEFT2_70 = [
-    [0, 0, 3, 3, 3, 3, 3, 3],
-    [0, 0, 0, 3, 3, 3, 3, 3],
-    [0, 0, 0, 3, 3, 3, 3, 3],
-    [0, 0, 0, 0, 3, 3, 3, 3],
-    [0, 0, 0, 0, 0, 3, 3, 3],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_ACHILLES_LEFT2_71 = [
-    [1, 1, 1, 2, 1, 1, 2, 3],
-    [1, 1, 1, 2, 1, 1, 3, 2],
-    [1, 1, 1, 1, 0, 0, 2, 2],
-    [3, 1, 1, 1, 1, 0, 0, 2],
-    [3, 1, 1, 3, 3, 0, 0, 0],
-    [0, 0, 1, 1, 1, 1, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_ACHILLES_LEFTUP1_72 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 1, 2, 0, 1, 1, 1],
-    [0, 0, 2, 2, 3, 2, 1, 1],
-    [0, 0, 0, 3, 3, 3, 2, 1],
-    [0, 0, 0, 2, 3, 3, 3, 1],
-    [0, 0, 1, 1, 2, 3, 3, 3],
-    [0, 0, 1, 1, 1, 1, 3, 3]
-  ];
-  var SPRITE_ACHILLES_LEFTUP1_73 = [
-    [0, 0, 0, 1, 1, 1, 0, 0],
-    [0, 0, 1, 1, 1, 1, 1, 0],
-    [3, 3, 1, 1, 1, 1, 1, 1],
-    [1, 3, 3, 1, 0, 0, 0, 0],
-    [1, 3, 3, 3, 0, 0, 0, 0],
-    [1, 3, 3, 3, 0, 0, 0, 0],
-    [3, 3, 3, 3, 3, 0, 0, 0],
-    [3, 3, 3, 3, 3, 0, 0, 0]
-  ];
-  var SPRITE_ACHILLES_LEFTUP1_74 = [
-    [0, 0, 3, 1, 1, 1, 3, 3],
-    [0, 0, 3, 3, 3, 3, 3, 3],
-    [0, 0, 1, 3, 3, 3, 3, 3],
-    [1, 1, 1, 1, 3, 3, 3, 3],
-    [1, 1, 1, 1, 3, 3, 3, 3],
-    [1, 1, 1, 0, 0, 3, 3, 3],
-    [0, 1, 1, 0, 0, 0, 0, 0],
-    [0, 0, 1, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_ACHILLES_LEFTUP1_75 = [
-    [3, 3, 3, 3, 3, 0, 0, 0],
-    [3, 3, 3, 3, 3, 1, 2, 2],
-    [3, 3, 3, 3, 1, 2, 2, 3],
-    [3, 3, 3, 3, 0, 2, 3, 0],
-    [3, 3, 3, 1, 0, 0, 0, 0],
-    [3, 3, 1, 2, 2, 0, 0, 0],
-    [0, 0, 2, 2, 3, 0, 0, 0],
-    [0, 0, 2, 3, 0, 0, 0, 0]
-  ];
-  var SPRITE_ACHILLES_LEFTUP2_76 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 1, 2, 0, 1, 1, 1],
-    [0, 0, 2, 2, 3, 2, 1, 1],
-    [0, 0, 0, 3, 3, 3, 2, 1],
-    [0, 0, 0, 2, 3, 3, 3, 1],
-    [0, 0, 1, 1, 2, 3, 3, 3],
-    [0, 0, 1, 1, 1, 1, 3, 3],
-    [0, 0, 3, 1, 1, 1, 3, 3]
-  ];
-  var SPRITE_ACHILLES_LEFTUP2_77 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [3, 3, 0, 0, 0, 0, 0, 0],
-    [1, 3, 3, 1, 1, 0, 0, 0],
-    [1, 3, 3, 3, 1, 1, 0, 0],
-    [1, 3, 3, 3, 1, 1, 1, 0],
-    [3, 3, 3, 3, 3, 0, 1, 0],
-    [3, 3, 3, 3, 3, 0, 0, 0],
-    [3, 3, 3, 3, 3, 0, 0, 0]
-  ];
-  var SPRITE_ACHILLES_LEFTUP2_78 = [
-    [0, 0, 3, 3, 3, 3, 3, 3],
-    [0, 0, 0, 3, 3, 3, 3, 3],
-    [0, 0, 0, 3, 3, 3, 3, 3],
-    [0, 0, 0, 1, 3, 3, 3, 3],
-    [0, 0, 0, 1, 1, 3, 3, 3],
-    [0, 0, 0, 1, 1, 1, 0, 0],
-    [0, 0, 0, 0, 1, 1, 0, 0],
-    [0, 0, 0, 0, 0, 1, 1, 0]
-  ];
-  var SPRITE_ACHILLES_LEFTUP2_79 = [
-    [3, 3, 3, 3, 3, 1, 2, 2],
-    [3, 3, 3, 3, 1, 1, 2, 3],
-    [3, 3, 3, 3, 1, 2, 3, 0],
-    [3, 3, 3, 0, 0, 2, 3, 0],
-    [3, 3, 1, 0, 0, 0, 0, 0],
-    [0, 1, 1, 2, 0, 0, 0, 0],
-    [0, 2, 2, 3, 0, 0, 0, 0],
-    [0, 2, 3, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_ACHILLES_TOP1_80 = [
-    [0, 0, 0, 0, 0, 0, 0, 2],
-    [0, 0, 0, 0, 0, 0, 0, 2],
-    [1, 1, 0, 0, 0, 0, 1, 3],
-    [1, 1, 1, 0, 0, 1, 2, 3],
-    [0, 1, 1, 0, 3, 1, 2, 3],
-    [0, 0, 1, 1, 3, 1, 1, 3],
-    [0, 0, 1, 1, 3, 1, 3, 3],
-    [0, 0, 0, 1, 3, 3, 3, 3]
-  ];
-  var SPRITE_ACHILLES_TOP1_81 = [
-    [1, 0, 0, 0, 0, 0, 0, 0],
-    [2, 0, 0, 0, 0, 0, 0, 0],
-    [3, 1, 0, 0, 0, 0, 1, 1],
-    [3, 2, 1, 0, 0, 1, 1, 1],
-    [3, 2, 1, 3, 0, 1, 1, 0],
-    [3, 1, 1, 3, 1, 1, 0, 0],
-    [3, 3, 1, 3, 1, 1, 0, 0],
-    [3, 3, 3, 3, 1, 0, 0, 0]
-  ];
-  var SPRITE_ACHILLES_TOP1_82 = [
-    [0, 0, 0, 3, 3, 3, 3, 3],
-    [0, 0, 0, 3, 3, 3, 3, 3],
-    [0, 0, 0, 0, 3, 3, 3, 3],
-    [0, 0, 0, 0, 3, 3, 3, 3],
-    [0, 0, 0, 0, 1, 3, 3, 3],
-    [0, 0, 0, 0, 0, 1, 3, 3],
-    [0, 0, 0, 0, 2, 2, 2, 0],
-    [0, 0, 0, 0, 2, 3, 3, 0]
-  ];
-  var SPRITE_ACHILLES_TOP1_83 = [
-    [3, 3, 3, 3, 3, 0, 0, 0],
-    [3, 3, 3, 3, 3, 0, 0, 0],
-    [3, 3, 3, 3, 0, 0, 0, 0],
-    [3, 3, 3, 3, 0, 0, 0, 0],
-    [3, 3, 3, 1, 0, 0, 0, 0],
-    [3, 3, 1, 0, 0, 0, 0, 0],
-    [0, 2, 2, 2, 0, 0, 0, 0],
-    [0, 3, 3, 2, 0, 0, 0, 0]
-  ];
-  var SPRITE_ACHILLES_TOP2_84 = [
-    [0, 0, 0, 0, 0, 0, 0, 2],
-    [0, 0, 0, 0, 0, 0, 0, 2],
-    [0, 0, 0, 0, 0, 0, 1, 3],
-    [0, 0, 0, 0, 0, 1, 2, 3],
-    [0, 0, 0, 0, 3, 1, 2, 3],
-    [0, 0, 0, 0, 3, 1, 1, 3],
-    [0, 0, 0, 3, 3, 1, 3, 3],
-    [0, 0, 1, 3, 3, 3, 3, 3]
-  ];
-  var SPRITE_ACHILLES_TOP2_85 = [
-    [1, 0, 0, 0, 0, 0, 0, 0],
-    [2, 0, 0, 0, 0, 0, 0, 0],
-    [3, 1, 0, 0, 0, 0, 0, 0],
-    [3, 2, 1, 0, 0, 0, 0, 0],
-    [3, 2, 1, 3, 0, 0, 0, 0],
-    [3, 1, 1, 3, 0, 0, 0, 0],
-    [3, 3, 1, 3, 3, 0, 0, 0],
-    [3, 3, 3, 3, 3, 1, 0, 0]
-  ];
-  var SPRITE_ACHILLES_TOP2_86 = [
-    [0, 1, 1, 3, 3, 3, 3, 3],
-    [1, 1, 1, 3, 3, 3, 3, 3],
-    [1, 3, 1, 0, 3, 3, 3, 3],
-    [1, 3, 0, 0, 3, 3, 3, 3],
-    [1, 3, 0, 0, 1, 3, 3, 3],
-    [1, 0, 0, 2, 2, 1, 3, 3],
-    [0, 0, 3, 3, 2, 2, 0, 0],
-    [0, 0, 0, 3, 3, 3, 0, 0]
-  ];
-  var SPRITE_ACHILLES_TOP2_87 = [
-    [3, 3, 3, 3, 3, 1, 1, 0],
-    [3, 3, 3, 3, 3, 1, 1, 1],
-    [3, 3, 3, 3, 0, 1, 3, 1],
-    [3, 3, 3, 3, 0, 0, 3, 1],
-    [3, 3, 3, 1, 0, 0, 3, 1],
-    [3, 3, 1, 2, 2, 0, 0, 1],
-    [0, 0, 2, 2, 3, 3, 0, 0],
-    [0, 0, 3, 3, 3, 0, 0, 0]
-  ];
-  var ACHILLES_SPRITES = [
-    {
-      name: "Achilles (LEFT1)",
-      moveCharacterCode: 3 /* ACHILLES */,
-      defaultPaletteCode: 2,
-      defaultColorCombination: 1,
-      charCodes: [64, 65, 66, 67],
-      tiles: [SPRITE_ACHILLES_LEFT1_64, SPRITE_ACHILLES_LEFT1_65, SPRITE_ACHILLES_LEFT1_66, SPRITE_ACHILLES_LEFT1_67]
-    },
-    {
-      name: "Achilles (LEFT2)",
-      moveCharacterCode: 3 /* ACHILLES */,
-      defaultPaletteCode: 2,
-      defaultColorCombination: 1,
-      charCodes: [68, 69, 70, 71],
-      tiles: [SPRITE_ACHILLES_LEFT2_68, SPRITE_ACHILLES_LEFT2_69, SPRITE_ACHILLES_LEFT2_70, SPRITE_ACHILLES_LEFT2_71]
-    },
-    {
-      name: "Achilles (LEFTUP1)",
-      moveCharacterCode: 3 /* ACHILLES */,
-      defaultPaletteCode: 2,
-      defaultColorCombination: 1,
-      charCodes: [72, 73, 74, 75],
-      tiles: [
-        SPRITE_ACHILLES_LEFTUP1_72,
-        SPRITE_ACHILLES_LEFTUP1_73,
-        SPRITE_ACHILLES_LEFTUP1_74,
-        SPRITE_ACHILLES_LEFTUP1_75
-      ]
-    },
-    {
-      name: "Achilles (LEFTUP2)",
-      moveCharacterCode: 3 /* ACHILLES */,
-      defaultPaletteCode: 2,
-      defaultColorCombination: 1,
-      charCodes: [76, 77, 78, 79],
-      tiles: [
-        SPRITE_ACHILLES_LEFTUP2_76,
-        SPRITE_ACHILLES_LEFTUP2_77,
-        SPRITE_ACHILLES_LEFTUP2_78,
-        SPRITE_ACHILLES_LEFTUP2_79
-      ]
-    },
-    {
-      name: "Achilles (TOP1)",
-      moveCharacterCode: 3 /* ACHILLES */,
-      defaultPaletteCode: 2,
-      defaultColorCombination: 1,
-      charCodes: [80, 81, 82, 83],
-      tiles: [SPRITE_ACHILLES_TOP1_80, SPRITE_ACHILLES_TOP1_81, SPRITE_ACHILLES_TOP1_82, SPRITE_ACHILLES_TOP1_83]
-    },
-    {
-      name: "Achilles (TOP2)",
-      moveCharacterCode: 3 /* ACHILLES */,
-      defaultPaletteCode: 2,
-      defaultColorCombination: 1,
-      charCodes: [84, 85, 86, 87],
-      tiles: [SPRITE_ACHILLES_TOP2_84, SPRITE_ACHILLES_TOP2_85, SPRITE_ACHILLES_TOP2_86, SPRITE_ACHILLES_TOP2_87]
-    }
-  ];
-
-  // src/shared/data/characters/car.ts
-  var SPRITE_CAR_LEFT1_120 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 1, 3, 3, 0, 0, 0],
-    [0, 0, 1, 3, 3, 0, 0, 0],
-    [0, 0, 1, 3, 3, 0, 0, 0],
-    [0, 0, 0, 1, 0, 0, 2, 2],
-    [0, 0, 2, 2, 2, 2, 1, 1],
-    [0, 2, 3, 2, 2, 1, 1, 3]
-  ];
-  var SPRITE_CAR_LEFT1_121 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [1, 3, 3, 3, 3, 0, 0, 0],
-    [1, 3, 3, 3, 3, 0, 0, 0],
-    [1, 3, 3, 3, 1, 1, 1, 0],
-    [0, 0, 1, 0, 1, 1, 1, 0],
-    [2, 2, 2, 2, 1, 1, 1, 0],
-    [2, 1, 2, 1, 1, 1, 1, 0],
-    [2, 3, 3, 3, 1, 1, 1, 0]
-  ];
-  var SPRITE_CAR_LEFT1_122 = [
-    [0, 2, 3, 2, 2, 1, 1, 3],
-    [0, 2, 3, 2, 2, 1, 1, 3],
-    [0, 0, 2, 2, 2, 2, 1, 1],
-    [0, 0, 0, 1, 0, 0, 2, 2],
-    [0, 0, 1, 3, 3, 0, 0, 0],
-    [0, 0, 1, 3, 3, 0, 0, 0],
-    [0, 0, 1, 3, 3, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_CAR_LEFT1_123 = [
-    [2, 3, 3, 3, 1, 1, 1, 0],
-    [2, 3, 3, 3, 1, 1, 1, 0],
-    [2, 1, 2, 1, 1, 1, 1, 0],
-    [2, 2, 2, 2, 1, 1, 1, 0],
-    [0, 0, 1, 0, 1, 1, 1, 0],
-    [1, 3, 3, 3, 1, 1, 1, 0],
-    [1, 3, 3, 3, 3, 0, 0, 0],
-    [1, 3, 3, 3, 3, 0, 0, 0]
-  ];
-  var SPRITE_CAR_LEFT2_124 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 3, 3, 1, 0, 0, 0],
-    [0, 0, 3, 3, 1, 0, 0, 0],
-    [0, 0, 3, 3, 1, 0, 0, 0],
-    [0, 0, 0, 1, 0, 0, 2, 2],
-    [0, 0, 2, 2, 2, 2, 1, 1],
-    [0, 2, 3, 2, 2, 1, 1, 3]
-  ];
-  var SPRITE_CAR_LEFT2_125 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [3, 1, 1, 3, 3, 0, 0, 0],
-    [3, 1, 1, 3, 3, 0, 0, 0],
-    [3, 1, 1, 3, 1, 1, 1, 0],
-    [0, 0, 1, 0, 1, 1, 1, 0],
-    [2, 2, 2, 2, 1, 1, 1, 0],
-    [2, 1, 2, 1, 1, 1, 1, 0],
-    [2, 3, 3, 3, 1, 1, 1, 0]
-  ];
-  var SPRITE_CAR_LEFT2_126 = [
-    [0, 2, 3, 2, 2, 1, 1, 3],
-    [0, 2, 3, 2, 2, 1, 1, 3],
-    [0, 0, 2, 2, 2, 2, 1, 1],
-    [0, 0, 0, 1, 0, 0, 2, 2],
-    [0, 0, 3, 3, 1, 0, 0, 0],
-    [0, 0, 3, 3, 1, 0, 0, 0],
-    [0, 0, 3, 3, 1, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_CAR_LEFT2_127 = [
-    [2, 3, 3, 3, 1, 1, 1, 0],
-    [2, 3, 3, 3, 1, 1, 1, 0],
-    [2, 1, 2, 1, 1, 1, 1, 0],
-    [2, 2, 2, 2, 1, 1, 1, 0],
-    [0, 0, 1, 0, 1, 1, 1, 0],
-    [3, 1, 1, 3, 1, 1, 1, 0],
-    [3, 1, 1, 3, 3, 0, 0, 0],
-    [3, 1, 1, 3, 3, 0, 0, 0]
-  ];
-  var SPRITE_CAR_LEFTUP1_128 = [
-    [0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 1, 3],
-    [0, 0, 0, 2, 2, 2, 0, 3],
-    [0, 0, 2, 2, 3, 2, 2, 0],
-    [0, 0, 2, 3, 2, 2, 2, 2],
-    [0, 0, 2, 2, 2, 1, 1, 1],
-    [0, 1, 0, 2, 2, 1, 1, 3],
-    [1, 3, 3, 0, 2, 1, 3, 3]
-  ];
-  var SPRITE_CAR_LEFTUP1_129 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [3, 0, 0, 0, 0, 0, 0, 0],
-    [3, 3, 0, 0, 0, 0, 0, 0],
-    [3, 0, 0, 0, 1, 1, 0, 0],
-    [0, 0, 0, 1, 1, 3, 3, 0],
-    [2, 2, 0, 1, 3, 3, 3, 3],
-    [1, 2, 2, 0, 3, 3, 3, 3],
-    [2, 2, 2, 2, 0, 1, 3, 0]
-  ];
-  var SPRITE_CAR_LEFTUP1_130 = [
-    [0, 3, 3, 3, 0, 2, 1, 2],
-    [0, 0, 3, 0, 0, 2, 2, 2],
-    [0, 0, 0, 0, 0, 0, 2, 2],
-    [0, 0, 0, 0, 1, 1, 0, 2],
-    [0, 0, 0, 1, 1, 3, 3, 0],
-    [0, 0, 0, 1, 3, 3, 3, 1],
-    [0, 0, 0, 0, 3, 3, 3, 3],
-    [0, 0, 0, 0, 0, 3, 3, 0]
-  ];
-  var SPRITE_CAR_LEFTUP1_131 = [
-    [2, 3, 1, 2, 1, 1, 1, 0],
-    [3, 3, 3, 1, 1, 1, 1, 1],
-    [1, 3, 1, 1, 1, 1, 1, 0],
-    [2, 1, 1, 1, 1, 1, 0, 0],
-    [1, 1, 1, 1, 1, 0, 0, 0],
-    [1, 1, 1, 1, 0, 0, 0, 0],
-    [1, 1, 1, 0, 0, 0, 0, 0],
-    [0, 1, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_CAR_LEFTUP2_132 = [
-    [0, 0, 0, 0, 0, 0, 0, 3],
-    [0, 0, 0, 0, 0, 0, 3, 3],
-    [0, 0, 0, 2, 2, 2, 0, 3],
-    [0, 0, 2, 2, 3, 2, 2, 0],
-    [0, 0, 2, 3, 2, 2, 2, 2],
-    [0, 0, 2, 2, 2, 1, 1, 1],
-    [0, 3, 0, 2, 2, 1, 1, 3],
-    [3, 3, 3, 0, 2, 1, 3, 3]
-  ];
-  var SPRITE_CAR_LEFTUP2_133 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [3, 0, 0, 0, 0, 0, 0, 0],
-    [3, 1, 0, 0, 0, 0, 0, 0],
-    [1, 0, 0, 0, 3, 3, 0, 0],
-    [0, 0, 0, 3, 3, 1, 1, 0],
-    [2, 2, 0, 3, 1, 1, 3, 3],
-    [1, 2, 2, 0, 1, 3, 3, 3],
-    [2, 2, 2, 2, 0, 1, 3, 0]
-  ];
-  var SPRITE_CAR_LEFTUP2_134 = [
-    [0, 3, 3, 1, 0, 2, 1, 2],
-    [0, 0, 1, 0, 0, 2, 2, 2],
-    [0, 0, 0, 0, 0, 0, 2, 2],
-    [0, 0, 0, 0, 3, 3, 0, 2],
-    [0, 0, 0, 3, 3, 1, 1, 0],
-    [0, 0, 0, 3, 1, 1, 3, 1],
-    [0, 0, 0, 0, 1, 3, 3, 3],
-    [0, 0, 0, 0, 0, 3, 3, 0]
-  ];
-  var SPRITE_CAR_LEFTUP2_135 = [
-    [2, 3, 1, 2, 1, 1, 1, 0],
-    [3, 3, 3, 1, 1, 1, 1, 1],
-    [1, 3, 1, 1, 1, 1, 1, 0],
-    [2, 1, 1, 1, 1, 1, 0, 0],
-    [1, 1, 1, 1, 1, 0, 0, 0],
-    [1, 1, 1, 1, 0, 0, 0, 0],
-    [1, 1, 1, 0, 0, 0, 0, 0],
-    [0, 1, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_CAR_UP1_136 = [
-    [0, 0, 0, 0, 0, 0, 0, 2],
-    [0, 0, 0, 1, 1, 0, 2, 2],
-    [0, 0, 0, 3, 3, 1, 2, 3],
-    [0, 0, 0, 3, 3, 1, 2, 2],
-    [0, 0, 0, 3, 3, 0, 2, 2],
-    [0, 0, 0, 0, 0, 0, 2, 1],
-    [0, 0, 0, 0, 0, 2, 1, 1],
-    [0, 0, 0, 0, 0, 2, 1, 3]
-  ];
-  var SPRITE_CAR_UP1_137 = [
-    [2, 0, 0, 0, 0, 0, 0, 0],
-    [2, 2, 0, 1, 1, 0, 0, 0],
-    [3, 2, 1, 3, 3, 0, 0, 0],
-    [2, 2, 1, 3, 3, 0, 0, 0],
-    [2, 2, 0, 3, 3, 0, 0, 0],
-    [1, 2, 0, 0, 0, 0, 0, 0],
-    [1, 1, 2, 0, 0, 0, 0, 0],
-    [3, 1, 2, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_CAR_UP1_138 = [
-    [0, 1, 1, 1, 0, 2, 1, 3],
-    [0, 3, 3, 3, 0, 2, 2, 2],
-    [0, 3, 3, 3, 1, 2, 1, 3],
-    [0, 3, 3, 3, 1, 2, 2, 3],
-    [0, 3, 3, 3, 0, 2, 1, 3],
-    [0, 3, 3, 1, 1, 1, 1, 1],
-    [0, 0, 0, 1, 1, 1, 1, 1],
-    [0, 0, 0, 1, 1, 1, 1, 1]
-  ];
-  var SPRITE_CAR_UP1_139 = [
-    [3, 1, 2, 0, 1, 1, 1, 0],
-    [2, 2, 2, 0, 3, 3, 3, 0],
-    [3, 1, 2, 1, 3, 3, 3, 0],
-    [3, 2, 2, 1, 3, 3, 3, 0],
-    [3, 1, 2, 0, 3, 3, 3, 0],
-    [1, 1, 1, 1, 1, 3, 3, 0],
-    [1, 1, 1, 1, 1, 0, 0, 0],
-    [1, 1, 1, 1, 1, 0, 0, 0]
-  ];
-  var SPRITE_CAR_UP2_140 = [
-    [0, 0, 0, 0, 0, 0, 0, 2],
-    [0, 0, 0, 3, 3, 0, 2, 2],
-    [0, 0, 0, 3, 3, 1, 2, 3],
-    [0, 0, 0, 3, 3, 1, 2, 2],
-    [0, 0, 0, 1, 1, 0, 2, 2],
-    [0, 0, 0, 0, 0, 0, 2, 1],
-    [0, 0, 0, 0, 0, 2, 1, 1],
-    [0, 0, 0, 0, 0, 2, 1, 3]
-  ];
-  var SPRITE_CAR_UP2_141 = [
-    [2, 0, 0, 0, 0, 0, 0, 0],
-    [2, 2, 0, 3, 3, 0, 0, 0],
-    [3, 2, 1, 3, 3, 0, 0, 0],
-    [2, 2, 1, 3, 3, 0, 0, 0],
-    [2, 2, 0, 1, 1, 0, 0, 0],
-    [1, 2, 0, 0, 0, 0, 0, 0],
-    [1, 1, 2, 0, 0, 0, 0, 0],
-    [3, 1, 2, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_CAR_UP2_142 = [
-    [0, 3, 3, 3, 0, 2, 1, 3],
-    [0, 1, 1, 1, 0, 2, 2, 2],
-    [0, 1, 1, 1, 1, 2, 1, 3],
-    [0, 3, 3, 3, 1, 2, 2, 3],
-    [0, 3, 3, 3, 0, 2, 1, 3],
-    [0, 3, 3, 1, 1, 1, 1, 1],
-    [0, 0, 0, 1, 1, 1, 1, 1],
-    [0, 0, 0, 1, 1, 1, 1, 1]
-  ];
-  var SPRITE_CAR_UP2_143 = [
-    [3, 1, 2, 0, 3, 3, 3, 0],
-    [2, 2, 2, 0, 1, 1, 1, 0],
-    [3, 1, 2, 1, 1, 1, 1, 0],
-    [3, 2, 2, 1, 3, 3, 3, 0],
-    [3, 1, 2, 0, 3, 3, 3, 0],
-    [1, 1, 1, 1, 1, 3, 3, 0],
-    [1, 1, 1, 1, 1, 0, 0, 0],
-    [1, 1, 1, 1, 1, 0, 0, 0]
-  ];
-  var CAR_SPRITES = [
-    {
-      name: "Car (LEFT1)",
-      moveCharacterCode: 6 /* CAR */,
-      defaultPaletteCode: 1,
-      defaultColorCombination: 0,
-      charCodes: [120, 121, 122, 123],
-      tiles: [SPRITE_CAR_LEFT1_120, SPRITE_CAR_LEFT1_121, SPRITE_CAR_LEFT1_122, SPRITE_CAR_LEFT1_123]
-    },
-    {
-      name: "Car (LEFT2)",
-      moveCharacterCode: 6 /* CAR */,
-      defaultPaletteCode: 1,
-      defaultColorCombination: 0,
-      charCodes: [124, 125, 126, 127],
-      tiles: [SPRITE_CAR_LEFT2_124, SPRITE_CAR_LEFT2_125, SPRITE_CAR_LEFT2_126, SPRITE_CAR_LEFT2_127]
-    },
-    {
-      name: "Car (LEFTUP1)",
-      moveCharacterCode: 6 /* CAR */,
-      defaultPaletteCode: 1,
-      defaultColorCombination: 0,
-      charCodes: [128, 129, 130, 131],
-      tiles: [SPRITE_CAR_LEFTUP1_128, SPRITE_CAR_LEFTUP1_129, SPRITE_CAR_LEFTUP1_130, SPRITE_CAR_LEFTUP1_131]
-    },
-    {
-      name: "Car (LEFTUP2)",
-      moveCharacterCode: 6 /* CAR */,
-      defaultPaletteCode: 1,
-      defaultColorCombination: 0,
-      charCodes: [132, 133, 134, 135],
-      tiles: [SPRITE_CAR_LEFTUP2_132, SPRITE_CAR_LEFTUP2_133, SPRITE_CAR_LEFTUP2_134, SPRITE_CAR_LEFTUP2_135]
-    },
-    {
-      name: "Car (UP1)",
-      moveCharacterCode: 6 /* CAR */,
-      defaultPaletteCode: 1,
-      defaultColorCombination: 2,
-      charCodes: [136, 137, 138, 139],
-      tiles: [SPRITE_CAR_UP1_136, SPRITE_CAR_UP1_137, SPRITE_CAR_UP1_138, SPRITE_CAR_UP1_139]
-    },
-    {
-      name: "Car (UP2)",
-      moveCharacterCode: 6 /* CAR */,
-      defaultPaletteCode: 1,
-      defaultColorCombination: 2,
-      charCodes: [140, 141, 142, 143],
-      tiles: [SPRITE_CAR_UP2_140, SPRITE_CAR_UP2_141, SPRITE_CAR_UP2_142, SPRITE_CAR_UP2_143]
-    }
-  ];
-
-  // src/shared/data/characters/com-opr.ts
-  var SPRITE_COMPUTER_1_244 = [
-    [2, 2, 2, 2, 2, 2, 2, 2],
-    [2, 2, 3, 3, 3, 3, 2, 3],
-    [2, 2, 3, 3, 2, 2, 2, 3],
-    [2, 2, 3, 3, 2, 2, 2, 3],
-    [2, 2, 3, 3, 2, 2, 2, 3],
-    [2, 2, 3, 3, 3, 3, 2, 3],
-    [2, 2, 3, 3, 3, 3, 2, 3],
-    [2, 2, 2, 2, 2, 2, 2, 2]
-  ];
-  var SPRITE_COMPUTER_2_245 = [
-    [2, 2, 2, 2, 2, 2, 2, 2],
-    [3, 3, 3, 3, 2, 3, 2, 2],
-    [3, 2, 3, 3, 2, 3, 3, 2],
-    [3, 2, 3, 3, 2, 3, 3, 3],
-    [3, 2, 3, 3, 2, 3, 3, 2],
-    [3, 3, 3, 3, 2, 3, 3, 2],
-    [3, 3, 3, 3, 2, 3, 3, 2],
-    [2, 2, 2, 2, 2, 2, 2, 2]
-  ];
-  var SPRITE_COMPUTER_3_246 = [
-    [2, 2, 2, 2, 2, 2, 2, 2],
-    [2, 3, 2, 3, 3, 3, 3, 2],
-    [3, 3, 2, 3, 3, 2, 3, 3],
-    [3, 3, 2, 3, 3, 3, 3, 3],
-    [3, 3, 2, 3, 3, 3, 3, 2],
-    [3, 3, 2, 3, 3, 2, 2, 2],
-    [3, 3, 2, 3, 3, 2, 2, 2],
-    [2, 2, 2, 2, 2, 2, 2, 2]
-  ];
-  var SPRITE_COMPUTER_4_247 = [
-    [2, 2, 2, 2, 2, 2, 2, 2],
-    [2, 3, 3, 2, 3, 3, 2, 3],
-    [2, 3, 3, 2, 3, 3, 2, 2],
-    [2, 3, 3, 2, 3, 3, 2, 2],
-    [2, 3, 3, 2, 3, 3, 2, 2],
-    [2, 3, 3, 3, 3, 3, 2, 2],
-    [2, 3, 3, 3, 3, 3, 2, 2],
-    [2, 2, 2, 2, 2, 2, 2, 2]
-  ];
-  var SPRITE_COMPUTER_5_248 = [
-    [2, 2, 2, 2, 2, 2, 2, 2],
-    [3, 3, 3, 2, 3, 3, 3, 3],
-    [3, 3, 2, 2, 3, 3, 2, 2],
-    [3, 3, 2, 2, 3, 3, 3, 3],
-    [3, 3, 2, 2, 3, 3, 2, 2],
-    [3, 3, 2, 2, 3, 3, 3, 3],
-    [3, 3, 2, 2, 3, 3, 3, 3],
-    [2, 2, 2, 2, 2, 2, 2, 2]
-  ];
-  var SPRITE_COMPUTER_6_249 = [
-    [2, 2, 2, 2, 2, 2, 2, 2],
-    [2, 3, 3, 3, 3, 2, 2, 2],
-    [2, 3, 3, 2, 3, 3, 2, 2],
-    [2, 3, 3, 3, 3, 3, 2, 2],
-    [2, 3, 3, 3, 3, 2, 2, 2],
-    [2, 3, 3, 2, 3, 3, 2, 2],
-    [2, 3, 3, 2, 2, 3, 2, 2],
-    [2, 2, 2, 2, 2, 2, 2, 2]
-  ];
-  var SPRITE_OPERATOR_1_250 = [
-    [2, 2, 2, 2, 2, 2, 2, 2],
-    [2, 2, 3, 3, 3, 3, 3, 2],
-    [2, 2, 3, 3, 2, 3, 3, 2],
-    [2, 2, 3, 3, 2, 3, 3, 2],
-    [2, 2, 3, 3, 2, 3, 3, 2],
-    [2, 2, 3, 3, 3, 3, 3, 2],
-    [2, 2, 3, 3, 3, 3, 3, 2],
-    [2, 2, 2, 2, 2, 2, 2, 2]
-  ];
-  var SPRITE_OPERATOR_2_251 = [
-    [2, 2, 2, 2, 2, 2, 2, 2],
-    [3, 3, 3, 3, 2, 2, 3, 3],
-    [3, 3, 2, 3, 3, 2, 3, 3],
-    [3, 3, 3, 3, 3, 2, 3, 3],
-    [3, 3, 3, 3, 2, 2, 3, 3],
-    [3, 3, 2, 2, 2, 2, 3, 3],
-    [3, 3, 2, 2, 2, 2, 3, 3],
-    [2, 2, 2, 2, 2, 2, 2, 2]
-  ];
-  var SPRITE_OPERATOR_3_252 = [
-    [2, 2, 2, 2, 2, 2, 2, 2],
-    [3, 3, 2, 3, 3, 3, 3, 2],
-    [2, 2, 2, 3, 3, 2, 3, 3],
-    [3, 3, 2, 3, 3, 3, 3, 3],
-    [2, 2, 2, 3, 3, 3, 3, 2],
-    [3, 3, 2, 3, 3, 2, 3, 3],
-    [3, 3, 2, 3, 3, 2, 2, 3],
-    [2, 2, 2, 2, 2, 2, 2, 2]
-  ];
-  var SPRITE_OPERATOR_4_253 = [
-    [2, 2, 2, 2, 2, 2, 2, 2],
-    [2, 2, 3, 3, 3, 2, 2, 3],
-    [2, 3, 3, 2, 3, 3, 2, 2],
-    [2, 3, 3, 2, 3, 3, 2, 2],
-    [2, 3, 3, 3, 3, 3, 2, 2],
-    [2, 3, 3, 3, 3, 3, 2, 2],
-    [2, 3, 3, 2, 3, 3, 2, 2],
-    [2, 2, 2, 2, 2, 2, 2, 2]
-  ];
-  var SPRITE_OPERATOR_5_254 = [
-    [2, 2, 2, 2, 2, 2, 2, 2],
-    [3, 3, 3, 2, 3, 3, 3, 3],
-    [3, 3, 2, 2, 3, 3, 2, 3],
-    [3, 3, 2, 2, 3, 3, 2, 3],
-    [3, 3, 2, 2, 3, 3, 2, 3],
-    [3, 3, 2, 2, 3, 3, 3, 3],
-    [3, 3, 2, 2, 3, 3, 3, 3],
-    [2, 2, 2, 2, 2, 2, 2, 2]
-  ];
-  var SPRITE_OPERATOR_6_255 = [
-    [2, 2, 2, 2, 2, 2, 2, 2],
-    [3, 2, 3, 3, 3, 3, 2, 2],
-    [3, 2, 3, 3, 2, 3, 3, 2],
-    [3, 2, 3, 3, 3, 3, 3, 2],
-    [3, 2, 3, 3, 3, 3, 2, 2],
-    [3, 2, 3, 3, 2, 3, 3, 2],
-    [3, 2, 3, 3, 2, 2, 3, 2],
-    [2, 2, 2, 2, 2, 2, 2, 2]
-  ];
-  var COMPUTEROPERATOR_SPRITES = [
-    {
-      name: "Computer",
-      defaultPaletteCode: 0,
-      defaultColorCombination: 0,
-      charCodes: [244, 245, 246, 247, 248, 249],
-      tiles: [
-        SPRITE_COMPUTER_1_244,
-        SPRITE_COMPUTER_2_245,
-        SPRITE_COMPUTER_3_246,
-        SPRITE_COMPUTER_4_247,
-        SPRITE_COMPUTER_5_248,
-        SPRITE_COMPUTER_6_249
-      ]
-    },
-    {
-      name: "Operator",
-      defaultPaletteCode: 0,
-      defaultColorCombination: 0,
-      charCodes: [250, 251, 252, 253, 254, 255],
-      tiles: [
-        SPRITE_OPERATOR_1_250,
-        SPRITE_OPERATOR_2_251,
-        SPRITE_OPERATOR_3_252,
-        SPRITE_OPERATOR_4_253,
-        SPRITE_OPERATOR_5_254,
-        SPRITE_OPERATOR_6_255
-      ]
-    }
-  ];
-
-  // src/shared/data/characters/explosion.ts
-  var SPRITE_EXPLOSION_1_176 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 2, 0, 0, 0],
-    [0, 0, 0, 2, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 2, 2, 1],
-    [0, 0, 0, 0, 2, 2, 1, 1],
-    [0, 0, 1, 1, 1, 1, 1, 1]
-  ];
-  var SPRITE_EXPLOSION_1_177 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 2, 0, 0, 0, 0, 0],
-    [0, 0, 0, 2, 0, 0, 0, 0],
-    [2, 2, 0, 0, 0, 0, 0, 0],
-    [1, 2, 2, 0, 0, 0, 0, 0],
-    [1, 1, 1, 1, 1, 0, 0, 0]
-  ];
-  var SPRITE_EXPLOSION_1_178 = [
-    [0, 0, 0, 0, 2, 2, 1, 1],
-    [0, 0, 0, 0, 0, 2, 2, 1],
-    [0, 0, 0, 2, 0, 0, 0, 1],
-    [0, 0, 0, 0, 2, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_EXPLOSION_1_179 = [
-    [1, 2, 2, 0, 0, 0, 0, 0],
-    [2, 2, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 2, 0, 0, 0, 0],
-    [0, 0, 2, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_EXPLOSION_2_180 = [
-    [0, 0, 0, 3, 3, 0, 0, 0],
-    [3, 0, 3, 3, 0, 0, 1, 0],
-    [0, 0, 3, 0, 0, 0, 1, 2],
-    [0, 0, 0, 2, 0, 2, 1, 2],
-    [0, 1, 0, 0, 2, 2, 1, 1],
-    [0, 0, 1, 1, 2, 2, 1, 1],
-    [0, 3, 0, 1, 1, 1, 1, 1],
-    [3, 0, 2, 2, 1, 1, 1, 1]
-  ];
-  var SPRITE_EXPLOSION_2_181 = [
-    [0, 3, 3, 0, 0, 0, 0, 0],
-    [3, 3, 3, 3, 0, 1, 0, 0],
-    [0, 0, 0, 3, 1, 0, 0, 0],
-    [2, 0, 2, 1, 1, 0, 0, 0],
-    [2, 2, 1, 1, 2, 0, 3, 0],
-    [2, 1, 1, 2, 0, 0, 3, 3],
-    [1, 1, 1, 2, 2, 0, 0, 3],
-    [1, 1, 1, 1, 2, 0, 3, 0]
-  ];
-  var SPRITE_EXPLOSION_2_182 = [
-    [3, 0, 2, 1, 1, 1, 1, 1],
-    [3, 2, 2, 1, 1, 1, 1, 1],
-    [0, 3, 2, 1, 1, 2, 1, 1],
-    [0, 3, 1, 1, 1, 1, 1, 1],
-    [0, 0, 1, 1, 2, 1, 2, 1],
-    [0, 1, 1, 2, 0, 2, 2, 1],
-    [1, 0, 0, 0, 3, 0, 0, 3],
-    [0, 0, 3, 0, 0, 3, 3, 0]
-  ];
-  var SPRITE_EXPLOSION_2_183 = [
-    [1, 2, 1, 1, 1, 0, 0, 3],
-    [1, 1, 1, 2, 2, 0, 3, 0],
-    [1, 1, 1, 1, 2, 2, 0, 0],
-    [1, 1, 2, 1, 1, 2, 1, 0],
-    [1, 2, 1, 2, 0, 0, 0, 0],
-    [1, 0, 2, 0, 0, 3, 0, 0],
-    [1, 0, 0, 3, 0, 3, 3, 0],
-    [1, 0, 0, 0, 3, 3, 0, 0]
-  ];
-  var EXPLOSION_SPRITES = [
-    {
-      name: "Explosion (1)",
-      moveCharacterCode: 10 /* EXPLOSION */,
-      defaultPaletteCode: 1,
-      defaultColorCombination: 3,
-      charCodes: [176, 177, 178, 179],
-      tiles: [SPRITE_EXPLOSION_1_176, SPRITE_EXPLOSION_1_177, SPRITE_EXPLOSION_1_178, SPRITE_EXPLOSION_1_179]
-    },
-    {
-      name: "Explosion (2)",
-      moveCharacterCode: 10 /* EXPLOSION */,
-      defaultPaletteCode: 1,
-      defaultColorCombination: 3,
-      charCodes: [180, 181, 182, 183],
-      tiles: [SPRITE_EXPLOSION_2_180, SPRITE_EXPLOSION_2_181, SPRITE_EXPLOSION_2_182, SPRITE_EXPLOSION_2_183]
-    }
-  ];
-
-  // src/shared/data/characters/fighter-fly.ts
-  var SPRITE_FIGHTERFLY_1_56 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 1, 2, 2, 0, 0, 0],
-    [0, 1, 1, 1, 0, 2, 0, 2],
-    [0, 1, 1, 1, 1, 0, 3, 3],
-    [0, 0, 1, 1, 1, 3, 1, 3],
-    [0, 0, 1, 1, 1, 3, 3, 3],
-    [0, 0, 0, 0, 1, 3, 3, 2]
-  ];
-  var SPRITE_FIGHTERFLY_1_57 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 2, 2, 1, 0],
-    [2, 2, 0, 2, 0, 1, 1, 1],
-    [2, 3, 3, 0, 1, 1, 1, 1],
-    [2, 3, 1, 3, 1, 1, 1, 1],
-    [2, 3, 3, 3, 1, 1, 1, 0],
-    [2, 2, 3, 3, 1, 0, 0, 0]
-  ];
-  var SPRITE_FIGHTERFLY_1_58 = [
-    [0, 0, 0, 0, 0, 2, 2, 1],
-    [0, 0, 0, 0, 2, 1, 3, 1],
-    [0, 0, 0, 3, 2, 1, 3, 1],
-    [0, 0, 3, 0, 0, 2, 2, 2],
-    [0, 0, 0, 0, 1, 1, 3, 3],
-    [0, 0, 2, 2, 1, 0, 3, 3],
-    [0, 2, 2, 2, 2, 0, 0, 3],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_FIGHTERFLY_1_59 = [
-    [3, 1, 2, 2, 0, 0, 0, 0],
-    [3, 1, 3, 1, 2, 0, 0, 0],
-    [3, 1, 3, 1, 2, 3, 0, 0],
-    [2, 2, 2, 2, 0, 0, 3, 0],
-    [3, 3, 3, 1, 0, 0, 0, 0],
-    [3, 3, 3, 0, 1, 0, 0, 0],
-    [3, 3, 0, 1, 2, 2, 0, 0],
-    [0, 0, 0, 2, 2, 2, 2, 0]
-  ];
-  var SPRITE_FIGHTERFLY_2_60 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 2, 2, 0, 0, 0],
-    [0, 0, 0, 0, 0, 2, 0, 2],
-    [0, 0, 0, 0, 0, 0, 3, 3],
-    [0, 0, 0, 0, 0, 3, 1, 3],
-    [0, 0, 0, 1, 1, 3, 3, 3],
-    [0, 0, 1, 1, 1, 3, 3, 2]
-  ];
-  var SPRITE_FIGHTERFLY_2_61 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 2, 2, 0, 0],
-    [2, 2, 0, 2, 0, 0, 0, 0],
-    [2, 3, 3, 0, 0, 0, 0, 0],
-    [2, 3, 1, 3, 0, 0, 0, 0],
-    [2, 3, 3, 3, 1, 1, 0, 0],
-    [2, 2, 3, 3, 1, 1, 1, 0]
-  ];
-  var SPRITE_FIGHTERFLY_2_62 = [
-    [0, 1, 1, 1, 1, 2, 2, 1],
-    [0, 1, 1, 1, 2, 1, 3, 1],
-    [0, 0, 1, 3, 2, 1, 3, 1],
-    [0, 0, 3, 0, 0, 2, 2, 2],
-    [0, 0, 0, 0, 0, 1, 3, 3],
-    [0, 0, 0, 0, 1, 0, 3, 3],
-    [0, 0, 0, 2, 2, 1, 0, 3],
-    [0, 0, 2, 2, 2, 2, 0, 0]
-  ];
-  var SPRITE_FIGHTERFLY_2_63 = [
-    [3, 1, 2, 2, 1, 1, 1, 1],
-    [3, 1, 3, 1, 2, 1, 1, 1],
-    [3, 1, 3, 1, 2, 3, 1, 0],
-    [2, 2, 2, 2, 0, 0, 3, 0],
-    [3, 3, 3, 1, 1, 0, 0, 0],
-    [3, 3, 3, 0, 1, 2, 2, 0],
-    [3, 3, 0, 0, 2, 2, 2, 2],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var FIGHTERFLY_SPRITES = [
-    {
-      name: "Fighter Fly (1)",
-      moveCharacterCode: 2 /* FIGHTER_FLY */,
-      defaultPaletteCode: 2,
-      defaultColorCombination: 1,
-      charCodes: [56, 57, 58, 59],
-      tiles: [SPRITE_FIGHTERFLY_1_56, SPRITE_FIGHTERFLY_1_57, SPRITE_FIGHTERFLY_1_58, SPRITE_FIGHTERFLY_1_59]
-    },
-    {
-      name: "Fighter Fly (2)",
-      moveCharacterCode: 2 /* FIGHTER_FLY */,
-      defaultPaletteCode: 2,
-      defaultColorCombination: 1,
-      charCodes: [60, 61, 62, 63],
-      tiles: [SPRITE_FIGHTERFLY_2_60, SPRITE_FIGHTERFLY_2_61, SPRITE_FIGHTERFLY_2_62, SPRITE_FIGHTERFLY_2_63]
-    }
-  ];
-
-  // src/shared/data/characters/fireball.ts
-  var SPRITE_FIREBALL_1_112 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 3, 3, 3, 3, 0],
-    [0, 0, 3, 3, 2, 2, 3, 3],
-    [0, 3, 3, 2, 2, 2, 2, 2],
-    [0, 3, 2, 2, 0, 1, 0, 1],
-    [0, 3, 2, 2, 0, 1, 0, 1],
-    [0, 3, 2, 2, 1, 1, 1, 1]
-  ];
-  var SPRITE_FIREBALL_1_113 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 3, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [3, 0, 0, 3, 0, 0, 0, 0],
-    [3, 3, 0, 0, 0, 0, 0, 0],
-    [2, 3, 0, 0, 3, 0, 0, 3],
-    [2, 3, 0, 0, 3, 0, 0, 0],
-    [2, 3, 0, 0, 3, 3, 0, 0]
-  ];
-  var SPRITE_FIREBALL_1_114 = [
-    [0, 0, 3, 2, 1, 1, 1, 2],
-    [0, 0, 3, 2, 2, 1, 2, 2],
-    [0, 3, 3, 2, 2, 2, 2, 2],
-    [0, 3, 3, 2, 2, 2, 2, 2],
-    [0, 3, 3, 3, 2, 2, 2, 2],
-    [0, 0, 3, 3, 3, 3, 2, 2],
-    [0, 0, 0, 3, 3, 3, 3, 3],
-    [0, 0, 0, 0, 0, 3, 3, 3]
-  ];
-  var SPRITE_FIREBALL_1_115 = [
-    [3, 3, 0, 3, 3, 3, 0, 0],
-    [3, 0, 3, 3, 2, 3, 0, 0],
-    [2, 3, 3, 2, 3, 3, 0, 0],
-    [2, 2, 2, 2, 3, 0, 0, 0],
-    [2, 2, 2, 3, 3, 0, 0, 0],
-    [2, 2, 3, 3, 3, 0, 0, 0],
-    [2, 2, 3, 3, 0, 0, 0, 0],
-    [3, 3, 3, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_FIREBALL_2_116 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 3, 3, 3, 3, 3],
-    [0, 0, 3, 3, 2, 2, 2, 3],
-    [0, 3, 3, 2, 2, 2, 2, 2],
-    [0, 3, 2, 1, 0, 1, 0, 1],
-    [0, 3, 2, 1, 0, 1, 0, 1],
-    [0, 0, 3, 2, 1, 1, 1, 1]
-  ];
-  var SPRITE_FIREBALL_2_117 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [3, 0, 0, 0, 0, 0, 0, 0],
-    [3, 0, 0, 0, 0, 0, 0, 0],
-    [3, 3, 0, 0, 0, 0, 0, 0],
-    [2, 3, 0, 0, 0, 0, 0, 0],
-    [2, 3, 0, 0, 0, 0, 3, 0]
-  ];
-  var SPRITE_FIREBALL_2_118 = [
-    [0, 3, 3, 2, 1, 1, 1, 1],
-    [0, 3, 2, 2, 1, 1, 1, 1],
-    [3, 3, 2, 2, 2, 1, 1, 2],
-    [3, 3, 2, 2, 2, 2, 2, 2],
-    [3, 3, 2, 2, 2, 2, 2, 2],
-    [3, 3, 3, 2, 2, 2, 2, 2],
-    [0, 3, 3, 3, 2, 2, 2, 2],
-    [0, 0, 0, 3, 3, 3, 3, 3]
-  ];
-  var SPRITE_FIREBALL_2_119 = [
-    [2, 3, 0, 0, 0, 3, 3, 0],
-    [2, 3, 0, 3, 3, 3, 3, 0],
-    [2, 3, 3, 3, 3, 3, 0, 0],
-    [2, 3, 3, 2, 2, 3, 0, 0],
-    [2, 2, 2, 2, 3, 0, 0, 0],
-    [2, 2, 2, 3, 3, 0, 0, 0],
-    [2, 3, 3, 3, 0, 0, 0, 0],
-    [3, 3, 0, 0, 0, 0, 0, 0]
-  ];
-  var FIREBALL_SPRITES = [
-    {
-      name: "Fireball (1)",
-      moveCharacterCode: 5 /* FIREBALL */,
-      defaultPaletteCode: 0,
-      defaultColorCombination: 3,
-      charCodes: [112, 113, 114, 115],
-      tiles: [SPRITE_FIREBALL_1_112, SPRITE_FIREBALL_1_113, SPRITE_FIREBALL_1_114, SPRITE_FIREBALL_1_115]
-    },
-    {
-      name: "Fireball (2)",
-      moveCharacterCode: 5 /* FIREBALL */,
-      defaultPaletteCode: 0,
-      defaultColorCombination: 3,
-      charCodes: [116, 117, 118, 119],
-      tiles: [SPRITE_FIREBALL_2_116, SPRITE_FIREBALL_2_117, SPRITE_FIREBALL_2_118, SPRITE_FIREBALL_2_119]
-    }
-  ];
-
-  // src/shared/data/characters/lady.ts
-  var SPRITE_LADY_WALK1_28 = [
-    [0, 0, 0, 0, 0, 0, 3, 3],
-    [0, 0, 0, 0, 3, 3, 3, 3],
-    [0, 0, 0, 0, 0, 1, 1, 1],
-    [0, 0, 0, 0, 1, 1, 3, 1],
-    [0, 0, 0, 0, 0, 1, 1, 1],
-    [0, 0, 0, 0, 0, 0, 1, 1],
-    [0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 1, 1, 0, 2, 2]
-  ];
-  var SPRITE_LADY_WALK1_29 = [
-    [3, 0, 0, 0, 0, 0, 0, 0],
-    [3, 3, 0, 0, 0, 0, 0, 0],
-    [3, 3, 0, 0, 0, 0, 0, 0],
-    [3, 3, 0, 0, 3, 0, 0, 0],
-    [1, 3, 3, 3, 0, 0, 0, 0],
-    [3, 3, 3, 3, 3, 0, 0, 0],
-    [2, 3, 3, 3, 0, 0, 0, 0],
-    [2, 2, 3, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_LADY_WALK1_30 = [
-    [0, 0, 0, 1, 1, 2, 2, 2],
-    [0, 0, 0, 0, 0, 0, 3, 3],
-    [0, 0, 0, 0, 0, 2, 2, 2],
-    [0, 0, 3, 2, 2, 2, 2, 2],
-    [0, 0, 0, 3, 2, 2, 2, 2],
-    [0, 0, 0, 3, 3, 2, 2, 2],
-    [0, 0, 0, 0, 3, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_LADY_WALK1_31 = [
-    [2, 0, 0, 0, 0, 0, 0, 0],
-    [3, 1, 0, 0, 0, 0, 0, 0],
-    [2, 1, 0, 0, 0, 0, 0, 0],
-    [2, 0, 0, 0, 0, 0, 0, 0],
-    [2, 2, 0, 0, 0, 0, 0, 0],
-    [2, 2, 2, 0, 0, 0, 0, 0],
-    [0, 3, 3, 0, 0, 0, 0, 0],
-    [3, 3, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_LADY_WALK2_32 = [
-    [0, 0, 0, 0, 0, 0, 3, 3],
-    [0, 0, 0, 0, 3, 3, 3, 3],
-    [0, 0, 0, 0, 0, 1, 1, 1],
-    [0, 0, 0, 0, 1, 1, 3, 1],
-    [0, 0, 0, 0, 0, 1, 1, 1],
-    [0, 0, 0, 0, 0, 0, 1, 1],
-    [0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 2, 2]
-  ];
-  var SPRITE_LADY_WALK2_33 = [
-    [3, 0, 0, 0, 0, 0, 0, 0],
-    [3, 3, 0, 0, 0, 0, 0, 0],
-    [3, 3, 0, 0, 0, 0, 0, 0],
-    [3, 3, 0, 0, 3, 0, 0, 0],
-    [1, 3, 3, 3, 0, 0, 0, 0],
-    [3, 3, 3, 3, 3, 0, 0, 0],
-    [2, 3, 3, 3, 0, 0, 0, 0],
-    [2, 2, 3, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_LADY_WALK2_34 = [
-    [0, 0, 0, 0, 0, 2, 2, 2],
-    [0, 0, 0, 0, 0, 1, 3, 3],
-    [0, 0, 0, 0, 0, 0, 2, 1],
-    [0, 0, 0, 0, 0, 0, 2, 1],
-    [0, 0, 0, 0, 0, 2, 2, 2],
-    [0, 0, 0, 0, 2, 2, 2, 2],
-    [0, 0, 0, 0, 3, 3, 2, 2],
-    [0, 0, 0, 0, 0, 0, 0, 3]
-  ];
-  var SPRITE_LADY_WALK2_35 = [
-    [3, 2, 0, 0, 0, 0, 0, 0],
-    [2, 2, 0, 0, 0, 0, 0, 0],
-    [2, 0, 0, 0, 0, 0, 0, 0],
-    [1, 2, 0, 0, 0, 0, 0, 0],
-    [2, 2, 0, 0, 0, 0, 0, 0],
-    [2, 2, 2, 0, 0, 0, 0, 0],
-    [2, 2, 2, 0, 0, 0, 0, 0],
-    [3, 3, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_LADY_WALK3_36 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 3, 3, 3],
-    [0, 0, 0, 3, 3, 3, 3, 3],
-    [0, 0, 0, 0, 1, 1, 1, 3],
-    [0, 0, 0, 1, 1, 3, 1, 3],
-    [0, 0, 0, 0, 1, 1, 1, 1],
-    [0, 0, 0, 0, 0, 1, 1, 3],
-    [0, 0, 0, 0, 0, 0, 1, 2]
-  ];
-  var SPRITE_LADY_WALK3_37 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [3, 0, 0, 0, 0, 0, 0, 0],
-    [3, 0, 0, 0, 0, 0, 0, 0],
-    [3, 0, 0, 3, 0, 0, 0, 0],
-    [3, 3, 3, 0, 0, 0, 0, 0],
-    [3, 3, 3, 3, 0, 0, 0, 0],
-    [3, 3, 3, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_LADY_WALK3_38 = [
-    [0, 0, 0, 0, 0, 2, 2, 2],
-    [0, 0, 0, 0, 2, 2, 2, 2],
-    [0, 0, 1, 1, 2, 0, 3, 3],
-    [0, 0, 0, 1, 0, 0, 2, 2],
-    [0, 0, 0, 0, 0, 0, 2, 2],
-    [0, 0, 0, 0, 0, 2, 2, 2],
-    [0, 0, 0, 0, 0, 2, 2, 2],
-    [0, 0, 0, 0, 3, 3, 3, 0]
-  ];
-  var SPRITE_LADY_WALK3_39 = [
-    [2, 3, 0, 0, 0, 0, 0, 0],
-    [2, 2, 0, 0, 0, 0, 0, 0],
-    [1, 2, 0, 2, 0, 0, 0, 0],
-    [1, 1, 2, 0, 0, 0, 0, 0],
-    [2, 2, 2, 3, 0, 0, 0, 0],
-    [2, 2, 3, 3, 0, 0, 0, 0],
-    [0, 0, 0, 3, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_LADY_JUMP_40 = [
-    [0, 0, 0, 1, 1, 0, 0, 3],
-    [0, 0, 0, 1, 1, 3, 3, 3],
-    [0, 0, 0, 1, 1, 0, 1, 1],
-    [0, 0, 0, 2, 2, 1, 1, 3],
-    [0, 0, 0, 0, 2, 2, 1, 1],
-    [0, 0, 0, 0, 2, 2, 0, 1],
-    [0, 0, 0, 0, 0, 2, 2, 2],
-    [0, 0, 0, 0, 0, 0, 2, 2]
-  ];
-  var SPRITE_LADY_JUMP_41 = [
-    [3, 3, 0, 0, 0, 0, 0, 0],
-    [3, 3, 3, 0, 0, 0, 0, 0],
-    [1, 3, 3, 0, 0, 0, 0, 0],
-    [1, 3, 3, 0, 0, 3, 0, 0],
-    [1, 1, 3, 3, 3, 0, 0, 0],
-    [1, 3, 3, 3, 3, 3, 0, 0],
-    [1, 2, 2, 3, 3, 0, 0, 0],
-    [2, 2, 2, 2, 0, 0, 0, 0]
-  ];
-  var SPRITE_LADY_JUMP_42 = [
-    [0, 0, 0, 0, 0, 0, 0, 2],
-    [0, 0, 3, 0, 0, 0, 0, 3],
-    [0, 0, 3, 3, 2, 2, 2, 2],
-    [0, 0, 0, 3, 2, 2, 2, 2],
-    [0, 0, 0, 3, 3, 2, 2, 2],
-    [0, 0, 0, 0, 0, 0, 2, 2],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_LADY_JUMP_43 = [
-    [2, 2, 0, 2, 1, 0, 0, 0],
-    [3, 3, 0, 1, 1, 0, 0, 0],
-    [2, 2, 0, 0, 0, 0, 0, 0],
-    [2, 2, 0, 2, 0, 0, 0, 0],
-    [2, 2, 2, 0, 0, 0, 0, 0],
-    [2, 2, 3, 3, 0, 0, 0, 0],
-    [1, 1, 1, 3, 3, 0, 0, 0],
-    [0, 1, 0, 0, 3, 0, 0, 0]
-  ];
-  var SPRITE_LADY_SLIP_44 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 3],
-    [0, 0, 0, 0, 0, 3, 3, 3],
-    [0, 0, 0, 0, 0, 0, 1, 1],
-    [0, 0, 0, 0, 0, 1, 1, 3],
-    [0, 0, 0, 0, 0, 0, 1, 1],
-    [0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 1, 0, 0]
-  ];
-  var SPRITE_LADY_SLIP_45 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [3, 3, 0, 0, 0, 0, 0, 0],
-    [3, 3, 3, 0, 0, 0, 0, 0],
-    [1, 3, 3, 0, 0, 0, 0, 0],
-    [1, 3, 3, 0, 0, 3, 0, 0],
-    [1, 1, 3, 3, 3, 0, 0, 0],
-    [1, 3, 3, 3, 3, 3, 0, 0],
-    [1, 2, 2, 3, 3, 0, 0, 0]
-  ];
-  var SPRITE_LADY_SLIP_46 = [
-    [0, 0, 0, 0, 0, 1, 1, 2],
-    [0, 0, 0, 0, 0, 0, 2, 2],
-    [0, 0, 0, 0, 0, 0, 0, 3],
-    [0, 0, 0, 0, 0, 0, 2, 2],
-    [0, 0, 0, 3, 0, 3, 2, 2],
-    [0, 0, 0, 3, 2, 3, 3, 2],
-    [0, 0, 0, 0, 3, 2, 3, 2],
-    [0, 0, 0, 0, 3, 0, 3, 0]
-  ];
-  var SPRITE_LADY_SLIP_47 = [
-    [2, 2, 2, 2, 0, 0, 0, 0],
-    [2, 2, 0, 2, 1, 0, 0, 0],
-    [3, 3, 0, 1, 1, 0, 0, 0],
-    [2, 2, 0, 0, 0, 0, 0, 0],
-    [2, 2, 2, 0, 0, 0, 0, 0],
-    [2, 2, 2, 2, 0, 0, 1, 0],
-    [2, 2, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 1, 0, 0, 0, 0]
-  ];
-  var SPRITE_LADY_LADDER_48 = [
-    [0, 0, 0, 0, 0, 0, 3, 3],
-    [0, 0, 0, 0, 0, 3, 3, 3],
-    [0, 0, 0, 0, 0, 3, 3, 3],
-    [0, 0, 0, 0, 0, 3, 3, 3],
-    [0, 0, 0, 0, 0, 3, 3, 3],
-    [0, 0, 0, 0, 0, 0, 3, 3],
-    [0, 0, 0, 1, 1, 3, 3, 2],
-    [0, 0, 0, 2, 1, 2, 2, 2]
-  ];
-  var SPRITE_LADY_LADDER_49 = [
-    [3, 0, 0, 0, 0, 0, 0, 0],
-    [3, 3, 0, 0, 0, 0, 0, 0],
-    [3, 3, 0, 1, 0, 0, 0, 0],
-    [3, 3, 1, 1, 0, 0, 0, 0],
-    [3, 3, 0, 2, 0, 0, 0, 0],
-    [3, 0, 2, 2, 0, 0, 0, 0],
-    [3, 2, 2, 0, 0, 0, 0, 0],
-    [2, 2, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_LADY_LADDER_50 = [
-    [0, 0, 0, 2, 2, 2, 2, 2],
-    [0, 0, 0, 0, 2, 0, 3, 3],
-    [0, 0, 0, 0, 0, 0, 2, 2],
-    [0, 0, 0, 0, 0, 2, 2, 2],
-    [0, 0, 0, 0, 2, 2, 2, 2],
-    [0, 0, 0, 0, 2, 2, 2, 2],
-    [0, 0, 0, 0, 0, 3, 3, 0],
-    [0, 0, 0, 0, 3, 3, 0, 0]
-  ];
-  var SPRITE_LADY_LADDER_51 = [
-    [2, 0, 0, 0, 0, 0, 0, 0],
-    [3, 2, 0, 0, 0, 0, 0, 0],
-    [2, 2, 2, 0, 0, 0, 0, 0],
-    [2, 2, 2, 0, 0, 0, 0, 0],
-    [2, 2, 3, 3, 0, 0, 0, 0],
-    [2, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_LADY_DOWN_52 = [
-    [0, 0, 0, 0, 0, 0, 3, 3],
-    [0, 0, 0, 0, 0, 3, 3, 3],
-    [0, 0, 0, 0, 0, 3, 1, 3],
-    [0, 0, 3, 0, 3, 1, 1, 3],
-    [0, 0, 0, 3, 3, 3, 1, 1],
-    [0, 0, 2, 2, 2, 3, 1, 0],
-    [0, 1, 2, 2, 2, 2, 1, 0],
-    [1, 1, 1, 0, 2, 2, 2, 1]
-  ];
-  var SPRITE_LADY_DOWN_53 = [
-    [3, 3, 0, 3, 0, 0, 0, 0],
-    [3, 3, 3, 0, 0, 1, 0, 0],
-    [1, 1, 3, 0, 0, 1, 1, 0],
-    [1, 3, 1, 0, 2, 1, 1, 1],
-    [1, 1, 3, 2, 2, 2, 0, 0],
-    [0, 1, 2, 2, 2, 0, 0, 0],
-    [0, 1, 2, 2, 0, 0, 0, 0],
-    [1, 2, 2, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_LADY_DOWN_54 = [
-    [0, 0, 1, 0, 0, 0, 2, 2],
-    [0, 0, 0, 0, 0, 0, 3, 3],
-    [0, 0, 0, 0, 2, 2, 2, 2],
-    [0, 0, 0, 2, 2, 2, 2, 2],
-    [0, 3, 3, 3, 2, 2, 2, 2],
-    [0, 0, 0, 3, 3, 0, 2, 2],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_LADY_DOWN_55 = [
-    [2, 2, 0, 0, 0, 0, 0, 0],
-    [3, 3, 0, 0, 0, 0, 0, 0],
-    [2, 2, 2, 0, 0, 0, 0, 0],
-    [2, 2, 2, 2, 0, 0, 0, 0],
-    [2, 2, 2, 2, 0, 0, 0, 0],
-    [2, 2, 2, 2, 2, 0, 0, 0],
-    [0, 0, 3, 3, 3, 3, 0, 0],
-    [0, 0, 3, 3, 0, 0, 0, 0]
-  ];
-  var LADY_SPRITES = [
-    {
-      name: "Lady (WALK1)",
-      moveCharacterCode: 1 /* LADY */,
-      defaultPaletteCode: 0,
-      defaultColorCombination: 2,
-      charCodes: [28, 29, 30, 31],
-      tiles: [SPRITE_LADY_WALK1_28, SPRITE_LADY_WALK1_29, SPRITE_LADY_WALK1_30, SPRITE_LADY_WALK1_31]
-    },
-    {
-      name: "Lady (WALK2)",
-      moveCharacterCode: 1 /* LADY */,
-      defaultPaletteCode: 0,
-      defaultColorCombination: 2,
-      charCodes: [32, 33, 34, 35],
-      tiles: [SPRITE_LADY_WALK2_32, SPRITE_LADY_WALK2_33, SPRITE_LADY_WALK2_34, SPRITE_LADY_WALK2_35]
-    },
-    {
-      name: "Lady (WALK3)",
-      moveCharacterCode: 1 /* LADY */,
-      defaultPaletteCode: 0,
-      defaultColorCombination: 2,
-      charCodes: [36, 37, 38, 39],
-      tiles: [SPRITE_LADY_WALK3_36, SPRITE_LADY_WALK3_37, SPRITE_LADY_WALK3_38, SPRITE_LADY_WALK3_39]
-    },
-    {
-      name: "Lady (JUMP)",
-      moveCharacterCode: 1 /* LADY */,
-      defaultPaletteCode: 0,
-      defaultColorCombination: 2,
-      charCodes: [40, 41, 42, 43],
-      tiles: [SPRITE_LADY_JUMP_40, SPRITE_LADY_JUMP_41, SPRITE_LADY_JUMP_42, SPRITE_LADY_JUMP_43]
-    },
-    {
-      name: "Lady (SLIP)",
-      moveCharacterCode: 1 /* LADY */,
-      defaultPaletteCode: 0,
-      defaultColorCombination: 2,
-      charCodes: [44, 45, 46, 47],
-      tiles: [SPRITE_LADY_SLIP_44, SPRITE_LADY_SLIP_45, SPRITE_LADY_SLIP_46, SPRITE_LADY_SLIP_47]
-    },
-    {
-      name: "Lady (LADDER)",
-      moveCharacterCode: 1 /* LADY */,
-      defaultPaletteCode: 0,
-      defaultColorCombination: 2,
-      charCodes: [48, 49, 50, 51],
-      tiles: [SPRITE_LADY_LADDER_48, SPRITE_LADY_LADDER_49, SPRITE_LADY_LADDER_50, SPRITE_LADY_LADDER_51]
-    },
-    {
-      name: "Lady (DOWN)",
-      moveCharacterCode: 1 /* LADY */,
-      defaultPaletteCode: 0,
-      defaultColorCombination: 2,
-      charCodes: [52, 53, 54, 55],
-      tiles: [SPRITE_LADY_DOWN_52, SPRITE_LADY_DOWN_53, SPRITE_LADY_DOWN_54, SPRITE_LADY_DOWN_55]
-    }
-  ];
-
-  // src/shared/data/characters/laser.ts
-  var SPRITE_LASER_HORIZONTAL1_208 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 2, 2, 0, 0, 0],
-    [0, 0, 2, 1, 1, 2, 0, 0],
-    [0, 0, 0, 2, 2, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_LASER_HORIZONTAL2_209 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 3, 3, 3, 3, 0, 0],
-    [0, 3, 2, 2, 2, 2, 3, 0],
-    [3, 2, 1, 1, 1, 1, 2, 3],
-    [0, 3, 2, 2, 2, 2, 3, 0],
-    [0, 0, 3, 3, 3, 3, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_LASER_DIAGONAL1_210 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 2, 2, 0, 0, 0, 0],
-    [0, 0, 2, 1, 2, 0, 0, 0],
-    [0, 0, 0, 2, 1, 2, 0, 0],
-    [0, 0, 0, 0, 2, 2, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_LASER_DIAGONAL2_211 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 2, 3, 3, 3, 0, 0, 0],
-    [0, 3, 1, 2, 2, 3, 0, 0],
-    [0, 3, 2, 1, 1, 2, 3, 0],
-    [0, 3, 2, 1, 1, 2, 3, 0],
-    [0, 0, 3, 2, 2, 1, 3, 0],
-    [0, 0, 0, 3, 3, 3, 2, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_LASER_VERTICAL1_212 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 2, 0, 0, 0, 0],
-    [0, 0, 2, 1, 2, 0, 0, 0],
-    [0, 0, 2, 1, 2, 0, 0, 0],
-    [0, 0, 0, 2, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_LASER_VERTICAL2_213 = [
-    [0, 0, 0, 3, 0, 0, 0, 0],
-    [0, 0, 3, 2, 3, 0, 0, 0],
-    [0, 3, 2, 1, 2, 3, 0, 0],
-    [0, 3, 2, 1, 2, 3, 0, 0],
-    [0, 3, 2, 1, 2, 3, 0, 0],
-    [0, 3, 2, 1, 2, 3, 0, 0],
-    [0, 0, 3, 2, 3, 0, 0, 0],
-    [0, 0, 0, 3, 0, 0, 0, 0]
-  ];
-  var LASER_SPRITES = [
-    {
-      name: "Laser (HORIZONTAL1)",
-      moveCharacterCode: 12 /* LASER */,
-      defaultPaletteCode: 1,
-      defaultColorCombination: 0,
-      charCodes: 208,
-      tiles: SPRITE_LASER_HORIZONTAL1_208
-    },
-    {
-      name: "Laser (HORIZONTAL2)",
-      moveCharacterCode: 12 /* LASER */,
-      defaultPaletteCode: 1,
-      defaultColorCombination: 0,
-      charCodes: 209,
-      tiles: SPRITE_LASER_HORIZONTAL2_209
-    },
-    {
-      name: "Laser (DIAGONAL1)",
-      moveCharacterCode: 12 /* LASER */,
-      defaultPaletteCode: 1,
-      defaultColorCombination: 0,
-      charCodes: 210,
-      tiles: SPRITE_LASER_DIAGONAL1_210
-    },
-    {
-      name: "Laser (DIAGONAL2)",
-      moveCharacterCode: 12 /* LASER */,
-      defaultPaletteCode: 1,
-      defaultColorCombination: 0,
-      charCodes: 211,
-      tiles: SPRITE_LASER_DIAGONAL2_211
-    },
-    {
-      name: "Laser (VERTICAL1)",
-      moveCharacterCode: 12 /* LASER */,
-      defaultPaletteCode: 1,
-      defaultColorCombination: 0,
-      charCodes: 212,
-      tiles: SPRITE_LASER_VERTICAL1_212
-    },
-    {
-      name: "Laser (VERTICAL2)",
-      moveCharacterCode: 12 /* LASER */,
-      defaultPaletteCode: 1,
-      defaultColorCombination: 0,
-      charCodes: 213,
-      tiles: SPRITE_LASER_VERTICAL2_213
-    }
-  ];
-
-  // src/shared/data/characters/mario.ts
-  var SPRITE_MARIO_WALK1_0 = [
-    [0, 0, 0, 0, 0, 0, 2, 2],
-    [0, 0, 0, 0, 2, 2, 2, 2],
-    [0, 0, 0, 0, 0, 1, 1, 1],
-    [0, 0, 0, 1, 1, 1, 3, 1],
-    [0, 0, 1, 1, 1, 3, 1, 1],
-    [0, 0, 0, 3, 3, 3, 3, 1],
-    [0, 0, 0, 0, 1, 1, 1, 1],
-    [0, 0, 1, 1, 0, 0, 2, 2]
-  ];
-  var SPRITE_MARIO_WALK1_1 = [
-    [2, 2, 0, 0, 0, 0, 0, 0],
-    [2, 2, 2, 0, 0, 0, 0, 0],
-    [3, 3, 3, 0, 0, 0, 0, 0],
-    [1, 3, 1, 3, 0, 0, 0, 0],
-    [3, 3, 1, 3, 0, 0, 0, 0],
-    [1, 1, 3, 3, 0, 0, 0, 0],
-    [1, 1, 0, 0, 0, 0, 0, 0],
-    [2, 3, 2, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_MARIO_WALK1_2 = [
-    [0, 0, 1, 1, 2, 2, 2, 2],
-    [0, 0, 0, 2, 2, 2, 2, 2],
-    [0, 0, 2, 0, 0, 3, 2, 2],
-    [0, 0, 2, 2, 3, 3, 3, 3],
-    [0, 0, 2, 2, 3, 3, 3, 3],
-    [0, 0, 2, 2, 3, 3, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_MARIO_WALK1_3 = [
-    [2, 3, 2, 2, 1, 0, 0, 0],
-    [2, 3, 2, 1, 1, 0, 0, 0],
-    [3, 3, 3, 0, 0, 0, 0, 0],
-    [3, 3, 3, 0, 0, 0, 0, 0],
-    [3, 3, 3, 3, 0, 0, 0, 0],
-    [3, 3, 3, 2, 2, 0, 0, 0],
-    [0, 0, 2, 2, 0, 0, 0, 0],
-    [0, 2, 2, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_MARIO_WALK2_4 = [
-    [0, 0, 0, 0, 0, 0, 2, 2],
-    [0, 0, 0, 0, 2, 2, 2, 2],
-    [0, 0, 0, 0, 0, 1, 1, 1],
-    [0, 0, 0, 1, 1, 1, 3, 1],
-    [0, 0, 1, 1, 1, 3, 1, 1],
-    [0, 0, 0, 3, 3, 3, 3, 1],
-    [0, 0, 0, 0, 1, 1, 1, 1],
-    [0, 0, 0, 0, 0, 0, 2, 2]
-  ];
-  var SPRITE_MARIO_WALK2_5 = [
-    [2, 2, 0, 0, 0, 0, 0, 0],
-    [2, 2, 2, 0, 0, 0, 0, 0],
-    [3, 3, 3, 0, 0, 0, 0, 0],
-    [1, 3, 1, 3, 0, 0, 0, 0],
-    [3, 3, 1, 3, 0, 0, 0, 0],
-    [1, 1, 3, 3, 0, 0, 0, 0],
-    [1, 1, 0, 0, 0, 0, 0, 0],
-    [3, 2, 2, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_MARIO_WALK2_6 = [
-    [0, 0, 0, 0, 0, 2, 2, 3],
-    [0, 0, 0, 1, 2, 2, 2, 3],
-    [0, 0, 0, 1, 3, 3, 3, 3],
-    [0, 0, 0, 0, 3, 3, 3, 1],
-    [0, 0, 0, 0, 0, 3, 3, 1],
-    [0, 0, 0, 0, 0, 2, 2, 3],
-    [0, 0, 0, 0, 2, 2, 2, 0],
-    [0, 0, 0, 0, 0, 0, 0, 2]
-  ];
-  var SPRITE_MARIO_WALK2_7 = [
-    [2, 2, 2, 0, 0, 0, 0, 0],
-    [3, 2, 2, 0, 0, 0, 0, 0],
-    [1, 2, 2, 0, 0, 0, 0, 0],
-    [1, 2, 3, 0, 0, 0, 0, 0],
-    [1, 3, 3, 0, 0, 0, 0, 0],
-    [3, 3, 0, 0, 0, 0, 0, 0],
-    [2, 2, 0, 0, 0, 0, 0, 0],
-    [2, 2, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_MARIO_WALK3_8 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 2, 2, 2],
-    [0, 0, 0, 2, 2, 2, 2, 2],
-    [0, 0, 0, 0, 1, 1, 1, 3],
-    [0, 0, 1, 1, 1, 3, 1, 1],
-    [0, 1, 1, 1, 3, 1, 1, 3],
-    [0, 0, 3, 3, 3, 3, 1, 1],
-    [0, 0, 0, 1, 1, 1, 1, 1]
-  ];
-  var SPRITE_MARIO_WALK3_9 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [2, 0, 0, 0, 0, 0, 0, 0],
-    [2, 2, 0, 0, 0, 0, 0, 0],
-    [3, 3, 0, 0, 0, 0, 0, 0],
-    [3, 1, 3, 0, 0, 0, 0, 0],
-    [3, 1, 3, 0, 0, 0, 0, 0],
-    [1, 3, 3, 0, 0, 0, 0, 0],
-    [1, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_MARIO_WALK3_10 = [
-    [0, 0, 0, 0, 0, 2, 2, 3],
-    [0, 0, 0, 0, 2, 2, 3, 2],
-    [0, 1, 1, 2, 2, 3, 3, 2],
-    [0, 1, 1, 2, 3, 3, 1, 3],
-    [0, 0, 0, 0, 3, 3, 3, 3],
-    [0, 0, 0, 0, 0, 3, 3, 3],
-    [0, 0, 0, 0, 0, 0, 2, 2],
-    [0, 0, 0, 0, 0, 2, 2, 2]
-  ];
-  var SPRITE_MARIO_WALK3_11 = [
-    [2, 2, 0, 0, 0, 0, 0, 0],
-    [2, 2, 2, 0, 0, 0, 0, 0],
-    [2, 2, 1, 1, 0, 0, 0, 0],
-    [3, 3, 1, 1, 0, 0, 0, 0],
-    [3, 3, 3, 2, 0, 0, 0, 0],
-    [0, 3, 3, 2, 2, 0, 0, 0],
-    [0, 0, 0, 0, 2, 0, 0, 0]
-  ];
-  var SPRITE_MARIO_JUMP_12 = [
-    [0, 0, 1, 1, 1, 0, 0, 0],
-    [0, 0, 1, 1, 1, 0, 2, 2],
-    [0, 0, 1, 1, 0, 0, 0, 1],
-    [0, 0, 2, 2, 0, 1, 1, 1],
-    [0, 0, 2, 2, 1, 1, 1, 3],
-    [0, 0, 2, 2, 2, 3, 3, 3],
-    [0, 0, 0, 2, 2, 2, 1, 1],
-    [0, 0, 0, 0, 2, 2, 3, 2]
-  ];
-  var SPRITE_MARIO_JUMP_13 = [
-    [2, 2, 2, 2, 0, 0, 0, 0],
-    [2, 2, 2, 2, 2, 0, 0, 0],
-    [1, 1, 3, 3, 3, 0, 0, 0],
-    [3, 1, 1, 3, 1, 3, 0, 0],
-    [1, 1, 3, 3, 1, 3, 0, 0],
-    [3, 1, 1, 1, 3, 3, 0, 0],
-    [1, 1, 1, 1, 0, 0, 0, 0],
-    [2, 3, 2, 2, 2, 0, 0, 0]
-  ];
-  var SPRITE_MARIO_JUMP_14 = [
-    [0, 0, 0, 0, 0, 3, 2, 2],
-    [0, 0, 2, 0, 0, 3, 2, 2],
-    [0, 0, 2, 2, 3, 3, 3, 3],
-    [0, 0, 2, 2, 3, 3, 3, 1],
-    [0, 0, 2, 2, 3, 3, 3, 3],
-    [0, 0, 0, 0, 0, 0, 3, 3],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_MARIO_JUMP_15 = [
-    [3, 2, 2, 2, 2, 2, 0, 0],
-    [3, 2, 2, 2, 2, 1, 1, 0],
-    [3, 2, 3, 0, 0, 1, 1, 0],
-    [3, 3, 3, 2, 2, 0, 0, 0],
-    [3, 3, 3, 3, 2, 2, 0, 0],
-    [3, 3, 3, 3, 2, 2, 0, 0],
-    [3, 3, 3, 0, 0, 2, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_MARIO_SLIP_16 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 2],
-    [0, 0, 0, 0, 0, 2, 2, 2],
-    [0, 0, 0, 0, 0, 0, 1, 1],
-    [0, 0, 0, 0, 1, 1, 1, 3],
-    [0, 0, 0, 1, 1, 1, 3, 1],
-    [0, 0, 0, 0, 3, 3, 3, 3],
-    [0, 0, 0, 0, 0, 1, 1, 1]
-  ];
-  var SPRITE_MARIO_SLIP_17 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [2, 2, 2, 2, 0, 0, 0, 0],
-    [2, 2, 2, 2, 2, 0, 0, 0],
-    [1, 1, 3, 3, 3, 0, 0, 0],
-    [3, 1, 1, 3, 1, 3, 0, 0],
-    [1, 1, 3, 3, 1, 3, 0, 0],
-    [3, 1, 1, 1, 3, 3, 0, 0],
-    [1, 1, 1, 1, 0, 0, 0, 0]
-  ];
-  var SPRITE_MARIO_SLIP_18 = [
-    [0, 0, 0, 1, 1, 0, 3, 2],
-    [0, 0, 0, 1, 1, 3, 2, 2],
-    [0, 0, 0, 1, 2, 3, 2, 3],
-    [0, 0, 0, 2, 3, 3, 3, 1],
-    [0, 0, 2, 0, 2, 3, 3, 3],
-    [0, 0, 2, 3, 2, 2, 3, 3],
-    [0, 0, 2, 2, 3, 2, 2, 3],
-    [0, 0, 0, 2, 2, 0, 2, 0]
-  ];
-  var SPRITE_MARIO_SLIP_19 = [
-    [2, 2, 3, 2, 2, 0, 0, 0],
-    [2, 3, 2, 2, 2, 2, 0, 0],
-    [3, 3, 2, 2, 2, 2, 2, 0],
-    [1, 3, 3, 3, 0, 2, 1, 0],
-    [3, 3, 3, 3, 0, 1, 1, 0],
-    [3, 3, 3, 3, 0, 0, 0, 0],
-    [3, 3, 0, 0, 0, 0, 1, 0],
-    [0, 0, 0, 0, 1, 0, 0, 0]
-  ];
-  var SPRITE_MARIO_LADDER_20 = [
-    [0, 0, 0, 0, 0, 0, 2, 2],
-    [0, 0, 0, 0, 0, 2, 2, 2],
-    [0, 0, 0, 0, 0, 2, 2, 2],
-    [0, 0, 0, 0, 1, 3, 2, 2],
-    [0, 0, 0, 0, 1, 3, 3, 3],
-    [0, 0, 0, 0, 3, 3, 3, 3],
-    [0, 0, 0, 1, 0, 1, 1, 1],
-    [0, 0, 1, 2, 2, 3, 2, 2]
-  ];
-  var SPRITE_MARIO_LADDER_21 = [
-    [2, 2, 0, 0, 0, 0, 0, 0],
-    [2, 2, 2, 0, 1, 0, 0, 0],
-    [2, 2, 2, 0, 1, 1, 0, 0],
-    [2, 2, 3, 1, 2, 2, 0, 0],
-    [3, 3, 3, 1, 2, 2, 0, 0],
-    [3, 3, 3, 3, 2, 2, 0, 0],
-    [1, 1, 1, 2, 2, 0, 0, 0],
-    [2, 2, 3, 2, 2, 0, 0, 0]
-  ];
-  var SPRITE_MARIO_LADDER_22 = [
-    [0, 0, 2, 2, 2, 3, 2, 2],
-    [0, 0, 2, 2, 2, 3, 3, 2],
-    [0, 0, 0, 0, 0, 3, 3, 3],
-    [0, 0, 0, 0, 3, 3, 3, 3],
-    [0, 0, 0, 0, 3, 3, 3, 3],
-    [0, 0, 0, 0, 3, 3, 3, 3],
-    [0, 0, 0, 0, 0, 3, 3, 3],
-    [0, 0, 0, 0, 2, 2, 2, 0]
-  ];
-  var SPRITE_MARIO_LADDER_23 = [
-    [2, 2, 3, 2, 0, 0, 0, 0],
-    [2, 3, 3, 0, 0, 0, 0, 0],
-    [3, 3, 3, 3, 0, 0, 0, 0],
-    [3, 3, 3, 3, 0, 0, 0, 0],
-    [3, 3, 3, 2, 2, 0, 0, 0],
-    [0, 0, 2, 2, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_MARIO_DOWN_24 = [
-    [0, 0, 0, 0, 0, 0, 2, 2],
-    [0, 0, 0, 0, 0, 2, 2, 2],
-    [0, 0, 0, 0, 0, 3, 1, 3],
-    [0, 0, 0, 0, 1, 1, 1, 3],
-    [0, 0, 0, 0, 1, 3, 1, 1],
-    [0, 0, 0, 0, 3, 1, 3, 3],
-    [0, 1, 2, 2, 2, 1, 1, 0],
-    [1, 1, 2, 2, 2, 1, 0, 0]
-  ];
-  var SPRITE_MARIO_DOWN_25 = [
-    [2, 2, 0, 0, 0, 0, 0, 0],
-    [2, 2, 2, 0, 0, 0, 0, 0],
-    [1, 1, 3, 0, 0, 0, 0, 0],
-    [1, 3, 1, 1, 0, 1, 0, 0],
-    [1, 1, 3, 1, 0, 1, 1, 0],
-    [3, 3, 1, 3, 2, 1, 1, 1],
-    [0, 1, 1, 2, 2, 2, 1, 0],
-    [0, 0, 1, 2, 2, 0, 0, 0]
-  ];
-  var SPRITE_MARIO_DOWN_26 = [
-    [1, 0, 1, 0, 2, 2, 1, 1],
-    [0, 0, 0, 0, 0, 2, 3, 2],
-    [0, 0, 2, 2, 0, 3, 1, 3],
-    [0, 0, 1, 2, 3, 3, 3, 3],
-    [0, 0, 1, 2, 2, 3, 3, 3],
-    [0, 0, 0, 1, 2, 3, 3, 3],
-    [0, 0, 0, 0, 1, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_MARIO_DOWN_27 = [
-    [1, 1, 2, 2, 0, 0, 0, 0],
-    [2, 3, 2, 0, 0, 0, 0, 0],
-    [3, 1, 3, 0, 0, 0, 0, 0],
-    [3, 3, 3, 0, 0, 0, 0, 0],
-    [3, 3, 3, 3, 3, 0, 0, 0],
-    [3, 3, 3, 3, 2, 2, 0, 0],
-    [0, 3, 3, 2, 2, 1, 0, 0],
-    [0, 0, 0, 2, 1, 0, 0, 0]
-  ];
-  var MARIO_SPRITES = [
-    {
-      name: "Mario (WALK1)",
-      moveCharacterCode: 0 /* MARIO */,
-      defaultPaletteCode: 0,
-      defaultColorCombination: 0,
-      charCodes: [0, 1, 2, 3],
-      tiles: [SPRITE_MARIO_WALK1_0, SPRITE_MARIO_WALK1_1, SPRITE_MARIO_WALK1_2, SPRITE_MARIO_WALK1_3]
-    },
-    {
-      name: "Mario (WALK2)",
-      moveCharacterCode: 0 /* MARIO */,
-      defaultPaletteCode: 0,
-      defaultColorCombination: 0,
-      charCodes: [4, 5, 6, 7],
-      tiles: [SPRITE_MARIO_WALK2_4, SPRITE_MARIO_WALK2_5, SPRITE_MARIO_WALK2_6, SPRITE_MARIO_WALK2_7]
-    },
-    {
-      name: "Mario (WALK3)",
-      moveCharacterCode: 0 /* MARIO */,
-      defaultPaletteCode: 0,
-      defaultColorCombination: 0,
-      charCodes: [8, 9, 10, 11],
-      tiles: [SPRITE_MARIO_WALK3_8, SPRITE_MARIO_WALK3_9, SPRITE_MARIO_WALK3_10, SPRITE_MARIO_WALK3_11]
-    },
-    {
-      name: "Mario (JUMP)",
-      moveCharacterCode: 0 /* MARIO */,
-      defaultPaletteCode: 0,
-      defaultColorCombination: 0,
-      charCodes: [12, 13, 14, 15],
-      tiles: [SPRITE_MARIO_JUMP_12, SPRITE_MARIO_JUMP_13, SPRITE_MARIO_JUMP_14, SPRITE_MARIO_JUMP_15]
-    },
-    {
-      name: "Mario (SLIP)",
-      moveCharacterCode: 0 /* MARIO */,
-      defaultPaletteCode: 0,
-      defaultColorCombination: 0,
-      charCodes: [16, 17, 18, 19],
-      tiles: [SPRITE_MARIO_SLIP_16, SPRITE_MARIO_SLIP_17, SPRITE_MARIO_SLIP_18, SPRITE_MARIO_SLIP_19]
-    },
-    {
-      name: "Mario (LADDER)",
-      moveCharacterCode: 0 /* MARIO */,
-      defaultPaletteCode: 0,
-      defaultColorCombination: 0,
-      charCodes: [20, 21, 22, 23],
-      tiles: [SPRITE_MARIO_LADDER_20, SPRITE_MARIO_LADDER_21, SPRITE_MARIO_LADDER_22, SPRITE_MARIO_LADDER_23]
-    },
-    {
-      name: "Mario (DOWN)",
-      moveCharacterCode: 0 /* MARIO */,
-      defaultPaletteCode: 0,
-      defaultColorCombination: 0,
-      charCodes: [24, 25, 26, 27],
-      tiles: [SPRITE_MARIO_DOWN_24, SPRITE_MARIO_DOWN_25, SPRITE_MARIO_DOWN_26, SPRITE_MARIO_DOWN_27]
-    }
-  ];
-  var LUIGI_SPRITES = MARIO_SPRITES.map((sprite) => ({
-    ...sprite,
-    name: sprite.name.replace("Mario", "Luigi"),
-    defaultColorCombination: 1
-  }));
-
-  // src/shared/data/characters/misc.ts
-  var SPRITE_PAINTCOLOR_1_214 = [
-    [1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1]
-  ];
-  var SPRITE_PAINTCOLOR_2_215 = [
-    [2, 2, 2, 2, 2, 2, 2, 2],
-    [2, 2, 2, 2, 2, 2, 2, 2],
-    [2, 2, 2, 2, 2, 2, 2, 2],
-    [2, 2, 2, 2, 2, 2, 2, 2],
-    [2, 2, 2, 2, 2, 2, 2, 2],
-    [2, 2, 2, 2, 2, 2, 2, 2],
-    [2, 2, 2, 2, 2, 2, 2, 2],
-    [2, 2, 2, 2, 2, 2, 2, 2]
-  ];
-  var SPRITE_PAINTCOLOR_3_216 = [
-    [3, 3, 3, 3, 3, 3, 3, 3],
-    [3, 3, 3, 3, 3, 3, 3, 3],
-    [3, 3, 3, 3, 3, 3, 3, 3],
-    [3, 3, 3, 3, 3, 3, 3, 3],
-    [3, 3, 3, 3, 3, 3, 3, 3],
-    [3, 3, 3, 3, 3, 3, 3, 3],
-    [3, 3, 3, 3, 3, 3, 3, 3],
-    [3, 3, 3, 3, 3, 3, 3, 3]
-  ];
-  var SPRITE_MUSICBOARDCURSOR_1_217 = [
-    [1, 0, 0, 0, 0, 0, 0, 0],
-    [1, 0, 0, 0, 0, 0, 0, 0],
-    [1, 0, 0, 0, 0, 0, 0, 0],
-    [1, 0, 0, 0, 0, 0, 0, 0],
-    [1, 0, 0, 0, 0, 0, 0, 0],
-    [1, 0, 0, 0, 0, 0, 0, 0],
-    [1, 0, 0, 0, 0, 0, 0, 0],
-    [0, 1, 1, 1, 1, 1, 1, 1]
-  ];
-  var SPRITE_MUSICBOARDCURSOR_2_218 = [
-    [1, 1, 1, 1, 1, 1, 1, 0],
-    [0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 0, 1]
-  ];
-  var SPRITE_MUSICBOARDCURSOR_3_219 = [
-    [1, 1, 1, 1, 1, 1, 1, 0],
-    [1, 1, 1, 1, 1, 1, 1, 0],
-    [1, 0, 0, 0, 0, 0, 1, 0],
-    [1, 0, 0, 0, 0, 0, 1, 0],
-    [1, 0, 0, 0, 0, 0, 1, 0],
-    [1, 1, 1, 1, 1, 1, 1, 0],
-    [1, 1, 1, 1, 1, 1, 1, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_FIRSTCURSOR_220 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [1, 1, 1, 1, 1, 1, 1, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_SECONDCURSOR_221 = [
-    [1, 1, 1, 1, 1, 1, 1, 0],
-    [1, 1, 1, 1, 1, 1, 1, 0],
-    [1, 1, 1, 1, 1, 1, 1, 0],
-    [1, 1, 1, 1, 1, 1, 1, 0],
-    [1, 1, 1, 1, 1, 1, 1, 0],
-    [1, 1, 1, 1, 1, 1, 1, 0],
-    [1, 1, 1, 1, 1, 1, 1, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_LAMP_1_222 = [
-    [0, 0, 3, 3, 3, 3, 0, 0],
-    [0, 0, 3, 2, 2, 3, 0, 0],
-    [0, 0, 3, 2, 2, 3, 0, 0],
-    [0, 0, 3, 2, 2, 3, 0, 0],
-    [0, 0, 3, 2, 2, 3, 0, 0],
-    [0, 0, 3, 3, 3, 3, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_LAMP_2_223 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 2, 2, 0, 0, 0],
-    [0, 0, 2, 1, 2, 2, 0, 0],
-    [0, 0, 2, 2, 2, 2, 0, 0],
-    [0, 0, 0, 2, 2, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var MISC_SPRITES = [
-    {
-      name: "Paint Color (1)",
-      defaultPaletteCode: 0,
-      defaultColorCombination: 0,
-      charCodes: 214,
-      tiles: SPRITE_PAINTCOLOR_1_214
-    },
-    {
-      name: "Paint Color (2)",
-      defaultPaletteCode: 0,
-      defaultColorCombination: 0,
-      charCodes: 215,
-      tiles: SPRITE_PAINTCOLOR_2_215
-    },
-    {
-      name: "Paint Color (3)",
-      defaultPaletteCode: 0,
-      defaultColorCombination: 0,
-      charCodes: 216,
-      tiles: SPRITE_PAINTCOLOR_3_216
-    },
-    {
-      name: "Music Board Cursor (1)",
-      defaultPaletteCode: 0,
-      defaultColorCombination: 0,
-      charCodes: 217,
-      tiles: SPRITE_MUSICBOARDCURSOR_1_217
-    },
-    {
-      name: "Music Board Cursor (2)",
-      defaultPaletteCode: 0,
-      defaultColorCombination: 0,
-      charCodes: 218,
-      tiles: SPRITE_MUSICBOARDCURSOR_2_218
-    },
-    {
-      name: "Music Board Cursor (3)",
-      defaultPaletteCode: 0,
-      defaultColorCombination: 0,
-      charCodes: 219,
-      tiles: SPRITE_MUSICBOARDCURSOR_3_219
-    },
-    {
-      name: "1st Cursor",
-      defaultPaletteCode: 0,
-      defaultColorCombination: 0,
-      charCodes: 220,
-      tiles: SPRITE_FIRSTCURSOR_220
-    },
-    {
-      name: "2nd Cursor",
-      defaultPaletteCode: 0,
-      defaultColorCombination: 0,
-      charCodes: 221,
-      tiles: SPRITE_SECONDCURSOR_221
-    },
-    {
-      name: "Lamp (1)",
-      defaultPaletteCode: 0,
-      defaultColorCombination: 0,
-      charCodes: 222,
-      tiles: SPRITE_LAMP_1_222
-    },
-    {
-      name: "Lamp (2)",
-      defaultPaletteCode: 0,
-      defaultColorCombination: 0,
-      charCodes: 223,
-      tiles: SPRITE_LAMP_2_223
-    }
-  ];
-
-  // src/shared/data/characters/nitpicker.ts
-  var SPRITE_NITPICKER_1_200 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 1, 1],
-    [0, 0, 0, 0, 3, 3, 1, 0],
-    [0, 0, 0, 2, 2, 3, 1, 0],
-    [0, 0, 2, 2, 0, 2, 1, 0],
-    [0, 2, 2, 2, 2, 2, 3, 1]
-  ];
-  var SPRITE_NITPICKER_1_201 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [1, 0, 0, 0, 0, 0, 0, 0],
-    [1, 1, 0, 0, 0, 0, 0, 0],
-    [1, 1, 3, 3, 0, 0, 0, 0],
-    [1, 1, 3, 3, 3, 3, 0, 3],
-    [1, 1, 3, 3, 3, 3, 3, 3],
-    [1, 3, 3, 3, 3, 3, 3, 3]
-  ];
-  var SPRITE_NITPICKER_1_202 = [
-    [2, 2, 2, 2, 2, 2, 3, 3],
-    [0, 0, 0, 0, 2, 2, 3, 3],
-    [0, 2, 2, 2, 2, 2, 3, 1],
-    [0, 0, 0, 2, 2, 3, 3, 3],
-    [0, 0, 0, 0, 0, 3, 3, 3],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_NITPICKER_1_203 = [
-    [3, 3, 1, 1, 3, 3, 3, 3],
-    [3, 3, 3, 3, 3, 3, 3, 3],
-    [3, 3, 3, 1, 1, 3, 3, 0],
-    [1, 3, 3, 3, 3, 3, 2, 2],
-    [3, 1, 3, 3, 1, 1, 1, 0],
-    [0, 0, 3, 3, 3, 3, 3, 3],
-    [0, 0, 0, 0, 3, 3, 3, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_NITPICKER_2_204 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 1, 1],
-    [2, 2, 2, 2, 3, 3, 1, 0],
-    [0, 2, 2, 2, 2, 3, 1, 0],
-    [0, 0, 2, 2, 0, 2, 1, 0]
-  ];
-  var SPRITE_NITPICKER_2_205 = [
-    [0, 0, 0, 3, 3, 3, 3, 0],
-    [0, 0, 3, 3, 3, 3, 3, 3],
-    [0, 3, 3, 3, 3, 1, 1, 1],
-    [1, 3, 3, 3, 3, 3, 3, 0],
-    [1, 1, 3, 3, 1, 1, 0, 0],
-    [1, 1, 3, 3, 3, 3, 0, 3],
-    [1, 1, 3, 3, 3, 3, 0, 3],
-    [1, 1, 3, 3, 3, 3, 3, 3]
-  ];
-  var SPRITE_NITPICKER_2_206 = [
-    [0, 0, 0, 2, 2, 2, 3, 1],
-    [0, 0, 0, 0, 2, 2, 3, 3],
-    [0, 0, 0, 2, 2, 2, 3, 3],
-    [0, 0, 2, 2, 2, 3, 3, 3],
-    [0, 2, 2, 2, 3, 3, 3, 3],
-    [0, 0, 0, 0, 0, 0, 3, 3],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_NITPICKER_2_207 = [
-    [1, 3, 3, 3, 3, 3, 3, 3],
-    [3, 3, 3, 3, 3, 3, 3, 3],
-    [3, 3, 3, 3, 3, 3, 3, 0],
-    [3, 3, 3, 3, 2, 2, 2, 2],
-    [3, 3, 3, 3, 3, 0, 2, 0],
-    [3, 3, 3, 3, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var NITPICKER_SPRITES = [
-    {
-      name: "Nit Picker (1)",
-      moveCharacterCode: 15 /* NITPICKER */,
-      defaultPaletteCode: 2,
-      defaultColorCombination: 0,
-      charCodes: [200, 201, 202, 203],
-      tiles: [SPRITE_NITPICKER_1_200, SPRITE_NITPICKER_1_201, SPRITE_NITPICKER_1_202, SPRITE_NITPICKER_1_203]
-    },
-    {
-      name: "Nit Picker (2)",
-      moveCharacterCode: 15 /* NITPICKER */,
-      defaultPaletteCode: 2,
-      defaultColorCombination: 0,
-      charCodes: [204, 205, 206, 207],
-      tiles: [SPRITE_NITPICKER_2_204, SPRITE_NITPICKER_2_205, SPRITE_NITPICKER_2_206, SPRITE_NITPICKER_2_207]
-    }
-  ];
-
-  // src/shared/data/characters/number.ts
-  var SPRITE_NUMBER_1_240 = [
-    [0, 1, 1, 1, 0, 0, 0, 0],
-    [0, 1, 1, 1, 0, 0, 0, 0],
-    [0, 0, 1, 1, 0, 0, 0, 0],
-    [0, 0, 1, 1, 0, 0, 0, 0],
-    [0, 0, 1, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_NUMBER_2_241 = [
-    [0, 1, 1, 1, 1, 0, 0, 0],
-    [0, 0, 0, 1, 1, 0, 0, 0],
-    [0, 1, 1, 1, 1, 0, 0, 0],
-    [0, 1, 1, 0, 0, 0, 0, 0],
-    [0, 1, 1, 1, 1, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_NUMBER_3_242 = [
-    [0, 1, 1, 1, 1, 0, 0, 0],
-    [0, 0, 0, 1, 1, 0, 0, 0],
-    [0, 1, 1, 1, 1, 0, 0, 0],
-    [0, 0, 0, 1, 1, 0, 0, 0],
-    [0, 1, 1, 1, 1, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_NUMBER_4_243 = [
-    [1, 0, 1, 1, 0, 0, 0, 0],
-    [1, 0, 1, 1, 0, 0, 0, 0],
-    [1, 0, 1, 1, 0, 0, 0, 0],
-    [1, 1, 1, 1, 1, 0, 0, 0],
-    [0, 0, 1, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var NUMBER_SPRITES = [
-    {
-      name: "Number (1)",
-      defaultPaletteCode: 0,
-      defaultColorCombination: 0,
-      charCodes: 240,
-      tiles: SPRITE_NUMBER_1_240
-    },
-    {
-      name: "Number (2)",
-      defaultPaletteCode: 0,
-      defaultColorCombination: 0,
-      charCodes: 241,
-      tiles: SPRITE_NUMBER_2_241
-    },
-    {
-      name: "Number (3)",
-      defaultPaletteCode: 0,
-      defaultColorCombination: 0,
-      charCodes: 242,
-      tiles: SPRITE_NUMBER_3_242
-    },
-    {
-      name: "Number (4)",
-      defaultPaletteCode: 0,
-      defaultColorCombination: 0,
-      charCodes: 243,
-      tiles: SPRITE_NUMBER_4_243
-    }
-  ];
-
-  // src/shared/data/characters/penguin.ts
-  var SPRITE_PENGUIN_LEFTSTEP1_96 = [
-    [0, 0, 0, 0, 3, 3, 3, 3],
-    [0, 0, 0, 3, 1, 1, 3, 3],
-    [0, 0, 0, 1, 1, 1, 1, 3],
-    [0, 0, 1, 1, 1, 1, 1, 1],
-    [0, 0, 1, 0, 1, 1, 1, 1],
-    [0, 0, 1, 0, 1, 1, 1, 3],
-    [0, 2, 2, 2, 2, 2, 3, 3],
-    [2, 2, 2, 2, 2, 2, 2, 3]
-  ];
-  var SPRITE_PENGUIN_LEFTSTEP1_97 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [3, 0, 0, 0, 0, 0, 0, 0],
-    [3, 3, 0, 0, 0, 0, 0, 0],
-    [3, 3, 0, 0, 0, 0, 0, 0],
-    [3, 3, 3, 0, 0, 0, 0, 0],
-    [3, 3, 3, 0, 0, 0, 0, 0],
-    [3, 3, 3, 0, 0, 0, 0, 0],
-    [3, 3, 3, 3, 0, 0, 0, 0]
-  ];
-  var SPRITE_PENGUIN_LEFTSTEP1_98 = [
-    [0, 0, 1, 2, 2, 2, 1, 3],
-    [0, 0, 1, 1, 1, 1, 1, 1],
-    [0, 0, 1, 1, 1, 1, 1, 1],
-    [0, 0, 1, 1, 1, 1, 1, 1],
-    [0, 0, 1, 1, 1, 2, 2, 2],
-    [0, 0, 0, 1, 1, 1, 2, 2],
-    [0, 0, 0, 2, 2, 1, 1, 1],
-    [0, 2, 2, 2, 2, 2, 2, 0]
-  ];
-  var SPRITE_PENGUIN_LEFTSTEP1_99 = [
-    [3, 3, 3, 3, 3, 3, 3, 0],
-    [3, 3, 3, 3, 3, 3, 0, 0],
-    [1, 3, 3, 3, 3, 0, 0, 0],
-    [1, 3, 3, 3, 0, 0, 0, 0],
-    [1, 3, 3, 3, 0, 0, 0, 0],
-    [2, 3, 3, 3, 3, 0, 0, 0],
-    [2, 2, 3, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_PENGUIN_LEFTSTEP2_100 = [
-    [0, 0, 0, 0, 0, 0, 0, 3],
-    [0, 0, 0, 0, 0, 0, 1, 1],
-    [0, 0, 0, 0, 0, 1, 1, 1],
-    [0, 0, 0, 0, 1, 1, 0, 1],
-    [0, 0, 0, 0, 1, 0, 1, 1],
-    [0, 0, 2, 2, 2, 2, 1, 1],
-    [0, 0, 0, 2, 2, 2, 2, 2],
-    [0, 0, 0, 0, 2, 2, 2, 2]
-  ];
-  var SPRITE_PENGUIN_LEFTSTEP2_101 = [
-    [3, 3, 0, 0, 0, 0, 0, 0],
-    [3, 3, 3, 0, 0, 0, 0, 0],
-    [1, 3, 3, 3, 0, 0, 0, 0],
-    [1, 1, 3, 3, 0, 0, 0, 0],
-    [1, 1, 3, 3, 0, 0, 0, 0],
-    [1, 3, 3, 3, 0, 0, 0, 0],
-    [3, 3, 3, 3, 0, 0, 0, 0],
-    [3, 3, 3, 3, 3, 0, 0, 0]
-  ];
-  var SPRITE_PENGUIN_LEFTSTEP2_102 = [
-    [0, 0, 0, 1, 1, 1, 2, 3],
-    [0, 0, 0, 1, 1, 1, 1, 1],
-    [0, 0, 1, 1, 1, 1, 1, 1],
-    [0, 0, 1, 1, 1, 1, 1, 1],
-    [0, 0, 0, 1, 1, 1, 1, 1],
-    [0, 2, 2, 2, 1, 1, 1, 1],
-    [0, 0, 2, 2, 2, 1, 1, 1],
-    [0, 0, 0, 0, 0, 0, 0, 2]
-  ];
-  var SPRITE_PENGUIN_LEFTSTEP2_103 = [
-    [3, 3, 3, 3, 3, 0, 0, 0],
-    [3, 3, 3, 3, 3, 3, 0, 0],
-    [1, 3, 3, 3, 3, 3, 3, 0],
-    [1, 3, 3, 3, 3, 3, 3, 0],
-    [1, 3, 3, 3, 0, 0, 0, 0],
-    [3, 3, 3, 3, 0, 0, 0, 0],
-    [3, 3, 3, 3, 3, 0, 0, 0],
-    [2, 2, 2, 3, 0, 0, 0, 0]
-  ];
-  var SPRITE_PENGUIN_FRONT_104 = [
-    [0, 0, 0, 0, 0, 3, 3, 3],
-    [0, 0, 0, 0, 3, 3, 3, 3],
-    [0, 0, 0, 0, 3, 1, 1, 3],
-    [0, 0, 0, 3, 3, 1, 1, 1],
-    [0, 0, 0, 3, 1, 1, 0, 1],
-    [0, 0, 0, 3, 1, 1, 0, 1],
-    [0, 0, 0, 3, 1, 1, 2, 2],
-    [0, 0, 3, 3, 2, 2, 2, 2]
-  ];
-  var SPRITE_PENGUIN_FRONT_105 = [
-    [3, 3, 0, 0, 0, 0, 0, 0],
-    [3, 3, 3, 0, 0, 0, 0, 0],
-    [1, 1, 3, 0, 0, 0, 0, 0],
-    [1, 1, 1, 3, 0, 0, 0, 0],
-    [0, 1, 1, 3, 0, 0, 0, 0],
-    [0, 1, 1, 3, 0, 0, 0, 0],
-    [2, 1, 3, 3, 3, 3, 0, 0],
-    [2, 2, 2, 3, 3, 3, 3, 0]
-  ];
-  var SPRITE_PENGUIN_FRONT_106 = [
-    [0, 0, 3, 3, 3, 2, 2, 2],
-    [0, 3, 3, 3, 3, 1, 1, 1],
-    [0, 3, 3, 3, 3, 1, 1, 1],
-    [3, 3, 3, 0, 3, 1, 1, 1],
-    [0, 0, 0, 0, 1, 1, 1, 1],
-    [0, 0, 0, 0, 1, 1, 1, 1],
-    [0, 0, 0, 2, 2, 2, 2, 1],
-    [0, 0, 2, 2, 2, 2, 2, 2]
-  ];
-  var SPRITE_PENGUIN_FRONT_107 = [
-    [2, 2, 3, 3, 3, 3, 3, 3],
-    [1, 1, 1, 3, 3, 0, 0, 0],
-    [1, 1, 1, 1, 3, 0, 0, 0],
-    [1, 1, 1, 1, 1, 0, 0, 0],
-    [1, 1, 1, 1, 1, 2, 2, 0],
-    [1, 1, 1, 2, 2, 2, 0, 0],
-    [1, 2, 2, 2, 2, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_PENGUIN_BACK_108 = [
-    [0, 0, 0, 0, 0, 3, 3, 3],
-    [0, 0, 0, 0, 3, 3, 3, 3],
-    [0, 0, 0, 0, 3, 3, 3, 3],
-    [0, 0, 0, 3, 3, 3, 3, 3],
-    [0, 0, 0, 3, 3, 3, 3, 3],
-    [0, 0, 0, 3, 3, 3, 3, 3],
-    [0, 0, 0, 3, 3, 3, 3, 3],
-    [0, 0, 3, 3, 3, 3, 3, 3]
-  ];
-  var SPRITE_PENGUIN_BACK_109 = [
-    [3, 3, 0, 0, 0, 0, 0, 0],
-    [3, 3, 3, 0, 0, 0, 0, 0],
-    [3, 3, 3, 0, 0, 0, 0, 0],
-    [3, 3, 3, 3, 0, 0, 0, 0],
-    [3, 3, 3, 3, 0, 0, 0, 0],
-    [3, 3, 3, 3, 0, 0, 0, 0],
-    [3, 3, 3, 3, 3, 3, 0, 0],
-    [3, 3, 3, 3, 3, 3, 3, 0]
-  ];
-  var SPRITE_PENGUIN_BACK_110 = [
-    [0, 0, 3, 3, 3, 3, 3, 3],
-    [0, 3, 3, 3, 3, 3, 3, 3],
-    [0, 3, 3, 3, 3, 3, 3, 3],
-    [3, 3, 3, 0, 3, 3, 3, 3],
-    [0, 0, 0, 0, 3, 3, 3, 3],
-    [0, 0, 0, 0, 3, 3, 3, 3],
-    [0, 0, 0, 2, 2, 3, 3, 3],
-    [0, 0, 2, 2, 2, 2, 2, 0]
-  ];
-  var SPRITE_PENGUIN_BACK_111 = [
-    [3, 3, 3, 3, 3, 3, 3, 3],
-    [3, 3, 3, 3, 3, 0, 0, 0],
-    [3, 3, 3, 3, 3, 0, 0, 0],
-    [3, 3, 3, 3, 3, 0, 0, 0],
-    [3, 3, 3, 3, 3, 2, 2, 0],
-    [3, 3, 3, 3, 2, 2, 0, 0],
-    [3, 3, 2, 2, 2, 0, 0, 0],
-    [3, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var PENGUIN_SPRITES = [
-    {
-      name: "Penguin (LEFTSTEP1)",
-      moveCharacterCode: 4 /* PENGUIN */,
-      defaultPaletteCode: 2,
-      defaultColorCombination: 0,
-      charCodes: [96, 97, 98, 99],
-      tiles: [
-        SPRITE_PENGUIN_LEFTSTEP1_96,
-        SPRITE_PENGUIN_LEFTSTEP1_97,
-        SPRITE_PENGUIN_LEFTSTEP1_98,
-        SPRITE_PENGUIN_LEFTSTEP1_99
-      ]
-    },
-    {
-      name: "Penguin (LEFTSTEP2)",
-      moveCharacterCode: 4 /* PENGUIN */,
-      defaultPaletteCode: 2,
-      defaultColorCombination: 0,
-      charCodes: [100, 101, 102, 103],
-      tiles: [
-        SPRITE_PENGUIN_LEFTSTEP2_100,
-        SPRITE_PENGUIN_LEFTSTEP2_101,
-        SPRITE_PENGUIN_LEFTSTEP2_102,
-        SPRITE_PENGUIN_LEFTSTEP2_103
-      ]
-    },
-    {
-      name: "Penguin (FRONT)",
-      moveCharacterCode: 4 /* PENGUIN */,
-      defaultPaletteCode: 2,
-      defaultColorCombination: 0,
-      charCodes: [104, 105, 106, 107],
-      tiles: [SPRITE_PENGUIN_FRONT_104, SPRITE_PENGUIN_FRONT_105, SPRITE_PENGUIN_FRONT_106, SPRITE_PENGUIN_FRONT_107]
-    },
-    {
-      name: "Penguin (BACK)",
-      moveCharacterCode: 4 /* PENGUIN */,
-      defaultPaletteCode: 2,
-      defaultColorCombination: 0,
-      charCodes: [108, 109, 110, 111],
-      tiles: [SPRITE_PENGUIN_BACK_108, SPRITE_PENGUIN_BACK_109, SPRITE_PENGUIN_BACK_110, SPRITE_PENGUIN_BACK_111]
-    }
-  ];
-
-  // src/shared/data/characters/quill.ts
-  var SPRITE_QUILL1_1_224 = [
-    [2, 2, 0, 0, 0, 0, 0, 0],
-    [0, 2, 2, 0, 0, 0, 0, 0],
-    [0, 0, 2, 2, 0, 0, 0, 0],
-    [0, 0, 0, 2, 0, 0, 0, 0],
-    [0, 0, 0, 2, 2, 0, 0, 0],
-    [0, 0, 0, 0, 2, 2, 0, 0],
-    [0, 0, 0, 0, 0, 2, 0, 0],
-    [0, 0, 0, 0, 0, 2, 2, 0]
-  ];
-  var SPRITE_QUILL1_2_225 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_QUILL1_3_226 = [
-    [0, 0, 0, 0, 0, 1, 2, 1],
-    [0, 0, 0, 0, 0, 1, 2, 2],
-    [0, 0, 0, 0, 1, 1, 1, 2],
-    [0, 0, 0, 0, 1, 1, 1, 1],
-    [0, 0, 0, 0, 1, 1, 1, 1],
-    [0, 0, 0, 0, 0, 1, 1, 1],
-    [0, 0, 0, 0, 0, 1, 1, 1],
-    [0, 0, 0, 0, 0, 1, 1, 1]
-  ];
-  var SPRITE_QUILL1_4_227 = [
-    [1, 0, 0, 0, 0, 0, 0, 0],
-    [1, 1, 0, 0, 0, 0, 0, 0],
-    [1, 1, 1, 0, 0, 0, 0, 0],
-    [2, 1, 1, 1, 0, 0, 0, 0],
-    [2, 1, 1, 1, 1, 0, 0, 0],
-    [1, 2, 3, 1, 1, 0, 0, 0],
-    [1, 2, 1, 3, 3, 1, 0, 0],
-    [3, 1, 2, 1, 1, 3, 0, 0]
-  ];
-  var SPRITE_QUILL1_5_228 = [
-    [0, 0, 0, 0, 0, 0, 1, 1],
-    [0, 0, 0, 0, 0, 0, 1, 1],
-    [0, 0, 0, 0, 0, 0, 1, 3],
-    [0, 0, 0, 0, 0, 0, 0, 3],
-    [0, 0, 0, 0, 0, 0, 0, 3],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_QUILL1_6_229 = [
-    [3, 1, 2, 1, 1, 1, 0, 0],
-    [3, 1, 1, 2, 3, 1, 1, 0],
-    [1, 1, 1, 2, 1, 3, 1, 0],
-    [1, 1, 3, 1, 2, 1, 3, 0],
-    [1, 1, 3, 1, 2, 1, 1, 1],
-    [1, 1, 3, 1, 2, 3, 1, 1],
-    [0, 3, 1, 1, 3, 2, 3, 1],
-    [0, 3, 1, 1, 3, 2, 3, 1]
-  ];
-  var SPRITE_QUILL1_7_230 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_QUILL1_8_231 = [
-    [0, 0, 1, 1, 3, 2, 3, 3],
-    [0, 0, 0, 3, 3, 2, 3, 3],
-    [0, 0, 0, 3, 3, 3, 3, 3],
-    [0, 0, 0, 0, 3, 3, 3, 3],
-    [0, 0, 0, 0, 3, 3, 3, 3],
-    [0, 0, 0, 0, 0, 3, 3, 3],
-    [0, 0, 0, 0, 0, 3, 3, 0],
-    [0, 0, 0, 0, 0, 0, 3, 0]
-  ];
-  var SPRITE_QUILL2_1_232 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 3],
-    [0, 0, 0, 0, 0, 0, 1, 3]
-  ];
-  var SPRITE_QUILL2_2_233 = [
-    [0, 0, 0, 0, 0, 0, 3, 3],
-    [0, 0, 0, 0, 3, 3, 3, 3],
-    [0, 0, 0, 3, 3, 3, 3, 0],
-    [0, 0, 3, 3, 3, 3, 3, 0],
-    [0, 1, 3, 3, 2, 3, 3, 0],
-    [1, 1, 3, 2, 3, 3, 3, 0],
-    [1, 1, 2, 3, 3, 3, 0, 0],
-    [1, 1, 2, 1, 1, 1, 0, 0]
-  ];
-  var SPRITE_QUILL2_3_234 = [
-    [0, 0, 0, 0, 0, 1, 1, 3],
-    [0, 0, 0, 0, 0, 1, 1, 3],
-    [0, 0, 0, 0, 3, 1, 1, 1],
-    [0, 0, 0, 0, 3, 1, 1, 1],
-    [0, 0, 0, 1, 1, 3, 1, 2],
-    [0, 0, 0, 1, 1, 3, 1, 2],
-    [0, 0, 0, 1, 1, 1, 2, 2],
-    [0, 0, 1, 1, 1, 1, 2, 1]
-  ];
-  var SPRITE_QUILL2_4_235 = [
-    [1, 2, 1, 1, 1, 1, 0, 0],
-    [1, 2, 1, 1, 1, 0, 0, 0],
-    [2, 3, 3, 3, 3, 0, 0, 0],
-    [2, 1, 1, 1, 0, 0, 0, 0],
-    [1, 1, 1, 1, 0, 0, 0, 0],
-    [1, 1, 1, 1, 0, 0, 0, 0],
-    [3, 3, 3, 0, 0, 0, 0, 0],
-    [1, 1, 1, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_QUILL2_5_236 = [
-    [0, 0, 1, 1, 1, 2, 2, 1],
-    [0, 0, 1, 1, 1, 2, 1, 1],
-    [0, 0, 1, 1, 2, 2, 1, 1],
-    [0, 0, 1, 1, 2, 1, 1, 1],
-    [0, 0, 1, 2, 2, 1, 1, 1],
-    [0, 0, 0, 2, 1, 1, 1, 0],
-    [0, 0, 0, 2, 0, 0, 0, 0],
-    [0, 0, 2, 2, 0, 0, 0, 0]
-  ];
-  var SPRITE_QUILL2_6_237 = [
-    [1, 1, 1, 0, 0, 0, 0, 0],
-    [1, 1, 0, 0, 0, 0, 0, 0],
-    [1, 1, 0, 0, 0, 0, 0, 0],
-    [1, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_QUILL2_7_238 = [
-    [0, 0, 2, 0, 0, 0, 0, 0],
-    [0, 0, 2, 0, 0, 0, 0, 0],
-    [0, 2, 2, 0, 0, 0, 0, 0],
-    [0, 2, 0, 0, 0, 0, 0, 0],
-    [0, 2, 0, 0, 0, 0, 0, 0],
-    [2, 2, 0, 0, 0, 0, 0, 0],
-    [2, 0, 0, 0, 0, 0, 0, 0],
-    [2, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_QUILL2_8_239 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var QUILL_SPRITES = [
-    {
-      name: "Quill (1)",
-      defaultPaletteCode: 0,
-      defaultColorCombination: 0,
-      charCodes: [224, 225, 226, 227, 228, 229, 230, 231],
-      tiles: [
-        SPRITE_QUILL1_1_224,
-        SPRITE_QUILL1_2_225,
-        SPRITE_QUILL1_3_226,
-        SPRITE_QUILL1_4_227,
-        SPRITE_QUILL1_5_228,
-        SPRITE_QUILL1_6_229,
-        SPRITE_QUILL1_7_230,
-        SPRITE_QUILL1_8_231
-      ]
-    },
-    {
-      name: "Quill (2)",
-      defaultPaletteCode: 0,
-      defaultColorCombination: 0,
-      charCodes: [232, 233, 234, 235, 236, 237, 238, 239],
-      tiles: [
-        SPRITE_QUILL2_1_232,
-        SPRITE_QUILL2_2_233,
-        SPRITE_QUILL2_3_234,
-        SPRITE_QUILL2_4_235,
-        SPRITE_QUILL2_5_236,
-        SPRITE_QUILL2_6_237,
-        SPRITE_QUILL2_7_238,
-        SPRITE_QUILL2_8_239
-      ]
-    }
-  ];
-
-  // src/shared/data/characters/shell-creeper.ts
-  var SPRITE_SHELLCREEPER_1_184 = [
-    [0, 0, 0, 0, 1, 0, 0, 0],
-    [0, 0, 0, 1, 1, 1, 0, 0],
-    [0, 0, 2, 1, 1, 1, 0, 0],
-    [0, 2, 2, 0, 1, 1, 2, 0],
-    [0, 2, 2, 0, 1, 1, 2, 0],
-    [2, 0, 2, 1, 1, 2, 2, 0],
-    [2, 2, 2, 2, 2, 2, 2, 0],
-    [2, 2, 2, 2, 2, 2, 0, 0]
-  ];
-  var SPRITE_SHELLCREEPER_1_185 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 3, 3, 3, 1, 0, 0, 0],
-    [3, 0, 3, 3, 0, 1, 0, 0],
-    [3, 3, 0, 0, 3, 3, 1, 0]
-  ];
-  var SPRITE_SHELLCREEPER_1_186 = [
-    [2, 2, 0, 0, 2, 2, 0, 3],
-    [0, 0, 0, 0, 2, 2, 1, 3],
-    [0, 0, 0, 2, 2, 2, 1, 0],
-    [0, 0, 2, 2, 2, 2, 1, 3],
-    [0, 0, 0, 0, 2, 2, 1, 1],
-    [0, 0, 0, 0, 0, 0, 2, 1],
-    [0, 0, 0, 0, 2, 2, 2, 2],
-    [0, 0, 0, 2, 2, 2, 2, 0]
-  ];
-  var SPRITE_SHELLCREEPER_1_187 = [
-    [3, 0, 3, 3, 0, 3, 1, 0],
-    [0, 3, 3, 3, 3, 0, 3, 0],
-    [3, 0, 3, 3, 0, 3, 0, 2],
-    [3, 3, 0, 0, 3, 3, 3, 0],
-    [3, 0, 3, 3, 0, 3, 1, 1],
-    [1, 3, 3, 3, 3, 1, 1, 0],
-    [1, 1, 1, 1, 1, 1, 2, 0],
-    [0, 0, 0, 0, 0, 2, 2, 2]
-  ];
-  var SPRITE_SHELLCREEPER_2_188 = [
-    [0, 0, 0, 0, 1, 0, 0, 0],
-    [0, 0, 0, 1, 1, 1, 0, 0],
-    [0, 0, 2, 1, 1, 1, 0, 0],
-    [0, 2, 2, 0, 1, 1, 2, 0],
-    [0, 2, 2, 0, 1, 1, 2, 0],
-    [2, 0, 2, 1, 1, 2, 2, 0],
-    [2, 2, 2, 2, 2, 2, 2, 0],
-    [2, 2, 2, 0, 2, 2, 0, 3]
-  ];
-  var SPRITE_SHELLCREEPER_2_189 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 3, 3, 3, 1, 0, 0, 0],
-    [3, 0, 3, 3, 0, 1, 0, 0],
-    [3, 3, 0, 0, 3, 3, 1, 0],
-    [3, 0, 3, 3, 0, 3, 1, 0]
-  ];
-  var SPRITE_SHELLCREEPER_2_190 = [
-    [2, 2, 0, 2, 2, 2, 1, 3],
-    [0, 0, 2, 2, 2, 2, 1, 0],
-    [0, 0, 0, 2, 2, 2, 1, 3],
-    [0, 0, 0, 0, 2, 2, 1, 1],
-    [0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 2, 2],
-    [0, 0, 0, 0, 0, 0, 2, 2],
-    [0, 0, 0, 0, 0, 0, 0, 2]
-  ];
-  var SPRITE_SHELLCREEPER_2_191 = [
-    [0, 3, 3, 3, 3, 0, 3, 0],
-    [3, 0, 3, 3, 0, 3, 0, 2],
-    [3, 3, 0, 0, 3, 3, 3, 0],
-    [3, 0, 3, 3, 0, 3, 1, 1],
-    [1, 3, 3, 3, 3, 1, 1, 0],
-    [1, 1, 1, 1, 1, 1, 2, 0],
-    [2, 0, 0, 0, 2, 2, 0, 0],
-    [2, 2, 0, 2, 2, 2, 0, 0]
-  ];
-  var SHELLCREEPER_SPRITES = [
-    {
-      name: "Shell Creeper (1)",
-      moveCharacterCode: 13 /* SHELL_CREEPER */,
-      defaultPaletteCode: 2,
-      defaultColorCombination: 3,
-      charCodes: [184, 185, 186, 187],
-      tiles: [SPRITE_SHELLCREEPER_1_184, SPRITE_SHELLCREEPER_1_185, SPRITE_SHELLCREEPER_1_186, SPRITE_SHELLCREEPER_1_187]
-    },
-    {
-      name: "Shell Creeper (2)",
-      moveCharacterCode: 13 /* SHELL_CREEPER */,
-      defaultPaletteCode: 0,
-      defaultColorCombination: 3,
-      charCodes: [188, 189, 190, 191],
-      tiles: [SPRITE_SHELLCREEPER_2_188, SPRITE_SHELLCREEPER_2_189, SPRITE_SHELLCREEPER_2_190, SPRITE_SHELLCREEPER_2_191]
-    }
-  ];
-
-  // src/shared/data/characters/side-stepper.ts
-  var SPRITE_SIDESTEPPER_1_192 = [
-    [0, 0, 3, 3, 0, 0, 0, 0],
-    [0, 3, 3, 0, 0, 1, 1, 0],
-    [3, 3, 0, 3, 0, 1, 1, 0],
-    [3, 3, 0, 3, 0, 1, 2, 0],
-    [3, 3, 3, 3, 0, 1, 2, 0],
-    [3, 3, 3, 0, 0, 1, 1, 0],
-    [3, 3, 0, 0, 0, 0, 3, 0],
-    [0, 3, 0, 0, 0, 3, 3, 3]
-  ];
-  var SPRITE_SIDESTEPPER_1_193 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [1, 1, 0, 0, 0, 0, 0, 0],
-    [1, 1, 0, 0, 1, 1, 0, 0],
-    [2, 1, 0, 0, 3, 3, 1, 0],
-    [2, 1, 0, 3, 0, 3, 3, 1],
-    [1, 1, 0, 3, 3, 0, 3, 1],
-    [3, 0, 0, 3, 3, 3, 3, 3],
-    [3, 3, 0, 0, 3, 3, 3, 3]
-  ];
-  var SPRITE_SIDESTEPPER_1_194 = [
-    [0, 3, 3, 0, 0, 3, 2, 3],
-    [0, 0, 3, 3, 2, 3, 3, 3],
-    [0, 0, 0, 0, 2, 3, 3, 3],
-    [0, 2, 3, 3, 2, 3, 3, 3],
-    [0, 3, 0, 0, 2, 2, 3, 3],
-    [0, 3, 0, 3, 0, 2, 2, 2],
-    [0, 3, 0, 3, 0, 3, 0, 0],
-    [0, 3, 0, 3, 0, 3, 0, 0]
-  ];
-  var SPRITE_SIDESTEPPER_1_195 = [
-    [2, 1, 0, 0, 0, 0, 3, 3],
-    [3, 3, 1, 3, 3, 3, 3, 0],
-    [3, 3, 3, 0, 0, 0, 0, 0],
-    [3, 3, 3, 3, 3, 2, 0, 0],
-    [3, 3, 2, 0, 0, 0, 3, 0],
-    [2, 2, 0, 3, 3, 0, 3, 0],
-    [0, 0, 3, 0, 3, 0, 0, 0],
-    [0, 0, 3, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_SIDESTEPPER_2_196 = [
-    [0, 0, 0, 0, 0, 1, 1, 0],
-    [0, 0, 0, 0, 0, 1, 1, 0],
-    [0, 0, 3, 3, 0, 1, 2, 0],
-    [0, 3, 3, 0, 0, 1, 2, 0],
-    [3, 3, 0, 3, 0, 1, 1, 0],
-    [3, 3, 0, 3, 0, 0, 3, 0],
-    [3, 3, 3, 3, 0, 3, 3, 3],
-    [3, 3, 3, 0, 0, 3, 2, 3]
-  ];
-  var SPRITE_SIDESTEPPER_2_197 = [
-    [1, 1, 0, 1, 1, 1, 0, 0],
-    [1, 1, 0, 0, 3, 3, 1, 0],
-    [2, 1, 0, 3, 0, 3, 1, 0],
-    [2, 1, 0, 3, 3, 0, 3, 1],
-    [1, 1, 0, 3, 3, 3, 3, 1],
-    [3, 0, 0, 0, 3, 3, 3, 3],
-    [3, 3, 0, 0, 0, 0, 3, 3],
-    [2, 1, 0, 0, 0, 3, 3, 0]
-  ];
-  var SPRITE_SIDESTEPPER_2_198 = [
-    [3, 3, 0, 3, 2, 3, 3, 3],
-    [0, 3, 3, 0, 2, 3, 3, 3],
-    [0, 0, 2, 3, 2, 3, 3, 3],
-    [0, 3, 0, 0, 2, 2, 3, 3],
-    [3, 3, 0, 3, 0, 2, 2, 2],
-    [3, 0, 3, 0, 3, 0, 0, 0],
-    [0, 0, 0, 0, 3, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_SIDESTEPPER_2_199 = [
-    [3, 3, 1, 3, 3, 3, 0, 0],
-    [3, 3, 3, 0, 0, 0, 0, 0],
-    [3, 3, 3, 3, 3, 0, 0, 0],
-    [3, 3, 2, 0, 3, 2, 0, 0],
-    [2, 2, 0, 3, 0, 3, 0, 0],
-    [0, 3, 0, 3, 0, 3, 0, 0],
-    [0, 3, 0, 3, 0, 3, 0, 0],
-    [3, 0, 0, 3, 0, 3, 0, 0]
-  ];
-  var SIDESTEPPER_SPRITES = [
-    {
-      name: "Side Stepper (1)",
-      moveCharacterCode: 14 /* SIDE_STEPPER */,
-      defaultPaletteCode: 2,
-      defaultColorCombination: 2,
-      charCodes: [192, 193, 194, 195],
-      tiles: [SPRITE_SIDESTEPPER_1_192, SPRITE_SIDESTEPPER_1_193, SPRITE_SIDESTEPPER_1_194, SPRITE_SIDESTEPPER_1_195]
-    },
-    {
-      name: "Side Stepper (2)",
-      moveCharacterCode: 14 /* SIDE_STEPPER */,
-      defaultPaletteCode: 2,
-      defaultColorCombination: 2,
-      charCodes: [188, 189, 190, 191],
-      tiles: [SPRITE_SIDESTEPPER_2_196, SPRITE_SIDESTEPPER_2_197, SPRITE_SIDESTEPPER_2_198, SPRITE_SIDESTEPPER_2_199]
-    }
-  ];
-
-  // src/shared/data/characters/smiley.ts
-  var SPRITE_SMILEY_1_88 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 1, 1, 3],
-    [0, 0, 0, 0, 3, 1, 1, 3],
-    [0, 0, 0, 3, 3, 1, 1, 3],
-    [0, 0, 3, 1, 3, 1, 2, 3],
-    [0, 0, 1, 1, 3, 1, 2, 3],
-    [0, 3, 1, 3, 3, 1, 1, 3],
-    [1, 3, 3, 3, 3, 3, 3, 3]
-  ];
-  var SPRITE_SMILEY_1_89 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [3, 1, 1, 0, 0, 0, 0, 0],
-    [3, 1, 1, 3, 0, 0, 0, 0],
-    [3, 1, 1, 3, 3, 0, 0, 0],
-    [3, 2, 1, 3, 3, 3, 0, 0],
-    [3, 2, 1, 3, 3, 3, 0, 0],
-    [3, 1, 1, 3, 3, 3, 3, 0],
-    [3, 3, 3, 3, 3, 3, 3, 1]
-  ];
-  var SPRITE_SMILEY_1_90 = [
-    [1, 3, 3, 3, 3, 1, 0, 1],
-    [2, 3, 3, 0, 1, 1, 0, 1],
-    [2, 3, 1, 0, 1, 1, 0, 1],
-    [2, 2, 3, 0, 1, 1, 0, 1],
-    [0, 0, 3, 3, 1, 1, 0, 1],
-    [0, 0, 0, 3, 3, 1, 0, 1],
-    [0, 0, 0, 0, 3, 3, 3, 3],
-    [0, 0, 0, 0, 0, 3, 3, 3]
-  ];
-  var SPRITE_SMILEY_1_91 = [
-    [1, 0, 1, 3, 3, 3, 3, 1],
-    [1, 0, 1, 1, 0, 3, 3, 2],
-    [1, 0, 1, 1, 0, 1, 3, 2],
-    [1, 0, 1, 1, 0, 3, 2, 2],
-    [1, 0, 1, 1, 3, 3, 0, 0],
-    [1, 0, 1, 3, 3, 0, 0, 0],
-    [3, 3, 3, 3, 0, 0, 0, 0],
-    [3, 3, 3, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_SMILEY_2_92 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 1, 1, 3],
-    [0, 0, 0, 0, 3, 1, 2, 3],
-    [0, 0, 0, 3, 3, 1, 2, 3],
-    [0, 0, 3, 1, 3, 1, 1, 3],
-    [0, 0, 1, 1, 3, 1, 1, 3],
-    [0, 3, 1, 3, 3, 1, 1, 3],
-    [1, 3, 3, 3, 3, 3, 3, 3]
-  ];
-  var SPRITE_SMILEY_2_93 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [3, 1, 1, 0, 0, 0, 0, 0],
-    [3, 2, 1, 3, 0, 0, 0, 0],
-    [3, 2, 1, 3, 3, 0, 0, 0],
-    [3, 1, 1, 3, 3, 3, 0, 0],
-    [3, 1, 1, 3, 3, 3, 0, 0],
-    [3, 1, 1, 3, 3, 3, 3, 0],
-    [3, 3, 3, 3, 3, 3, 3, 1]
-  ];
-  var SPRITE_SMILEY_2_94 = [
-    [1, 3, 3, 3, 3, 1, 0, 1],
-    [2, 3, 3, 0, 1, 1, 0, 1],
-    [2, 3, 1, 0, 1, 3, 3, 3],
-    [2, 2, 1, 3, 3, 3, 3, 3],
-    [0, 0, 3, 3, 3, 3, 3, 3],
-    [0, 0, 0, 3, 3, 3, 3, 3],
-    [0, 0, 0, 0, 3, 3, 3, 3],
-    [0, 0, 0, 0, 0, 3, 3, 3]
-  ];
-  var SPRITE_SMILEY_2_95 = [
-    [1, 0, 1, 3, 3, 3, 3, 1],
-    [1, 0, 1, 1, 0, 3, 3, 2],
-    [3, 3, 3, 1, 0, 1, 3, 2],
-    [3, 3, 3, 3, 3, 1, 2, 2],
-    [3, 3, 3, 3, 3, 3, 0, 0],
-    [3, 3, 3, 3, 3, 0, 0, 0],
-    [3, 3, 3, 3, 0, 0, 0, 0],
-    [3, 3, 3, 0, 0, 0, 0, 0]
-  ];
-  var SMILEY_SPRITES = [
-    {
-      name: "Smiley (1)",
-      moveCharacterCode: 11 /* SMILEY */,
-      defaultPaletteCode: 2,
-      defaultColorCombination: 1,
-      charCodes: [88, 89, 90, 91],
-      tiles: [SPRITE_SMILEY_1_88, SPRITE_SMILEY_1_89, SPRITE_SMILEY_1_90, SPRITE_SMILEY_1_91]
-    },
-    {
-      name: "Smiley (2)",
-      moveCharacterCode: 11 /* SMILEY */,
-      defaultPaletteCode: 2,
-      defaultColorCombination: 2,
-      charCodes: [92, 93, 94, 95],
-      tiles: [SPRITE_SMILEY_2_92, SPRITE_SMILEY_2_93, SPRITE_SMILEY_2_94, SPRITE_SMILEY_2_95]
-    }
-  ];
-
-  // src/shared/data/characters/spinner.ts
-  var SPRITE_SPINNER_1_144 = [
-    [0, 0, 0, 0, 0, 3, 3, 3],
-    [0, 0, 0, 0, 0, 2, 2, 2],
-    [0, 0, 0, 0, 0, 0, 2, 2],
-    [0, 0, 0, 0, 0, 0, 0, 3],
-    [0, 0, 0, 0, 0, 0, 0, 3],
-    [3, 1, 0, 0, 0, 2, 2, 2],
-    [3, 1, 1, 0, 0, 2, 2, 1],
-    [3, 1, 1, 3, 3, 2, 1, 3]
-  ];
-  var SPRITE_SPINNER_1_145 = [
-    [3, 3, 3, 0, 0, 0, 0, 0],
-    [2, 2, 2, 0, 0, 0, 0, 0],
-    [2, 2, 0, 0, 0, 0, 0, 0],
-    [3, 0, 0, 0, 0, 0, 0, 0],
-    [3, 0, 0, 0, 0, 0, 0, 0],
-    [2, 2, 2, 0, 0, 0, 1, 3],
-    [1, 2, 2, 0, 0, 1, 1, 3],
-    [3, 1, 2, 3, 3, 1, 1, 3]
-  ];
-  var SPRITE_SPINNER_1_146 = [
-    [3, 1, 2, 3, 3, 2, 1, 3],
-    [3, 2, 2, 0, 0, 2, 2, 1],
-    [3, 2, 0, 0, 0, 2, 2, 2],
-    [0, 0, 0, 0, 0, 0, 0, 3],
-    [0, 0, 0, 0, 0, 0, 0, 3],
-    [0, 0, 0, 0, 0, 0, 1, 1],
-    [0, 0, 0, 0, 0, 1, 1, 1],
-    [0, 0, 0, 0, 0, 3, 3, 3]
-  ];
-  var SPRITE_SPINNER_1_147 = [
-    [3, 1, 2, 3, 3, 2, 1, 3],
-    [1, 2, 2, 0, 0, 2, 2, 3],
-    [2, 2, 2, 0, 0, 0, 2, 3],
-    [3, 0, 0, 0, 0, 0, 0, 0],
-    [3, 0, 0, 0, 0, 0, 0, 0],
-    [1, 1, 0, 0, 0, 0, 0, 0],
-    [1, 1, 1, 0, 0, 0, 0, 0],
-    [3, 3, 3, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_SPINNER_2_148 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 3, 0, 0, 0, 0],
-    [0, 0, 3, 1, 1, 0, 0, 0],
-    [0, 3, 1, 1, 1, 0, 0, 0],
-    [3, 2, 1, 1, 3, 0, 0, 2],
-    [0, 2, 2, 3, 3, 3, 2, 2],
-    [0, 0, 0, 0, 3, 2, 2, 1],
-    [0, 0, 0, 0, 2, 2, 1, 3]
-  ];
-  var SPRITE_SPINNER_2_149 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 3, 0, 0, 0, 0],
-    [0, 0, 1, 1, 3, 0, 0, 0],
-    [0, 0, 1, 1, 1, 3, 0, 0],
-    [0, 0, 3, 1, 1, 2, 3, 0],
-    [2, 3, 3, 3, 2, 2, 0, 0],
-    [2, 2, 3, 0, 0, 0, 0, 0],
-    [1, 2, 2, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_SPINNER_2_150 = [
-    [0, 0, 0, 2, 2, 1, 3, 3],
-    [0, 0, 0, 0, 2, 2, 1, 3],
-    [0, 0, 0, 0, 3, 2, 2, 1],
-    [0, 1, 1, 3, 3, 3, 2, 2],
-    [3, 1, 1, 1, 3, 0, 0, 2],
-    [0, 3, 1, 2, 2, 0, 0, 0],
-    [0, 0, 3, 2, 2, 0, 0, 0],
-    [0, 0, 0, 3, 0, 0, 0, 0]
-  ];
-  var SPRITE_SPINNER_2_151 = [
-    [3, 1, 2, 2, 0, 0, 0, 0],
-    [1, 2, 2, 0, 0, 0, 0, 0],
-    [2, 2, 3, 0, 0, 0, 0, 0],
-    [2, 3, 3, 3, 1, 1, 0, 0],
-    [0, 0, 3, 1, 1, 1, 3, 0],
-    [0, 0, 2, 2, 1, 3, 0, 0],
-    [0, 0, 2, 2, 3, 0, 0, 0],
-    [0, 0, 0, 3, 0, 0, 0, 0]
-  ];
-  var SPINNER_SPRITES = [
-    {
-      name: "Spinner (1)",
-      moveCharacterCode: 7 /* SPINNER */,
-      defaultPaletteCode: 1,
-      defaultColorCombination: 1,
-      charCodes: [144, 145, 146, 147],
-      tiles: [SPRITE_SPINNER_1_144, SPRITE_SPINNER_1_145, SPRITE_SPINNER_1_146, SPRITE_SPINNER_1_147]
-    },
-    {
-      name: "Spinner (2)",
-      moveCharacterCode: 7 /* SPINNER */,
-      defaultPaletteCode: 1,
-      defaultColorCombination: 1,
-      charCodes: [148, 149, 150, 151],
-      tiles: [SPRITE_SPINNER_2_148, SPRITE_SPINNER_2_149, SPRITE_SPINNER_2_150, SPRITE_SPINNER_2_151]
-    }
-  ];
-
-  // src/shared/data/characters/star-killer.ts
-  var SPRITE_STARKILLER_LEFT_152 = [
-    [0, 0, 0, 0, 0, 0, 1, 3],
-    [0, 0, 0, 0, 0, 1, 1, 3],
-    [0, 0, 0, 0, 0, 1, 1, 3],
-    [0, 0, 0, 0, 3, 3, 3, 3],
-    [0, 0, 0, 1, 1, 1, 1, 1],
-    [0, 0, 1, 1, 3, 3, 3, 1],
-    [0, 1, 1, 3, 1, 3, 1, 1],
-    [0, 1, 1, 3, 3, 3, 1, 1]
-  ];
-  var SPRITE_STARKILLER_LEFT_153 = [
-    [1, 1, 1, 0, 0, 0, 0, 0],
-    [1, 1, 1, 1, 1, 0, 0, 0],
-    [1, 1, 1, 1, 1, 1, 0, 0],
-    [3, 3, 3, 3, 3, 3, 0, 0],
-    [1, 1, 1, 1, 1, 1, 1, 0],
-    [1, 2, 2, 2, 2, 2, 2, 0],
-    [1, 3, 3, 3, 3, 3, 3, 0],
-    [1, 3, 2, 3, 2, 3, 2, 0]
-  ];
-  var SPRITE_STARKILLER_LEFT_154 = [
-    [0, 1, 1, 3, 3, 3, 1, 1],
-    [0, 2, 1, 3, 3, 3, 2, 1],
-    [0, 0, 2, 1, 3, 3, 3, 2],
-    [0, 0, 0, 2, 2, 2, 2, 2],
-    [0, 0, 0, 0, 3, 3, 3, 3],
-    [0, 0, 0, 0, 0, 1, 1, 3],
-    [0, 0, 0, 0, 0, 2, 2, 3],
-    [0, 0, 0, 0, 0, 0, 2, 3]
-  ];
-  var SPRITE_STARKILLER_LEFT_155 = [
-    [1, 3, 2, 3, 2, 3, 2, 0],
-    [1, 3, 3, 3, 3, 3, 3, 0],
-    [2, 1, 1, 1, 1, 1, 1, 0],
-    [2, 2, 2, 2, 2, 2, 2, 0],
-    [3, 3, 3, 3, 3, 3, 0, 0],
-    [1, 1, 1, 1, 1, 1, 0, 0],
-    [2, 2, 2, 2, 2, 0, 0, 0],
-    [2, 2, 2, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_STARKILLER_LEFTUP_156 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 1, 1, 1, 3],
-    [0, 0, 0, 1, 1, 1, 1, 1],
-    [0, 0, 1, 1, 1, 1, 3, 3],
-    [0, 0, 2, 1, 1, 3, 1, 3],
-    [0, 0, 2, 1, 3, 3, 3, 1],
-    [0, 0, 2, 2, 3, 3, 1, 1],
-    [0, 0, 3, 2, 2, 3, 1, 1]
-  ];
-  var SPRITE_STARKILLER_LEFTUP_157 = [
-    [1, 1, 1, 1, 0, 0, 0, 0],
-    [3, 1, 1, 1, 3, 0, 0, 0],
-    [1, 3, 1, 3, 1, 1, 0, 0],
-    [1, 1, 3, 1, 1, 1, 0, 0],
-    [3, 1, 1, 3, 1, 1, 1, 0],
-    [1, 1, 1, 1, 3, 1, 1, 0],
-    [1, 1, 2, 1, 1, 3, 1, 0],
-    [1, 2, 3, 2, 1, 1, 3, 0]
-  ];
-  var SPRITE_STARKILLER_LEFTUP_158 = [
-    [0, 2, 1, 3, 2, 2, 2, 1],
-    [0, 2, 1, 3, 2, 2, 2, 2],
-    [0, 2, 2, 1, 3, 2, 2, 1],
-    [0, 2, 2, 3, 1, 3, 2, 2],
-    [0, 0, 3, 2, 2, 1, 3, 2],
-    [0, 0, 0, 2, 2, 2, 1, 3],
-    [0, 0, 0, 0, 2, 2, 2, 1],
-    [0, 0, 0, 0, 0, 0, 2, 2]
-  ];
-  var SPRITE_STARKILLER_LEFTUP_159 = [
-    [2, 3, 3, 3, 2, 1, 1, 0],
-    [3, 3, 3, 2, 3, 2, 1, 0],
-    [3, 3, 2, 3, 2, 3, 2, 0],
-    [1, 3, 3, 2, 3, 3, 2, 0],
-    [2, 1, 3, 3, 3, 2, 0, 0],
-    [2, 2, 1, 3, 2, 0, 0, 0],
-    [3, 2, 2, 1, 0, 0, 0, 0],
-    [1, 3, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_STARKILLER_UP_160 = [
-    [0, 0, 0, 0, 0, 0, 2, 1],
-    [0, 0, 0, 0, 0, 2, 1, 1],
-    [0, 0, 0, 0, 0, 2, 1, 1],
-    [0, 0, 0, 0, 2, 1, 3, 3],
-    [0, 0, 1, 3, 2, 3, 3, 3],
-    [0, 2, 1, 3, 2, 3, 3, 3],
-    [0, 2, 1, 3, 2, 3, 2, 1],
-    [0, 3, 3, 3, 2, 2, 1, 1]
-  ];
-  var SPRITE_STARKILLER_UP_161 = [
-    [1, 1, 0, 0, 0, 0, 0, 0],
-    [1, 1, 1, 0, 0, 0, 0, 0],
-    [1, 1, 1, 0, 0, 0, 0, 0],
-    [3, 3, 1, 1, 0, 0, 0, 0],
-    [3, 1, 3, 1, 3, 1, 0, 0],
-    [3, 3, 3, 1, 3, 1, 1, 0],
-    [1, 1, 3, 1, 3, 1, 1, 0],
-    [1, 1, 1, 1, 3, 3, 3, 0]
-  ];
-  var SPRITE_STARKILLER_UP_162 = [
-    [0, 2, 1, 3, 2, 2, 1, 1],
-    [0, 2, 1, 3, 2, 1, 3, 3],
-    [0, 2, 1, 3, 2, 1, 3, 3],
-    [0, 2, 1, 3, 2, 1, 3, 2],
-    [0, 0, 1, 3, 2, 1, 3, 3],
-    [0, 0, 1, 3, 2, 1, 3, 2],
-    [0, 0, 0, 3, 2, 1, 3, 3],
-    [0, 0, 0, 0, 0, 1, 3, 2]
-  ];
-  var SPRITE_STARKILLER_UP_163 = [
-    [1, 1, 1, 1, 3, 1, 1, 0],
-    [3, 3, 2, 1, 3, 1, 1, 0],
-    [3, 3, 2, 1, 3, 1, 1, 0],
-    [2, 3, 2, 1, 3, 1, 1, 0],
-    [3, 3, 2, 1, 3, 1, 0, 0],
-    [2, 3, 2, 1, 3, 1, 0, 0],
-    [3, 3, 2, 1, 3, 0, 0, 0],
-    [2, 3, 2, 0, 0, 0, 0, 0]
-  ];
-  var STARKILLER_SPRITES = [
-    {
-      name: "Star Killer (LEFT)",
-      moveCharacterCode: 8 /* STAR_KILLER */,
-      defaultPaletteCode: 1,
-      defaultColorCombination: 1,
-      charCodes: [152, 153, 154, 155],
-      tiles: [
-        SPRITE_STARKILLER_LEFT_152,
-        SPRITE_STARKILLER_LEFT_153,
-        SPRITE_STARKILLER_LEFT_154,
-        SPRITE_STARKILLER_LEFT_155
-      ]
-    },
-    {
-      name: "Star Killer (LEFTUP)",
-      moveCharacterCode: 8 /* STAR_KILLER */,
-      defaultPaletteCode: 1,
-      defaultColorCombination: 1,
-      charCodes: [156, 157, 158, 159],
-      tiles: [
-        SPRITE_STARKILLER_LEFTUP_156,
-        SPRITE_STARKILLER_LEFTUP_157,
-        SPRITE_STARKILLER_LEFTUP_158,
-        SPRITE_STARKILLER_LEFTUP_159
-      ]
-    },
-    {
-      name: "Star Killer (UP)",
-      moveCharacterCode: 8 /* STAR_KILLER */,
-      defaultPaletteCode: 1,
-      defaultColorCombination: 2,
-      charCodes: [160, 161, 162, 163],
-      tiles: [SPRITE_STARKILLER_UP_160, SPRITE_STARKILLER_UP_161, SPRITE_STARKILLER_UP_162, SPRITE_STARKILLER_UP_163]
-    }
-  ];
-
-  // src/shared/data/characters/starship.ts
-  var SPRITE_STARSHIP_LEFT_164 = [
-    [0, 0, 0, 0, 0, 0, 1, 1],
-    [0, 0, 0, 0, 0, 1, 1, 1],
-    [0, 0, 0, 0, 0, 0, 0, 3],
-    [0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 3, 3],
-    [0, 0, 0, 0, 2, 1, 1, 1],
-    [0, 0, 1, 1, 1, 3, 3, 1],
-    [0, 1, 1, 3, 3, 3, 1, 1]
-  ];
-  var SPRITE_STARSHIP_LEFT_165 = [
-    [2, 1, 1, 0, 0, 0, 0, 0],
-    [2, 1, 1, 1, 0, 0, 0, 0],
-    [3, 3, 0, 0, 0, 0, 0, 0],
-    [1, 1, 1, 0, 0, 0, 0, 0],
-    [3, 3, 3, 3, 0, 0, 0, 0],
-    [1, 1, 1, 3, 3, 2, 3, 0],
-    [1, 1, 1, 1, 3, 2, 3, 0],
-    [1, 2, 2, 2, 2, 2, 3, 0]
-  ];
-  var SPRITE_STARSHIP_LEFT_166 = [
-    [0, 1, 1, 3, 3, 3, 1, 1],
-    [0, 0, 1, 1, 1, 3, 3, 1],
-    [0, 0, 0, 0, 2, 1, 1, 1],
-    [0, 0, 0, 0, 0, 0, 3, 3],
-    [0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 0, 3],
-    [0, 0, 0, 0, 0, 1, 1, 1],
-    [0, 0, 0, 0, 0, 0, 1, 1]
-  ];
-  var SPRITE_STARSHIP_LEFT_167 = [
-    [1, 2, 2, 2, 2, 2, 3, 0],
-    [1, 1, 1, 1, 3, 2, 3, 0],
-    [1, 1, 1, 3, 3, 2, 3, 0],
-    [3, 3, 3, 3, 0, 0, 0, 0],
-    [1, 1, 1, 0, 0, 0, 0, 0],
-    [3, 3, 0, 0, 0, 0, 0, 0],
-    [2, 1, 1, 1, 0, 0, 0, 0],
-    [2, 1, 1, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_STARSHIP_LEFTUP_168 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 1, 1, 1, 0, 0, 0],
-    [0, 0, 1, 1, 1, 1, 2, 0],
-    [0, 0, 1, 1, 3, 3, 1, 1],
-    [0, 0, 0, 1, 3, 3, 3, 3],
-    [0, 0, 0, 1, 3, 3, 1, 1],
-    [0, 0, 0, 2, 1, 3, 1, 1]
-  ];
-  var SPRITE_STARSHIP_LEFTUP_169 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 1, 1, 1, 0, 0, 0, 0],
-    [0, 0, 1, 1, 1, 0, 0, 0],
-    [0, 0, 3, 1, 2, 2, 0, 0],
-    [3, 1, 1, 3, 2, 1, 1, 0],
-    [1, 3, 1, 1, 3, 1, 1, 0],
-    [1, 1, 3, 1, 0, 0, 1, 0],
-    [2, 1, 1, 3, 0, 0, 0, 0]
-  ];
-  var SPRITE_STARSHIP_UP_170 = [
-    [0, 0, 0, 0, 1, 3, 1, 2],
-    [0, 0, 0, 0, 3, 1, 1, 2],
-    [0, 1, 0, 0, 1, 3, 1, 1],
-    [0, 1, 1, 3, 1, 1, 3, 1],
-    [0, 1, 1, 1, 3, 1, 1, 3],
-    [0, 0, 1, 2, 2, 3, 1, 1],
-    [0, 0, 0, 2, 1, 1, 0, 0],
-    [0, 0, 0, 0, 1, 1, 1, 0]
-  ];
-  var SPRITE_STARSHIP_UP_171 = [
-    [2, 2, 1, 3, 3, 0, 0, 0],
-    [2, 2, 2, 3, 2, 0, 0, 0],
-    [2, 2, 2, 2, 2, 2, 0, 0],
-    [1, 2, 2, 2, 2, 3, 0, 0],
-    [3, 3, 2, 2, 3, 0, 0, 0],
-    [3, 2, 2, 3, 0, 0, 0, 0],
-    [0, 0, 3, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-  var SPRITE_STARSHIP_UP_172 = [
-    [0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 1, 1],
-    [0, 0, 0, 0, 0, 0, 1, 3],
-    [0, 0, 0, 0, 0, 2, 1, 3],
-    [0, 1, 0, 0, 0, 1, 3, 3],
-    [1, 1, 0, 0, 3, 1, 3, 3],
-    [1, 1, 3, 1, 3, 1, 3, 1]
-  ];
-  var SPRITE_STARSHIP_UP_173 = [
-    [1, 0, 0, 0, 0, 0, 0, 0],
-    [1, 0, 0, 0, 0, 0, 0, 0],
-    [1, 1, 0, 0, 0, 0, 0, 0],
-    [3, 1, 0, 0, 0, 0, 0, 0],
-    [3, 1, 2, 0, 0, 0, 0, 0],
-    [3, 3, 1, 0, 0, 0, 1, 0],
-    [3, 3, 1, 3, 0, 0, 1, 1],
-    [1, 3, 1, 3, 1, 3, 1, 1]
-  ];
-  var SPRITE_STARSHIP_UP_174 = [
-    [1, 1, 3, 1, 3, 1, 1, 1],
-    [2, 2, 3, 1, 3, 1, 1, 2],
-    [1, 1, 3, 1, 3, 1, 1, 2],
-    [1, 1, 0, 1, 3, 1, 1, 2],
-    [0, 1, 0, 0, 3, 3, 1, 2],
-    [0, 0, 0, 0, 0, 3, 3, 2],
-    [0, 0, 0, 0, 0, 2, 2, 2],
-    [0, 0, 0, 0, 0, 3, 3, 3]
-  ];
-  var SPRITE_STARSHIP_UP_175 = [
-    [1, 1, 1, 3, 1, 3, 1, 1],
-    [2, 1, 1, 3, 1, 3, 2, 2],
-    [2, 1, 1, 3, 1, 3, 1, 1],
-    [2, 1, 1, 3, 1, 0, 1, 1],
-    [2, 1, 3, 3, 0, 0, 1, 0],
-    [2, 3, 3, 0, 0, 0, 0, 0],
-    [2, 2, 2, 0, 0, 0, 0, 0],
-    [3, 3, 3, 0, 0, 0, 0, 0]
-  ];
-  var STARSHIP_SPRITES = [
-    {
-      name: "Starship (LEFT)",
-      moveCharacterCode: 9 /* STARSHIP */,
-      defaultPaletteCode: 1,
-      defaultColorCombination: 0,
-      charCodes: [164, 165, 166, 167],
-      tiles: [SPRITE_STARSHIP_LEFT_164, SPRITE_STARSHIP_LEFT_165, SPRITE_STARSHIP_LEFT_166, SPRITE_STARSHIP_LEFT_167]
-    },
-    {
-      name: "Starship (LEFTUP)",
-      moveCharacterCode: 9 /* STARSHIP */,
-      defaultPaletteCode: 1,
-      defaultColorCombination: 0,
-      charCodes: [168, 169, 170, 171],
-      tiles: [SPRITE_STARSHIP_LEFTUP_168, SPRITE_STARSHIP_LEFTUP_169, SPRITE_STARSHIP_UP_170, SPRITE_STARSHIP_UP_171]
-    },
-    {
-      name: "Starship (UP)",
-      moveCharacterCode: 9 /* STARSHIP */,
-      defaultPaletteCode: 1,
-      defaultColorCombination: 0,
-      charCodes: [172, 173, 174, 175],
-      tiles: [SPRITE_STARSHIP_UP_172, SPRITE_STARSHIP_UP_173, SPRITE_STARSHIP_UP_174, SPRITE_STARSHIP_UP_175]
-    }
-  ];
-
-  // src/shared/data/sprites.ts
-  var CHARACTER_SPRITES = [
-    ...MARIO_SPRITES,
-    ...LUIGI_SPRITES,
-    ...LADY_SPRITES,
-    ...FIGHTERFLY_SPRITES,
-    ...ACHILLES_SPRITES,
-    ...SMILEY_SPRITES,
-    ...PENGUIN_SPRITES,
-    ...FIREBALL_SPRITES,
-    ...CAR_SPRITES,
-    ...SPINNER_SPRITES,
-    ...STARKILLER_SPRITES,
-    ...STARSHIP_SPRITES,
-    ...EXPLOSION_SPRITES,
-    ...SHELLCREEPER_SPRITES,
-    ...SIDESTEPPER_SPRITES,
-    ...NITPICKER_SPRITES,
-    ...LASER_SPRITES,
-    ...MISC_SPRITES,
-    ...QUILL_SPRITES,
-    ...NUMBER_SPRITES,
-    ...COMPUTEROPERATOR_SPRITES
-  ];
-  var TILE_LIST = CHARACTER_SPRITES.flatMap((sprite) => sprite.tiles);
 
   // src/shared/utils/spriteLookup.ts
   function getSpriteTileByCode(code, tileIndex = 0) {

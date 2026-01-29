@@ -3,6 +3,7 @@
  * Manages animated sprite movement for DEF MOVE and MOVE commands
  */
 
+import { getSpriteSizeForMoveDefinition } from '@/core/animation/CharacterAnimationBuilder'
 import {
   readSpriteIsActive,
   SHARED_ANIMATION_BUFFER_BYTES,
@@ -119,9 +120,15 @@ export class AnimationManager {
       throw new Error(`No movement definition for action number ${actionNumber} (use DEF MOVE first)`)
     }
 
-    // Start position from device or default (center); main thread uses pending POSITION when node missing
-    const initialX = startX ?? SCREEN_DIMENSIONS.SPRITE.DEFAULT_X
-    const initialY = startY ?? SCREEN_DIMENSIONS.SPRITE.DEFAULT_Y
+    // Start position: from POSITION command, or default so sprite center is at screen center
+    const screenCenterX = SCREEN_DIMENSIONS.SPRITE.DEFAULT_X
+    const screenCenterY = SCREEN_DIMENSIONS.SPRITE.DEFAULT_Y
+    const halfSize =
+      startX === undefined || startY === undefined
+        ? getSpriteSizeForMoveDefinition(definition) / 2
+        : 0
+    const initialX = startX ?? screenCenterX - halfSize
+    const initialY = startY ?? screenCenterY - halfSize
 
     // Calculate direction deltas
     const { deltaX, deltaY } = this.getDirectionDeltas(definition.direction)

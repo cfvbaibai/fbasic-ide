@@ -8,6 +8,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { AnimationManager } from '@/core/animation/AnimationManager'
+import { getSpriteSizeForMoveDefinition } from '@/core/animation/CharacterAnimationBuilder'
+import { SCREEN_DIMENSIONS } from '@/core/constants'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
 import type { MoveDefinition } from '@/core/sprite/types'
 import { MoveCharacterCode } from '@/shared/data/types'
@@ -133,13 +135,16 @@ describe('AnimationManager', () => {
       )
     })
 
-    it('should use default position when startX/startY not provided', () => {
+    it('should use default position so sprite center is at screen center when startX/startY not provided', () => {
       manager.defineMovement(validDefinition)
       manager.startMovement(0)
 
       const state = manager.getMovementState(0)
-      expect(state?.startX).toBe(128)
-      expect(state?.startY).toBe(120)
+      const size = getSpriteSizeForMoveDefinition(validDefinition)
+      const cx = SCREEN_DIMENSIONS.SPRITE.DEFAULT_X
+      const cy = SCREEN_DIMENSIONS.SPRITE.DEFAULT_Y
+      expect(state?.startX).toBe(cx - size / 2)
+      expect(state?.startY).toBe(cy - size / 2)
     })
   })
 

@@ -11,6 +11,7 @@ import type {
   AnimationSequence,
   CharacterAnimationConfig,
   DirectionMapping,
+  MoveDefinition,
 } from '@/core/sprite/types'
 import { CHARACTER_SPRITES } from '@/shared/data/sprites'
 import type { MoveCharacterCode, SpriteDefinition, Tile } from '@/shared/data/types'
@@ -320,4 +321,23 @@ export function getSequenceForMovement(
     invertX: mapping.invertX,
     invertY: mapping.invertY,
   }
+}
+
+/**
+ * Get sprite size in pixels (8 or 16) for a DEF MOVE definition.
+ * Used to compute default position so sprite center is at screen center.
+ * @param definition - MoveDefinition (characterType, direction, etc.)
+ * @returns 8 for 8×8 (1 tile), 16 for 16×16 (4 tiles)
+ */
+export function getSpriteSizeForMoveDefinition(definition: MoveDefinition): number {
+  const configs = buildAllCharacterAnimationConfigs()
+  const { sequence } = getSequenceForMovement(
+    definition.characterType,
+    definition.direction,
+    configs
+  )
+  if (!sequence?.frames?.length) return 8
+  const firstFrame = sequence.frames[0]
+  if (!firstFrame) return 8
+  return firstFrame.length === 4 ? 16 : 8
 }

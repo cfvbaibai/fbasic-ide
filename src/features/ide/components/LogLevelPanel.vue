@@ -64,6 +64,7 @@ watch(() => props.open, (open: boolean) => open && refreshLevels())
             <span class="logger-desc">{{ entry.description }}</span>
           </div>
           <select
+            :key="`${entry.key}-${levels[entry.key] ?? 'warn'}`"
             :value="levels[entry.key] ?? 'warn'"
             class="level-select"
             :aria-label="`Log level for ${entry.name}`"
@@ -153,7 +154,7 @@ watch(() => props.open, (open: boolean) => open && refreshLevels())
   border-radius: 6px;
   cursor: pointer;
 
-  /* Ask browser to use dark form control styling (dropdown list) where supported */
+  /* Dark dropdown list where supported */
   color-scheme: dark;
 }
 
@@ -162,7 +163,6 @@ watch(() => props.open, (open: boolean) => open && refreshLevels())
   border-color: var(--base-solid-primary);
 }
 
-/* Theme the dropdown options list to match dark UI (browser support varies) */
 .level-select option {
   background: var(--base-solid-gray-10);
   color: var(--base-solid-gray-100);

@@ -48,20 +48,30 @@ export interface SharedDisplayViews {
   scalarsView: Uint8Array
 }
 
+/** F-BASIC character code for space (empty cell). Code 0 is a picture tile, so buffer must not start as zeros. */
+const CHAR_CODE_SPACE = 0x20
+
 /**
  * Create SharedArrayBuffer and typed views for full display state (sprites + screen + cursor + sequence + scalars).
  * Call only when crossOriginIsolated (required for SharedArrayBuffer).
+ * Initializes screen region to spaces so the screen shows empty on first load (not code-0 BGITEM).
  */
 export function createSharedDisplayBuffer(): SharedDisplayViews {
   if (typeof SharedArrayBuffer === 'undefined') {
     throw new Error('SharedArrayBuffer is not available (require cross-origin isolation)')
   }
   const buffer = new SharedArrayBuffer(SHARED_DISPLAY_BUFFER_BYTES)
+  const charView = new Uint8Array(buffer, OFFSET_CHARS, CELLS)
+  const patternView = new Uint8Array(buffer, OFFSET_PATTERNS, CELLS)
+  // SharedArrayBuffer is zero-initialized; 
+  // code 0 is a picture BGITEM. Fill screen with space so initial screen is empty.
+  charView.fill(CHAR_CODE_SPACE)
+  patternView.fill(0)
   return {
     buffer,
     spriteView: new Float64Array(buffer, OFFSET_SPRITES, MAX_SPRITES * 3),
-    charView: new Uint8Array(buffer, OFFSET_CHARS, CELLS),
-    patternView: new Uint8Array(buffer, OFFSET_PATTERNS, CELLS),
+    charView,
+    patternView,
     cursorView: new Uint8Array(buffer, OFFSET_CURSOR, 2),
     sequenceView: new Int32Array(buffer, OFFSET_SEQUENCE, 1),
     scalarsView: new Uint8Array(buffer, OFFSET_SCALARS, 4),

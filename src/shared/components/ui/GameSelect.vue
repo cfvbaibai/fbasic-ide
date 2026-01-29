@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useEventListener } from '@vueuse/core'
-import { computed, onDeactivated, ref, useTemplateRef } from 'vue'
+import { computed, nextTick, onDeactivated, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import GameIcon from './GameIcon.vue'
@@ -36,6 +36,20 @@ const { t } = useI18n()
 
 const isOpen = ref(false)
 const selectRef = useTemplateRef<HTMLDivElement>('selectRef')
+const dropdownRef = useTemplateRef<HTMLElement>('dropdownRef')
+
+/** Position for teleported dropdown (fixed, so not clipped by parent overflow). */
+const dropdownStyle = ref({ top: '0px', left: '0px', width: '100px' })
+
+function updateDropdownPosition(): void {
+  if (!selectRef.value) return
+  const rect = selectRef.value.getBoundingClientRect()
+  dropdownStyle.value = {
+    top: `${rect.bottom + 4}px`,
+    left: `${rect.left}px`,
+    width: `${rect.width}px`,
+  }
+}
 
 const selectedOption = computed(() => {
   return props.options.find(opt => opt.value === props.modelValue)
@@ -48,17 +62,30 @@ const displayText = computed(() => {
 const handleSelect = (option: GameSelectOption) => {
   if (!option.disabled) {
     emit('update:modelValue', option.value)
-    isOpen.value = false
+    // Close after emit so parent can process the event before dropdown unmounts
+    void nextTick(() => {
+      isOpen.value = false
+    })
   }
 }
 
 const handleClickOutside = (event: MouseEvent) => {
-  if (selectRef.value && !selectRef.value.contains(event.target as Node)) {
-    isOpen.value = false
-  }
+  const target = event.target as Node
+  if (selectRef.value?.contains(target)) return
+  if (dropdownRef.value?.contains(target)) return
+  // Teleported dropdown may not have ref set yet; check by class
+  if ((target as Element).closest?.('.game-select-dropdown')) return
+  isOpen.value = false
 }
 
 useEventListener(document, 'click', handleClickOutside)
+useEventListener(window, 'resize', () => {
+  if (isOpen.value) updateDropdownPosition()
+})
+
+watch(isOpen, open => {
+  if (open) void nextTick(updateDropdownPosition)
+})
 
 // Close dropdown on deactivation (keep-alive support)
 onDeactivated(() => {
@@ -91,24 +118,32 @@ const selectWidth = computed(() => props.width ?? '100%')
       <GameIcon icon="mdi:chevron-down" size="small" class="game-select-arrow" />
     </button>
 
-    <Transition name="game-select-dropdown">
-      <div v-if="isOpen" class="game-select-dropdown">
+    <Teleport to="body">
+      <Transition name="game-select-dropdown">
         <div
-          v-for="option in options"
-          :key="String(option.value)"
-          :class="[
-            'game-select-option',
-            {
-              selected: option.value === modelValue,
-              disabled: option.disabled,
-            },
-          ]"
-          @click="handleSelect(option)"
+          v-if="isOpen"
+          ref="dropdownRef"
+          class="game-select-dropdown game-select-dropdown-fixed"
+          :style="dropdownStyle"
+          @click.stop
         >
-          {{ option.label }}
+          <div
+            v-for="option in options"
+            :key="String(option.value)"
+            :class="[
+              'game-select-option',
+              {
+                selected: option.value === modelValue,
+                disabled: option.disabled,
+              },
+            ]"
+            @mousedown.prevent="handleSelect(option)"
+          >
+            {{ option.label }}
+          </div>
         </div>
-      </div>
-    </Transition>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
@@ -176,11 +211,6 @@ const selectWidth = computed(() => props.width ?? '100%')
 }
 
 .game-select-dropdown {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  right: 0;
-  z-index: 1000;
   background: var(--game-surface-bg-gradient);
   border: 2px solid var(--game-surface-border);
   border-radius: 8px;
@@ -190,7 +220,12 @@ const selectWidth = computed(() => props.width ?? '100%')
     inset 0 1px 0 var(--base-alpha-gray-100-10);
   max-height: 200px;
   overflow-y: auto;
-  margin-top: 4px;
+}
+
+/* Teleported dropdown: fixed so not clipped by parent overflow */
+.game-select-dropdown-fixed {
+  position: fixed;
+  z-index: 9999;
 }
 
 .game-select-option {
