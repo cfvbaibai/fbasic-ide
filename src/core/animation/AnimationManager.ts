@@ -25,7 +25,9 @@ export class AnimationManager {
   private sharedAnimationView: Float64Array | null = null
 
   /**
-   * Set device adapter for sending animation commands
+   * Set device adapter for sending animation commands to the main thread.
+   * @param adapter - Device adapter implementing sendAnimationCommand
+   *   (and optional setSpritePosition, clearSpritePosition)
    */
   setDeviceAdapter(adapter: BasicDeviceAdapter): void {
     this.deviceAdapter = adapter
@@ -61,8 +63,10 @@ export class AnimationManager {
   }
 
   /**
-   * Define a movement (DEF MOVE command)
-   * Stores the movement definition but does not start movement
+   * Define a movement (DEF MOVE command). Stores the definition; does not start movement.
+   * @param definition - MoveDefinition (actionNumber 0-7, characterType, direction,
+   *   speed, distance, priority, colorCombination)
+   * @throws Error if any parameter is out of range
    */
   defineMovement(definition: MoveDefinition): void {
     // Validate action number
@@ -94,16 +98,20 @@ export class AnimationManager {
   }
 
   /**
-   * Get movement definition
+   * Get movement definition for an action slot.
+   * @param actionNumber - Action slot 0-7
+   * @returns MoveDefinition if defined, otherwise undefined
    */
   getMoveDefinition(actionNumber: number): MoveDefinition | undefined {
     return this.moveDefinitions.get(actionNumber)
   }
 
   /**
-   * Start movement (MOVE command)
-   * Initializes movement state and begins animation
-   * Position will be retrieved from Konva nodes in the frontend
+   * Start movement (MOVE command). Initializes state and sends START_MOVEMENT to main thread.
+   * @param actionNumber - Action slot 0-7 (must have been defined with DEF MOVE)
+   * @param startX - Optional pixel X (0-255); default center if omitted
+   * @param startY - Optional pixel Y (0-239); default center if omitted
+   * @throws Error if no definition exists for actionNumber
    */
   startMovement(actionNumber: number, startX?: number, startY?: number): void {
     const definition = this.moveDefinitions.get(actionNumber)
@@ -157,8 +165,9 @@ export class AnimationManager {
   }
 
   /**
-   * Set movements inactive (main thread notified us that they completed naturally).
+   * Set movements inactive (main thread notified that they completed naturally).
    * Only updates worker state; does not send any command to main thread.
+   * @param actionNumbers - Action slots 0-7 to mark inactive
    */
   setMovementsInactive(actionNumbers: number[]): void {
     for (const actionNumber of actionNumbers) {
@@ -170,9 +179,9 @@ export class AnimationManager {
   }
 
   /**
-   * Stop movement (CUT command)
-   * Stops movement but keeps sprite visible at current position
-   * Position is stored in Konva nodes, no need to sync back to worker
+   * Stop movement (CUT command). Stops movement but keeps sprite visible at current position.
+   * Sends STOP_MOVEMENT to main thread.
+   * @param actionNumbers - Action slots 0-7 to stop
    */
   stopMovement(actionNumbers: number[]): void {
     for (const actionNumber of actionNumbers) {
@@ -193,8 +202,8 @@ export class AnimationManager {
   }
 
   /**
-   * Erase movement (ERA command)
-   * Stops movement and hides sprite
+   * Erase movement (ERA command). Stops movement and hides sprite; sends ERASE_MOVEMENT to main thread.
+   * @param actionNumbers - Action slots 0-7 to erase
    */
   eraseMovement(actionNumbers: number[]): void {
     for (const actionNumber of actionNumbers) {
@@ -216,8 +225,12 @@ export class AnimationManager {
   }
 
   /**
-   * Set initial position (POSITION command)
-   * Sends SET_POSITION to main thread; main thread sets Konva node or stores pending for START_MOVEMENT.
+   * Set initial position (POSITION command). Sends SET_POSITION to main thread.
+   * Main thread sets Konva node or stores pending for next START_MOVEMENT.
+   * @param actionNumber - Action slot 0-7
+   * @param x - Pixel X (0-255)
+   * @param y - Pixel Y (0-239)
+   * @throws Error if actionNumber or coordinates out of range
    */
   setPosition(actionNumber: number, x: number, y: number): void {
     if (actionNumber < 0 || actionNumber > 7) {
@@ -243,9 +256,10 @@ export class AnimationManager {
   }
 
   /**
-   * Get movement status (MOVE(n) function)
-   * Returns -1 if movement is active, 0 if complete or not started.
+   * Get movement status (MOVE(n) function). -1 = moving, 0 = complete or not started.
    * When shared buffer is set (worker), reads isActive from shared memory.
+   * @param actionNumber - Action slot 0-7
+   * @returns -1 if movement is active, 0 otherwise
    */
   getMovementStatus(actionNumber: number): -1 | 0 {
     if (this.sharedAnimationView && readSpriteIsActive(this.sharedAnimationView, actionNumber)) {
@@ -259,9 +273,10 @@ export class AnimationManager {
   }
 
   /**
-   * Get sprite position (XPOS/YPOS functions)
-   * NOTE: Position is stored in Konva nodes in frontend, not in worker.
-   * This method returns null - frontend should query Konva nodes directly.
+   * Get sprite position (XPOS/YPOS functions). Position lives in Konva on main thread; worker returns null.
+   * Frontend should read from shared buffer or Konva for XPOS/YPOS.
+   * @param _actionNumber - Action slot 0-7 (unused in worker; frontend reads from buffer/Konva)
+   * @returns null in worker; frontend uses shared buffer or Konva nodes
    */
   getSpritePosition(_actionNumber: number): { x: number; y: number } | null {
     // Position is in Konva nodes, not in worker state
@@ -270,14 +285,17 @@ export class AnimationManager {
   }
 
   /**
-   * Get all active movement states
+   * Get all movement states (active and inactive).
+   * @returns Array of MovementState for all defined movements
    */
   getAllMovementStates(): MovementState[] {
     return Array.from(this.movementStates.values())
   }
 
   /**
-   * Get movement state for a specific action number
+   * Get movement state for a specific action slot.
+   * @param actionNumber - Action slot 0-7
+   * @returns MovementState if present, otherwise undefined
    */
   getMovementState(actionNumber: number): MovementState | undefined {
     return this.movementStates.get(actionNumber)

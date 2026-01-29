@@ -19,4 +19,6 @@
 
 **Related plans**: [Shared Screen Buffer Implementation Plan](shared-screen-buffer-implementation-plan.md) — worker–main sync via SharedArrayBuffer (screen + sprites).
 
+**Sprite System**: 6/6 phases complete. Phases 1–6 done (2026-01-29). Optional 4.4/4.5 (incremental dirty, requestIdleCallback) not implemented — see Phase 5 "Remaining optional work" in remaining-work-plan.md.
+
 **Last Updated**: 2026-01-29 (SharedArrayBuffer strategy; Phase 6.2 state sync done)

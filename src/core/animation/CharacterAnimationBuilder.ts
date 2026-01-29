@@ -196,8 +196,10 @@ function buildSequencesFromConfig(
 }
 
 /**
- * Build character animation configuration for a character type
- * Uses characterSequenceConfig if available, otherwise falls back to old method
+ * Build character animation configuration for a character type.
+ * Uses characterSequenceConfig if available, otherwise falls back to parsing CHARACTER_SPRITES.
+ * @param characterCode - MoveCharacterCode (0-15)
+ * @returns CharacterAnimationConfig or null if no sprites for this character
  */
 export function buildCharacterAnimationConfig(
   characterCode: MoveCharacterCode
@@ -253,9 +255,9 @@ export function buildCharacterAnimationConfig(
 let cachedConfigs: Map<MoveCharacterCode, CharacterAnimationConfig> | null = null
 
 /**
- * Build all character animation configurations
- * Returns a map of character code to configuration
- * Results are cached after first call
+ * Build all character animation configurations for character types 0-15.
+ * Results are cached after first call.
+ * @returns Map from MoveCharacterCode to CharacterAnimationConfig
  */
 export function buildAllCharacterAnimationConfigs(): Map<
   MoveCharacterCode,
@@ -280,7 +282,11 @@ export function buildAllCharacterAnimationConfigs(): Map<
 }
 
 /**
- * Get sequence for a movement based on character type and direction
+ * Get the animation sequence and inversion flags for a movement (character + direction).
+ * @param characterCode - MoveCharacterCode (0-15)
+ * @param direction - Direction 0-8 (0=none, 1=up, 2=up-right, etc.)
+ * @param configs - Map of character configs (e.g. from buildAllCharacterAnimationConfigs())
+ * @returns sequence (or null), invertX, invertY
  */
 export function getSequenceForMovement(
   characterCode: MoveCharacterCode,

@@ -18,11 +18,12 @@ This document outlines the architectural design for integrating SCREEN device fu
 
 3. **Animation System**:
    - AnimationManager runs in web worker (same as ExecutionEngine)
-   - Frame rate: ~30 FPS (requestAnimationFrame on main thread)
-   - Command-based communication (not pixel data per frame)
+   - Main thread uses requestAnimationFrame for animation (no fixed 30 FPS cap)
+   - State sync via SharedArrayBuffer (sprites 0-192 bytes; screen/cursor/sequence/scalars follow)
+   - Command-based communication (ANIMATION_COMMAND, SCREEN_CHANGED) in addition to shared buffer
    - Device has knowledge of SpriteDefinition and MoveDefinition data
-   - Main thread executes animation commands using Konva.js canvas rendering
-   - **Position updates happen on main thread** - worker sends initial state, frontend handles frame-by-frame updates
+   - Main thread renders using Konva.js and reads shared buffer on each frame
+   - **Position updates happen on main thread** - worker sends initial state; frontend steps movement each rAF and writes back to shared buffer
 
 4. **Input Synchronization**: STICK and STRIG are **polled** by the program, not automatically frame-synchronized
 
@@ -78,7 +79,7 @@ graph TB
         DA[DeviceAdapter Interface]
         
         EE -->|PRINT, STICK, STRIG| DA
-        EE -->|SPRITE, MOVE| AM
+        EE -->|DEF MOVE, MOVE| AM
         AM -->|Animation Commands| DA
     end
     
@@ -94,11 +95,17 @@ graph TB
         end
         
         subgraph MainThread["Main Thread"]
-            DOM[DOM/CSS Animation]
+            Konva[Konva Canvas Renderer]
+            RAF[requestAnimationFrame Loop]
             Input[Input Handler]
         end
         
-        WWDA <-->|postMessage| DOM
+        SAB[SharedArrayBuffer]
+        WWDA -->|writes screen + sprites| SAB
+        WWDA -->|postMessage SCREEN_CHANGED / ANIMATION_COMMAND| RAF
+        SAB -->|read on render| Konva
+        RAF -->|step movement, render| Konva
+        RAF -->|UPDATE_ANIMATION_POSITIONS| WWDA
         Input -->|postMessage| WWDA
     end
     

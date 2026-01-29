@@ -87,21 +87,25 @@ export class SpriteStateManager {
   }
 
   /**
-   * Get sprite state
+   * Get sprite state for a slot.
+   * @param spriteNumber - Sprite slot 0-7
+   * @returns SpriteState or undefined
    */
   getSpriteState(spriteNumber: number): SpriteState | undefined {
     return this.spriteStates.get(spriteNumber)
   }
 
   /**
-   * Get all sprite states
+   * Get all sprite states (all 8 slots).
+   * @returns Array of SpriteState for slots 0-7
    */
   getAllSpriteStates(): SpriteState[] {
     return Array.from(this.spriteStates.values())
   }
 
   /**
-   * Get all visible sprites
+   * Get all visible sprite states.
+   * @returns Array of SpriteState where visible === true
    */
   getVisibleSprites(): SpriteState[] {
     return Array.from(this.spriteStates.values()).filter(s => s.visible)
@@ -126,7 +130,8 @@ export class SpriteStateManager {
   }
 
   /**
-   * Reset a specific sprite
+   * Reset a specific sprite slot to default (no definition, hidden, 0,0).
+   * @param spriteNumber - Sprite slot 0-7
    */
   resetSprite(spriteNumber: number): void {
     this.spriteStates.set(spriteNumber, {

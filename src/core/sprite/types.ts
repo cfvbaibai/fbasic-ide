@@ -1,5 +1,7 @@
 /**
- * Sprite and animation type definitions for Family BASIC sprite system
+ * Sprite and animation type definitions for Family BASIC sprite system.
+ * Used by DEF SPRITE/SPRITE (DefSpriteDefinition, SpriteState) and DEF MOVE/MOVE (MoveDefinition, MovementState).
+ * @module core/sprite/types
  */
 
 import type { MoveCharacterCode, Tile } from '@/shared/data/types'

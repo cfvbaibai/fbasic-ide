@@ -289,13 +289,11 @@ This document outlines the remaining work needed to complete the Family Basic ID
 
 ---
 
-### Phase 5: Implement Sprite System (🚧 IN PROGRESS)
+### Phase 5: Implement Sprite System ✅ COMPLETE
 
-**Estimated Effort**: 5-10 days
-**Priority**: Medium (advanced feature, foundational work in progress)
-**Status**: 5/6 phases complete (83%)
-
-**Detailed Plan**: See `docs/planning/sprite-animation-implementation-plan.md`
+**Estimated Effort**: 5-10 days (done)
+**Priority**: Medium
+**Status**: 6/6 phases complete. Sprite implementation plan retired (2026-01-29); details consolidated here.
 
 #### 5.1 Sprite Commands - Progress Tracker
 - [x] **Phase 1**: Canvas Infrastructure ✅ (2026-01-25)
@@ -324,10 +322,16 @@ This document outlines the remaining work needed to complete the Family Basic ID
   - XPOS, YPOS (sprite coordinates) ✅
   - MOVE(n) status query ✅
   - Position preservation fix for CUT command ✅
-- [ ] **Phase 6**: Integration & Polish
-  - Performance optimization
-  - Comprehensive testing
-  - Documentation
+- [x] **Phase 6**: Integration & Polish ✅ (2026-01-29)
+  - Performance: dirty background, animation-first prioritization, buffer-only render (useKonvaBackgroundRenderer, useScreenAnimationLoop, useRenderQueue)
+  - State sync: SharedArrayBuffer (sharedDisplayBuffer, sharedAnimationBuffer)
+  - Error handling: executor audit, consistent messages
+  - Testing: Layer 1/2 + `test/animation/` (AnimationManager, CharacterAnimationBuilder, FrameAnimation)
+  - Documentation: JSDoc, architecture diagrams
+
+**Remaining optional work (from retired sprite plan; implement only if needed)**:
+- **4.4 Incremental dirty update** — Cap dirty cells per frame (e.g. 64) when a single update has many cells; add only if hitches remain on very large PRINTs.
+- **4.5 requestIdleCallback for full redraw** — When no active movements, schedule full redraw via requestIdleCallback; use only if needed.
 
 **Files Created So Far**:
 - `src/core/sprite/types.ts` - Type definitions
@@ -347,7 +351,6 @@ This document outlines the remaining work needed to complete the Family Basic ID
 - `src/features/ide/composables/useMovementStateSync.ts` - Movement state synchronization
 
 **Reference Documentation**:
-- `docs/planning/sprite-animation-implementation-plan.md` - **Main implementation plan**
 - `.claude/skills/fbasic-reference/references/sprites.md`
 - `docs/reference/family-basic-manual/page-74.md` through `page-87.md`
 - `docs/archive/device-models/screen/canvas-sprite-animation-design.md` - Historical canvas-based design (superseded by Konva.js)
@@ -543,186 +546,7 @@ This document outlines the remaining work needed to complete the Family Basic ID
 
 ---
 
-**Last Updated**: 2026-01-26
+**Last Updated**: 2026-01-29  
 **Next Review**: After Phase 2 completion (VIEW command, PALET B command)
 
-## Recent Updates
-
-### Vue 3 Reactivity Fixes & Code Quality Improvements (2026-01-26)
-- ✅ **Props Reactivity Loss Fix**:
-  - Fixed `Screen.vue` props reactivity loss by wrapping `onPositionSync` access with `toValue()`
-  - Prevents loss of reactivity when passing props to composables
-- ✅ **KonvaSpriteTestPage Refactoring**:
-  - Reduced main component from 514 to 266 lines (52% reduction)
-  - Extracted animation loop logic to `useSpriteAnimation.ts` (107 lines)
-  - Extracted Konva stage initialization to `useKonvaStage.ts` (173 lines)
-  - Improved maintainability and separation of concerns
-- ✅ **TypeScript Type Safety**:
-  - Fixed type inference issues with Konva.Image refs
-  - Added explicit Ref type imports and assertions
-  - Resolved useTemplateRef type compatibility
-- ✅ **Code Quality**:
-  - All files now respect 500-line limit
-  - Removed unused SPRITE_SCALE variable
-  - All ESLint, TypeScript, and Stylelint checks pass
-
-**Status**: Vue 3 best practices fully addressed. All code quality standards met.
-
-### Backdrop Screen Implementation (2026-01-24)
-- ✅ **Canvas Dimensions**: Extended canvas from 240×208 to 256×240 pixels (full backdrop/sprite screen size)
-- ✅ **Backdrop Rendering**: Implemented proper 32×30 character backdrop screen rendering
-  - Backdrop screen: 32×30 characters = 256×240 pixels
-  - Background screen positioned at offset (16, 24) within backdrop
-  - Backdrop rendered as solid color (default: black, color code 0)
-- ✅ **State Management**: Added backdrop color state to device adapters
-  - Added `backdropColor` state (default: 0 = black)
-  - Added `setBackdropColor()` method to `BasicDeviceAdapter` interface
-  - Implemented in `WebWorkerDeviceAdapter` and `TestDeviceAdapter`
-- ✅ **Message Handling**: Extended `ScreenUpdateMessage` interface to support 'backdrop' update type
-  - Added backdrop color to message handlers
-  - Updated `useBasicIdeMessageHandlers.ts` to handle backdrop color updates
-- ✅ **Component Updates**: Updated all screen components to support backdrop color
-  - `Screen.vue`: Accepts `backdropColor` prop, passes to renderer
-  - `RuntimeOutput.vue`: Passes backdrop color to Screen component
-  - `IdePage.vue`: Connects backdrop color state to components
-  - Added watchers to re-render when backdrop color changes
-- ✅ **Rendering Logic**: Updated `canvasRenderer.ts` to properly render backdrop layer
-  - Backdrop rendered first (solid color fill)
-  - Background screen rendered on top at correct offset
-  - Proper layer ordering maintained
-- ✅ **PALET B Command**: Fully implemented
-  - Added PALET, PALETB, PALETS tokens to parser
-  - Added `paletStatement` rule supporting both `PALET B/S` (with space) and `PALETB/PALETS` (no space) forms
-  - Created `PaletExecutor.ts` handling PALET B and PALET S commands
-  - When `PALET B 0, C1, ...` is executed, sets backdrop color to C1
-  - 16 comprehensive unit tests covering all scenarios
-  - All tests pass, type checking and linting pass
-
-**Status**: Backdrop screen and PALET B command fully implemented. Dynamic backdrop color changes now supported via `PALET B 0, colorCode, ...` command.
-
-### CGEN Command Implementation & WebWorkerDeviceAdapter Refactoring (2026-01-24)
-- ✅ **Parser**: Added `CGEN` token and `cgenStatement` rule (CGEN n, where n is 0-3)
-- ✅ **Executor**: Created `CgenExecutor.ts` with full validation (mode: 0-3)
-  - Mode 0: Character table A on BG, A on sprite
-  - Mode 1: Character table A on BG, B on sprite
-  - Mode 2: Character table B on BG, A on sprite (default)
-  - Mode 3: Character table B on BG, B on sprite
-- ✅ **Device Adapter**: Implemented `setCharacterGeneratorMode()` in device adapters
-  - Added to `BasicDeviceAdapter` interface
-  - Implemented in `WebWorkerDeviceAdapter` and `TestDeviceAdapter`
-  - Sends 'cgen' update messages with cgenMode value
-- ✅ **Message Handler**: Added 'cgen' update type handling in `useBasicIdeMessageHandlers.ts`
-- ✅ **Integration**: Registered CGEN in `StatementRouter.ts`
-- ✅ **Interface Updates**: Extended `ScreenUpdateMessage` interface to support 'cgen' update type
-- ✅ **Testing**: 
-  - 13 unit tests in `CgenExecutor.test.ts` covering all modes, expressions, error handling, and integration
-  - All tests pass with proper TypeScript types
-- ✅ **Code Quality**: Refactored `WebWorkerDeviceAdapter.ts` to address file size limit
-  - Split 849-line file into focused modules:
-    - `WebWorkerDeviceAdapter.ts` (370 lines) - Main adapter class
-    - `WebWorkerManager.ts` (242 lines) - Web worker lifecycle management
-    - `ScreenStateManager.ts` (382 lines) - Screen buffer and state management
-    - `MessageHandler.ts` (127 lines) - Message routing and handling
-  - All files now under 500-line limit
-  - Improved separation of concerns and maintainability
-- ✅ **Type Safety**: All code uses proper TypeScript types, no `any` types
-- ✅ **Linting**: All lint errors resolved, file size limits respected
-
-**Status**: CGEN command fully implemented and tested. WebWorkerDeviceAdapter successfully refactored into maintainable modules.
-
-### CGSET Command Implementation & Palette Rendering Fix (2026-01-23)
-- ✅ **Parser**: Added `CGSET` token and `cgsetStatement` rule (CGSET [m][,n])
-- ✅ **Executor**: Created `CgsetExecutor.ts` with full validation (m: 0-1, n: 0-2, both optional, defaults: m=1, n=1)
-- ✅ **Device Adapter**: Implemented `setColorPalette()` in `WebWorkerDeviceAdapter` and `TestDeviceAdapter`
-  - Sends 'palette' update messages with bgPalette and spritePalette values
-- ✅ **Message Handler**: Added 'palette' update type handling in `useBasicIdeMessageHandlers.ts`
-  - Processes palette updates to update bgPalette ref in context
-- ✅ **UI Integration**: Fixed palette rendering in Screen component
-  - Added `bgPalette` prop to Screen and RuntimeOutput components
-  - Screen component now uses palette from props instead of hardcoded value
-  - Added watcher to re-render when palette changes
-- ✅ **Integration**: Registered CGSET in `StatementRouter.ts`
-- ✅ **Interface Updates**: Extended `ScreenUpdateMessage` interface to support 'palette' update type
-- ✅ **Testing**: 
-  - 18 unit tests in `CgsetExecutor.test.ts` covering all scenarios including CGSET + PRINT integration
-  - 11 integration tests in `CgsetIntegration.test.ts` verifying message generation, handler processing, and PRINT integration
-  - Tests verify that CGSET 0, 1 sets palette correctly and characters use color 0x2C from palette 0
-- ✅ **Type Safety**: All tests use proper TypeScript types, no `any` types
-
-**Status**: CGSET command fully implemented and tested. Palette changes now correctly affect character rendering. Characters printed after `CGSET 0, 1` are rendered with color 0x2C (#4EB7BC) from palette 0 instead of white.
-
-### COLOR Command Implementation (2026-01-23)
-- ✅ **Parser**: Added `COLOR` token and `colorStatement` rule (COLOR X, Y, n)
-- ✅ **Executor**: Created `ColorExecutor.ts` with full validation (X: 0-27, Y: 0-23, pattern: 0-3)
-- ✅ **Device Adapter**: Implemented `setColorPattern()` in `WebWorkerDeviceAdapter` and `TestDeviceAdapter`
-  - Updates 2×2 character area containing specified position
-  - Sends 'color' update messages with colorUpdates array
-- ✅ **Message Handler**: Fixed bug where 'color' update messages weren't being processed
-  - Added 'color' case handler in `useBasicIdeMessageHandlers.ts`
-  - Processes colorUpdates array to update screen buffer colorPattern values
-- ✅ **Integration**: Registered COLOR in `StatementRouter.ts`
-- ✅ **Interface Updates**: Extended `ScreenUpdateMessage` interface to support 'color' update type
-- ✅ **Testing**: 
-  - 16 unit tests in `ColorExecutor.test.ts` covering all scenarios
-  - 9 integration tests in `ColorIntegration.test.ts` with message handler simulation
-  - Tests verify message generation, handler processing, and area calculation
-- ✅ **Type Safety**: All tests use proper TypeScript types, no `any` types
-
-**Status**: COLOR command fully implemented and tested. Color patterns are correctly applied to screen areas and visible in the IDE.
-
-### LOCATE Command Implementation (2026-01-22)
-- ✅ **Parser**: Added `LOCATE` token and `locateStatement` rule
-- ✅ **Executor**: Created `LocateExecutor.ts` with full validation (X: 0-27, Y: 0-23)
-- ✅ **Device Adapter**: Implemented `setCursorPosition()` in `WebWorkerDeviceAdapter` and `TestDeviceAdapter`
-- ✅ **Integration**: Registered LOCATE in `StatementRouter.ts`
-- ✅ **Testing**: 
-  - 16 unit tests in `LocateExecutor.test.ts` covering all scenarios
-  - 8 integration tests in `LocatePrintIntegration.test.ts` verifying LOCATE + PRINT behavior
-  - 9 device adapter tests in `WebWorkerDeviceAdapter.test.ts` testing cursor positioning
-- ✅ **Type Safety**: All tests use proper TypeScript types, no `any` types
-
-**Status**: LOCATE command fully implemented and tested. Cursor positioning works correctly with PRINT statements.
-
-### Vue Best Practices Improvements (2026-01-22 to 2026-01-26)
-- ✅ **Template Refs**: Migrated 6 components to Vue 3.5+ `useTemplateRef` pattern (2026-01-22)
-- ✅ **Keep-Alive Support**: Added `onDeactivated` cleanup to prevent memory leaks (2026-01-22)
-- ✅ **Type Extraction**: Created type files for 10 UI components with proper exports (2026-01-22)
-- ✅ **Error Messages**: Enhanced store error messages with descriptive context (2026-01-22)
-- ✅ **JSDoc Verification**: Confirmed most components have comprehensive documentation (2026-01-22)
-- ✅ **Props Reactivity**: Fixed Screen.vue props reactivity loss with `toValue()` wrapper (2026-01-26)
-
-**Reference**: See `docs/planning/vue-vueuse-best-practices-plan.md` for detailed implementation
-
-### Sprite System Progress (2026-01-25)
-
-**Phase 3: Basic Animation** ✅ Complete:
-- ✅ DEF MOVE and MOVE commands fully implemented
-- ✅ Real-time animation command communication
-- ✅ Movement calculation and timing
-- ✅ requestAnimationFrame animation loop
-
-**Phase 4: Animation Sequences** ✅ Complete:
-- ✅ Frame cycling with character sprites
-- ✅ **Explicit character sequence configuration** (`characterSequenceConfig.ts`)
-  - All 16 character types have explicit configs
-  - Direction-specific sprite lists with frame order
-  - Per-frame inversion flags (frameInversions)
-- ✅ **Per-frame sprite inversion support**
-  - FrameInversionConfig interface added
-  - Each frame can have its own inversion flags
-  - Sprite renderers support per-frame inversions with direction-level fallback
-- ✅ CharacterAnimationBuilder refactored to use config-based approach
-- ✅ Direction-to-sequence mapping with automatic inversion
-
-**Phase 5: Movement Control** ✅ Complete:
-- ✅ CUT command - stops movement, preserves position
-- ✅ ERA command - erases sprite completely
-- ✅ POSITION command - sets initial position for next MOVE
-- ✅ MOVE(n) function - returns movement status (-1=moving, 0=complete)
-- ✅ XPOS(n) function - returns current X position
-- ✅ YPOS(n) function - returns current Y position
-- ✅ **Position preservation fix** - CUT command now correctly preserves animated positions using Konva sprite node references
-
-**Status**: 5/6 phases complete (83%). Phases 1-5 fully functional. Remaining: Integration & Polish (Phase 6).
-
-**Reference**: See `docs/planning/sprite-animation-implementation-plan.md` for detailed implementation
+**Changelog**: Recent updates and implementation notes are in `docs/diary/`, one file per date: `docs/diary/yyyy-MM-dd.txt` (e.g. `2026-01-22.txt`, `2026-01-26.txt`).

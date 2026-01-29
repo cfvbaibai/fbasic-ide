@@ -352,6 +352,11 @@ export const CHARACTER_SEQUENCE_CONFIGS: CharacterSequenceConfig[] = [
 /**
  * Get configuration for a specific character type
  */
+/**
+ * Get the explicit character sequence configuration for a character type (0-15).
+ * @param characterType - MoveCharacterCode (0-15)
+ * @returns CharacterSequenceConfig if found, otherwise null
+ */
 export function getCharacterSequenceConfig(
   characterType: MoveCharacterCode
 ): CharacterSequenceConfig | null {

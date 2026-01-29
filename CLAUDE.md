@@ -64,8 +64,15 @@ pnpm test:run <path>  # Run specific test file (no -- separator needed)
 - `docs/device-models/` - Device specifications and architecture
 - `docs/reference/` - Language references, manuals, specifications
 - `docs/poc/` - Experimental documentation and POCs
+- `docs/diary/` - Changelogs, recent updates, implementation notes (**one date per file**)
 
 **NEVER create documentation files at the workspace root.** All documentation belongs in `docs/` with appropriate subdirectories.
+
+### Changelog and Diary Content
+
+- **Changelog-style sections** (e.g. "Recent Updates", "Implementation Notes", "Changelog", "What's New") **MUST** live in `docs/diary/`, not inline in planning/guides/analysis docs.
+- **One date, one file**: Diary entries are organized by date. File name format: **`yyyy-MM-dd.txt`** (e.g. `2026-01-22.txt`). Append to the existing file for that date when adding entries.
+- In the source doc, add a short pointer to the diary (e.g. "Changelog: see `docs/diary/` (files `yyyy-MM-dd.txt` by date)").
 
 ### File Naming
 - Use kebab-case: `feature-name-plan.md`, `refactoring-guide.md`

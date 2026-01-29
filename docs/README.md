@@ -34,8 +34,7 @@ Reference material:
 
 ### 📋 `planning/`
 Active planning and refactoring documents:
-- `remaining-work-plan.md` - Comprehensive plan for remaining project work
-- `sprite-animation-implementation-plan.md` - Sprite animation system implementation plan
+- `remaining-work-plan.md` - Comprehensive plan for remaining project work (includes Phase 5 Sprite System; optional 4.4/4.5 noted)
 
 **Note**: Completed planning documents are archived in `archive/planning/`
 

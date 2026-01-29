@@ -26,13 +26,23 @@ export const OFFSET_SCALARS = OFFSET_SEQUENCE + 4 // 1544
 
 export const SHARED_DISPLAY_BUFFER_BYTES = OFFSET_SCALARS + 4 // 1548
 
+/**
+ * Typed views over the shared display buffer (sprites + screen + cursor + sequence + scalars).
+ */
 export interface SharedDisplayViews {
+  /** Raw SharedArrayBuffer (1548 bytes). */
   buffer: SharedArrayBuffer
+  /** Sprite positions and isActive (0-192 bytes; Float64 × 24). */
   spriteView: Float64Array
+  /** Screen character codes (28×24 cells). */
   charView: Uint8Array
+  /** Screen color patterns (28×24 cells). */
   patternView: Uint8Array
+  /** Cursor X, Y (2 bytes). */
   cursorView: Uint8Array
+  /** Sequence number for change detection (Int32). */
   sequenceView: Int32Array
+  /** Scalars: bgPalette, spritePalette, backdropColor, cgenMode (4 bytes). */
   scalarsView: Uint8Array
 }
 

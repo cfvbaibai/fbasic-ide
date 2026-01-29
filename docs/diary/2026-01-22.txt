@@ -1,0 +1,23 @@
+### Recent Updates (2026-01-22)
+
+**LOCATE Command Implementation**:
+- ✅ **Parser**: Added `LOCATE` token and `locateStatement` rule
+- ✅ **Executor**: Created `LocateExecutor.ts` with full validation (X: 0-27, Y: 0-23)
+- ✅ **Device Adapter**: Implemented `setCursorPosition()` in `WebWorkerDeviceAdapter` and `TestDeviceAdapter`
+- ✅ **Integration**: Registered LOCATE in `StatementRouter.ts`
+- ✅ **Testing**:
+  - 16 unit tests in `LocateExecutor.test.ts` covering all scenarios
+  - 8 integration tests in `LocatePrintIntegration.test.ts` verifying LOCATE + PRINT behavior
+  - 9 device adapter tests in `WebWorkerDeviceAdapter.test.ts` testing cursor positioning
+- ✅ **Type Safety**: All tests use proper TypeScript types, no `any` types
+
+**Status**: LOCATE command fully implemented and tested. Cursor positioning works correctly with PRINT statements.
+
+**Vue Best Practices Improvements** (2026-01-22):
+- ✅ **Template Refs**: Migrated 6 components to Vue 3.5+ `useTemplateRef` pattern
+- ✅ **Keep-Alive Support**: Added `onDeactivated` cleanup to prevent memory leaks
+- ✅ **Type Extraction**: Created type files for 10 UI components with proper exports
+- ✅ **Error Messages**: Enhanced store error messages with descriptive context
+- ✅ **JSDoc Verification**: Confirmed most components have comprehensive documentation
+
+**Reference**: See `docs/planning/vue-vueuse-best-practices-plan.md` for detailed implementation.
