@@ -1,43 +1,48 @@
 {
-  "title": "Family Basic IDE",
-  "codeEditor": {
-    "title": "Code Editor",
-    "placeholder": "Enter your Family Basic code here..."
-  },
-  "controls": {
-    "run": "Run",
-    "stop": "Stop",
-    "clear": "Clear",
-    "debug": "Debug"
-  },
-  "output": {
-    "title": "Runtime Output",
-    "empty": "No output yet. Run your BASIC program to see results here.",
-    "screen": "Screen",
-    "stdout": "Stdout",
-    "variables": "Variables",
-    "debug": "Debug",
-    "errorLine": "Line {line}"
-  },
-  "samples": {
-    "basic": "Basic",
-    "pause": "Pause Demo",
-    "gaming": "Joystick Test",
-    "complex": "Complex",
-    "comprehensive": "Full Demo",
-    "allChars": "All Chars",
-    "spriteTest": "Sprite Test",
-    "moveTest": "Move Test",
-    "testMoveControl": "Move Control Test"
-  },
-  "joystick": {
-    "control": "Joystick Control",
-    "status": "Joystick Status",
-    "joystick": "Joystick {id}",
-    "columns": {
-      "id": "ID",
-      "stick": "STICK",
-      "strig": "STRIG"
+    "title": "Family Basic IDE",
+    "codeEditor": {
+        "title": "Code Editor",
+        "placeholder": "Enter your Family Basic code here..."
+    },
+    "controls": {
+        "run": "Run",
+        "stop": "Stop",
+        "clear": "Clear",
+        "debug": "Debug"
+    },
+    "output": {
+        "title": "Runtime Output",
+        "empty": "No output yet. Run your BASIC program to see results here.",
+        "screen": "Screen",
+        "stdout": "Stdout",
+        "variables": "Variables",
+        "debug": "Debug",
+        "errorLine": "Line {line}",
+        "paletteBg": "BG",
+        "paletteSprite": "Sprite",
+        "paletteBgTitle": "Active background palette (0–1)",
+        "paletteSpriteTitle": "Active sprite palette (0–2)",
+        "combo": "Combo"
+    },
+    "samples": {
+        "basic": "Basic",
+        "pause": "Pause Demo",
+        "gaming": "Joystick Test",
+        "complex": "Complex",
+        "comprehensive": "Full Demo",
+        "allChars": "All Chars",
+        "spriteTest": "Sprite Test",
+        "moveTest": "Move Test",
+        "testMoveControl": "Move Control Test"
+    },
+    "joystick": {
+        "control": "Joystick Control",
+        "status": "Joystick Status",
+        "joystick": "Joystick {id}",
+        "columns": {
+            "id": "ID",
+            "stick": "STICK",
+            "strig": "STRIG"
+        }
     }
-  }
 }

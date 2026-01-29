@@ -150,7 +150,9 @@
       }
     }
     /**
-     * Set device adapter for sending animation commands
+     * Set device adapter for sending animation commands to the main thread.
+     * @param adapter - Device adapter implementing sendAnimationCommand
+     *   (and optional setSpritePosition, clearSpritePosition)
      */
     setDeviceAdapter(adapter) {
       this.deviceAdapter = adapter;
@@ -177,8 +179,10 @@
       );
     }
     /**
-     * Define a movement (DEF MOVE command)
-     * Stores the movement definition but does not start movement
+     * Define a movement (DEF MOVE command). Stores the definition; does not start movement.
+     * @param definition - MoveDefinition (actionNumber 0-7, characterType, direction,
+     *   speed, distance, priority, colorCombination)
+     * @throws Error if any parameter is out of range
      */
     defineMovement(definition) {
       if (definition.actionNumber < 0 || definition.actionNumber > 7) {
@@ -205,15 +209,19 @@
       this.moveDefinitions.set(definition.actionNumber, definition);
     }
     /**
-     * Get movement definition
+     * Get movement definition for an action slot.
+     * @param actionNumber - Action slot 0-7
+     * @returns MoveDefinition if defined, otherwise undefined
      */
     getMoveDefinition(actionNumber) {
       return this.moveDefinitions.get(actionNumber);
     }
     /**
-     * Start movement (MOVE command)
-     * Initializes movement state and begins animation
-     * Position will be retrieved from Konva nodes in the frontend
+     * Start movement (MOVE command). Initializes state and sends START_MOVEMENT to main thread.
+     * @param actionNumber - Action slot 0-7 (must have been defined with DEF MOVE)
+     * @param startX - Optional pixel X (0-255); default center if omitted
+     * @param startY - Optional pixel Y (0-239); default center if omitted
+     * @throws Error if no definition exists for actionNumber
      */
     startMovement(actionNumber, startX, startY) {
       const definition = this.moveDefinitions.get(actionNumber);
@@ -253,8 +261,9 @@
       }
     }
     /**
-     * Set movements inactive (main thread notified us that they completed naturally).
+     * Set movements inactive (main thread notified that they completed naturally).
      * Only updates worker state; does not send any command to main thread.
+     * @param actionNumbers - Action slots 0-7 to mark inactive
      */
     setMovementsInactive(actionNumbers) {
       for (const actionNumber of actionNumbers) {
@@ -265,9 +274,9 @@
       }
     }
     /**
-     * Stop movement (CUT command)
-     * Stops movement but keeps sprite visible at current position
-     * Position is stored in Konva nodes, no need to sync back to worker
+     * Stop movement (CUT command). Stops movement but keeps sprite visible at current position.
+     * Sends STOP_MOVEMENT to main thread.
+     * @param actionNumbers - Action slots 0-7 to stop
      */
     stopMovement(actionNumbers) {
       for (const actionNumber of actionNumbers) {
@@ -285,8 +294,8 @@
       }
     }
     /**
-     * Erase movement (ERA command)
-     * Stops movement and hides sprite
+     * Erase movement (ERA command). Stops movement and hides sprite; sends ERASE_MOVEMENT to main thread.
+     * @param actionNumbers - Action slots 0-7 to erase
      */
     eraseMovement(actionNumbers) {
       for (const actionNumber of actionNumbers) {
@@ -305,8 +314,12 @@
       }
     }
     /**
-     * Set initial position (POSITION command)
-     * Sends SET_POSITION to main thread; main thread sets Konva node or stores pending for START_MOVEMENT.
+     * Set initial position (POSITION command). Sends SET_POSITION to main thread.
+     * Main thread sets Konva node or stores pending for next START_MOVEMENT.
+     * @param actionNumber - Action slot 0-7
+     * @param x - Pixel X (0-255)
+     * @param y - Pixel Y (0-239)
+     * @throws Error if actionNumber or coordinates out of range
      */
     setPosition(actionNumber, x, y) {
       if (actionNumber < 0 || actionNumber > 7) {
@@ -330,9 +343,10 @@
       }
     }
     /**
-     * Get movement status (MOVE(n) function)
-     * Returns -1 if movement is active, 0 if complete or not started.
+     * Get movement status (MOVE(n) function). -1 = moving, 0 = complete or not started.
      * When shared buffer is set (worker), reads isActive from shared memory.
+     * @param actionNumber - Action slot 0-7
+     * @returns -1 if movement is active, 0 otherwise
      */
     getMovementStatus(actionNumber) {
       if (this.sharedAnimationView && readSpriteIsActive(this.sharedAnimationView, actionNumber)) {
@@ -345,21 +359,25 @@
       return 0;
     }
     /**
-     * Get sprite position (XPOS/YPOS functions)
-     * NOTE: Position is stored in Konva nodes in frontend, not in worker.
-     * This method returns null - frontend should query Konva nodes directly.
+     * Get sprite position (XPOS/YPOS functions). Position lives in Konva on main thread; worker returns null.
+     * Frontend should read from shared buffer or Konva for XPOS/YPOS.
+     * @param _actionNumber - Action slot 0-7 (unused in worker; frontend reads from buffer/Konva)
+     * @returns null in worker; frontend uses shared buffer or Konva nodes
      */
     getSpritePosition(_actionNumber) {
       return null;
     }
     /**
-     * Get all active movement states
+     * Get all movement states (active and inactive).
+     * @returns Array of MovementState for all defined movements
      */
     getAllMovementStates() {
       return Array.from(this.movementStates.values());
     }
     /**
-     * Get movement state for a specific action number
+     * Get movement state for a specific action slot.
+     * @param actionNumber - Action slot 0-7
+     * @returns MovementState if present, otherwise undefined
      */
     getMovementState(actionNumber) {
       return this.movementStates.get(actionNumber);
@@ -5883,7 +5901,7 @@
       }
       const actionNumber = Math.floor(toNumber(args[0] ?? 0));
       if (actionNumber < 0 || actionNumber > 7) {
-        throw new Error("MOVE action number must be 0-7");
+        throw new Error(`MOVE action number out of range (0-7), got ${actionNumber}`);
       }
       if (!this.context.animationManager) {
         return 0;
@@ -5903,7 +5921,7 @@
       }
       const actionNumber = Math.floor(toNumber(args[0] ?? 0));
       if (actionNumber < 0 || actionNumber > 7) {
-        throw new Error("XPOS action number must be 0-7");
+        throw new Error(`XPOS action number out of range (0-7), got ${actionNumber}`);
       }
       const position = this.context.getSpritePosition(actionNumber);
       return position?.x ?? 0;
@@ -5921,7 +5939,7 @@
       }
       const actionNumber = Math.floor(toNumber(args[0] ?? 0));
       if (actionNumber < 0 || actionNumber > 7) {
-        throw new Error("YPOS action number must be 0-7");
+        throw new Error(`YPOS action number out of range (0-7), got ${actionNumber}`);
       }
       const position = this.context.getSpritePosition(actionNumber);
       return position?.y ?? 0;
@@ -6807,6 +6825,24 @@
         const bgStr = bgPalette !== void 0 ? String(bgPalette) : "default(1)";
         const spriteStr = spritePalette !== void 0 ? String(spritePalette) : "default(1)";
         this.context.addDebugOutput(`CGSET: Background palette=${bgStr}, Sprite palette=${spriteStr}`);
+      }
+    }
+  };
+
+  // src/core/execution/executors/ClearExecutor.ts
+  var ClearExecutor = class {
+    constructor(variableService) {
+      this.variableService = variableService;
+    }
+    /**
+     * Execute CLEAR statement
+     * CLEAR (expression)? — clears variables and arrays; address if present is ignored
+     */
+    execute(_clearStmtCst) {
+      this.variableService.clearVariables();
+      this.variableService.clearArrays();
+      if (this.variableService.context.config.enableDebugMode) {
+        this.variableService.context.addDebugOutput("CLEAR: variables and arrays cleared");
       }
     }
   };
@@ -12418,6 +12454,101 @@
     }
   };
 
+  // src/core/execution/executors/SwapExecutor.ts
+  var SwapExecutor = class {
+    constructor(variableService) {
+      this.variableService = variableService;
+    }
+    /**
+     * Execute SWAP statement
+     * SWAP variable1, variable2 — types must match
+     */
+    execute(swapStmtCst, lineNumber) {
+      const targets = getCstNodes(swapStmtCst.children.swapTarget);
+      if (targets.length !== 2) {
+        this.variableService.context.addError({
+          line: lineNumber,
+          message: "SWAP: exactly two variables required",
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      const [target1, target2] = targets;
+      if (!target1 || !target2) return;
+      const value1 = this.getTargetValue(target1);
+      const value2 = this.getTargetValue(target2);
+      if (value1 === void 0 || value2 === void 0) {
+        return;
+      }
+      const type1 = typeof value1;
+      const type2 = typeof value2;
+      if (type1 !== type2) {
+        this.variableService.context.addError({
+          line: lineNumber,
+          message: `SWAP: type mismatch (cannot swap numeric and string variables)`,
+          type: ERROR_TYPES.RUNTIME
+        });
+        return;
+      }
+      this.setTargetValue(target1, value2);
+      this.setTargetValue(target2, value1);
+      if (this.variableService.context.config.enableDebugMode) {
+        this.variableService.context.addDebugOutput(`SWAP: values exchanged`);
+      }
+    }
+    /**
+     * Get value for a swap target (Identifier or arrayAccess)
+     */
+    getTargetValue(targetCst) {
+      const arrayAccessCst = getFirstCstNode(targetCst.children.arrayAccess);
+      if (arrayAccessCst) {
+        const identifierToken2 = getFirstToken(arrayAccessCst.children.Identifier);
+        const expressionListCst = getFirstCstNode(arrayAccessCst.children.expressionList);
+        if (!identifierToken2 || !expressionListCst) return void 0;
+        const name2 = identifierToken2.image.toUpperCase();
+        const indexExprs = getCstNodes(expressionListCst.children.expression);
+        const indices = indexExprs.map(
+          (expr) => Math.floor(
+            this.variableService.evaluator.evaluateExpression(expr) ?? 0
+          )
+        );
+        return this.variableService.getArrayElement(name2, indices);
+      }
+      const identifierToken = getFirstToken(targetCst.children.Identifier);
+      if (!identifierToken) return void 0;
+      const name = identifierToken.image.toUpperCase();
+      const variable = this.variableService.getVariable(name);
+      if (variable !== void 0) {
+        return variable.value;
+      }
+      return name.endsWith("$") ? "" : 0;
+    }
+    /**
+     * Set value for a swap target (Identifier or arrayAccess)
+     */
+    setTargetValue(targetCst, value) {
+      const arrayAccessCst = getFirstCstNode(targetCst.children.arrayAccess);
+      if (arrayAccessCst) {
+        const identifierToken2 = getFirstToken(arrayAccessCst.children.Identifier);
+        const expressionListCst = getFirstCstNode(arrayAccessCst.children.expressionList);
+        if (!identifierToken2 || !expressionListCst) return;
+        const name2 = identifierToken2.image.toUpperCase();
+        const indexExprs = getCstNodes(expressionListCst.children.expression);
+        const indices = indexExprs.map(
+          (expr) => Math.floor(
+            this.variableService.evaluator.evaluateExpression(expr) ?? 0
+          )
+        );
+        this.variableService.setArrayElement(name2, indices, value);
+        return;
+      }
+      const identifierToken = getFirstToken(targetCst.children.Identifier);
+      if (!identifierToken) return;
+      const name = identifierToken.image.toUpperCase();
+      this.variableService.setVariable(name, value);
+    }
+  };
+
   // src/core/execution/StatementRouter.ts
   var StatementRouter = class {
     constructor(context, evaluator, variableService, dataService) {
@@ -12441,6 +12572,8 @@
       __publicField(this, "readExecutor");
       __publicField(this, "restoreExecutor");
       __publicField(this, "clsExecutor");
+      __publicField(this, "swapExecutor");
+      __publicField(this, "clearExecutor");
       __publicField(this, "locateExecutor");
       __publicField(this, "colorExecutor");
       __publicField(this, "cgsetExecutor");
@@ -12470,6 +12603,8 @@
       this.readExecutor = new ReadExecutor(dataService, variableService, evaluator);
       this.restoreExecutor = new RestoreExecutor(dataService);
       this.clsExecutor = new ClsExecutor(context);
+      this.swapExecutor = new SwapExecutor(variableService);
+      this.clearExecutor = new ClearExecutor(variableService);
       this.locateExecutor = new LocateExecutor(context, evaluator);
       this.colorExecutor = new ColorExecutor(context, evaluator);
       this.cgsetExecutor = new CgsetExecutor(context, evaluator);
@@ -12664,6 +12799,16 @@
         const clsStmtCst = getFirstCstNode(singleCommandCst.children.clsStatement);
         if (clsStmtCst) {
           this.clsExecutor.execute(clsStmtCst);
+        }
+      } else if (singleCommandCst.children.swapStatement) {
+        const swapStmtCst = getFirstCstNode(singleCommandCst.children.swapStatement);
+        if (swapStmtCst) {
+          this.swapExecutor.execute(swapStmtCst, expandedStatement.lineNumber);
+        }
+      } else if (singleCommandCst.children.clearStatement) {
+        const clearStmtCst = getFirstCstNode(singleCommandCst.children.clearStatement);
+        if (clearStmtCst) {
+          this.clearExecutor.execute(clearStmtCst);
         }
       } else if (singleCommandCst.children.locateStatement) {
         const locateStmtCst = getFirstCstNode(singleCommandCst.children.locateStatement);
@@ -22328,6 +22473,8 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
   var Read = createToken({ name: "Read", pattern: /\bREAD\b/i });
   var Restore = createToken({ name: "Restore", pattern: /\bRESTORE\b/i });
   var Cls = createToken({ name: "Cls", pattern: /\bCLS\b/i });
+  var Swap = createToken({ name: "Swap", pattern: /\bSWAP\b/i });
+  var Clear = createToken({ name: "Clear", pattern: /\bCLEAR\b/i });
   var Locate = createToken({ name: "Locate", pattern: /\bLOCATE\b/i });
   var Color = createToken({ name: "Color", pattern: /\bCOLOR\b/i });
   var Cgset = createToken({ name: "Cgset", pattern: /\bCGSET\b/i });
@@ -22440,6 +22587,8 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     Read,
     Restore,
     Cls,
+    Swap,
+    Clear,
     Locate,
     Color,
     Cgset,
@@ -22865,6 +23014,27 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       this.clsStatement = this.RULE("clsStatement", () => {
         this.CONSUME(Cls);
       });
+      this.swapTarget = this.RULE("swapTarget", () => {
+        this.OR([
+          {
+            GATE: () => this.LA(1).tokenType === Identifier && this.LA(2).tokenType === LParen,
+            ALT: () => this.SUBRULE(this.arrayAccess)
+          },
+          { ALT: () => this.CONSUME(Identifier) }
+        ]);
+      });
+      this.swapStatement = this.RULE("swapStatement", () => {
+        this.CONSUME(Swap);
+        this.SUBRULE(this.swapTarget);
+        this.CONSUME(Comma);
+        this.SUBRULE2(this.swapTarget);
+      });
+      this.clearStatement = this.RULE("clearStatement", () => {
+        this.CONSUME(Clear);
+        this.OPTION(() => {
+          this.SUBRULE(this.expression);
+        });
+      });
       this.locateStatement = this.RULE("locateStatement", () => {
         this.CONSUME(Locate);
         this.SUBRULE(this.expression);
@@ -23098,6 +23268,14 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           {
             GATE: () => this.LA(1).tokenType === Cls,
             ALT: () => this.SUBRULE(this.clsStatement)
+          },
+          {
+            GATE: () => this.LA(1).tokenType === Swap,
+            ALT: () => this.SUBRULE(this.swapStatement)
+          },
+          {
+            GATE: () => this.LA(1).tokenType === Clear,
+            ALT: () => this.SUBRULE(this.clearStatement)
           },
           {
             GATE: () => this.LA(1).tokenType === Locate,
@@ -23370,6 +23548,8 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           "END",
           "REM",
           "CLS",
+          "SWAP",
+          "CLEAR",
           "DATA",
           "READ",
           "RESTORE",
@@ -23450,19 +23630,23 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       }
     }
     /**
-     * Get sprite state
+     * Get sprite state for a slot.
+     * @param spriteNumber - Sprite slot 0-7
+     * @returns SpriteState or undefined
      */
     getSpriteState(spriteNumber) {
       return this.spriteStates.get(spriteNumber);
     }
     /**
-     * Get all sprite states
+     * Get all sprite states (all 8 slots).
+     * @returns Array of SpriteState for slots 0-7
      */
     getAllSpriteStates() {
       return Array.from(this.spriteStates.values());
     }
     /**
-     * Get all visible sprites
+     * Get all visible sprite states.
+     * @returns Array of SpriteState where visible === true
      */
     getVisibleSprites() {
       return Array.from(this.spriteStates.values()).filter((s) => s.visible);
@@ -23484,7 +23668,8 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       }
     }
     /**
-     * Reset a specific sprite
+     * Reset a specific sprite slot to default (no definition, hidden, 0,0).
+     * @param spriteNumber - Sprite slot 0-7
      */
     resetSprite(spriteNumber) {
       this.spriteStates.set(spriteNumber, {
@@ -24046,7 +24231,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     }
     /**
      * Create a full screen update message.
-     * Defensive: if called without correct `this` (e.g. unbound), return a safe message to avoid "reading 'screenBuffer'" throw.
+     * Defensive: if called without correct `this` (e.g. unbound), return a safe message.
      */
     createFullScreenUpdateMessage() {
       const self2 = this;
@@ -24359,9 +24544,9 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       // === DEVICE STATE ===
       __publicField(this, "strigClickBuffer", /* @__PURE__ */ new Map());
       __publicField(this, "stickStates", /* @__PURE__ */ new Map());
-      /** Shared display buffer views (sprites + screen + cursor + sequence + scalars). Set when receiving SET_SHARED_ANIMATION_BUFFER. */
+      /** Shared display buffer. Set when receiving SET_SHARED_ANIMATION_BUFFER. */
       __publicField(this, "sharedDisplayViews", null);
-      /** Last position set by POSITION command per sprite; when set, getSpritePosition returns it so MOVE uses it instead of buffer (0,0). */
+      /** Last POSITION per sprite; getSpritePosition returns it so MOVE uses it (not buffer 0,0). */
       __publicField(this, "lastPositionBySprite", /* @__PURE__ */ new Map());
       __publicField(this, "isEnabled", true);
       // === MANAGERS ===
@@ -24862,7 +25047,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       } catch (error) {
         const err = error instanceof Error ? error : new Error(String(error));
         console.error("\u274C [WORKER] Error processing message:", err.message);
-        console.error("Stack trace:", err.stack || "(no stack available)");
+        console.error("Stack trace:", err.stack ?? "(no stack available)");
         const location = this.interpreter?.getExecutionLocation?.() ?? null;
         this.sendError(message.id, err, location);
       }
@@ -24923,7 +25108,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         this.isRunning = false;
         const err = error instanceof Error ? error : new Error(String(error));
         console.error("\u274C [WORKER] Execution error:", err.message);
-        console.error("Stack trace:", err.stack || "(no stack available)");
+        console.error("Stack trace:", err.stack ?? "(no stack available)");
         const location = this.interpreter?.getExecutionLocation() ?? null;
         this.sendError(message.id, err, location);
       }

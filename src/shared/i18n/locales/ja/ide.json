@@ -1,43 +1,48 @@
 {
-  "title": "Family Basic IDE",
-  "codeEditor": {
-    "title": "コードエディター",
-    "placeholder": "Family Basicコードをここに入力..."
-  },
-  "controls": {
-    "run": "実行",
-    "stop": "停止",
-    "clear": "クリア",
-    "debug": "デバッグ"
-  },
-  "output": {
-    "title": "実行出力",
-    "empty": "まだ出力がありません。BASICプログラムを実行すると、ここに結果が表示されます。",
-    "screen": "画面",
-    "stdout": "標準出力",
-    "variables": "変数",
-    "debug": "デバッグ",
-    "errorLine": "行 {line}"
-  },
-  "samples": {
-    "basic": "基本",
-    "pause": "一時停止デモ",
-    "gaming": "ジョイスティックテスト",
-    "complex": "複雑",
-    "comprehensive": "完全デモ",
-    "allChars": "全文字",
-    "spriteTest": "スプライトテスト",
-    "moveTest": "移動テスト",
-    "testMoveControl": "移動制御テスト"
-  },
-  "joystick": {
-    "control": "ジョイスティック制御",
-    "status": "ジョイスティック状態",
-    "joystick": "ジョイスティック{id}",
-    "columns": {
-      "id": "ID",
-      "stick": "STICK",
-      "strig": "STRIG"
+    "title": "Family Basic IDE",
+    "codeEditor": {
+        "title": "コードエディター",
+        "placeholder": "Family Basicコードをここに入力..."
+    },
+    "controls": {
+        "run": "実行",
+        "stop": "停止",
+        "clear": "クリア",
+        "debug": "デバッグ"
+    },
+    "output": {
+        "title": "実行出力",
+        "empty": "まだ出力がありません。BASICプログラムを実行すると、ここに結果が表示されます。",
+        "screen": "画面",
+        "stdout": "標準出力",
+        "variables": "変数",
+        "debug": "デバッグ",
+        "errorLine": "行 {line}",
+        "paletteBg": "BG",
+        "paletteSprite": "スプライト",
+        "paletteBgTitle": "現在の背景パレット (0–1)",
+        "paletteSpriteTitle": "現在のスプライトパレット (0–2)",
+        "combo": "コンボ"
+    },
+    "samples": {
+        "basic": "基本",
+        "pause": "一時停止デモ",
+        "gaming": "ジョイスティックテスト",
+        "complex": "複雑",
+        "comprehensive": "完全デモ",
+        "allChars": "全文字",
+        "spriteTest": "スプライトテスト",
+        "moveTest": "移動テスト",
+        "testMoveControl": "移動制御テスト"
+    },
+    "joystick": {
+        "control": "ジョイスティック制御",
+        "status": "ジョイスティック状態",
+        "joystick": "ジョイスティック{id}",
+        "columns": {
+            "id": "ID",
+            "stick": "STICK",
+            "strig": "STRIG"
+        }
     }
-  }
 }

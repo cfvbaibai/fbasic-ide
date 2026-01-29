@@ -1,5 +1,11 @@
 /// <reference types="vite/client" />
 
+// Vite ?worker imports: default export is a Worker constructor
+declare module '*?worker' {
+  const WorkerConstructor: new () => Worker
+  export default WorkerConstructor
+}
+
 // Monaco Editor environment configuration
 declare global {
   interface Window {

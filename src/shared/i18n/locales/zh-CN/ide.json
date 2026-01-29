@@ -1,43 +1,48 @@
 {
-  "title": "Family Basic IDE",
-  "codeEditor": {
-    "title": "代码编辑器",
-    "placeholder": "在此输入您的 Family Basic 代码..."
-  },
-  "controls": {
-    "run": "运行",
-    "stop": "停止",
-    "clear": "清除",
-    "debug": "调试"
-  },
-  "output": {
-    "title": "运行时输出",
-    "empty": "暂无输出。运行您的 BASIC 程序以查看结果。",
-    "screen": "屏幕",
-    "stdout": "标准输出",
-    "variables": "变量",
-    "debug": "调试",
-    "errorLine": "第 {line} 行"
-  },
-  "samples": {
-    "basic": "基础",
-    "pause": "暂停演示",
-    "gaming": "手柄测试",
-    "complex": "复杂",
-    "comprehensive": "完整演示",
-    "allChars": "所有字符",
-    "spriteTest": "Sprite测试",
-    "moveTest": "移动测试",
-    "testMoveControl": "移动控制测试"
-  },
-  "joystick": {
-    "control": "手柄控制",
-    "status": "手柄状态",
-    "joystick": "手柄 {id}",
-    "columns": {
-      "id": "ID",
-      "stick": "STICK",
-      "strig": "STRIG"
+    "title": "Family Basic IDE",
+    "codeEditor": {
+        "title": "代码编辑器",
+        "placeholder": "在此输入您的 Family Basic 代码..."
+    },
+    "controls": {
+        "run": "运行",
+        "stop": "停止",
+        "clear": "清除",
+        "debug": "调试"
+    },
+    "output": {
+        "title": "运行时输出",
+        "empty": "暂无输出。运行您的 BASIC 程序以查看结果。",
+        "screen": "屏幕",
+        "stdout": "标准输出",
+        "variables": "变量",
+        "debug": "调试",
+        "errorLine": "第 {line} 行",
+        "paletteBg": "背景",
+        "paletteSprite": "精灵",
+        "paletteBgTitle": "当前背景调色板 (0–1)",
+        "paletteSpriteTitle": "当前精灵调色板 (0–2)",
+        "combo": "组合"
+    },
+    "samples": {
+        "basic": "基础",
+        "pause": "暂停演示",
+        "gaming": "手柄测试",
+        "complex": "复杂",
+        "comprehensive": "完整演示",
+        "allChars": "所有字符",
+        "spriteTest": "Sprite测试",
+        "moveTest": "移动测试",
+        "testMoveControl": "移动控制测试"
+    },
+    "joystick": {
+        "control": "手柄控制",
+        "status": "手柄状态",
+        "joystick": "手柄 {id}",
+        "columns": {
+            "id": "ID",
+            "stick": "STICK",
+            "strig": "STRIG"
+        }
     }
-  }
 }

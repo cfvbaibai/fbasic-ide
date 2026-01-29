@@ -8,6 +8,7 @@ import type { MovementState, SpriteState } from '@/core/sprite/types'
 import { provideScreenZoom } from '@/features/ide/composables/useScreenZoom'
 import { GameButton, GameButtonGroup, GameIcon, GameTabPane } from '@/shared/components/ui'
 
+import ActivePaletteDisplay from './ActivePaletteDisplay.vue'
 import Screen from './Screen.vue'
 
 /**
@@ -100,6 +101,11 @@ const currentZoomLevel = computed(() => zoomLevel.value)
             {{ level.label }}
           </GameButton>
         </GameButtonGroup>
+        <ActivePaletteDisplay
+          :bg-palette="bgPalette"
+          :sprite-palette="spritePalette"
+          class="palette-display"
+        />
       </div>
     </template>
 
@@ -139,5 +145,11 @@ const currentZoomLevel = computed(() => zoomLevel.value)
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.palette-display {
+  margin-left: 0.5rem;
 }
 </style>
