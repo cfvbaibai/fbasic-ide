@@ -21,7 +21,7 @@ import type {
 } from '@/core/interfaces'
 import type { MovementState } from '@/core/sprite/types'
 import { ExecutionError } from '@/features/ide/errors/ExecutionError'
-import { logIdeMessages, logScreen } from '@/shared/logger'
+import { logComposable, logIdeMessages, logScreen } from '@/shared/logger'
 
 import type { WebWorkerManager } from './useBasicIdeWebWorkerUtils'
 
@@ -94,7 +94,7 @@ function flushMessageQueue(): void {
     const messagesToProcess = messageQueue.splice(0)
     for (const { message, context } of messagesToProcess) {
       if (!context) {
-        console.warn('⚠️ [COMPOSABLE] Skipping queued message: context is undefined')
+        logComposable.warn('Skipping queued message: context is undefined')
         continue
       }
       processMessage(message, context)
@@ -182,11 +182,11 @@ export function handleScreenUpdateMessage(message: AnyServiceWorkerMessage, cont
   
   const update = message.data
   if (!update) {
-    console.warn('⚠️ [COMPOSABLE] SCREEN_UPDATE message has no data')
+    logComposable.warn('SCREEN_UPDATE message has no data')
     return
   }
   if (!context?.screenBuffer) {
-    console.warn('⚠️ [COMPOSABLE] SCREEN_UPDATE: context or screenBuffer missing, skipping')
+    logComposable.warn('SCREEN_UPDATE: context or screenBuffer missing, skipping')
     return
   }
 
@@ -287,19 +287,19 @@ export function handleScreenUpdateMessage(message: AnyServiceWorkerMessage, cont
       // Update background and sprite palette codes
       if (update.bgPalette !== undefined) {
         context.bgPalette.value = update.bgPalette
-        console.log('🖥️ [COMPOSABLE] Updated background palette:', update.bgPalette)
+        logComposable.debug('Updated background palette:', update.bgPalette)
       }
       if (update.spritePalette !== undefined) {
         // Note: spritePalette is stored but not currently used in rendering
         // It will be used when sprite system is implemented
-        console.log('🖥️ [COMPOSABLE] Updated sprite palette:', update.spritePalette)
+        logComposable.debug('Updated sprite palette:', update.spritePalette)
       }
       break
     case 'backdrop':
       // Update backdrop color
       if (update.backdropColor !== undefined && context.backdropColor) {
         context.backdropColor.value = update.backdropColor
-        console.log('🖥️ [COMPOSABLE] Updated backdrop color:', update.backdropColor)
+        logComposable.debug('Updated backdrop color:', update.backdropColor)
       }
       break
     case 'cgen':
@@ -308,7 +308,7 @@ export function handleScreenUpdateMessage(message: AnyServiceWorkerMessage, cont
         if (context.cgenMode) {
           context.cgenMode.value = update.cgenMode
         }
-        console.log('🖥️ [COMPOSABLE] Updated character generator mode:', update.cgenMode)
+        logComposable.debug('Updated character generator mode:', update.cgenMode)
       }
       break
   }
@@ -320,9 +320,9 @@ export function handleScreenUpdateMessage(message: AnyServiceWorkerMessage, cont
 export function handleResultMessage(message: AnyServiceWorkerMessage, context: MessageHandlerContext): void {
   const resultMessage = message as ResultMessage
   const result = resultMessage.data // message.data IS the ExecutionResult
-  console.log('✅ [COMPOSABLE] Execution completed:', result.executionId, 'result:', result)
+  logComposable.debug('Execution completed:', result.executionId, 'result:', result)
   if (!result.success && result.errors?.length) {
-    console.error('[COMPOSABLE] Execution failed:', result.errors[0]?.message, result.errors)
+    logComposable.error('Execution failed:', result.errors[0]?.message, result.errors)
   }
 
   // Flush queued OUTPUT/ANIMATION_COMMAND so output and movement state are updated before resolving.
@@ -336,7 +336,7 @@ export function handleResultMessage(message: AnyServiceWorkerMessage, context: M
     context.webWorkerManager.pendingMessages.delete(message.id)
     pending.resolve(result)
   } else {
-    console.warn('⚠️ [COMPOSABLE] No pending message found for messageId:', message.id)
+    logComposable.warn('No pending message found for messageId:', message.id)
   }
 }
 
@@ -352,8 +352,8 @@ export function handleErrorMessage(message: AnyServiceWorkerMessage, context: Me
   const sourceLine = data?.sourceLine
   const stack = data?.stack
 
-  console.error(
-    '❌ [COMPOSABLE] Execution error:',
+  logComposable.error(
+    'Execution error:',
     executionId,
     errorText,
     lineNumber != null ? `(at line ${lineNumber})` : ''
@@ -374,7 +374,7 @@ export function handleErrorMessage(message: AnyServiceWorkerMessage, context: Me
   }
 
   if (!context?.webWorkerManager) {
-    console.warn('⚠️ [COMPOSABLE] handleErrorMessage: context or webWorkerManager missing, skipping pending reject')
+    logComposable.warn('handleErrorMessage: context or webWorkerManager missing, skipping pending reject')
     return
   }
   const pending = context.webWorkerManager.pendingMessages.get(message.id)
@@ -388,7 +388,7 @@ export function handleErrorMessage(message: AnyServiceWorkerMessage, context: Me
     })
     pending.reject(executionError)
   } else {
-    console.warn('⚠️ [COMPOSABLE] No pending message found for error messageId:', message.id)
+    logComposable.warn('No pending message found for error messageId:', message.id)
   }
 }
 
@@ -667,7 +667,7 @@ function getDirectionDeltaY(direction: number): number {
  */
 export function handleWorkerMessage(message: AnyServiceWorkerMessage, context: MessageHandlerContext): void {
   if (!context) {
-    console.warn('⚠️ [COMPOSABLE] handleWorkerMessage called with undefined context, skipping')
+    logComposable.warn('handleWorkerMessage called with undefined context, skipping')
     return
   }
   // Critical messages must be handled immediately (they resolve promises, etc.)
@@ -715,6 +715,6 @@ function processMessage(message: AnyServiceWorkerMessage, context: MessageHandle
       handleProgressMessage(message, context)
       break
     default:
-      console.warn('⚠️ [COMPOSABLE] Unknown message type:', message.type)
+      logComposable.warn('Unknown message type:', message.type)
   }
 }

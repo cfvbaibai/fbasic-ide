@@ -1,8 +1,285 @@
 "use strict";
 (() => {
+  var __create = Object.create;
   var __defProp = Object.defineProperty;
+  var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+  var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __getProtoOf = Object.getPrototypeOf;
+  var __hasOwnProp = Object.prototype.hasOwnProperty;
   var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+  var __commonJS = (cb, mod2) => function __require() {
+    return mod2 || (0, cb[__getOwnPropNames(cb)[0]])((mod2 = { exports: {} }).exports, mod2), mod2.exports;
+  };
+  var __copyProps = (to, from, except, desc) => {
+    if (from && typeof from === "object" || typeof from === "function") {
+      for (let key of __getOwnPropNames(from))
+        if (!__hasOwnProp.call(to, key) && key !== except)
+          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+    }
+    return to;
+  };
+  var __toESM = (mod2, isNodeMode, target) => (target = mod2 != null ? __create(__getProtoOf(mod2)) : {}, __copyProps(
+    // If the importer is in node compatibility mode or this is not an ESM
+    // file that has been converted to a CommonJS file using a Babel-
+    // compatible transform (i.e. "__esModule" has not been set), then set
+    // "default" to the CommonJS "module.exports" for node compatibility.
+    isNodeMode || !mod2 || !mod2.__esModule ? __defProp(target, "default", { value: mod2, enumerable: true }) : target,
+    mod2
+  ));
   var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
+
+  // node_modules/.pnpm/loglevel@1.9.2/node_modules/loglevel/lib/loglevel.js
+  var require_loglevel = __commonJS({
+    "node_modules/.pnpm/loglevel@1.9.2/node_modules/loglevel/lib/loglevel.js"(exports2, module2) {
+      (function(root2, definition) {
+        "use strict";
+        if (typeof define === "function" && define.amd) {
+          define(definition);
+        } else if (typeof module2 === "object" && module2.exports) {
+          module2.exports = definition();
+        } else {
+          root2.log = definition();
+        }
+      })(exports2, function() {
+        "use strict";
+        var noop2 = function() {
+        };
+        var undefinedType = "undefined";
+        var isIE = typeof window !== undefinedType && typeof window.navigator !== undefinedType && /Trident\/|MSIE /.test(window.navigator.userAgent);
+        var logMethods = [
+          "trace",
+          "debug",
+          "info",
+          "warn",
+          "error"
+        ];
+        var _loggersByName = {};
+        var defaultLogger = null;
+        function bindMethod(obj, methodName) {
+          var method = obj[methodName];
+          if (typeof method.bind === "function") {
+            return method.bind(obj);
+          } else {
+            try {
+              return Function.prototype.bind.call(method, obj);
+            } catch (e) {
+              return function() {
+                return Function.prototype.apply.apply(method, [obj, arguments]);
+              };
+            }
+          }
+        }
+        function traceForIE() {
+          if (console.log) {
+            if (console.log.apply) {
+              console.log.apply(console, arguments);
+            } else {
+              Function.prototype.apply.apply(console.log, [console, arguments]);
+            }
+          }
+          if (console.trace) console.trace();
+        }
+        function realMethod(methodName) {
+          if (methodName === "debug") {
+            methodName = "log";
+          }
+          if (typeof console === undefinedType) {
+            return false;
+          } else if (methodName === "trace" && isIE) {
+            return traceForIE;
+          } else if (console[methodName] !== void 0) {
+            return bindMethod(console, methodName);
+          } else if (console.log !== void 0) {
+            return bindMethod(console, "log");
+          } else {
+            return noop2;
+          }
+        }
+        function replaceLoggingMethods() {
+          var level = this.getLevel();
+          for (var i = 0; i < logMethods.length; i++) {
+            var methodName = logMethods[i];
+            this[methodName] = i < level ? noop2 : this.methodFactory(methodName, level, this.name);
+          }
+          this.log = this.debug;
+          if (typeof console === undefinedType && level < this.levels.SILENT) {
+            return "No console available for logging";
+          }
+        }
+        function enableLoggingWhenConsoleArrives(methodName) {
+          return function() {
+            if (typeof console !== undefinedType) {
+              replaceLoggingMethods.call(this);
+              this[methodName].apply(this, arguments);
+            }
+          };
+        }
+        function defaultMethodFactory(methodName, _level, _loggerName) {
+          return realMethod(methodName) || enableLoggingWhenConsoleArrives.apply(this, arguments);
+        }
+        function Logger(name, factory) {
+          var self2 = this;
+          var inheritedLevel;
+          var defaultLevel2;
+          var userLevel;
+          var storageKey = "loglevel";
+          if (typeof name === "string") {
+            storageKey += ":" + name;
+          } else if (typeof name === "symbol") {
+            storageKey = void 0;
+          }
+          function persistLevelIfPossible(levelNum) {
+            var levelName = (logMethods[levelNum] || "silent").toUpperCase();
+            if (typeof window === undefinedType || !storageKey) return;
+            try {
+              window.localStorage[storageKey] = levelName;
+              return;
+            } catch (ignore) {
+            }
+            try {
+              window.document.cookie = encodeURIComponent(storageKey) + "=" + levelName + ";";
+            } catch (ignore) {
+            }
+          }
+          function getPersistedLevel() {
+            var storedLevel;
+            if (typeof window === undefinedType || !storageKey) return;
+            try {
+              storedLevel = window.localStorage[storageKey];
+            } catch (ignore) {
+            }
+            if (typeof storedLevel === undefinedType) {
+              try {
+                var cookie = window.document.cookie;
+                var cookieName = encodeURIComponent(storageKey);
+                var location = cookie.indexOf(cookieName + "=");
+                if (location !== -1) {
+                  storedLevel = /^([^;]+)/.exec(
+                    cookie.slice(location + cookieName.length + 1)
+                  )[1];
+                }
+              } catch (ignore) {
+              }
+            }
+            if (self2.levels[storedLevel] === void 0) {
+              storedLevel = void 0;
+            }
+            return storedLevel;
+          }
+          function clearPersistedLevel() {
+            if (typeof window === undefinedType || !storageKey) return;
+            try {
+              window.localStorage.removeItem(storageKey);
+            } catch (ignore) {
+            }
+            try {
+              window.document.cookie = encodeURIComponent(storageKey) + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC";
+            } catch (ignore) {
+            }
+          }
+          function normalizeLevel(input) {
+            var level = input;
+            if (typeof level === "string" && self2.levels[level.toUpperCase()] !== void 0) {
+              level = self2.levels[level.toUpperCase()];
+            }
+            if (typeof level === "number" && level >= 0 && level <= self2.levels.SILENT) {
+              return level;
+            } else {
+              throw new TypeError("log.setLevel() called with invalid level: " + input);
+            }
+          }
+          self2.name = name;
+          self2.levels = {
+            "TRACE": 0,
+            "DEBUG": 1,
+            "INFO": 2,
+            "WARN": 3,
+            "ERROR": 4,
+            "SILENT": 5
+          };
+          self2.methodFactory = factory || defaultMethodFactory;
+          self2.getLevel = function() {
+            if (userLevel != null) {
+              return userLevel;
+            } else if (defaultLevel2 != null) {
+              return defaultLevel2;
+            } else {
+              return inheritedLevel;
+            }
+          };
+          self2.setLevel = function(level, persist) {
+            userLevel = normalizeLevel(level);
+            if (persist !== false) {
+              persistLevelIfPossible(userLevel);
+            }
+            return replaceLoggingMethods.call(self2);
+          };
+          self2.setDefaultLevel = function(level) {
+            defaultLevel2 = normalizeLevel(level);
+            if (!getPersistedLevel()) {
+              self2.setLevel(level, false);
+            }
+          };
+          self2.resetLevel = function() {
+            userLevel = null;
+            clearPersistedLevel();
+            replaceLoggingMethods.call(self2);
+          };
+          self2.enableAll = function(persist) {
+            self2.setLevel(self2.levels.TRACE, persist);
+          };
+          self2.disableAll = function(persist) {
+            self2.setLevel(self2.levels.SILENT, persist);
+          };
+          self2.rebuild = function() {
+            if (defaultLogger !== self2) {
+              inheritedLevel = normalizeLevel(defaultLogger.getLevel());
+            }
+            replaceLoggingMethods.call(self2);
+            if (defaultLogger === self2) {
+              for (var childName in _loggersByName) {
+                _loggersByName[childName].rebuild();
+              }
+            }
+          };
+          inheritedLevel = normalizeLevel(
+            defaultLogger ? defaultLogger.getLevel() : "WARN"
+          );
+          var initialLevel = getPersistedLevel();
+          if (initialLevel != null) {
+            userLevel = normalizeLevel(initialLevel);
+          }
+          replaceLoggingMethods.call(self2);
+        }
+        defaultLogger = new Logger();
+        defaultLogger.getLogger = function getLogger(name) {
+          if (typeof name !== "symbol" && typeof name !== "string" || name === "") {
+            throw new TypeError("You must supply a name when creating a logger.");
+          }
+          var logger = _loggersByName[name];
+          if (!logger) {
+            logger = _loggersByName[name] = new Logger(
+              name,
+              defaultLogger.methodFactory
+            );
+          }
+          return logger;
+        };
+        var _log = typeof window !== undefinedType ? window.log : void 0;
+        defaultLogger.noConflict = function() {
+          if (typeof window !== undefinedType && window.log === defaultLogger) {
+            window.log = _log;
+          }
+          return defaultLogger;
+        };
+        defaultLogger.getLoggers = function getLoggers() {
+          return _loggersByName;
+        };
+        defaultLogger["default"] = defaultLogger;
+        return defaultLogger;
+      });
+    }
+  });
 
   // src/core/animation/sharedAnimationBuffer.ts
   var MAX_SPRITES = 8;
@@ -420,6 +697,27 @@
       this.moveDefinitions.clear();
     }
   };
+
+  // src/shared/logger.ts
+  var import_loglevel = __toESM(require_loglevel(), 1);
+  var defaultLevel = "warn";
+  import_loglevel.default.setDefaultLevel(defaultLevel);
+  var logIdeMessages = import_loglevel.default.getLogger("ide-messages");
+  logIdeMessages.setDefaultLevel(defaultLevel);
+  var logScreen = import_loglevel.default.getLogger("screen");
+  logScreen.setDefaultLevel(defaultLevel);
+  var logWorker = import_loglevel.default.getLogger("worker");
+  logWorker.setDefaultLevel(defaultLevel);
+  var logDevice = import_loglevel.default.getLogger("device");
+  logDevice.setDefaultLevel(defaultLevel);
+  var logComposable = import_loglevel.default.getLogger("composable");
+  logComposable.setDefaultLevel(defaultLevel);
+  var logInterpreter = import_loglevel.default.getLogger("interpreter");
+  logInterpreter.setDefaultLevel(defaultLevel);
+  var logCore = import_loglevel.default.getLogger("core");
+  logCore.setDefaultLevel(defaultLevel);
+  var logApp = import_loglevel.default.getLogger("app");
+  logApp.setDefaultLevel(defaultLevel);
 
   // node_modules/.pnpm/decimal.js@10.6.0/node_modules/decimal.js/decimal.mjs
   var EXP_LIMIT = 9e15;
@@ -2418,9 +2716,9 @@
     Decimal2.floor = floor;
     Decimal2.hypot = hypot;
     Decimal2.ln = ln;
-    Decimal2.log = log;
+    Decimal2.log = log2;
     Decimal2.log10 = log10;
-    Decimal2.log2 = log2;
+    Decimal2.log2 = log22;
     Decimal2.max = max;
     Decimal2.min = min;
     Decimal2.mod = mod;
@@ -2480,10 +2778,10 @@
   function ln(x) {
     return new this(x).ln();
   }
-  function log(x, y) {
+  function log2(x, y) {
     return new this(x).log(y);
   }
-  function log2(x) {
+  function log22(x) {
     return new this(x).log(2);
   }
   function log10(x) {
@@ -6405,7 +6703,7 @@
      * Add data values from a DATA statement (AST version - deprecated)
      */
     addDataValues(_expressions) {
-      console.warn("addDataValues called with AST - use addDataValuesCst instead");
+      logCore.warn("addDataValues called with AST - use addDataValuesCst instead");
     }
     /**
      * Read the next data value
@@ -13187,7 +13485,7 @@
       if (this.deviceAdapter) {
         const consumedValue = this.deviceAdapter.consumeStrigState(joystickId);
         if (consumedValue > 0) {
-          console.log(`\u{1F3AE} [EXECUTION] STRIG event consumed: joystickId=${joystickId}, value=${consumedValue}`);
+          logInterpreter.debug(`STRIG event consumed: joystickId=${joystickId}, value=${consumedValue}`);
           return consumedValue;
         }
       }
@@ -23697,7 +23995,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       __publicField(this, "parser");
       __publicField(this, "executionEngine");
       __publicField(this, "context");
-      console.log("\u{1F527} [MAIN] BasicInterpreter constructor called with config:", {
+      logInterpreter.debug("BasicInterpreter constructor called with config:", {
         hasDeviceAdapter: !!config2?.deviceAdapter,
         maxIterations: config2?.maxIterations,
         maxOutputLines: config2?.maxOutputLines,
@@ -23711,7 +24009,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         strictMode: false,
         ...config2
       };
-      console.log("\u{1F527} [MAIN] Final config after merge:", {
+      logInterpreter.debug("Final config after merge:", {
         maxIterations: this.config.maxIterations,
         maxOutputLines: this.config.maxOutputLines,
         enableDebugMode: this.config.enableDebugMode,
@@ -23723,11 +24021,11 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
      * Execute BASIC code
      */
     async execute(code) {
-      console.log("\u{1F680} [MAIN] BasicInterpreter.execute called with code length:", code.length);
+      logInterpreter.debug("BasicInterpreter.execute called with code length:", code.length);
       try {
         const parseResult = await this.parser.parse(code);
         if (!parseResult.success) {
-          console.error("[BasicInterpreter] Parse failed:", parseResult.errors);
+          logInterpreter.error("[BasicInterpreter] Parse failed:", parseResult.errors);
           return {
             success: false,
             errors: parseResult.errors?.map((error) => ({
@@ -23769,7 +24067,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         const result = await this.executionEngine.execute();
         return result;
       } catch (error) {
-        console.error("[BasicInterpreter] Execution error:", error);
+        logInterpreter.error("[BasicInterpreter] Execution error:", error);
         const location = this.getExecutionLocation();
         const errMsg = error instanceof Error ? error.message : String(error);
         const stackStr = error instanceof Error ? error.stack : void 0;
@@ -23911,7 +24209,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
   }
   function writeScreenState(views, screenBuffer, cursorX, cursorY, bgPalette, spritePalette, backdropColor, cgenMode) {
     if (screenBuffer == null) {
-      console.warn("[sharedDisplayBuffer] writeScreenState: screenBuffer is required, skipping");
+      logCore.warn("[sharedDisplayBuffer] writeScreenState: screenBuffer is required, skipping");
       return;
     }
     const { charView, patternView, cursorView, scalarsView } = views;
@@ -23946,13 +24244,13 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
      * Handle messages from the web worker
      */
     handleWorkerMessage(message, onOutput) {
-      console.log("\u{1F50D} [MESSAGE_HANDLER] Processing worker message:", {
+      logIdeMessages.debug("Processing worker message:", {
         type: message.type,
         id: message.id,
         timestamp: message.timestamp
       });
       if (message.type === "OUTPUT") {
-        console.log("\u{1F4E4} [MESSAGE_HANDLER] Handling OUTPUT message:", {
+        logIdeMessages.debug("Handling OUTPUT message:", {
           outputType: message.data.outputType,
           outputLength: message.data.output.length
         });
@@ -23963,57 +24261,57 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       }
       if (message.type === "SCREEN_UPDATE") {
         const screenMessage = message;
-        console.log("\u{1F5A5}\uFE0F [MESSAGE_HANDLER] SCREEN_UPDATE message received (handled by composable):", {
+        logIdeMessages.debug("SCREEN_UPDATE message received (handled by composable):", {
           updateType: screenMessage.data.updateType
         });
         return;
       }
       const pending = this.pendingMessages.get(message.id);
       if (!pending) {
-        console.log("\u26A0\uFE0F [MESSAGE_HANDLER] No pending message found for ID:", message.id);
+        logIdeMessages.warn("No pending message found for ID:", message.id);
         return;
       }
-      console.log("\u2705 [MESSAGE_HANDLER] Found pending message for ID:", message.id);
+      logIdeMessages.debug("Found pending message for ID:", message.id);
       switch (message.type) {
         case "RESULT": {
           const resultMessage = message;
-          console.log("\u{1F4CA} [MESSAGE_HANDLER] Received RESULT message:", {
+          logIdeMessages.debug("Received RESULT message:", {
             success: resultMessage.data.success,
             executionTime: resultMessage.data.executionTime
           });
           clearTimeout(pending.timeout);
           this.pendingMessages.delete(message.id);
           if (resultMessage.data.errors?.some((error) => error.message.includes("not yet fully implemented"))) {
-            console.log("\u26A0\uFE0F [MESSAGE_HANDLER] Web worker indicates fallback needed, rejecting to trigger fallback");
+            logIdeMessages.warn("Web worker indicates fallback needed, rejecting to trigger fallback");
             pending.reject(new Error("Web worker execution not implemented, falling back to main thread"));
           } else {
-            console.log("\u2705 [MESSAGE_HANDLER] Web worker result is valid, resolving pending promise");
+            logIdeMessages.debug("Web worker result is valid, resolving pending promise");
             pending.resolve(resultMessage.data);
           }
           break;
         }
         case "ERROR": {
           const errorMessage = message;
-          console.log("\u274C [MESSAGE_HANDLER] Received ERROR message:", {
+          logIdeMessages.debug("Received ERROR message:", {
             message: errorMessage.data.message,
             errorType: errorMessage.data.errorType,
             recoverable: errorMessage.data.recoverable
           });
           clearTimeout(pending.timeout);
           this.pendingMessages.delete(message.id);
-          console.log("\u274C [MESSAGE_HANDLER] Rejecting pending promise due to error");
+          logIdeMessages.debug("Rejecting pending promise due to error");
           pending.reject(new Error(errorMessage.data.message));
           break;
         }
         case "PROGRESS": {
           const progressMessage = message;
-          console.log("\u{1F4C8} [MESSAGE_HANDLER] Received PROGRESS message:", {
+          logIdeMessages.debug("Received PROGRESS message:", {
             progress: progressMessage.data.progress
           });
           break;
         }
         default:
-          console.log("\u26A0\uFE0F [MESSAGE_HANDLER] Unexpected message type:", message.type);
+          logIdeMessages.warn("Unexpected message type:", message.type);
           break;
       }
     }
@@ -24078,7 +24376,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
      */
     setCursorPosition(x, y) {
       if (x < 0 || x > 27 || y < 0 || y > 23) {
-        console.warn(`\u{1F50C} [SCREEN] Invalid cursor position: (${x}, ${y}), clamping to valid range`);
+        logDevice.warn(`Invalid cursor position: (${x}, ${y}), clamping to valid range`);
         x = Math.max(0, Math.min(27, x));
         y = Math.max(0, Math.min(23, y));
       }
@@ -24127,12 +24425,12 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
      */
     setColorPattern(x, y, pattern) {
       if (x < 0 || x > 27 || y < 0 || y > 23) {
-        console.warn(`\u{1F50C} [SCREEN] Invalid color position: (${x}, ${y}), clamping to valid range`);
+        logDevice.warn(`Invalid color position: (${x}, ${y}), clamping to valid range`);
         x = Math.max(0, Math.min(27, x));
         y = Math.max(0, Math.min(23, y));
       }
       if (pattern < 0 || pattern > 3) {
-        console.warn(`\u{1F50C} [SCREEN] Invalid color pattern: ${pattern}, clamping to valid range (0-3)`);
+        logDevice.warn(`Invalid color pattern: ${pattern}, clamping to valid range (0-3)`);
         pattern = Math.max(0, Math.min(3, pattern));
       }
       const areaX = Math.floor(x / 2) * 2;
@@ -24177,11 +24475,11 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
      */
     setColorPalette(bgPalette, spritePalette) {
       if (bgPalette < 0 || bgPalette > 1) {
-        console.warn(`\u{1F50C} [SCREEN] Invalid background palette: ${bgPalette}, clamping to valid range (0-1)`);
+        logDevice.warn(`Invalid background palette: ${bgPalette}, clamping to valid range (0-1)`);
         bgPalette = Math.max(0, Math.min(1, bgPalette));
       }
       if (spritePalette < 0 || spritePalette > 2) {
-        console.warn(`\u{1F50C} [SCREEN] Invalid sprite palette: ${spritePalette}, clamping to valid range (0-2)`);
+        logDevice.warn(`Invalid sprite palette: ${spritePalette}, clamping to valid range (0-2)`);
         spritePalette = Math.max(0, Math.min(2, spritePalette));
       }
       this.bgPalette = bgPalette;
@@ -24192,7 +24490,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
      */
     setBackdropColor(colorCode) {
       if (colorCode < 0 || colorCode > 60) {
-        console.warn(`\u{1F50C} [SCREEN] Invalid backdrop color code: ${colorCode}, clamping to valid range (0-60)`);
+        logDevice.warn(`Invalid backdrop color code: ${colorCode}, clamping to valid range (0-60)`);
         colorCode = Math.max(0, Math.min(60, colorCode));
       }
       this.backdropColor = colorCode;
@@ -24202,7 +24500,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
      */
     setCharacterGeneratorMode(mode) {
       if (mode < 0 || mode > 3) {
-        console.warn(`\u{1F50C} [SCREEN] Invalid CGEN mode: ${mode}, clamping to valid range (0-3)`);
+        logDevice.warn(`Invalid CGEN mode: ${mode}, clamping to valid range (0-3)`);
         mode = Math.max(0, Math.min(3, mode));
       }
       this.cgenMode = mode;
@@ -24372,7 +24670,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
      */
     static isSupported() {
       const supported = typeof Worker !== "undefined";
-      console.log("\u{1F50D} [WEB_WORKER] isSupported check:", {
+      logWorker.debug("isSupported check:", {
         hasWorker: typeof Worker !== "undefined",
         supported
       });
@@ -24383,7 +24681,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
      */
     static isInWebWorker() {
       const inWebWorker = typeof window === "undefined" && typeof self !== "undefined";
-      console.log("\u{1F50D} [WEB_WORKER] isInWebWorker check:", {
+      logWorker.debug("isInWebWorker check:", {
         hasWindow: typeof window !== "undefined",
         hasSelf: typeof self !== "undefined",
         inWebWorker
@@ -24394,41 +24692,41 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
      * Initialize the web worker
      */
     async initialize(workerScript) {
-      console.log("\u{1F527} [WEB_WORKER] WebWorkerManager.initialize called with script:", workerScript);
+      logWorker.debug("WebWorkerManager.initialize called with script:", workerScript);
       if (!_WebWorkerManager.isSupported()) {
-        console.error("\u274C [WEB_WORKER] Web workers are not supported in this environment");
+        logWorker.error("Web workers are not supported in this environment");
         throw new Error("Web workers are not supported in this environment");
       }
       if (this.worker) {
-        console.log("\u2705 [WEB_WORKER] Worker already initialized");
+        logWorker.debug("Worker already initialized");
         return;
       }
       const script = workerScript ?? DEFAULTS.WEB_WORKER.WORKER_SCRIPT;
-      console.log("\u{1F527} [WEB_WORKER] Creating worker with script:", script);
+      logWorker.debug("Creating worker with script:", script);
       try {
         this.worker = new Worker(script);
-        console.log("\u2705 [WEB_WORKER] Worker created successfully");
+        logWorker.debug("Worker created successfully");
       } catch (error) {
-        console.error("\u274C [WEB_WORKER] Failed to create worker:", error);
+        logWorker.error("Failed to create worker:", error);
         throw error;
       }
       this.worker.onerror = (error) => {
-        console.error("\u274C [WEB_WORKER] Web worker error:", error);
+        logWorker.error("Web worker error:", error);
         this.rejectAllPending(`Web worker error: ${error.message}`);
       };
       this.worker.onmessageerror = (error) => {
-        console.error("\u274C [WEB_WORKER] Web worker message error:", error);
+        logWorker.error("Web worker message error:", error);
         this.rejectAllPending("Web worker message error");
       };
-      console.log("\u2705 [WEB_WORKER] Worker initialization completed successfully");
+      logWorker.debug("Worker initialization completed successfully");
     }
     /**
      * Execute BASIC code in the web worker
      */
     async executeInWorker(code, config2, options = {}, onMessage) {
-      console.log(`executeInWorker called with code: ${code.substring(0, 50)}...`);
+      logWorker.debug(`executeInWorker called with code: ${code.substring(0, 50)}...`);
       if (!this.worker) {
-        console.log("Worker not initialized, initializing...");
+        logWorker.debug("Worker not initialized, initializing...");
         await this.initialize(DEFAULTS.WEB_WORKER.WORKER_SCRIPT);
       }
       if (!this.worker) {
@@ -24436,10 +24734,10 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       }
       const messageId = (++this.messageId).toString();
       const timeout = options.timeout ?? DEFAULTS.WEB_WORKER.MESSAGE_TIMEOUT;
-      console.log("Sending message with ID:", messageId, "timeout:", timeout);
+      logWorker.debug("Sending message with ID:", messageId, "timeout:", timeout);
       return new Promise((resolve, reject2) => {
         const timeoutHandle = setTimeout(() => {
-          console.log("Web worker timeout after", timeout, "ms for message ID:", messageId);
+          logWorker.warn("Web worker timeout after", timeout, "ms for message ID:", messageId);
           this.pendingMessages.delete(messageId);
           reject2(new Error(`Web worker execution timeout after ${timeout}ms`));
         }, timeout);
@@ -24467,7 +24765,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
             onMessage(message2);
           };
         }
-        console.log("\u{1F504} [MAIN\u2192WORKER] Posting message to worker:", {
+        logWorker.debug("Posting message to worker:", {
           type: message.type,
           id: message.id,
           timestamp: message.timestamp,
@@ -24477,7 +24775,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         if (this.worker) {
           this.worker.postMessage(message);
         }
-        console.log("\u2705 [MAIN\u2192WORKER] Message posted to worker successfully");
+        logWorker.debug("Message posted to worker successfully");
       });
     }
     /**
@@ -24494,14 +24792,14 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           reason: "user_request"
         }
       };
-      console.log("\u{1F6D1} [MAIN\u2192WORKER] Posting STOP message to worker:", {
+      logWorker.debug("Posting STOP message to worker:", {
         type: message.type,
         id: message.id,
         timestamp: message.timestamp,
         reason: message.data.reason
       });
       this.worker.postMessage(message);
-      console.log("\u2705 [MAIN\u2192WORKER] STOP message posted to worker successfully");
+      logWorker.debug("STOP message posted to worker successfully");
     }
     /**
      * Send a message to the web worker
@@ -24571,7 +24869,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       __publicField(this, "FRAME_INTERVAL_MS", 1e3 / 60);
       // ~16.67ms for 60 FPS
       __publicField(this, "MAX_BATCH_DELAY_MS", 33);
-      console.log("\u{1F50C} [WEB_WORKER_DEVICE] WebWorkerDeviceAdapter created");
+      logWorker.debug("WebWorkerDeviceAdapter created");
       this.webWorkerManager = new WebWorkerManager();
       this.screenStateManager = new ScreenStateManager();
       this.messageHandler = new MessageHandler(this.webWorkerManager.getPendingMessages());
@@ -24617,7 +24915,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     sendStrigEvent(joystickId, state) {
       const worker = this.webWorkerManager.getWorker();
       if (!worker) {
-        console.log("\u{1F50C} [WEB_WORKER] No worker available for STRIG event");
+        logWorker.debug("No worker available for STRIG event");
         return;
       }
       const message = {
@@ -24630,7 +24928,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           timestamp: Date.now()
         }
       };
-      console.log("\u{1F50C} [WEB_WORKER] Sending STRIG event to web worker:", {
+      logWorker.debug("Sending STRIG event to web worker:", {
         joystickId,
         state,
         messageId: message.id
@@ -24656,7 +24954,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
      */
     setEnabled(enabled) {
       this.isEnabled = enabled;
-      console.log("\u{1F50C} [WEB_WORKER_DEVICE] Device adapter enabled:", enabled);
+      logWorker.debug("Device adapter enabled:", enabled);
     }
     // === JOYSTICK INPUT METHODS ===
     getJoystickCount() {
@@ -24667,14 +24965,14 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     }
     setStickState(joystickId, state) {
       this.stickStates.set(joystickId, state);
-      console.log("\u{1F50C} [WEB_WORKER_DEVICE] Stick state set:", {
+      logWorker.debug("Stick state set:", {
         joystickId,
         state
       });
     }
     pushStrigState(joystickId, state) {
       if (!this.isEnabled) return;
-      console.log("\u{1F50C} [WEB_WORKER_DEVICE] pushStrigState called:", {
+      logWorker.debug("pushStrigState called:", {
         joystickId,
         state
       });
@@ -24684,7 +24982,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         }
         const buffer = this.strigClickBuffer.get(joystickId);
         buffer.push(state);
-        console.log("\u{1F50C} [WEB_WORKER_DEVICE] STRIG pulse buffered:", {
+        logWorker.debug("STRIG pulse buffered:", {
           joystickId,
           state,
           bufferSize: buffer.length
@@ -24721,7 +25019,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       if (!manager) return;
       const buffer = manager.getScreenBuffer();
       if (buffer == null) {
-        console.warn("[WebWorkerDeviceAdapter] syncScreenStateToShared: getScreenBuffer() returned null/undefined, skipping");
+        logWorker.warn("[WebWorkerDeviceAdapter] syncScreenStateToShared: getScreenBuffer() returned null/undefined, skipping");
         return;
       }
       const { x: cursorX, y: cursorY } = manager.getCursorPosition();
@@ -24751,14 +25049,14 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         return 0;
       }
       const clickValue = buffer.shift();
-      console.log(
-        `\u{1F50C} [WEB_WORKER_DEVICE] consumeStrigState: consumed STRIG event for joystick ${joystickId}, value=${clickValue}, remaining=${buffer.length}`
+      logWorker.debug(
+        `consumeStrigState: consumed STRIG event for joystick ${joystickId}, value=${clickValue}, remaining=${buffer.length}`
       );
       return clickValue;
     }
     // === TEXT OUTPUT METHODS ===
     printOutput(output) {
-      console.log("\u{1F50C} [WEB_WORKER_DEVICE] Print output:", output);
+      logWorker.debug("Print output:", output);
       self.postMessage({
         type: "OUTPUT",
         id: `output-${Date.now()}`,
@@ -24776,7 +25074,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       this.scheduleScreenUpdate();
     }
     debugOutput(output) {
-      console.log("\u{1F50C} [WEB_WORKER_DEVICE] Debug output:", output);
+      logWorker.debug("Debug output:", output);
       self.postMessage({
         type: "OUTPUT",
         id: `debug-${Date.now()}`,
@@ -24790,7 +25088,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       });
     }
     errorOutput(output) {
-      console.error("\u{1F50C} [WEB_WORKER_DEVICE] Error output:", output);
+      logWorker.error("Error output:", output);
       self.postMessage({
         type: "OUTPUT",
         id: `error-${Date.now()}`,
@@ -24804,7 +25102,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       });
     }
     clearScreen() {
-      console.log("\u{1F50C} [WEB_WORKER_DEVICE] Clear screen");
+      logWorker.debug("Clear screen");
       this.screenStateManager.initializeScreen();
       if (this.sharedDisplayViews) {
         this.syncScreenStateToShared();
@@ -24815,7 +25113,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       this.cancelPendingScreenUpdate();
     }
     setCursorPosition(x, y) {
-      console.log("\u{1F50C} [WEB_WORKER_DEVICE] Set cursor position:", { x, y });
+      logWorker.debug("Set cursor position:", { x, y });
       this.screenStateManager.setCursorPosition(x, y);
       if (this.sharedDisplayViews) {
         this.syncScreenStateToShared();
@@ -24825,7 +25123,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       }
     }
     setColorPattern(x, y, pattern) {
-      console.log("\u{1F50C} [WEB_WORKER_DEVICE] Set color pattern:", { x, y, pattern });
+      logWorker.debug("Set color pattern:", { x, y, pattern });
       const cellsToUpdate = this.screenStateManager.setColorPattern(x, y, pattern);
       if (this.sharedDisplayViews) {
         this.syncScreenStateToShared();
@@ -24835,7 +25133,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       }
     }
     setColorPalette(bgPalette, spritePalette) {
-      console.log("\u{1F50C} [WEB_WORKER_DEVICE] Set color palette:", {
+      logWorker.debug("Set color palette:", {
         bgPalette,
         spritePalette
       });
@@ -24848,7 +25146,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       }
     }
     setBackdropColor(colorCode) {
-      console.log("\u{1F50C} [WEB_WORKER_DEVICE] Set backdrop color:", colorCode);
+      logWorker.debug("Set backdrop color:", colorCode);
       this.screenStateManager.setBackdropColor(colorCode);
       if (this.sharedDisplayViews) {
         this.syncScreenStateToShared();
@@ -24858,7 +25156,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       }
     }
     setCharacterGeneratorMode(mode) {
-      console.log("\u{1F50C} [WEB_WORKER_DEVICE] Set character generator mode:", mode);
+      logWorker.debug("Set character generator mode:", mode);
       this.screenStateManager.setCharacterGeneratorMode(mode);
       if (this.sharedDisplayViews) {
         this.syncScreenStateToShared();
@@ -24872,7 +25170,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
      * This allows movements to start as soon as MOVE is called
      */
     sendAnimationCommand(command) {
-      console.log("\u{1F3AC} [WEB_WORKER_DEVICE] Sending animation command:", command.type, command);
+      logWorker.debug("Sending animation command:", command.type, command);
       const message = {
         type: "ANIMATION_COMMAND",
         id: `anim-${Date.now()}-${Math.random()}`,
@@ -24908,7 +25206,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       const worker = this.webWorkerManager.getWorker();
       if (worker) {
         worker.onmessage = (event) => {
-          console.log("\u{1F4E8} [WORKER\u2192MAIN] Main thread received message from worker:", {
+          logWorker.debug("Main thread received message from worker:", {
             type: event.data.type,
             id: event.data.id,
             timestamp: event.data.timestamp,
@@ -24931,7 +25229,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
      * Handle OUTPUT messages from the web worker
      */
     handleOutputMessage(message) {
-      console.log("\u{1F4E4} [MAIN] Handling OUTPUT message:", {
+      logWorker.debug("Handling OUTPUT message:", {
         outputType: message.data.outputType,
         outputLength: message.data.output.length
       });
@@ -25012,7 +25310,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     setupMessageListener() {
       if (typeof self === "undefined") return;
       self.addEventListener("message", (event) => {
-        console.log("\u{1F4E8} [WORKER] Web worker received message from main thread:", {
+        logWorker.debug("Web worker received message from main thread:", {
           type: event.data.type,
           id: event.data.id,
           timestamp: event.data.timestamp,
@@ -25022,7 +25320,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       });
     }
     async handleMessage(message) {
-      console.log("\u{1F50D} [WORKER] Processing message:", {
+      logWorker.debug("Processing message:", {
         type: message.type,
         id: message.id,
         timestamp: message.timestamp
@@ -25030,32 +25328,32 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       try {
         switch (message.type) {
           case "EXECUTE":
-            console.log("\u25B6\uFE0F [WORKER] Handling EXECUTE message");
+            logWorker.debug("Handling EXECUTE message");
             await this.handleExecute(message);
             break;
           case "STOP":
-            console.log("\u23F9\uFE0F [WORKER] Handling STOP message");
+            logWorker.debug("Handling STOP message");
             this.handleStop(message);
             break;
           case "STRIG_EVENT":
-            console.log("\u{1F3AE} [WORKER] Handling STRIG_EVENT message");
+            logWorker.debug("Handling STRIG_EVENT message");
             this.handleStrigEvent(message);
             break;
           case "STICK_EVENT":
-            console.log("\u{1F3AE} [WORKER] Handling STICK_EVENT message");
+            logWorker.debug("Handling STICK_EVENT message");
             this.handleStickEvent(message);
             break;
           case "SET_SHARED_ANIMATION_BUFFER":
             this.handleSetSharedAnimationBuffer(message);
             break;
           default:
-            console.log("\u26A0\uFE0F [WORKER] Unexpected message type:", message.type);
+            logWorker.warn("Unexpected message type:", message.type);
             break;
         }
       } catch (error) {
         const err = error instanceof Error ? error : new Error(String(error));
-        console.error("\u274C [WORKER] Error processing message:", err.message);
-        console.error("Stack trace:", err.stack ?? "(no stack available)");
+        logWorker.error("Error processing message:", err.message);
+        logWorker.error("Stack trace:", err.stack ?? "(no stack available)");
         const location = this.interpreter?.getExecutionLocation?.() ?? null;
         this.sendError(message.id, err, location);
       }
@@ -25067,11 +25365,11 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         if (this.webWorkerDeviceAdapter) {
           this.webWorkerDeviceAdapter.setCurrentExecutionId(message.id);
         }
-        console.log("\u25B6\uFE0F [WORKER] Starting execution:", {
+        logWorker.debug("Starting execution:", {
           executionId: message.id,
           codeLength: code.length
         });
-        console.log("\u{1F527} [WORKER] Creating interpreter with WebWorkerDeviceAdapter:", {
+        logWorker.debug("Creating interpreter with WebWorkerDeviceAdapter:", {
           hasOriginalDeviceAdapter: !!config2.deviceAdapter,
           maxIterations: config2.maxIterations,
           maxOutputLines: config2.maxOutputLines
@@ -25081,18 +25379,18 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           deviceAdapter: this.webWorkerDeviceAdapter,
           sharedAnimationBuffer: this.sharedAnimationBuffer ?? void 0
         });
-        console.log("\u2705 [WORKER] Interpreter created with WebWorkerDeviceAdapter");
-        console.log("\u{1F680} [WORKER] Executing BASIC code");
+        logWorker.debug("Interpreter created with WebWorkerDeviceAdapter");
+        logWorker.debug("Executing BASIC code");
         this.isRunning = true;
         const result = await this.interpreter.execute(code);
         this.isRunning = false;
-        console.log("\u2705 [WORKER] Execution completed:", {
+        logWorker.debug("Execution completed:", {
           success: result.success,
           outputLines: this.webWorkerDeviceAdapter?.printOutput.length ?? 0,
           executionTime: result.executionTime
         });
         if (!result.success && result.errors?.length) {
-          console.error("[WORKER] Execution returned success: false", result.errors[0]?.message, result.errors);
+          logWorker.error("Execution returned success: false", result.errors[0]?.message, result.errors);
         }
         if (this.webWorkerDeviceAdapter) {
           this.webWorkerDeviceAdapter.setCurrentExecutionId(null);
@@ -25115,47 +25413,47 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       } catch (error) {
         this.isRunning = false;
         const err = error instanceof Error ? error : new Error(String(error));
-        console.error("\u274C [WORKER] Execution error:", err.message);
-        console.error("Stack trace:", err.stack ?? "(no stack available)");
+        logWorker.error("Execution error:", err.message);
+        logWorker.error("Stack trace:", err.stack ?? "(no stack available)");
         const location = this.interpreter?.getExecutionLocation() ?? null;
         this.sendError(message.id, err, location);
       }
     }
     handleStop(_message) {
-      console.log("\u23F9\uFE0F [WORKER] Stopping execution:", {
+      logWorker.debug("Stopping execution:", {
         wasRunning: this.isRunning,
         currentExecutionId: this.currentExecutionId
       });
       this.isRunning = false;
       if (this.interpreter) {
-        console.log("\u{1F6D1} [WORKER] Calling interpreter.stop()");
+        logWorker.debug("Calling interpreter.stop()");
         this.interpreter.stop();
       }
     }
     handleStrigEvent(message) {
       const { joystickId, state } = message.data;
-      console.log("\u{1F3AE} [WORKER] Processing STRIG event:", { joystickId, state });
+      logWorker.debug("Processing STRIG event:", { joystickId, state });
       if (this.webWorkerDeviceAdapter) {
-        console.log("\u{1F3AE} [WORKER] Updating WebWorkerDeviceAdapter STRIG buffer");
+        logWorker.debug("Updating WebWorkerDeviceAdapter STRIG buffer");
         this.webWorkerDeviceAdapter.pushStrigState(joystickId, state);
       } else {
-        console.log("\u{1F3AE} [WORKER] No WebWorkerDeviceAdapter available for STRIG event");
+        logWorker.debug("No WebWorkerDeviceAdapter available for STRIG event");
       }
     }
     handleStickEvent(message) {
       const { joystickId, state } = message.data;
-      console.log("\u{1F3AE} [WORKER] Processing STICK event:", { joystickId, state });
+      logWorker.debug("Processing STICK event:", { joystickId, state });
       if (this.webWorkerDeviceAdapter) {
-        console.log("\u{1F3AE} [WORKER] Updating WebWorkerDeviceAdapter STICK state");
+        logWorker.debug("Updating WebWorkerDeviceAdapter STICK state");
         this.webWorkerDeviceAdapter.setStickState(joystickId, state);
       } else {
-        console.log("\u{1F3AE} [WORKER] No WebWorkerDeviceAdapter available for STICK event");
+        logWorker.debug("No WebWorkerDeviceAdapter available for STICK event");
       }
     }
     handleSetSharedAnimationBuffer(message) {
       const data = message.data;
       if (!data?.buffer) {
-        console.warn("[WORKER] SET_SHARED_ANIMATION_BUFFER: message.data or buffer missing");
+        logWorker.warn("SET_SHARED_ANIMATION_BUFFER: message.data or buffer missing");
         return;
       }
       const { buffer } = data;
@@ -25177,7 +25475,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           timestamp: Date.now()
         }
       };
-      console.log("\u{1F4E4} [WORKER\u2192MAIN] Sending OUTPUT message:", {
+      logWorker.debug("Sending OUTPUT message:", {
         outputType,
         outputLength: output.length,
         executionId: this.currentExecutionId
@@ -25191,7 +25489,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         timestamp: Date.now(),
         data: result
       };
-      console.log("\u{1F4CA} [WORKER\u2192MAIN] Sending RESULT message:", {
+      logWorker.debug("Sending RESULT message:", {
         messageId,
         success: result.success,
         executionTime: result.executionTime
@@ -25214,7 +25512,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           recoverable: true
         }
       };
-      console.error("\u274C [WORKER\u2192MAIN] Sending ERROR message:", {
+      logWorker.error("Sending ERROR message:", {
         messageId,
         errorMessage: error.message,
         lineNumber: location?.lineNumber,
@@ -25222,7 +25520,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         errorType: "execution",
         recoverable: true
       });
-      console.error("Stack trace:", stackStr);
+      logWorker.error("Stack trace:", stackStr);
       self.postMessage(message);
     }
   };

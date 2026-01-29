@@ -6,6 +6,7 @@
  */
 
 import type { ScreenCell } from '@/core/interfaces'
+import { logCore } from '@/shared/logger'
 import { getCharacterByCode, getCodeByChar } from '@/shared/utils/backgroundLookup'
 
 import { MAX_SPRITES } from './sharedAnimationBuffer'
@@ -101,7 +102,7 @@ export function writeScreenState(
   cgenMode: number
 ): void {
   if (screenBuffer == null) {
-    console.warn('[sharedDisplayBuffer] writeScreenState: screenBuffer is required, skipping')
+    logCore.warn('[sharedDisplayBuffer] writeScreenState: screenBuffer is required, skipping')
     return
   }
   const { charView, patternView, cursorView, scalarsView } = views

@@ -6,6 +6,7 @@
  */
 
 import type { AnimationCommand, BasicDeviceAdapter } from '@/core/interfaces'
+import { logDevice } from '@/shared/logger'
 
 export class TestDeviceAdapter implements BasicDeviceAdapter {
   // === JOYSTICK STATE ===
@@ -38,7 +39,7 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
   private spritePositions: Map<number, { x: number; y: number }> = new Map()
 
   constructor() {
-    console.log('🧪 [TEST_DEVICE] TestDeviceAdapter created')
+    logDevice.debug('TestDeviceAdapter created')
   }
 
   // === JOYSTICK INPUT METHODS ===
@@ -53,7 +54,7 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
 
   setStickState(joystickId: number, state: number): void {
     this.stickStates.set(joystickId, state)
-    console.log('🧪 [TEST_DEVICE] Stick state set:', { joystickId, state })
+    logDevice.debug('Stick state set:', { joystickId, state })
   }
 
   pushStrigState(joystickId: number, state: number): void {
@@ -62,7 +63,7 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
     }
     const buffer = this.strigBuffer.get(joystickId)!
     buffer.push(state)
-    console.log('🧪 [TEST_DEVICE] STRIG state pushed:', {
+    logDevice.debug('STRIG state pushed:', {
       joystickId,
       state,
       bufferSize: buffer.length,
@@ -80,7 +81,7 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
     }
 
     const state = buffer.shift()!
-    console.log('🧪 [TEST_DEVICE] STRIG state consumed:', {
+    logDevice.debug('STRIG state consumed:', {
       joystickId,
       state,
       remaining: buffer.length,
@@ -111,17 +112,17 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
 
   printOutput(output: string): void {
     this.printOutputs.push(output)
-    console.log('🧪 [TEST_DEVICE] Print output:', output)
+    logDevice.debug('Print output:', output)
   }
 
   debugOutput(output: string): void {
     this.debugOutputs.push(output)
-    console.log('🧪 [TEST_DEVICE] Debug output:', output)
+    logDevice.debug('Debug output:', output)
   }
 
   errorOutput(output: string): void {
     this.errorOutputs.push(output)
-    console.log('🧪 [TEST_DEVICE] Error output:', output)
+    logDevice.debug('Error output:', output)
   }
 
   clearScreen(): void {
@@ -129,12 +130,12 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
     this.printOutputs = []
     this.debugOutputs = []
     this.errorOutputs = []
-    console.log('🧪 [TEST_DEVICE] Clear screen called')
+    logDevice.debug('Clear screen called')
   }
 
   setCursorPosition(x: number, y: number): void {
     this.cursorPosition = { x, y }
-    console.log('🧪 [TEST_DEVICE] Set cursor position:', { x, y })
+    logDevice.debug('Set cursor position:', { x, y })
   }
 
   setColorPattern(x: number, y: number, pattern: number): void {
@@ -143,7 +144,7 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
       this.colorPatternCalls = []
     }
     this.colorPatternCalls.push({ x, y, pattern })
-    console.log('🧪 [TEST_DEVICE] Set color pattern:', { x, y, pattern })
+    logDevice.debug('Set color pattern:', { x, y, pattern })
   }
 
   setColorPalette(bgPalette: number, spritePalette: number): void {
@@ -153,7 +154,7 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
     }
     this.colorPaletteCalls.push({ bgPalette, spritePalette })
     this.currentColorPalette = { bgPalette, spritePalette }
-    console.log('🧪 [TEST_DEVICE] Set color palette:', {
+    logDevice.debug('Set color palette:', {
       bgPalette,
       spritePalette,
     })
@@ -166,7 +167,7 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
     }
     this.backdropColorCalls.push(colorCode)
     this.currentBackdropColor = colorCode
-    console.log('🧪 [TEST_DEVICE] Set backdrop color:', colorCode)
+    logDevice.debug('Set backdrop color:', colorCode)
   }
 
   setCharacterGeneratorMode(mode: number): void {
@@ -176,7 +177,7 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
     }
     this.cgenModeCalls.push(mode)
     this.currentCgenMode = mode
-    console.log('🧪 [TEST_DEVICE] Set character generator mode:', mode)
+    logDevice.debug('Set character generator mode:', mode)
   }
 
   // === TEST HELPER METHODS ===

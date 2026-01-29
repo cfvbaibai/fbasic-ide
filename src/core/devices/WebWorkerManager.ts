@@ -12,6 +12,7 @@ import type {
   InterpreterConfig,
   StopMessage,
 } from '@/core/interfaces'
+import { logWorker } from '@/shared/logger'
 
 export interface WebWorkerExecutionOptions {
   onProgress?: (iterationCount: number, currentStatement?: string) => void
@@ -36,7 +37,7 @@ export class WebWorkerManager {
    */
   static isSupported(): boolean {
     const supported = typeof Worker !== 'undefined'
-    console.log('🔍 [WEB_WORKER] isSupported check:', {
+    logWorker.debug('isSupported check:', {
       hasWorker: typeof Worker !== 'undefined',
       supported,
     })
@@ -48,7 +49,7 @@ export class WebWorkerManager {
    */
   static isInWebWorker(): boolean {
     const inWebWorker = typeof window === 'undefined' && typeof self !== 'undefined'
-    console.log('🔍 [WEB_WORKER] isInWebWorker check:', {
+    logWorker.debug('isInWebWorker check:', {
       hasWindow: typeof window !== 'undefined',
       hasSelf: typeof self !== 'undefined',
       inWebWorker,
@@ -60,41 +61,41 @@ export class WebWorkerManager {
    * Initialize the web worker
    */
   async initialize(workerScript?: string): Promise<void> {
-    console.log('🔧 [WEB_WORKER] WebWorkerManager.initialize called with script:', workerScript)
+    logWorker.debug('WebWorkerManager.initialize called with script:', workerScript)
     if (!WebWorkerManager.isSupported()) {
-      console.error('❌ [WEB_WORKER] Web workers are not supported in this environment')
+      logWorker.error('Web workers are not supported in this environment')
       throw new Error('Web workers are not supported in this environment')
     }
 
     if (this.worker) {
-      console.log('✅ [WEB_WORKER] Worker already initialized')
+      logWorker.debug('Worker already initialized')
       return // Already initialized
     }
 
     const script = workerScript ?? DEFAULTS.WEB_WORKER.WORKER_SCRIPT
-    console.log('🔧 [WEB_WORKER] Creating worker with script:', script)
+    logWorker.debug('Creating worker with script:', script)
 
     try {
       this.worker = new Worker(script)
-      console.log('✅ [WEB_WORKER] Worker created successfully')
+      logWorker.debug('Worker created successfully')
     } catch (error) {
-      console.error('❌ [WEB_WORKER] Failed to create worker:', error)
+      logWorker.error('Failed to create worker:', error)
       throw error
     }
 
     // Handle worker errors
     this.worker.onerror = error => {
-      console.error('❌ [WEB_WORKER] Web worker error:', error)
+      logWorker.error('Web worker error:', error)
       this.rejectAllPending(`Web worker error: ${error.message}`)
     }
 
     // Handle worker termination
     this.worker.onmessageerror = error => {
-      console.error('❌ [WEB_WORKER] Web worker message error:', error)
+      logWorker.error('Web worker message error:', error)
       this.rejectAllPending('Web worker message error')
     }
 
-    console.log('✅ [WEB_WORKER] Worker initialization completed successfully')
+    logWorker.debug('Worker initialization completed successfully')
   }
 
   /**
@@ -106,9 +107,9 @@ export class WebWorkerManager {
     options: WebWorkerExecutionOptions = {},
     onMessage?: (message: AnyServiceWorkerMessage) => void
   ): Promise<ExecutionResult> {
-    console.log(`executeInWorker called with code: ${code.substring(0, 50)}...`)
+    logWorker.debug(`executeInWorker called with code: ${code.substring(0, 50)}...`)
     if (!this.worker) {
-      console.log('Worker not initialized, initializing...')
+      logWorker.debug('Worker not initialized, initializing...')
       await this.initialize(DEFAULTS.WEB_WORKER.WORKER_SCRIPT)
     }
 
@@ -118,12 +119,12 @@ export class WebWorkerManager {
 
     const messageId = (++this.messageId).toString()
     const timeout = options.timeout ?? DEFAULTS.WEB_WORKER.MESSAGE_TIMEOUT
-    console.log('Sending message with ID:', messageId, 'timeout:', timeout)
+    logWorker.debug('Sending message with ID:', messageId, 'timeout:', timeout)
 
     return new Promise<ExecutionResult>((resolve, reject) => {
       // Set up timeout
       const timeoutHandle = setTimeout(() => {
-        console.log('Web worker timeout after', timeout, 'ms for message ID:', messageId)
+        logWorker.warn('Web worker timeout after', timeout, 'ms for message ID:', messageId)
         this.pendingMessages.delete(messageId)
         reject(new Error(`Web worker execution timeout after ${timeout}ms`))
       }, timeout)
@@ -158,7 +159,7 @@ export class WebWorkerManager {
         }
       }
 
-      console.log('🔄 [MAIN→WORKER] Posting message to worker:', {
+      logWorker.debug('Posting message to worker:', {
         type: message.type,
         id: message.id,
         timestamp: message.timestamp,
@@ -168,7 +169,7 @@ export class WebWorkerManager {
       if (this.worker) {
         this.worker.postMessage(message)
       }
-      console.log('✅ [MAIN→WORKER] Message posted to worker successfully')
+      logWorker.debug('Message posted to worker successfully')
     })
   }
 
@@ -188,14 +189,14 @@ export class WebWorkerManager {
       },
     }
 
-    console.log('🛑 [MAIN→WORKER] Posting STOP message to worker:', {
+    logWorker.debug('Posting STOP message to worker:', {
       type: message.type,
       id: message.id,
       timestamp: message.timestamp,
       reason: message.data.reason,
     })
     this.worker.postMessage(message)
-    console.log('✅ [MAIN→WORKER] STOP message posted to worker successfully')
+    logWorker.debug('STOP message posted to worker successfully')
   }
 
   /**

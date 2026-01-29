@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 
+import { logCore } from '@/shared/logger'
 import { classifyColorWithPalette } from '@/shared/utils/colorClassification'
 
 /**
@@ -47,7 +48,7 @@ export function useImageAnalysis() {
 
       hasAnalyzed.value = true
     } catch (error) {
-      console.error('Error analyzing image:', error)
+      logCore.error('Error analyzing image:', error)
     } finally {
       isAnalyzing.value = false
     }
@@ -171,7 +172,7 @@ export function useImageAnalysis() {
 
       generatedArray.value = formattedArrays.join('\n\n')
     } catch (error) {
-      console.error('Error generating array:', error)
+      logCore.error('Error generating array:', error)
       generatedArray.value = errorMessage
     }
   }

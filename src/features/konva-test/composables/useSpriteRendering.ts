@@ -3,6 +3,7 @@ import Konva from 'konva'
 import { buildAllCharacterAnimationConfigs, getSequenceForMovement } from '@/core/animation/CharacterAnimationBuilder'
 import type { MovementState } from '@/core/sprite/types'
 import { COLORS, SPRITE_PALETTES } from '@/shared/data/palette'
+import { logCore } from '@/shared/logger'
 
 const SPRITE_SCALE = 3
 
@@ -144,7 +145,7 @@ export async function createKonvaImage(movement: MovementState): Promise<Konva.I
   )
 
   if (!sequence || sequence.frames.length === 0) {
-    console.warn(`No sequence found for movement ${movement.actionNumber}`)
+    logCore.warn(`No sequence found for movement ${movement.actionNumber}`)
     return null
   }
 

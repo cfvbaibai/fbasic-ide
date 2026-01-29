@@ -18,6 +18,7 @@ import VueKonva from 'vue-konva'
 import App from './App.vue'
 import router from './router/index'
 import i18n from './shared/i18n'
+import { logApp } from './shared/logger'
 
 if (typeof window !== 'undefined') {
   window.MonacoEnvironment = {
@@ -42,7 +43,7 @@ app.use(VueKonva)
 if (typeof window !== 'undefined') {
   void import('@/features/ide/composables/useKonvaBackgroundRenderer').then(({ preInitializeBackgroundTiles }) => {
     void preInitializeBackgroundTiles().catch(err => {
-      console.warn('[App] Background tile pre-initialization failed:', err)
+      logApp.warn('Background tile pre-initialization failed:', err)
     })
   })
 }

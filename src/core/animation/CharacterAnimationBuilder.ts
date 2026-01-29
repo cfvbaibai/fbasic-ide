@@ -20,6 +20,7 @@ import {
   isOneTileSprite,
   isSixTileSprite,
 } from '@/shared/data/types'
+import { logCore } from '@/shared/logger'
 
 /**
  * Extract sequence name from sprite name
@@ -171,7 +172,7 @@ function buildSequencesFromConfig(
     for (const spriteName of directionConfig.spriteNames) {
       const sprite = findSpriteByName(spriteName, characterCode)
       if (!sprite) {
-        console.warn(`[CharacterAnimationBuilder] Sprite not found: ${spriteName} for character ${characterCode}`)
+        logCore.warn(`[CharacterAnimationBuilder] Sprite not found: ${spriteName} for character ${characterCode}`)
         continue
       }
 

@@ -10,6 +10,8 @@
 
 import type { CstNode } from 'chevrotain'
 
+import { logInterpreter } from '@/shared/logger'
+
 // Import the FBasicParser
 import { AnimationManager } from './animation/AnimationManager'
 import { ERROR_TYPES, EXECUTION_LIMITS } from './constants'
@@ -34,7 +36,7 @@ export class BasicInterpreter {
   private context?: ExecutionContext
 
   constructor(config?: Partial<InterpreterConfig>) {
-    console.log('🔧 [MAIN] BasicInterpreter constructor called with config:', {
+    logInterpreter.debug('BasicInterpreter constructor called with config:', {
       hasDeviceAdapter: !!config?.deviceAdapter,
       maxIterations: config?.maxIterations,
       maxOutputLines: config?.maxOutputLines,
@@ -50,7 +52,7 @@ export class BasicInterpreter {
       ...config,
     }
 
-    console.log('🔧 [MAIN] Final config after merge:', {
+    logInterpreter.debug('Final config after merge:', {
       maxIterations: this.config.maxIterations,
       maxOutputLines: this.config.maxOutputLines,
       enableDebugMode: this.config.enableDebugMode,
@@ -64,12 +66,12 @@ export class BasicInterpreter {
    * Execute BASIC code
    */
   async execute(code: string): Promise<ExecutionResult> {
-    console.log('🚀 [MAIN] BasicInterpreter.execute called with code length:', code.length)
+    logInterpreter.debug('BasicInterpreter.execute called with code length:', code.length)
     try {
       // Parse the code
       const parseResult = await this.parser.parse(code)
       if (!parseResult.success) {
-        console.error('[BasicInterpreter] Parse failed:', parseResult.errors)
+        logInterpreter.error('[BasicInterpreter] Parse failed:', parseResult.errors)
         return {
           success: false,
           errors:
@@ -133,7 +135,7 @@ export class BasicInterpreter {
 
       return result
     } catch (error) {
-      console.error('[BasicInterpreter] Execution error:', error)
+      logInterpreter.error('[BasicInterpreter] Execution error:', error)
       const location = this.getExecutionLocation()
       const errMsg = error instanceof Error ? error.message : String(error)
       const stackStr = error instanceof Error ? error.stack : undefined

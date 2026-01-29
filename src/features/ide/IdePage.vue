@@ -3,10 +3,11 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import type { HighlighterInfo, ParserInfo } from '@/core/interfaces'
-import { GameBlock, GameButton, GameButtonGroup, GameLayout } from '@/shared/components/ui'
+import { GameBlock, GameButton, GameButtonGroup, GameIconButton, GameLayout } from '@/shared/components/ui'
 
 import IdeControls from './components/IdeControls.vue'
 import JoystickControl from './components/JoystickControl.vue'
+import LogLevelPanel from './components/LogLevelPanel.vue'
 import MonacoCodeEditor from './components/MonacoCodeEditor.vue'
 import RuntimeOutput from './components/RuntimeOutput.vue'
 import { useBasicIde as useBasicIdeEnhanced } from './composables/useBasicIdeEnhanced'
@@ -65,6 +66,9 @@ const canStop = isRunning
 // Parser capabilities for display
 const parserInfo = ref<ParserInfo | null>(null)
 const highlighterInfo = ref<HighlighterInfo | null>(null)
+
+// Log level panel visibility (floating toggle)
+const logLevelPanelOpen = ref(false)
 
 // Initialize parser info
 onMounted(() => {
@@ -175,6 +179,19 @@ onMounted(() => {
 
         <!-- Right Panel - Runtime Output -->
         <div class="output-panel">
+          <div class="log-level-toggle">
+            <GameIconButton
+              :icon="logLevelPanelOpen ? 'mdi:close' : 'mdi:format-list-bulleted-type'"
+              :title="logLevelPanelOpen ? 'Close log levels' : 'Open log levels'"
+              size="small"
+              @click="logLevelPanelOpen = !logLevelPanelOpen"
+            />
+          </div>
+          <Transition name="log-panel">
+            <div v-show="logLevelPanelOpen" class="log-level-panel-wrapper">
+              <LogLevelPanel :open="logLevelPanelOpen" />
+            </div>
+          </Transition>
           <RuntimeOutput
             :shared-animation-view="sharedAnimationView"
             :shared-display-views="sharedDisplayViews"
@@ -291,6 +308,33 @@ onMounted(() => {
   overflow: hidden;
   box-shadow: var(--game-shadow-base);
   position: relative;
+}
+
+.log-level-toggle {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 10;
+}
+
+.log-level-panel-wrapper {
+  position: absolute;
+  top: 2.5rem;
+  right: 0.5rem;
+  z-index: 9;
+  max-height: calc(100% - 3rem);
+  overflow-y: auto;
+}
+
+.log-panel-enter-active,
+.log-panel-leave-active {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.log-panel-enter-from,
+.log-panel-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
 }
 
 .output-panel > * {

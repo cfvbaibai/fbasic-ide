@@ -9,6 +9,7 @@ import { buildAllCharacterAnimationConfigs, getSequenceForMovement } from '@/cor
 import type { ColorCombination, MovementState, SpriteState } from '@/core/sprite/types'
 import { COLORS, SPRITE_PALETTES } from '@/shared/data/palette'
 import type { Tile } from '@/shared/data/types'
+import { logScreen } from '@/shared/logger'
 
 /**
  * Cache for pre-rendered sprite images (HTMLImageElement)
@@ -212,7 +213,7 @@ export async function createAnimatedSpriteKonvaImage(
   )
 
   if (!sequence || sequence.frames.length === 0) {
-    console.warn(`[useKonvaSpriteRenderer] No sequence found for movement ${movement.actionNumber}`)
+    logScreen.warn(`No sequence found for movement ${movement.actionNumber}`)
     return null
   }
 

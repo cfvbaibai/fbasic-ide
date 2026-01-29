@@ -7,6 +7,7 @@ import Konva from 'konva'
 
 import type { ScreenCell } from '@/core/interfaces'
 import { BACKGROUND_PALETTES, COLORS } from '@/shared/data/palette'
+import { logScreen } from '@/shared/logger'
 import { getBackgroundItemByChar, getCharacterByCode } from '@/shared/utils/backgroundLookup'
 
 const CELL_SIZE = 8 // 8×8 pixels per character cell
@@ -366,7 +367,7 @@ export async function preInitializeBackgroundTiles(): Promise<void> {
         }
       }
 
-      console.log(`[BackgroundRenderer] Pre-initialized ${backgroundTileImageCache.size} tile images`)
+      logScreen.debug(`Pre-initialized ${backgroundTileImageCache.size} tile images`)
     } finally {
       // Initialization complete
     }

@@ -40,6 +40,7 @@ import { FBasicParser } from '@/core/parser/FBasicParser'
 import { getSampleCode } from '@/core/samples/sampleCodes'
 import type { MovementState, SpriteState } from '@/core/sprite/types'
 import { ExecutionError } from '@/features/ide/errors/ExecutionError'
+import { logComposable } from '@/shared/logger'
 
 import { formatArrayForDisplay } from './useBasicIdeFormatting'
 import {
@@ -231,7 +232,7 @@ export function useBasicIde() {
         return null
       }
     } catch (error) {
-      console.error('Parse error:', error)
+      logComposable.error('Parse error:', error)
       errors.value = [
         {
           line: 0,
@@ -262,7 +263,7 @@ export function useBasicIde() {
       // Check web worker health before execution
       const isHealthy = await checkWebWorkerHealthWrapper()
       if (!isHealthy) {
-        console.log('🔄 [COMPOSABLE] Web worker unhealthy, restarting...')
+        logComposable.debug('Web worker unhealthy, restarting...')
         await restartWebWorkerWrapper()
       }
 
@@ -297,7 +298,7 @@ export function useBasicIde() {
 
       if (result?.errors && result.errors.length > 0) {
         errors.value = result.errors
-        console.error('[IDE] Run finished with errors:', result.errors[0]?.message, result.errors)
+        logComposable.error('[IDE] Run finished with errors:', result.errors[0]?.message, result.errors)
       }
 
       if (result?.variables) {
@@ -370,7 +371,7 @@ export function useBasicIde() {
         }
       }
     } catch (error) {
-      console.error('Execution error:', error)
+      logComposable.error('Execution error:', error)
       if (error instanceof ExecutionError) {
         errors.value = [
           {
@@ -506,7 +507,7 @@ export function useBasicIde() {
 
   // Cleanup function for web worker
   const cleanupWebWorker = () => {
-    console.log('🧹 [COMPOSABLE] Cleaning up web worker...')
+    logComposable.debug('Cleaning up web worker...')
     if (webWorkerManager.worker) {
       webWorkerManager.worker.terminate()
       webWorkerManager.worker = null

@@ -142,7 +142,7 @@ async function initializeKonva(): Promise<void> {
   // Get the Konva stage node from vue-konva ref
   const stageNode = stageRef.value?.getNode() ?? stageRef.value?.getStage?.() ?? null
   if (!stageNode) {
-    console.error('[Screen] Failed to get Konva stage node')
+    logScreen.error('Failed to get Konva stage node')
     return
   }
 
@@ -150,7 +150,7 @@ async function initializeKonva(): Promise<void> {
   // This ensures all tile images are ready before rendering
   // Start immediately but don't wait - images will be created on-demand if not ready
   void preInitializeBackgroundTiles().catch(err => {
-    console.warn('[Screen] Background tile pre-initialization failed:', err)
+    logScreen.warn('Background tile pre-initialization failed:', err)
   })
 
   // Initialize layers (backdrop is managed by vue-konva template, so we don't need to access it)
@@ -265,7 +265,7 @@ async function render(): Promise<void> {
       }
     }
   } catch (error) {
-    console.error('[Screen] Error rendering screen layers:', error)
+    logScreen.error('Error rendering screen layers:', error)
   } finally {
     renderInProgress = false
   }

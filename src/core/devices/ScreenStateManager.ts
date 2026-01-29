@@ -5,6 +5,7 @@
  */
 
 import type { ScreenCell, ScreenUpdateMessage } from '@/core/interfaces'
+import { logDevice } from '@/shared/logger'
 
 export class ScreenStateManager {
   private screenBuffer: ScreenCell[][] = []
@@ -57,7 +58,7 @@ export class ScreenStateManager {
   setCursorPosition(x: number, y: number): void {
     // Validate ranges
     if (x < 0 || x > 27 || y < 0 || y > 23) {
-      console.warn(`🔌 [SCREEN] Invalid cursor position: (${x}, ${y}), clamping to valid range`)
+      logDevice.warn(`Invalid cursor position: (${x}, ${y}), clamping to valid range`)
       x = Math.max(0, Math.min(27, x))
       y = Math.max(0, Math.min(23, y))
     }
@@ -116,13 +117,13 @@ export class ScreenStateManager {
   setColorPattern(x: number, y: number, pattern: number): Array<{ x: number; y: number; pattern: number }> {
     // Validate ranges
     if (x < 0 || x > 27 || y < 0 || y > 23) {
-      console.warn(`🔌 [SCREEN] Invalid color position: (${x}, ${y}), clamping to valid range`)
+      logDevice.warn(`Invalid color position: (${x}, ${y}), clamping to valid range`)
       x = Math.max(0, Math.min(27, x))
       y = Math.max(0, Math.min(23, y))
     }
 
     if (pattern < 0 || pattern > 3) {
-      console.warn(`🔌 [SCREEN] Invalid color pattern: ${pattern}, clamping to valid range (0-3)`)
+      logDevice.warn(`Invalid color pattern: ${pattern}, clamping to valid range (0-3)`)
       pattern = Math.max(0, Math.min(3, pattern))
     }
 
@@ -182,12 +183,12 @@ export class ScreenStateManager {
   setColorPalette(bgPalette: number, spritePalette: number): void {
     // Validate ranges
     if (bgPalette < 0 || bgPalette > 1) {
-      console.warn(`🔌 [SCREEN] Invalid background palette: ${bgPalette}, clamping to valid range (0-1)`)
+      logDevice.warn(`Invalid background palette: ${bgPalette}, clamping to valid range (0-1)`)
       bgPalette = Math.max(0, Math.min(1, bgPalette))
     }
 
     if (spritePalette < 0 || spritePalette > 2) {
-      console.warn(`🔌 [SCREEN] Invalid sprite palette: ${spritePalette}, clamping to valid range (0-2)`)
+      logDevice.warn(`Invalid sprite palette: ${spritePalette}, clamping to valid range (0-2)`)
       spritePalette = Math.max(0, Math.min(2, spritePalette))
     }
 
@@ -201,7 +202,7 @@ export class ScreenStateManager {
   setBackdropColor(colorCode: number): void {
     // Validate range (0-60)
     if (colorCode < 0 || colorCode > 60) {
-      console.warn(`🔌 [SCREEN] Invalid backdrop color code: ${colorCode}, clamping to valid range (0-60)`)
+      logDevice.warn(`Invalid backdrop color code: ${colorCode}, clamping to valid range (0-60)`)
       colorCode = Math.max(0, Math.min(60, colorCode))
     }
 
@@ -214,7 +215,7 @@ export class ScreenStateManager {
   setCharacterGeneratorMode(mode: number): void {
     // Validate range
     if (mode < 0 || mode > 3) {
-      console.warn(`🔌 [SCREEN] Invalid CGEN mode: ${mode}, clamping to valid range (0-3)`)
+      logDevice.warn(`Invalid CGEN mode: ${mode}, clamping to valid range (0-3)`)
       mode = Math.max(0, Math.min(3, mode))
     }
 

@@ -19,6 +19,7 @@ import type {
   InterpreterConfig,
   OutputMessage,
 } from '@/core/interfaces'
+import { logWorker } from '@/shared/logger'
 
 import { MessageHandler } from './MessageHandler'
 import { ScreenStateManager } from './ScreenStateManager'
@@ -51,7 +52,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   private readonly MAX_BATCH_DELAY_MS = 33 // Maximum delay (2 frames) to prevent excessive lag
 
   constructor() {
-    console.log('🔌 [WEB_WORKER_DEVICE] WebWorkerDeviceAdapter created')
+    logWorker.debug('WebWorkerDeviceAdapter created')
     this.webWorkerManager = new WebWorkerManager()
     this.screenStateManager = new ScreenStateManager()
     this.messageHandler = new MessageHandler(this.webWorkerManager.getPendingMessages())
@@ -108,7 +109,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   sendStrigEvent(joystickId: number, state: number): void {
     const worker = this.webWorkerManager.getWorker()
     if (!worker) {
-      console.log('🔌 [WEB_WORKER] No worker available for STRIG event')
+      logWorker.debug('No worker available for STRIG event')
       return
     }
 
@@ -123,7 +124,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       },
     }
 
-    console.log('🔌 [WEB_WORKER] Sending STRIG event to web worker:', {
+    logWorker.debug('Sending STRIG event to web worker:', {
       joystickId,
       state,
       messageId: message.id,
@@ -154,7 +155,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
    */
   setEnabled(enabled: boolean): void {
     this.isEnabled = enabled
-    console.log('🔌 [WEB_WORKER_DEVICE] Device adapter enabled:', enabled)
+    logWorker.debug('Device adapter enabled:', enabled)
   }
 
   // === JOYSTICK INPUT METHODS ===
@@ -169,7 +170,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
 
   setStickState(joystickId: number, state: number): void {
     this.stickStates.set(joystickId, state)
-    console.log('🔌 [WEB_WORKER_DEVICE] Stick state set:', {
+    logWorker.debug('Stick state set:', {
       joystickId,
       state,
     })
@@ -178,7 +179,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   pushStrigState(joystickId: number, state: number): void {
     if (!this.isEnabled) return
 
-    console.log('🔌 [WEB_WORKER_DEVICE] pushStrigState called:', {
+    logWorker.debug('pushStrigState called:', {
       joystickId,
       state,
     })
@@ -189,7 +190,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       }
       const buffer = this.strigClickBuffer.get(joystickId)!
       buffer.push(state)
-      console.log('🔌 [WEB_WORKER_DEVICE] STRIG pulse buffered:', {
+      logWorker.debug('STRIG pulse buffered:', {
         joystickId,
         state,
         bufferSize: buffer.length,
@@ -232,7 +233,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     if (!manager) return
     const buffer = manager.getScreenBuffer()
     if (buffer == null) {
-      console.warn('[WebWorkerDeviceAdapter] syncScreenStateToShared: getScreenBuffer() returned null/undefined, skipping')
+      logWorker.warn('[WebWorkerDeviceAdapter] syncScreenStateToShared: getScreenBuffer() returned null/undefined, skipping')
       return
     }
     const { x: cursorX, y: cursorY } = manager.getCursorPosition()
@@ -265,9 +266,8 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     }
 
     const clickValue = buffer.shift()!
-    console.log(
-      `🔌 [WEB_WORKER_DEVICE] consumeStrigState: consumed STRIG event ` +
-        `for joystick ${joystickId}, value=${clickValue}, remaining=${buffer.length}`
+    logWorker.debug(
+      `consumeStrigState: consumed STRIG event for joystick ${joystickId}, value=${clickValue}, remaining=${buffer.length}`
     )
     return clickValue
   }
@@ -275,7 +275,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   // === TEXT OUTPUT METHODS ===
 
   printOutput(output: string): void {
-    console.log('🔌 [WEB_WORKER_DEVICE] Print output:', output)
+    logWorker.debug('Print output:', output)
 
     // Send to STDOUT (original textarea output)
     self.postMessage({
@@ -301,7 +301,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   }
 
   debugOutput(output: string): void {
-    console.log('🔌 [WEB_WORKER_DEVICE] Debug output:', output)
+    logWorker.debug('Debug output:', output)
     // Send debug output to main thread
     self.postMessage({
       type: 'OUTPUT',
@@ -317,7 +317,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   }
 
   errorOutput(output: string): void {
-    console.error('🔌 [WEB_WORKER_DEVICE] Error output:', output)
+    logWorker.error('Error output:', output)
     // Send error output to main thread
     self.postMessage({
       type: 'OUTPUT',
@@ -333,7 +333,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   }
 
   clearScreen(): void {
-    console.log('🔌 [WEB_WORKER_DEVICE] Clear screen')
+    logWorker.debug('Clear screen')
     this.screenStateManager.initializeScreen()
     if (this.sharedDisplayViews) {
       this.syncScreenStateToShared()
@@ -345,7 +345,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   }
 
   setCursorPosition(x: number, y: number): void {
-    console.log('🔌 [WEB_WORKER_DEVICE] Set cursor position:', { x, y })
+    logWorker.debug('Set cursor position:', { x, y })
     this.screenStateManager.setCursorPosition(x, y)
     if (this.sharedDisplayViews) {
       this.syncScreenStateToShared()
@@ -356,7 +356,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   }
 
   setColorPattern(x: number, y: number, pattern: number): void {
-    console.log('🔌 [WEB_WORKER_DEVICE] Set color pattern:', { x, y, pattern })
+    logWorker.debug('Set color pattern:', { x, y, pattern })
     const cellsToUpdate = this.screenStateManager.setColorPattern(x, y, pattern)
     if (this.sharedDisplayViews) {
       this.syncScreenStateToShared()
@@ -367,7 +367,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   }
 
   setColorPalette(bgPalette: number, spritePalette: number): void {
-    console.log('🔌 [WEB_WORKER_DEVICE] Set color palette:', {
+    logWorker.debug('Set color palette:', {
       bgPalette,
       spritePalette,
     })
@@ -381,7 +381,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   }
 
   setBackdropColor(colorCode: number): void {
-    console.log('🔌 [WEB_WORKER_DEVICE] Set backdrop color:', colorCode)
+    logWorker.debug('Set backdrop color:', colorCode)
     this.screenStateManager.setBackdropColor(colorCode)
     if (this.sharedDisplayViews) {
       this.syncScreenStateToShared()
@@ -392,7 +392,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   }
 
   setCharacterGeneratorMode(mode: number): void {
-    console.log('🔌 [WEB_WORKER_DEVICE] Set character generator mode:', mode)
+    logWorker.debug('Set character generator mode:', mode)
     this.screenStateManager.setCharacterGeneratorMode(mode)
     if (this.sharedDisplayViews) {
       this.syncScreenStateToShared()
@@ -407,7 +407,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
    * This allows movements to start as soon as MOVE is called
    */
   sendAnimationCommand(command: AnimationCommand): void {
-    console.log('🎬 [WEB_WORKER_DEVICE] Sending animation command:', command.type, command)
+    logWorker.debug('Sending animation command:', command.type, command)
 
     const message: AnyServiceWorkerMessage = {
       type: 'ANIMATION_COMMAND',
@@ -449,7 +449,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     const worker = this.webWorkerManager.getWorker()
     if (worker) {
       worker.onmessage = event => {
-        console.log('📨 [WORKER→MAIN] Main thread received message from worker:', {
+        logWorker.debug('Main thread received message from worker:', {
           type: event.data.type,
           id: event.data.id,
           timestamp: event.data.timestamp,
@@ -474,7 +474,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
    * Handle OUTPUT messages from the web worker
    */
   private handleOutputMessage(message: OutputMessage): void {
-    console.log('📤 [MAIN] Handling OUTPUT message:', {
+    logWorker.debug('Handling OUTPUT message:', {
       outputType: message.data.outputType,
       outputLength: message.data.output.length,
     })

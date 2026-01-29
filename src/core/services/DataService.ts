@@ -11,6 +11,7 @@ import type { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
 import { getCstNodes, getFirstCstNode, getFirstToken } from '@/core/parser/cst-helpers'
 import type { ExecutionContext } from '@/core/state/ExecutionContext'
 import type { BasicScalarValue } from '@/core/types/BasicTypes'
+import { logCore } from '@/shared/logger'
 
 export class DataService {
   constructor(
@@ -71,7 +72,7 @@ export class DataService {
   addDataValues(_expressions: unknown[]): void {
     // This method is kept for compatibility but should not be used
     // Use addDataValuesCst instead
-    console.warn('addDataValues called with AST - use addDataValuesCst instead')
+    logCore.warn('addDataValues called with AST - use addDataValuesCst instead')
   }
 
   /**

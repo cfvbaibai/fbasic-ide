@@ -1,6 +1,8 @@
 import { useIntervalFn, useTimeoutFn } from '@vueuse/core'
 import { onDeactivated, onUnmounted, ref } from 'vue'
 
+import { logComposable } from '@/shared/logger'
+
 interface UseJoystickEventsOptions {
   sendStickEvent?: (joystickId: number, state: number) => void
   sendStrigEvent?: (joystickId: number, state: number) => void
@@ -76,7 +78,7 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
 
     // Send STICK event to service worker
     if (sendStickEvent && stickValue > 0) {
-      console.log('🎮 [JOYSTICK_CONTROL] Sending STICK event:', { joystickId, direction, stickValue })
+      logComposable.debug('Sending STICK event:', { joystickId, direction, stickValue })
       sendStickEvent(joystickId, stickValue)
 
       // Update local state for display
@@ -96,7 +98,7 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
     // useIntervalFn starts immediately by default, so we just need to store pause
     const { pause } = useIntervalFn(() => {
       if (sendStickEvent && stickValue > 0) {
-        console.log('🎮 [JOYSTICK_CONTROL] Repeating STICK event:', { joystickId, direction, stickValue })
+        logComposable.debug('Repeating STICK event:', { joystickId, direction, stickValue })
         sendStickEvent(joystickId, stickValue)
       }
     }, dpadRepeatInterval)
@@ -117,7 +119,7 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
 
     // Only send release event and stop flashing if button was actually being held
     if (wasHeld && sendStickEvent) {
-      console.log('🎮 [JOYSTICK_CONTROL] Sending STICK release event:', { joystickId, direction, stickValue: 0 })
+      logComposable.debug('Sending STICK release event:', { joystickId, direction, stickValue: 0 })
       sendStickEvent(joystickId, 0)
 
       // Update local state for display
@@ -170,7 +172,7 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
 
     // Send STRIG event to service worker
     if (sendStrigEvent && strigValue > 0) {
-      console.log('🎮 [JOYSTICK_CONTROL] Sending STRIG event:', { joystickId, button, strigValue })
+      logComposable.debug('Sending STRIG event:', { joystickId, button, strigValue })
       sendStrigEvent(joystickId, strigValue)
 
       // Update local state for display

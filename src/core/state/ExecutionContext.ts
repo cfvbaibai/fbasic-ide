@@ -10,6 +10,7 @@ import type { ExpandedStatement } from '@/core/execution/statement-expander'
 import type { BasicDeviceAdapter, BasicError, BasicVariable, InterpreterConfig } from '@/core/interfaces'
 import type { SpriteStateManager } from '@/core/sprite/SpriteStateManager'
 import type { BasicArrayValue, BasicScalarValue } from '@/core/types/BasicTypes'
+import { logInterpreter } from '@/shared/logger'
 
 export interface LoopState {
   variableName: string
@@ -222,7 +223,7 @@ export class ExecutionContext {
       const consumedValue = this.deviceAdapter.consumeStrigState(joystickId)
 
       if (consumedValue > 0) {
-        console.log(`🎮 [EXECUTION] STRIG event consumed: joystickId=${joystickId}, value=${consumedValue}`)
+        logInterpreter.debug(`STRIG event consumed: joystickId=${joystickId}, value=${consumedValue}`)
         return consumedValue
       }
     }

@@ -7,6 +7,7 @@ import Konva from 'konva'
 import type { Ref } from 'vue'
 
 import type { MovementState } from '@/core/sprite/types'
+import { logCore } from '@/shared/logger'
 import type { VueKonvaStageInstance } from '@/types/vue-konva'
 
 import { createBackgroundItemKonvaImages } from './useBackgroundItems'
@@ -78,13 +79,13 @@ export function useKonvaStage(options: UseKonvaStageOptions) {
 
     const stageNode = stageRef.value?.getNode() ?? stageRef.value?.getStage?.() ?? null
     if (!stageNode) {
-      console.error('Failed to get Konva stage node')
+      logCore.error('Failed to get Konva stage node')
       return
     }
 
     const layers = stageNode.getLayers()
     if (layers.length === 0) {
-      console.error('No layers found in stage')
+      logCore.error('No layers found in stage')
       return
     }
 

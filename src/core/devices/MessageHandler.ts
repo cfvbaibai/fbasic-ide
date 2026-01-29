@@ -5,6 +5,7 @@
  */
 
 import type { AnyServiceWorkerMessage, ExecutionResult, OutputMessage } from '@/core/interfaces'
+import { logIdeMessages } from '@/shared/logger'
 
 export interface PendingMessage {
   resolve: (result: ExecutionResult) => void
@@ -19,7 +20,7 @@ export class MessageHandler {
    * Handle messages from the web worker
    */
   handleWorkerMessage(message: AnyServiceWorkerMessage, onOutput?: (message: OutputMessage) => void): void {
-    console.log('🔍 [MESSAGE_HANDLER] Processing worker message:', {
+    logIdeMessages.debug('Processing worker message:', {
       type: message.type,
       id: message.id,
       timestamp: message.timestamp,
@@ -27,7 +28,7 @@ export class MessageHandler {
 
     // Handle OUTPUT messages separately as they don't have pending message IDs
     if (message.type === 'OUTPUT') {
-      console.log('📤 [MESSAGE_HANDLER] Handling OUTPUT message:', {
+      logIdeMessages.debug('Handling OUTPUT message:', {
         outputType: message.data.outputType,
         outputLength: message.data.output.length,
       })
@@ -41,7 +42,7 @@ export class MessageHandler {
     // They don't need to be processed here, just pass through
     if (message.type === 'SCREEN_UPDATE') {
       const screenMessage = message as { data: { updateType: string } }
-      console.log('🖥️ [MESSAGE_HANDLER] SCREEN_UPDATE message received (handled by composable):', {
+      logIdeMessages.debug('SCREEN_UPDATE message received (handled by composable):', {
         updateType: screenMessage.data.updateType,
       })
       return
@@ -49,17 +50,17 @@ export class MessageHandler {
 
     const pending = this.pendingMessages.get(message.id)
     if (!pending) {
-      console.log('⚠️ [MESSAGE_HANDLER] No pending message found for ID:', message.id)
+      logIdeMessages.warn('No pending message found for ID:', message.id)
       return
     }
 
-    console.log('✅ [MESSAGE_HANDLER] Found pending message for ID:', message.id)
+    logIdeMessages.debug('Found pending message for ID:', message.id)
     // -- Only handling response messages, not request messages
     // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
     switch (message.type) {
       case 'RESULT': {
         const resultMessage = message
-        console.log('📊 [MESSAGE_HANDLER] Received RESULT message:', {
+        logIdeMessages.debug('Received RESULT message:', {
           success: resultMessage.data.success,
           executionTime: resultMessage.data.executionTime,
         })
@@ -68,11 +69,11 @@ export class MessageHandler {
 
         // Check if web worker indicates fallback is needed
         if (resultMessage.data.errors?.some(error => error.message.includes('not yet fully implemented'))) {
-          console.log('⚠️ [MESSAGE_HANDLER] Web worker indicates fallback needed, rejecting to trigger fallback')
+          logIdeMessages.warn('Web worker indicates fallback needed, rejecting to trigger fallback')
           // Web worker can't handle the execution, reject to trigger fallback
           pending.reject(new Error('Web worker execution not implemented, falling back to main thread'))
         } else {
-          console.log('✅ [MESSAGE_HANDLER] Web worker result is valid, resolving pending promise')
+          logIdeMessages.debug('Web worker result is valid, resolving pending promise')
           pending.resolve(resultMessage.data)
         }
         break
@@ -80,14 +81,14 @@ export class MessageHandler {
 
       case 'ERROR': {
         const errorMessage = message
-        console.log('❌ [MESSAGE_HANDLER] Received ERROR message:', {
+        logIdeMessages.debug('Received ERROR message:', {
           message: errorMessage.data.message,
           errorType: errorMessage.data.errorType,
           recoverable: errorMessage.data.recoverable,
         })
         clearTimeout(pending.timeout)
         this.pendingMessages.delete(message.id)
-        console.log('❌ [MESSAGE_HANDLER] Rejecting pending promise due to error')
+        logIdeMessages.debug('Rejecting pending promise due to error')
         pending.reject(new Error(errorMessage.data.message))
         break
       }
@@ -95,7 +96,7 @@ export class MessageHandler {
       case 'PROGRESS': {
         // Handle progress updates if needed
         const progressMessage = message
-        console.log('📈 [MESSAGE_HANDLER] Received PROGRESS message:', {
+        logIdeMessages.debug('Received PROGRESS message:', {
           progress: progressMessage.data.progress,
         })
         // Could emit progress events here
@@ -105,7 +106,7 @@ export class MessageHandler {
       default:
         // Other message types (EXECUTE, STOP, STRIG_EVENT, STICK_EVENT, INIT, READY)
         // are requests sent to the worker, not responses handled here
-        console.log('⚠️ [MESSAGE_HANDLER] Unexpected message type:', message.type)
+        logIdeMessages.warn('Unexpected message type:', message.type)
         break
     }
   }
