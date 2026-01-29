@@ -4,248 +4,22 @@
   var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
   var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
 
-  // src/core/animation/AnimationManager.ts
-  var AnimationManager = class {
-    constructor() {
-      __publicField(this, "moveDefinitions", /* @__PURE__ */ new Map());
-      __publicField(this, "movementStates", /* @__PURE__ */ new Map());
-      __publicField(this, "deviceAdapter");
+  // src/core/animation/sharedAnimationBuffer.ts
+  var MAX_SPRITES = 8;
+  var FLOATS_PER_SPRITE = 3;
+  var SHARED_ANIMATION_BUFFER_LENGTH = MAX_SPRITES * FLOATS_PER_SPRITE;
+  var SHARED_ANIMATION_BUFFER_BYTES = SHARED_ANIMATION_BUFFER_LENGTH * 8;
+  function slotBase(actionNumber) {
+    if (actionNumber < 0 || actionNumber >= MAX_SPRITES) {
+      throw new RangeError(`actionNumber must be 0-${MAX_SPRITES - 1}, got ${actionNumber}`);
     }
-    /**
-     * Set device adapter for sending animation commands
-     */
-    setDeviceAdapter(adapter) {
-      this.deviceAdapter = adapter;
-    }
-    /**
-     * Define a movement (DEF MOVE command)
-     * Stores the movement definition but does not start movement
-     */
-    defineMovement(definition) {
-      if (definition.actionNumber < 0 || definition.actionNumber > 7) {
-        throw new Error(`Invalid action number: ${definition.actionNumber} (must be 0-7)`);
-      }
-      if (definition.characterType < 0 || definition.characterType > 15) {
-        throw new Error(`Invalid character type: ${definition.characterType} (must be 0-15)`);
-      }
-      if (definition.direction < 0 || definition.direction > 8) {
-        throw new Error(`Invalid direction: ${definition.direction} (must be 0-8)`);
-      }
-      if (definition.speed < 1 || definition.speed > 255) {
-        throw new Error(`Invalid speed: ${definition.speed} (must be 1-255)`);
-      }
-      if (definition.distance < 1 || definition.distance > 255) {
-        throw new Error(`Invalid distance: ${definition.distance} (must be 1-255)`);
-      }
-      if (definition.priority < 0 || definition.priority > 1) {
-        throw new Error(`Invalid priority: ${definition.priority} (must be 0-1)`);
-      }
-      if (definition.colorCombination < 0 || definition.colorCombination > 3) {
-        throw new Error(`Invalid color combination: ${definition.colorCombination} (must be 0-3)`);
-      }
-      this.moveDefinitions.set(definition.actionNumber, definition);
-    }
-    /**
-     * Get movement definition
-     */
-    getMoveDefinition(actionNumber) {
-      return this.moveDefinitions.get(actionNumber);
-    }
-    /**
-     * Start movement (MOVE command)
-     * Initializes movement state and begins animation
-     * Position will be retrieved from Konva nodes in the frontend
-     */
-    startMovement(actionNumber, startX, startY) {
-      const definition = this.moveDefinitions.get(actionNumber);
-      if (!definition) {
-        throw new Error(`No movement definition for action number ${actionNumber} (use DEF MOVE first)`);
-      }
-      const initialX = startX ?? 120;
-      const initialY = startY ?? 120;
-      console.log(`\u{1F3AF} [AnimationManager] startMovement(${actionNumber}):`, {
-        startX,
-        startY,
-        initialX,
-        initialY,
-        note: "Frontend will get actual position from Konva nodes"
-      });
-      const { deltaX, deltaY } = this.getDirectionDeltas(definition.direction);
-      const speedDotsPerSecond = definition.speed > 0 ? 60 / definition.speed : 0;
-      const totalDistance = 2 * definition.distance;
-      const movementState = {
-        actionNumber,
-        definition,
-        startX: initialX,
-        startY: initialY,
-        remainingDistance: totalDistance,
-        totalDistance,
-        speedDotsPerSecond,
-        directionDeltaX: deltaX,
-        directionDeltaY: deltaY,
-        isActive: true,
-        currentFrameIndex: 0,
-        frameCounter: 0
-      };
-      this.movementStates.set(actionNumber, movementState);
-      if (this.deviceAdapter?.sendAnimationCommand) {
-        const command = {
-          type: "START_MOVEMENT",
-          actionNumber,
-          definition,
-          startX: initialX,
-          startY: initialY
-        };
-        this.deviceAdapter.sendAnimationCommand(command);
-      }
-    }
-    /**
-     * Update all active movements (called each frame)
-     * NOTE: This method is never called in the worker - animation happens on main thread.
-     * Position updates happen in the frontend animation loop using Konva nodes.
-     * @param _deltaTime - Time elapsed since last frame in milliseconds
-     */
-    updateMovements(_deltaTime) {
-      for (const movement of this.movementStates.values()) {
-        if (!movement.isActive || movement.remainingDistance <= 0) {
-          movement.isActive = false;
-          continue;
-        }
-      }
-    }
-    /**
-     * Stop movement (CUT command)
-     * Stops movement but keeps sprite visible at current position
-     * Position is stored in Konva nodes, no need to sync back to worker
-     */
-    stopMovement(actionNumbers) {
-      for (const actionNumber of actionNumbers) {
-        const movement = this.movementStates.get(actionNumber);
-        if (movement) {
-          movement.isActive = false;
-        }
-      }
-      if (this.deviceAdapter?.sendAnimationCommand) {
-        const command = {
-          type: "STOP_MOVEMENT",
-          actionNumbers
-        };
-        this.deviceAdapter.sendAnimationCommand(command);
-      }
-    }
-    /**
-     * Erase movement (ERA command)
-     * Stops movement and hides sprite
-     */
-    eraseMovement(actionNumbers) {
-      for (const actionNumber of actionNumbers) {
-        const movement = this.movementStates.get(actionNumber);
-        if (movement) {
-          movement.isActive = false;
-        }
-        this.movementStates.delete(actionNumber);
-      }
-      if (this.deviceAdapter?.sendAnimationCommand) {
-        const command = {
-          type: "ERASE_MOVEMENT",
-          actionNumbers
-        };
-        this.deviceAdapter.sendAnimationCommand(command);
-      }
-    }
-    /**
-     * Set initial position (POSITION command)
-     * Sends command to frontend to set Konva node position
-     */
-    setPosition(actionNumber, x, y) {
-      if (actionNumber < 0 || actionNumber > 7) {
-        throw new Error(`Invalid action number: ${actionNumber} (must be 0-7)`);
-      }
-      if (x < 0 || x > 255) {
-        throw new Error(`Invalid X coordinate: ${x} (must be 0-255)`);
-      }
-      if (y < 0 || y > 239) {
-        throw new Error(`Invalid Y coordinate: ${y} (must be 0-239)`);
-      }
-      if (this.deviceAdapter?.sendAnimationCommand) {
-        const command = {
-          type: "SET_POSITION",
-          actionNumber,
-          x,
-          y
-        };
-        this.deviceAdapter.sendAnimationCommand(command);
-      }
-    }
-    /**
-     * Get movement status (MOVE(n) function)
-     * Returns -1 if movement is active, 0 if complete or not started
-     */
-    getMovementStatus(actionNumber) {
-      const movement = this.movementStates.get(actionNumber);
-      if (movement?.isActive) {
-        return -1;
-      }
-      return 0;
-    }
-    /**
-     * Get sprite position (XPOS/YPOS functions)
-     * NOTE: Position is stored in Konva nodes in frontend, not in worker.
-     * This method returns null - frontend should query Konva nodes directly.
-     */
-    getSpritePosition(_actionNumber) {
-      return null;
-    }
-    /**
-     * Get all active movement states
-     */
-    getAllMovementStates() {
-      return Array.from(this.movementStates.values());
-    }
-    /**
-     * Get movement state for a specific action number
-     */
-    getMovementState(actionNumber) {
-      return this.movementStates.get(actionNumber);
-    }
-    /**
-     * Calculate direction deltas from direction code
-     * Direction: 0=none, 1=up, 2=up-right, 3=right, 4=down-right,
-     *            5=down, 6=down-left, 7=left, 8=up-left
-     * Returns dx, dy in range [-1, 0, 1]
-     */
-    getDirectionDeltas(direction) {
-      switch (direction) {
-        case 0:
-          return { deltaX: 0, deltaY: 0 };
-        case 1:
-          return { deltaX: 0, deltaY: -1 };
-        case 2:
-          return { deltaX: 1, deltaY: -1 };
-        case 3:
-          return { deltaX: 1, deltaY: 0 };
-        case 4:
-          return { deltaX: 1, deltaY: 1 };
-        case 5:
-          return { deltaX: 0, deltaY: 1 };
-        case 6:
-          return { deltaX: -1, deltaY: 1 };
-        case 7:
-          return { deltaX: -1, deltaY: 0 };
-        case 8:
-          return { deltaX: -1, deltaY: -1 };
-        default:
-          return { deltaX: 0, deltaY: 0 };
-      }
-    }
-    /**
-     * Reset all movement states (for program reset)
-     */
-    reset() {
-      this.movementStates.clear();
-      this.moveDefinitions.clear();
-    }
-  };
+    return actionNumber * FLOATS_PER_SPRITE;
+  }
+  function readSpriteIsActive(view, actionNumber) {
+    if (actionNumber < 0 || actionNumber >= MAX_SPRITES) return false;
+    const base = slotBase(actionNumber);
+    return view[base + 2] !== 0;
+  }
 
   // src/core/constants.ts
   var EXECUTION_LIMITS = {
@@ -333,8 +107,11 @@
       // Maximum Y coordinate (0-239, 240 dots)
       WIDTH: 256,
       // Total width in dots
-      HEIGHT: 240
+      HEIGHT: 240,
       // Total height in dots
+      /** Default position when POSITION not set: center of screen (256×240) */
+      DEFAULT_X: 128,
+      DEFAULT_Y: 120
     }
   };
   var COLOR_PATTERNS = {
@@ -358,6 +135,272 @@
     // End of block 3 (columns 16-23)
     BLOCK_4_END: 28
     // End of block 4 (columns 24-27)
+  };
+
+  // src/core/animation/AnimationManager.ts
+  var AnimationManager = class {
+    constructor(sharedAnimationBuffer) {
+      __publicField(this, "moveDefinitions", /* @__PURE__ */ new Map());
+      __publicField(this, "movementStates", /* @__PURE__ */ new Map());
+      __publicField(this, "deviceAdapter");
+      /** Shared animation state view (isActive). When set, getMovementStatus reads from it. */
+      __publicField(this, "sharedAnimationView", null);
+      if (sharedAnimationBuffer) {
+        this.sharedAnimationView = this.viewFromBuffer(sharedAnimationBuffer);
+      }
+    }
+    /**
+     * Set device adapter for sending animation commands
+     */
+    setDeviceAdapter(adapter) {
+      this.deviceAdapter = adapter;
+    }
+    /**
+     * Set shared animation buffer (used by worker for getMovementStatus / MOVE(n)).
+     * Accepts either the standalone animation buffer (192 bytes) or the combined display buffer
+     * (1548 bytes); in the latter case uses only the first 192 bytes for the sprite Float64 view.
+     */
+    setSharedAnimationBuffer(buffer) {
+      this.sharedAnimationView = buffer ? this.viewFromBuffer(buffer) : null;
+    }
+    /** Create Float64Array view from buffer (standalone 192 bytes or combined display buffer). */
+    viewFromBuffer(buffer) {
+      const byteLen = buffer.byteLength;
+      if (byteLen === SHARED_ANIMATION_BUFFER_BYTES) {
+        return new Float64Array(buffer);
+      }
+      if (byteLen >= SHARED_ANIMATION_BUFFER_BYTES) {
+        return new Float64Array(buffer, 0, SHARED_ANIMATION_BUFFER_LENGTH);
+      }
+      throw new RangeError(
+        `Shared animation buffer too small: ${byteLen} bytes, need at least ${SHARED_ANIMATION_BUFFER_BYTES}`
+      );
+    }
+    /**
+     * Define a movement (DEF MOVE command)
+     * Stores the movement definition but does not start movement
+     */
+    defineMovement(definition) {
+      if (definition.actionNumber < 0 || definition.actionNumber > 7) {
+        throw new Error(`Invalid action number: ${definition.actionNumber} (must be 0-7)`);
+      }
+      if (definition.characterType < 0 || definition.characterType > 15) {
+        throw new Error(`Invalid character type: ${definition.characterType} (must be 0-15)`);
+      }
+      if (definition.direction < 0 || definition.direction > 8) {
+        throw new Error(`Invalid direction: ${definition.direction} (must be 0-8)`);
+      }
+      if (definition.speed < 1 || definition.speed > 255) {
+        throw new Error(`Invalid speed: ${definition.speed} (must be 1-255)`);
+      }
+      if (definition.distance < 1 || definition.distance > 255) {
+        throw new Error(`Invalid distance: ${definition.distance} (must be 1-255)`);
+      }
+      if (definition.priority < 0 || definition.priority > 1) {
+        throw new Error(`Invalid priority: ${definition.priority} (must be 0-1)`);
+      }
+      if (definition.colorCombination < 0 || definition.colorCombination > 3) {
+        throw new Error(`Invalid color combination: ${definition.colorCombination} (must be 0-3)`);
+      }
+      this.moveDefinitions.set(definition.actionNumber, definition);
+    }
+    /**
+     * Get movement definition
+     */
+    getMoveDefinition(actionNumber) {
+      return this.moveDefinitions.get(actionNumber);
+    }
+    /**
+     * Start movement (MOVE command)
+     * Initializes movement state and begins animation
+     * Position will be retrieved from Konva nodes in the frontend
+     */
+    startMovement(actionNumber, startX, startY) {
+      const definition = this.moveDefinitions.get(actionNumber);
+      if (!definition) {
+        throw new Error(`No movement definition for action number ${actionNumber} (use DEF MOVE first)`);
+      }
+      const initialX = startX ?? SCREEN_DIMENSIONS.SPRITE.DEFAULT_X;
+      const initialY = startY ?? SCREEN_DIMENSIONS.SPRITE.DEFAULT_Y;
+      const { deltaX, deltaY } = this.getDirectionDeltas(definition.direction);
+      const speedDotsPerSecond = definition.speed > 0 ? 60 / definition.speed : 0;
+      const totalDistance = 2 * definition.distance;
+      const movementState = {
+        actionNumber,
+        definition,
+        startX: initialX,
+        startY: initialY,
+        remainingDistance: totalDistance,
+        totalDistance,
+        speedDotsPerSecond,
+        directionDeltaX: deltaX,
+        directionDeltaY: deltaY,
+        isActive: true,
+        currentFrameIndex: 0,
+        frameCounter: 0
+      };
+      this.movementStates.set(actionNumber, movementState);
+      if (this.deviceAdapter?.sendAnimationCommand) {
+        const command = {
+          type: "START_MOVEMENT",
+          actionNumber,
+          definition,
+          startX: initialX,
+          startY: initialY
+        };
+        this.deviceAdapter.sendAnimationCommand(command);
+        this.deviceAdapter.clearSpritePosition?.(actionNumber);
+      }
+    }
+    /**
+     * Set movements inactive (main thread notified us that they completed naturally).
+     * Only updates worker state; does not send any command to main thread.
+     */
+    setMovementsInactive(actionNumbers) {
+      for (const actionNumber of actionNumbers) {
+        const movement = this.movementStates.get(actionNumber);
+        if (movement) {
+          movement.isActive = false;
+        }
+      }
+    }
+    /**
+     * Stop movement (CUT command)
+     * Stops movement but keeps sprite visible at current position
+     * Position is stored in Konva nodes, no need to sync back to worker
+     */
+    stopMovement(actionNumbers) {
+      for (const actionNumber of actionNumbers) {
+        const movement = this.movementStates.get(actionNumber);
+        if (movement) {
+          movement.isActive = false;
+        }
+      }
+      if (this.deviceAdapter?.sendAnimationCommand) {
+        const command = {
+          type: "STOP_MOVEMENT",
+          actionNumbers
+        };
+        this.deviceAdapter.sendAnimationCommand(command);
+      }
+    }
+    /**
+     * Erase movement (ERA command)
+     * Stops movement and hides sprite
+     */
+    eraseMovement(actionNumbers) {
+      for (const actionNumber of actionNumbers) {
+        const movement = this.movementStates.get(actionNumber);
+        if (movement) {
+          movement.isActive = false;
+        }
+        this.movementStates.delete(actionNumber);
+      }
+      if (this.deviceAdapter?.sendAnimationCommand) {
+        const command = {
+          type: "ERASE_MOVEMENT",
+          actionNumbers
+        };
+        this.deviceAdapter.sendAnimationCommand(command);
+      }
+    }
+    /**
+     * Set initial position (POSITION command)
+     * Sends SET_POSITION to main thread; main thread sets Konva node or stores pending for START_MOVEMENT.
+     */
+    setPosition(actionNumber, x, y) {
+      if (actionNumber < 0 || actionNumber > 7) {
+        throw new Error(`Invalid action number: ${actionNumber} (must be 0-7)`);
+      }
+      if (x < 0 || x > 255) {
+        throw new Error(`Invalid X coordinate: ${x} (must be 0-255)`);
+      }
+      if (y < 0 || y > 239) {
+        throw new Error(`Invalid Y coordinate: ${y} (must be 0-239)`);
+      }
+      this.deviceAdapter?.setSpritePosition?.(actionNumber, x, y);
+      if (this.deviceAdapter?.sendAnimationCommand) {
+        const command = {
+          type: "SET_POSITION",
+          actionNumber,
+          x,
+          y
+        };
+        this.deviceAdapter.sendAnimationCommand(command);
+      }
+    }
+    /**
+     * Get movement status (MOVE(n) function)
+     * Returns -1 if movement is active, 0 if complete or not started.
+     * When shared buffer is set (worker), reads isActive from shared memory.
+     */
+    getMovementStatus(actionNumber) {
+      if (this.sharedAnimationView && readSpriteIsActive(this.sharedAnimationView, actionNumber)) {
+        return -1;
+      }
+      const movement = this.movementStates.get(actionNumber);
+      if (movement?.isActive) {
+        return -1;
+      }
+      return 0;
+    }
+    /**
+     * Get sprite position (XPOS/YPOS functions)
+     * NOTE: Position is stored in Konva nodes in frontend, not in worker.
+     * This method returns null - frontend should query Konva nodes directly.
+     */
+    getSpritePosition(_actionNumber) {
+      return null;
+    }
+    /**
+     * Get all active movement states
+     */
+    getAllMovementStates() {
+      return Array.from(this.movementStates.values());
+    }
+    /**
+     * Get movement state for a specific action number
+     */
+    getMovementState(actionNumber) {
+      return this.movementStates.get(actionNumber);
+    }
+    /**
+     * Calculate direction deltas from direction code
+     * Direction: 0=none, 1=up, 2=up-right, 3=right, 4=down-right,
+     *            5=down, 6=down-left, 7=left, 8=up-left
+     * Returns dx, dy in range [-1, 0, 1]
+     */
+    getDirectionDeltas(direction) {
+      switch (direction) {
+        case 0:
+          return { deltaX: 0, deltaY: 0 };
+        case 1:
+          return { deltaX: 0, deltaY: -1 };
+        case 2:
+          return { deltaX: 1, deltaY: -1 };
+        case 3:
+          return { deltaX: 1, deltaY: 0 };
+        case 4:
+          return { deltaX: 1, deltaY: 1 };
+        case 5:
+          return { deltaX: 0, deltaY: 1 };
+        case 6:
+          return { deltaX: -1, deltaY: 1 };
+        case 7:
+          return { deltaX: -1, deltaY: 0 };
+        case 8:
+          return { deltaX: -1, deltaY: -1 };
+        default:
+          return { deltaX: 0, deltaY: 0 };
+      }
+    }
+    /**
+     * Reset all movement states (for program reset)
+     */
+    reset() {
+      this.movementStates.clear();
+      this.moveDefinitions.clear();
+    }
   };
 
   // node_modules/.pnpm/decimal.js@10.6.0/node_modules/decimal.js/decimal.mjs
@@ -2561,6 +2604,21 @@
   function getTokens(children) {
     if (!children) return [];
     return children.filter(isCstToken);
+  }
+  function getSourceTextFromCst(node) {
+    const parts = [];
+    if (!node.children) return "";
+    for (const key of Object.keys(node.children)) {
+      const elements = node.children[key];
+      for (const el of elements) {
+        if (isCstToken(el)) {
+          parts.push(el.image);
+        } else if (isCstNode(el)) {
+          parts.push(getSourceTextFromCst(el));
+        }
+      }
+    }
+    return parts.join(" ").replace(/\s+/g, " ").trim();
   }
 
   // src/shared/data/bg/kana.ts
@@ -11374,7 +11432,10 @@
         if (!this.validateRange(actionNumber, 0, 7, "action number", lineNumber)) return;
         if (this.context.animationManager) {
           try {
-            this.context.animationManager.startMovement(actionNumber);
+            const position = this.context.deviceAdapter?.getSpritePosition(actionNumber);
+            const startX = position?.x;
+            const startY = position?.y;
+            this.context.animationManager.startMovement(actionNumber, startX, startY);
           } catch (error) {
             this.context.addError({
               line: lineNumber ?? 0,
@@ -23474,6 +23535,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       try {
         const parseResult = await this.parser.parse(code);
         if (!parseResult.success) {
+          console.error("[BasicInterpreter] Parse failed:", parseResult.errors);
           return {
             success: false,
             errors: parseResult.errors?.map((error) => ({
@@ -23491,7 +23553,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
             this.context.deviceAdapter = this.config.deviceAdapter;
           }
           this.context.spriteStateManager = new SpriteStateManager();
-          this.context.animationManager = new AnimationManager();
+          this.context.animationManager = new AnimationManager(this.config.sharedAnimationBuffer);
           if (this.config.deviceAdapter) {
             this.context.animationManager.setDeviceAdapter(this.config.deviceAdapter);
           }
@@ -23515,13 +23577,19 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         const result = await this.executionEngine.execute();
         return result;
       } catch (error) {
+        console.error("[BasicInterpreter] Execution error:", error);
+        const location = this.getExecutionLocation();
+        const errMsg = error instanceof Error ? error.message : String(error);
+        const stackStr = error instanceof Error ? error.stack : void 0;
         return {
           success: false,
           errors: [
             {
-              line: 0,
-              message: `Execution error: ${error}`,
-              type: ERROR_TYPES.RUNTIME
+              line: location?.lineNumber ?? 0,
+              message: errMsg,
+              type: ERROR_TYPES.RUNTIME,
+              ...typeof stackStr === "string" && stackStr.length > 0 && { stack: stackStr },
+              ...location?.sourceLine && { sourceLine: location.sourceLine }
             }
           ],
           variables: /* @__PURE__ */ new Map(),
@@ -23600,7 +23668,81 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     getAnimationManager() {
       return this.context?.animationManager ?? null;
     }
+    /**
+     * Get current execution location for error reporting (BASIC line number and source text).
+     * Returns null if context or current statement is not available.
+     */
+    getExecutionLocation() {
+      if (!this.context) return null;
+      const lineNumber = this.context.getCurrentLineNumber();
+      const statement = this.context.getCurrentStatement();
+      if (!statement) return { lineNumber, statementIndex: this.context.currentStatementIndex };
+      let sourceLine;
+      try {
+        sourceLine = getSourceTextFromCst(statement.command);
+      } catch {
+        sourceLine = void 0;
+      }
+      return {
+        lineNumber,
+        statementIndex: statement.statementIndex,
+        sourceLine: sourceLine ?? void 0
+      };
+    }
   };
+
+  // src/core/animation/sharedDisplayBuffer.ts
+  var COLS = 28;
+  var ROWS = 24;
+  var CELLS = COLS * ROWS;
+  var SPRITES_BYTES = MAX_SPRITES * 3 * 8;
+  var OFFSET_SPRITES = 0;
+  var OFFSET_CHARS = SPRITES_BYTES;
+  var OFFSET_PATTERNS = OFFSET_CHARS + CELLS;
+  var OFFSET_CURSOR = OFFSET_PATTERNS + CELLS;
+  var OFFSET_SEQUENCE = 1540;
+  var OFFSET_SCALARS = OFFSET_SEQUENCE + 4;
+  var SHARED_DISPLAY_BUFFER_BYTES = OFFSET_SCALARS + 4;
+  function createViewsFromDisplayBuffer(buffer) {
+    return {
+      buffer,
+      spriteView: new Float64Array(buffer, OFFSET_SPRITES, MAX_SPRITES * 3),
+      charView: new Uint8Array(buffer, OFFSET_CHARS, CELLS),
+      patternView: new Uint8Array(buffer, OFFSET_PATTERNS, CELLS),
+      cursorView: new Uint8Array(buffer, OFFSET_CURSOR, 2),
+      sequenceView: new Int32Array(buffer, OFFSET_SEQUENCE, 1),
+      scalarsView: new Uint8Array(buffer, OFFSET_SCALARS, 4)
+    };
+  }
+  function cellIndex(x, y) {
+    return y * COLS + x;
+  }
+  function writeScreenState(views, screenBuffer, cursorX, cursorY, bgPalette, spritePalette, backdropColor, cgenMode) {
+    if (screenBuffer == null) {
+      console.warn("[sharedDisplayBuffer] writeScreenState: screenBuffer is required, skipping");
+      return;
+    }
+    const { charView, patternView, cursorView, scalarsView } = views;
+    for (let y = 0; y < ROWS; y++) {
+      const row = screenBuffer[y];
+      for (let x = 0; x < COLS; x++) {
+        const cell = row?.[x];
+        const idx = cellIndex(x, y);
+        const ch = cell?.character ?? " ";
+        charView[idx] = ch.length === 1 ? ch.charCodeAt(0) : 32;
+        patternView[idx] = (cell?.colorPattern ?? 0) & 3;
+      }
+    }
+    cursorView[0] = Math.max(0, Math.min(COLS - 1, cursorX));
+    cursorView[1] = Math.max(0, Math.min(ROWS - 1, cursorY));
+    scalarsView[0] = bgPalette & 1;
+    scalarsView[1] = spritePalette & 3;
+    scalarsView[2] = Math.max(0, Math.min(60, backdropColor));
+    scalarsView[3] = cgenMode & 3;
+  }
+  function incrementSequence(views) {
+    views.sequenceView[0] = (views.sequenceView[0] ?? 0) + 1;
+  }
 
   // src/core/devices/MessageHandler.ts
   var MessageHandler = class {
@@ -23903,19 +24045,25 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       return this.currentExecutionId;
     }
     /**
-     * Create a full screen update message
+     * Create a full screen update message.
+     * Defensive: if called without correct `this` (e.g. unbound), return a safe message to avoid "reading 'screenBuffer'" throw.
      */
     createFullScreenUpdateMessage() {
+      const self2 = this;
+      const buffer = self2?.screenBuffer ?? [];
+      const cursorX = self2?.cursorX ?? 0;
+      const cursorY = self2?.cursorY ?? 0;
+      const executionId = self2?.currentExecutionId ?? "unknown";
       return {
         type: "SCREEN_UPDATE",
         id: `screen-full-${Date.now()}`,
         timestamp: Date.now(),
         data: {
-          executionId: this.currentExecutionId ?? "unknown",
+          executionId,
           updateType: "full",
-          screenBuffer: this.screenBuffer,
-          cursorX: this.cursorX,
-          cursorY: this.cursorY,
+          screenBuffer: buffer,
+          cursorX,
+          cursorY,
           timestamp: Date.now()
         }
       };
@@ -24211,8 +24359,10 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       // === DEVICE STATE ===
       __publicField(this, "strigClickBuffer", /* @__PURE__ */ new Map());
       __publicField(this, "stickStates", /* @__PURE__ */ new Map());
-      __publicField(this, "spritePositions", /* @__PURE__ */ new Map());
-      // Cached sprite positions from Konva nodes
+      /** Shared display buffer views (sprites + screen + cursor + sequence + scalars). Set when receiving SET_SHARED_ANIMATION_BUFFER. */
+      __publicField(this, "sharedDisplayViews", null);
+      /** Last position set by POSITION command per sprite; when set, getSpritePosition returns it so MOVE uses it instead of buffer (0,0). */
+      __publicField(this, "lastPositionBySprite", /* @__PURE__ */ new Map());
       __publicField(this, "isEnabled", true);
       // === MANAGERS ===
       __publicField(this, "webWorkerManager");
@@ -24349,14 +24499,58 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       }
     }
     // === SPRITE POSITION QUERY ===
+    /**
+     * Set shared display buffer (called from worker when receiving SET_SHARED_ANIMATION_BUFFER).
+     * Creates views for sprites, screen cells, cursor, sequence, and scalars.
+     */
+    setSharedAnimationBuffer(buffer) {
+      this.sharedDisplayViews = createViewsFromDisplayBuffer(buffer);
+    }
     getSpritePosition(actionNumber) {
-      return this.spritePositions.get(actionNumber) ?? null;
+      if (this.lastPositionBySprite.has(actionNumber)) {
+        return this.lastPositionBySprite.get(actionNumber) ?? null;
+      }
+      return null;
+    }
+    setSpritePosition(actionNumber, x, y) {
+      this.lastPositionBySprite.set(actionNumber, { x, y });
+    }
+    clearSpritePosition(actionNumber) {
+      this.lastPositionBySprite.delete(actionNumber);
     }
     /**
-     * Update cached sprite position (called from frontend via UPDATE_ANIMATION_POSITIONS message)
+     * Write current screen state from ScreenStateManager to shared buffer and increment sequence.
+     * Caller must then postMessage(SCREEN_CHANGED).
      */
-    updateSpritePosition(actionNumber, x, y) {
-      this.spritePositions.set(actionNumber, { x, y });
+    syncScreenStateToShared() {
+      if (!this.sharedDisplayViews) return;
+      const manager = this.screenStateManager;
+      if (!manager) return;
+      const buffer = manager.getScreenBuffer();
+      if (buffer == null) {
+        console.warn("[WebWorkerDeviceAdapter] syncScreenStateToShared: getScreenBuffer() returned null/undefined, skipping");
+        return;
+      }
+      const { x: cursorX, y: cursorY } = manager.getCursorPosition();
+      const { bgPalette, spritePalette } = manager.getPalette();
+      writeScreenState(
+        this.sharedDisplayViews,
+        buffer,
+        cursorX,
+        cursorY,
+        bgPalette,
+        spritePalette,
+        manager.getBackdropColor(),
+        manager.getCgenMode()
+      );
+      incrementSequence(this.sharedDisplayViews);
+    }
+    postScreenChanged() {
+      self.postMessage({
+        type: "SCREEN_CHANGED",
+        id: `screen-changed-${Date.now()}`,
+        timestamp: Date.now()
+      });
     }
     consumeStrigState(joystickId) {
       const buffer = this.strigClickBuffer.get(joystickId);
@@ -24419,21 +24613,33 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
     clearScreen() {
       console.log("\u{1F50C} [WEB_WORKER_DEVICE] Clear screen");
       this.screenStateManager.initializeScreen();
-      const updateMessage = this.screenStateManager.createClearScreenUpdateMessage();
-      self.postMessage(updateMessage);
+      if (this.sharedDisplayViews) {
+        this.syncScreenStateToShared();
+        this.postScreenChanged();
+      } else {
+        self.postMessage(this.screenStateManager.createClearScreenUpdateMessage());
+      }
       this.cancelPendingScreenUpdate();
     }
     setCursorPosition(x, y) {
       console.log("\u{1F50C} [WEB_WORKER_DEVICE] Set cursor position:", { x, y });
       this.screenStateManager.setCursorPosition(x, y);
-      const updateMessage = this.screenStateManager.createCursorUpdateMessage();
-      self.postMessage(updateMessage);
+      if (this.sharedDisplayViews) {
+        this.syncScreenStateToShared();
+        this.postScreenChanged();
+      } else {
+        self.postMessage(this.screenStateManager.createCursorUpdateMessage());
+      }
     }
     setColorPattern(x, y, pattern) {
       console.log("\u{1F50C} [WEB_WORKER_DEVICE] Set color pattern:", { x, y, pattern });
       const cellsToUpdate = this.screenStateManager.setColorPattern(x, y, pattern);
-      const updateMessage = this.screenStateManager.createColorUpdateMessage(cellsToUpdate);
-      self.postMessage(updateMessage);
+      if (this.sharedDisplayViews) {
+        this.syncScreenStateToShared();
+        this.postScreenChanged();
+      } else {
+        self.postMessage(this.screenStateManager.createColorUpdateMessage(cellsToUpdate));
+      }
     }
     setColorPalette(bgPalette, spritePalette) {
       console.log("\u{1F50C} [WEB_WORKER_DEVICE] Set color palette:", {
@@ -24441,20 +24647,32 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         spritePalette
       });
       this.screenStateManager.setColorPalette(bgPalette, spritePalette);
-      const updateMessage = this.screenStateManager.createPaletteUpdateMessage();
-      self.postMessage(updateMessage);
+      if (this.sharedDisplayViews) {
+        this.syncScreenStateToShared();
+        this.postScreenChanged();
+      } else {
+        self.postMessage(this.screenStateManager.createPaletteUpdateMessage());
+      }
     }
     setBackdropColor(colorCode) {
       console.log("\u{1F50C} [WEB_WORKER_DEVICE] Set backdrop color:", colorCode);
       this.screenStateManager.setBackdropColor(colorCode);
-      const updateMessage = this.screenStateManager.createBackdropUpdateMessage();
-      self.postMessage(updateMessage);
+      if (this.sharedDisplayViews) {
+        this.syncScreenStateToShared();
+        this.postScreenChanged();
+      } else {
+        self.postMessage(this.screenStateManager.createBackdropUpdateMessage());
+      }
     }
     setCharacterGeneratorMode(mode) {
       console.log("\u{1F50C} [WEB_WORKER_DEVICE] Set character generator mode:", mode);
       this.screenStateManager.setCharacterGeneratorMode(mode);
-      const updateMessage = this.screenStateManager.createCgenUpdateMessage();
-      self.postMessage(updateMessage);
+      if (this.sharedDisplayViews) {
+        this.syncScreenStateToShared();
+        this.postScreenChanged();
+      } else {
+        self.postMessage(this.screenStateManager.createCgenUpdateMessage());
+      }
     }
     /**
      * Send animation command to main thread immediately
@@ -24477,8 +24695,12 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       this.screenStateManager.setCurrentExecutionId(executionId);
       if (executionId) {
         this.screenStateManager.initializeScreen();
-        const updateMessage = this.screenStateManager.createClearScreenUpdateMessage();
-        self.postMessage(updateMessage);
+        if (this.sharedDisplayViews) {
+          this.syncScreenStateToShared();
+          this.postScreenChanged();
+        } else {
+          self.postMessage(this.screenStateManager.createClearScreenUpdateMessage());
+        }
         this.cancelPendingScreenUpdate();
       } else {
         this.flushScreenUpdate();
@@ -24550,7 +24772,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       }, delay);
     }
     /**
-     * Cancel any pending screen update
+     * Cancel any pending screen update (used by flush paths and by tests to avoid timeouts firing after teardown).
      */
     cancelPendingScreenUpdate() {
       if (this.screenUpdateTimeout !== null) {
@@ -24560,8 +24782,9 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       this.pendingScreenUpdate = false;
     }
     /**
-     * Flush the pending screen update immediately
-     * Updates the last update time to maintain FPS-based timing
+     * Flush the pending screen update immediately.
+     * With shared buffer: writes to shared buffer, increments sequence, sends SCREEN_CHANGED.
+     * Without (e.g. tests): sends SCREEN_UPDATE full.
      */
     flushScreenUpdate() {
       this.screenUpdateTimeout = null;
@@ -24570,8 +24793,12 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       }
       this.pendingScreenUpdate = false;
       this.lastScreenUpdateTime = performance.now();
-      const updateMessage = this.screenStateManager.createFullScreenUpdateMessage();
-      self.postMessage(updateMessage);
+      if (this.sharedDisplayViews) {
+        this.syncScreenStateToShared();
+        this.postScreenChanged();
+      } else if (this.screenStateManager) {
+        self.postMessage(this.screenStateManager.createFullScreenUpdateMessage());
+      }
     }
   };
 
@@ -24582,6 +24809,7 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       __publicField(this, "isRunning", false);
       __publicField(this, "currentExecutionId", null);
       __publicField(this, "webWorkerDeviceAdapter", null);
+      __publicField(this, "sharedAnimationBuffer", null);
       this.interpreter = null;
       this.isRunning = false;
       this.currentExecutionId = null;
@@ -24624,17 +24852,19 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
             console.log("\u{1F3AE} [WORKER] Handling STICK_EVENT message");
             this.handleStickEvent(message);
             break;
-          case "UPDATE_ANIMATION_POSITIONS":
-            console.log("\u{1F3AC} [WORKER] Handling UPDATE_ANIMATION_POSITIONS message");
-            this.handleUpdateAnimationPositions(message);
+          case "SET_SHARED_ANIMATION_BUFFER":
+            this.handleSetSharedAnimationBuffer(message);
             break;
           default:
             console.log("\u26A0\uFE0F [WORKER] Unexpected message type:", message.type);
             break;
         }
       } catch (error) {
-        console.log("\u274C [WORKER] Error processing message:", error);
-        this.sendError(message.id, error instanceof Error ? error : new Error(String(error)));
+        const err = error instanceof Error ? error : new Error(String(error));
+        console.error("\u274C [WORKER] Error processing message:", err.message);
+        console.error("Stack trace:", err.stack || "(no stack available)");
+        const location = this.interpreter?.getExecutionLocation?.() ?? null;
+        this.sendError(message.id, err, location);
       }
     }
     async handleExecute(message) {
@@ -24655,8 +24885,8 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         });
         this.interpreter = new BasicInterpreter({
           ...config2,
-          deviceAdapter: this.webWorkerDeviceAdapter
-          // Use WebWorkerDeviceAdapter (non-null assertion)
+          deviceAdapter: this.webWorkerDeviceAdapter,
+          sharedAnimationBuffer: this.sharedAnimationBuffer ?? void 0
         });
         console.log("\u2705 [WORKER] Interpreter created with WebWorkerDeviceAdapter");
         console.log("\u{1F680} [WORKER] Executing BASIC code");
@@ -24668,6 +24898,12 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
           outputLines: this.webWorkerDeviceAdapter?.printOutput.length ?? 0,
           executionTime: result.executionTime
         });
+        if (!result.success && result.errors?.length) {
+          console.error("[WORKER] Execution returned success: false", result.errors[0]?.message, result.errors);
+        }
+        if (this.webWorkerDeviceAdapter) {
+          this.webWorkerDeviceAdapter.setCurrentExecutionId(null);
+        }
         if (!this.interpreter) {
           throw new Error("Interpreter not initialized");
         }
@@ -24685,7 +24921,11 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         this.sendResult(message.id, enhancedResult);
       } catch (error) {
         this.isRunning = false;
-        this.sendError(message.id, error instanceof Error ? error : new Error(String(error)));
+        const err = error instanceof Error ? error : new Error(String(error));
+        console.error("\u274C [WORKER] Execution error:", err.message);
+        console.error("Stack trace:", err.stack || "(no stack available)");
+        const location = this.interpreter?.getExecutionLocation() ?? null;
+        this.sendError(message.id, err, location);
       }
     }
     handleStop(_message) {
@@ -24719,12 +24959,16 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         console.log("\u{1F3AE} [WORKER] No WebWorkerDeviceAdapter available for STICK event");
       }
     }
-    handleUpdateAnimationPositions(message) {
-      const { positions } = message.data;
+    handleSetSharedAnimationBuffer(message) {
+      const data = message.data;
+      if (!data?.buffer) {
+        console.warn("[WORKER] SET_SHARED_ANIMATION_BUFFER: message.data or buffer missing");
+        return;
+      }
+      const { buffer } = data;
+      this.sharedAnimationBuffer = buffer;
       if (this.webWorkerDeviceAdapter) {
-        for (const pos of positions) {
-          this.webWorkerDeviceAdapter.updateSpritePosition(pos.actionNumber, pos.x, pos.y);
-        }
+        this.webWorkerDeviceAdapter.setSharedAnimationBuffer(buffer);
       }
     }
     sendOutput(output, outputType) {
@@ -24761,7 +25005,8 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
       });
       self.postMessage(message);
     }
-    sendError(messageId, error) {
+    sendError(messageId, error, location) {
+      const stackStr = error && typeof error.stack === "string" && error.stack || "(stack not available)";
       const message = {
         type: "ERROR",
         id: messageId,
@@ -24769,17 +25014,22 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         data: {
           executionId: messageId,
           message: error.message,
-          stack: error.stack,
+          stack: stackStr,
+          lineNumber: location?.lineNumber,
+          sourceLine: location?.sourceLine,
           errorType: "execution",
           recoverable: true
         }
       };
-      console.log("\u274C [WORKER\u2192MAIN] Sending ERROR message:", {
+      console.error("\u274C [WORKER\u2192MAIN] Sending ERROR message:", {
         messageId,
         errorMessage: error.message,
+        lineNumber: location?.lineNumber,
+        sourceLine: location?.sourceLine ? `${location.sourceLine.slice(0, 40)}...` : void 0,
         errorType: "execution",
         recoverable: true
       });
+      console.error("Stack trace:", stackStr);
       self.postMessage(message);
     }
   };

@@ -22,6 +22,10 @@ export interface BasicError {
   line: number
   message: string
   type: (typeof ERROR_TYPES)[keyof typeof ERROR_TYPES]
+  /** Stack trace for runtime errors (worker or interpreter catch). */
+  stack?: string
+  /** Source line text at the failing statement. */
+  sourceLine?: string
 }
 
 /**
@@ -61,6 +65,10 @@ export interface BasicDeviceAdapter {
 
   // === SPRITE POSITION QUERY ===
   getSpritePosition(actionNumber: number): { x: number; y: number } | null
+  /** Store position for sprite (called when POSITION runs); used so MOVE uses it when no prior START_MOVEMENT. */
+  setSpritePosition?(actionNumber: number, x: number, y: number): void
+  /** Clear stored position for sprite (e.g. after START_MOVEMENT so next MOVE uses buffer/default). */
+  clearSpritePosition?(actionNumber: number): void
 
   // === TEXT OUTPUT ===
   printOutput(output: string): void
@@ -117,6 +125,8 @@ export interface InterpreterConfig {
   enableDebugMode: boolean
   strictMode: boolean
   deviceAdapter?: BasicDeviceAdapter
+  /** Shared animation state buffer (positions + isActive). Used by worker for XPOS/YPOS and MOVE(n). */
+  sharedAnimationBuffer?: SharedArrayBuffer
 }
 
 /**
@@ -225,13 +235,14 @@ export type ServiceWorkerMessageType =
   | 'PROGRESS'
   | 'OUTPUT'
   | 'SCREEN_UPDATE'
+  | 'SCREEN_CHANGED'
   | 'STOP'
   | 'INIT'
   | 'READY'
   | 'STRIG_EVENT'
   | 'STICK_EVENT'
   | 'ANIMATION_COMMAND'
-  | 'UPDATE_ANIMATION_POSITIONS'
+  | 'SET_SHARED_ANIMATION_BUFFER'
 
 // Execute message - sent from UI to service worker
 export interface ExecuteMessage extends ServiceWorkerMessage {
@@ -311,6 +322,15 @@ export interface ScreenCell {
   y: number
 }
 
+// Screen changed message - sent from worker to UI when shared screen buffer was updated (no payload)
+export interface ScreenChangedMessage extends ServiceWorkerMessage {
+  type: 'SCREEN_CHANGED'
+  data?: {
+    id?: string
+    timestamp?: number
+  }
+}
+
 // Stop message - sent from UI to service worker
 export interface StopMessage extends ServiceWorkerMessage {
   type: 'STOP'
@@ -353,6 +373,10 @@ export interface ErrorMessage extends ServiceWorkerMessage {
     executionId: string
     message: string
     stack?: string
+    /** BASIC line number where the error occurred (1-based). */
+    lineNumber?: number
+    /** Source line text at the failing statement (for display). */
+    sourceLine?: string
     errorType: 'execution' | 'timeout' | 'initialization' | 'communication'
     recoverable: boolean
   }
@@ -377,16 +401,11 @@ export interface ReadyMessage extends ServiceWorkerMessage {
   }
 }
 
-// Update animation positions message - sent from main thread to service worker
-// to sync frontend's current animation positions back to worker's AnimationManager
-export interface UpdateAnimationPositionsMessage extends ServiceWorkerMessage {
-  type: 'UPDATE_ANIMATION_POSITIONS'
+// Set shared animation buffer - sent from main thread to worker once after worker is created
+export interface SetSharedAnimationBufferMessage extends ServiceWorkerMessage {
+  type: 'SET_SHARED_ANIMATION_BUFFER'
   data: {
-    positions: Array<{
-      actionNumber: number
-      x: number
-      y: number
-    }>
+    buffer: SharedArrayBuffer
   }
 }
 
@@ -397,6 +416,7 @@ export type AnyServiceWorkerMessage =
   | ProgressMessage
   | OutputMessage
   | ScreenUpdateMessage
+  | ScreenChangedMessage
   | StopMessage
   | StrigEventMessage
   | StickEventMessage
@@ -404,7 +424,7 @@ export type AnyServiceWorkerMessage =
   | InitMessage
   | ReadyMessage
   | AnimationCommandMessage
-  | UpdateAnimationPositionsMessage
+  | SetSharedAnimationBufferMessage
 
 // Message handler interface for type-safe message handling
 export interface ServiceWorkerMessageHandler {

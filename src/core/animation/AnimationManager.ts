@@ -3,17 +3,26 @@
  * Manages animated sprite movement for DEF MOVE and MOVE commands
  */
 
+import {
+  readSpriteIsActive,
+  SHARED_ANIMATION_BUFFER_BYTES,
+  SHARED_ANIMATION_BUFFER_LENGTH,
+} from '@/core/animation/sharedAnimationBuffer'
+import { SCREEN_DIMENSIONS } from '@/core/constants'
 import type { AnimationCommand, BasicDeviceAdapter } from '@/core/interfaces'
 import type { MoveDefinition, MovementState } from '@/core/sprite/types'
 
 /**
  * AnimationManager - Manages 8 action slots (0-7) for animated sprite movement
- * Handles move definitions, movement states, and position updates
+ * Handles move definitions and movement states.
+ * Note: Position updates happen in the frontend animation loop using Konva nodes.
  */
 export class AnimationManager {
   private moveDefinitions: Map<number, MoveDefinition> = new Map()
   private movementStates: Map<number, MovementState> = new Map()
   private deviceAdapter?: BasicDeviceAdapter
+  /** Shared animation state view (isActive). When set, getMovementStatus reads from it. */
+  private sharedAnimationView: Float64Array | null = null
 
   /**
    * Set device adapter for sending animation commands
@@ -22,9 +31,33 @@ export class AnimationManager {
     this.deviceAdapter = adapter
   }
 
-  constructor() {
-    // Position is now managed by Konva nodes in the frontend
-    // No need to store default positions here
+  /**
+   * Set shared animation buffer (used by worker for getMovementStatus / MOVE(n)).
+   * Accepts either the standalone animation buffer (192 bytes) or the combined display buffer
+   * (1548 bytes); in the latter case uses only the first 192 bytes for the sprite Float64 view.
+   */
+  setSharedAnimationBuffer(buffer: SharedArrayBuffer | undefined): void {
+    this.sharedAnimationView = buffer ? this.viewFromBuffer(buffer) : null
+  }
+
+  /** Create Float64Array view from buffer (standalone 192 bytes or combined display buffer). */
+  private viewFromBuffer(buffer: SharedArrayBuffer): Float64Array {
+    const byteLen = buffer.byteLength
+    if (byteLen === SHARED_ANIMATION_BUFFER_BYTES) {
+      return new Float64Array(buffer)
+    }
+    if (byteLen >= SHARED_ANIMATION_BUFFER_BYTES) {
+      return new Float64Array(buffer, 0, SHARED_ANIMATION_BUFFER_LENGTH)
+    }
+    throw new RangeError(
+      `Shared animation buffer too small: ${byteLen} bytes, need at least ${SHARED_ANIMATION_BUFFER_BYTES}`
+    )
+  }
+
+  constructor(sharedAnimationBuffer?: SharedArrayBuffer) {
+    if (sharedAnimationBuffer) {
+      this.sharedAnimationView = this.viewFromBuffer(sharedAnimationBuffer)
+    }
   }
 
   /**
@@ -78,18 +111,9 @@ export class AnimationManager {
       throw new Error(`No movement definition for action number ${actionNumber} (use DEF MOVE first)`)
     }
 
-    // Use provided position or default to (120, 120)
-    // Frontend will get actual position from Konva nodes if available
-    const initialX = startX ?? 120
-    const initialY = startY ?? 120
-
-    console.log(`🎯 [AnimationManager] startMovement(${actionNumber}):`, {
-      startX,
-      startY,
-      initialX,
-      initialY,
-      note: 'Frontend will get actual position from Konva nodes',
-    })
+    // Start position from device or default (center); main thread uses pending POSITION when node missing
+    const initialX = startX ?? SCREEN_DIMENSIONS.SPRITE.DEFAULT_X
+    const initialY = startY ?? SCREEN_DIMENSIONS.SPRITE.DEFAULT_Y
 
     // Calculate direction deltas
     const { deltaX, deltaY } = this.getDirectionDeltas(definition.direction)
@@ -100,7 +124,7 @@ export class AnimationManager {
     // Calculate total distance: 2×D dots
     const totalDistance = 2 * definition.distance
 
-    // Create movement state (without currentX/currentY - position is in Konva nodes)
+    // Store movement state; startX/startY sent in command and stored for result sync (default = center)
     const movementState: MovementState = {
       actionNumber,
       definition,
@@ -118,7 +142,7 @@ export class AnimationManager {
 
     this.movementStates.set(actionNumber, movementState)
 
-    // Send animation command to main thread immediately
+    // Send animation command to main thread immediately (startX/startY sent here, not stored)
     if (this.deviceAdapter?.sendAnimationCommand) {
       const command: AnimationCommand = {
         type: 'START_MOVEMENT',
@@ -128,24 +152,20 @@ export class AnimationManager {
         startY: initialY,
       }
       this.deviceAdapter.sendAnimationCommand(command)
+      this.deviceAdapter.clearSpritePosition?.(actionNumber)
     }
   }
 
   /**
-   * Update all active movements (called each frame)
-   * NOTE: This method is never called in the worker - animation happens on main thread.
-   * Position updates happen in the frontend animation loop using Konva nodes.
-   * @param _deltaTime - Time elapsed since last frame in milliseconds
+   * Set movements inactive (main thread notified us that they completed naturally).
+   * Only updates worker state; does not send any command to main thread.
    */
-  updateMovements(_deltaTime: number): void {
-    // This method is a placeholder - actual position updates happen in frontend
-    // via useScreenAnimationLoop which reads/writes Konva node positions
-    for (const movement of this.movementStates.values()) {
-      if (!movement.isActive || movement.remainingDistance <= 0) {
+  setMovementsInactive(actionNumbers: number[]): void {
+    for (const actionNumber of actionNumbers) {
+      const movement = this.movementStates.get(actionNumber)
+      if (movement) {
         movement.isActive = false
-        continue
       }
-      // Position updates are handled in frontend animation loop
     }
   }
 
@@ -182,7 +202,6 @@ export class AnimationManager {
       if (movement) {
         movement.isActive = false
       }
-      // Remove movement state
       this.movementStates.delete(actionNumber)
     }
 
@@ -198,7 +217,7 @@ export class AnimationManager {
 
   /**
    * Set initial position (POSITION command)
-   * Sends command to frontend to set Konva node position
+   * Sends SET_POSITION to main thread; main thread sets Konva node or stores pending for START_MOVEMENT.
    */
   setPosition(actionNumber: number, x: number, y: number): void {
     if (actionNumber < 0 || actionNumber > 7) {
@@ -211,7 +230,7 @@ export class AnimationManager {
       throw new Error(`Invalid Y coordinate: ${y} (must be 0-239)`)
     }
 
-    // Send command to frontend to set Konva node position
+    this.deviceAdapter?.setSpritePosition?.(actionNumber, x, y)
     if (this.deviceAdapter?.sendAnimationCommand) {
       const command: AnimationCommand = {
         type: 'SET_POSITION',
@@ -225,9 +244,13 @@ export class AnimationManager {
 
   /**
    * Get movement status (MOVE(n) function)
-   * Returns -1 if movement is active, 0 if complete or not started
+   * Returns -1 if movement is active, 0 if complete or not started.
+   * When shared buffer is set (worker), reads isActive from shared memory.
    */
   getMovementStatus(actionNumber: number): -1 | 0 {
+    if (this.sharedAnimationView && readSpriteIsActive(this.sharedAnimationView, actionNumber)) {
+      return -1
+    }
     const movement = this.movementStates.get(actionNumber)
     if (movement?.isActive) {
       return -1
@@ -300,6 +323,5 @@ export class AnimationManager {
   reset(): void {
     this.movementStates.clear()
     this.moveDefinitions.clear()
-    // Position is managed by Konva nodes in frontend, no need to reset here
   }
 }

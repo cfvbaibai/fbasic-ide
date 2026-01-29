@@ -5,7 +5,7 @@
  * and screen buffer management.
  */
 
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { WebWorkerDeviceAdapter } from '@/core/devices/WebWorkerDeviceAdapter'
 import type { AnyServiceWorkerMessage } from '@/core/interfaces'
@@ -39,9 +39,15 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
   let adapter: WebWorkerDeviceAdapter
 
   beforeEach(() => {
+    vi.useFakeTimers()
     adapter = new WebWorkerDeviceAdapter()
     adapter.setCurrentExecutionId('test-execution')
     capturedMessages = []
+  })
+
+  afterEach(() => {
+    adapter.cancelPendingScreenUpdate()
+    vi.useRealTimers()
   })
 
   it('should set cursor position correctly', () => {
@@ -67,6 +73,7 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
 
     // Print text
     adapter.printOutput('HELLO')
+    vi.advanceTimersByTime(50)
 
     // Check that screen update was sent
     const screenMessage = capturedMessages.find(
@@ -74,11 +81,11 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
     )
 
     expect(screenMessage).toBeDefined()
-    expect(screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data).toBe(true)
+    expect(screenMessage && screenMessage.data && 'screenBuffer' in screenMessage.data).toBe(true)
 
     // Check that characters were written at position (10, 5)
     const screenBuffer =
-      screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
+      screenMessage?.data && 'screenBuffer' in screenMessage.data
         ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
         : undefined
     expect(screenBuffer).toBeDefined()
@@ -93,6 +100,7 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
   it('should write characters starting from (0, 0) by default', () => {
     // Don't set cursor position - should start at (0, 0)
     adapter.printOutput('TEST')
+    vi.advanceTimersByTime(50)
 
     const screenMessage = capturedMessages.find(
       msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
@@ -100,7 +108,7 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
 
     expect(screenMessage).toBeDefined()
     const screenBuffer =
-      screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
+      screenMessage?.data && 'screenBuffer' in screenMessage.data
         ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
         : undefined
     expect(screenBuffer?.[0]).toBeDefined() // Row 0
@@ -115,6 +123,7 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
     capturedMessages = []
 
     adapter.printOutput('HI')
+    vi.advanceTimersByTime(50)
 
     // After printing "HI" at (10, 5), cursor should be at (12, 5)
     // Check the screen buffer to see where next character would go
@@ -123,7 +132,7 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
     )
 
     const screenBuffer =
-      screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
+      screenMessage?.data && 'screenBuffer' in screenMessage.data
         ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
         : undefined
 
@@ -134,12 +143,13 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
     // Next print should continue from (12, 5)
     capturedMessages = []
     adapter.printOutput('BYE')
+    vi.advanceTimersByTime(50)
 
     const nextScreenMessage = capturedMessages.find(
       msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
     )
     const nextScreenBuffer =
-      nextScreenMessage && 'data' in nextScreenMessage && 'screenBuffer' in nextScreenMessage.data
+      nextScreenMessage?.data && 'screenBuffer' in nextScreenMessage.data
         ? (nextScreenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
         : undefined
 
@@ -155,6 +165,7 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
     capturedMessages = []
 
     adapter.printOutput('I LOVE YOU')
+    vi.advanceTimersByTime(50)
 
     const screenMessage = capturedMessages.find(
       msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
@@ -162,7 +173,7 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
 
     expect(screenMessage).toBeDefined()
     const screenBuffer =
-      screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
+      screenMessage?.data && 'screenBuffer' in screenMessage.data
         ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
         : undefined
 
@@ -185,12 +196,13 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
     adapter.setCursorPosition(5, 5)
     capturedMessages = []
     adapter.printOutput('FIRST')
+    vi.advanceTimersByTime(50)
 
     let screenMessage = capturedMessages.find(
       msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
     )
     let screenBuffer =
-      screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
+      screenMessage?.data && 'screenBuffer' in screenMessage.data
         ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
         : undefined
     expect(screenBuffer?.[5]?.[5]?.character).toBe('F')
@@ -199,12 +211,13 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
     adapter.setCursorPosition(15, 10)
     capturedMessages = []
     adapter.printOutput('SECOND')
+    vi.advanceTimersByTime(50)
 
     screenMessage = capturedMessages.find(
       msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
     )
     screenBuffer =
-      screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
+      screenMessage?.data && 'screenBuffer' in screenMessage.data
         ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
         : undefined
 
@@ -219,12 +232,13 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
     capturedMessages = []
 
     adapter.printOutput('LINE1\nLINE2')
+    vi.advanceTimersByTime(50)
 
     const screenMessage = capturedMessages.find(
       msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
     )
     const screenBuffer =
-      screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
+      screenMessage?.data && 'screenBuffer' in screenMessage.data
         ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
         : undefined
 
@@ -249,12 +263,13 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
 
     // Print text that will wrap
     adapter.printOutput('ABCDEFGH')
+    vi.advanceTimersByTime(50)
 
     const screenMessage = capturedMessages.find(
       msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
     )
     const screenBuffer =
-      screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
+      screenMessage?.data && 'screenBuffer' in screenMessage.data
         ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
         : undefined
 
@@ -271,6 +286,7 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
   it('should clear screen and reset cursor', () => {
     // Write something first
     adapter.printOutput('TEST')
+    vi.advanceTimersByTime(50)
     capturedMessages = []
 
     // Clear screen
@@ -284,12 +300,13 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
     // After clear, cursor should be at (0, 0)
     capturedMessages = []
     adapter.printOutput('AFTER')
+    vi.advanceTimersByTime(50)
 
     const screenMessage = capturedMessages.find(
       msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
     )
     const screenBuffer =
-      screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
+      screenMessage?.data && 'screenBuffer' in screenMessage.data
         ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
         : undefined
 
@@ -301,10 +318,13 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
     // Write content at multiple positions
     adapter.setCursorPosition(5, 5)
     adapter.printOutput('FIRST')
+    vi.advanceTimersByTime(50)
     adapter.setCursorPosition(10, 10)
     adapter.printOutput('SECOND')
+    vi.advanceTimersByTime(50)
     adapter.setCursorPosition(15, 15)
     adapter.printOutput('THIRD')
+    vi.advanceTimersByTime(50)
     capturedMessages = []
 
     // Clear screen
@@ -319,12 +339,13 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
     // Print something after clear and verify screen is empty except for new content
     capturedMessages = []
     adapter.printOutput('NEW')
+    vi.advanceTimersByTime(50)
 
     const screenMessage = capturedMessages.find(
       msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
     )
     const screenBuffer =
-      screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
+      screenMessage?.data && 'screenBuffer' in screenMessage.data
         ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
         : undefined
 
@@ -356,12 +377,13 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
     // Print after clear - should start at (0, 0)
     capturedMessages = []
     adapter.printOutput('RESET')
+    vi.advanceTimersByTime(50)
 
     const screenMessage = capturedMessages.find(
       msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
     )
     const screenBuffer =
-      screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
+      screenMessage?.data && 'screenBuffer' in screenMessage.data
         ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
         : undefined
 
@@ -373,6 +395,7 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
   it('should handle multiple clearScreen calls', () => {
     // Write content
     adapter.printOutput('CONTENT1')
+    vi.advanceTimersByTime(50)
     capturedMessages = []
 
     // First clear
@@ -385,6 +408,7 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
     // Write more content
     capturedMessages = []
     adapter.printOutput('CONTENT2')
+    vi.advanceTimersByTime(50)
     capturedMessages = []
 
     // Second clear
@@ -397,12 +421,13 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
     // Print after second clear
     capturedMessages = []
     adapter.printOutput('FINAL')
+    vi.advanceTimersByTime(50)
 
     const screenMessage = capturedMessages.find(
       msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
     )
     const screenBuffer =
-      screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
+      screenMessage?.data && 'screenBuffer' in screenMessage.data
         ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
         : undefined
 
@@ -422,12 +447,13 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
     // Should still work and reset cursor
     capturedMessages = []
     adapter.printOutput('EMPTY')
+    vi.advanceTimersByTime(50)
 
     const screenMessage = capturedMessages.find(
       msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
     )
     const screenBuffer =
-      screenMessage && 'data' in screenMessage && 'screenBuffer' in screenMessage.data
+      screenMessage?.data && 'screenBuffer' in screenMessage.data
         ? (screenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
         : undefined
 

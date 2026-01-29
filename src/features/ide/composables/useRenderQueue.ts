@@ -1,14 +1,23 @@
 /**
- * Render queue composable - Manages render scheduling using requestAnimationFrame
- * Ensures updates are processed in order and aligned with browser refresh cycle
- * If multiple updates come in rapid succession, we drop intermediate ones and only render the latest
+ * Render queue - schedules renders via requestAnimationFrame.
+ * When animation is active, defers to pending static render (animation loop runs first).
  */
+
+export interface UseRenderQueueOptions {
+  /** When true, schedule() sets pending static render instead of scheduling own rAF (animation loop will run render) */
+  hasActiveMovements: () => boolean
+  /** Set pending static render flag (true = render requested, false = consumed) */
+  setPendingStaticRender: (pending: boolean) => void
+}
 
 /**
  * Create a render queue that schedules renders using requestAnimationFrame
- * Returns a schedule function and cleanup function
+ * When hasActiveMovements() is true, only sets pending static render; animation loop runs render at end of frame.
  */
-export function useRenderQueue(renderFn: () => Promise<void>): {
+export function useRenderQueue(
+  renderFn: () => Promise<void>,
+  options?: UseRenderQueueOptions
+): {
   schedule: () => void
   cleanup: () => void
 } {
@@ -29,7 +38,6 @@ export function useRenderQueue(renderFn: () => Promise<void>): {
     } finally {
       isRendering = false
 
-      // If a new render was queued while we were rendering, schedule it
       if (pendingRender) {
         schedule()
       }
@@ -37,23 +45,22 @@ export function useRenderQueue(renderFn: () => Promise<void>): {
   }
 
   function schedule(): void {
-    // Always update pendingRender to the latest render function
-    // This ensures we drop intermediate updates and only render the latest state
     pendingRender = renderFn
 
-    // If already rendering, the new render will be picked up after current one completes
     if (isRendering) {
       return
     }
 
-    // If there's already a pending animation frame, don't schedule another one
-    // The existing frame will pick up the latest pendingRender
+    // When animation is active, defer to animation loop: set pending static render instead of scheduling rAF
+    if (options?.hasActiveMovements?.()) {
+      options.setPendingStaticRender(true)
+      return
+    }
+
     if (pendingAnimationFrame !== null) {
       return
     }
 
-    // Use requestAnimationFrame for optimal timing with browser rendering
-    // This automatically aligns with display refresh rate and reduces blocking
     pendingAnimationFrame = requestAnimationFrame(() => {
       pendingAnimationFrame = null
       void executeRender()

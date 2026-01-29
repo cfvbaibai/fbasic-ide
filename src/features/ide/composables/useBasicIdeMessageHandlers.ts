@@ -1,9 +1,17 @@
 /**
  * Message handlers for BASIC IDE web worker communication
+ *
+ * Use loglevel: log.getLogger('ide-messages').setLevel('debug') in console for verbose logs.
  */
+/* eslint-disable max-lines -- multiple handlers; extract to useBasicIdeScreenUpdateHandler etc. when adding more */
 
 import type { Ref } from 'vue'
 
+import { writeSpriteState } from '@/core/animation/sharedAnimationBuffer'
+import type {
+  DecodedScreenState,
+  SharedDisplayViews,
+} from '@/core/animation/sharedDisplayBuffer'
 import type {
   AnimationCommand,
   AnyServiceWorkerMessage,
@@ -12,8 +20,12 @@ import type {
   ScreenCell,
 } from '@/core/interfaces'
 import type { MovementState } from '@/core/sprite/types'
+import { ExecutionError } from '@/features/ide/errors/ExecutionError'
+import { logIdeMessages, logScreen } from '@/shared/logger'
 
 import type { WebWorkerManager } from './useBasicIdeWebWorkerUtils'
+
+export { ExecutionError }
 
 /**
  * Message queue for non-critical messages
@@ -69,20 +81,63 @@ function scheduleQueueProcessing(): void {
   })
 }
 
+/**
+ * Flush the message queue synchronously (e.g. before resolving RESULT so OUTPUT/ANIMATION_COMMAND are applied first).
+ */
+function flushMessageQueue(): void {
+  if (queueAnimationFrame !== null) {
+    cancelAnimationFrame(queueAnimationFrame)
+    queueAnimationFrame = null
+  }
+  isProcessingQueue = false
+  while (messageQueue.length > 0) {
+    const messagesToProcess = messageQueue.splice(0)
+    for (const { message, context } of messagesToProcess) {
+      if (!context) {
+        console.warn('⚠️ [COMPOSABLE] Skipping queued message: context is undefined')
+        continue
+      }
+      processMessage(message, context)
+    }
+  }
+}
+
+/**
+ * Pending action for a sprite when its Konva node does not exist yet; 
+ * applied when node is created or START_MOVEMENT is handled. 
+ */
+export type PendingSpriteAction = { type: 'POSITION'; x: number; y: number }
+
+/** Per-sprite action queue (action number → list of pending actions). */
+export type SpriteActionQueues = Map<number, PendingSpriteAction[]>
+
 export interface MessageHandlerContext {
   output: Ref<string[]>
-  errors: Ref<Array<{ line: number; message: string; type: string }>>
+  errors: Ref<
+    Array<{ line: number; message: string; type: string; stack?: string; sourceLine?: string }>
+  >
   debugOutput: Ref<string>
   screenBuffer: Ref<ScreenCell[][]>
   cursorX: Ref<number>
   cursorY: Ref<number>
   bgPalette: Ref<number>
   backdropColor?: Ref<number>
+  spritePalette?: Ref<number>
   cgenMode?: Ref<number>
   movementStates?: Ref<MovementState[]>
   frontSpriteNodes?: Ref<Map<number, unknown>>
   backSpriteNodes?: Ref<Map<number, unknown>>
+  /** Per-sprite action queue; POSITION etc. when node does not exist; consumed when START_MOVEMENT is handled. */
+  spriteActionQueues?: Ref<SpriteActionQueues>
   webWorkerManager: WebWorkerManager
+  /** Shared animation state view; main thread writes positions + isActive for worker (XPOS/YPOS, MOVE(n)). */
+  sharedAnimationView?: Float64Array
+  /** Shared display buffer views; main reads screen/cursor/scalars when SCREEN_CHANGED. */
+  sharedDisplayViews?: SharedDisplayViews
+  /** Called when SCREEN_CHANGED is received to schedule a render (Screen.vue reads from shared buffer). */
+  scheduleRender?: () => void
+  /** Called by Screen.vue after decoding shared buffer to update refs (screenBuffer, cursorX, etc.). */
+  setDecodedScreenState?: (decoded: DecodedScreenState) => void
 }
 
 /**
@@ -91,7 +146,7 @@ export interface MessageHandlerContext {
 export function handleOutputMessage(message: AnyServiceWorkerMessage, context: MessageHandlerContext): void {
   if (message.type !== 'OUTPUT') return
   const { output: outputText, outputType } = message.data
-  console.log('📤 [COMPOSABLE] Handling output:', outputType, outputText)
+  logIdeMessages.debug('📤 Handling output:', outputType, outputText)
 
   if (outputType === 'print') {
     context.output.value.push(outputText)
@@ -107,12 +162,33 @@ export function handleOutputMessage(message: AnyServiceWorkerMessage, context: M
 }
 
 /**
- * Handle screen update message from web worker
+ * Handle SCREEN_CHANGED message from web worker (shared buffer path).
+ * Only schedules a render; Screen.vue reads from shared buffer and decodes in its render path.
+ */
+export function handleScreenChangedMessage(
+  _message: AnyServiceWorkerMessage,
+  context: MessageHandlerContext
+): void {
+  if (context.scheduleRender) {
+    context.scheduleRender()
+  }
+}
+
+/**
+ * Handle screen update message from web worker (legacy SCREEN_UPDATE; worker no longer sends for shared buffer path)
  */
 export function handleScreenUpdateMessage(message: AnyServiceWorkerMessage, context: MessageHandlerContext): void {
   if (message.type !== 'SCREEN_UPDATE') return
   
   const update = message.data
+  if (!update) {
+    console.warn('⚠️ [COMPOSABLE] SCREEN_UPDATE message has no data')
+    return
+  }
+  if (!context?.screenBuffer) {
+    console.warn('⚠️ [COMPOSABLE] SCREEN_UPDATE: context or screenBuffer missing, skipping')
+    return
+  }
 
   switch (update.updateType) {
     case 'character':
@@ -245,6 +321,13 @@ export function handleResultMessage(message: AnyServiceWorkerMessage, context: M
   const resultMessage = message as ResultMessage
   const result = resultMessage.data // message.data IS the ExecutionResult
   console.log('✅ [COMPOSABLE] Execution completed:', result.executionId, 'result:', result)
+  if (!result.success && result.errors?.length) {
+    console.error('[COMPOSABLE] Execution failed:', result.errors[0]?.message, result.errors)
+  }
+
+  // Flush queued OUTPUT/ANIMATION_COMMAND so output and movement state are updated before resolving.
+  // Otherwise RESULT resolves first, UI re-renders with empty output, then rAF applies OUTPUT (one frame late).
+  flushMessageQueue()
 
   // Use message.id to look up the pending message (not executionId from data)
   const pending = context.webWorkerManager.pendingMessages.get(message.id)
@@ -262,14 +345,48 @@ export function handleResultMessage(message: AnyServiceWorkerMessage, context: M
  */
 export function handleErrorMessage(message: AnyServiceWorkerMessage, context: MessageHandlerContext): void {
   const errorMessage = message as ErrorMessage
-  console.error('❌ [COMPOSABLE] Execution error:', errorMessage.data.executionId, errorMessage.data.message)
+  const data = errorMessage.data
+  const executionId = data?.executionId ?? 'unknown'
+  const errorText = data?.message ?? String(message)
+  const lineNumber = data?.lineNumber
+  const sourceLine = data?.sourceLine
+  const stack = data?.stack
 
-  // Use message.id to look up the pending message (not executionId from data)
+  console.error(
+    '❌ [COMPOSABLE] Execution error:',
+    executionId,
+    errorText,
+    lineNumber != null ? `(at line ${lineNumber})` : ''
+  )
+
+  flushMessageQueue()
+
+  // Set errors so UI shows root line/stack; reject with ExecutionError so runCode catch preserves them
+  const errorEntry = {
+    line: lineNumber ?? 0,
+    message: errorText,
+    type: 'runtime' as const,
+    ...(typeof stack === 'string' && stack.length > 0 && { stack }),
+    ...(sourceLine && { sourceLine }),
+  }
+  if (context?.errors) {
+    context.errors.value = [errorEntry]
+  }
+
+  if (!context?.webWorkerManager) {
+    console.warn('⚠️ [COMPOSABLE] handleErrorMessage: context or webWorkerManager missing, skipping pending reject')
+    return
+  }
   const pending = context.webWorkerManager.pendingMessages.get(message.id)
   if (pending) {
     clearTimeout(pending.timeout)
     context.webWorkerManager.pendingMessages.delete(message.id)
-    pending.reject(new Error(errorMessage.data.message))
+    const executionError = new ExecutionError(errorText, {
+      lineNumber,
+      sourceLine,
+      stackTrace: stack,
+    })
+    pending.reject(executionError)
   } else {
     console.warn('⚠️ [COMPOSABLE] No pending message found for error messageId:', message.id)
   }
@@ -281,8 +398,7 @@ export function handleErrorMessage(message: AnyServiceWorkerMessage, context: Me
 export function handleProgressMessage(message: AnyServiceWorkerMessage, _context: MessageHandlerContext): void {
   if (message.type !== 'PROGRESS') return
   const { iterationCount, currentStatement } = message.data
-  console.log('🔄 [COMPOSABLE] Progress:', iterationCount, currentStatement)
-  // Could emit progress events here if needed
+  logIdeMessages.debug('🔄 Progress:', iterationCount, currentStatement)
 }
 
 /**
@@ -296,23 +412,25 @@ export function handleAnimationCommandMessage(message: AnyServiceWorkerMessage, 
   // TypeScript narrows message.data to AnimationCommand after type check
   const command: AnimationCommand = message.data
 
-  console.log('🎬 [COMPOSABLE] Handling animation command:', command.type, command)
+  logIdeMessages.debug('🎬 Handling animation command:', command.type, command)
 
   switch (command.type) {
     case 'START_MOVEMENT': {
-      // Get start position from Konva node if it exists (from previous CUT), otherwise use command position
-      let startX = command.startX
-      let startY = command.startY
+      // Start position: Konva node (if exists) > last POSITION from this sprite's action queue > command from worker
+      const queue = context.spriteActionQueues?.value.get(command.actionNumber) ?? []
+      const lastPosition = [...queue].reverse().find((a): a is PendingSpriteAction => a.type === 'POSITION')
+      let startX = lastPosition?.x ?? command.startX
+      let startY = lastPosition?.y ?? command.startY
+      context.spriteActionQueues?.value.set(command.actionNumber, [])
 
-      // Check if there's an existing Konva node with a position
       const existingNode =
         command.definition.priority === 0
           ? context.frontSpriteNodes?.value?.get(command.actionNumber)
           : context.backSpriteNodes?.value?.get(command.actionNumber)
 
       if (existingNode && typeof existingNode === 'object' && 'x' in existingNode && 'y' in existingNode) {
-        const nodeX = typeof existingNode.x === 'function' ? (existingNode.x as () => number)() : command.startX
-        const nodeY = typeof existingNode.y === 'function' ? (existingNode.y as () => number)() : command.startY
+        const nodeX = typeof existingNode.x === 'function' ? (existingNode.x as () => number)() : startX
+        const nodeY = typeof existingNode.y === 'function' ? (existingNode.y as () => number)() : startY
         startX = nodeX
         startY = nodeY
       }
@@ -375,64 +493,70 @@ export function handleAnimationCommandMessage(message: AnyServiceWorkerMessage, 
       // Force reactivity by creating new array
       context.movementStates.value = [...context.movementStates.value]
 
-      // Immediately sync position to worker for XPOS/YPOS queries
-      // This ensures XPOS/YPOS works even before animation loop starts syncing
-      if (context.webWorkerManager?.worker) {
-        context.webWorkerManager.worker.postMessage({
-          type: 'UPDATE_ANIMATION_POSITIONS',
-          id: crypto.randomUUID(),
-          timestamp: Date.now(),
-          data: {
-            positions: [{ actionNumber: command.actionNumber, x: startX, y: startY }],
-          },
-        })
+      logScreen.warn(
+        'START_MOVEMENT actionNumber=',
+        command.actionNumber,
+        'total movements=',
+        context.movementStates.value.length
+      )
+
+      if (context.sharedAnimationView) {
+        writeSpriteState(context.sharedAnimationView, command.actionNumber, startX, startY, true)
       }
       break
     }
 
     case 'STOP_MOVEMENT': {
-      // Mark movements as inactive
-      // Position is stored in Konva nodes, no need to sync back to worker
       if (command.positions) {
         for (const pos of command.positions) {
           const movement = context.movementStates.value.find(m => m.actionNumber === pos.actionNumber)
           if (movement) {
             movement.isActive = false
             movement.remainingDistance = pos.remainingDistance
+            if (context.sharedAnimationView) {
+              writeSpriteState(context.sharedAnimationView, pos.actionNumber, pos.x, pos.y, false)
+            }
           }
         }
       } else {
-        // Get position from Konva nodes (single source of truth)
         for (const actionNumber of command.actionNumbers) {
           const movement = context.movementStates.value.find(m => m.actionNumber === actionNumber)
           if (movement) {
-            // Get position from Konva sprite node (actual rendered position)
-            const _spriteNode =
-              movement.definition.priority === 0
-                ? context.frontSpriteNodes?.value?.get(actionNumber)
-                : context.backSpriteNodes?.value?.get(actionNumber)
-
-
-            // Mark as inactive - position stays in Konva node
             movement.isActive = false
+            if (context.sharedAnimationView) {
+              const spriteNode =
+                movement.definition.priority === 0
+                  ? context.frontSpriteNodes?.value?.get(actionNumber)
+                  : context.backSpriteNodes?.value?.get(actionNumber)
+              const x = spriteNode && typeof spriteNode === 'object' && 'x' in spriteNode && typeof (spriteNode as { x: () => number }).x === 'function'
+                ? (spriteNode as { x: () => number; y: () => number }).x()
+                : 0
+              const y = spriteNode && typeof spriteNode === 'object' && 'y' in spriteNode && typeof (spriteNode as { y: () => number }).y === 'function'
+                ? (spriteNode as { x: () => number; y: () => number }).y()
+                : 0
+              writeSpriteState(context.sharedAnimationView, actionNumber, x, y, false)
+            }
           }
         }
       }
-
       context.movementStates.value = [...context.movementStates.value]
       break
     }
 
     case 'ERASE_MOVEMENT': {
-      // Remove movements completely
       context.movementStates.value = context.movementStates.value.filter(
         m => !command.actionNumbers.includes(m.actionNumber)
       )
+      for (const actionNumber of command.actionNumbers) {
+        context.spriteActionQueues?.value.delete(actionNumber)
+        if (context.sharedAnimationView) {
+          writeSpriteState(context.sharedAnimationView, actionNumber, 0, 0, false)
+        }
+      }
       break
     }
 
     case 'SET_POSITION': {
-      // Set position on Konva node
       const spriteNode =
         context.frontSpriteNodes?.value?.get(command.actionNumber) ??
         context.backSpriteNodes?.value?.get(command.actionNumber)
@@ -441,31 +565,34 @@ export function handleAnimationCommandMessage(message: AnyServiceWorkerMessage, 
         if (typeof spriteNode.x === 'function' && typeof spriteNode.y === 'function') {
           ;(spriteNode.x as (x: number) => void)(command.x)
           ;(spriteNode.y as (y: number) => void)(command.y)
-          
-          // Immediately sync position to worker for XPOS/YPOS queries
-          if (context.webWorkerManager?.worker) {
-            context.webWorkerManager.worker.postMessage({
-              type: 'UPDATE_ANIMATION_POSITIONS',
-              id: crypto.randomUUID(),
-              timestamp: Date.now(),
-              data: {
-                positions: [{ actionNumber: command.actionNumber, x: command.x, y: command.y }],
-              },
-            })
+          context.spriteActionQueues?.value.delete(command.actionNumber)
+          if (context.sharedAnimationView) {
+            const movement = context.movementStates?.value.find(m => m.actionNumber === command.actionNumber)
+            writeSpriteState(
+              context.sharedAnimationView,
+              command.actionNumber,
+              command.x,
+              command.y,
+              movement?.isActive ?? false
+            )
           }
         }
       } else {
-        // Node doesn't exist yet - cache position in worker anyway so XPOS/YPOS works
-        // The position will be set on the node when it's created
-        if (context.webWorkerManager?.worker) {
-          context.webWorkerManager.worker.postMessage({
-            type: 'UPDATE_ANIMATION_POSITIONS',
-            id: crypto.randomUUID(),
-            timestamp: Date.now(),
-            data: {
-              positions: [{ actionNumber: command.actionNumber, x: command.x, y: command.y }],
-            },
-          })
+        const queues = context.spriteActionQueues?.value
+        if (queues) {
+          const q = queues.get(command.actionNumber) ?? []
+          q.push({ type: 'POSITION', x: command.x, y: command.y })
+          queues.set(command.actionNumber, q)
+        }
+        if (context.sharedAnimationView) {
+          const movement = context.movementStates?.value.find(m => m.actionNumber === command.actionNumber)
+          writeSpriteState(
+            context.sharedAnimationView,
+            command.actionNumber,
+            command.x,
+            command.y,
+            movement?.isActive ?? false
+          )
         }
       }
       break
@@ -539,6 +666,10 @@ function getDirectionDeltaY(direction: number): number {
  * - Messages are batched per frame for efficiency
  */
 export function handleWorkerMessage(message: AnyServiceWorkerMessage, context: MessageHandlerContext): void {
+  if (!context) {
+    console.warn('⚠️ [COMPOSABLE] handleWorkerMessage called with undefined context, skipping')
+    return
+  }
   // Critical messages must be handled immediately (they resolve promises, etc.)
   const isCritical = message.type === 'RESULT' || message.type === 'ERROR'
   
@@ -557,13 +688,16 @@ export function handleWorkerMessage(message: AnyServiceWorkerMessage, context: M
  * Process a message (internal function)
  */
 function processMessage(message: AnyServiceWorkerMessage, context: MessageHandlerContext): void {
-  console.log('📨 [COMPOSABLE] Received message from worker:', message.type)
+  logIdeMessages.debug('📨 Received message from worker:', message.type)
 
   // -- Only handling response messages, request messages sent elsewhere
   // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
   switch (message.type) {
     case 'OUTPUT':
       handleOutputMessage(message, context)
+      break
+    case 'SCREEN_CHANGED':
+      handleScreenChangedMessage(message, context)
       break
     case 'SCREEN_UPDATE':
       handleScreenUpdateMessage(message, context)

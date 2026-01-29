@@ -13,10 +13,10 @@ import type {
   ExecuteMessage,
   OutputMessage,
   ResultMessage,
+  SetSharedAnimationBufferMessage,
   StickEventMessage,
   StopMessage,
   StrigEventMessage,
-  UpdateAnimationPositionsMessage,
 } from '@/core/interfaces'
 
 // Web Worker Interpreter Implementation
@@ -25,6 +25,7 @@ class WebWorkerInterpreter {
   private isRunning: boolean = false
   private currentExecutionId: string | null = null
   private webWorkerDeviceAdapter: WebWorkerDeviceAdapter | null = null
+  private sharedAnimationBuffer: SharedArrayBuffer | null = null
 
   constructor() {
     this.interpreter = null
@@ -76,9 +77,8 @@ class WebWorkerInterpreter {
           console.log('🎮 [WORKER] Handling STICK_EVENT message')
           this.handleStickEvent(message)
           break
-        case 'UPDATE_ANIMATION_POSITIONS':
-          console.log('🎬 [WORKER] Handling UPDATE_ANIMATION_POSITIONS message')
-          this.handleUpdateAnimationPositions(message)
+        case 'SET_SHARED_ANIMATION_BUFFER':
+          this.handleSetSharedAnimationBuffer(message)
           break
 
         default:
@@ -89,8 +89,12 @@ class WebWorkerInterpreter {
           break
       }
     } catch (error) {
-      console.log('❌ [WORKER] Error processing message:', error)
-      this.sendError(message.id, error instanceof Error ? error : new Error(String(error)))
+      const err = error instanceof Error ? error : new Error(String(error))
+      console.error('❌ [WORKER] Error processing message:', err.message)
+      console.error('Stack trace:', err.stack ?? '(no stack available)')
+      // Capture location from interpreter when available (e.g. error escaped from handleExecute)
+      const location = this.interpreter?.getExecutionLocation?.() ?? null
+      this.sendError(message.id, err, location)
     }
   }
 
@@ -117,7 +121,8 @@ class WebWorkerInterpreter {
       })
       this.interpreter = new BasicInterpreter({
         ...config,
-        deviceAdapter: this.webWorkerDeviceAdapter!, // Use WebWorkerDeviceAdapter (non-null assertion)
+        deviceAdapter: this.webWorkerDeviceAdapter!,
+        sharedAnimationBuffer: this.sharedAnimationBuffer ?? undefined,
       })
       console.log('✅ [WORKER] Interpreter created with WebWorkerDeviceAdapter')
 
@@ -132,6 +137,15 @@ class WebWorkerInterpreter {
         outputLines: this.webWorkerDeviceAdapter?.printOutput.length ?? 0,
         executionTime: result.executionTime,
       })
+      if (!result.success && result.errors?.length) {
+        console.error('[WORKER] Execution returned success: false', result.errors[0]?.message, result.errors)
+      }
+
+      // Flush final screen buffer so main thread receives full SCREEN_UPDATE before RESULT.
+      // Otherwise RESULT can be processed first and only the first batched screen shows.
+      if (this.webWorkerDeviceAdapter) {
+        this.webWorkerDeviceAdapter.setCurrentExecutionId(null)
+      }
 
       // Get sprite states and movement states from interpreter
       if (!this.interpreter) {
@@ -154,7 +168,11 @@ class WebWorkerInterpreter {
       this.sendResult(message.id, enhancedResult)
     } catch (error) {
       this.isRunning = false
-      this.sendError(message.id, error instanceof Error ? error : new Error(String(error)))
+      const err = error instanceof Error ? error : new Error(String(error))
+      console.error('❌ [WORKER] Execution error:', err.message)
+      console.error('Stack trace:', err.stack ?? '(no stack available)')
+      const location = this.interpreter?.getExecutionLocation() ?? null
+      this.sendError(message.id, err, location)
     }
   }
 
@@ -196,14 +214,16 @@ class WebWorkerInterpreter {
     }
   }
 
-  handleUpdateAnimationPositions(message: UpdateAnimationPositionsMessage) {
-    const { positions } = message.data
-
-    // Update cached positions in WebWorkerDeviceAdapter for XPOS/YPOS queries
+  handleSetSharedAnimationBuffer(message: SetSharedAnimationBufferMessage) {
+    const data = message.data
+    if (!data?.buffer) {
+      console.warn('[WORKER] SET_SHARED_ANIMATION_BUFFER: message.data or buffer missing')
+      return
+    }
+    const { buffer } = data
+    this.sharedAnimationBuffer = buffer
     if (this.webWorkerDeviceAdapter) {
-      for (const pos of positions) {
-        this.webWorkerDeviceAdapter.updateSpritePosition(pos.actionNumber, pos.x, pos.y)
-      }
+      this.webWorkerDeviceAdapter.setSharedAnimationBuffer(buffer)
     }
   }
 
@@ -244,7 +264,15 @@ class WebWorkerInterpreter {
     self.postMessage(message)
   }
 
-  sendError(messageId: string, error: Error) {
+  sendError(
+    messageId: string,
+    error: Error,
+    location?: { lineNumber: number; statementIndex: number; sourceLine?: string } | null
+  ): void {
+    // Always send a string for stack so main thread can display it (worker stack may be undefined in some envs)
+    const stackStr =
+      (error && typeof (error).stack === 'string' && (error).stack) ||
+      '(stack not available)'
     const message: ErrorMessage = {
       type: 'ERROR',
       id: messageId,
@@ -252,17 +280,22 @@ class WebWorkerInterpreter {
       data: {
         executionId: messageId,
         message: error.message,
-        stack: error.stack,
+        stack: stackStr,
+        lineNumber: location?.lineNumber,
+        sourceLine: location?.sourceLine,
         errorType: 'execution',
         recoverable: true,
       },
     }
-    console.log('❌ [WORKER→MAIN] Sending ERROR message:', {
+    console.error('❌ [WORKER→MAIN] Sending ERROR message:', {
       messageId,
       errorMessage: error.message,
+      lineNumber: location?.lineNumber,
+      sourceLine: location?.sourceLine ? `${location.sourceLine.slice(0, 40)}...` : undefined,
       errorType: 'execution',
       recoverable: true,
     })
+    console.error('Stack trace:', stackStr)
     self.postMessage(message)
   }
 }

@@ -60,6 +60,24 @@ const routes: RouteRecordRaw[] = [
       icon: 'mdi:animation',
     },
   },
+  {
+    path: '/position-sync-load-test',
+    name: 'PositionSyncLoadTest',
+    component: () => import('@/features/ide/PositionSyncLoadTestPage.vue'),
+    meta: {
+      title: 'Position Sync Load Test',
+      showInNav: false,
+    },
+  },
+  {
+    path: '/print-vs-sprites-test',
+    name: 'PrintVsSpritesTest',
+    component: () => import('@/features/ide/PrintVsSpritesTestPage.vue'),
+    meta: {
+      title: 'PRINT vs Sprites (Phase 6.1)',
+      showInNav: false,
+    },
+  },
 ]
 
 const router = createRouter({

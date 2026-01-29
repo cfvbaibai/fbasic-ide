@@ -2,6 +2,11 @@
 import Konva from 'konva'
 import { computed, onUnmounted, ref, toValue, useTemplateRef, watch } from 'vue'
 
+import type { SharedDisplayViews } from '@/core/animation/sharedDisplayBuffer'
+import {
+  readScreenStateFromShared,
+  readSequence,
+} from '@/core/animation/sharedDisplayBuffer'
 import type { ScreenCell } from '@/core/interfaces'
 import type { MovementState, SpriteState } from '@/core/sprite/types'
 import { preInitializeBackgroundTiles } from '@/features/ide/composables/useKonvaBackgroundRenderer'
@@ -15,11 +20,9 @@ import { useRenderQueue } from '@/features/ide/composables/useRenderQueue'
 import { useScreenAnimationLoop } from '@/features/ide/composables/useScreenAnimationLoop'
 import { useScreenZoom } from '@/features/ide/composables/useScreenZoom'
 import { COLORS } from '@/shared/data/palette'
+import { logScreen } from '@/shared/logger'
 import type { VueKonvaStageInstance } from '@/types/vue-konva'
 
-/**
- * Screen component - Renders the F-BASIC screen buffer using Konva.js
- */
 defineOptions({
   name: 'Screen',
 })
@@ -42,6 +45,7 @@ const props = withDefaults(defineProps<Props>(), {
   bgPalette: 1,
   backdropColor: 0,
   spritePalette: 1,
+  cgenMode: 2,
   spriteStates: () => [],
   movementStates: () => [],
   spriteEnabled: false,
@@ -54,14 +58,26 @@ interface Props {
   bgPalette?: number
   backdropColor?: number
   spritePalette?: number
+  cgenMode?: number
   spriteStates?: SpriteState[]
   movementStates?: MovementState[]
   spriteEnabled?: boolean
   // External sprite node maps (for message handler to get actual positions)
   externalFrontSpriteNodes?: Map<number, unknown>
   externalBackSpriteNodes?: Map<number, unknown>
-  // Function to sync positions to worker for XPOS/YPOS queries
-  onPositionSync?: (positions: Array<{ actionNumber: number; x: number; y: number }>) => void
+  /** Shared animation state view (Float64Array). Main thread writes positions + isActive each frame. */
+  sharedAnimationView?: Float64Array
+  /** Shared display buffer views; when present, render path reads sequence and decodes instead of using props. */
+  sharedDisplayViews?: SharedDisplayViews
+  /** Called after decoding shared buffer to update parent refs (screenBuffer, cursorX, etc.). */
+  setDecodedScreenState?: (decoded: import('@/core/animation/sharedDisplayBuffer').DecodedScreenState) => void
+  /** Register this component's scheduleRender so parent can trigger render on SCREEN_CHANGED. */
+  registerScheduleRender?: (fn: () => void) => void
+}
+
+/** Deep copy of screen buffer for dirty diff (last rendered state) */
+function deepCopyBuffer(buf: ScreenCell[][]): ScreenCell[][] {
+  return buf.map(row => row.map(c => ({ ...c })))
 }
 
 // Konva Stage reference
@@ -99,10 +115,23 @@ const layers = ref<KonvaScreenLayers>({
 const frontSpriteNodes = ref<Map<number, Konva.Image>>(new Map())
 const backSpriteNodes = ref<Map<number, Konva.Image>>(new Map())
 
+// Dirty background: last rendered buffer for diff; grid of "y,x" -> Konva.Image for per-cell updates
+const lastBackgroundBufferRef = ref<ScreenCell[][] | null>(null)
+const backgroundNodeGridRef = ref<Map<string, Konva.Image>>(new Map())
+
+// Shared buffer path: last sequence and last decoded buffer (so we only decode when sequence changes)
+const lastSequenceRef = ref(-1)
+const lastDecodedBufferRef = ref<ScreenCell[][] | null>(null)
+
+// Render reason: bufferOnly = only screenBuffer changed (PRINT); full = sprite/palette/backdrop/etc
+type RenderReason = 'full' | 'bufferOnly'
+const pendingRenderReasonRef = ref<RenderReason>('full')
+
+// When animation is active: static render is deferred to end of frame (animation first)
+const pendingStaticRenderRef = ref(false)
+
 // Track if a render is in progress to prevent overlapping renders
 let renderInProgress = false
-
-// Note: pendingBackgroundUpdate removed - static rendering happens immediately via watchers
 
 /**
  * Initialize Konva Stage and layers
@@ -141,6 +170,19 @@ async function render(): Promise<void> {
 
   renderInProgress = true
   try {
+    // Shared buffer path: read sequence; if changed (or first run), decode and update parent refs
+    let bufferToRender: ScreenCell[][] = props?.screenBuffer ?? []
+    if (props?.sharedDisplayViews) {
+      const seq = readSequence(props.sharedDisplayViews)
+      if (seq !== lastSequenceRef.value || lastDecodedBufferRef.value === null) {
+        const decoded = readScreenStateFromShared(props.sharedDisplayViews)
+        props.setDecodedScreenState?.(decoded)
+        lastSequenceRef.value = seq
+        lastDecodedBufferRef.value = decoded.buffer
+      }
+      bufferToRender = lastDecodedBufferRef.value ?? (props?.screenBuffer ?? [])
+    }
+
     // Determine if background should be cached (static when no active movements)
     const hasActiveMovements = localMovementStates.value.some(m => m.isActive)
     const backgroundShouldCache = !hasActiveMovements
@@ -152,35 +194,74 @@ async function render(): Promise<void> {
       backgroundLayer: layers.value.backgroundLayer as Konva.Layer | null,
       spriteFrontLayer: layers.value.spriteFrontLayer as Konva.Layer | null,
     }
-    const { frontSpriteNodes: frontNodes, backSpriteNodes: backNodes } = await renderAllScreenLayers(
-      layersToRender,
-      props.screenBuffer,
-      props.spriteStates ?? [],
-      localMovementStates.value,
-      paletteCode.value,
-      props.spritePalette ?? 1,
-      props.backdropColor ?? 0,
-      props.spriteEnabled ?? false,
-      backgroundShouldCache,
-      frontSpriteNodes.value as Map<number, Konva.Image>,
-      backSpriteNodes.value as Map<number, Konva.Image>
-    )
-
-    // Update sprite node maps
-    frontSpriteNodes.value = frontNodes as Map<number, Konva.Image>
-    backSpriteNodes.value = backNodes as Map<number, Konva.Image>
-
-    // Sync with external sprite node maps (for message handler access)
-    if (props.externalFrontSpriteNodes) {
-      props.externalFrontSpriteNodes.clear()
-      for (const [key, value] of frontNodes.entries()) {
-        props.externalFrontSpriteNodes.set(key, value)
-      }
+    // Use props count when ahead of local (log: all 8 START_MOVEMENTs in one rAF; sync watch can run after render())
+    const propsMovementCount = props.movementStates?.length ?? 0
+    const localMovementCount = localMovementStates.value.length
+    const movementCount = Math.max(propsMovementCount, localMovementCount)
+    const spriteNodeCount = frontSpriteNodes.value.size + backSpriteNodes.value.size
+    const needSpriteBuild =
+      movementCount > 0 && (spriteNodeCount === 0 || spriteNodeCount < movementCount)
+    const backgroundOnly =
+      !needSpriteBuild && pendingRenderReasonRef.value === 'bufferOnly'
+    // When props is ahead, pass props so we build all sprites; else use local (mutable state)
+    const movementsToRender =
+      propsMovementCount > localMovementCount && (props.movementStates?.length ?? 0) > 0
+        ? (props.movementStates ?? [])
+        : localMovementStates.value
+    if (needSpriteBuild || !backgroundOnly) {
+      logScreen.debug('render', {
+        movementCount,
+        propsMovementCount,
+        localMovementCount,
+        spriteNodeCount,
+        needSpriteBuild,
+        backgroundOnly,
+        reason: pendingRenderReasonRef.value,
+      })
     }
-    if (props.externalBackSpriteNodes) {
-      props.externalBackSpriteNodes.clear()
-      for (const [key, value] of backNodes.entries()) {
-        props.externalBackSpriteNodes.set(key, value)
+    // Only use dirty background when buffer-only; full render (palette/sprite/backdrop) does full replace
+    const lastBackgroundBuffer =
+      backgroundOnly ? lastBackgroundBufferRef.value : null
+    const { frontSpriteNodes: frontNodes, backSpriteNodes: backNodes } =
+      await renderAllScreenLayers(
+        layersToRender,
+        bufferToRender,
+        props.spriteStates ?? [],
+        movementsToRender,
+        paletteCode.value,
+        props.spritePalette ?? 1,
+        props.backdropColor ?? 0,
+        props.spriteEnabled ?? false,
+        backgroundShouldCache,
+        frontSpriteNodes.value as Map<number, Konva.Image>,
+        backSpriteNodes.value as Map<number, Konva.Image>,
+        {
+          backgroundOnly,
+          lastBackgroundBuffer,
+          backgroundNodeGridRef: backgroundNodeGridRef.value as Map<
+            string,
+            Konva.Image
+          >,
+        }
+      )
+
+    // After background render, store buffer for next dirty diff
+    lastBackgroundBufferRef.value = deepCopyBuffer(bufferToRender)
+
+    if (!backgroundOnly) {
+      frontSpriteNodes.value = frontNodes as Map<number, Konva.Image>
+      backSpriteNodes.value = backNodes as Map<number, Konva.Image>
+      if (props.externalFrontSpriteNodes) {
+        props.externalFrontSpriteNodes.clear()
+        for (const [key, value] of frontNodes.entries()) {
+          props.externalFrontSpriteNodes.set(key, value)
+        }
+      }
+      if (props.externalBackSpriteNodes) {
+        props.externalBackSpriteNodes.clear()
+        for (const [key, value] of backNodes.entries()) {
+          props.externalBackSpriteNodes.set(key, value)
+        }
       }
     }
   } catch (error) {
@@ -194,7 +275,17 @@ async function render(): Promise<void> {
 // When new MOVE commands are added, trigger a full render to show initial state
 const { localMovementStates } = useMovementStateSync({
   movementStates: computed(() => props.movementStates),
-  onSync: () => scheduleRender(),
+  onSync: () => {
+    logScreen.debug(
+      'sync',
+      'props.movementStates=',
+      props.movementStates?.length ?? 0,
+      'localMovementStates=',
+      localMovementStates.value.length
+    )
+    pendingRenderReasonRef.value = 'full'
+    scheduleRender()
+  },
 })
 
 // Watch paletteCode, backdropColor, spritePalette, sprite states, and sprite enabled to trigger re-render
@@ -217,28 +308,52 @@ watch(
     zoomLevel,
   ],
   () => {
-    // Static rendering - execute immediately, no waiting
-    // Animation loop only handles MOVE animations, not static rendering
+    pendingRenderReasonRef.value = 'full'
     scheduleRender()
   }
 )
 
-// Render queue using requestAnimationFrame for optimal browser rendering alignment
-// This ensures updates are processed in order and aligned with browser refresh cycle
-const { schedule: scheduleRender, cleanup: cleanupRenderQueue } = useRenderQueue(async () => {
-  await render()
-})
+// Render queue: when animation is active, sets pending static render so animation loop runs render at end of frame
+const { schedule: scheduleRender, cleanup: cleanupRenderQueue } = useRenderQueue(
+  async () => {
+    await render()
+  },
+  {
+    hasActiveMovements: () =>
+      localMovementStates.value.some(m => m.isActive),
+    setPendingStaticRender: (v: boolean) => {
+      pendingStaticRenderRef.value = v
+    },
+  }
+)
 
-// Watch screenBuffer and render when it changes (PRINT command - static rendering)
-// Static rendering should execute immediately, no waiting for animation loop
-// Use deep watch to detect all cell changes (not just array reference changes)
-// Use flush: 'post' to ensure we render after all synchronous updates are complete
-// The scheduleRender function handles FIFO ordering and throttling
+// Register scheduleRender with parent so SCREEN_CHANGED can trigger a redraw (shared buffer path)
 watch(
-  () => props.screenBuffer,
+  () => props.registerScheduleRender,
+  fn => {
+    if (fn) fn(scheduleRender)
+  },
+  { immediate: true }
+)
+
+// Watch screenBuffer and render when it changes (PRINT). Use full when movements > nodes.
+// When using shared buffer, SCREEN_CHANGED triggers scheduleRender; this watch still runs for ref updates.
+watch(
+  () => props?.screenBuffer,
   () => {
-    // PRINT command changes - queue render with FIFO ordering and throttling
-    // Animation loop only handles MOVE animations, not static PRINT rendering
+    const movementCount = props.movementStates?.length ?? 0
+    const spriteNodeCount = frontSpriteNodes.value.size + backSpriteNodes.value.size
+    const useFull = movementCount > spriteNodeCount
+    if (useFull) {
+      logScreen.debug(
+        'screenBuffer watch → full',
+        'movementCount=',
+        movementCount,
+        'spriteNodeCount=',
+        spriteNodeCount
+      )
+    }
+    pendingRenderReasonRef.value = useFull ? 'full' : 'bufferOnly'
     scheduleRender()
   },
   { immediate: true, deep: true, flush: 'post' }
@@ -258,15 +373,22 @@ watch(
 )
 
 // Setup animation loop - ONLY for MOVE command animations
-// Static rendering (PRINT, SPRITE, CGSET, COLOR) is handled by watchers above
+// When movements are active, run pending static render at end of frame (animation first, then render)
 const stopAnimationLoop = useScreenAnimationLoop({
   localMovementStates,
   layers,
   frontSpriteNodes,
   backSpriteNodes,
   spritePalette: computed(() => props.spritePalette ?? 1),
-
-  onPositionSync: toValue(() => props.onPositionSync),
+  sharedAnimationView: toValue(() => props.sharedAnimationView),
+  getPendingStaticRender: () => pendingStaticRenderRef.value,
+  onRunPendingStaticRender: async () => {
+    await render()
+    pendingStaticRenderRef.value = false
+  },
+  onAnimationStopped: () => {
+    if (pendingStaticRenderRef.value) scheduleRender()
+  },
 })
 
 // Stop animation loop and cancel pending renders when component unmounts
@@ -323,158 +445,5 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-/* CRT Color Variables - Dark Theme (default) */
-
-/* stylelint-disable function-disallowed-list */
-
-/* Using modern CSS relative color syntax (rgb(from ...)) - not hardcoded RGB values */
-.screen-display {
-  --crt-glow-light-10: rgb(from var(--base-solid-gray-100) r g b / 10%);
-  --crt-glow-light-20: rgb(from var(--base-solid-gray-100) r g b / 20%);
-  --crt-glow-light-40: rgb(from var(--base-solid-gray-100) r g b / 40%);
-  --crt-glow-light-80: rgb(from var(--base-solid-gray-100) r g b / 80%);
-  --crt-shadow-dark-10: rgb(from var(--base-solid-gray-00) r g b / 10%);
-  --crt-shadow-dark-30: rgb(from var(--base-solid-gray-00) r g b / 30%);
-  --crt-shadow-dark-40: rgb(from var(--base-solid-gray-00) r g b / 40%);
-  --crt-shadow-dark-50: rgb(from var(--base-solid-gray-00) r g b / 50%);
-  --crt-shadow-dark-60: rgb(from var(--base-solid-gray-00) r g b / 60%);
-  --crt-shadow-dark-80: rgb(from var(--base-solid-gray-00) r g b / 80%);
-  --crt-border-color: var(--base-solid-gray-00);
-
-  flex: 1 1 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  overflow: auto;
-  min-height: 0;
-  gap: 1rem;
-}
-
-/* CRT Color Variables - Light Theme */
-.light-theme .screen-display {
-  --crt-glow-light-10: rgb(from var(--base-solid-gray-100) r g b / 10%);
-  --crt-glow-light-20: rgb(from var(--base-solid-gray-100) r g b / 20%);
-  --crt-glow-light-40: rgb(from var(--base-solid-gray-100) r g b / 40%);
-  --crt-glow-light-80: rgb(from var(--base-solid-gray-100) r g b / 80%);
-  --crt-shadow-dark-10: rgb(from var(--base-solid-gray-00) r g b / 10%);
-  --crt-shadow-dark-30: rgb(from var(--base-solid-gray-00) r g b / 30%);
-  --crt-shadow-dark-40: rgb(from var(--base-solid-gray-00) r g b / 40%);
-  --crt-shadow-dark-50: rgb(from var(--base-solid-gray-00) r g b / 50%);
-  --crt-shadow-dark-60: rgb(from var(--base-solid-gray-00) r g b / 60%);
-  --crt-shadow-dark-80: rgb(from var(--base-solid-gray-00) r g b / 80%);
-  --crt-border-color: var(--base-solid-gray-00);
-}
-/* stylelint-enable function-disallowed-list */
-
-/* CRT Bezel - outer frame */
-.crt-bezel {
-  background: linear-gradient(
-    135deg,
-    var(--game-screen-header-bg) 0%,
-    var(--crt-border-color) 50%,
-    var(--game-screen-header-bg) 100%
-  );
-  border: 8px solid var(--crt-border-color);
-  border-radius: 12px;
-  box-shadow:
-    inset 0 2px 4px var(--crt-glow-light-10),
-    0 8px 32px var(--crt-shadow-dark-80),
-    0 0 0 2px var(--crt-shadow-dark-50);
-  padding: 16px;
-}
-
-/* Light theme: darker background, lighter border, subtle shadows */
-.light-theme .crt-bezel {
-  background: linear-gradient(
-    135deg,
-    var(--base-solid-gray-30) 0%,
-    var(--base-solid-gray-50) 50%,
-    var(--base-solid-gray-30) 100%
-  );
-  border-color: var(--base-solid-gray-50);
-  box-shadow:
-    inset 0 1px 2px var(--crt-shadow-dark-10),
-    0 4px 16px var(--base-alpha-gray-00-20),
-    0 0 0 1px var(--crt-shadow-dark-30);
-}
-
-/* CRT Screen - inner screen area */
-.crt-screen {
-  position: relative;
-  border: 4px solid var(--crt-border-color);
-  border-radius: 16px;
-  box-shadow:
-    inset 0 0 80px var(--crt-glow-light-80),
-    0 4px 20px var(--crt-shadow-dark-60),
-    inset 0 -2px 10px var(--crt-shadow-dark-80);
-  overflow: hidden;
-  background: radial-gradient(
-    ellipse 150% 110% at 85% 8%,
-    var(--crt-glow-light-20) 0%,
-    var(--crt-glow-light-10) 18%,
-    var(--crt-glow-light-10) 35%,
-    transparent 60%,
-    var(--crt-shadow-dark-30) 100%
-  );
-}
-
-/* Scanlines overlay */
-.crt-scanlines {
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    var(--crt-shadow-dark-10) 2px,
-    var(--crt-shadow-dark-10) 4px
-  );
-  pointer-events: none;
-  z-index: 2;
-  mix-blend-mode: multiply;
-}
-
-/* Screen reflection/glow effect - point light from top right */
-.crt-reflection {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    ellipse 140% 100% at 85% 5%,
-    var(--crt-glow-light-40) 0%,
-    var(--crt-glow-light-20) 15%,
-    var(--crt-glow-light-10) 30%,
-    transparent 55%,
-    var(--crt-shadow-dark-40) 100%
-  );
-  pointer-events: none;
-  z-index: 1;
-  border-radius: 16px;
-}
-
-/* Light theme: reflection uses light colors at top-right (inverted from dark theme) */
-.light-theme .crt-reflection {
-  background: radial-gradient(
-    ellipse 140% 100% at 85% 5%,
-    var(--crt-shadow-dark-40) 0%,
-    var(--crt-shadow-dark-30) 15%,
-    var(--crt-shadow-dark-10) 30%,
-    transparent 55%,
-    var(--crt-glow-light-40) 100%
-  );
-}
-
-.screen-stage-wrapper {
-  position: relative;
-  z-index: 0;
-  overflow: hidden;
-}
-
-.screen-stage {
-  display: block;
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
-  filter: brightness(1.05) contrast(1.1);
-}
+@import url('@/shared/styles/screen-crt.css');
 </style>

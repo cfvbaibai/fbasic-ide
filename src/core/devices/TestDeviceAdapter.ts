@@ -5,7 +5,7 @@
  * Provides controlled behavior for testing without external dependencies.
  */
 
-import type { BasicDeviceAdapter } from '@/core/interfaces'
+import type { AnimationCommand, BasicDeviceAdapter } from '@/core/interfaces'
 
 export class TestDeviceAdapter implements BasicDeviceAdapter {
   // === JOYSTICK STATE ===
@@ -32,6 +32,10 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
   public currentBackdropColor: number = 0 // Default backdrop color (0 = black)
   public cgenModeCalls: number[] = []
   public currentCgenMode: number = 2 // Default is 2 (B on BG, A on sprite)
+
+  // === ANIMATION COMMANDS (for sprite/move executor tests) ===
+  public animationCommandCalls: AnimationCommand[] = []
+  private spritePositions: Map<number, { x: number; y: number }> = new Map()
 
   constructor() {
     console.log('🧪 [TEST_DEVICE] TestDeviceAdapter created')
@@ -86,9 +90,21 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
 
   // === SPRITE POSITION QUERY ===
 
-  getSpritePosition(_actionNumber: number): { x: number; y: number } | null {
-    // Test adapter doesn't track sprite positions
-    return null
+  getSpritePosition(actionNumber: number): { x: number; y: number } | null {
+    return this.spritePositions.get(actionNumber) ?? null
+  }
+
+  /**
+   * Set sprite position for XPOS/YPOS tests
+   */
+  setSpritePositionForTest(actionNumber: number, x: number, y: number): void {
+    this.spritePositions.set(actionNumber, { x, y })
+  }
+
+  // === ANIMATION COMMANDS ===
+
+  sendAnimationCommand(command: AnimationCommand): void {
+    this.animationCommandCalls.push(command)
   }
 
   // === TEXT OUTPUT METHODS ===
@@ -213,6 +229,8 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
   reset(): void {
     this.clearOutputs()
     this.clearJoystickState()
+    this.animationCommandCalls = []
+    this.spritePositions.clear()
   }
 
   /**

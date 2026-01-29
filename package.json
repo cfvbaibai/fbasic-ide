@@ -23,6 +23,7 @@
         "visualize-cst": "tsx scripts/visualize-cst.ts"
     },
     "dependencies": {
+        "loglevel": "^1.9.2",
         "@iconify/vue": "^5.0.0",
         "@vueuse/core": "^14.1.0",
         "chevrotain": "^11.0.3",

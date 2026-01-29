@@ -22,7 +22,8 @@ export interface WebWorkerManager {
  */
 export async function initializeWebWorker(
   webWorkerManager: WebWorkerManager,
-  onMessage: (message: AnyServiceWorkerMessage) => void
+  onMessage: (message: AnyServiceWorkerMessage) => void,
+  sharedAnimationBuffer: SharedArrayBuffer
 ): Promise<void> {
   if (webWorkerManager.worker) {
     console.log('✅ [COMPOSABLE] Web worker already initialized')
@@ -42,15 +43,21 @@ export async function initializeWebWorker(
       console.error('❌ [COMPOSABLE] Web worker error:', error)
       rejectAllPendingMessages(webWorkerManager, `Web worker error: ${error.message}`)
       // Restart web worker on error
-      void restartWebWorker(webWorkerManager, onMessage)
+      void restartWebWorker(webWorkerManager, onMessage, sharedAnimationBuffer)
     }
 
     webWorkerManager.worker.onmessageerror = error => {
       console.error('❌ [COMPOSABLE] Web worker message error:', error)
       rejectAllPendingMessages(webWorkerManager, 'Web worker message error')
-      // Restart web worker on message error
-      void restartWebWorker(webWorkerManager, onMessage)
+      void restartWebWorker(webWorkerManager, onMessage, sharedAnimationBuffer)
     }
+
+    webWorkerManager.worker.postMessage({
+      type: 'SET_SHARED_ANIMATION_BUFFER',
+      id: `init-buffer-${Date.now()}`,
+      timestamp: Date.now(),
+      data: { buffer: sharedAnimationBuffer },
+    })
 
     console.log('✅ [COMPOSABLE] Web worker initialized successfully')
   } catch (error) {
@@ -64,24 +71,19 @@ export async function initializeWebWorker(
  */
 export async function restartWebWorker(
   webWorkerManager: WebWorkerManager,
-  onMessage: (message: AnyServiceWorkerMessage) => void
+  onMessage: (message: AnyServiceWorkerMessage) => void,
+  sharedAnimationBuffer: SharedArrayBuffer
 ): Promise<void> {
   console.log('🔄 [COMPOSABLE] Restarting web worker...')
 
-  // Terminate existing worker
   if (webWorkerManager.worker) {
     webWorkerManager.worker.terminate()
     webWorkerManager.worker = null
   }
 
-  // Clear pending messages
   rejectAllPendingMessages(webWorkerManager, 'Web worker restarted')
-
-  // Wait a bit before restarting
   await new Promise(resolve => setTimeout(resolve, 100))
-
-  // Reinitialize
-  await initializeWebWorker(webWorkerManager, onMessage)
+  await initializeWebWorker(webWorkerManager, onMessage, sharedAnimationBuffer)
 }
 
 /**

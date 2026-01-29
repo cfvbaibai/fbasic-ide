@@ -12,6 +12,7 @@ import { COLORS } from '@/shared/data/palette'
 import {
   clearBackgroundTileCache,
   updateBackgroundLayer,
+  updateBackgroundLayerDirty,
 } from './useKonvaBackgroundRenderer'
 import {
   clearSpriteImageCache,
@@ -97,20 +98,33 @@ export function renderBackdropLayer(
 
 /**
  * Render background layer from screen buffer
- * Optimized: Synchronous update, no async overhead
+ * When lastBuffer and nodeGridRef are provided, only dirty cells are updated
  */
 export function renderBackgroundLayer(
   layer: Konva.Layer | null,
   buffer: ScreenCell[][],
   paletteCode: number,
-  shouldCache: boolean = true
+  shouldCache: boolean = true,
+  lastBuffer?: ScreenCell[][] | null,
+  nodeGridRef?: Map<string, Konva.Image>
 ): void {
   if (!layer) return
 
-  // Update background layer with new buffer (synchronous)
-  updateBackgroundLayer(layer, buffer, paletteCode)
+  if (
+    lastBuffer != null &&
+    nodeGridRef != null
+  ) {
+    updateBackgroundLayerDirty(
+      layer,
+      buffer,
+      lastBuffer,
+      paletteCode,
+      nodeGridRef
+    )
+  } else {
+    updateBackgroundLayer(layer, buffer, paletteCode, nodeGridRef)
+  }
 
-  // Cache layer if static (for performance)
   if (shouldCache) {
     layer.cache()
   } else {
@@ -253,6 +267,15 @@ export function clearAllCaches(): void {
   clearBackgroundTileCache()
 }
 
+export interface RenderAllScreenLayersOptions {
+  /** When true, only update backdrop and background; do not rebuild sprite layers */
+  backgroundOnly?: boolean
+  /** Last rendered buffer for dirty background; when set with backgroundNodeGridRef, only dirty cells are updated */
+  lastBackgroundBuffer?: ScreenCell[][] | null
+  /** Grid of "y,x" -> Konva.Image for dirty background updates; populated/updated by full or dirty render */
+  backgroundNodeGridRef?: Map<string, Konva.Image>
+}
+
 /**
  * Main function to render all screen layers
  * Coordinates backdrop, background, and sprite rendering
@@ -269,14 +292,36 @@ export async function renderAllScreenLayers(
   spriteEnabled: boolean,
   backgroundShouldCache: boolean = true,
   frontSpriteNodes?: Map<number, Konva.Image>,
-  backSpriteNodes?: Map<number, Konva.Image>
+  backSpriteNodes?: Map<number, Konva.Image>,
+  options?: RenderAllScreenLayersOptions
 ): Promise<{
   frontSpriteNodes: Map<number, Konva.Image>
   backSpriteNodes: Map<number, Konva.Image>
 }> {
+  const backgroundOnly = options?.backgroundOnly ?? false
+  const lastBackgroundBuffer = options?.lastBackgroundBuffer
+  const backgroundNodeGridRef = options?.backgroundNodeGridRef
+
   // 1. Render backdrop layer (if layer exists, otherwise handled by template)
   if (layers.backdropLayer) {
     renderBackdropLayer(layers.backdropLayer, backdropColor)
+  }
+
+  if (backgroundOnly) {
+    // Buffer-only update (e.g. PRINT): only background (and backdrop); do not rebuild sprite layers
+    renderBackgroundLayer(
+      layers.backgroundLayer,
+      buffer,
+      bgPaletteCode,
+      backgroundShouldCache,
+      lastBackgroundBuffer,
+      backgroundNodeGridRef
+    )
+    if (layers.backgroundLayer) layers.backgroundLayer.draw()
+    return {
+      frontSpriteNodes: frontSpriteNodes ?? new Map(),
+      backSpriteNodes: backSpriteNodes ?? new Map(),
+    }
   }
 
   // 2. Render back sprites (priority E=1)
@@ -290,8 +335,15 @@ export async function renderAllScreenLayers(
     backSpriteNodes
   )
 
-  // 3. Render background layer (synchronous, optimized)
-  renderBackgroundLayer(layers.backgroundLayer, buffer, bgPaletteCode, backgroundShouldCache)
+  // 3. Render background layer (synchronous, full or dirty)
+  renderBackgroundLayer(
+    layers.backgroundLayer,
+    buffer,
+    bgPaletteCode,
+    backgroundShouldCache,
+    lastBackgroundBuffer,
+    backgroundNodeGridRef
+  )
 
   // 4. Render front sprites (priority E=0)
   const frontNodes = await renderSpriteLayer(

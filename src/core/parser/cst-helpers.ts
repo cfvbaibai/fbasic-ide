@@ -56,3 +56,23 @@ export function getLineNumberFromStatement(stmtCst: CstNode): number | null {
   if (!lineNumberToken) return null
   return parseInt(lineNumberToken.image, 10)
 }
+
+/**
+ * Recursively collect token images from a CST node to form source text.
+ * Used for error reporting to show the failing BASIC line.
+ */
+export function getSourceTextFromCst(node: CstNode): string {
+  const parts: string[] = []
+  if (!node.children) return ''
+  for (const key of Object.keys(node.children)) {
+    const elements = node.children[key] as CstElement[]
+    for (const el of elements) {
+      if (isCstToken(el)) {
+        parts.push(el.image)
+      } else if (isCstNode(el)) {
+        parts.push(getSourceTextFromCst(el))
+      }
+    }
+  }
+  return parts.join(' ').replace(/\s+/g, ' ').trim()
+}

@@ -1,8 +1,8 @@
 # SPRITE Layer and MOVE Animation Implementation Plan
 
 **Date Started**: 2026-01-24
-**Last Updated**: 2026-01-25
-**Status**: 🚧 In Progress - Phase 5 Complete (movement control commands with position preservation fix)
+**Last Updated**: 2026-01-29
+**Status**: 🚧 In Progress - Phase 5 Complete; Layer 1 + Layer 2 tests complete (see `sprite-testing-strategy.md`)
 **Purpose**: Detailed implementation plan for SPRITE rendering and MOVE animation system
 
 ## Progress Summary
@@ -71,15 +71,19 @@ graph TB
         RAF -->|Render Frame| CR
     end
 
-    WWDA -->|postMessage| RAF
-    RAF -->|Query Status| WWDA
+    SAB[SharedArrayBuffer]
+    WWDA -->|Write screen + sprites| SAB
+    WWDA -->|postMessage SCREEN_CHANGED / ANIMATION_COMMAND| RAF
+    SAB -->|Read on render| CR
+    RAF -->|Query Status / UPDATE_ANIMATION_POSITIONS| WWDA
 ```
 
 **Key Principles:**
-1. **Command-Based Communication** - Send high-level commands, not pixel data
-2. **State-Driven Rendering** - Animation state in worker, rendering on main thread
-3. **Frame-Based Animation** - Use requestAnimationFrame for smooth 30 FPS rendering
-4. **Canvas Rendering** - Pixel-perfect tile-based sprite rendering
+1. **SharedArrayBuffer for state sync** - Single shared display buffer (sprites 0–192 bytes, screen cells, cursor, sequence, scalars); worker writes after each screen/background change; main reads on render. See [Shared Screen Buffer Implementation Plan](shared-screen-buffer-implementation-plan.md).
+2. **Command-Based Communication** - Send high-level commands (ANIMATION_COMMAND, SCREEN_CHANGED), not pixel or full-screen payloads
+3. **State-Driven Rendering** - Animation state in worker; main decodes shared buffer when sequence changes and renders
+4. **Frame-Based Animation** - Use requestAnimationFrame for smooth 30 FPS rendering
+5. **Canvas Rendering** - Pixel-perfect tile-based sprite rendering
 
 ## Data Structures
 
@@ -311,9 +315,10 @@ enum MoveCharacterCode {
 - ✅ `src/features/ide/IdePage.vue` - Pass sprite states from composable
 
 **Test Files**:
-- ⏳ `test/executors/DefSpriteExecutor.test.ts` - Pending
-- ⏳ `test/executors/SpriteExecutor.test.ts` - Pending
-- ⏳ `test/integration/StaticSpriteRendering.test.ts` - Pending
+- ✅ `test/executors/DefSpriteExecutor.test.ts` - Layer 1 unit tests (see `docs/planning/sprite-testing-strategy.md`)
+- ✅ `test/executors/SpriteExecutor.test.ts` - Layer 1 unit tests
+- ✅ `test/executors/SpriteOnOffExecutor.test.ts` - Layer 1 unit tests
+- ⏳ `test/integration/StaticSpriteRendering.test.ts` - Pending (Layer 2 visual/E2E). Layer 2 worker+mock: see sprite-testing-strategy.md.
 
 **Acceptance Criteria**: ✅ All Met
 - [x] DEF SPRITE command defines sprites correctly
@@ -449,10 +454,10 @@ enum MoveCharacterCode {
 - ✅ `src/shared/i18n/locales/{en,zh-CN,zh-TW,ja}/ide.json` - Added moveTest translations
 
 **Test Files**:
-- ⏳ `test/executors/DefMoveExecutor.test.ts` - Pending
-- ⏳ `test/executors/MoveExecutor.test.ts` - Pending
+- ✅ `test/executors/DefMoveExecutor.test.ts` - Layer 1 unit tests (see `docs/planning/sprite-testing-strategy.md`)
+- ✅ `test/executors/MoveExecutor.test.ts` - Layer 1 unit tests
 - ⏳ `test/animation/AnimationManager.test.ts` - Pending
-- ⏳ `test/integration/BasicMovement.test.ts` - Pending
+- ✅ `test/integration/sprite-movement-lifecycle.test.ts`, `sprite-position-sync.test.ts` - Layer 2 integration tests (see sprite-testing-strategy.md)
 
 **Acceptance Criteria**: ✅ All Met
 - [x] DEF MOVE defines movement parameters correctly
@@ -640,13 +645,11 @@ enum MoveCharacterCode {
 - ✅ `src/core/animation/AnimationManager.ts` - Methods already implemented (stopMovement, eraseMovement, setPosition, getMovementStatus, getSpritePosition)
 
 **Test Files**:
-- ⏳ `test/executors/CutExecutor.test.ts` - Pending
-- ⏳ `test/executors/EraExecutor.test.ts` - Pending
-- ⏳ `test/executors/PositionExecutor.test.ts` - Pending
-- ⏳ `test/functions/MoveFunction.test.ts` - Pending
-- ⏳ `test/functions/XposFunction.test.ts` - Pending
-- ⏳ `test/functions/YposFunction.test.ts` - Pending
-- ⏳ `test/integration/MovementControl.test.ts` - Pending
+- ✅ `test/executors/CutExecutor.test.ts` - Layer 1 unit tests (see `docs/planning/sprite-testing-strategy.md`)
+- ✅ `test/executors/EraExecutor.test.ts` - Layer 1 unit tests
+- ✅ `test/executors/PositionExecutor.test.ts` - Layer 1 unit tests
+- ✅ `test/evaluation/SpriteFunctions.test.ts` - MOVE(n), XPOS(n), YPOS(n) tests
+- ✅ `test/integration/sprite-movement-lifecycle.test.ts`, `sprite-position-sync.test.ts` - Layer 2 integration tests (CUT/ERA/POSITION/MOVE lifecycle; see sprite-testing-strategy.md)
 
 **Acceptance Criteria**: ✅ All Met
 - [x] CUT stops movement, sprite stays visible
@@ -669,51 +672,45 @@ enum MoveCharacterCode {
 **Tasks**:
 
 #### 6.1 Performance Optimization
-- [ ] Implement tile caching
-  - Cache key: `${spriteDef}-${colorComb}-${invertX}-${invertY}`
-  - Reuse cached ImageData objects
-- [ ] Implement dirty region tracking
-  - Track sprite movement areas
-  - Only re-render changed regions
-  - Full redraw only when necessary
-- [ ] Optimize frame rate
+- [x] ~~Implement tile caching~~ **Done** (Konva composables)
+  - `useKonvaSpriteRenderer.ts`: spriteImageCache, frameImageCache, staticSpriteImageCache
+  - `useKonvaBackgroundRenderer.ts`: backgroundTileImageCache
+  - Cache keys include tiles/color/inversion; no `spriteCanvasRenderer.ts` (rendering uses Konva)
+- [ ] Implement dirty region tracking — **see [Phase 6.1 Performance Plan](phase-6-1-performance-plan.md)** (PRINT vs moving sprites)
+  - **Background**: Only re-render changed buffer cells (dirty set); full redraw only when necessary
+  - **Prioritization**: Run animation step before static render in same frame when movements active
+  - **Buffer-only**: Don’t rebuild sprite layers when only screenBuffer changed (PRINT)
+  - Optional: incremental dirty update, requestIdleCallback for full redraw when no movements
+- [ ] Optimize frame rate (optional)
   - Cap at 30 FPS if needed
   - Consider frame skipping on slow devices
 
 #### 6.2 State Synchronization
-- [ ] Web worker → main thread state sync
-  - Batch sprite state updates
-  - Send only changed states
-  - Minimize message passing overhead
-- [ ] Main thread → web worker queries
-  - Implement request-response pattern
+- [x] ~~Web worker → main thread state sync~~ **Done** — [SharedArrayBuffer strategy](shared-screen-buffer-implementation-plan.md)
+  - **Screen + cursor + scalars**: Single shared display buffer; worker writes after every screen/background change, increments sequence, sends lightweight `SCREEN_CHANGED` (no payload). Main reads from shared buffer on render, decodes to `ScreenCell[][]` and refs.
+  - **Sprite positions**: First 192 bytes of same buffer (Float64Array × 24 for 8 sprites × x, y, isActive). Worker writes via `writeSpriteState`; main reads in animation loop. No SCREEN_UPDATE payloads when shared buffer is used.
+- [ ] Main thread → web worker queries (optional)
+  - Implement request-response pattern if needed
   - Use Promise-based status queries
   - Handle timeouts
 
 #### 6.3 Error Handling
-- [ ] Add comprehensive error handling
-  - Validate all sprite parameters
-  - Handle out-of-bounds positions
-  - Handle invalid character types
-  - Graceful degradation on errors
-- [ ] Add error messages to executors
+- [x] ~~Validate sprite parameters; out-of-bounds; executor error messages~~ **Partial**
+  - Executors (e.g. SpriteExecutor, DefSpriteExecutor) validate and addError with clear messages
+  - AnimationManager throws with clear messages for invalid DEF MOVE / MOVE
+  - Audit remaining executors and graceful degradation still eligible
+- [ ] Add error messages to executors (audit for consistency)
   - Clear error context
   - User-friendly messages
 
 #### 6.4 Testing
-- [ ] Add comprehensive unit tests
-  - All executors (100% coverage goal)
-  - AnimationManager logic
-  - Rendering functions
-- [ ] Add integration tests
-  - Full movement workflows
-  - Multiple sprites interaction
-  - State synchronization
-- [ ] Add visual regression tests
-  - Sprite rendering accuracy
-  - Animation smoothness
-  - Frame timing correctness
-- [ ] Manual testing
+- [x] ~~All executors unit tests~~ **Done** (see `sprite-testing-strategy.md` Layer 1)
+  - DefSpriteExecutor, SpriteExecutor, SpriteOnOffExecutor, DefMoveExecutor, MoveExecutor, CutExecutor, EraExecutor, PositionExecutor + SpriteFunctions (MOVE, XPOS, YPOS)
+- [x] ~~Integration tests (movement workflows, state sync)~~ **Done** (Layer 2: sprite-movement-lifecycle, sprite-position-sync)
+- [ ] Add AnimationManager / CharacterAnimationBuilder / frame logic unit tests
+  - No `test/animation/` folder yet (AnimationManager.test.ts, etc.)
+- [x] Visual regression tests (optional; doc says out of scope in sprite-testing-strategy)
+- [x] Manual testing
   - Test all 16 character types
   - Test all 8 directions
   - Test simultaneous movements
@@ -726,16 +723,16 @@ enum MoveCharacterCode {
 - [ ] Update architecture diagrams
 
 **Files to Modify**:
-- All sprite/animation files (add error handling)
-- `src/features/ide/composables/spriteCanvasRenderer.ts` (caching)
-- `src/core/animation/AnimationManager.ts` (batching)
+- All sprite/animation files (error-handling audit)
+- `src/features/ide/composables/useKonvaSpriteRenderer.ts` (caching already present; dirty regions if added)
+- `src/core/animation/AnimationManager.ts` (batching if added)
 
 **Test Files**:
-- Complete test suite for all sprite functionality
+- Add `test/animation/` (AnimationManager, CharacterAnimationBuilder, frame logic) as needed
 
 **Acceptance Criteria**:
 - All tests passing (>90% coverage)
-- Smooth 30 FPS animation
+- Smooth 30 FPS animation (or current rAF behavior acceptable)
 - No memory leaks
 - Error handling comprehensive
 - Documentation complete
@@ -745,24 +742,51 @@ enum MoveCharacterCode {
 
 ---
 
+#### Phase 6 Review (2026-01-28)
+
+**Already done (not previously marked in Phase 6)**:
+- **Tile/sprite caching**: Implemented in Konva composables (sprite + frame + static + background tile caches).
+- **Executor + SpriteFunctions tests**: Layer 1 complete (76 tests in 9 files per sprite-testing-strategy).
+- **Integration tests**: Layer 2 complete (sprite-movement-lifecycle, sprite-position-sync).
+- **Error handling**: Executors validate parameters and report clear errors; AnimationManager throws with clear messages.
+
+**Out-of-date in this document**:
+- **File Structure** (below): Lists `spriteCanvasRenderer.ts`, `canvasRenderer.ts`, `useScreenCanvasRenderer.ts`; actual rendering uses `useKonvaSpriteRenderer.ts`, `useKonvaScreenRenderer.ts`, `useKonvaBackgroundRenderer.ts`, `useScreenAnimationLoop.ts`. Test layout lists `test/animation/` (missing) and integration names StaticSpriteRendering, BasicMovement, AnimatedMovement, MovementControl (actual: sprite-movement-lifecycle, sprite-position-sync).
+- **Success Criteria**: "Basic animation frame cycling works (Phase 4)" and "All commands implemented (CUT, ERA, POSITION, …)" still unchecked; Phases 4 and 5 are complete.
+- **Testing Strategy** checkboxes: Several items are covered by Layer 1/2 but still show [ ].
+
+**Eligible next steps (in order of impact)**:
+1. **6.4** – Add `test/animation/` unit tests for AnimationManager, CharacterAnimationBuilder, and frame logic.
+2. **6.1** – Dirty region tracking (re-render only changed regions) if performance demands it.
+3. **6.2** – ~~Batch worker→main state updates~~ **Done** via SharedArrayBuffer (see [shared-screen-buffer-implementation-plan.md](shared-screen-buffer-implementation-plan.md)). Remaining: optional main→worker request-response / Promise-based queries if needed.
+4. **6.3** – Audit all sprite/executor code for consistent error messages and graceful degradation.
+5. **6.5** – JSDoc, sprite user guide, code examples, and architecture diagram updates.
+6. **Doc hygiene** – Update File Structure, Success Criteria, and Testing Strategy to match current codebase and sprite-testing-strategy.md.
+
+---
+
 ## File Structure
+
+**Current layout (Konva-based rendering; see Phase 6 review for test layout):**
 
 ```
 src/
 ├── core/
 │   ├── animation/
-│   │   ├── AnimationManager.ts          # Main animation manager
-│   │   ├── CharacterAnimationBuilder.ts # Build animation configs (config-based approach)
-│   │   ├── characterSequenceConfig.ts  # Explicit character sequence configuration
-│   │   └── types.ts                     # Animation type definitions
+│   │   ├── AnimationManager.ts           # Main animation manager
+│   │   ├── CharacterAnimationBuilder.ts  # Build animation configs (config-based approach)
+│   │   ├── characterSequenceConfig.ts    # Explicit character sequence configuration
+│   │   ├── sharedAnimationBuffer.ts      # Sprite position sync (Float64Array × 24, first 192 bytes)
+│   │   ├── sharedDisplayBuffer.ts        # Full display sync (sprites + screen cells + cursor + sequence + scalars)
+│   │   └── types.ts                      # Animation type definitions
 │   ├── sprite/
 │   │   ├── types.ts                      # ✅ Sprite type definitions
 │   │   ├── SpriteStateManager.ts         # ✅ Sprite state management
-│   │   └── characterSetConverter.ts     # ✅ Character set conversion (Table A)
+│   │   └── characterSetConverter.ts      # ✅ Character set conversion (Table A)
 │   └── execution/executors/
 │       ├── DefSpriteExecutor.ts          # ✅ DEF SPRITE command (with CHR$ parsing)
-│       ├── SpriteExecutor.ts              # ✅ SPRITE command
-│       ├── SpriteOnOffExecutor.ts         # ✅ SPRITE ON/OFF command
+│       ├── SpriteExecutor.ts             # ✅ SPRITE command
+│       ├── SpriteOnOffExecutor.ts        # ✅ SPRITE ON/OFF command
 │       ├── DefMoveExecutor.ts            # DEF MOVE command (Phase 3)
 │       ├── MoveExecutor.ts               # MOVE command (Phase 3)
 │       ├── CutExecutor.ts                # CUT command (Phase 5)
@@ -770,34 +794,26 @@ src/
 │       └── PositionExecutor.ts           # POSITION command (Phase 5)
 ├── shared/
 │   └── utils/
-│       └── spriteLookup.ts                # ✅ Sprite lookup from Table A
+│       └── spriteLookup.ts               # ✅ Sprite lookup from Table A
 ├── features/ide/composables/
-│   ├── spriteCanvasRenderer.ts            # ✅ Sprite rendering with transparency
-│   ├── canvasRenderer.ts                  # ✅ Multi-layer rendering with alpha
-│   ├── useBasicIdeEnhanced.ts             # ✅ Sprite state management
-│   └── useScreenCanvasRenderer.ts         # Animation loop (Phase 3)
+│   ├── useKonvaSpriteRenderer.ts        # ✅ Sprite rendering + tile/sprite caches
+│   ├── useKonvaScreenRenderer.ts        # ✅ Multi-layer rendering (Konva)
+│   ├── useKonvaBackgroundRenderer.ts    # ✅ Background tile cache
+│   ├── useScreenAnimationLoop.ts       # ✅ Animation loop (Phase 3)
+│   ├── useBasicIdeEnhanced.ts           # ✅ Sprite state management
+│   └── useMovementStateSync.ts           # Movement state sync
 └── features/ide/components/
-    ├── Screen.vue                          # ✅ Updated with sprite support
-    └── RuntimeOutput.vue                   # ✅ Passes sprite props to Screen
+    ├── Screen.vue                        # ✅ Updated with sprite support
+    └── RuntimeOutput.vue                 # ✅ Passes sprite props to Screen
 
 test/
-├── animation/
-│   ├── AnimationManager.test.ts
-│   ├── CharacterAnimationBuilder.test.ts
-│   └── FrameAnimation.test.ts
-├── executors/
-│   ├── DefSpriteExecutor.test.ts
-│   ├── SpriteExecutor.test.ts
-│   ├── DefMoveExecutor.test.ts
-│   ├── MoveExecutor.test.ts
-│   ├── CutExecutor.test.ts
-│   ├── EraExecutor.test.ts
-│   └── PositionExecutor.test.ts
-└── integration/
-    ├── StaticSpriteRendering.test.ts
-    ├── BasicMovement.test.ts
-    ├── AnimatedMovement.test.ts
-    └── MovementControl.test.ts
+├── executors/                            # ✅ Layer 1 (DefSprite, Sprite, SpriteOnOff, DefMove, Move, Cut, Era, Position)
+├── evaluation/
+│   └── SpriteFunctions.test.ts           # ✅ MOVE(n), XPOS(n), YPOS(n)
+├── integration/
+│   ├── sprite-movement-lifecycle.test.ts # ✅ Layer 2
+│   └── sprite-position-sync.test.ts      # ✅ Layer 2
+└── animation/                            # ⏳ Phase 6: not yet (AnimationManager, CharacterAnimationBuilder)
 ```
 
 ## Key Technical Specifications
@@ -830,32 +846,34 @@ test/
 
 ## Testing Strategy
 
+See **`docs/planning/sprite-testing-strategy.md`** for Layer 1/2 status and run commands.
+
 ### Unit Tests
-- [x] Canvas renderer functions
-- [ ] Sprite state management
-- [ ] Movement calculations
-- [ ] Frame animation logic
-- [ ] Direction mapping
-- [ ] Tile rendering with inversion
+- [x] Canvas/Konva renderer functions (caching in useKonvaSpriteRenderer, useKonvaBackgroundRenderer)
+- [x] Sprite state management (covered by executor + SpriteFunctions tests)
+- [x] Movement calculations (MoveExecutor, DefMoveExecutor, integration)
+- [ ] Frame animation logic (AnimationManager, CharacterAnimationBuilder — no test/animation/ yet)
+- [x] Direction mapping (executor + integration)
+- [x] Tile rendering with inversion (DefSpriteExecutor, SpriteExecutor tests)
 
 ### Integration Tests
-- [ ] DEF SPRITE + SPRITE workflow
-- [ ] DEF MOVE + MOVE workflow
-- [ ] Multiple simultaneous movements
-- [ ] Movement with frame animation
-- [ ] Control commands (CUT, ERA, POSITION)
-- [ ] Status queries (MOVE, XPOS, YPOS)
+- [x] DEF SPRITE + SPRITE workflow (Layer 1 executor tests)
+- [x] DEF MOVE + MOVE workflow (Layer 1 + Layer 2 sprite-movement-lifecycle, sprite-position-sync)
+- [x] Multiple simultaneous movements (integration)
+- [x] Movement with frame animation (integration)
+- [x] Control commands (CUT, ERA, POSITION) (executor tests + integration)
+- [x] Status queries (MOVE, XPOS, YPOS) (SpriteFunctions.test.ts)
 
 ### Visual Tests
-- [ ] Static sprite rendering accuracy
-- [ ] Animated sprite smoothness
-- [ ] Frame cycling correctness
-- [ ] Layering (front/back priority)
-- [ ] Inversion (horizontal/vertical)
-- [ ] All 16 character types
+- [ ] Static sprite rendering accuracy (manual / out of scope for automated)
+- [ ] Animated sprite smoothness (manual)
+- [ ] Frame cycling correctness (manual)
+- [ ] Layering (front/back priority) (manual)
+- [ ] Inversion (horizontal/vertical) (manual)
+- [ ] All 16 character types (manual)
 
 ### Performance Tests
-- [ ] Frame rate consistency (30 FPS)
+- [ ] Frame rate consistency (30 FPS or rAF)
 - [ ] Memory usage (no leaks)
 - [ ] CPU usage (acceptable overhead)
 - [ ] Multiple sprites (8 simultaneous)
@@ -913,15 +931,15 @@ test/
 - [x] DEF MOVE defines movement parameters ✅
 - [x] MOVE executes sprite movement ✅
 - [x] Sprites move in correct directions at correct speeds ✅
-- [ ] Basic animation frame cycling works (Phase 4)
+- [x] Basic animation frame cycling works (Phase 4) ✅
 
 ### Complete Implementation
-- [ ] All commands implemented (CUT, ERA, POSITION, MOVE, XPOS, YPOS)
-- [ ] All 16 character types with animation sequences
-- [ ] Smooth 30 FPS animation
-- [ ] Proper frame cycling for all characters
-- [ ] Automatic direction-based inversion
-- [ ] Comprehensive test coverage (>90%)
+- [x] All commands implemented (CUT, ERA, POSITION, MOVE, XPOS, YPOS) ✅
+- [x] All 16 character types with animation sequences ✅
+- [ ] Smooth 30 FPS animation (or rAF acceptable)
+- [x] Proper frame cycling for all characters ✅
+- [x] Automatic direction-based inversion ✅
+- [ ] Comprehensive test coverage (>90%) — Layer 1+2 done; animation unit tests pending
 - [ ] No performance issues with 8 simultaneous sprites
 - [ ] Complete documentation
 
@@ -1099,10 +1117,15 @@ test/
 
 **Phase 6 - Integration & Optimization**:
 1. Performance optimization (tile caching, dirty region tracking)
-2. State synchronization improvements
+2. ~~State synchronization improvements~~ **Done** — SharedArrayBuffer (see below)
 3. Comprehensive error handling
 4. Complete test suite (>90% coverage)
 5. Documentation updates
+
+### Recent Updates (2026-01-29)
+
+**SharedArrayBuffer strategy**:
+- Screen and sprite state sync now use a **single SharedArrayBuffer** (shared display buffer). Layout: sprites 0–192 bytes (Float64Array × 24), cell chars, patterns, cursor, sequence, scalars. Worker writes after every screen/background change and increments sequence; sends lightweight `SCREEN_CHANGED` (no payload). Main reads from shared buffer on render, decodes to `ScreenCell[][]` and refs. Sprite positions are read by main in the animation loop from the same buffer. See [Shared Screen Buffer Implementation Plan](shared-screen-buffer-implementation-plan.md). Modules: `sharedAnimationBuffer.ts` (sprite helpers), `sharedDisplayBuffer.ts` (full layout, encode/decode, sequence).
 
 ### Recent Updates (2026-01-25)
 
@@ -1189,4 +1212,6 @@ test/
 
 **Status**: All code respects file size limits and follows Vue 3 best practices.
 
-**Last Updated**: 2026-01-26 (Phase 5 complete, code quality improvements)
+**Related plans**: [Shared Screen Buffer Implementation Plan](shared-screen-buffer-implementation-plan.md) — worker–main sync via SharedArrayBuffer (screen + sprites).
+
+**Last Updated**: 2026-01-29 (SharedArrayBuffer strategy; Phase 6.2 state sync done)

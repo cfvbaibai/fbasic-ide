@@ -47,10 +47,13 @@ export class MoveExecutor {
       // Validate range
       if (!this.validateRange(actionNumber, 0, 7, 'action number', lineNumber)) return
 
-      // Start movement via animation manager
+      // Start movement via animation manager; use device position if available (e.g. after CUT)
       if (this.context.animationManager) {
         try {
-          this.context.animationManager.startMovement(actionNumber)
+          const position = this.context.deviceAdapter?.getSpritePosition(actionNumber)
+          const startX = position?.x
+          const startY = position?.y
+          this.context.animationManager.startMovement(actionNumber, startX, startY)
         } catch (error) {
           this.context.addError({
             line: lineNumber ?? 0,

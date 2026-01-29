@@ -6,6 +6,7 @@
 import type Konva from 'konva'
 import { computed, type Ref, watch } from 'vue'
 
+import { MAX_SPRITES, writeSpriteState } from '@/core/animation/sharedAnimationBuffer'
 import type { MovementState } from '@/core/sprite/types'
 
 import type { KonvaScreenLayers } from './useKonvaScreenRenderer'
@@ -14,15 +15,20 @@ import { updateAnimatedSprites } from './useKonvaScreenRenderer'
 /**
  * Update movement positions and frame indices
  * Positions are read from and written to Konva nodes (single source of truth)
+ * Returns action numbers that completed this frame (remainingDistance <= 0)
  */
 function updateMovements(
   movements: MovementState[],
   deltaTime: number,
   frontSpriteNodes: Map<number, Konva.Image>,
   backSpriteNodes: Map<number, Konva.Image>
-): void {
+): number[] {
+  const completed: number[] = []
   for (const movement of movements) {
     if (!movement.isActive || movement.remainingDistance <= 0) {
+      if (movement.remainingDistance <= 0 && movement.isActive) {
+        completed.push(movement.actionNumber)
+      }
       movement.isActive = false
       continue
     }
@@ -73,9 +79,11 @@ function updateMovements(
 
     // Check if movement is complete
     if (movement.remainingDistance <= 0) {
+      completed.push(movement.actionNumber)
       movement.isActive = false
     }
   }
+  return completed
 }
 
 export interface UseScreenAnimationLoopOptions {
@@ -84,7 +92,13 @@ export interface UseScreenAnimationLoopOptions {
   frontSpriteNodes: Ref<Map<number, Konva.Image> | Map<number, unknown>>
   backSpriteNodes: Ref<Map<number, Konva.Image> | Map<number, unknown>>
   spritePalette: Ref<number> | number
-  onPositionSync?: (positions: Array<{ actionNumber: number; x: number; y: number }>) => void
+  /** Shared animation state view; main writes positions + isActive each frame (XPOS/YPOS, MOVE(n)). */
+  sharedAnimationView?: Float64Array
+  /** When movements are active: run pending static render at end of frame (animation first, then render) */
+  getPendingStaticRender?: () => boolean
+  onRunPendingStaticRender?: () => Promise<void>
+  /** When animation loop stops (no active movements), call so caller can flush pending static render */
+  onAnimationStopped?: () => void
 }
 
 /**
@@ -102,7 +116,10 @@ export function useScreenAnimationLoop(
     frontSpriteNodes,
     backSpriteNodes,
     spritePalette,
-    onPositionSync,
+    sharedAnimationView,
+    getPendingStaticRender,
+    onRunPendingStaticRender,
+    onAnimationStopped,
   } = options
 
   let animationFrameId: number | null = null
@@ -137,7 +154,6 @@ export function useScreenAnimationLoop(
     )
 
     // Update animated sprite Konva nodes (positions and frames)
-    // This only updates the MOVE sprites, not static sprites
     await updateAnimatedSprites(
       layers.value.spriteFrontLayer as Konva.Layer | null,
       layers.value.spriteBackLayer as Konva.Layer | null,
@@ -147,51 +163,36 @@ export function useScreenAnimationLoop(
       backSpriteNodes.value as Map<number, Konva.Image>
     )
 
-    // Sync positions to worker for XPOS/YPOS queries (every frame)
-    // Sync positions for ALL sprite nodes that exist, not just active movements
-    // This ensures XPOS/YPOS works for stopped movements (CUT) and movements that haven't started yet
-    if (onPositionSync) {
-      const positions: Array<{ actionNumber: number; x: number; y: number }> = []
-      const syncedActionNumbers = new Set<number>()
-      
-      // First, sync positions for movements in localMovementStates (active and stopped)
-      for (const movement of localMovementStates.value) {
-        // Get position from Konva node (single source of truth)
-        const spriteNode =
-          movement.definition.priority === 0
-            ? (frontSpriteNodes.value as Map<number, Konva.Image>).get(movement.actionNumber)
-            : (backSpriteNodes.value as Map<number, Konva.Image>).get(movement.actionNumber)
+    // Write positions + isActive to shared buffer for worker (XPOS/YPOS, MOVE(n))
+    if (sharedAnimationView) {
+      const frontNodes = frontSpriteNodes.value as Map<number, Konva.Image>
+      const backNodes = backSpriteNodes.value as Map<number, Konva.Image>
+      const movementByAction = new Map(localMovementStates.value.map(m => [m.actionNumber, m]))
 
-        if (spriteNode) {
-          const x = spriteNode.x()
-          const y = spriteNode.y()
-          positions.push({ actionNumber: movement.actionNumber, x, y })
-          syncedActionNumbers.add(movement.actionNumber)
+      for (let actionNumber = 0; actionNumber < MAX_SPRITES; actionNumber++) {
+        const movement = movementByAction.get(actionNumber)
+        const spriteNode =
+          movement?.definition.priority === 0
+            ? frontNodes.get(actionNumber)
+            : backNodes.get(actionNumber)
+        const node = spriteNode ?? frontNodes.get(actionNumber) ?? backNodes.get(actionNumber)
+        if (node) {
+          const x = node.x()
+          const y = node.y()
+          const isActive = movement?.isActive ?? false
+          writeSpriteState(sharedAnimationView, actionNumber, x, y, isActive)
+        } else {
+          writeSpriteState(sharedAnimationView, actionNumber, 0, 0, false)
         }
       }
-      
-      // Also sync positions for any other sprite nodes that exist (e.g., from POSITION command before MOVE)
-      // Check both front and back sprite nodes
-      for (const [actionNumber, spriteNode] of (frontSpriteNodes.value as Map<number, Konva.Image>).entries()) {
-        if (!syncedActionNumbers.has(actionNumber) && spriteNode) {
-          const x = spriteNode.x()
-          const y = spriteNode.y()
-          positions.push({ actionNumber, x, y })
-          syncedActionNumbers.add(actionNumber)
-        }
-      }
-      
-      for (const [actionNumber, spriteNode] of (backSpriteNodes.value as Map<number, Konva.Image>).entries()) {
-        if (!syncedActionNumbers.has(actionNumber) && spriteNode) {
-          const x = spriteNode.x()
-          const y = spriteNode.y()
-          positions.push({ actionNumber, x, y })
-        }
-      }
-      
-      if (positions.length > 0) {
-        onPositionSync(positions)
-      }
+    }
+
+    // Prioritize animation: run pending static render at end of frame (so animation step ran first)
+    if (
+      getPendingStaticRender?.() &&
+      onRunPendingStaticRender
+    ) {
+      await onRunPendingStaticRender()
     }
 
     // Continue animation loop
@@ -228,12 +229,12 @@ export function useScreenAnimationLoop(
     if (active && isPaused) {
       startLoop()
     } else if (!active && !isPaused) {
-      // Stop the loop when no active movements
       if (animationFrameId !== null) {
         cancelAnimationFrame(animationFrameId)
         animationFrameId = null
       }
       isPaused = true
+      onAnimationStopped?.()
     }
   })
 

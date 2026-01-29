@@ -362,6 +362,8 @@ This document outlines the remaining work needed to complete the Family Basic ID
 #### 6.1 Test Coverage
 - [ ] Review test coverage for all executors
 - [x] Add missing tests for new executors (LOCATE, COLOR executor tests added)
+- [x] Layer 1 sprite/move unit tests (DefSprite, Sprite, SpriteOnOff, DefMove, Move, Cut, Era, Position executors + MOVE/XPOS/YPOS; see `docs/planning/sprite-testing-strategy.md`)
+- [x] Layer 2 sprite integration tests (worker + mock frontend: sprite-movement-lifecycle, sprite-position-sync; see `docs/planning/sprite-testing-strategy.md`)
 - [x] Add integration tests for screen commands (LOCATE, COLOR integration tests added)
 - [ ] Add integration tests for input commands
 - [x] Test error handling for all commands (LOCATE, COLOR error handling tested)
@@ -648,8 +650,6 @@ This document outlines the remaining work needed to complete the Family Basic ID
 - ✅ **Type Safety**: All tests use proper TypeScript types, no `any` types
 
 **Status**: CGSET command fully implemented and tested. Palette changes now correctly affect character rendering. Characters printed after `CGSET 0, 1` are rendered with color 0x2C (#4EB7BC) from palette 0 instead of white.
-
-### COLOR Command Implementation (2026-01-23)
 
 ### COLOR Command Implementation (2026-01-23)
 - ✅ **Parser**: Added `COLOR` token and `colorStatement` rule (COLOR X, Y, n)

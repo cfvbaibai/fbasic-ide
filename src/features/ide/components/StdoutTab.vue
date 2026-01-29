@@ -14,7 +14,13 @@ defineOptions({
 const props = defineProps<{
   output: string[]
   isRunning: boolean
-  errors?: { line: number; message: string; type: string }[]
+  errors?: Array<{
+    line: number
+    message: string
+    type: string
+    stack?: string
+    sourceLine?: string
+  }>
 }>()
 
 const { t } = useI18n()
@@ -64,13 +70,23 @@ watch(() => props.output.length, scrollToBottom)
             </div>
           </div>
           <div v-if="errors && errors.length > 0" class="error-output">
-            <div v-for="(error, index) in errors" :key="index" class="error-line">
-              <GameIcon icon="mdi:alert" size="small" />
-              <span class="error-type">{{ error.type }}:</span>
-              <span class="error-message">{{ error.message }}</span>
-              <span v-if="error.line > 0" class="error-line-number"
-                >({{ t('ide.output.errorLine', { line: error.line }) }})</span
-              >
+            <div v-for="(error, index) in errors" :key="index" class="error-block">
+              <div class="error-line">
+                <GameIcon icon="mdi:alert" size="small" />
+                <span class="error-type">{{ error.type }}:</span>
+                <span class="error-message">{{ error.message }}</span>
+                <span v-if="error.line > 0" class="error-line-number"
+                  >({{ t('ide.output.errorLine', { line: error.line }) }})</span
+                >
+              </div>
+              <div v-if="error.sourceLine" class="error-source-line">
+                <span class="error-source-label">At:</span>
+                <code>{{ error.sourceLine }}</code>
+              </div>
+              <details v-if="error.stack" class="error-stack-details">
+                <summary>Stack trace</summary>
+                <pre class="error-stack">{{ error.stack }}</pre>
+              </details>
             </div>
           </div>
         </div>
@@ -155,5 +171,54 @@ watch(() => props.output.length, scrollToBottom)
   opacity: 0.8;
   font-size: 0.8rem;
   font-style: italic;
+}
+
+.error-block {
+  margin-bottom: 0.75rem;
+}
+
+.error-source-line {
+  margin-top: 0.25rem;
+  margin-left: 1.5rem;
+  font-size: 0.85rem;
+  color: var(--game-screen-text-color);
+}
+
+.error-source-label {
+  margin-right: 0.25rem;
+  font-style: italic;
+  opacity: 0.9;
+}
+
+.error-source-line code {
+  background: var(--game-surface-bg-start);
+  padding: 0.1rem 0.25rem;
+  border-radius: 2px;
+  font-family: var(--game-font-family-mono);
+}
+
+.error-stack-details {
+  margin-top: 0.25rem;
+  margin-left: 1.5rem;
+  font-size: 0.75rem;
+  color: var(--game-screen-text-color);
+  opacity: 0.9;
+}
+
+.error-stack-details summary {
+  cursor: pointer;
+  user-select: none;
+}
+
+.error-stack {
+  margin: 0.25rem 0 0;
+  padding: 0.5rem;
+  overflow: auto;
+  background: var(--game-surface-bg-start);
+  border-radius: 2px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  font-size: 0.7rem;
+  max-height: 12rem;
 }
 </style>

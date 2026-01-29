@@ -9,6 +9,9 @@
  * - See docs/guides/skin-system.md for skin system documentation
  */
 
+/* Y2K Futuristic Fonts - Google Fonts Import */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Exo+2:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
 :root {
     /* Game UI Base Colors (Gray Scale) */
     --base-solid-gray-00: #000000;
@@ -161,9 +164,6 @@
 
 
 /* Multi-language Font Support */
-
-/* Y2K Futuristic Fonts - Google Fonts Import */
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Exo+2:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
 
 /* FZRuiZhengHei (方正锐正黑) Font Face Declaration */
 

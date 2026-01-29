@@ -17,6 +17,7 @@ import { ERROR_TYPES, EXECUTION_LIMITS } from './constants'
 import { ExecutionContext, ExecutionEngine } from './execution'
 import { expandStatements } from './execution/statement-expander'
 import type { BasicVariable, ExecutionResult, InterpreterConfig } from './interfaces'
+import { getSourceTextFromCst } from './parser/cst-helpers'
 import { FBasicParser } from './parser/FBasicParser'
 import { SpriteStateManager } from './sprite/SpriteStateManager'
 
@@ -68,6 +69,7 @@ export class BasicInterpreter {
       // Parse the code
       const parseResult = await this.parser.parse(code)
       if (!parseResult.success) {
+        console.error('[BasicInterpreter] Parse failed:', parseResult.errors)
         return {
           success: false,
           errors:
@@ -90,8 +92,8 @@ export class BasicInterpreter {
         }
         // Initialize sprite state manager
         this.context.spriteStateManager = new SpriteStateManager()
-        // Initialize animation manager
-        this.context.animationManager = new AnimationManager()
+        // Initialize animation manager (worker passes shared buffer for isActive / MOVE(n))
+        this.context.animationManager = new AnimationManager(this.config.sharedAnimationBuffer)
         // Set device adapter in animation manager for command sending
         if (this.config.deviceAdapter) {
           this.context.animationManager.setDeviceAdapter(this.config.deviceAdapter)
@@ -131,13 +133,19 @@ export class BasicInterpreter {
 
       return result
     } catch (error) {
+      console.error('[BasicInterpreter] Execution error:', error)
+      const location = this.getExecutionLocation()
+      const errMsg = error instanceof Error ? error.message : String(error)
+      const stackStr = error instanceof Error ? error.stack : undefined
       return {
         success: false,
         errors: [
           {
-            line: 0,
-            message: `Execution error: ${error}`,
+            line: location?.lineNumber ?? 0,
+            message: errMsg,
             type: ERROR_TYPES.RUNTIME,
+            ...(typeof stackStr === 'string' && stackStr.length > 0 && { stack: stackStr }),
+            ...(location?.sourceLine && { sourceLine: location.sourceLine }),
           },
         ],
         variables: new Map(),
@@ -226,5 +234,27 @@ export class BasicInterpreter {
    */
   getAnimationManager() {
     return this.context?.animationManager ?? null
+  }
+
+  /**
+   * Get current execution location for error reporting (BASIC line number and source text).
+   * Returns null if context or current statement is not available.
+   */
+  getExecutionLocation(): { lineNumber: number; statementIndex: number; sourceLine?: string } | null {
+    if (!this.context) return null
+    const lineNumber = this.context.getCurrentLineNumber()
+    const statement = this.context.getCurrentStatement()
+    if (!statement) return { lineNumber, statementIndex: this.context.currentStatementIndex }
+    let sourceLine: string | undefined
+    try {
+      sourceLine = getSourceTextFromCst(statement.command)
+    } catch {
+      sourceLine = undefined
+    }
+    return {
+      lineNumber,
+      statementIndex: statement.statementIndex,
+      sourceLine: sourceLine ?? undefined,
+    }
   }
 }

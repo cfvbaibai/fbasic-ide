@@ -159,6 +159,9 @@ export const SCREEN_DIMENSIONS = {
     MAX_Y: 239, // Maximum Y coordinate (0-239, 240 dots)
     WIDTH: 256, // Total width in dots
     HEIGHT: 240, // Total height in dots
+    /** Default position when POSITION not set: center of screen (256×240) */
+    DEFAULT_X: 128,
+    DEFAULT_Y: 120,
   },
 } as const
 

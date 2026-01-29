@@ -14,6 +14,8 @@ const COLS = 28 // Background screen: 28 columns
 const ROWS = 24 // Background screen: 24 rows
 const BG_OFFSET_X = 2 * CELL_SIZE // 16 pixels (2 columns offset)
 const BG_OFFSET_Y = 3 * CELL_SIZE // 24 pixels (3 rows offset)
+/** If dirty cell count exceeds this, fall back to full redraw (50% of 28×24) */
+const FULL_REDRAW_THRESHOLD = 336
 
 /**
  * Cache for background tile canvases (HTMLCanvasElement)
@@ -119,6 +121,66 @@ function createBackgroundTileImage(
 }
 
 /**
+ * Compute set of dirty cell keys "y,x" by diffing current buffer with last rendered buffer
+ */
+export function computeDirtyCells(
+  buffer: ScreenCell[][],
+  lastBuffer: ScreenCell[][] | null
+): Set<string> {
+  if (!lastBuffer) return new Set()
+  const dirty = new Set<string>()
+  for (let y = 0; y < ROWS; y++) {
+    const row = buffer[y]
+    const lastRow = lastBuffer[y]
+    for (let x = 0; x < COLS; x++) {
+      const cell = row?.[x]
+      const lastCell = lastRow?.[x]
+      const char = cell?.character ?? ' '
+      const pattern = cell?.colorPattern ?? 0
+      const lastChar = lastCell?.character ?? ' '
+      const lastPattern = lastCell?.colorPattern ?? 0
+      if (char !== lastChar || pattern !== lastPattern) {
+        dirty.add(`${y},${x}`)
+      }
+    }
+  }
+  return dirty
+}
+
+/**
+ * Create Konva.Image nodes for specified background cells only
+ */
+export function createBackgroundKonvaImagesForCells(
+  buffer: ScreenCell[][],
+  paletteCode: number,
+  cells: Array<{ y: number; x: number }>
+): Konva.Image[] {
+  const konvaImages: Konva.Image[] = []
+  for (const { y, x } of cells) {
+    const row = buffer[y]
+    const cell = row?.[x]
+    const character = cell?.character ?? ' '
+    const colorPattern = cell?.colorPattern ?? 0
+    const tileImage = createBackgroundTileImage(
+      character,
+      colorPattern,
+      paletteCode
+    )
+    const pixelX = BG_OFFSET_X + x * CELL_SIZE
+    const pixelY = BG_OFFSET_Y + y * CELL_SIZE
+    const konvaImage = new Konva.Image({
+      x: pixelX,
+      y: pixelY,
+      image: tileImage,
+      scaleX: 1,
+      scaleY: 1,
+    })
+    konvaImages.push(konvaImage)
+  }
+  return konvaImages
+}
+
+/**
  * Create Konva.Image nodes for all background screen cells
  * Renders from screen buffer (28×24 characters) at offset (16, 24)
  * Optimized: Creates all images synchronously (no async/await in loop)
@@ -170,32 +232,94 @@ export function createBackgroundKonvaImages(
 }
 
 /**
- * Update background layer with new screen buffer
+ * Update background layer with new screen buffer (full replace)
  * Clears existing nodes and creates new ones
- * Note: Caching should be handled by the caller based on whether the layer is static
- * Optimized: Synchronous image creation, no async overhead
+ * Optionally populates nodeGridRef with "y,x" -> Konva.Image for dirty updates later
  */
 export function updateBackgroundLayer(
   layer: Konva.Layer,
   buffer: ScreenCell[][],
-  paletteCode: number
+  paletteCode: number,
+  nodeGridRef?: Map<string, Konva.Image>
 ): void {
-  // Clear cache first (if it exists) before clearing children
   layer.clearCache()
-
-  // Clear existing nodes
   layer.destroyChildren()
+  if (nodeGridRef) nodeGridRef.clear()
 
-  // Create new background images - synchronous, no await needed
   const konvaImages = createBackgroundKonvaImages(buffer, paletteCode)
-
-  // Add all images to layer in a single batch
-  // This ensures all images are added before drawing
   if (konvaImages.length > 0) {
     layer.add(...konvaImages)
   }
+  if (nodeGridRef) {
+    for (let i = 0; i < konvaImages.length; i++) {
+      const img = konvaImages[i]
+      if (img) {
+        const y = Math.floor(i / COLS)
+        const x = i % COLS
+        nodeGridRef.set(`${y},${x}`, img)
+      }
+    }
+  }
+  layer.draw()
+}
 
-  // Draw the layer (caller will cache if needed)
+/**
+ * Update only dirty background cells (no full destroy/recreate)
+ * If lastBuffer is null or dirty count > threshold, falls back to full redraw
+ */
+export function updateBackgroundLayerDirty(
+  layer: Konva.Layer,
+  buffer: ScreenCell[][],
+  lastBuffer: ScreenCell[][] | null,
+  paletteCode: number,
+  nodeGridRef: Map<string, Konva.Image>
+): void {
+  if (!lastBuffer) {
+    updateBackgroundLayer(layer, buffer, paletteCode, nodeGridRef)
+    return
+  }
+  const dirty = computeDirtyCells(buffer, lastBuffer)
+  if (dirty.size > FULL_REDRAW_THRESHOLD) {
+    updateBackgroundLayer(layer, buffer, paletteCode, nodeGridRef)
+    return
+  }
+  if (dirty.size === 0) {
+    layer.draw()
+    return
+  }
+  for (const key of dirty) {
+    const parts = key.split(',')
+    const y = Number(parts[0])
+    const x = Number(parts[1])
+    const row = buffer[y]
+    const cell = row?.[x]
+    const character = cell?.character ?? ' '
+    const colorPattern = cell?.colorPattern ?? 0
+    const tileImage = createBackgroundTileImage(
+      character,
+      colorPattern,
+      paletteCode
+    )
+    const pixelX = BG_OFFSET_X + x * CELL_SIZE
+    const pixelY = BG_OFFSET_Y + y * CELL_SIZE
+    const node = nodeGridRef.get(key)
+    if (node) {
+      node.image(tileImage)
+      node.x(pixelX)
+      node.y(pixelY)
+    } else {
+      const konvaImage = new Konva.Image({
+        x: pixelX,
+        y: pixelY,
+        image: tileImage,
+        scaleX: 1,
+        scaleY: 1,
+      })
+      layer.add(konvaImage)
+      nodeGridRef.set(key, konvaImage)
+    }
+  }
+  layer.clearCache()
   layer.draw()
 }
 

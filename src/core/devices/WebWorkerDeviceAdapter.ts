@@ -5,6 +5,12 @@
  * Delegates to specialized modules for web worker management, screen state, and message handling.
  */
 
+import {
+  createViewsFromDisplayBuffer,
+  incrementSequence,
+  type SharedDisplayViews,
+  writeScreenState,
+} from '@/core/animation/sharedDisplayBuffer'
 import type {
   AnimationCommand,
   AnyServiceWorkerMessage,
@@ -24,7 +30,10 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   // === DEVICE STATE ===
   private strigClickBuffer: Map<number, number[]> = new Map()
   private stickStates: Map<number, number> = new Map()
-  private spritePositions: Map<number, { x: number; y: number }> = new Map() // Cached sprite positions from Konva nodes
+  /** Shared display buffer. Set when receiving SET_SHARED_ANIMATION_BUFFER. */
+  private sharedDisplayViews: SharedDisplayViews | null = null
+  /** Last POSITION per sprite; getSpritePosition returns it so MOVE uses it (not buffer 0,0). */
+  private lastPositionBySprite: Map<number, { x: number; y: number }> = new Map()
   private isEnabled = true
 
   // === MANAGERS ===
@@ -190,15 +199,63 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
 
   // === SPRITE POSITION QUERY ===
 
+  /**
+   * Set shared display buffer (called from worker when receiving SET_SHARED_ANIMATION_BUFFER).
+   * Creates views for sprites, screen cells, cursor, sequence, and scalars.
+   */
+  setSharedAnimationBuffer(buffer: SharedArrayBuffer): void {
+    this.sharedDisplayViews = createViewsFromDisplayBuffer(buffer)
+  }
+
   getSpritePosition(actionNumber: number): { x: number; y: number } | null {
-    return this.spritePositions.get(actionNumber) ?? null
+    if (this.lastPositionBySprite.has(actionNumber)) {
+      return this.lastPositionBySprite.get(actionNumber) ?? null
+    }
+    return null
+  }
+
+  setSpritePosition(actionNumber: number, x: number, y: number): void {
+    this.lastPositionBySprite.set(actionNumber, { x, y })
+  }
+
+  clearSpritePosition(actionNumber: number): void {
+    this.lastPositionBySprite.delete(actionNumber)
   }
 
   /**
-   * Update cached sprite position (called from frontend via UPDATE_ANIMATION_POSITIONS message)
+   * Write current screen state from ScreenStateManager to shared buffer and increment sequence.
+   * Caller must then postMessage(SCREEN_CHANGED).
    */
-  updateSpritePosition(actionNumber: number, x: number, y: number): void {
-    this.spritePositions.set(actionNumber, { x, y })
+  private syncScreenStateToShared(): void {
+    if (!this.sharedDisplayViews) return
+    const manager = this.screenStateManager
+    if (!manager) return
+    const buffer = manager.getScreenBuffer()
+    if (buffer == null) {
+      console.warn('[WebWorkerDeviceAdapter] syncScreenStateToShared: getScreenBuffer() returned null/undefined, skipping')
+      return
+    }
+    const { x: cursorX, y: cursorY } = manager.getCursorPosition()
+    const { bgPalette, spritePalette } = manager.getPalette()
+    writeScreenState(
+      this.sharedDisplayViews,
+      buffer,
+      cursorX,
+      cursorY,
+      bgPalette,
+      spritePalette,
+      manager.getBackdropColor(),
+      manager.getCgenMode()
+    )
+    incrementSequence(this.sharedDisplayViews)
+  }
+
+  private postScreenChanged(): void {
+    self.postMessage({
+      type: 'SCREEN_CHANGED',
+      id: `screen-changed-${Date.now()}`,
+      timestamp: Date.now(),
+    })
   }
 
   consumeStrigState(joystickId: number): number {
@@ -277,34 +334,36 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
 
   clearScreen(): void {
     console.log('🔌 [WEB_WORKER_DEVICE] Clear screen')
-    // Clear screen buffer
     this.screenStateManager.initializeScreen()
-
-    // Send clear update immediately (not batched, as it's a special operation)
-    const updateMessage = this.screenStateManager.createClearScreenUpdateMessage()
-    self.postMessage(updateMessage)
-    // Cancel any pending batched update since we just sent a clear
+    if (this.sharedDisplayViews) {
+      this.syncScreenStateToShared()
+      this.postScreenChanged()
+    } else {
+      self.postMessage(this.screenStateManager.createClearScreenUpdateMessage())
+    }
     this.cancelPendingScreenUpdate()
   }
 
   setCursorPosition(x: number, y: number): void {
     console.log('🔌 [WEB_WORKER_DEVICE] Set cursor position:', { x, y })
-
     this.screenStateManager.setCursorPosition(x, y)
-
-    // Send cursor update
-    const updateMessage = this.screenStateManager.createCursorUpdateMessage()
-    self.postMessage(updateMessage)
+    if (this.sharedDisplayViews) {
+      this.syncScreenStateToShared()
+      this.postScreenChanged()
+    } else {
+      self.postMessage(this.screenStateManager.createCursorUpdateMessage())
+    }
   }
 
   setColorPattern(x: number, y: number, pattern: number): void {
     console.log('🔌 [WEB_WORKER_DEVICE] Set color pattern:', { x, y, pattern })
-
     const cellsToUpdate = this.screenStateManager.setColorPattern(x, y, pattern)
-
-    // Send screen update with color pattern changes
-    const updateMessage = this.screenStateManager.createColorUpdateMessage(cellsToUpdate)
-    self.postMessage(updateMessage)
+    if (this.sharedDisplayViews) {
+      this.syncScreenStateToShared()
+      this.postScreenChanged()
+    } else {
+      self.postMessage(this.screenStateManager.createColorUpdateMessage(cellsToUpdate))
+    }
   }
 
   setColorPalette(bgPalette: number, spritePalette: number): void {
@@ -312,32 +371,35 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       bgPalette,
       spritePalette,
     })
-
     this.screenStateManager.setColorPalette(bgPalette, spritePalette)
-
-    // Send palette update message
-    const updateMessage = this.screenStateManager.createPaletteUpdateMessage()
-    self.postMessage(updateMessage)
+    if (this.sharedDisplayViews) {
+      this.syncScreenStateToShared()
+      this.postScreenChanged()
+    } else {
+      self.postMessage(this.screenStateManager.createPaletteUpdateMessage())
+    }
   }
 
   setBackdropColor(colorCode: number): void {
     console.log('🔌 [WEB_WORKER_DEVICE] Set backdrop color:', colorCode)
-
     this.screenStateManager.setBackdropColor(colorCode)
-
-    // Send backdrop color update message
-    const updateMessage = this.screenStateManager.createBackdropUpdateMessage()
-    self.postMessage(updateMessage)
+    if (this.sharedDisplayViews) {
+      this.syncScreenStateToShared()
+      this.postScreenChanged()
+    } else {
+      self.postMessage(this.screenStateManager.createBackdropUpdateMessage())
+    }
   }
 
   setCharacterGeneratorMode(mode: number): void {
     console.log('🔌 [WEB_WORKER_DEVICE] Set character generator mode:', mode)
-
     this.screenStateManager.setCharacterGeneratorMode(mode)
-
-    // Send CGEN update message
-    const updateMessage = this.screenStateManager.createCgenUpdateMessage()
-    self.postMessage(updateMessage)
+    if (this.sharedDisplayViews) {
+      this.syncScreenStateToShared()
+      this.postScreenChanged()
+    } else {
+      self.postMessage(this.screenStateManager.createCgenUpdateMessage())
+    }
   }
 
   /**
@@ -362,15 +424,16 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
    */
   setCurrentExecutionId(executionId: string | null): void {
     this.screenStateManager.setCurrentExecutionId(executionId)
-    // Clear screen when starting new execution
     if (executionId) {
       this.screenStateManager.initializeScreen()
-      const updateMessage = this.screenStateManager.createClearScreenUpdateMessage()
-      self.postMessage(updateMessage)
-      // Cancel any pending batched update since we just sent a clear
+      if (this.sharedDisplayViews) {
+        this.syncScreenStateToShared()
+        this.postScreenChanged()
+      } else {
+        self.postMessage(this.screenStateManager.createClearScreenUpdateMessage())
+      }
       this.cancelPendingScreenUpdate()
     } else {
-      // Execution ended - flush any pending screen updates to ensure final state is sent
       this.flushScreenUpdate()
     }
   }
@@ -467,9 +530,9 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   }
 
   /**
-   * Cancel any pending screen update
+   * Cancel any pending screen update (used by flush paths and by tests to avoid timeouts firing after teardown).
    */
-  private cancelPendingScreenUpdate(): void {
+  cancelPendingScreenUpdate(): void {
     if (this.screenUpdateTimeout !== null) {
       self.clearTimeout(this.screenUpdateTimeout)
       this.screenUpdateTimeout = null
@@ -478,26 +541,22 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   }
 
   /**
-   * Flush the pending screen update immediately
-   * Updates the last update time to maintain FPS-based timing
+   * Flush the pending screen update immediately.
+   * With shared buffer: writes to shared buffer, increments sequence, sends SCREEN_CHANGED.
+   * Without (e.g. tests): sends SCREEN_UPDATE full.
    */
   private flushScreenUpdate(): void {
-    // Clear the timeout
     this.screenUpdateTimeout = null
-
-    // Only send if there's actually a pending update
     if (!this.pendingScreenUpdate) {
       return
     }
-
-    // Reset the flag
     this.pendingScreenUpdate = false
-
-    // Update last update time for FPS-based timing
     this.lastScreenUpdateTime = performance.now()
-
-    // Send the full screen update
-    const updateMessage = this.screenStateManager.createFullScreenUpdateMessage()
-    self.postMessage(updateMessage)
+    if (this.sharedDisplayViews) {
+      this.syncScreenStateToShared()
+      this.postScreenChanged()
+    } else if (this.screenStateManager) {
+      self.postMessage(this.screenStateManager.createFullScreenUpdateMessage())
+    }
   }
 }

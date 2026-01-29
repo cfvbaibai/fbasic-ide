@@ -24,6 +24,10 @@
 
 import { onDeactivated, onUnmounted, ref, watch } from 'vue'
 
+import {
+  createSharedDisplayBuffer,
+  type DecodedScreenState,
+} from '@/core/animation/sharedDisplayBuffer'
 import { EXECUTION_LIMITS } from '@/core/constants'
 import type {
   AnyServiceWorkerMessage,
@@ -35,9 +39,14 @@ import type {
 import { FBasicParser } from '@/core/parser/FBasicParser'
 import { getSampleCode } from '@/core/samples/sampleCodes'
 import type { MovementState, SpriteState } from '@/core/sprite/types'
+import { ExecutionError } from '@/features/ide/errors/ExecutionError'
 
 import { formatArrayForDisplay } from './useBasicIdeFormatting'
-import { handleWorkerMessage, type MessageHandlerContext } from './useBasicIdeMessageHandlers'
+import {
+  handleWorkerMessage,
+  type MessageHandlerContext,
+  type PendingSpriteAction,
+} from './useBasicIdeMessageHandlers'
 import { clearScreenBuffer, initializeScreenBuffer } from './useBasicIdeScreenUtils'
 import type { WebWorkerManager } from './useBasicIdeWebWorkerUtils'
 import {
@@ -67,7 +76,9 @@ export function useBasicIde() {
 
   const isRunning = ref(false)
   const output = ref<string[]>([])
-  const errors = ref<Array<{ line: number; message: string; type: string }>>([])
+  const errors = ref<
+    Array<{ line: number; message: string; type: string; stack?: string; sourceLine?: string }>
+  >([])
   const variables = ref<Record<string, BasicVariable>>({})
   const highlightedCode = ref('')
   const debugOutput = ref<string>('')
@@ -79,6 +90,8 @@ export function useBasicIde() {
   const cursorY = ref(0)
   const bgPalette = ref(1) // Default background palette code is 1
   const backdropColor = ref(0) // Default backdrop color code (0 = black)
+  const spritePalette = ref(1) // Default sprite palette (0-2)
+  const cgenMode = ref(2) // Default character generator mode (0-3)
 
   // Sprite state
   const spriteStates = ref<SpriteState[]>([])
@@ -89,9 +102,31 @@ export function useBasicIde() {
   // These will be updated by Screen component
   const frontSpriteNodes = ref<Map<number, unknown>>(new Map())
   const backSpriteNodes = ref<Map<number, unknown>>(new Map())
+  // Per-sprite action queue (POSITION etc.) when node does not exist; consumed when START_MOVEMENT is handled
+  const spriteActionQueues = ref<Map<number, PendingSpriteAction[]>>(new Map())
 
   // Parser instance
   const parser = new FBasicParser()
+
+  // Shared display buffer (sprites + screen + cursor + sequence + scalars); worker writes screen, main reads
+  const sharedDisplayViews = createSharedDisplayBuffer()
+  const sharedAnimationBuffer = sharedDisplayViews.buffer
+  const sharedAnimationView = sharedDisplayViews.spriteView
+
+  // Screen render trigger: Screen.vue registers its scheduleRender so SCREEN_CHANGED can request a redraw
+  const scheduleScreenRenderRef = ref<(() => void) | null>(null)
+  const registerScheduleRender = (fn: () => void) => {
+    scheduleScreenRenderRef.value = fn
+  }
+  const setDecodedScreenState = (decoded: DecodedScreenState) => {
+    screenBuffer.value = decoded.buffer
+    cursorX.value = decoded.cursorX
+    cursorY.value = decoded.cursorY
+    bgPalette.value = decoded.bgPalette
+    spritePalette.value = decoded.spritePalette
+    backdropColor.value = decoded.backdropColor
+    cgenMode.value = decoded.cgenMode
+  }
 
   // Web Worker Manager
   const webWorkerManager: WebWorkerManager = {
@@ -133,23 +168,31 @@ export function useBasicIde() {
     cursorY,
     bgPalette,
     backdropColor,
+    spritePalette,
+    cgenMode,
     movementStates,
     frontSpriteNodes,
     backSpriteNodes,
+    spriteActionQueues,
     webWorkerManager,
+    sharedAnimationView,
+    sharedDisplayViews,
+    scheduleRender: () => scheduleScreenRenderRef.value?.(),
+    setDecodedScreenState,
   }
 
   // Web Worker Management Functions
   const initializeWebWorkerWrapper = async (): Promise<void> => {
     await initializeWebWorker(webWorkerManager, message => {
       handleWorkerMessage(message, messageHandlerContext)
-    })
+    }, sharedAnimationBuffer)
   }
 
   const restartWebWorkerWrapper = async (): Promise<void> => {
+    spriteActionQueues.value.clear()
     await restartWebWorker(webWorkerManager, message => {
       handleWorkerMessage(message, messageHandlerContext)
-    })
+    }, sharedAnimationBuffer)
   }
 
   const checkWebWorkerHealthWrapper = async (): Promise<boolean> => {
@@ -254,6 +297,7 @@ export function useBasicIde() {
 
       if (result?.errors && result.errors.length > 0) {
         errors.value = result.errors
+        console.error('[IDE] Run finished with errors:', result.errors[0]?.message, result.errors)
       }
 
       if (result?.variables) {
@@ -292,20 +336,22 @@ export function useBasicIde() {
         movementStates.value = result.movementStates.map(m => {
           const existing = existingStates.get(m.actionNumber)
           if (existing) {
-            // Preserve remaining distance and frame state
-            // Position is stored in Konva nodes, not in state
+            // Preserve startX/startY from existing (worker does not store them; they came from START_MOVEMENT)
+            // Preserve remaining distance and frame state; position is in Konva nodes
             if (!m.isActive && !existing.isActive) {
-              // Both are stopped - preserve remaining distance
               return {
                 ...m,
+                startX: existing.startX,
+                startY: existing.startY,
                 remainingDistance: existing.remainingDistance,
                 currentFrameIndex: existing.currentFrameIndex,
                 frameCounter: existing.frameCounter,
               }
             } else if (existing.isActive && m.isActive && existing.actionNumber === m.actionNumber) {
-              // Both are active - preserve remaining distance and frame state
               return {
                 ...m,
+                startX: existing.startX,
+                startY: existing.startY,
                 remainingDistance: existing.remainingDistance,
                 currentFrameIndex: existing.currentFrameIndex,
                 frameCounter: existing.frameCounter,
@@ -325,13 +371,25 @@ export function useBasicIde() {
       }
     } catch (error) {
       console.error('Execution error:', error)
-      errors.value = [
-        {
-          line: 0,
-          message: error instanceof Error ? error.message : 'Execution error',
-          type: 'runtime',
-        },
-      ]
+      if (error instanceof ExecutionError) {
+        errors.value = [
+          {
+            line: error.lineNumber ?? 0,
+            message: error.message,
+            type: 'runtime',
+            ...(error.stackTrace && { stack: error.stackTrace }),
+            ...(error.sourceLine && { sourceLine: error.sourceLine }),
+          },
+        ]
+      } else {
+        errors.value = [
+          {
+            line: 0,
+            message: error instanceof Error ? error.message : 'Execution error',
+            type: 'runtime',
+          },
+        ]
+      }
     } finally {
       isRunning.value = false
     }
@@ -456,22 +514,6 @@ export function useBasicIde() {
     rejectAllPendingMessages(webWorkerManager, 'Component unmounted')
   }
 
-  /**
-   * Sync sprite positions to worker for XPOS/YPOS queries
-   */
-  const syncSpritePositions = (positions: Array<{ actionNumber: number; x: number; y: number }>): void => {
-    if (webWorkerManager.worker && positions.length > 0) {
-      webWorkerManager.worker.postMessage({
-        type: 'UPDATE_ANIMATION_POSITIONS',
-        id: crypto.randomUUID(),
-        timestamp: Date.now(),
-        data: {
-          positions,
-        },
-      })
-    }
-  }
-
   // Clean up on unmount AND deactivation (keep-alive)
   onUnmounted(cleanupWebWorker)
   onDeactivated(cleanupWebWorker)
@@ -491,6 +533,8 @@ export function useBasicIde() {
     cursorY,
     bgPalette,
     backdropColor,
+    spritePalette,
+    cgenMode,
     spriteStates,
     spriteEnabled,
     movementStates,
@@ -513,6 +557,9 @@ export function useBasicIde() {
     // Web worker communication
     sendStickEvent,
     sendStrigEvent,
-    syncSpritePositions,
+    sharedAnimationView,
+    sharedDisplayViews,
+    setDecodedScreenState,
+    registerScheduleRender,
   }
 }

@@ -35,6 +35,8 @@ const {
   cursorY,
   bgPalette,
   backdropColor,
+  spritePalette,
+  cgenMode,
   spriteStates,
   spriteEnabled,
   movementStates,
@@ -50,7 +52,10 @@ const {
   toggleDebugMode,
   sendStickEvent,
   sendStrigEvent,
-  syncSpritePositions,
+  sharedAnimationView,
+  sharedDisplayViews,
+  setDecodedScreenState,
+  registerScheduleRender,
 } = useBasicIdeEnhanced()
 
 // Computed properties for backward compatibility
@@ -171,7 +176,10 @@ onMounted(() => {
         <!-- Right Panel - Runtime Output -->
         <div class="output-panel">
           <RuntimeOutput
-            :on-position-sync="syncSpritePositions"
+            :shared-animation-view="sharedAnimationView"
+            :shared-display-views="sharedDisplayViews"
+            :set-decoded-screen-state="setDecodedScreenState"
+            :register-schedule-render="registerScheduleRender"
             :output="output"
             :is-running="isRunning"
             :errors="errors"
@@ -183,6 +191,8 @@ onMounted(() => {
             :cursor-y="cursorY"
             :bg-palette="bgPalette"
             :backdrop-color="backdropColor"
+            :sprite-palette="spritePalette"
+            :cgen-mode="cgenMode"
             :sprite-states="spriteStates"
             :sprite-enabled="spriteEnabled"
             :movement-states="movementStates"

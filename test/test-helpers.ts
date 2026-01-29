@@ -118,3 +118,171 @@ export async function parseLetStatement(code: string): Promise<CstNode | null> {
 
   return getLetStatementCst(singleCmdCst)
 }
+
+/**
+ * Get DEF SPRITE statement CST from single command CST
+ */
+export function getDefSpriteStatementCst(singleCommandCst: CstNode): CstNode | null {
+  const cst = singleCommandCst.children.defSpriteStatement?.[0]
+  return cst && 'children' in cst ? cst : null
+}
+
+/**
+ * Get SPRITE statement CST from single command CST
+ */
+export function getSpriteStatementCst(singleCommandCst: CstNode): CstNode | null {
+  const cst = singleCommandCst.children.spriteStatement?.[0]
+  return cst && 'children' in cst ? cst : null
+}
+
+/**
+ * Get SPRITE ON/OFF statement CST from single command CST
+ */
+export function getSpriteOnOffStatementCst(singleCommandCst: CstNode): CstNode | null {
+  const cst = singleCommandCst.children.spriteOnOffStatement?.[0]
+  return cst && 'children' in cst ? cst : null
+}
+
+/**
+ * Get DEF MOVE statement CST from single command CST
+ */
+export function getDefMoveStatementCst(singleCommandCst: CstNode): CstNode | null {
+  const cst = singleCommandCst.children.defMoveStatement?.[0]
+  return cst && 'children' in cst ? cst : null
+}
+
+/**
+ * Get MOVE statement CST from single command CST
+ */
+export function getMoveStatementCst(singleCommandCst: CstNode): CstNode | null {
+  const cst = singleCommandCst.children.moveStatement?.[0]
+  return cst && 'children' in cst ? cst : null
+}
+
+/**
+ * Get CUT statement CST from single command CST
+ */
+export function getCutStatementCst(singleCommandCst: CstNode): CstNode | null {
+  const cst = singleCommandCst.children.cutStatement?.[0]
+  return cst && 'children' in cst ? cst : null
+}
+
+/**
+ * Get ERA statement CST from single command CST
+ */
+export function getEraStatementCst(singleCommandCst: CstNode): CstNode | null {
+  const cst = singleCommandCst.children.eraStatement?.[0]
+  return cst && 'children' in cst ? cst : null
+}
+
+/**
+ * Get POSITION statement CST from single command CST
+ */
+export function getPositionStatementCst(singleCommandCst: CstNode): CstNode | null {
+  const cst = singleCommandCst.children.positionStatement?.[0]
+  return cst && 'children' in cst ? cst : null
+}
+
+/**
+ * Parse and extract DEF SPRITE statement CST
+ */
+export async function parseDefSpriteStatement(code: string): Promise<CstNode | null> {
+  const stmtCst = await parseStatement(code)
+  if (!stmtCst) return null
+  const cmdCst = getCommandCst(stmtCst)
+  if (!cmdCst) return null
+  const singleCmdCst = getSingleCommandCst(cmdCst)
+  if (!singleCmdCst) return null
+  return getDefSpriteStatementCst(singleCmdCst)
+}
+
+/**
+ * Parse and extract SPRITE statement CST
+ */
+export async function parseSpriteStatement(code: string): Promise<CstNode | null> {
+  const stmtCst = await parseStatement(code)
+  if (!stmtCst) return null
+  const cmdCst = getCommandCst(stmtCst)
+  if (!cmdCst) return null
+  const singleCmdCst = getSingleCommandCst(cmdCst)
+  if (!singleCmdCst) return null
+  return getSpriteStatementCst(singleCmdCst)
+}
+
+/**
+ * Parse and extract SPRITE ON/OFF statement CST
+ */
+export async function parseSpriteOnOffStatement(code: string): Promise<CstNode | null> {
+  const stmtCst = await parseStatement(code)
+  if (!stmtCst) return null
+  const cmdCst = getCommandCst(stmtCst)
+  if (!cmdCst) return null
+  const singleCmdCst = getSingleCommandCst(cmdCst)
+  if (!singleCmdCst) return null
+  return getSpriteOnOffStatementCst(singleCmdCst)
+}
+
+/**
+ * Parse and extract DEF MOVE statement CST
+ */
+export async function parseDefMoveStatement(code: string): Promise<CstNode | null> {
+  const stmtCst = await parseStatement(code)
+  if (!stmtCst) return null
+  const cmdCst = getCommandCst(stmtCst)
+  if (!cmdCst) return null
+  const singleCmdCst = getSingleCommandCst(cmdCst)
+  if (!singleCmdCst) return null
+  return getDefMoveStatementCst(singleCmdCst)
+}
+
+/**
+ * Parse and extract MOVE statement CST
+ */
+export async function parseMoveStatement(code: string): Promise<CstNode | null> {
+  const stmtCst = await parseStatement(code)
+  if (!stmtCst) return null
+  const cmdCst = getCommandCst(stmtCst)
+  if (!cmdCst) return null
+  const singleCmdCst = getSingleCommandCst(cmdCst)
+  if (!singleCmdCst) return null
+  return getMoveStatementCst(singleCmdCst)
+}
+
+/**
+ * Parse and extract CUT statement CST
+ */
+export async function parseCutStatement(code: string): Promise<CstNode | null> {
+  const stmtCst = await parseStatement(code)
+  if (!stmtCst) return null
+  const cmdCst = getCommandCst(stmtCst)
+  if (!cmdCst) return null
+  const singleCmdCst = getSingleCommandCst(cmdCst)
+  if (!singleCmdCst) return null
+  return getCutStatementCst(singleCmdCst)
+}
+
+/**
+ * Parse and extract ERA statement CST
+ */
+export async function parseEraStatement(code: string): Promise<CstNode | null> {
+  const stmtCst = await parseStatement(code)
+  if (!stmtCst) return null
+  const cmdCst = getCommandCst(stmtCst)
+  if (!cmdCst) return null
+  const singleCmdCst = getSingleCommandCst(cmdCst)
+  if (!singleCmdCst) return null
+  return getEraStatementCst(singleCmdCst)
+}
+
+/**
+ * Parse and extract POSITION statement CST
+ */
+export async function parsePositionStatement(code: string): Promise<CstNode | null> {
+  const stmtCst = await parseStatement(code)
+  if (!stmtCst) return null
+  const cmdCst = getCommandCst(stmtCst)
+  if (!cmdCst) return null
+  const singleCmdCst = getSingleCommandCst(cmdCst)
+  if (!singleCmdCst) return null
+  return getPositionStatementCst(singleCmdCst)
+}

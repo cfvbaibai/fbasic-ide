@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
+import type { SharedDisplayViews } from '@/core/animation/sharedDisplayBuffer'
 import type { BasicVariable, ScreenCell } from '@/core/interfaces'
 import type { MovementState, SpriteState } from '@/core/sprite/types'
 import { GameTabs } from '@/shared/components/ui'
@@ -18,7 +19,7 @@ defineOptions({
 })
 
 // Props are used in template, but linter requires assignment for withDefaults
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 const props = withDefaults(defineProps<Props>(), {
   errors: () => [],
   variables: () => ({}),
@@ -61,10 +62,27 @@ interface Props {
   movementStates?: MovementState[]
   externalFrontSpriteNodes?: Map<number, unknown>
   externalBackSpriteNodes?: Map<number, unknown>
-  onPositionSync?: (positions: Array<{ actionNumber: number; x: number; y: number }>) => void
+  /** Shared animation state view (Float64Array). Main thread writes positions + isActive each frame. */
+  sharedAnimationView?: Float64Array
+  /** Shared display buffer views; when present, Screen reads from shared buffer on SCREEN_CHANGED. */
+  sharedDisplayViews?: SharedDisplayViews
+  /** Called by Screen after decoding shared buffer to update parent refs. */
+  setDecodedScreenState?: (decoded: import('@/core/animation/sharedDisplayBuffer').DecodedScreenState) => void
+  /** Register Screen's scheduleRender so parent can trigger redraw on SCREEN_CHANGED. */
+  registerScheduleRender?: (fn: () => void) => void
+  spritePalette?: number
+  cgenMode?: number
 }
 
 const activeTab = ref('screen')
+
+// On execution failure, switch to STDOUT tab so the user sees the error
+watch(
+  () => props.errors?.length ?? 0,
+  (len) => {
+    if (len > 0) activeTab.value = 'stdout'
+  }
+)
 </script>
 
 <template>
@@ -77,12 +95,17 @@ const activeTab = ref('screen')
         :cursor-y="cursorY"
         :bg-palette="bgPalette"
         :backdrop-color="backdropColor"
+        :sprite-palette="spritePalette"
+        :cgen-mode="cgenMode"
         :sprite-states="spriteStates"
         :sprite-enabled="spriteEnabled"
         :movement-states="movementStates"
         :external-front-sprite-nodes="externalFrontSpriteNodes"
         :external-back-sprite-nodes="externalBackSpriteNodes"
-        :on-position-sync="onPositionSync"
+        :shared-animation-view="sharedAnimationView"
+        :shared-display-views="sharedDisplayViews"
+        :set-decoded-screen-state="setDecodedScreenState"
+        :register-schedule-render="registerScheduleRender"
       />
 
       <!-- STDOUT Tab -->

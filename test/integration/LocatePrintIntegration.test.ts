@@ -4,7 +4,7 @@
  * Tests that verify LOCATE and PRINT work together correctly in actual BASIC programs.
  */
 
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { WebWorkerDeviceAdapter } from '@/core/devices/WebWorkerDeviceAdapter'
@@ -51,6 +51,10 @@ describe('LOCATE and PRINT Integration', () => {
     capturedMessages = []
   })
 
+  afterEach(() => {
+    deviceAdapter.cancelPendingScreenUpdate()
+  })
+
   it('should display text at LOCATE position', async () => {
     const source = `
 10 LOCATE 10, 10
@@ -70,7 +74,7 @@ describe('LOCATE and PRINT Integration', () => {
     expect(screenMessages.length).toBeGreaterThan(0)
     const lastScreenMessage = screenMessages[screenMessages.length - 1]
     const screenBuffer =
-      lastScreenMessage && 'data' in lastScreenMessage && 'screenBuffer' in lastScreenMessage.data
+      lastScreenMessage?.data && 'screenBuffer' in lastScreenMessage.data
         ? (lastScreenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
         : undefined
 
@@ -106,7 +110,7 @@ describe('LOCATE and PRINT Integration', () => {
     )
     const lastScreenMessage = screenMessages[screenMessages.length - 1]
     const screenBuffer =
-      lastScreenMessage && 'data' in lastScreenMessage && 'screenBuffer' in lastScreenMessage.data
+      lastScreenMessage?.data && 'screenBuffer' in lastScreenMessage.data
         ? (lastScreenMessage.data as { screenBuffer: Array<Array<{ character: string; x: number; y: number }>> })
             .screenBuffer
         : undefined
@@ -144,7 +148,7 @@ describe('LOCATE and PRINT Integration', () => {
     )
     const lastScreenMessage = screenMessages[screenMessages.length - 1]
     const screenBuffer =
-      lastScreenMessage && 'data' in lastScreenMessage && 'screenBuffer' in lastScreenMessage.data
+      lastScreenMessage?.data && 'screenBuffer' in lastScreenMessage.data
         ? (lastScreenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
         : undefined
 
@@ -181,7 +185,7 @@ describe('LOCATE and PRINT Integration', () => {
     )
     const lastScreenMessage = screenMessages[screenMessages.length - 1]
     const screenBuffer =
-      lastScreenMessage && 'data' in lastScreenMessage && 'screenBuffer' in lastScreenMessage.data
+      lastScreenMessage?.data && 'screenBuffer' in lastScreenMessage.data
         ? (lastScreenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
         : undefined
 
@@ -207,7 +211,7 @@ describe('LOCATE and PRINT Integration', () => {
     )
     const lastScreenMessage = screenMessages[screenMessages.length - 1]
     const screenBuffer =
-      lastScreenMessage && 'data' in lastScreenMessage && 'screenBuffer' in lastScreenMessage.data
+      lastScreenMessage?.data && 'screenBuffer' in lastScreenMessage.data
         ? (lastScreenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
         : undefined
 
@@ -219,6 +223,7 @@ describe('LOCATE and PRINT Integration', () => {
   })
 
   it('should handle CLS then LOCATE and PRINT', async () => {
+    vi.useFakeTimers()
     const source = `
 10 PRINT "BEFORE"
 20 CLS
@@ -227,16 +232,24 @@ describe('LOCATE and PRINT Integration', () => {
 50 END
 `
     const result = await interpreter.execute(source)
+    vi.advanceTimersByTime(100)
+    vi.useRealTimers()
 
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
 
     const screenMessages = capturedMessages.filter(
-      msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
+      msg => msg.type === 'SCREEN_UPDATE' && msg.data && 'updateType' in msg.data && msg.data.updateType === 'full'
     )
-    const lastScreenMessage = screenMessages[screenMessages.length - 1]
+    // Use the full update that has "AFTER" at (10, 10) — last one may be batched out of order
+    const lastScreenMessage = [...screenMessages].reverse().find(msg => {
+      const buf = msg.data && 'screenBuffer' in msg.data
+        ? (msg.data as { screenBuffer: ScreenBuffer }).screenBuffer
+        : undefined
+      return buf?.[10]?.[10]?.character === 'A' && buf?.[10]?.[11]?.character === 'F'
+    }) ?? screenMessages[screenMessages.length - 1]
     const screenBuffer =
-      lastScreenMessage && 'data' in lastScreenMessage && 'screenBuffer' in lastScreenMessage.data
+      lastScreenMessage?.data && 'screenBuffer' in lastScreenMessage.data
         ? (lastScreenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
         : undefined
 
@@ -279,7 +292,7 @@ describe('LOCATE and PRINT Integration', () => {
     expect(screenMessages.length).toBeGreaterThan(0)
     const lastScreenMessage = screenMessages[screenMessages.length - 1]
     const screenBuffer =
-      lastScreenMessage && 'data' in lastScreenMessage && 'screenBuffer' in lastScreenMessage.data
+      lastScreenMessage?.data && 'screenBuffer' in lastScreenMessage.data
         ? (lastScreenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
         : undefined
 
@@ -319,7 +332,7 @@ describe('LOCATE and PRINT Integration', () => {
     )
     const lastScreenMessage = screenMessages[screenMessages.length - 1]
     const screenBuffer =
-      lastScreenMessage && 'data' in lastScreenMessage && 'screenBuffer' in lastScreenMessage.data
+      lastScreenMessage?.data && 'screenBuffer' in lastScreenMessage.data
         ? (lastScreenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
         : undefined
 

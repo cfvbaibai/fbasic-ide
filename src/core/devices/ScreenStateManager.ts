@@ -257,19 +257,25 @@ export class ScreenStateManager {
   }
 
   /**
-   * Create a full screen update message
+   * Create a full screen update message.
+   * Defensive: if called without correct `this` (e.g. unbound), return a safe message.
    */
   createFullScreenUpdateMessage(): ScreenUpdateMessage {
+    const self = this as ScreenStateManager | undefined
+    const buffer = self?.screenBuffer ?? []
+    const cursorX = self?.cursorX ?? 0
+    const cursorY = self?.cursorY ?? 0
+    const executionId = self?.currentExecutionId ?? 'unknown'
     return {
       type: 'SCREEN_UPDATE',
       id: `screen-full-${Date.now()}`,
       timestamp: Date.now(),
       data: {
-        executionId: this.currentExecutionId ?? 'unknown',
+        executionId,
         updateType: 'full',
-        screenBuffer: this.screenBuffer,
-        cursorX: this.cursorX,
-        cursorY: this.cursorY,
+        screenBuffer: buffer,
+        cursorX,
+        cursorY,
         timestamp: Date.now(),
       },
     }
