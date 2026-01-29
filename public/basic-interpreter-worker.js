@@ -5498,9 +5498,16 @@
   function getBackgroundItemByCode(code) {
     return BY_CODE.get(code) ?? null;
   }
+  function getBackgroundItemByChar(char) {
+    return BY_CHAR.get(char) ?? null;
+  }
   function getCharacterByCode(code) {
     const bgItem = getBackgroundItemByCode(code);
     return bgItem?.char ?? null;
+  }
+  function getCodeByChar(char) {
+    const bgItem = getBackgroundItemByChar(char);
+    return bgItem?.code ?? null;
   }
 
   // src/core/evaluation/FunctionEvaluator.ts
@@ -23914,7 +23921,8 @@ Make sure that all grammar rule definitions are done before 'performSelfAnalysis
         const cell = row?.[x];
         const idx = cellIndex(x, y);
         const ch = cell?.character ?? " ";
-        charView[idx] = ch.length === 1 ? ch.charCodeAt(0) : 32;
+        const code = getCodeByChar(ch) ?? (ch.length === 1 ? ch.charCodeAt(0) : 32);
+        charView[idx] = Math.max(0, Math.min(255, code));
         patternView[idx] = (cell?.colorPattern ?? 0) & 3;
       }
     }

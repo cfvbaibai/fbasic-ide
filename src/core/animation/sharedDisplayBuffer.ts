@@ -6,6 +6,7 @@
  */
 
 import type { ScreenCell } from '@/core/interfaces'
+import { getCharacterByCode, getCodeByChar } from '@/shared/utils/backgroundLookup'
 
 import { MAX_SPRITES } from './sharedAnimationBuffer'
 
@@ -110,7 +111,9 @@ export function writeScreenState(
       const cell = row?.[x]
       const idx = cellIndex(x, y)
       const ch = cell?.character ?? ' '
-      charView[idx] = ch.length === 1 ? ch.charCodeAt(0) : 0x20
+      // Store F-BASIC code (0-255); use mapping so e.g. '「' → 91, not Unicode 12300
+      const code = getCodeByChar(ch) ?? (ch.length === 1 ? ch.charCodeAt(0) : 0x20)
+      charView[idx] = Math.max(0, Math.min(255, code))
       patternView[idx] = (cell?.colorPattern ?? 0) & 3
     }
   }
@@ -143,7 +146,7 @@ export function readScreenStateFromShared(views: SharedDisplayViews): DecodedScr
     for (let x = 0; x < COLS; x++) {
       const idx = cellIndex(x, y)
       row.push({
-        character: String.fromCharCode(charView[idx] ?? 0x20),
+        character: getCharacterByCode(charView[idx] ?? 0x20) ?? String.fromCharCode(charView[idx] ?? 0x20),
         colorPattern: (patternView[idx] ?? 0) & 3,
         x,
         y,

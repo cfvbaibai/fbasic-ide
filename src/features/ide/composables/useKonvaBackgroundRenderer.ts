@@ -7,7 +7,7 @@ import Konva from 'konva'
 
 import type { ScreenCell } from '@/core/interfaces'
 import { BACKGROUND_PALETTES, COLORS } from '@/shared/data/palette'
-import { getBackgroundItemByChar } from '@/shared/utils/backgroundLookup'
+import { getBackgroundItemByChar, getCharacterByCode } from '@/shared/utils/backgroundLookup'
 
 const CELL_SIZE = 8 // 8×8 pixels per character cell
 const COLS = 28 // Background screen: 28 columns
@@ -345,9 +345,9 @@ export async function preInitializeBackgroundTiles(): Promise<void> {
       const paletteCodes = [0, 1] // Two background palettes
       const colorPatterns = [0, 1, 2, 3] // Four color patterns
 
-      // Process all character codes (0-255)
+      // Process all character codes (0-255) using F-BASIC mapping so cache keys match screen buffer
       for (let code = 0; code <= 255; code++) {
-        const char = String.fromCharCode(code)
+        const char = getCharacterByCode(code) ?? String.fromCharCode(code)
 
         // Create images for all palette/pattern combinations for this character
         for (const paletteCode of paletteCodes) {

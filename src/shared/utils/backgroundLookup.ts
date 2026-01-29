@@ -57,3 +57,13 @@ export function getCharacterByCode(code: number): string | null {
   const bgItem = getBackgroundItemByCode(code)
   return bgItem?.char ?? null
 }
+
+/**
+ * Get F-BASIC character code (0-255) for a character string
+ * Returns the code for the character, or null if not in background items
+ * Used when writing screen buffer so we store codes not Unicode code points
+ */
+export function getCodeByChar(char: string): number | null {
+  const bgItem = getBackgroundItemByChar(char)
+  return bgItem?.code ?? null
+}
