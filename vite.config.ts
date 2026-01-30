@@ -37,18 +37,13 @@ export default defineConfig({
     hookTimeout: 10000,
     teardownTimeout: 10000,
     pool: 'forks',
-    poolOptions: {
-      forks: {
-        singleFork: false,
-        maxForks: 4, // Use up to 4 worker processes
-        minForks: 2, // Use at least 2 worker processes
-      },
-    },
+    // Vitest 4: poolOptions are now top-level
+    singleFork: false,
+    maxForks: 4, // Use up to 4 worker processes
+    minForks: 2, // Use at least 2 worker processes
     // Enable parallel test execution
     maxConcurrency: 10,
     // Optimize for faster execution
     isolate: true,
-    // Use threads for better performance
-    threads: true,
   },
 })

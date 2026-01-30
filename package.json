@@ -26,13 +26,13 @@
         "visualize-cst": "tsx scripts/visualize-cst.ts"
     },
     "dependencies": {
-        "loglevel": "^1.9.2",
         "@iconify/vue": "^5.0.0",
         "@vueuse/core": "^14.1.0",
         "chevrotain": "^11.0.3",
         "decimal.js": "^10.6.0",
         "konva": "^10.2.0",
         "lodash-es": "^4.17.21",
+        "loglevel": "^1.9.2",
         "monaco-editor": "^0.55.1",
         "peggy": "^3.0.2",
         "vue": "^3.5.22",
@@ -47,7 +47,7 @@
         "@typescript-eslint/eslint-plugin": "^8.46.0",
         "@typescript-eslint/parser": "^8.46.0",
         "@vitejs/plugin-vue": "^6.0.1",
-        "@vitest/ui": "^3.2.4",
+        "@vitest/ui": "^4.0.18",
         "@vue/eslint-config-prettier": "^10.2.0",
         "@vue/eslint-config-typescript": "^14.6.0",
         "@vue/test-utils": "^2.4.6",
@@ -69,7 +69,7 @@
         "tsx": "^4.19.2",
         "typescript": "^5.9.3",
         "vite": "^7.1.7",
-        "vitest": "^3.2.4",
+        "vitest": "^4.0.18",
         "vue-eslint-parser": "^10.2.0",
         "vue-tsc": "^3.1.1"
     }
