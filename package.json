@@ -3,9 +3,12 @@
     "private": true,
     "version": "0.0.0",
     "type": "module",
+    "engines": {
+        "node": ">=24.13.0"
+    },
     "scripts": {
-        "dev": "npm run build-web-worker && vite",
-        "build": "npm run build-web-worker && vue-tsc && vite build",
+        "dev": "tsx scripts/build-service-worker.ts && vite",
+        "build": "tsx scripts/build-service-worker.ts && vue-tsc && vite build",
         "preview": "vite preview",
         "lint": "eslint . --fix && pnpm lint:style",
         "lint:style": "stylelint \"src/**/*.{css,vue}\"",
