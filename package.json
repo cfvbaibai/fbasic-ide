@@ -34,7 +34,6 @@
         "lodash-es": "^4.17.21",
         "loglevel": "^1.9.2",
         "monaco-editor": "^0.55.1",
-        "peggy": "^3.0.2",
         "vue": "^3.5.22",
         "vue-i18n": "^11.2.8",
         "vue-konva": "^3.3.0",
