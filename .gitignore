@@ -64,3 +64,6 @@ $RECYCLE.BIN/
 
 # Generated parser files
 src/core/parser/fbasic-parser.js
+
+# Built web worker (from scripts/build-service-worker.ts)
+public/basic-interpreter-worker.js
