@@ -5,15 +5,12 @@ This directory contains documentation for the Family Basic IDE (F-BASIC Emulator
 ## Structure
 
 ### 📘 `guides/`
-Developer guides and how-to documentation:
-- `architecture.md` - System architecture overview
-- `chevrotain-monaco-integration.md` - Guide for integrating Chevrotain parser with Monaco Editor
-- `color-usage-review.md` - Color usage review and guidelines
-- `css-v-bind-patterns.md` - CSS v-bind usage patterns in Vue 3
-- `theme-guide-v2.md` - Theme system architecture and usage guide
-- `sunset-vaporwave-theme-guide.md` - Sunset Vaporwave theme specification
-- `y2k-theme-guide.md` - Y2K Futuristic theme specification
-- `testing-xpos-ypos.md` - Testing guide for XPOS/YPOS functions
+Essential patterns for AI assistants working with this codebase:
+- `architecture.md` - System architecture overview and file structure
+- `theme-patterns.md` - Theme system patterns and best practices
+- `vue-patterns.md` - Vue 3 patterns and component guidelines
+
+**Note**: Detailed and theme-specific guides are archived in `archive/guides/`
 
 ### 📊 `analysis/`
 Current analysis documents and reports:
@@ -56,6 +53,7 @@ Historical documentation preserved for reference:
 - `planning/` - Completed planning documents
 - `analysis/` - Historical analysis and status reports
 - `device-models/` - Superseded design documents
+- `guides/` - Detailed implementation guides and theme-specific documentation
 
 ## Quick Links
 
