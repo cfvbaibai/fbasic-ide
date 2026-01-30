@@ -36,7 +36,7 @@ describe('PositionExecutor', () => {
     expect(result.errors).toHaveLength(0)
     const posCmd = deviceAdapter.animationCommandCalls.find(c => c.type === 'SET_POSITION')
     expect(posCmd).toBeDefined()
-    if (posCmd && posCmd.type === 'SET_POSITION') {
+    if (posCmd?.type === 'SET_POSITION') {
       expect(posCmd.actionNumber).toBe(0)
       expect(posCmd.x).toBe(100)
       expect(posCmd.y).toBe(50)

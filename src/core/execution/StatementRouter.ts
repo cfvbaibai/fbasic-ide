@@ -209,7 +209,7 @@ export class StatementRouter {
                       const forStmt = getFirstCstNode(singleCmd?.children.forStatement)
                       if (forStmt) {
                         const forVarToken = getFirstToken(forStmt.children.Identifier)
-                        if (forVarToken && forVarToken.image.toUpperCase() === varName) {
+                        if (forVarToken?.image.toUpperCase() === varName) {
                           thenCommandIndex = i // Jump back to FOR statement
                           break
                         }

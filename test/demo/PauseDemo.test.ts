@@ -21,10 +21,10 @@ const shouldRunPauseDemoTests = process.env.RUN_PAUSE_DEMO_TESTS === 'true'
 describe.skipIf(!shouldRunPauseDemoTests)('Pause Demo Program', () => {
   let interpreter: BasicInterpreter
   let mockDeviceAdapter: BasicDeviceAdapter
-  let printOutputMock: ReturnType<typeof vi.fn>
+  let printOutputMock: ReturnType<typeof vi.fn<(output: string) => void>>
 
   beforeEach(() => {
-    printOutputMock = vi.fn()
+    printOutputMock = vi.fn<(output: string) => void>()
     mockDeviceAdapter = {
       getJoystickCount: () => 2,
       getStickState: () => 0,

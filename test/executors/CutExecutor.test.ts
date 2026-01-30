@@ -37,7 +37,7 @@ describe('CutExecutor', () => {
     expect(result.errors).toHaveLength(0)
     const stopCmd = deviceAdapter.animationCommandCalls.find(c => c.type === 'STOP_MOVEMENT')
     expect(stopCmd).toBeDefined()
-    if (stopCmd && stopCmd.type === 'STOP_MOVEMENT') {
+    if (stopCmd?.type === 'STOP_MOVEMENT') {
       expect(stopCmd.actionNumbers).toContain(0)
     }
     expect(interpreter.getAnimationManager()?.getMovementStatus(0)).toBe(0)
@@ -82,7 +82,7 @@ describe('CutExecutor', () => {
     expect(result.success).toBe(true)
     const stopCmd = deviceAdapter.animationCommandCalls.find(c => c.type === 'STOP_MOVEMENT')
     expect(stopCmd).toBeDefined()
-    if (stopCmd && stopCmd.type === 'STOP_MOVEMENT') {
+    if (stopCmd?.type === 'STOP_MOVEMENT') {
       expect(stopCmd.actionNumbers).toContain(0)
     }
   })
@@ -125,7 +125,7 @@ describe('CutExecutor', () => {
     expect(result.success).toBe(true)
     const stopCmd = deviceAdapter.animationCommandCalls.find(c => c.type === 'STOP_MOVEMENT')
     expect(stopCmd).toBeDefined()
-    if (stopCmd && stopCmd.type === 'STOP_MOVEMENT') {
+    if (stopCmd?.type === 'STOP_MOVEMENT') {
       expect(stopCmd.actionNumbers).toContain(0)
       expect(stopCmd.actionNumbers).toContain(1)
     }

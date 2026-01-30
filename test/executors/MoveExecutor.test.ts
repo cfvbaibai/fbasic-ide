@@ -38,7 +38,7 @@ describe('MoveExecutor', () => {
     const startCmd = deviceAdapter.animationCommandCalls.find(c => c.type === 'START_MOVEMENT')
     expect(startCmd).toBeDefined()
     expect(startCmd?.type).toBe('START_MOVEMENT')
-    if (startCmd && startCmd.type === 'START_MOVEMENT') {
+    if (startCmd?.type === 'START_MOVEMENT') {
       expect(startCmd.actionNumber).toBe(0)
       expect(startCmd.definition).toBeDefined()
       expect(startCmd.startX).toBeDefined()

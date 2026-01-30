@@ -37,7 +37,7 @@ describe('EraExecutor', () => {
     expect(result.errors).toHaveLength(0)
     const eraseCmd = deviceAdapter.animationCommandCalls.find(c => c.type === 'ERASE_MOVEMENT')
     expect(eraseCmd).toBeDefined()
-    if (eraseCmd && eraseCmd.type === 'ERASE_MOVEMENT') {
+    if (eraseCmd?.type === 'ERASE_MOVEMENT') {
       expect(eraseCmd.actionNumbers).toContain(0)
     }
   })
@@ -124,7 +124,7 @@ describe('EraExecutor', () => {
     expect(result.success).toBe(true)
     const eraseCmd = deviceAdapter.animationCommandCalls.find(c => c.type === 'ERASE_MOVEMENT')
     expect(eraseCmd).toBeDefined()
-    if (eraseCmd && eraseCmd.type === 'ERASE_MOVEMENT') {
+    if (eraseCmd?.type === 'ERASE_MOVEMENT') {
       expect(eraseCmd.actionNumbers).toContain(0)
       expect(eraseCmd.actionNumbers).toContain(1)
     }

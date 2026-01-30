@@ -106,7 +106,7 @@ describe('Sprite Position Synchronization', () => {
     const lastStart = startCalls[1]
     expect(lastStart).toBeDefined()
     expect(lastStart?.type).toBe('START_MOVEMENT')
-    if (lastStart && lastStart.type === 'START_MOVEMENT') {
+    if (lastStart?.type === 'START_MOVEMENT') {
       expect(lastStart.startX).toBe(50)
       expect(lastStart.startY).toBe(25)
     }

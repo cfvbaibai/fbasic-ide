@@ -132,7 +132,7 @@ export class PrintExecutor {
           // Look ahead to find separator after this item
           let separator: PrintSeparator = null
           const nextElement = elements[i + 1]
-          if (nextElement && nextElement.type === 'separator') {
+          if (nextElement?.type === 'separator') {
             separator = nextElement.separator ?? null
           }
 

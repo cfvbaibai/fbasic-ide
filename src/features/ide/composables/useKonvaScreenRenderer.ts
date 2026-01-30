@@ -227,7 +227,7 @@ export async function updateAnimatedSprites(
   // Update sprites on front layer (priority E=0)
   // Include both active and stopped movements (stopped movements need position updates)
   for (const movement of movementStates) {
-    if (!movement.definition || movement.definition.priority !== 0) continue
+    if (movement.definition?.priority !== 0) continue
 
     const spriteNode = frontSpriteNodes.get(movement.actionNumber)
     if (spriteNode) {
@@ -241,7 +241,7 @@ export async function updateAnimatedSprites(
   // Update sprites on back layer (priority E=1)
   // Include both active and stopped movements
   for (const movement of movementStates) {
-    if (!movement.definition || movement.definition.priority !== 1) continue
+    if (movement.definition?.priority !== 1) continue
 
     const spriteNode = backSpriteNodes.get(movement.actionNumber)
     if (spriteNode) {
