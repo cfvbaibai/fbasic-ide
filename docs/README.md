@@ -6,13 +6,20 @@ This directory contains documentation for the Family Basic IDE (F-BASIC Emulator
 
 ### 📘 `guides/`
 Developer guides and how-to documentation:
+- `architecture.md` - System architecture overview
 - `chevrotain-monaco-integration.md` - Guide for integrating Chevrotain parser with Monaco Editor
-- `theme-guide-v2.md` - Theme system usage guide
 - `color-usage-review.md` - Color usage review and guidelines
+- `css-v-bind-patterns.md` - CSS v-bind usage patterns in Vue 3
+- `theme-guide-v2.md` - Theme system architecture and usage guide
+- `sunset-vaporwave-theme-guide.md` - Sunset Vaporwave theme specification
+- `y2k-theme-guide.md` - Y2K Futuristic theme specification
+- `testing-xpos-ypos.md` - Testing guide for XPOS/YPOS functions
 
 ### 📊 `analysis/`
 Current analysis documents and reports:
-- `screen-model-manual-comparison.md` - Screen model verification against manual
+- `animation-commands-queue-review.md` - Animation command queue architecture review
+- `full-screen-buffer-shared-memory.md` - Shared memory buffer implementation analysis
+- `remaining-commands-emulator-compatibility.md` - Remaining F-BASIC commands compatibility analysis
 
 **Note**: Historical analysis documents are archived in `archive/analysis/`
 
@@ -37,6 +44,12 @@ Active planning and refactoring documents:
 - `remaining-work-plan.md` - Comprehensive plan for remaining project work (includes Phase 5 Sprite System; optional 4.4/4.5 noted)
 
 **Note**: Completed planning documents are archived in `archive/planning/`
+
+### 📓 `diary/`
+Daily changelogs and implementation notes:
+- Files organized by date: `yyyy-MM-dd.txt` format
+- Contains recent updates, implementation notes, and status summaries
+- One date per file, append entries to existing files
 
 ### 📦 `archive/`
 Historical documentation preserved for reference:

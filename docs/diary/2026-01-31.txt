@@ -1,0 +1,45 @@
+### Dependency Upgrades and Maintenance (2026-01-31)
+
+**Vitest 4.0.18 Upgrade**:
+- ✅ Upgraded vitest and @vitest/ui from 3.2.4 to 4.0.18
+- Migrated test configuration for Vitest 4 compatibility
+  - Moved `poolOptions` to top-level in vite.config.ts
+  - Removed conflicting `threads` option
+- All 930 tests pass successfully
+- Commit: `chore: upgrade Vitest from v3.2.4 to v4.0.18`
+
+**Dependency Cleanup**:
+- ✅ Removed unused `peggy` parser dependency (zero usage in codebase)
+- Also removed transitive dependencies: commander, source-map-generator
+- Commit: `chore: remove unused peggy dependency`
+
+**All Dependencies Upgraded**:
+- ✅ Updated 20 packages to latest stable versions
+- Dependencies (4): chevrotain 11.1.1, lodash-es 4.17.23, vue 3.5.27, vue-router 5.0.1
+- Dev dependencies (16): ESLint, TypeScript tools, Vite 7.3.1, Vue tooling, and more
+- Major version upgrades (safe, no breaking changes):
+  - vue-router: 4.6.3 → 5.0.1 (no breaking changes)
+  - globals: 16.5.0 → 17.2.0 (no impact on usage)
+  - @types/node: 24.7.1 → 25.1.0 (type-only)
+- esbuild: 0.25.10 → 0.27.2
+- All tests pass, no security vulnerabilities
+- Commit: `chore: upgrade all dependencies to latest versions`
+
+**TypeScript Fixes**:
+- ✅ Fixed 6 TypeScript type errors blocking build
+- Added Node types to tsconfig.json (fixes NodeJS namespace errors in 4 files)
+- Fixed Vitest 4 mock type compatibility in PauseDemo.test.ts
+- Applied 8 optional chaining improvements from linter auto-fix
+- Build now completes successfully
+- Commit: `fix: resolve TypeScript type errors blocking build`
+
+**Documentation Hygiene**:
+- ✅ Updated docs/README.md to reflect actual files
+  - Added missing analysis files (3)
+  - Added missing guide files (5)
+  - Added diary section documentation
+- All documentation properly organized per CLAUDE.md guidelines
+
+**Status**: All dependencies current, build working, tests passing (930/930), no TypeScript errors, documentation up to date.
+
+**Last Updated**: 2026-01-31 (Dependency maintenance, TypeScript fixes, docs cleanup)

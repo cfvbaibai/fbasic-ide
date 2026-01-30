@@ -1,0 +1,1 @@
+# Proof of Concepts\n\nThis directory contains experimental documentation and proof-of-concept designs.\n\nPOCs are temporary and exploratory - successful POCs should be migrated to appropriate documentation sections.
