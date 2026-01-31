@@ -50,7 +50,8 @@
       "Bash(pnpm list:*)",
       "Bash(npm view:*)",
       "Bash(git mv:*)",
-      "Bash(wc:*)"
+      "Bash(wc:*)",
+      "Bash(git restore:*)"
     ]
   },
   "enabledPlugins": {
