@@ -20,6 +20,8 @@ import type {
   InterpreterConfig,
   OutputMessage,
 } from '@/core/interfaces'
+import { parseMusic } from '@/core/sound/MusicDSLParser'
+import { SoundStateManager } from '@/core/sound/SoundStateManager'
 import { logWorker } from '@/shared/logger'
 
 import { MessageHandler } from './MessageHandler'
@@ -42,6 +44,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   private webWorkerManager: WebWorkerManager
   private screenStateManager: ScreenStateManager
   private messageHandler: MessageHandler
+  private soundStateManager: SoundStateManager
 
   // === INPUT REQUEST (worker only: INPUT/LINPUT) ===
   private pendingInputRequests: Map<
@@ -62,6 +65,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     logWorker.debug('WebWorkerDeviceAdapter created')
     this.webWorkerManager = new WebWorkerManager()
     this.screenStateManager = new ScreenStateManager()
+    this.soundStateManager = new SoundStateManager()
     this.messageHandler = new MessageHandler(this.webWorkerManager.getPendingMessages())
     this.setupMessageListener()
   }
@@ -499,6 +503,47 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       this.cancelPendingScreenUpdate()
     } else {
       this.flushScreenUpdate()
+    }
+  }
+
+  /**
+   * Play sound using F-BASIC PLAY music DSL
+   * Parses the music string into Note[] and posts PLAY_SOUND message to main thread
+   */
+  playSound(musicString: string): void {
+    logWorker.debug('Playing sound:', musicString)
+
+    try {
+      // Parse music string using DSL parser
+      const musicCommand = parseMusic(musicString, this.soundStateManager)
+
+      // Flatten all channels into a single event array for transmission
+      const events = musicCommand.channels.flatMap(channelEvents => channelEvents)
+
+      // Convert events to serializable format
+      const serializedEvents = events.map(event => ({
+        frequency: 'frequency' in event ? event.frequency : undefined,
+        duration: event.duration,
+        channel: event.channel,
+        duty: 'duty' in event ? event.duty : 0,
+        envelope: 'envelope' in event ? event.envelope : 0,
+        volumeOrLength: 'volumeOrLength' in event ? event.volumeOrLength : 0,
+      }))
+
+      // Post PLAY_SOUND message to main thread
+      self.postMessage({
+        type: 'PLAY_SOUND',
+        id: `play-sound-${Date.now()}`,
+        timestamp: Date.now(),
+        data: {
+          executionId: this.screenStateManager.getCurrentExecutionId() ?? 'unknown',
+          musicString,
+          events: serializedEvents,
+        },
+      })
+    } catch (error) {
+      logWorker.error('Error parsing music string:', error)
+      this.errorOutput(`PLAY error: ${error instanceof Error ? error.message : String(error)}`)
     }
   }
 

@@ -116,6 +116,16 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
     return Promise.resolve(values ?? ['0'])
   }
 
+  // === SOUND OUTPUT ===
+
+  /** Captured playSound calls for testing */
+  public playSoundCalls: string[] = []
+
+  playSound?(musicString: string): void {
+    this.playSoundCalls.push(musicString)
+    logDevice.debug('Play sound:', musicString)
+  }
+
   // === ANIMATION COMMANDS ===
 
   sendAnimationCommand(command: AnimationCommand): void {

@@ -20,11 +20,13 @@ import type {
   ResultMessage,
   ScreenCell,
 } from '@/core/interfaces'
+import type { Note, Rest } from '@/core/sound/types'
 import type { MovementState } from '@/core/sprite/types'
 import { ExecutionError } from '@/features/ide/errors/ExecutionError'
 import { logComposable, logIdeMessages, logScreen } from '@/shared/logger'
 
 import { extendExecutionTimeout, type WebWorkerManager } from './useBasicIdeWebWorkerUtils'
+import { useWebAudioPlayer } from './useWebAudioPlayer'
 
 export { ExecutionError }
 
@@ -40,6 +42,12 @@ interface QueuedMessage {
 const messageQueue: QueuedMessage[] = []
 let isProcessingQueue = false
 let queueAnimationFrame: number | null = null
+
+/**
+ * Shared Web Audio player instance
+ * Created once and reused across all PLAY commands
+ */
+const audioPlayer = useWebAudioPlayer()
 
 /**
  * Process queued messages during animation frame
@@ -407,6 +415,65 @@ export function handleProgressMessage(message: AnyServiceWorkerMessage, _context
 }
 
 /**
+ * Handle PLAY_SOUND message from web worker
+ * Converts flat event array back to per-channel structure and plays via Web Audio API
+ */
+export function handlePlaySoundMessage(message: AnyServiceWorkerMessage, _context: MessageHandlerContext): void {
+  if (message.type !== 'PLAY_SOUND') return
+
+  const playSoundMessage = message
+  const { events } = playSoundMessage.data
+
+  logIdeMessages.debug('🎵 Handling PLAY_SOUND:', events.length, 'events')
+
+  // Initialize audio context on first use (requires user gesture)
+  if (!audioPlayer.isInitialized.value) {
+    audioPlayer.initialize()
+  }
+
+  // Group events by channel to reconstruct per-channel structure
+  const channelMap = new Map<number, Array<Note | Rest>>()
+
+  for (const event of events) {
+    const channel = event.channel
+    if (!channelMap.has(channel)) {
+      channelMap.set(channel, [])
+    }
+
+    const channelEvents = channelMap.get(channel)!
+
+    if (event.frequency !== undefined) {
+      // It's a Note
+      const note: Note = {
+        frequency: event.frequency,
+        duration: event.duration,
+        channel: event.channel,
+        duty: event.duty,
+        envelope: event.envelope,
+        volumeOrLength: event.volumeOrLength,
+      }
+      channelEvents.push(note)
+    } else {
+      // It's a Rest
+      const rest: Rest = {
+        duration: event.duration,
+        channel: event.channel,
+      }
+      channelEvents.push(rest)
+    }
+  }
+
+  // Convert map to array of channels (ensure channels 0-2 exist)
+  const channels: Array<Array<Note | Rest>> = []
+  for (let i = 0; i < 3; i++) {
+    channels.push(channelMap.get(i) ?? [])
+  }
+
+  // Play sequentially: next PLAY starts after current melody finishes (F-BASIC behavior)
+  audioPlayer.playMusicSequential(channels)
+}
+
+/**
  * Handle animation command message from web worker
  * These commands are sent immediately when MOVE is executed
  */
@@ -727,6 +794,9 @@ function processMessage(message: AnyServiceWorkerMessage, context: MessageHandle
       break
     case 'PROGRESS':
       handleProgressMessage(message, context)
+      break
+    case 'PLAY_SOUND':
+      handlePlaySoundMessage(message, context)
       break
     case 'REQUEST_INPUT': {
       const reqInputData = (message).data

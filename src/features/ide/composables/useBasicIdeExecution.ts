@@ -12,6 +12,7 @@ import { formatArrayForDisplay } from './useBasicIdeFormatting'
 import { clearScreenBuffer, initializeScreenBuffer } from './useBasicIdeScreenUtils'
 import type { BasicIdeState } from './useBasicIdeState'
 import type { BasicIdeWorkerIntegration } from './useBasicIdeWorkerIntegration'
+import { useWebAudioPlayer } from './useWebAudioPlayer'
 
 /** Parser returns CST or null; used by runCode. */
 export type ParseCodeFn = () => Promise<unknown>
@@ -31,6 +32,9 @@ export function useBasicIdeExecution(
   worker: BasicIdeWorkerIntegration,
   parseCode: ParseCodeFn
 ): BasicIdeExecution {
+  // Initialize Web Audio player for PLAY command
+  const audioPlayer = useWebAudioPlayer()
+
   const runCode = async () => {
     if (state.isRunning.value) return
 
@@ -39,6 +43,10 @@ export function useBasicIdeExecution(
     state.errors.value = []
     state.variables.value = {}
     state.debugOutput.value = ''
+
+    // Initialize audio context before running (autoplay policy requirement)
+    // User gesture (Run button click) allows AudioContext creation
+    audioPlayer.initialize()
 
     try {
       await worker.initializeWebWorker()

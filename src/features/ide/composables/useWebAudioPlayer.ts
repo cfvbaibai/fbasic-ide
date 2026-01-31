@@ -1,0 +1,220 @@
+/**
+ * Web Audio API player for F-BASIC PLAY command
+ *
+ * Handles 3-channel polyphonic playback with duty cycle, envelope, and volume.
+ * Based on POC implementation in docs/poc/play-command-poc.html.
+ */
+
+import { ref } from 'vue'
+
+import type { Note, Rest } from '@/core/sound/types'
+
+/**
+ * Web Audio API player for F-BASIC PLAY command
+ * Handles 3-channel polyphonic playback with duty cycle, envelope, volume
+ */
+/** Total duration (ms) of a channel's events (notes + rests) */
+function getChannelDurationMs(channelEvents: Array<Note | Rest>): number {
+  return channelEvents.reduce((sum, e) => sum + e.duration, 0)
+}
+
+/** Total playback time (ms) = max of per-channel durations (channels play in parallel) */
+function getTotalDurationMs(channels: Array<Array<Note | Rest>>): number {
+  if (channels.length === 0) return 0
+  return Math.max(...channels.map(getChannelDurationMs))
+}
+
+export function useWebAudioPlayer() {
+  const audioContext = ref<AudioContext | null>(null)
+  const isInitialized = ref(false)
+  /** Queue for sequential PLAY: next melody starts after current finishes */
+  const playQueue: Array<Array<Array<Note | Rest>>> = []
+  let isPlaying = false
+
+  /**
+   * Initialize AudioContext (requires user gesture)
+   */
+  function initialize(): void {
+    if (!audioContext.value) {
+      // Safari uses webkitAudioContext
+      const contextClass =
+        window.AudioContext ||
+        (window as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
+      if (contextClass) {
+        audioContext.value = new contextClass()
+        isInitialized.value = true
+      }
+    }
+
+    // Resume if suspended (autoplay policy)
+    if (audioContext.value?.state === 'suspended') {
+      void audioContext.value.resume()
+    }
+  }
+
+  /**
+   * Create square wave with duty cycle using Fourier series
+   * See POC docs/poc/play-command-poc.html for reference
+   */
+  function createSquareWave(duty: number): PeriodicWave | null {
+    if (!audioContext.value) return null
+
+    const n = 32 // Number of harmonics
+    const real = new Float32Array(n)
+    const imag = new Float32Array(n)
+
+    // Fourier series for square wave with duty cycle
+    // duty: 0=12.5%, 1=25%, 2=50%, 3=75%
+    const dutyCycle = [0.125, 0.25, 0.5, 0.75][duty] ?? 0.5
+
+    // DC offset for duty cycle != 50%
+    real[0] = 2 * dutyCycle - 1
+
+    // Fourier series for pulse wave
+    for (let i = 1; i < n; i++) {
+      const coeff = (2 / (Math.PI * i)) * Math.sin(Math.PI * i * dutyCycle)
+      imag[i] = coeff
+    }
+
+    return audioContext.value.createPeriodicWave(real, imag, { disableNormalization: false })
+  }
+
+  /**
+   * Play a single note
+   */
+  function playNote(note: Note): void {
+    if (!audioContext.value) {
+      initialize()
+      if (!audioContext.value) return
+    }
+
+    const ctx = audioContext.value
+    const oscillator = ctx.createOscillator()
+    const gainNode = ctx.createGain()
+
+    // Set frequency
+    oscillator.frequency.value = note.frequency
+
+    // Set waveform (square wave with duty cycle)
+    const periodicWave = createSquareWave(note.duty)
+    if (periodicWave) {
+      oscillator.setPeriodicWave(periodicWave)
+    }
+
+    // Connect nodes
+    oscillator.connect(gainNode)
+    gainNode.connect(ctx.destination)
+
+    // Calculate volume
+    // M0: volumeOrLength is volume (0-15)
+    // M1: volumeOrLength is envelope length (0-15), start at max volume
+    const volume = note.envelope === 0 ? note.volumeOrLength / 15 : 1.0
+
+    // Apply envelope if M1
+    const now = ctx.currentTime
+    const duration = note.duration / 1000 // ms → seconds
+
+    if (note.envelope === 1) {
+      // Exponential decay (longer volumeOrLength = slower decay)
+      const decayFactor = note.volumeOrLength / 15 // 0-15 → 0-1
+      const decayTime = duration * (0.5 + decayFactor * 0.5) // 50%-100% of duration
+
+      gainNode.gain.setValueAtTime(volume, now)
+      gainNode.gain.exponentialRampToValueAtTime(0.01, now + decayTime)
+    } else {
+      // M0: Constant volume
+      gainNode.gain.setValueAtTime(volume, now)
+    }
+
+    // Schedule playback
+    oscillator.start(now)
+    oscillator.stop(now + duration)
+  }
+
+  /**
+   * Play multiple channels simultaneously (polyphonic)
+   */
+  function playMusic(channels: Array<Array<Note | Rest>>): void {
+    // Initialize audio context on first use
+    if (!isInitialized.value) {
+      initialize()
+    }
+
+    // Schedule all notes across all channels
+    channels.forEach((channelEvents) => {
+      let timeOffset = 0
+
+      channelEvents.forEach((event) => {
+        if ('frequency' in event) {
+          // It's a Note - schedule playback
+          const note = event
+
+          // Schedule note to start at timeOffset
+          setTimeout(() => {
+            playNote(note)
+          }, timeOffset)
+
+          timeOffset += note.duration
+        } else {
+          // It's a Rest - just add to time offset
+          const rest = event
+          timeOffset += rest.duration
+        }
+      })
+    })
+  }
+
+  /**
+   * Play melody and run onComplete after total duration (ms).
+   * Used internally for sequential playback.
+   */
+  function playMusicWithCallback(
+    channels: Array<Array<Note | Rest>>,
+    onComplete: () => void
+  ): void {
+    playMusic(channels)
+    const totalMs = getTotalDurationMs(channels)
+    setTimeout(onComplete, totalMs)
+  }
+
+  /**
+   * Play melodies sequentially (F-BASIC: next PLAY starts after current finishes).
+   * If a melody is already playing, the new one is queued.
+   */
+  function playMusicSequential(channels: Array<Array<Note | Rest>>): void {
+    if (isPlaying) {
+      playQueue.push(channels)
+      return
+    }
+    isPlaying = true
+    playMusicWithCallback(channels, () => {
+      isPlaying = false
+      const next = playQueue.shift()
+      if (next) {
+        playMusicSequential(next)
+      }
+    })
+  }
+
+  /**
+   * Stop all sounds and clear the play queue
+   */
+  function stopAll(): void {
+    playQueue.length = 0
+    isPlaying = false
+    if (audioContext.value) {
+      // Close and recreate context to stop all sounds
+      void audioContext.value.close()
+      audioContext.value = null
+      isInitialized.value = false
+    }
+  }
+
+  return {
+    isInitialized,
+    initialize,
+    playMusic,
+    playMusicSequential,
+    stopAll,
+  }
+}

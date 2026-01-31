@@ -51,7 +51,8 @@
       "Bash(npm view:*)",
       "Bash(git mv:*)",
       "Bash(wc:*)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "Bash(npx tsc:*)"
     ]
   },
   "enabledPlugins": {

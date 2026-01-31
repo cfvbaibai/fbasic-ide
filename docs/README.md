@@ -32,7 +32,7 @@ Reference material:
 
 ### 📋 `planning/` - Active Plans
 Current planning documents (553 lines total):
-- `remaining-work-plan.md` - Remaining work roadmap
+- `outstanding-work-plan.md` - Not-done-yet work (STOP, CONT, POKE, VIEW when unblocked)
 
 **Note**: Completed plans archived in `archive/planning/`
 

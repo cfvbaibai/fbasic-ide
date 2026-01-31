@@ -23,6 +23,7 @@ import {
   Next,
   End,
   Pause,
+  Play,
   If,
   Then,
   Goto,
@@ -124,6 +125,7 @@ class FBasicChevrotainParser extends CstParser {
   declare nextStatement: () => CstNode
   declare endStatement: () => CstNode
   declare pauseStatement: () => CstNode
+  declare playStatement: () => CstNode
   declare comparisonExpression: () => CstNode
   declare logicalNotExpression: () => CstNode
   declare logicalAndExpression: () => CstNode
@@ -469,6 +471,13 @@ class FBasicChevrotainParser extends CstParser {
     this.pauseStatement = this.RULE('pauseStatement', () => {
       this.CONSUME(Pause)
       this.SUBRULE(this.expression)
+    })
+
+    // PLAY StringExpression
+    // Plays back music according to the sound specified by the string data
+    this.playStatement = this.RULE('playStatement', () => {
+      this.CONSUME(Play)
+      this.SUBRULE(this.expression) // String expression with music data
     })
 
     // GOTO NumberLiteral
@@ -1015,6 +1024,10 @@ class FBasicChevrotainParser extends CstParser {
         {
           GATE: () => this.LA(1).tokenType === Pause,
           ALT: () => this.SUBRULE(this.pauseStatement),
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Play,
+          ALT: () => this.SUBRULE(this.playStatement),
         },
         {
           GATE: () => this.LA(1).tokenType === Dim,

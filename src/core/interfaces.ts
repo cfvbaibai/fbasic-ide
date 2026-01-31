@@ -96,6 +96,13 @@ export interface BasicDeviceAdapter {
 
   // === ANIMATION COMMANDS ===
   sendAnimationCommand?(command: AnimationCommand): void
+
+  // === SOUND OUTPUT ===
+  /**
+   * Play sound using F-BASIC PLAY music DSL
+   * @param musicString - Music string with tempo, notes, rests, and channel separators
+   */
+  playSound?(musicString: string): void
 }
 
 /**
@@ -258,6 +265,7 @@ export type ServiceWorkerMessageType =
   | 'SET_SHARED_ANIMATION_BUFFER'
   | 'REQUEST_INPUT'
   | 'INPUT_VALUE'
+  | 'PLAY_SOUND'
 
 // Execute message - sent from UI to service worker
 export interface ExecuteMessage extends ServiceWorkerMessage {
@@ -446,6 +454,23 @@ export interface InputValueMessage extends ServiceWorkerMessage {
   }
 }
 
+// Play sound - sent from worker to main to play PLAY command sound
+export interface PlaySoundMessage extends ServiceWorkerMessage {
+  type: 'PLAY_SOUND'
+  data: {
+    executionId: string
+    musicString: string
+    events: Array<{
+      frequency?: number
+      duration: number
+      channel: number
+      duty: number
+      envelope: number
+      volumeOrLength: number
+    }>
+  }
+}
+
 // Union type for all possible messages
 export type AnyServiceWorkerMessage =
   | ExecuteMessage
@@ -464,6 +489,7 @@ export type AnyServiceWorkerMessage =
   | SetSharedAnimationBufferMessage
   | RequestInputMessage
   | InputValueMessage
+  | PlaySoundMessage
 
 // Message handler interface for type-safe message handling
 export interface ServiceWorkerMessageHandler {

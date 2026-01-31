@@ -8,7 +8,6 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
-import type { BasicDeviceAdapter } from '@/core/interfaces'
 
 describe('InputExecutor', () => {
   let interpreter: BasicInterpreter
@@ -101,7 +100,7 @@ describe('InputExecutor', () => {
 
   it('should add error when device has no requestInput', async () => {
     const adapterWithoutInput = new TestDeviceAdapter()
-    ;(adapterWithoutInput as BasicDeviceAdapter).requestInput = undefined
+    adapterWithoutInput.requestInput = undefined
     const interp = new BasicInterpreter({
       maxIterations: 1000,
       maxOutputLines: 100,

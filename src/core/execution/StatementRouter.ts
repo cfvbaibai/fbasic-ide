@@ -36,6 +36,7 @@ import { NextExecutor } from './executors/NextExecutor'
 import { OnExecutor } from './executors/OnExecutor'
 import { PaletExecutor } from './executors/PaletExecutor'
 import { PauseExecutor } from './executors/PauseExecutor'
+import { PlayExecutor } from './executors/PlayExecutor'
 import { PositionExecutor } from './executors/PositionExecutor'
 import { PrintExecutor } from './executors/PrintExecutor'
 import { ReadExecutor } from './executors/ReadExecutor'
@@ -80,6 +81,7 @@ export class StatementRouter {
   private cutExecutor: CutExecutor
   private eraExecutor: EraExecutor
   private positionExecutor: PositionExecutor
+  private playExecutor: PlayExecutor
 
   constructor(
     private context: ExecutionContext,
@@ -120,6 +122,7 @@ export class StatementRouter {
     this.cutExecutor = new CutExecutor(context, evaluator)
     this.eraExecutor = new EraExecutor(context, evaluator)
     this.positionExecutor = new PositionExecutor(context, evaluator)
+    this.playExecutor = new PlayExecutor(context, evaluator)
   }
 
   /**
@@ -429,6 +432,11 @@ export class StatementRouter {
       const positionStmtCst = getFirstCstNode(singleCommandCst.children.positionStatement)
       if (positionStmtCst) {
         this.positionExecutor.execute(positionStmtCst, expandedStatement.lineNumber)
+      }
+    } else if (singleCommandCst.children.playStatement) {
+      const playStmtCst = getFirstCstNode(singleCommandCst.children.playStatement)
+      if (playStmtCst) {
+        this.playExecutor.execute(playStmtCst, expandedStatement.lineNumber)
       }
     } else {
       // Other statement types not yet implemented
