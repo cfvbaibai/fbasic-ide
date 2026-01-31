@@ -2,6 +2,30 @@
 
 All notable changes to this project are documented here.
 
+## 2026-01-31 - Split useBasicIdeEnhanced into logical modules
+
+### Changes
+- **useBasicIdeEnhanced.ts** (was 586 lines) is now a thin composer (~110 lines) that wires state, screen, worker, execution, and editor. Implementation is split for maintainability (each file under 500 lines).
+- **useBasicIdeState.ts**: Centralized reactive state (all refs: editor, execution, screen, sprite, input). Single source for refs used by other composables.
+- **useBasicIdeScreenIntegration.ts**: Shared display buffer creation, `registerScheduleRender`, `setDecodedScreenState`, `scheduleRender` callback.
+- **useBasicIdeWorkerIntegration.ts**: Web worker manager, message handler context, init/restart/health/send, joystick and input events, cleanup.
+- **useBasicIdeExecution.ts**: `runCode`, `stopCode`, `clearOutput`, `clearAll` (runCode flow, movement-state merge, error handling).
+- **useBasicIdeEditor.ts**: Parser instance, `updateHighlighting`, `parseCode`, `validateCode`, `loadSampleCode`, `sampleSelectOptions`, parser/highlighter capabilities.
+- Public API of `useBasicIde()` unchanged; consumers (IdePage, test pages) require no changes.
+
+## 2026-01-31 - Screen context via provide/inject (reduce prop drilling)
+
+### Changes
+- **Screen context**: Introduced `useScreenContext` composable (injection key + `provideScreenContext` / `useScreenContext`) so screen-related state is provided once by the page and injected by ScreenTab and Screen instead of being passed through RuntimeOutput.
+- **IdePage**: Provides screen context (screenBuffer, cursor, palettes, sprites, shared buffers, callbacks) after `useBasicIdeEnhanced()`; passes to RuntimeOutput only `output`, `isRunning`, `errors`, `variables`, `debugOutput`, `debugMode`.
+- **RuntimeOutput**: Props reduced to the six above; ScreenTab receives only `errors`.
+- **ScreenTab**: Injects screen context; uses it for ActivePaletteDisplay and passes nothing to Screen (Screen injects the same context).
+- **Screen**: No longer accepts screen-related props; injects screen context and reads/writes via `ctx.*.value` and callbacks.
+- **Test pages**: `PrintVsSpritesTestPage.vue` and `PositionSyncLoadTestPage.vue` updated to call `provideScreenContext` and pass only the reduced props to RuntimeOutput.
+
+### Files
+- **New**: `src/features/ide/composables/useScreenContext.ts` (key, type, provide/inject helpers).
+
 ## 2026-01-31 - Remove STDOUT tab; add error panel footer on Screen tab
 
 ### Changes

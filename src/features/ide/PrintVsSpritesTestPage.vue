@@ -13,6 +13,7 @@ import { GameBlock, GameButton, GameLayout } from '@/shared/components/ui'
 
 import RuntimeOutput from './components/RuntimeOutput.vue'
 import { useBasicIde as useBasicIdeEnhanced } from './composables/useBasicIdeEnhanced'
+import { provideScreenContext } from './composables/useScreenContext'
 
 defineOptions({
   name: 'PrintVsSpritesTestPage',
@@ -33,6 +34,8 @@ const {
   cursorY,
   bgPalette,
   backdropColor,
+  spritePalette,
+  cgenMode,
   spriteStates,
   spriteEnabled,
   movementStates,
@@ -43,6 +46,25 @@ const {
   setDecodedScreenState,
   registerScheduleRender,
 } = useBasicIdeEnhanced()
+
+provideScreenContext({
+  screenBuffer,
+  cursorX,
+  cursorY,
+  bgPalette,
+  backdropColor,
+  spritePalette,
+  cgenMode,
+  spriteStates,
+  spriteEnabled,
+  movementStates,
+  externalFrontSpriteNodes: frontSpriteNodes,
+  externalBackSpriteNodes: backSpriteNodes,
+  sharedAnimationView: ref(sharedAnimationView),
+  sharedDisplayViews: ref(sharedDisplayViews),
+  setDecodedScreenState,
+  registerScheduleRender,
+})
 
 // Disable STDOUT display for FPS test (PRINT still runs; we avoid stdout DOM updates)
 const stdoutDisabled = true
@@ -131,26 +153,12 @@ onBeforeUnmount(() => {
 
       <GameBlock title="Screen" title-icon="mdi:monitor" class="screen-panel">
         <RuntimeOutput
-          :shared-animation-view="sharedAnimationView"
-          :shared-display-views="sharedDisplayViews"
-          :set-decoded-screen-state="setDecodedScreenState"
-          :register-schedule-render="registerScheduleRender"
           :output="outputForDisplay"
           :is-running="isRunning"
           :errors="errors"
           :variables="variables"
           :debug-output="debugOutput"
           :debug-mode="debugMode"
-          :screen-buffer="screenBuffer"
-          :cursor-x="cursorX"
-          :cursor-y="cursorY"
-          :bg-palette="bgPalette"
-          :backdrop-color="backdropColor"
-          :sprite-states="spriteStates"
-          :sprite-enabled="spriteEnabled"
-          :movement-states="movementStates"
-          :external-front-sprite-nodes="frontSpriteNodes"
-          :external-back-sprite-nodes="backSpriteNodes"
         />
       </GameBlock>
     </div>

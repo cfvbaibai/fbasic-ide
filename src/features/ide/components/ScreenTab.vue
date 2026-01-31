@@ -2,9 +2,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import type { SharedDisplayViews } from '@/core/animation/sharedDisplayBuffer'
-import type { ScreenCell } from '@/core/interfaces'
-import type { MovementState, SpriteState } from '@/core/sprite/types'
+import { useScreenContext } from '@/features/ide/composables/useScreenContext'
 import { provideScreenZoom } from '@/features/ide/composables/useScreenZoom'
 import { GameButton, GameButtonGroup, GameIcon, GameTabPane } from '@/shared/components/ui'
 
@@ -14,57 +12,20 @@ import Screen from './Screen.vue'
 
 /**
  * ScreenTab component - Displays the screen buffer in a tab pane format with zoom controls.
+ * Screen data comes from useScreenContext (provided by IdePage).
  */
 defineOptions({
   name: 'ScreenTab',
 })
 
-// Props are used in template, but linter requires assignment for withDefaults
 const _props = withDefaults(
   defineProps<{
-    screenBuffer?: ScreenCell[][]
-    cursorX?: number
-    cursorY?: number
-    bgPalette?: number
-    backdropColor?: number
-    spritePalette?: number
-    cgenMode?: number
-    spriteStates?: SpriteState[]
-    spriteEnabled?: boolean
-    movementStates?: MovementState[]
-    externalFrontSpriteNodes?: Map<number, unknown>
-    externalBackSpriteNodes?: Map<number, unknown>
-    sharedAnimationView?: Float64Array
-    sharedDisplayViews?: SharedDisplayViews
-    setDecodedScreenState?: (decoded: import('@/core/animation/sharedDisplayBuffer').DecodedScreenState) => void
-    registerScheduleRender?: (fn: () => void) => void
     errors?: Array<{ line: number; message: string; type: string; stack?: string; sourceLine?: string }>
   }>(),
-  {
-    screenBuffer: () => {
-      const grid: ScreenCell[][] = []
-      for (let y = 0; y < 24; y++) {
-        const row: ScreenCell[] = []
-        for (let x = 0; x < 28; x++) {
-          row.push({ character: ' ', colorPattern: 0, x, y })
-        }
-        grid.push(row)
-      }
-      return grid
-    },
-    cursorX: 0,
-    cursorY: 0,
-    bgPalette: 1,
-    backdropColor: 0,
-    spritePalette: 1,
-    cgenMode: 2,
-    spriteStates: () => [],
-    spriteEnabled: false,
-    movementStates: () => [],
-    errors: () => [],
-  }
+  { errors: () => [] }
 )
 
+const screen = useScreenContext()
 const { t } = useI18n()
 
 // Provide zoom state for child components (Screen) and use it for controls
@@ -104,32 +65,15 @@ const currentZoomLevel = computed(() => zoomLevel.value)
           </GameButton>
         </GameButtonGroup>
         <ActivePaletteDisplay
-          :bg-palette="bgPalette"
-          :sprite-palette="spritePalette"
+          :bg-palette="screen.bgPalette.value"
+          :sprite-palette="screen.spritePalette.value"
           class="palette-display"
         />
       </div>
     </template>
 
     <div class="tab-content">
-      <Screen
-        :screen-buffer="screenBuffer"
-        :cursor-x="cursorX"
-        :cursor-y="cursorY"
-        :bg-palette="bgPalette"
-        :backdrop-color="backdropColor"
-        :sprite-palette="spritePalette"
-        :cgen-mode="cgenMode"
-        :sprite-states="spriteStates"
-        :sprite-enabled="spriteEnabled"
-        :movement-states="movementStates"
-        :external-front-sprite-nodes="externalFrontSpriteNodes"
-        :external-back-sprite-nodes="externalBackSpriteNodes"
-        :shared-animation-view="sharedAnimationView"
-        :shared-display-views="sharedDisplayViews"
-        :set-decoded-screen-state="setDecodedScreenState"
-        :register-schedule-render="registerScheduleRender"
-      />
+      <Screen />
     </div>
     <div class="tab-content-footer">
       <ErrorPanel :errors="errors" />

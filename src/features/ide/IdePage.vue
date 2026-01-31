@@ -18,6 +18,7 @@ import LogLevelPanel from './components/LogLevelPanel.vue'
 import MonacoCodeEditor from './components/MonacoCodeEditor.vue'
 import RuntimeOutput from './components/RuntimeOutput.vue'
 import { useBasicIde as useBasicIdeEnhanced } from './composables/useBasicIdeEnhanced'
+import { provideScreenContext } from './composables/useScreenContext'
 
 /**
  * IdePage component - The main IDE page for F-BASIC code editing and execution.
@@ -68,6 +69,26 @@ const {
   respondToInputRequest,
   sampleSelectOptions,
 } = useBasicIdeEnhanced()
+
+// Provide screen context so ScreenTab/Screen can inject instead of prop drilling
+provideScreenContext({
+  screenBuffer,
+  cursorX,
+  cursorY,
+  bgPalette,
+  backdropColor,
+  spritePalette,
+  cgenMode,
+  spriteStates,
+  spriteEnabled,
+  movementStates,
+  externalFrontSpriteNodes: frontSpriteNodes,
+  externalBackSpriteNodes: backSpriteNodes,
+  sharedAnimationView: ref(sharedAnimationView),
+  sharedDisplayViews: ref(sharedDisplayViews),
+  setDecodedScreenState,
+  registerScheduleRender,
+})
 
 // INPUT/LINPUT modal: local input value and submit/cancel
 const inputModalValue = ref<string | number>('')
@@ -157,28 +178,12 @@ onMounted(() => {
             </div>
           </Transition>
           <RuntimeOutput
-            :shared-animation-view="sharedAnimationView"
-            :shared-display-views="sharedDisplayViews"
-            :set-decoded-screen-state="setDecodedScreenState"
-            :register-schedule-render="registerScheduleRender"
             :output="output"
             :is-running="isRunning"
             :errors="errors"
             :variables="variables"
             :debug-output="debugOutput"
             :debug-mode="debugMode"
-            :screen-buffer="screenBuffer"
-            :cursor-x="cursorX"
-            :cursor-y="cursorY"
-            :bg-palette="bgPalette"
-            :backdrop-color="backdropColor"
-            :sprite-palette="spritePalette"
-            :cgen-mode="cgenMode"
-            :sprite-states="spriteStates"
-            :sprite-enabled="spriteEnabled"
-            :movement-states="movementStates"
-            :external-front-sprite-nodes="frontSpriteNodes"
-            :external-back-sprite-nodes="backSpriteNodes"
           />
         </div>
       </div>

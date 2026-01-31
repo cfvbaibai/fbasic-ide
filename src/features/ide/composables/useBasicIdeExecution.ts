@@ -1,0 +1,212 @@
+/**
+ * Execution flow: runCode, stopCode, clearOutput, clearAll.
+ * Depends on state, worker integration, and parseCode from editor.
+ */
+
+import { EXECUTION_LIMITS } from '@/core/constants'
+import type { BasicVariable } from '@/core/interfaces'
+import { ExecutionError } from '@/features/ide/errors/ExecutionError'
+import { logComposable } from '@/shared/logger'
+
+import { formatArrayForDisplay } from './useBasicIdeFormatting'
+import { clearScreenBuffer, initializeScreenBuffer } from './useBasicIdeScreenUtils'
+import type { BasicIdeState } from './useBasicIdeState'
+import type { BasicIdeWorkerIntegration } from './useBasicIdeWorkerIntegration'
+
+/** Parser returns CST or null; used by runCode. */
+export type ParseCodeFn = () => Promise<unknown>
+
+export interface BasicIdeExecution {
+  runCode: () => Promise<void>
+  stopCode: () => void
+  clearOutput: () => void
+  clearAll: () => void
+}
+
+/**
+ * Create run/stop/clear actions. Requires parseCode from editor for runCode.
+ */
+export function useBasicIdeExecution(
+  state: BasicIdeState,
+  worker: BasicIdeWorkerIntegration,
+  parseCode: ParseCodeFn
+): BasicIdeExecution {
+  const runCode = async () => {
+    if (state.isRunning.value) return
+
+    state.isRunning.value = true
+    state.output.value = []
+    state.errors.value = []
+    state.variables.value = {}
+    state.debugOutput.value = ''
+
+    try {
+      await worker.initializeWebWorker()
+
+      const isHealthy = await worker.checkWebWorkerHealth()
+      if (!isHealthy) {
+        logComposable.debug('Web worker unhealthy, restarting...')
+        await worker.restartWebWorker()
+      }
+
+      const cst = await parseCode()
+      if (!cst) {
+        state.isRunning.value = false
+        return
+      }
+
+      clearScreenBuffer(state.screenBuffer, state.cursorX, state.cursorY)
+      state.movementStates.value = []
+
+      const result = await worker.sendMessageToWorker({
+        type: 'EXECUTE',
+        id: `execute-${Date.now()}`,
+        timestamp: Date.now(),
+        data: {
+          code: state.code.value,
+          config: {
+            maxIterations: EXECUTION_LIMITS.MAX_ITERATIONS_PRODUCTION,
+            maxOutputLines: EXECUTION_LIMITS.MAX_OUTPUT_LINES_PRODUCTION,
+            enableDebugMode: state.debugMode.value,
+            strictMode: true,
+          },
+        },
+      })
+
+      if (result?.errors && result.errors.length > 0) {
+        state.errors.value = result.errors
+        logComposable.error('[IDE] Run finished with errors:', result.errors[0]?.message, result.errors)
+      }
+
+      if (result?.variables) {
+        const vars: Record<string, BasicVariable> =
+          result.variables instanceof Map ? Object.fromEntries(result.variables) : result.variables
+
+        if (result.arrays) {
+          const arrays =
+            result.arrays instanceof Map ? result.arrays : new Map(Object.entries(result.arrays))
+          for (const [arrayName, arrayValue] of arrays.entries()) {
+            const formatted = formatArrayForDisplay(arrayValue)
+            vars[arrayName] = {
+              value: formatted,
+              type: arrayName.endsWith('$') ? 'string' : 'number',
+            }
+          }
+        }
+
+        state.variables.value = vars
+      }
+
+      if (result?.spriteStates) {
+        state.spriteStates.value = result.spriteStates
+      }
+      if (result?.spriteEnabled !== undefined) {
+        state.spriteEnabled.value = result.spriteEnabled
+      }
+
+      if (result?.movementStates) {
+        const existingStates = new Map(state.movementStates.value.map(m => [m.actionNumber, m]))
+
+        state.movementStates.value = result.movementStates.map(m => {
+          const existing = existingStates.get(m.actionNumber)
+          if (existing) {
+            if (!m.isActive && !existing.isActive) {
+              return {
+                ...m,
+                startX: existing.startX,
+                startY: existing.startY,
+                remainingDistance: existing.remainingDistance,
+                currentFrameIndex: existing.currentFrameIndex,
+                frameCounter: existing.frameCounter,
+              }
+            }
+            if (
+              existing.isActive &&
+              m.isActive &&
+              existing.actionNumber === m.actionNumber
+            ) {
+              return {
+                ...m,
+                startX: existing.startX,
+                startY: existing.startY,
+                remainingDistance: existing.remainingDistance,
+                currentFrameIndex: existing.currentFrameIndex,
+                frameCounter: existing.frameCounter,
+              }
+            }
+          }
+          return m
+        })
+
+        for (const existing of existingStates.values()) {
+          if (
+            !existing.isActive &&
+            !state.movementStates.value.find(m => m.actionNumber === existing.actionNumber)
+          ) {
+            state.movementStates.value.push(existing)
+          }
+        }
+      }
+    } catch (error) {
+      logComposable.error('Execution error:', error)
+      if (error instanceof ExecutionError) {
+        state.errors.value = [
+          {
+            line: error.lineNumber ?? 0,
+            message: error.message,
+            type: 'runtime',
+            ...(error.stackTrace && { stack: error.stackTrace }),
+            ...(error.sourceLine && { sourceLine: error.sourceLine }),
+          },
+        ]
+      } else {
+        state.errors.value = [
+          {
+            line: 0,
+            message: error instanceof Error ? error.message : 'Execution error',
+            type: 'runtime',
+          },
+        ]
+      }
+    } finally {
+      state.isRunning.value = false
+    }
+  }
+
+  const stopCode = () => {
+    state.isRunning.value = false
+    if (worker.webWorkerManager.worker) {
+      worker.webWorkerManager.worker.postMessage({
+        type: 'STOP',
+        id: `stop-${Date.now()}`,
+        timestamp: Date.now(),
+        data: {},
+      })
+    }
+  }
+
+  const clearOutput = () => {
+    state.output.value = []
+    state.errors.value = []
+    state.variables.value = {}
+    state.debugOutput.value = ''
+    state.screenBuffer.value = initializeScreenBuffer()
+    state.cursorX.value = 0
+    state.cursorY.value = 0
+    state.spriteStates.value = []
+    state.spriteEnabled.value = false
+  }
+
+  const clearAll = () => {
+    state.code.value = ''
+    clearOutput()
+    state.highlightedCode.value = ''
+  }
+
+  return {
+    runCode,
+    stopCode,
+    clearOutput,
+    clearAll,
+  }
+}

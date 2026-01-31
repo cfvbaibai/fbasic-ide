@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import Konva from 'konva'
-import { computed, onUnmounted, ref, toValue, useTemplateRef, watch } from 'vue'
+import { computed, onDeactivated, onUnmounted, ref, toValue, useTemplateRef, watch } from 'vue'
 
-import type { SharedDisplayViews } from '@/core/animation/sharedDisplayBuffer'
 import {
   readScreenStateFromShared,
   readSequence,
 } from '@/core/animation/sharedDisplayBuffer'
 import type { ScreenCell } from '@/core/interfaces'
-import type { MovementState, SpriteState } from '@/core/sprite/types'
 import { preInitializeBackgroundTiles } from '@/features/ide/composables/useKonvaBackgroundRenderer'
 import {
   initializeKonvaLayers,
@@ -18,62 +16,22 @@ import {
 import { useMovementStateSync } from '@/features/ide/composables/useMovementStateSync'
 import { useRenderQueue } from '@/features/ide/composables/useRenderQueue'
 import { useScreenAnimationLoop } from '@/features/ide/composables/useScreenAnimationLoop'
+import { useScreenContext } from '@/features/ide/composables/useScreenContext'
 import { useScreenZoom } from '@/features/ide/composables/useScreenZoom'
 import { COLORS } from '@/shared/data/palette'
 import { logScreen } from '@/shared/logger'
 import type { VueKonvaStageInstance } from '@/types/vue-konva'
 
+/**
+ * Screen - CRT-style display for F-BASIC: backdrop, character grid, sprites.
+ * Reads state from useScreenContext; runs Konva render loop and animation loop.
+ */
 defineOptions({
   name: 'Screen',
 })
 
-const props = withDefaults(defineProps<Props>(), {
-  screenBuffer: () => {
-    // Initialize empty 28×24 grid
-    const grid: ScreenCell[][] = []
-    for (let y = 0; y < 24; y++) {
-      const row: ScreenCell[] = []
-      for (let x = 0; x < 28; x++) {
-        row.push({ character: ' ', colorPattern: 0, x, y })
-      }
-      grid.push(row)
-    }
-    return grid
-  },
-  cursorX: 0,
-  cursorY: 0,
-  bgPalette: 1,
-  backdropColor: 0,
-  spritePalette: 1,
-  cgenMode: 2,
-  spriteStates: () => [],
-  movementStates: () => [],
-  spriteEnabled: false,
-})
-
-interface Props {
-  screenBuffer: ScreenCell[][]
-  cursorX: number
-  cursorY: number
-  bgPalette?: number
-  backdropColor?: number
-  spritePalette?: number
-  cgenMode?: number
-  spriteStates?: SpriteState[]
-  movementStates?: MovementState[]
-  spriteEnabled?: boolean
-  // External sprite node maps (for message handler to get actual positions)
-  externalFrontSpriteNodes?: Map<number, unknown>
-  externalBackSpriteNodes?: Map<number, unknown>
-  /** Shared animation state view (Float64Array). Main thread writes positions + isActive each frame. */
-  sharedAnimationView?: Float64Array
-  /** Shared display buffer views; when present, render path reads sequence and decodes instead of using props. */
-  sharedDisplayViews?: SharedDisplayViews
-  /** Called after decoding shared buffer to update parent refs (screenBuffer, cursorX, etc.). */
-  setDecodedScreenState?: (decoded: import('@/core/animation/sharedDisplayBuffer').DecodedScreenState) => void
-  /** Register this component's scheduleRender so parent can trigger render on SCREEN_CHANGED. */
-  registerScheduleRender?: (fn: () => void) => void
-}
+// Screen data from context (provided by IdePage); no props
+const ctx = useScreenContext()
 
 /** Deep copy of screen buffer for dirty diff (last rendered state) */
 function deepCopyBuffer(buf: ScreenCell[][]): ScreenCell[][] {
@@ -83,12 +41,12 @@ function deepCopyBuffer(buf: ScreenCell[][]): ScreenCell[][] {
 // Konva Stage reference
 const stageRef = useTemplateRef<VueKonvaStageInstance>('stageRef')
 
-// Use bgPalette from props instead of hardcoded value
-const paletteCode = computed(() => props.bgPalette ?? 1)
+// Use bgPalette from context
+const paletteCode = computed(() => ctx.bgPalette.value ?? 1)
 
 // Computed backdrop color hex
 const backdropColorHex = computed(() => {
-  const colorCode = props.backdropColor ?? 0
+  const colorCode = ctx.backdropColor.value ?? 0
   return COLORS[colorCode] ?? COLORS[0] ?? '#000000'
 })
 
@@ -171,16 +129,17 @@ async function render(): Promise<void> {
   renderInProgress = true
   try {
     // Shared buffer path: read sequence; if changed (or first run), decode and update parent refs
-    let bufferToRender: ScreenCell[][] = props?.screenBuffer ?? []
-    if (props?.sharedDisplayViews) {
-      const seq = readSequence(props.sharedDisplayViews)
+    const sharedViews = ctx.sharedDisplayViews.value
+    let bufferToRender: ScreenCell[][] = ctx.screenBuffer.value ?? []
+    if (sharedViews) {
+      const seq = readSequence(sharedViews)
       if (seq !== lastSequenceRef.value || lastDecodedBufferRef.value === null) {
-        const decoded = readScreenStateFromShared(props.sharedDisplayViews)
-        props.setDecodedScreenState?.(decoded)
+        const decoded = readScreenStateFromShared(sharedViews)
+        ctx.setDecodedScreenState(decoded)
         lastSequenceRef.value = seq
         lastDecodedBufferRef.value = decoded.buffer
       }
-      bufferToRender = lastDecodedBufferRef.value ?? (props?.screenBuffer ?? [])
+      bufferToRender = lastDecodedBufferRef.value ?? (ctx.screenBuffer.value ?? [])
     }
 
     // Determine if background should be cached (static when no active movements)
@@ -194,24 +153,24 @@ async function render(): Promise<void> {
       backgroundLayer: layers.value.backgroundLayer as Konva.Layer | null,
       spriteFrontLayer: layers.value.spriteFrontLayer as Konva.Layer | null,
     }
-    // Use props count when ahead of local (log: all 8 START_MOVEMENTs in one rAF; sync watch can run after render())
-    const propsMovementCount = props.movementStates?.length ?? 0
+    // Use context count when ahead of local (log: all 8 START_MOVEMENTs in one rAF; sync watch can run after render())
+    const ctxMovementCount = ctx.movementStates.value?.length ?? 0
     const localMovementCount = localMovementStates.value.length
-    const movementCount = Math.max(propsMovementCount, localMovementCount)
+    const movementCount = Math.max(ctxMovementCount, localMovementCount)
     const spriteNodeCount = frontSpriteNodes.value.size + backSpriteNodes.value.size
     const needSpriteBuild =
       movementCount > 0 && (spriteNodeCount === 0 || spriteNodeCount < movementCount)
     const backgroundOnly =
       !needSpriteBuild && pendingRenderReasonRef.value === 'bufferOnly'
-    // When props is ahead, pass props so we build all sprites; else use local (mutable state)
+    // When context is ahead, pass context so we build all sprites; else use local (mutable state)
     const movementsToRender =
-      propsMovementCount > localMovementCount && (props.movementStates?.length ?? 0) > 0
-        ? (props.movementStates ?? [])
+      ctxMovementCount > localMovementCount && (ctx.movementStates.value?.length ?? 0) > 0
+        ? (ctx.movementStates.value ?? [])
         : localMovementStates.value
     if (needSpriteBuild || !backgroundOnly) {
       logScreen.debug('render', {
         movementCount,
-        propsMovementCount,
+        ctxMovementCount,
         localMovementCount,
         spriteNodeCount,
         needSpriteBuild,
@@ -226,12 +185,12 @@ async function render(): Promise<void> {
       await renderAllScreenLayers(
         layersToRender,
         bufferToRender,
-        props.spriteStates ?? [],
+        ctx.spriteStates.value ?? [],
         movementsToRender,
         paletteCode.value,
-        props.spritePalette ?? 1,
-        props.backdropColor ?? 0,
-        props.spriteEnabled ?? false,
+        ctx.spritePalette.value ?? 1,
+        ctx.backdropColor.value ?? 0,
+        ctx.spriteEnabled.value ?? false,
         backgroundShouldCache,
         frontSpriteNodes.value as Map<number, Konva.Image>,
         backSpriteNodes.value as Map<number, Konva.Image>,
@@ -251,16 +210,18 @@ async function render(): Promise<void> {
     if (!backgroundOnly) {
       frontSpriteNodes.value = frontNodes as Map<number, Konva.Image>
       backSpriteNodes.value = backNodes as Map<number, Konva.Image>
-      if (props.externalFrontSpriteNodes) {
-        props.externalFrontSpriteNodes.clear()
+      const extFront = ctx.externalFrontSpriteNodes.value
+      if (extFront) {
+        extFront.clear()
         for (const [key, value] of frontNodes.entries()) {
-          props.externalFrontSpriteNodes.set(key, value)
+          extFront.set(key, value)
         }
       }
-      if (props.externalBackSpriteNodes) {
-        props.externalBackSpriteNodes.clear()
+      const extBack = ctx.externalBackSpriteNodes.value
+      if (extBack) {
+        extBack.clear()
         for (const [key, value] of backNodes.entries()) {
-          props.externalBackSpriteNodes.set(key, value)
+          extBack.set(key, value)
         }
       }
     }
@@ -274,12 +235,12 @@ async function render(): Promise<void> {
 // Synchronize movement states from parent (with local mutable copy for animation)
 // When new MOVE commands are added, trigger a full render to show initial state
 const { localMovementStates } = useMovementStateSync({
-  movementStates: computed(() => props.movementStates),
+  movementStates: computed(() => ctx.movementStates.value),
   onSync: () => {
     logScreen.debug(
       'sync',
-      'props.movementStates=',
-      props.movementStates?.length ?? 0,
+      'ctx.movementStates=',
+      ctx.movementStates.value?.length ?? 0,
       'localMovementStates=',
       localMovementStates.value.length
     )
@@ -293,18 +254,18 @@ const { localMovementStates } = useMovementStateSync({
 // Combined watcher for better performance (Vue 3 best practice)
 // Use computed to extract sprite state fingerprint for efficient change detection
 const spriteStateFingerprint = computed(() => {
-  if (!props.spriteStates || props.spriteStates.length === 0) return ''
-  // Create a fingerprint from sprite properties we care about for rendering
-  return props.spriteStates.map(s => `${s.spriteNumber}:${s.x},${s.y},${s.visible ? '1' : '0'},${s.priority}`).join('|')
+  const states = ctx.spriteStates.value
+  if (!states || states.length === 0) return ''
+  return states.map(s => `${s.spriteNumber}:${s.x},${s.y},${s.visible ? '1' : '0'},${s.priority}`).join('|')
 })
 
 watch(
   [
     paletteCode,
-    () => props.backdropColor,
-    () => props.spritePalette,
+    () => ctx.backdropColor.value,
+    () => ctx.spritePalette.value,
     spriteStateFingerprint,
-    () => props.spriteEnabled,
+    () => ctx.spriteEnabled.value,
     zoomLevel,
   ],
   () => {
@@ -329,7 +290,7 @@ const { schedule: scheduleRender, cleanup: cleanupRenderQueue } = useRenderQueue
 
 // Register scheduleRender with parent so SCREEN_CHANGED can trigger a redraw (shared buffer path)
 watch(
-  () => props.registerScheduleRender,
+  () => ctx.registerScheduleRender,
   fn => {
     if (fn) fn(scheduleRender)
   },
@@ -339,9 +300,9 @@ watch(
 // Watch screenBuffer and render when it changes (PRINT). Use full when movements > nodes.
 // When using shared buffer, SCREEN_CHANGED triggers scheduleRender; this watch still runs for ref updates.
 watch(
-  () => props?.screenBuffer,
+  () => ctx.screenBuffer.value,
   () => {
-    const movementCount = props.movementStates?.length ?? 0
+    const movementCount = ctx.movementStates.value?.length ?? 0
     const spriteNodeCount = frontSpriteNodes.value.size + backSpriteNodes.value.size
     const useFull = movementCount > spriteNodeCount
     if (useFull) {
@@ -379,8 +340,8 @@ const stopAnimationLoop = useScreenAnimationLoop({
   layers,
   frontSpriteNodes,
   backSpriteNodes,
-  spritePalette: computed(() => props.spritePalette ?? 1),
-  sharedAnimationView: toValue(() => props.sharedAnimationView),
+  spritePalette: computed(() => ctx.spritePalette.value ?? 1),
+  sharedAnimationView: toValue(() => ctx.sharedAnimationView.value),
   getPendingStaticRender: () => pendingStaticRenderRef.value,
   onRunPendingStaticRender: async () => {
     await render()
@@ -391,11 +352,13 @@ const stopAnimationLoop = useScreenAnimationLoop({
   },
 })
 
-// Stop animation loop and cancel pending renders when component unmounts
-onUnmounted(() => {
+// Stop animation loop and cancel pending renders (unmount and keep-alive deactivation)
+function cleanupScreen() {
   stopAnimationLoop()
   cleanupRenderQueue()
-})
+}
+onUnmounted(cleanupScreen)
+onDeactivated(cleanupScreen)
 </script>
 
 <template>
