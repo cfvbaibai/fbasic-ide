@@ -4,31 +4,25 @@ This directory contains documentation for the Family Basic IDE (F-BASIC Emulator
 
 ## Structure
 
-### 📘 `guides/`
-Essential patterns for AI assistants working with this codebase:
-- `architecture.md` - System architecture overview and file structure
-- `theme-patterns.md` - Theme system patterns and best practices
-- `vue-patterns.md` - Vue 3 patterns and component guidelines
+### 📘 `guides/` - Essential AI Patterns
+AI-focused patterns and best practices (215 lines total):
+- `architecture.md` - System overview, file structure, key patterns
+- `theme-patterns.md` - CSS variable system and color rules
+- `vue-patterns.md` - Vue 3 composition API and component patterns
 
-**Note**: Detailed and theme-specific guides are archived in `archive/guides/`
+**Note**: Detailed guides archived in `archive/guides/`
 
-### 📊 `analysis/`
-Current analysis documents and reports:
-- `animation-commands-queue-review.md` - Animation command queue architecture review
-- `full-screen-buffer-shared-memory.md` - Shared memory buffer implementation analysis
-- `remaining-commands-emulator-compatibility.md` - Remaining F-BASIC commands compatibility analysis
+### 📊 `analysis/` - Active Analysis
+Current compatibility reviews (143 lines total):
+- `remaining-commands-emulator-compatibility.md` - F-BASIC commands analysis
 
-**Note**: Historical analysis documents are archived in `archive/analysis/`
+**Note**: Completed analysis archived in `archive/analysis/`
 
-### 🎮 `device-models/`
-Device model specifications and architecture:
-- `screen/` - Screen device model documentation
-  - `screen.md` - Screen layer architecture and specifications
-  - `architecture.md` - Screen device integration architecture
-  - `animation.md` - Animation frame system and timing
-- `joystick.md` - Joystick/input device model
+### 🎮 `device-models/` - Device Architecture
+Device model essentials (97 lines total):
+- `device-essentials.md` - Screen, joystick, and worker architecture
 
-**Note**: Historical design documents are archived in `archive/device-models/`
+**Note**: Detailed specifications archived in `archive/device-models/`
 
 ### 📚 `reference/`
 Reference material:
@@ -36,17 +30,17 @@ Reference material:
 - `family-basic-manual.pdf` - Family BASIC manual (PDF)
 
 
-### 📋 `planning/`
-Active planning and refactoring documents:
-- `remaining-work-plan.md` - Comprehensive plan for remaining project work (includes Phase 5 Sprite System; optional 4.4/4.5 noted)
+### 📋 `planning/` - Active Plans
+Current planning documents (553 lines total):
+- `remaining-work-plan.md` - Remaining work roadmap
 
-**Note**: Completed planning documents are archived in `archive/planning/`
+**Note**: Completed plans archived in `archive/planning/`
 
-### 📓 `diary/`
-Daily changelogs and implementation notes:
-- Files organized by date: `yyyy-MM-dd.txt` format
-- Contains recent updates, implementation notes, and status summaries
-- One date per file, append entries to existing files
+### 📝 `CHANGELOG.md` - Project History
+Consolidated changelog with all implementation notes:
+- Reverse chronological order (newest first)
+- Includes: features, fixes, refactorings, upgrades
+- Replaces previous diary/* files
 
 ### 📦 `archive/`
 Historical documentation preserved for reference:

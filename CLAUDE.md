@@ -1,14 +1,29 @@
 # CLAUDE.md
 
-Project configuration for Claude Code. This file provides essential context, constraints, and workflows for working with this codebase.
+AI-first project configuration for working with this codebase efficiently.
 
-## Project Overview
+## Quick Reference
 
-Family Basic IDE - a web-based emulator/IDE for the F-BASIC programming language (Nintendo Family Computer's BASIC).
+**Project**: Family Basic IDE - Web-based F-BASIC emulator/IDE
+**Stack**: Vue 3, TypeScript, Vite, Chevrotain parser
+**Tests**: 930 tests, Vitest 4.0.18
+**Node**: ≥24.13.0
 
-**Tech Stack**: Vue 3, TypeScript, Vite, Chevrotain parser
+## Essential Reading (Start Here)
 
-**Skills**: Vue 3 and VueUse best practices are available as agent skills. See [Architecture](docs/guides/architecture.md) for system architecture details.
+1. [Architecture](docs/guides/architecture.md) - System overview, file structure, key patterns
+2. [Vue Patterns](docs/guides/vue-patterns.md) - Vue 3 best practices
+3. [Theme Patterns](docs/guides/theme-patterns.md) - CSS variable system
+4. [Device Essentials](docs/device-models/device-essentials.md) - Screen & joystick architecture
+5. [Remaining Work](docs/planning/remaining-work-plan.md) - Active planning document
+6. [CHANGELOG](docs/CHANGELOG.md) - Recent changes and implementation notes
+
+## AI Workflow
+
+**For feature work**: Read architecture.md → Check remaining-work-plan.md → Implement
+**For bug fixes**: Check CHANGELOG.md for recent changes → Debug
+**For refactoring**: Review vue-patterns.md → Apply best practices
+**For UI work**: Review theme-patterns.md → Use existing variables
 
 ## Development Commands
 
@@ -58,21 +73,23 @@ pnpm test:run <path>  # Run specific test file (no -- separator needed)
 
 **ALL documentation files MUST be organized in the `docs/` directory:**
 
-- `docs/planning/` - Refactoring plans, migration plans, feature proposals
-- `docs/guides/` - How-to guides and integration documentation
-- `docs/analysis/` - Analysis reports and technical reviews
-- `docs/device-models/` - Device specifications and architecture
-- `docs/reference/` - Language references, manuals, specifications
-- `docs/poc/` - Experimental documentation and POCs
-- `docs/diary/` - Changelogs, recent updates, implementation notes (**one date per file**)
+- `docs/guides/` - Essential AI patterns (architecture, Vue, theme)
+- `docs/planning/` - Active planning documents
+- `docs/analysis/` - Current analysis and compatibility reviews
+- `docs/device-models/` - Device architecture essentials
+- `docs/reference/` - F-BASIC language manual (96 pages + PDF)
+- `docs/poc/` - Proof of concepts (experimental)
+- `docs/archive/` - Historical documentation
+- `docs/CHANGELOG.md` - All project changes (consolidated)
 
 **NEVER create documentation files at the workspace root.** All documentation belongs in `docs/` with appropriate subdirectories.
 
-### Changelog and Diary Content
+### Changelog Updates
 
-- **Changelog-style sections** (e.g. "Recent Updates", "Implementation Notes", "Changelog", "What's New") **MUST** live in `docs/diary/`, not inline in planning/guides/analysis docs.
-- **One date, one file**: Diary entries are organized by date. File name format: **`yyyy-MM-dd.txt`** (e.g. `2026-01-22.txt`). Append to the existing file for that date when adding entries.
-- In the source doc, add a short pointer to the diary (e.g. "Changelog: see `docs/diary/` (files `yyyy-MM-dd.txt` by date)").
+- **ALL changelog entries** go in `docs/CHANGELOG.md`
+- Format: `## YYYY-MM-DD - Title` for each date
+- Keep reverse chronological order (newest first)
+- Include: what changed, why, impact, status
 
 ### File Naming
 - Use kebab-case: `feature-name-plan.md`, `refactoring-guide.md`

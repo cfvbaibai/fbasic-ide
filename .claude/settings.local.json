@@ -32,7 +32,25 @@
       "Bash(pnpm run build:worker:*)",
       "Bash(pnpm run build-web-worker:*)",
       "Bash(pnpm dev)",
-      "Bash(pnpm build:*)"
+      "Bash(pnpm build:*)",
+      "Bash(npm config:*)",
+      "Bash(pnpm run dev)",
+      "Bash(echo:*)",
+      "Bash(powershell.exe -Command \"[System.Environment]::GetEnvironmentVariable\\(''npm_config_verify_deps_before_run'', ''User''\\)\")",
+      "Bash(powershell.exe -Command \"[System.Environment]::GetEnvironmentVariable\\(''npm_config__jsr_registry'', ''User''\\)\")",
+      "Bash(pnpm config:*)",
+      "Bash(powershell.exe -Command:*)",
+      "Bash(printenv:*)",
+      "Bash(npm run build-web-worker:*)",
+      "Bash(pnpm outdated:*)",
+      "Bash(pnpm why:*)",
+      "Bash(pnpm update:*)",
+      "Bash(pnpm remove:*)",
+      "Bash(pnpm audit:*)",
+      "Bash(pnpm list:*)",
+      "Bash(npm view:*)",
+      "Bash(git mv:*)",
+      "Bash(wc:*)"
     ]
   },
   "enabledPlugins": {
