@@ -71,13 +71,16 @@ describe('AnimationManager', () => {
       ).toThrow('Invalid direction: 9 (must be 0-8)')
     })
 
-    it('should throw for invalid speed (1-255)', () => {
-      expect(() =>
-        manager.defineMovement({ ...validDefinition, speed: 0 })
-      ).toThrow('Invalid speed: 0 (must be 1-255)')
+    it('should throw for invalid speed (0-255)', () => {
       expect(() =>
         manager.defineMovement({ ...validDefinition, speed: 256 })
-      ).toThrow('Invalid speed: 256 (must be 1-255)')
+      ).toThrow('Invalid speed: 256 (must be 0-255)')
+    })
+
+    it('should accept speed=0 (every 256 frames per manual)', () => {
+      expect(() =>
+        manager.defineMovement({ ...validDefinition, speed: 0 })
+      ).not.toThrow()
     })
 
     it('should throw for invalid distance (1-255)', () => {
@@ -133,6 +136,13 @@ describe('AnimationManager', () => {
           startY: 80,
         })
       )
+    })
+
+    it('should use speedDotsPerSecond = 60/256 when speed=0 (every 256 frames per manual)', () => {
+      manager.defineMovement({ ...validDefinition, speed: 0 })
+      manager.startMovement(0, 100, 80)
+      const state = manager.getMovementState(0)
+      expect(state?.speedDotsPerSecond).toBe(60 / 256)
     })
 
     it('should use default position so sprite center is at screen center when startX/startY not provided', () => {

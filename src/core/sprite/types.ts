@@ -47,7 +47,7 @@ export interface MoveDefinition {
   actionNumber: number // n: 0-7
   characterType: MoveCharacterCode // A: 0-15 (Mario, Lady, etc.)
   direction: number // B: 0-8 (0=none, 1=up, 2=up-right, etc.)
-  speed: number // C: 1-255 (60/C dots per second)
+  speed: number // C: 0-255 (0=every 256 frames, 60/C dots per second)
   distance: number // D: 1-255 (total distance = 2×D dots)
   priority: number // E: 0=front, 1=behind background
   colorCombination: number // F: 0-3
@@ -65,7 +65,7 @@ export interface MovementState {
   startY: number // Starting Y position (for reference, actual position in Konva)
   remainingDistance: number // Remaining distance in dots
   totalDistance: number // Total distance (2×D)
-  speedDotsPerSecond: number // 60/C dots per second
+  speedDotsPerSecond: number // 60/C dots per second (C=0 → 60/256)
   directionDeltaX: number // X direction component (-1, 0, or 1)
   directionDeltaY: number // Y direction component (-1, 0, or 1)
   isActive: boolean // Whether movement is active

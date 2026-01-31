@@ -83,9 +83,9 @@ describe('DefMoveExecutor', () => {
     expect(deviceAdapter.errorOutputs.some(m => m.includes('direction'))).toBe(true)
   })
 
-  it('should validate speed (1-255)', async () => {
+  it('should validate speed (0-255)', async () => {
     const source = `
-10 DEF MOVE(0) = SPRITE(0, 3, 0, 100, 0, 0)
+10 DEF MOVE(0) = SPRITE(0, 3, 256, 100, 0, 0)
 20 END
 `
     const result = await interpreter.execute(source)
@@ -93,6 +93,19 @@ describe('DefMoveExecutor', () => {
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
     expect(deviceAdapter.errorOutputs.some(m => m.includes('speed'))).toBe(true)
+  })
+
+  it('should accept speed=0 (every 256 frames, 60/256 dots/sec per manual)', async () => {
+    const source = `
+10 DEF MOVE(0) = SPRITE(0, 3, 0, 100, 0, 0)
+20 END
+`
+    const result = await interpreter.execute(source)
+
+    expect(result.success).toBe(true)
+    expect(result.errors).toHaveLength(0)
+    const def = interpreter.getAnimationManager()?.getMoveDefinition(0)
+    expect(def?.speed).toBe(0)
   })
 
   it('should validate distance (1-255)', async () => {

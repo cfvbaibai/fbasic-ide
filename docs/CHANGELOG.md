@@ -2,6 +2,19 @@
 
 All notable changes to this project are documented here.
 
+## 2026-01-31 - DEF MOVE speed C=0 support (every 256 frames)
+
+### Changes
+- **DEF MOVE speed parameter**: C now accepts 0–255 (was 1–255). Per F-BASIC manual p.74, “in case of 0, it will move every 256 frames”; C=0 is implemented as 60/256 dots per second.
+- **AnimationManager**: Validation allows speed 0; `speedDotsPerSecond = speed === 0 ? 60/256 : 60/speed`.
+- **DefMoveExecutor**: Range check updated to 0–255.
+- **useBasicIdeMessageHandlers**: START_MOVEMENT uses same C=0 → 60/256 mapping.
+- **Types/comments**: MoveDefinition.speed and related comments updated to “0–255 (0=every 256 frames)”.
+- **Tests**: DefMoveExecutor and AnimationManager tests updated: speed=0 accepted, speed=256 rejected; new test for speedDotsPerSecond when speed=0.
+
+### Files
+- `src/core/animation/AnimationManager.ts`, `src/core/execution/executors/DefMoveExecutor.ts`, `src/features/ide/composables/useBasicIdeMessageHandlers.ts`, `src/core/sprite/types.ts`, `src/core/parser/FBasicChevrotainParser.ts`, `src/core/samples/sampleCodes.ts`, `src/features/konva-test/composables/useMovementGeneration.ts`, `test/executors/DefMoveExecutor.test.ts`, `test/animation/AnimationManager.test.ts`.
+
 ## 2026-01-31 - Split useBasicIdeEnhanced into logical modules
 
 ### Changes

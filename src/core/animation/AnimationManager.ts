@@ -82,8 +82,8 @@ export class AnimationManager {
     if (definition.direction < 0 || definition.direction > 8) {
       throw new Error(`Invalid direction: ${definition.direction} (must be 0-8)`)
     }
-    if (definition.speed < 1 || definition.speed > 255) {
-      throw new Error(`Invalid speed: ${definition.speed} (must be 1-255)`)
+    if (definition.speed < 0 || definition.speed > 255) {
+      throw new Error(`Invalid speed: ${definition.speed} (must be 0-255)`)
     }
     if (definition.distance < 1 || definition.distance > 255) {
       throw new Error(`Invalid distance: ${definition.distance} (must be 1-255)`)
@@ -133,8 +133,9 @@ export class AnimationManager {
     // Calculate direction deltas
     const { deltaX, deltaY } = this.getDirectionDeltas(definition.direction)
 
-    // Calculate speed: 60/C dots per second
-    const speedDotsPerSecond = definition.speed > 0 ? 60 / definition.speed : 0
+    // Calculate speed: 60/C dots per second; C=0 means every 256 frames (manual: 60/256 dots/sec)
+    const speedDotsPerSecond =
+      definition.speed === 0 ? 60 / 256 : definition.speed > 0 ? 60 / definition.speed : 0
 
     // Calculate total distance: 2×D dots
     const totalDistance = 2 * definition.distance

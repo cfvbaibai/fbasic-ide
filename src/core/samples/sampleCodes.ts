@@ -232,7 +232,7 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 170 REM DEF MOVE(n) = SPRITE(A, B, C, D, E, F)
 180 REM A: character type (0=Mario, 1=Lady, etc.)
 190 REM B: direction (0=none, 1=up, 2=up-right, 3=right, 4=down-right, 5=down, 6=down-left, 7=left, 8=up-left)
-200 REM C: speed (1-255, 60/C dots per second)
+200 REM C: speed (0-255, 0=every 256 frames, 60/C dots per second)
 210 REM D: distance (1-255, total = 2*D dots)
 220 REM E: priority (0=front, 1=behind background)
 230 REM F: color combination (0-3)

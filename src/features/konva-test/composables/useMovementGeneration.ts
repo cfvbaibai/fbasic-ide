@@ -23,7 +23,7 @@ const directions = [
  */
 export function generateMovements(count: number, speed: number): MovementState[] {
   const newMovements: MovementState[] = []
-  const speedDotsPerSecond = 60 / speed
+  const speedDotsPerSecond = speed === 0 ? 60 / 256 : 60 / speed
 
   // Account for sprite size when calculating available space
   const spriteSize = 16 * SPRITE_SCALE

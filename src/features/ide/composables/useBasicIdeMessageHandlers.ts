@@ -476,7 +476,12 @@ export function handleAnimationCommandMessage(message: AnyServiceWorkerMessage, 
         startY,
         remainingDistance,
         totalDistance: 2 * command.definition.distance,
-        speedDotsPerSecond: command.definition.speed > 0 ? 60 / command.definition.speed : 0,
+        speedDotsPerSecond:
+          command.definition.speed === 0
+            ? 60 / 256
+            : command.definition.speed > 0
+              ? 60 / command.definition.speed
+              : 0,
         directionDeltaX: getDirectionDeltaX(command.definition.direction),
         directionDeltaY: getDirectionDeltaY(command.definition.direction),
         isActive: true,

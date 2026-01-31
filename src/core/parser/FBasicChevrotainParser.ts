@@ -872,7 +872,7 @@ class FBasicChevrotainParser extends CstParser {
     // n: action number (0-7)
     // A: character type (0-15)
     // B: direction (0-8)
-    // C: speed (1-255, 60/C dots per second)
+    // C: speed (0-255, 0=every 256 frames, 60/C dots per second)
     // D: distance (1-255, total = 2×D dots)
     // E: priority (0=front, 1=behind background)
     // F: color combination (0-3)
