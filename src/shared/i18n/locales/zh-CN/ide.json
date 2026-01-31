@@ -14,7 +14,6 @@
         "title": "运行时输出",
         "empty": "暂无输出。运行您的 BASIC 程序以查看结果。",
         "screen": "屏幕",
-        "stdout": "标准输出",
         "variables": "变量",
         "debug": "调试",
         "errorLine": "第 {line} 行",

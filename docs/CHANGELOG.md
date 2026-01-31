@@ -2,6 +2,18 @@
 
 All notable changes to this project are documented here.
 
+## 2026-01-31 - Remove STDOUT tab; add error panel footer on Screen tab
+
+### Changes
+- **STDOUT tab removed**: The Stdout tab in Runtime Output was only useful for error reporting. It has been removed; PRINT output is no longer shown in a separate tab.
+- **Error panel footer**: Screen tab now has a footer area (like the header with zoom controls) that is not part of the scrollable body. When there are runtime errors, an **ErrorPanel** appears in this footer with type, message, line, optional source line, and expandable stack trace.
+- **Layout**: ScreenTab structure is header (zoom + palette) → body (Screen canvas) → footer (ErrorPanel when errors exist). Footer uses `flex-shrink: 0` so it stays at the bottom and does not scroll with the canvas.
+- **New component**: `ErrorPanel.vue` shows the same error format as before (icon, type, message, line, source line, stack details).
+- **i18n**: Removed `ide.output.stdout` from en, ja, zh-CN, zh-TW.
+
+### Removed
+- `StdoutTab.vue` (deleted).
+
 ## 2026-01-31 - INPUT/LINPUT: Fix timeout and “No pending message”
 
 ### Fixes

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 
 import type { SharedDisplayViews } from '@/core/animation/sharedDisplayBuffer'
 import type { BasicVariable, ScreenCell } from '@/core/interfaces'
@@ -8,7 +8,6 @@ import { GameTabs } from '@/shared/components/ui'
 
 import DebugTab from './DebugTab.vue'
 import ScreenTab from './ScreenTab.vue'
-import StdoutTab from './StdoutTab.vue'
 import VariablesTab from './VariablesTab.vue'
 
 /**
@@ -19,8 +18,7 @@ defineOptions({
 })
 
 // Props are used in template, but linter requires assignment for withDefaults
- 
-const props = withDefaults(defineProps<Props>(), {
+const _props = withDefaults(defineProps<Props>(), {
   errors: () => [],
   variables: () => ({}),
   debugOutput: '',
@@ -75,14 +73,6 @@ interface Props {
 }
 
 const activeTab = ref('screen')
-
-// On execution failure, switch to STDOUT tab so the user sees the error
-watch(
-  () => props.errors?.length ?? 0,
-  (len) => {
-    if (len > 0) activeTab.value = 'stdout'
-  }
-)
 </script>
 
 <template>
@@ -106,10 +96,8 @@ watch(
         :shared-display-views="sharedDisplayViews"
         :set-decoded-screen-state="setDecodedScreenState"
         :register-schedule-render="registerScheduleRender"
+        :errors="errors"
       />
-
-      <!-- STDOUT Tab -->
-      <StdoutTab :output="output" :is-running="isRunning" :errors="errors" />
 
       <!-- Debug Output Tab -->
       <DebugTab :debug-output="debugOutput" :debug-mode="debugMode" />

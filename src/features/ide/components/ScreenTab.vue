@@ -9,6 +9,7 @@ import { provideScreenZoom } from '@/features/ide/composables/useScreenZoom'
 import { GameButton, GameButtonGroup, GameIcon, GameTabPane } from '@/shared/components/ui'
 
 import ActivePaletteDisplay from './ActivePaletteDisplay.vue'
+import ErrorPanel from './ErrorPanel.vue'
 import Screen from './Screen.vue'
 
 /**
@@ -19,8 +20,7 @@ defineOptions({
 })
 
 // Props are used in template, but linter requires assignment for withDefaults
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const props = withDefaults(
+const _props = withDefaults(
   defineProps<{
     screenBuffer?: ScreenCell[][]
     cursorX?: number
@@ -38,6 +38,7 @@ const props = withDefaults(
     sharedDisplayViews?: SharedDisplayViews
     setDecodedScreenState?: (decoded: import('@/core/animation/sharedDisplayBuffer').DecodedScreenState) => void
     registerScheduleRender?: (fn: () => void) => void
+    errors?: Array<{ line: number; message: string; type: string; stack?: string; sourceLine?: string }>
   }>(),
   {
     screenBuffer: () => {
@@ -60,6 +61,7 @@ const props = withDefaults(
     spriteStates: () => [],
     spriteEnabled: false,
     movementStates: () => [],
+    errors: () => [],
   }
 )
 
@@ -129,6 +131,9 @@ const currentZoomLevel = computed(() => zoomLevel.value)
         :register-schedule-render="registerScheduleRender"
       />
     </div>
+    <div class="tab-content-footer">
+      <ErrorPanel :errors="errors" />
+    </div>
   </GameTabPane>
 </template>
 
@@ -139,6 +144,10 @@ const currentZoomLevel = computed(() => zoomLevel.value)
   flex-direction: column;
   min-height: 0;
   overflow: hidden;
+}
+
+.tab-content-footer {
+  flex-shrink: 0;
 }
 
 .screen-controls {
