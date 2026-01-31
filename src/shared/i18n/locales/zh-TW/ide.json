@@ -25,6 +25,7 @@
         "combo": "組合"
     },
     "samples": {
+        "placeholder": "範例",
         "basic": "基礎",
         "pause": "暫停示範",
         "gaming": "搖桿測試",
@@ -33,7 +34,12 @@
         "allChars": "所有字元",
         "spriteTest": "Sprite測試",
         "moveTest": "移動測試",
-        "testMoveControl": "移動控制測試"
+        "testMoveControl": "移動控制測試",
+        "inputDemo": "INPUT / LINPUT"
+    },
+    "input": {
+        "submit": "確定",
+        "cancel": "取消"
     },
     "joystick": {
         "control": "搖桿控制",

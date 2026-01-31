@@ -35,9 +35,14 @@ import type {
   ExecutionResult,
   HighlighterInfo,
   ParserInfo,
+  RequestInputMessage,
 } from '@/core/interfaces'
 import { FBasicParser } from '@/core/parser/FBasicParser'
-import { getSampleCode } from '@/core/samples/sampleCodes'
+import {
+  getSampleCode,
+  getSampleCodeKeys,
+  type SampleCode,
+} from '@/core/samples/sampleCodes'
 import type { MovementState, SpriteState } from '@/core/sprite/types'
 import { ExecutionError } from '@/features/ide/errors/ExecutionError'
 import { logComposable } from '@/shared/logger'
@@ -71,9 +76,7 @@ export function useBasicIde() {
 40 FOR I=1 TO 3: PRINT "I="; I: NEXT
 50 END`)
 
-  const currentSampleType = ref<
-    'basic' | 'gaming' | 'complex' | 'comprehensive' | 'pause' | 'allChars' | 'spriteTest' | 'moveTest' | 'testMoveControl' | null
-  >(null)
+  const currentSampleType = ref<string | null>(null)
 
   const isRunning = ref(false)
   const output = ref<string[]>([])
@@ -98,6 +101,9 @@ export function useBasicIde() {
   const spriteStates = ref<SpriteState[]>([])
   const spriteEnabled = ref(false)
   const movementStates = ref<MovementState[]>([])
+
+  // INPUT/LINPUT: pending request from worker; modal shows when non-null
+  const pendingInputRequest = ref<RequestInputMessage['data'] | null>(null)
 
   // Sprite node maps (for getting actual rendered positions)
   // These will be updated by Screen component
@@ -159,6 +165,18 @@ export function useBasicIde() {
     }
   }
 
+  const respondToInputRequest = (requestId: string, values: string[], cancelled: boolean) => {
+    if (webWorkerManager.worker) {
+      webWorkerManager.worker.postMessage({
+        type: 'INPUT_VALUE',
+        id: requestId,
+        timestamp: Date.now(),
+        data: { requestId, values, cancelled },
+      })
+    }
+    pendingInputRequest.value = null
+  }
+
   // Message handler context
   const messageHandlerContext: MessageHandlerContext = {
     output,
@@ -180,6 +198,8 @@ export function useBasicIde() {
     sharedDisplayViews,
     scheduleRender: () => scheduleScreenRenderRef.value?.(),
     setDecodedScreenState,
+    pendingInputRequest,
+    respondToInputRequest,
   }
 
   // Web Worker Management Functions
@@ -448,20 +468,10 @@ export function useBasicIde() {
   }
 
   /**
-   * Load sample code
+   * Load sample code by key (from getSampleCodeKeys()).
    */
-  const loadSampleCode = (
-    sampleType:
-      | 'basic'
-      | 'gaming'
-      | 'complex'
-      | 'comprehensive'
-      | 'pause'
-      | 'allChars'
-      | 'spriteTest'
-      | 'moveTest'
-      | 'testMoveControl' = 'basic'
-  ) => {
+  const loadSampleCode = (sampleType: string) => {
+    if (!sampleType) return
     const sample = getSampleCode(sampleType)
     if (sample) {
       code.value = sample.code
@@ -469,6 +479,12 @@ export function useBasicIde() {
       void updateHighlighting()
     }
   }
+
+  /** Options for sample dropdown: { value: key, label: name } */
+  const sampleSelectOptions = getSampleCodeKeys().map(key => {
+    const sample: SampleCode | undefined = getSampleCode(key)
+    return { value: key, label: sample?.name ?? key }
+  })
 
   /**
    * Get parser capabilities
@@ -541,6 +557,8 @@ export function useBasicIde() {
     movementStates,
     frontSpriteNodes,
     backSpriteNodes,
+    pendingInputRequest,
+    respondToInputRequest,
 
     // Methods
     runCode,
@@ -549,6 +567,7 @@ export function useBasicIde() {
     clearAll,
     currentSampleType,
     loadSampleCode,
+    sampleSelectOptions,
     updateHighlighting,
     validateCode,
     getParserCapabilities,

@@ -38,6 +38,7 @@ const monarchLanguage: monaco.languages.IMonarchLanguage = {
     'STOP',
     'PAUSE',
     'INPUT',
+    'LINPUT',
     'DATA',
     'READ',
     'RESTORE',
@@ -86,7 +87,7 @@ const monarchLanguage: monaco.languages.IMonarchLanguage = {
 
       // Keywords (case-insensitive)
       // Note: REM is excluded here since REM lines are handled above as comments
-      [/\b(PRINT|LET|IF|THEN|FOR|NEXT|TO|STEP|GOTO|END|PAUSE|DIM|DATA|READ|RESTORE|SWAP|CLEAR)\b/i, 'keyword'],
+      [/\b(PRINT|LET|IF|THEN|FOR|NEXT|TO|STEP|GOTO|END|PAUSE|INPUT|LINPUT|DIM|DATA|READ|RESTORE|SWAP|CLEAR)\b/i, 'keyword'],
 
       // Multi-character relational operators (must come before single-character operators)
       [/<>|<=|>=/, 'operator'],

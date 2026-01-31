@@ -33,6 +33,8 @@ export const Dim = createToken({ name: 'Dim', pattern: /\bDIM\b/i })
 export const Data = createToken({ name: 'Data', pattern: /\bDATA\b/i })
 export const Read = createToken({ name: 'Read', pattern: /\bREAD\b/i })
 export const Restore = createToken({ name: 'Restore', pattern: /\bRESTORE\b/i })
+export const Input = createToken({ name: 'Input', pattern: /\bINPUT\b/i })
+export const Linput = createToken({ name: 'Linput', pattern: /\bLINPUT\b/i })
 export const Cls = createToken({ name: 'Cls', pattern: /\bCLS\b/i })
 export const Swap = createToken({ name: 'Swap', pattern: /\bSWAP\b/i })
 export const Clear = createToken({ name: 'Clear', pattern: /\bCLEAR\b/i })
@@ -180,6 +182,8 @@ export const allTokens = [
   Data,
   Read,
   Restore,
+  Input,
+  Linput,
   Cls,
   Swap,
   Clear,

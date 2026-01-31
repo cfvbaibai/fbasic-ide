@@ -38,6 +38,10 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
   public animationCommandCalls: AnimationCommand[] = []
   private spritePositions: Map<number, { x: number; y: number }> = new Map()
 
+  // === INPUT (for INPUT/LINPUT executor tests) ===
+  /** Queue of responses for requestInput; each call pops the next. Default: ['0'] if empty. */
+  public inputResponseQueue: string[][] = []
+
   constructor() {
     logDevice.debug('TestDeviceAdapter created')
   }
@@ -100,6 +104,16 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
    */
   setSpritePositionForTest(actionNumber: number, x: number, y: number): void {
     this.spritePositions.set(actionNumber, { x, y })
+  }
+
+  // === INPUT (INPUT/LINPUT) ===
+
+  requestInput?(
+    _prompt: string,
+    _options?: { variableCount?: number; isLinput?: boolean }
+  ): Promise<string[]> {
+    const values = this.inputResponseQueue.shift()
+    return Promise.resolve(values ?? ['0'])
   }
 
   // === ANIMATION COMMANDS ===

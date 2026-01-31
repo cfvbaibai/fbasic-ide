@@ -138,6 +138,28 @@ export function rejectAllPendingMessages(webWorkerManager: WebWorkerManager, rea
   webWorkerManager.pendingMessages.clear()
 }
 
+/** Default timeout (ms) when execution is waiting for INPUT/LINPUT. */
+const INPUT_WAIT_TIMEOUT_MS = 5 * 60 * 1000 // 5 minutes
+
+/**
+ * Extend the timeout for an execution that is waiting for user input (REQUEST_INPUT).
+ * Prevents "Web worker message timeout" while the user fills INPUT/LINPUT prompts.
+ */
+export function extendExecutionTimeout(
+  webWorkerManager: WebWorkerManager,
+  executionId: string,
+  durationMs: number = INPUT_WAIT_TIMEOUT_MS
+): void {
+  const pending = webWorkerManager.pendingMessages.get(executionId)
+  if (!pending) return
+  clearTimeout(pending.timeout)
+  pending.timeout = setTimeout(() => {
+    logComposable.debug('Message timeout (after input wait):', executionId)
+    webWorkerManager.pendingMessages.delete(executionId)
+    pending.reject(new Error('Web worker message timeout'))
+  }, durationMs)
+}
+
 /**
  * Send message to web worker and return promise
  */

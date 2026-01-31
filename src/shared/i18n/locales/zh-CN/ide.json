@@ -25,6 +25,7 @@
         "combo": "组合"
     },
     "samples": {
+        "placeholder": "示例",
         "basic": "基础",
         "pause": "暂停演示",
         "gaming": "手柄测试",
@@ -33,7 +34,12 @@
         "allChars": "所有字符",
         "spriteTest": "Sprite测试",
         "moveTest": "移动测试",
-        "testMoveControl": "移动控制测试"
+        "testMoveControl": "移动控制测试",
+        "inputDemo": "INPUT / LINPUT"
+    },
+    "input": {
+        "submit": "确定",
+        "cancel": "取消"
     },
     "joystick": {
         "control": "手柄控制",

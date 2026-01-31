@@ -11,6 +11,7 @@ import type {
   AnyServiceWorkerMessage,
   ErrorMessage,
   ExecuteMessage,
+  InputValueMessage,
   OutputMessage,
   ResultMessage,
   SetSharedAnimationBufferMessage,
@@ -80,6 +81,9 @@ class WebWorkerInterpreter {
           break
         case 'SET_SHARED_ANIMATION_BUFFER':
           this.handleSetSharedAnimationBuffer(message)
+          break
+        case 'INPUT_VALUE':
+          this.handleInputValue(message)
           break
 
         default:
@@ -183,9 +187,18 @@ class WebWorkerInterpreter {
       currentExecutionId: this.currentExecutionId,
     })
     this.isRunning = false
+    if (this.webWorkerDeviceAdapter) {
+      this.webWorkerDeviceAdapter.rejectAllInputRequests('Execution stopped')
+    }
     if (this.interpreter) {
       logWorker.debug('Calling interpreter.stop()')
       this.interpreter.stop()
+    }
+  }
+
+  handleInputValue(message: InputValueMessage) {
+    if (this.webWorkerDeviceAdapter) {
+      this.webWorkerDeviceAdapter.handleInputValueMessage(message)
     }
   }
 

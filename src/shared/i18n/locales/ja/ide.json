@@ -25,6 +25,7 @@
         "combo": "コンボ"
     },
     "samples": {
+        "placeholder": "サンプル",
         "basic": "基本",
         "pause": "一時停止デモ",
         "gaming": "ジョイスティックテスト",
@@ -33,7 +34,12 @@
         "allChars": "全文字",
         "spriteTest": "スプライトテスト",
         "moveTest": "移動テスト",
-        "testMoveControl": "移動制御テスト"
+        "testMoveControl": "移動制御テスト",
+        "inputDemo": "INPUT / LINPUT"
+    },
+    "input": {
+        "submit": "OK",
+        "cancel": "キャンセル"
     },
     "joystick": {
         "control": "ジョイスティック制御",

@@ -21,6 +21,27 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 60 END`,
   },
 
+  inputDemo: {
+    name: 'INPUT / LINPUT',
+    description: 'Demonstrates INPUT and LINPUT for keyboard input',
+    code: `10 REM INPUT and LINPUT Demo
+20 PRINT "INPUT / LINPUT Demo"
+30 PRINT "=================="
+40 PRINT ""
+50 INPUT "Enter your name"; N$
+60 PRINT "Hello, "; N$; "!"
+70 PRINT ""
+80 INPUT "Enter two numbers (A, B)"; A, B
+90 PRINT "A + B = "; A + B
+100 PRINT "A * B = "; A * B
+110 PRINT ""
+120 LINPUT "Enter a line (commas OK)"; L$
+130 PRINT "You entered: "; L$
+140 PRINT ""
+150 PRINT "Demo complete."
+160 END`,
+  },
+
   pause: {
     name: 'Pause Demo',
     description: 'Demonstrates PAUSE command for timing delays',

@@ -1,9 +1,16 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import type { HighlighterInfo, ParserInfo } from '@/core/interfaces'
-import { GameBlock, GameButton, GameButtonGroup, GameIconButton, GameLayout } from '@/shared/components/ui'
+import {
+  GameBlock,
+  GameButton,
+  GameIconButton,
+  GameInput,
+  GameLayout,
+  GameSelect,
+} from '@/shared/components/ui'
 
 import IdeControls from './components/IdeControls.vue'
 import JoystickControl from './components/JoystickControl.vue'
@@ -57,7 +64,30 @@ const {
   sharedDisplayViews,
   setDecodedScreenState,
   registerScheduleRender,
+  pendingInputRequest,
+  respondToInputRequest,
+  sampleSelectOptions,
 } = useBasicIdeEnhanced()
+
+// INPUT/LINPUT modal: local input value and submit/cancel
+const inputModalValue = ref<string | number>('')
+const inputModalSubmit = () => {
+  const req = pendingInputRequest.value
+  if (!req) return
+  const raw = String(inputModalValue.value)
+  const values = req.isLinput ? [raw] : raw.split(',').map(s => s.trim())
+  respondToInputRequest(req.requestId, values, false)
+  inputModalValue.value = ''
+}
+const inputModalCancel = () => {
+  const req = pendingInputRequest.value
+  if (!req) return
+  respondToInputRequest(req.requestId, [], true)
+  inputModalValue.value = ''
+}
+watch(pendingInputRequest, req => {
+  inputModalValue.value = req ? '' : ''
+})
 
 // Computed properties for backward compatibility
 const canRun = computed(() => !isRunning.value)
@@ -86,81 +116,15 @@ onMounted(() => {
         <GameBlock :title="t('ide.codeEditor.title')" title-icon="mdi:pencil" class="editor-panel">
           <template #right>
             <div class="editor-header-controls">
-              <div class="sample-programs">
-                <GameButtonGroup>
-                  <GameButton
-                    variant="toggle"
-                    :selected="currentSampleType === 'basic'"
-                    @click="loadSampleCode('basic')"
-                    size="small"
-                  >
-                    {{ t('ide.samples.basic') }}
-                  </GameButton>
-                  <GameButton
-                    variant="toggle"
-                    :selected="currentSampleType === 'pause'"
-                    @click="loadSampleCode('pause')"
-                    size="small"
-                  >
-                    {{ t('ide.samples.pause') }}
-                  </GameButton>
-                  <GameButton
-                    variant="toggle"
-                    :selected="currentSampleType === 'gaming'"
-                    @click="loadSampleCode('gaming')"
-                    size="small"
-                  >
-                    {{ t('ide.samples.gaming') }}
-                  </GameButton>
-                  <GameButton
-                    variant="toggle"
-                    :selected="currentSampleType === 'complex'"
-                    @click="loadSampleCode('complex')"
-                    size="small"
-                  >
-                    {{ t('ide.samples.complex') }}
-                  </GameButton>
-                  <GameButton
-                    variant="toggle"
-                    :selected="currentSampleType === 'comprehensive'"
-                    @click="loadSampleCode('comprehensive')"
-                    size="small"
-                  >
-                    {{ t('ide.samples.comprehensive') }}
-                  </GameButton>
-                  <GameButton
-                    variant="toggle"
-                    :selected="currentSampleType === 'allChars'"
-                    @click="loadSampleCode('allChars')"
-                    size="small"
-                  >
-                    {{ t('ide.samples.allChars') }}
-                  </GameButton>
-                  <GameButton
-                    variant="toggle"
-                    :selected="currentSampleType === 'spriteTest'"
-                    @click="loadSampleCode('spriteTest')"
-                    size="small"
-                  >
-                    {{ t('ide.samples.spriteTest') }}
-                  </GameButton>
-                  <GameButton
-                    variant="toggle"
-                    :selected="currentSampleType === 'moveTest'"
-                    @click="loadSampleCode('moveTest')"
-                    size="small"
-                  >
-                    {{ t('ide.samples.moveTest') }}
-                  </GameButton>
-                  <GameButton
-                    variant="toggle"
-                    :selected="currentSampleType === 'testMoveControl'"
-                    @click="loadSampleCode('testMoveControl')"
-                    size="small"
-                  >
-                    {{ t('ide.samples.testMoveControl') }}
-                  </GameButton>
-                </GameButtonGroup>
+              <div class="sample-select-wrap">
+                <GameSelect
+                  :model-value="currentSampleType ?? ''"
+                  :options="sampleSelectOptions"
+                  :placeholder="t('ide.samples.placeholder')"
+                  size="small"
+                  class="sample-select"
+                  @update:model-value="loadSampleCode($event as string)"
+                />
               </div>
               <IdeControls
                 :is-running="isRunning"
@@ -223,6 +187,41 @@ onMounted(() => {
       <div class="joystick-control-wrapper">
         <JoystickControl :send-stick-event="sendStickEvent" :send-strig-event="sendStrigEvent" />
       </div>
+
+      <!-- INPUT/LINPUT modal overlay -->
+      <Teleport to="body">
+        <div
+          v-if="pendingInputRequest"
+          class="input-modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="input-modal-prompt"
+        >
+          <div class="input-modal">
+            <p id="input-modal-prompt" class="input-modal-prompt">{{ pendingInputRequest.prompt }}</p>
+            <form class="input-modal-form" @submit.prevent="inputModalSubmit">
+              <GameInput
+                v-model="inputModalValue"
+                type="text"
+                :placeholder="
+                pendingInputRequest.isLinput
+                  ? 'Enter text (up to 31 chars)'
+                  : 'Separate multiple values with commas'
+              "
+                class="input-modal-field"
+              />
+              <div class="input-modal-actions">
+                <GameButton type="primary" size="medium" @click="inputModalSubmit">
+                  {{ t('ide.input.submit') }}
+                </GameButton>
+                <GameButton type="default" size="medium" @click="inputModalCancel">
+                  {{ t('ide.input.cancel') }}
+                </GameButton>
+              </div>
+            </form>
+          </div>
+        </div>
+      </Teleport>
     </div>
   </GameLayout>
 </template>
@@ -243,20 +242,14 @@ onMounted(() => {
   flex-wrap: wrap;
 }
 
-.sample-programs {
-  display: flex;
-  align-items: center;
+.sample-select-wrap {
+  flex-shrink: 0;
+  min-width: 0;
 }
 
-/* Make sample program buttons more compact */
-.sample-programs :deep(.game-button-group) {
-  padding: 1px;
-}
-
-.sample-programs :deep(.game-button) {
-  padding: 0.25rem 0.375rem;
-  font-size: 0.75rem;
-  line-height: 1.2;
+.sample-select {
+  width: 11rem;
+  max-width: 100%;
 }
 
 .parser-status {
@@ -345,6 +338,44 @@ onMounted(() => {
 
 .joystick-control-wrapper {
   padding: 0 1rem;
+}
+
+/* INPUT/LINPUT modal overlay */
+.input-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--base-alpha-gray-00-60);
+}
+
+.input-modal {
+  background: var(--game-surface-bg-gradient);
+  border: 2px solid var(--game-surface-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  min-width: 320px;
+  max-width: 90vw;
+  box-shadow: var(--game-shadow-base);
+}
+
+.input-modal-prompt {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  color: var(--game-text-primary);
+}
+
+.input-modal-field {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.input-modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
 }
 
 /* Glowing animations */

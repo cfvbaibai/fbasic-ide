@@ -16,6 +16,7 @@ import type {
   AnimationCommand,
   AnyServiceWorkerMessage,
   ErrorMessage,
+  RequestInputMessage,
   ResultMessage,
   ScreenCell,
 } from '@/core/interfaces'
@@ -23,7 +24,7 @@ import type { MovementState } from '@/core/sprite/types'
 import { ExecutionError } from '@/features/ide/errors/ExecutionError'
 import { logComposable, logIdeMessages, logScreen } from '@/shared/logger'
 
-import type { WebWorkerManager } from './useBasicIdeWebWorkerUtils'
+import { extendExecutionTimeout, type WebWorkerManager } from './useBasicIdeWebWorkerUtils'
 
 export { ExecutionError }
 
@@ -138,6 +139,10 @@ export interface MessageHandlerContext {
   scheduleRender?: () => void
   /** Called by Screen.vue after decoding shared buffer to update refs (screenBuffer, cursorX, etc.). */
   setDecodedScreenState?: (decoded: DecodedScreenState) => void
+  /** Pending INPUT/LINPUT request from worker; set when REQUEST_INPUT is received, cleared on submit/cancel. */
+  pendingInputRequest?: Ref<RequestInputMessage['data'] | null>
+  /** Send INPUT_VALUE to worker to resolve a pending input request. */
+  respondToInputRequest?: (requestId: string, values: string[], cancelled: boolean) => void
 }
 
 /**
@@ -671,8 +676,12 @@ export function handleWorkerMessage(message: AnyServiceWorkerMessage, context: M
     return
   }
   // Critical messages must be handled immediately (they resolve promises, etc.)
-  const isCritical = message.type === 'RESULT' || message.type === 'ERROR'
-  
+  // REQUEST_INPUT: show input modal immediately so user can respond
+  const isCritical =
+    message.type === 'RESULT' ||
+    message.type === 'ERROR' ||
+    message.type === 'REQUEST_INPUT'
+
   if (isCritical) {
     // Handle critical messages synchronously - they're needed for execution flow
     processMessage(message, context)
@@ -714,6 +723,17 @@ function processMessage(message: AnyServiceWorkerMessage, context: MessageHandle
     case 'PROGRESS':
       handleProgressMessage(message, context)
       break
+    case 'REQUEST_INPUT': {
+      const reqInputData = (message).data
+      if (context.pendingInputRequest) {
+        context.pendingInputRequest.value = reqInputData
+      }
+      // Extend run timeout so we don't reject while user fills INPUT/LINPUT
+      if (reqInputData?.executionId && context.webWorkerManager) {
+        extendExecutionTimeout(context.webWorkerManager, reqInputData.executionId)
+      }
+      break
+    }
     default:
       logComposable.warn('Unknown message type:', message.type)
   }

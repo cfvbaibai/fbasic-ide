@@ -50,7 +50,7 @@ This document outlines the remaining work needed to complete the Family Basic ID
 - ✅ **Operators**: Arithmetic, comparison, logical operators
 - ✅ **Input Functions**: STICK, STRIG (controller input)
 
-**Status**: Core language features implemented, remaining screen commands (VIEW, PALET B) and input commands missing.
+**Status**: Core language features implemented. Screen: PALET B ✅; VIEW deferred (requires BG GRAPHIC storage + editor). Input commands: INPUT ✅, LINPUT ✅.
 
 ---
 
@@ -151,12 +151,14 @@ This document outlines the remaining work needed to complete the Family Basic ID
 - [x] Add tests for PALET B command
 - **Note**: Infrastructure already in place (`setBackdropColor()` method exists)
 
-**VIEW** (Display BG GRAPHIC)
-- [ ] Add `VIEW` token to parser
-- [ ] Add `viewStatement` rule
-- [ ] Create `ViewExecutor.ts`
-- [ ] Implement BG GRAPHIC screen display
-- [ ] Add tests for VIEW command
+**VIEW** (Display BG GRAPHIC) — **Blocked**
+- **Prerequisite**: VIEW copies the BG GRAPHIC screen (28×21) to the background screen. We do **not** have:
+  1. **BG GRAPHIC storage** — no `bgGraphicBuffer` (28×21) in device/screen layer yet.
+  2. **BG GRAPHIC editor** — no UI for users to edit the BG GRAPHIC screen (on real hardware this is done in CGEN mode).
+- VIEW implementation is deferred until BG GRAPHIC buffer and editor (or another way to populate the buffer) exist.
+- [ ] Add BG GRAPHIC buffer + device `copyBgGraphicToBackground()` (future)
+- [ ] Add BG GRAPHIC editor or load/save path (future)
+- [ ] Add `VIEW` token and `viewStatement`, `ViewExecutor.ts`, tests (after above)
 
 **Files to Create**:
 - `src/core/execution/executors/ClsExecutor.ts` ✅
@@ -201,24 +203,24 @@ This document outlines the remaining work needed to complete the Family Basic ID
 **Estimated Effort**: 2-3 days  
 **Priority**: High (essential for interactive programs)
 
-#### 3.1 INPUT Command
-- [ ] Add `INPUT` token to parser
-- [ ] Add `inputStatement` rule (supports both `INPUT "prompt"; var` and `INPUT var`)
-- [ ] Create `InputExecutor.ts`
-- [ ] Implement input handling in device adapter
-- [ ] Add UI for input prompts in IDE
-- [ ] Add tests for INPUT command
+#### 3.1 INPUT Command ✅ COMPLETED
+- [x] Add `INPUT` token to parser
+- [x] Add `inputStatement` rule (INPUT ["prompt"] {; variable(, variable, ...)})
+- [x] Create `InputExecutor.ts`
+- [x] Implement input handling in device adapter (requestInput, REQUEST_INPUT/INPUT_VALUE)
+- [x] Add UI for input prompts in IDE (modal with prompt, field, OK/Cancel)
+- [x] Add tests for INPUT command
 
-#### 3.2 LINPUT Command
-- [ ] Add `LINPUT` token to parser
-- [ ] Add `linputStatement` rule
-- [ ] Create `LinputExecutor.ts`
-- [ ] Implement line input handling
-- [ ] Add tests for LINPUT command
+#### 3.2 LINPUT Command ✅ COMPLETED
+- [x] Add `LINPUT` token to parser
+- [x] Add `linputStatement` rule
+- [x] Create `LinputExecutor.ts`
+- [x] Implement line input handling (single string variable, allows commas)
+- [x] Add tests for LINPUT command
 
-**Files to Create**:
-- `src/core/execution/executors/InputExecutor.ts`
-- `src/core/execution/executors/LinputExecutor.ts`
+**Files Created**:
+- `src/core/execution/executors/InputExecutor.ts` ✅
+- `src/core/execution/executors/LinputExecutor.ts` ✅
 
 **Files to Modify**:
 - `src/core/parser/parser-tokens.ts`
@@ -467,13 +469,13 @@ This document outlines the remaining work needed to complete the Family Basic ID
 ### Minimum Viable Product (MVP)
 - ✅ Core language features (PRINT, LET, IF-THEN, FOR-NEXT, etc.)
 - [x] Screen commands (CLS ✅, LOCATE ✅, COLOR ✅, CGSET ✅, CGEN ✅, Backdrop Screen ✅)
-- [ ] Input commands (INPUT, LINPUT)
+- [x] Input commands (INPUT ✅, LINPUT ✅)
 - [x] Comprehensive test coverage (>80%) (LOCATE, COLOR, CGSET, CGEN fully tested)
 - [x] All TypeScript errors resolved
 - [x] All linting errors resolved
 
 ### Complete Product
-- [ ] All screen commands implemented (CGSET ✅, CGEN ✅, Backdrop Screen ✅, PALET B ✅, VIEW ⏳)
+- [ ] All screen commands implemented (CGSET ✅, CGEN ✅, Backdrop Screen ✅, PALET B ✅; VIEW ⏳ deferred — needs BG GRAPHIC buffer + editor)
 - [ ] All input commands implemented
 - [ ] Additional commands (STOP, CONT, SWAP, etc.)
 - [ ] Complete test coverage
@@ -486,9 +488,8 @@ This document outlines the remaining work needed to complete the Family Basic ID
 ## Timeline Estimate
 
 **Minimum (MVP)**: 5-8 days
-- Phase 2: Screen Commands (1-2 days remaining, COLOR ✅, CGSET ✅, CGEN ✅, Backdrop Screen ✅ completed)
-  - Remaining: VIEW command (PALET B ✅ completed)
-- Phase 3: Input Commands (2-3 days)
+- Phase 2: Screen Commands — VIEW deferred (requires BG GRAPHIC buffer + editor; PALET B ✅ completed).
+- Phase 3: Input Commands (2-3 days) — **recommended next**
 - Phase 6: Testing & QA (1-2 days, mostly complete)
 
 **Complete**: 15-25 days
@@ -547,7 +548,8 @@ This document outlines the remaining work needed to complete the Family Basic ID
 
 ---
 
-**Last Updated**: 2026-01-29  
-**Next Review**: After Phase 2 completion (VIEW command, PALET B command)
+**Last Updated**: 2026-01-31  
+**Suggested next step**: Phase 4 (STOP, CONT, SWAP, CLEAR) or Phase 6/7 (testing, docs). INPUT/LINPUT ✅ completed.  
+**Next Review**: After Phase 4 or when BG GRAPHIC work is planned
 
 **Changelog**: Recent updates and implementation notes are in `docs/diary/`, one file per date: `docs/diary/yyyy-MM-dd.txt` (e.g. `2026-01-22.txt`, `2026-01-26.txt`).

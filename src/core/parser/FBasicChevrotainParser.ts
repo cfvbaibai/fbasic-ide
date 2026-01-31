@@ -34,6 +34,8 @@ import {
   Data,
   Read,
   Restore,
+  Input,
+  Linput,
   Cls,
   Swap,
   Clear,
@@ -137,6 +139,8 @@ class FBasicChevrotainParser extends CstParser {
   declare dataStatement: () => CstNode
   declare readStatement: () => CstNode
   declare restoreStatement: () => CstNode
+  declare inputStatement: () => CstNode
+  declare linputStatement: () => CstNode
   declare clsStatement: () => CstNode
   declare swapStatement: () => CstNode
   declare swapTarget: () => CstNode
@@ -649,9 +653,37 @@ class FBasicChevrotainParser extends CstParser {
       })
     })
 
-    // CLS
-    // Clears the background screen
-    // Example: CLS
+    // INPUT ["prompt"] {; variable(, variable, ...)}
+    // Inputs numerical or character data from keyboard into variables
+    this.inputStatement = this.RULE('inputStatement', () => {
+      this.CONSUME(Input)
+      this.OPTION(() => {
+        this.CONSUME(StringLiteral)
+      })
+      this.OPTION2(() => {
+        this.OR([{ ALT: () => this.CONSUME(Semicolon) }, { ALT: () => this.CONSUME(Comma) }])
+      })
+      this.CONSUME(Identifier)
+      this.MANY(() => {
+        this.CONSUME2(Comma)
+        this.CONSUME2(Identifier)
+      })
+    })
+
+    // LINPUT ["prompt"] {; character variable}
+    // Inputs a single line (allows commas in input); one string variable only
+    this.linputStatement = this.RULE('linputStatement', () => {
+      this.CONSUME(Linput)
+      this.OPTION(() => {
+        this.CONSUME(StringLiteral)
+      })
+      this.OPTION2(() => {
+        this.OR([{ ALT: () => this.CONSUME(Semicolon) }, { ALT: () => this.CONSUME(Comma) }])
+      })
+      this.CONSUME(Identifier)
+    })
+
+    // CLS - Clears the background screen
     this.clsStatement = this.RULE('clsStatement', () => {
       this.CONSUME(Cls)
     })
@@ -999,6 +1031,14 @@ class FBasicChevrotainParser extends CstParser {
         {
           GATE: () => this.LA(1).tokenType === Restore,
           ALT: () => this.SUBRULE(this.restoreStatement),
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Linput,
+          ALT: () => this.SUBRULE(this.linputStatement),
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Input,
+          ALT: () => this.SUBRULE(this.inputStatement),
         },
         {
           GATE: () => this.LA(1).tokenType === Cls,

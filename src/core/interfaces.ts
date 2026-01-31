@@ -81,6 +81,19 @@ export interface BasicDeviceAdapter {
   setBackdropColor(colorCode: number): void
   setCharacterGeneratorMode(mode: number): void
 
+  // === KEYBOARD INPUT (INPUT / LINPUT) ===
+  /**
+   * Request user input from the IDE. Blocks until main thread sends INPUT_VALUE or execution is stopped.
+   * @param prompt - Prompt string to show (e.g. "A=" or "?").
+   * @param options - variableCount for INPUT (number of variables), or isLinput: true for LINPUT (single string).
+   * @returns Promise resolving to entered values (one per variable for INPUT, single-element for LINPUT).
+   *   Rejects if cancelled (e.g. user Stop).
+   */
+  requestInput?(
+    prompt: string,
+    options?: { variableCount?: number; isLinput?: boolean }
+  ): Promise<string[]>
+
   // === ANIMATION COMMANDS ===
   sendAnimationCommand?(command: AnimationCommand): void
 }
@@ -243,6 +256,8 @@ export type ServiceWorkerMessageType =
   | 'STICK_EVENT'
   | 'ANIMATION_COMMAND'
   | 'SET_SHARED_ANIMATION_BUFFER'
+  | 'REQUEST_INPUT'
+  | 'INPUT_VALUE'
 
 // Execute message - sent from UI to service worker
 export interface ExecuteMessage extends ServiceWorkerMessage {
@@ -409,6 +424,28 @@ export interface SetSharedAnimationBufferMessage extends ServiceWorkerMessage {
   }
 }
 
+// Request input - sent from worker to main when INPUT/LINPUT executes
+export interface RequestInputMessage extends ServiceWorkerMessage {
+  type: 'REQUEST_INPUT'
+  data: {
+    requestId: string
+    executionId: string
+    prompt: string
+    variableCount: number
+    isLinput: boolean
+  }
+}
+
+// Input value - sent from main to worker to resolve a REQUEST_INPUT
+export interface InputValueMessage extends ServiceWorkerMessage {
+  type: 'INPUT_VALUE'
+  data: {
+    requestId: string
+    values: string[]
+    cancelled: boolean
+  }
+}
+
 // Union type for all possible messages
 export type AnyServiceWorkerMessage =
   | ExecuteMessage
@@ -425,6 +462,8 @@ export type AnyServiceWorkerMessage =
   | ReadyMessage
   | AnimationCommandMessage
   | SetSharedAnimationBufferMessage
+  | RequestInputMessage
+  | InputValueMessage
 
 // Message handler interface for type-safe message handling
 export interface ServiceWorkerMessageHandler {

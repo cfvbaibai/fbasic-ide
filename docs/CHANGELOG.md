@@ -2,6 +2,42 @@
 
 All notable changes to this project are documented here.
 
+## 2026-01-31 - INPUT/LINPUT: Fix timeout and “No pending message”
+
+### Fixes
+- **Web worker message timeout**: While execution was waiting for INPUT/LINPUT, the 30s run timeout still ran and rejected the promise, causing “Execution error: Error: Web worker message timeout”. When the worker later sent RESULT, the pending message was already gone, so “No pending message found for messageId” appeared.
+- **Change**: On `REQUEST_INPUT`, the run timeout is extended by 5 minutes via `extendExecutionTimeout()` in `useBasicIdeWebWorkerUtils.ts`, and the message handler calls it when handling `REQUEST_INPUT`. The run promise now only times out if the user doesn’t respond to input within 5 minutes (or when the original timeout would have fired before the first INPUT).
+
+## 2026-01-31 - INPUT/LINPUT Demo + Sample Selector UI
+
+### Demo and UI
+- **INPUT / LINPUT demo sample**: New `inputDemo` sample in `sampleCodes.ts` — prompts for name (INPUT), two numbers (INPUT A, B), and a line with commas (LINPUT); prints results.
+- **Sample selection**: Replaced the wide row of 10 toggle buttons with a single **GameSelect** dropdown (placeholder “Sample”). Options are built from `getSampleCodeKeys()` and sample names; selecting loads that sample. Composable now exposes `sampleSelectOptions` and `loadSampleCode(sampleType: string)` for any key.
+- **i18n**: Added `ide.samples.placeholder` and `ide.samples.inputDemo` (en, ja, zh-CN, zh-TW).
+
+### Tests
+- InputExecutor/LinputExecutor tests: use optional chaining for `result.errors[0]?.message` to satisfy strict TS.
+
+## 2026-01-31 - INPUT and LINPUT Commands
+
+### Implemented
+- **INPUT**: Parser tokens and rules (`INPUT ["prompt"] {; variable(, variable, ...)}`), `InputExecutor`, device `requestInput`, worker↔main `REQUEST_INPUT`/`INPUT_VALUE` messages, IDE modal (prompt + field + OK/Cancel). Supports multiple variables; comma-separated input; numeric and string variables.
+- **LINPUT**: Parser rules, `LinputExecutor`, single string variable; allows commas in input (unlike INPUT).
+- **Device**: `BasicDeviceAdapter.requestInput?(prompt, options?)` (optional); `WebWorkerDeviceAdapter` implements with pending-request map; `TestDeviceAdapter` uses `inputResponseQueue` for tests.
+- **Worker**: `INPUT_VALUE` handling in `WebWorkerInterpreter`; `rejectAllInputRequests()` on STOP.
+- **IDE**: `pendingInputRequest` ref, `respondToInputRequest()`, modal in `IdePage.vue` (Teleport), i18n keys `ide.input.submit`/`cancel` (en, ja, zh-CN, zh-TW).
+- **Tests**: `InputExecutor.test.ts` (7 tests), `LinputExecutor.test.ts` (5 tests).
+
+### Status
+- ✅ Type-check passes
+- ✅ 942 tests pass (INPUT/LINPUT executor tests included)
+
+## 2026-01-31 - VIEW Deferred; Plan Updated
+
+### Planning
+- **VIEW command**: Documented as blocked. VIEW requires (1) BG GRAPHIC buffer (28×21) in device/screen layer, and (2) a BG GRAPHIC editor (or other way to populate the buffer). We have neither; no user-facing way to edit BG GRAPHIC yet.
+- **Remaining work plan**: Updated Phase 2 VIEW section with prerequisites; suggested next step set to Phase 3 (INPUT, LINPUT). Timeline and success criteria updated accordingly.
+
 ## 2026-01-31 - Dependency Maintenance & Documentation
 
 ### Dependency Upgrades

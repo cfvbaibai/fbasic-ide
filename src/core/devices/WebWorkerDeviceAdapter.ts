@@ -16,6 +16,7 @@ import type {
   AnyServiceWorkerMessage,
   BasicDeviceAdapter,
   ExecutionResult,
+  InputValueMessage,
   InterpreterConfig,
   OutputMessage,
 } from '@/core/interfaces'
@@ -41,6 +42,12 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   private webWorkerManager: WebWorkerManager
   private screenStateManager: ScreenStateManager
   private messageHandler: MessageHandler
+
+  // === INPUT REQUEST (worker only: INPUT/LINPUT) ===
+  private pendingInputRequests: Map<
+    string,
+    { resolve: (values: string[]) => void; reject: (err: Error) => void }
+  > = new Map()
 
   // === SCREEN UPDATE BATCHING ===
   // FPS-based batching: batches screen updates to align with target frame rate
@@ -417,6 +424,63 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     }
 
     self.postMessage(message)
+  }
+
+  /**
+   * Request user input (INPUT/LINPUT). Used in worker; posts REQUEST_INPUT to main and waits for INPUT_VALUE.
+   */
+  requestInput(
+    prompt: string,
+    options?: { variableCount?: number; isLinput?: boolean }
+  ): Promise<string[]> {
+    const variableCount = options?.variableCount ?? 1
+    const isLinput = options?.isLinput ?? false
+    const requestId = `input-${Date.now()}-${Math.random().toString(36).slice(2)}`
+    const executionId = this.screenStateManager.getCurrentExecutionId() ?? 'unknown'
+
+    const promise = new Promise<string[]>((resolve, reject) => {
+      this.pendingInputRequests.set(requestId, { resolve, reject })
+    })
+
+    self.postMessage({
+      type: 'REQUEST_INPUT',
+      id: requestId,
+      timestamp: Date.now(),
+      data: {
+        requestId,
+        executionId,
+        prompt,
+        variableCount,
+        isLinput,
+      },
+    })
+
+    return promise
+  }
+
+  /**
+   * Resolve or reject a pending input request (called from WebWorkerInterpreter when INPUT_VALUE is received).
+   */
+  handleInputValueMessage(message: InputValueMessage): void {
+    const { requestId, values, cancelled } = message.data
+    const pending = this.pendingInputRequests.get(requestId)
+    this.pendingInputRequests.delete(requestId)
+    if (!pending) return
+    if (cancelled) {
+      pending.reject(new Error('Input cancelled'))
+    } else {
+      pending.resolve(values)
+    }
+  }
+
+  /**
+   * Reject all pending input requests (e.g. when STOP is received).
+   */
+  rejectAllInputRequests(reason: string = 'Execution stopped'): void {
+    for (const [, pending] of this.pendingInputRequests) {
+      pending.reject(new Error(reason))
+    }
+    this.pendingInputRequests.clear()
   }
 
   /**

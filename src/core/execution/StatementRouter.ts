@@ -27,7 +27,9 @@ import { ForExecutor } from './executors/ForExecutor'
 import { GosubExecutor } from './executors/GosubExecutor'
 import { GotoExecutor } from './executors/GotoExecutor'
 import { IfThenExecutor } from './executors/IfThenExecutor'
+import { InputExecutor } from './executors/InputExecutor'
 import { LetExecutor } from './executors/LetExecutor'
+import { LinputExecutor } from './executors/LinputExecutor'
 import { LocateExecutor } from './executors/LocateExecutor'
 import { MoveExecutor } from './executors/MoveExecutor'
 import { NextExecutor } from './executors/NextExecutor'
@@ -52,6 +54,8 @@ export class StatementRouter {
   private endExecutor: EndExecutor
   private pauseExecutor: PauseExecutor
   private ifThenExecutor: IfThenExecutor
+  private inputExecutor: InputExecutor
+  private linputExecutor: LinputExecutor
   private gotoExecutor: GotoExecutor
   private gosubExecutor: GosubExecutor
   private returnExecutor: ReturnExecutor
@@ -90,6 +94,8 @@ export class StatementRouter {
     this.endExecutor = new EndExecutor(context)
     this.pauseExecutor = new PauseExecutor(context, evaluator)
     this.ifThenExecutor = new IfThenExecutor(context, evaluator)
+    this.inputExecutor = new InputExecutor(context, variableService)
+    this.linputExecutor = new LinputExecutor(context, variableService)
     this.gotoExecutor = new GotoExecutor(context)
     this.gosubExecutor = new GosubExecutor(context)
     this.returnExecutor = new ReturnExecutor(context)
@@ -304,6 +310,18 @@ export class StatementRouter {
       const pauseStmtCst = getFirstCstNode(singleCommandCst.children.pauseStatement)
       if (pauseStmtCst) {
         await this.pauseExecutor.execute(pauseStmtCst)
+      }
+      return
+    } else if (singleCommandCst.children.inputStatement) {
+      const inputStmtCst = getFirstCstNode(singleCommandCst.children.inputStatement)
+      if (inputStmtCst) {
+        await this.inputExecutor.execute(inputStmtCst)
+      }
+      return
+    } else if (singleCommandCst.children.linputStatement) {
+      const linputStmtCst = getFirstCstNode(singleCommandCst.children.linputStatement)
+      if (linputStmtCst) {
+        await this.linputExecutor.execute(linputStmtCst)
       }
       return
     } else if (singleCommandCst.children.dimStatement) {

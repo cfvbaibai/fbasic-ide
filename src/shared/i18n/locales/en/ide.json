@@ -25,6 +25,7 @@
         "combo": "Combo"
     },
     "samples": {
+        "placeholder": "Sample",
         "basic": "Basic",
         "pause": "Pause Demo",
         "gaming": "Joystick Test",
@@ -33,7 +34,12 @@
         "allChars": "All Chars",
         "spriteTest": "Sprite Test",
         "moveTest": "Move Test",
-        "testMoveControl": "Move Control Test"
+        "testMoveControl": "Move Control Test",
+        "inputDemo": "INPUT / LINPUT"
+    },
+    "input": {
+        "submit": "OK",
+        "cancel": "Cancel"
     },
     "joystick": {
         "control": "Joystick Control",
