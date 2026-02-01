@@ -40,6 +40,24 @@ describe('Arithmetic Calculations', () => {
       expect(result.variables.get('X')?.value).toBe(8)
     })
 
+    it('should evaluate hex literal &HDD as 221', async () => {
+      const code = '10 LET X = &HDD'
+      const result = await interpreter.execute(code)
+
+      expect(result.success).toBe(true)
+      expect(result.errors).toHaveLength(0)
+      expect(result.variables.get('X')?.value).toBe(221)
+    })
+
+    it('should evaluate hex literal in expression', async () => {
+      const code = '10 LET X = &H10 + &H0A'
+      const result = await interpreter.execute(code)
+
+      expect(result.success).toBe(true)
+      expect(result.errors).toHaveLength(0)
+      expect(result.variables.get('X')?.value).toBe(26) // 16 + 10
+    })
+
     it('should add positive and negative numbers', async () => {
       const code = '10 LET X = 10 + (-5)'
       const result = await interpreter.execute(code)

@@ -40,6 +40,14 @@ describe('LET Statement Parser', () => {
       expect(Array.isArray(statements) ? statements.length : 0).toBe(1)
     })
 
+    it('should parse LET statement with hex literal (&H prefix)', async () => {
+      const result = await parser.parse('35 LET Z = &HDD')
+      expect(result.success).toBe(true)
+      expect(result.cst).toBeDefined()
+      const statements = result.cst?.children.statement
+      expect(Array.isArray(statements) ? statements.length : 0).toBe(1)
+    })
+
     it('should parse LET statement with variable assignment', async () => {
       const result = await parser.parse('40 LET Z = X')
       expect(result.success).toBe(true)

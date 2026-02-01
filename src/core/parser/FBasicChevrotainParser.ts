@@ -98,6 +98,7 @@ import {
   RParen,
   // Literals
   StringLiteral,
+  HexLiteral,
   NumberLiteral,
   Identifier,
   // Lexer
@@ -232,7 +233,7 @@ class FBasicChevrotainParser extends CstParser {
       this.CONSUME(RParen)
     })
 
-    // Primary = NumberLiteral | StringLiteral | ArrayAccess | FunctionCall | Identifier | (LParen Expression RParen)
+    // Primary = NumberLiteral | HexLiteral | StringLiteral | ArrayAccess | FunctionCall | Identifier | (LParen Expression RParen)
     this.primary = this.RULE('primary', () => {
       this.OR([
         {
@@ -240,6 +241,7 @@ class FBasicChevrotainParser extends CstParser {
           ALT: () => this.CONSUME(StringLiteral),
         },
         { ALT: () => this.CONSUME(NumberLiteral) },
+        { ALT: () => this.CONSUME(HexLiteral) },
         {
           // Function call: String functions, arithmetic functions, controller input functions, and sprite query functions
           // Family BASIC arithmetic functions: ABS, SGN, RND, VAL
@@ -587,13 +589,14 @@ class FBasicChevrotainParser extends CstParser {
       })
     })
 
-    // DataConstant = NumberLiteral | StringLiteral | Identifier
+    // DataConstant = NumberLiteral | HexLiteral | StringLiteral | Identifier
     // DATA statements only accept constants (not expressions/variables)
     // Identifiers in DATA are treated as string constants (unquoted strings)
-    // Example: DATA 10, GOOD, "Hello, World"
+    // Example: DATA 10, &H0A, GOOD, "Hello, World"
     this.dataConstant = this.RULE('dataConstant', () => {
       this.OR([
         { ALT: () => this.CONSUME(NumberLiteral) },
+        { ALT: () => this.CONSUME(HexLiteral) },
         {
           GATE: () => this.LA(1).tokenType === StringLiteral,
           ALT: () => this.CONSUME(StringLiteral),

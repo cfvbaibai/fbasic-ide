@@ -433,6 +433,12 @@ export class ExpressionEvaluator {
       return parseInt(numberToken.image, 10)
     }
 
+    // Check for hex literal (&H<hex digits>, e.g. &HDD = 221)
+    const hexToken = getFirstToken(cst.children.HexLiteral)
+    if (hexToken) {
+      return parseInt(hexToken.image.slice(2), 16)
+    }
+
     // Check for string literal
     const stringToken = getFirstToken(cst.children.StringLiteral)
     if (stringToken) {

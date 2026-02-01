@@ -48,6 +48,14 @@ describe('DATA Statement Parser', () => {
       expect(Array.isArray(statements) ? statements.length : 0).toBe(1)
     })
 
+    it('should parse DATA statement with hex constants', async () => {
+      const result = await parser.parse('45 DATA &HDD, &H0A, &HFF')
+      expect(result.success).toBe(true)
+      expect(result.cst).toBeDefined()
+      const statements = result.cst?.children.statement
+      expect(Array.isArray(statements) ? statements.length : 0).toBe(1)
+    })
+
     it('should parse DATA statement with quoted strings containing commas', async () => {
       const result = await parser.parse('50 DATA ABC, DE, ", ", F')
       expect(result.success).toBe(true)

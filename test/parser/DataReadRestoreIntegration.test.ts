@@ -73,6 +73,19 @@ describe('DATA/READ/RESTORE Integration', () => {
       // Verify variable X has the last read value
       expect(result.variables.get('X')?.value).toBe(9)
     })
+
+    it('should read hex literal from DATA as numeric value', async () => {
+      const code = `10 DATA &HDD, &H0A
+20 READ A, B
+30 END`
+
+      const result = await interpreter.execute(code)
+
+      expect(result.success).toBe(true)
+      expect(result.errors).toHaveLength(0)
+      expect(result.variables.get('A')?.value).toBe(221) // &HDD = 221
+      expect(result.variables.get('B')?.value).toBe(10) // &H0A = 10
+    })
   })
 
   describe('Character Data Reading (Spec Example 2)', () => {

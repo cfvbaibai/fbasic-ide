@@ -139,6 +139,12 @@ export const StringLiteral = createToken({
   pattern: /"[^"]*"/,
 })
 
+// HexLiteral - &H followed by hex digits (e.g. &HDD = 221 decimal)
+export const HexLiteral = createToken({
+  name: 'HexLiteral',
+  pattern: /&H[0-9A-Fa-f]+/,
+})
+
 // NumberLiteral - only integers allowed (no decimal point, no scientific notation)
 // Family Basic only supports integer numerical variables
 export const NumberLiteral = createToken({
@@ -264,8 +270,9 @@ export const allTokens = [
   Underscore,
   Backslash,
   Apostrophe,
-  // Literals
+  // Literals (HexLiteral before NumberLiteral so &H... is one token)
   StringLiteral,
+  HexLiteral,
   NumberLiteral,
   Identifier,
 ]
