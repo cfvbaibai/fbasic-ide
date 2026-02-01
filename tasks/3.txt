@@ -1,0 +1,3 @@
+type: refactor
+subject: Make icons and fonts loaded from local repo
+description: Currently icons (iconify) and fonts are loaded from internet, which is unstable. Try to make it loaded from the repo itself.

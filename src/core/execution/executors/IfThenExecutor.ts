@@ -35,10 +35,11 @@ export class IfThenExecutor {
       return false
     }
 
-    // Evaluate the logical expression
+    // Evaluate the logical expression (evaluator may return number or string; coerce to number for BASIC semantics)
     let conditionResult: number
     try {
-      conditionResult = this.evaluator.evaluateLogicalExpression(logicalExprCst)
+      const raw = this.evaluator.evaluateLogicalExpression(logicalExprCst)
+      conditionResult = typeof raw === 'number' ? raw : Number(raw)
     } catch (error) {
       this.context.addError({
         line: lineNumber,

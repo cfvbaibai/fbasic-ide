@@ -9,8 +9,7 @@
  * - See docs/guides/skin-system.md for skin system documentation
  */
 
-/* Y2K Futuristic Fonts - Google Fonts Import */
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Exo+2:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+/* Local fonts are loaded via shared/styles/fonts.css (from @fontsource) */
 
 :root {
     /* Game UI Base Colors (Gray Scale) */

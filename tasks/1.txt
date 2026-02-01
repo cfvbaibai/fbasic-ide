@@ -1,0 +1,4 @@
+type: bug
+subject: bad line scrolling behavior of PRINT
+description:
+PRINT on the last line of the screen causes the content appears on top. The correct behavior should be scrolling the old content up and print the new content at bottom.

@@ -25,152 +25,130 @@ export class ExpressionEvaluator {
   }
 
   /**
-   * Evaluate a BASIC expression from CST
+   * Evaluate a BASIC expression from CST.
+   * Expression = LogicalExpression (includes AND/OR/NOT/XOR in numeric context per F-BASIC manual p.52).
    */
   evaluateExpression(exprCst: CstNode): number | string {
-    // Expression -> Additive -> ModExpression -> Multiplicative -> Unary -> Primary
-    const additiveCst = getFirstCstNode(exprCst.children.additive)
-    if (additiveCst) {
-      return this.evaluateAdditive(additiveCst)
+    const logicalCst = getFirstCstNode(exprCst.children.logicalExpression)
+    if (logicalCst) {
+      return this.evaluateLogicalExpression(logicalCst)
     }
 
     throw new Error('Invalid expression CST')
   }
 
+  /** Convert to 16-bit signed integer (F-BASIC numeric range). */
+  private toInt16(x: number): number {
+    const truncated = Math.trunc(x)
+    const masked = (truncated & 0xffff) >>> 0
+    return masked >= 0x8000 ? masked - 0x10000 : masked
+  }
+
   /**
-   * Evaluate a logical expression from CST
-   * Returns -1 for true, 0 for false (per Family BASIC spec)
-   * Supports: NOT, AND, OR, XOR
-   * Precedence: NOT > AND > OR > XOR
+   * Evaluate a logical expression from CST.
+   * Uses bitwise semantics (F-BASIC manual p.52): NOT/AND/OR/XOR operate on 16-bit values.
+   * Returns number or string (e.g. PRINT A$; (A AND 1) in arithmetic).
    * Structure: LogicalOrExpression (XOR LogicalOrExpression)*
    */
-  evaluateLogicalExpression(logicalCst: CstNode): number {
+  evaluateLogicalExpression(logicalCst: CstNode): number | string {
     const logicalOrExprs = getCstNodes(logicalCst.children.logicalOrExpression)
     if (logicalOrExprs.length === 0) {
       throw new Error('Invalid logical expression: missing logical OR expression')
     }
 
-    // Evaluate first logical OR expression
     let result = this.evaluateLogicalOrExpression(logicalOrExprs[0]!)
 
-    // Apply XOR operators (lowest precedence, combines LogicalOrExpressions)
     const xorTokens = getTokens(logicalCst.children.Xor)
     for (let i = 0; i < xorTokens.length && i + 1 < logicalOrExprs.length; i++) {
       const operand = this.evaluateLogicalOrExpression(logicalOrExprs[i + 1]!)
-      // XOR: exactly one must be non-zero (true) to return -1
-      // In BASIC: non-zero = true, zero = false
-      // XOR truth table: 1 XOR 1 = 0, 1 XOR 0 = 1, 0 XOR 1 = 1, 0 XOR 0 = 0
-      const leftIsTrue = result !== 0
-      const rightIsTrue = operand !== 0
-      result = leftIsTrue !== rightIsTrue ? -1 : 0
+      result = this.toInt16(this.toInt16(this.toNumber(result)) ^ this.toInt16(this.toNumber(operand)))
     }
 
     return result
   }
 
   /**
-   * Evaluate a logical OR expression from CST
+   * Evaluate a logical OR expression from CST (bitwise OR).
    * Structure: LogicalAndExpression (OR LogicalAndExpression)*
-   * OR combines LogicalAndExpressions
    */
-  private evaluateLogicalOrExpression(cst: CstNode): number {
+  private evaluateLogicalOrExpression(cst: CstNode): number | string {
     const logicalAndExprs = getCstNodes(cst.children.logicalAndExpression)
     if (logicalAndExprs.length === 0) {
       throw new Error('Invalid logical OR expression: missing logical AND expression')
     }
 
-    // Evaluate first logical AND expression
     let result = this.evaluateLogicalAndExpression(logicalAndExprs[0]!)
 
-    // Apply OR operators (combines LogicalAndExpressions)
     const orTokens = getTokens(cst.children.Or)
     for (let i = 0; i < orTokens.length && i + 1 < logicalAndExprs.length; i++) {
       const operand = this.evaluateLogicalAndExpression(logicalAndExprs[i + 1]!)
-      // OR: at least one must be non-zero (true) to return -1
-      result = result !== 0 || operand !== 0 ? -1 : 0
+      result = this.toInt16(this.toInt16(this.toNumber(result)) | this.toInt16(this.toNumber(operand)))
     }
 
     return result
   }
 
   /**
-   * Evaluate a logical AND expression from CST
+   * Evaluate a logical AND expression from CST (bitwise AND).
    * Structure: LogicalNotExpression (AND LogicalNotExpression)*
-   * AND has middle precedence (combines LogicalNotExpressions)
    */
-  private evaluateLogicalAndExpression(cst: CstNode): number {
+  private evaluateLogicalAndExpression(cst: CstNode): number | string {
     const logicalNotExprs = getCstNodes(cst.children.logicalNotExpression)
     if (logicalNotExprs.length === 0) {
       throw new Error('Invalid logical AND expression: missing logical NOT expression')
     }
 
-    // Evaluate first logical NOT expression
     let result = this.evaluateLogicalNotExpression(logicalNotExprs[0]!)
 
-    // Apply AND operators (middle precedence, combines LogicalNotExpressions)
     const andTokens = getTokens(cst.children.And)
     for (let i = 0; i < andTokens.length && i + 1 < logicalNotExprs.length; i++) {
       const operand = this.evaluateLogicalNotExpression(logicalNotExprs[i + 1]!)
-      // AND: both must be non-zero (true) to return -1
-      result = result !== 0 && operand !== 0 ? -1 : 0
+      result = this.toInt16(this.toInt16(this.toNumber(result)) & this.toInt16(this.toNumber(operand)))
     }
 
     return result
   }
 
   /**
-   * Evaluate a logical NOT expression from CST
+   * Evaluate a logical NOT expression from CST (bitwise NOT when NOT present).
    * Structure: (NOT)? ComparisonExpression
-   * NOT has highest precedence (applies to ComparisonExpression)
    */
-  private evaluateLogicalNotExpression(cst: CstNode): number {
+  private evaluateLogicalNotExpression(cst: CstNode): number | string {
     const comparisonExprCst = getFirstCstNode(cst.children.comparisonExpression)
     if (!comparisonExprCst) {
       throw new Error('Invalid logical NOT expression: missing comparison expression')
     }
 
-    // Evaluate comparison expression
-    let result = this.evaluateComparisonExpression(comparisonExprCst)
+    let result: number | string = this.evaluateComparisonExpression(comparisonExprCst)
 
-    // Apply NOT if present (highest precedence, unary operator)
     const notTokens = getTokens(cst.children.Not)
     if (notTokens.length > 0) {
-      // NOT: invert the boolean value
-      // -1 (true) becomes 0 (false), 0 (false) becomes -1 (true)
-      result = result !== 0 ? 0 : -1
+      result = this.toInt16(~this.toInt16(this.toNumber(result)))
     }
 
     return result
   }
 
   /**
-   * Evaluate a comparison expression from CST
-   * Returns -1 for true, 0 for false (per Family BASIC spec)
-   * Supports: =, <>, <, >, <=, >=
-   * Also supports single expression (non-zero = true, zero = false)
+   * Evaluate a comparison expression from CST.
+   * Left operand: bitwiseXorExpression; right operand (when present): additive.
+   * Returns number or string (raw value when single operand; -1/0 when relational).
    */
-  evaluateComparisonExpression(comparisonCst: CstNode): number {
-    const expressions = getCstNodes(comparisonCst.children.expression)
-    if (expressions.length === 0) {
-      throw new Error('Invalid comparison expression: missing expression')
+  evaluateComparisonExpression(comparisonCst: CstNode): number | string {
+    const bitwiseXorCst = getFirstCstNode(comparisonCst.children.bitwiseXorExpression)
+    if (!bitwiseXorCst) {
+      throw new Error('Invalid comparison expression: missing bitwise expression')
     }
 
-    const leftValue = this.evaluateExpression(expressions[0]!)
+    const leftValue = this.evaluateBitwiseXorExpression(bitwiseXorCst)
 
-    // If no comparison operator, treat as boolean (non-zero = true)
-    // Per Family BASIC spec: relational operators return -1 for true, 0 for false
-    // For single expressions: non-zero = true (-1), zero = false (0)
-    if (expressions.length === 1) {
-      if (typeof leftValue === 'string') {
-        // Non-empty string = true
-        return leftValue.length > 0 ? -1 : 0
-      }
-      // Non-zero number = true
-      return leftValue !== 0 ? -1 : 0
+    const additiveCst = getFirstCstNode(comparisonCst.children.additive)
+    // If no comparison operator, return raw value (PRINT A$ prints string; (A AND 1) stays 0 or 1)
+    if (!additiveCst) {
+      return leftValue
     }
 
-    // Two expressions with comparison operator
-    const rightValue = this.evaluateExpression(expressions[1]!)
+    const rightValue = this.evaluateAdditive(additiveCst)
 
     // Get comparison operator token
     const equalToken = getFirstToken(comparisonCst.children.Equal)
@@ -234,6 +212,65 @@ export class ExpressionEvaluator {
     }
 
     return 0
+  }
+
+  /**
+   * Evaluate bitwise XOR expression from CST (used as comparison operands).
+   * Returns number | string; bitwise ops coerce to number.
+   */
+  evaluateBitwiseXorExpression(cst: CstNode): number | string {
+    const bitwiseOrExprs = getCstNodes(cst.children.bitwiseOrExpression)
+    if (bitwiseOrExprs.length === 0) {
+      throw new Error('Invalid bitwise XOR expression')
+    }
+    let result = this.evaluateBitwiseOrExpression(bitwiseOrExprs[0]!)
+    const xorTokens = getTokens(cst.children.Xor)
+    for (let i = 0; i < xorTokens.length && i + 1 < bitwiseOrExprs.length; i++) {
+      const operand = this.evaluateBitwiseOrExpression(bitwiseOrExprs[i + 1]!)
+      result = this.toInt16(this.toNumber(result) ^ this.toNumber(operand))
+    }
+    return result
+  }
+
+  private evaluateBitwiseOrExpression(cst: CstNode): number | string {
+    const bitwiseAndExprs = getCstNodes(cst.children.bitwiseAndExpression)
+    if (bitwiseAndExprs.length === 0) {
+      throw new Error('Invalid bitwise OR expression')
+    }
+    let result = this.evaluateBitwiseAndExpression(bitwiseAndExprs[0]!)
+    const orTokens = getTokens(cst.children.Or)
+    for (let i = 0; i < orTokens.length && i + 1 < bitwiseAndExprs.length; i++) {
+      const operand = this.evaluateBitwiseAndExpression(bitwiseAndExprs[i + 1]!)
+      result = this.toInt16(this.toNumber(result) | this.toNumber(operand))
+    }
+    return result
+  }
+
+  private evaluateBitwiseAndExpression(cst: CstNode): number | string {
+    const bitwiseNotExprs = getCstNodes(cst.children.bitwiseNotExpression)
+    if (bitwiseNotExprs.length === 0) {
+      throw new Error('Invalid bitwise AND expression')
+    }
+    let result = this.evaluateBitwiseNotExpression(bitwiseNotExprs[0]!)
+    const andTokens = getTokens(cst.children.And)
+    for (let i = 0; i < andTokens.length && i + 1 < bitwiseNotExprs.length; i++) {
+      const operand = this.evaluateBitwiseNotExpression(bitwiseNotExprs[i + 1]!)
+      result = this.toInt16(this.toNumber(result) & this.toNumber(operand))
+    }
+    return result
+  }
+
+  private evaluateBitwiseNotExpression(cst: CstNode): number | string {
+    const additiveCst = getFirstCstNode(cst.children.additive)
+    if (!additiveCst) {
+      throw new Error('Invalid bitwise NOT expression')
+    }
+    let result = this.evaluateAdditive(additiveCst)
+    const notTokens = getTokens(cst.children.Not)
+    if (notTokens.length > 0) {
+      result = this.toInt16(~this.toInt16(this.toNumber(result)))
+    }
+    return result
   }
 
   /**

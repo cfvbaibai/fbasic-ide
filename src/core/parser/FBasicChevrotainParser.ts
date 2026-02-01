@@ -127,6 +127,10 @@ class FBasicChevrotainParser extends CstParser {
   declare endStatement: () => CstNode
   declare pauseStatement: () => CstNode
   declare playStatement: () => CstNode
+  declare bitwiseNotExpression: () => CstNode
+  declare bitwiseAndExpression: () => CstNode
+  declare bitwiseOrExpression: () => CstNode
+  declare bitwiseXorExpression: () => CstNode
   declare comparisonExpression: () => CstNode
   declare logicalNotExpression: () => CstNode
   declare logicalAndExpression: () => CstNode
@@ -324,17 +328,48 @@ class FBasicChevrotainParser extends CstParser {
       })
     })
 
-    // Expression = Additive (for now, simplified)
+    // Expression = LogicalExpression (full expression including AND/OR/NOT/XOR in numeric context)
+    // Per F-BASIC manual p.52: logical operators are numeric (bitwise) and participate in expression evaluation
     this.expression = this.RULE('expression', () => {
+      this.SUBRULE(this.logicalExpression)
+    })
+
+    // Bitwise levels (numeric AND/OR/NOT/XOR) - operands are additive only to avoid recursion
+    // Order per manual: NOT > AND > OR > XOR; these sit between additive and comparison
+    this.bitwiseNotExpression = this.RULE('bitwiseNotExpression', () => {
+      this.OPTION(() => this.CONSUME(Not))
       this.SUBRULE(this.additive)
     })
 
-    // ComparisonExpression = Expression (ComparisonOperator Expression)?
-    // Supports: =, <>, <, >, <=, >=
-    // In BASIC, a single expression can be used as a condition (non-zero = true, zero = false)
-    // Or two expressions can be compared
+    this.bitwiseAndExpression = this.RULE('bitwiseAndExpression', () => {
+      this.SUBRULE(this.bitwiseNotExpression)
+      this.MANY(() => {
+        this.CONSUME(And)
+        this.SUBRULE2(this.bitwiseNotExpression)
+      })
+    })
+
+    this.bitwiseOrExpression = this.RULE('bitwiseOrExpression', () => {
+      this.SUBRULE(this.bitwiseAndExpression)
+      this.MANY(() => {
+        this.CONSUME(Or)
+        this.SUBRULE2(this.bitwiseAndExpression)
+      })
+    })
+
+    this.bitwiseXorExpression = this.RULE('bitwiseXorExpression', () => {
+      this.SUBRULE(this.bitwiseOrExpression)
+      this.MANY(() => {
+        this.CONSUME(Xor)
+        this.SUBRULE2(this.bitwiseOrExpression)
+      })
+    })
+
+    // ComparisonExpression = BitwiseXorExpression (ComparisonOperator Additive)?
+    // Left operand is full bitwise (allows (A AND 1)=1); right operand is additive only so
+    // "X > 0 AND X < 10" parses as (X>0) AND (X<10) (relational binds tighter than AND).
     this.comparisonExpression = this.RULE('comparisonExpression', () => {
-      this.SUBRULE(this.expression)
+      this.SUBRULE(this.bitwiseXorExpression)
       this.OPTION(() => {
         this.OR([
           { ALT: () => this.CONSUME(Equal) },
@@ -344,7 +379,7 @@ class FBasicChevrotainParser extends CstParser {
           { ALT: () => this.CONSUME(LessThanOrEqual) },
           { ALT: () => this.CONSUME(GreaterThanOrEqual) },
         ])
-        this.SUBRULE2(this.expression)
+        this.SUBRULE2(this.additive)
       })
     })
 

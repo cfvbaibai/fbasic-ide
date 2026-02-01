@@ -58,6 +58,32 @@ export function getLineNumberFromStatement(stmtCst: CstNode): number | null {
 }
 
 /**
+ * Get the first additive CST from an expression (expression = logicalExpression -> ... -> additive).
+ * Used when code needs to traverse expression as additive (e.g. DEF SPRITE character set).
+ */
+export function getAdditiveFromExpression(exprCst: CstNode): CstNode | undefined {
+  const logicalCst = getFirstCstNode(exprCst.children.logicalExpression)
+  if (!logicalCst) return undefined
+  const logicalOrCst = getFirstCstNode(logicalCst.children.logicalOrExpression)
+  if (!logicalOrCst) return undefined
+  const logicalAndCst = getFirstCstNode(logicalOrCst.children.logicalAndExpression)
+  if (!logicalAndCst) return undefined
+  const logicalNotCst = getFirstCstNode(logicalAndCst.children.logicalNotExpression)
+  if (!logicalNotCst) return undefined
+  const comparisonCst = getFirstCstNode(logicalNotCst.children.comparisonExpression)
+  if (!comparisonCst) return undefined
+  const bitwiseXorCst = getFirstCstNode(comparisonCst.children.bitwiseXorExpression)
+  if (!bitwiseXorCst) return undefined
+  const bitwiseOrCst = getFirstCstNode(bitwiseXorCst.children.bitwiseOrExpression)
+  if (!bitwiseOrCst) return undefined
+  const bitwiseAndCst = getFirstCstNode(bitwiseOrCst.children.bitwiseAndExpression)
+  if (!bitwiseAndCst) return undefined
+  const bitwiseNotCst = getFirstCstNode(bitwiseAndCst.children.bitwiseNotExpression)
+  if (!bitwiseNotCst) return undefined
+  return getFirstCstNode(bitwiseNotCst.children.additive)
+}
+
+/**
  * Recursively collect token images from a CST node to form source text.
  * Used for error reporting to show the failing BASIC line.
  */

@@ -49,10 +49,10 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 20 PRINT "Starting countdown..."
 30 FOR I = 5 TO 1 STEP -1
 40   PRINT "Countdown: "; I
-50   PAUSE 1000
+50   PAUSE 20
 60 NEXT
 70 PRINT "Blast off!"
-80 PAUSE 2000
+80 PAUSE 20
 90 PRINT "Mission complete!"
 100 END`,
   },
@@ -86,7 +86,7 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 270 IF S1 > 0 OR T1 > 0 THEN PRINT "  Joystick 1: STICK="; S1; ", STRIG="; T1
 310 REM Check for exit condition (START button on joystick #1)
 320 IF T1 = 1 THEN GOTO 360
-330 PAUSE 200
+330 PAUSE 100
 340 GOTO 180
 350 PRINT ""
 360 PRINT "START button pressed on joystick #1"
@@ -327,7 +327,7 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 330 PRINT "  YPOS(0) = "; YPOS(0)
 340 PRINT ""
 350 REM Wait a bit for movement to progress
-360 PAUSE 500
+360 PAUSE 100
 370 PRINT "After 500ms pause:"
 380 PRINT "  MOVE(0) status: "; MOVE(0); " (-1=moving, 0=complete)"
 390 PRINT "  XPOS(0) = "; XPOS(0)
@@ -352,7 +352,7 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 580 PRINT "  YPOS(1) = "; YPOS(1)
 590 PRINT ""
 600 REM Wait for movement
-610 PAUSE 500
+610 PAUSE 100
 620 PRINT "After 500ms pause:"
 630 PRINT "  MOVE(1) status: "; MOVE(1)
 640 PRINT "  XPOS(1) = "; XPOS(1)
@@ -382,7 +382,7 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 880 PRINT ""
 890 REM Test 7: CUT multiple actions
 900 PRINT "Test 7: CUT multiple actions"
-910 PAUSE 500
+910 PAUSE 100
 920 CUT 2, 3
 930 PRINT "CUT 2, 3 executed"
 940 PRINT "  MOVE(2) status: "; MOVE(2); " (should be 0)"
@@ -438,7 +438,7 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 270   PRINT "  XPOS(0) = "; XPOS(0)
 280   PRINT "  YPOS(0) = "; YPOS(0)
 290   PRINT "  MOVE(0) = "; MOVE(0); " (-1=moving, 0=stopped)"
-300   PAUSE 200
+300   PAUSE 50
 310 NEXT
 320 PRINT ""
 330 PRINT "Test complete!"

@@ -9,7 +9,7 @@ import type { CstNode } from 'chevrotain'
 
 import { ERROR_TYPES } from '@/core/constants'
 import type { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
-import { getCstNodes, getFirstCstNode, getFirstToken } from '@/core/parser/cst-helpers'
+import { getAdditiveFromExpression, getCstNodes, getFirstCstNode, getFirstToken } from '@/core/parser/cst-helpers'
 import { convertCharacterSetToTiles, stringToCharCodes } from '@/core/sprite/characterSetConverter'
 import type { DefSpriteDefinition } from '@/core/sprite/types'
 import type { ExecutionContext } from '@/core/state/ExecutionContext'
@@ -207,8 +207,8 @@ export class DefSpriteExecutor {
   private extractChrCodesFromExpression(exprCst: CstNode): number[] {
     const codes: number[] = []
 
-    // Check if this is an additive expression (for CHR$(0)+CHR$(1)+...)
-    const additiveCst = getFirstCstNode(exprCst.children.additive)
+    // Expression = logicalExpression -> ... -> additive; get additive for CHR$(0)+CHR$(1)+...
+    const additiveCst = getAdditiveFromExpression(exprCst)
     if (additiveCst) {
       const modExprs = getCstNodes(additiveCst.children.modExpression)
       for (const modExpr of modExprs) {
@@ -218,24 +218,7 @@ export class DefSpriteExecutor {
       return codes
     }
 
-    // Check if this is a mod expression
-    const modExprCst = getFirstCstNode(exprCst.children.modExpression)
-    if (modExprCst) {
-      return this.extractChrCodesFromModExpression(modExprCst)
-    }
-
-    // Check if this is a multiplicative expression
-    const multExprCst = getFirstCstNode(exprCst.children.multiplicative)
-    if (multExprCst) {
-      return this.extractChrCodesFromMultiplicative(multExprCst)
-    }
-
-    // Check if this is a primary expression (function call, etc.)
-    const primaryCst = getFirstCstNode(exprCst.children.primary)
-    if (primaryCst) {
-      return this.extractChrCodesFromPrimary(primaryCst)
-    }
-
+    // Fallback: traverse additive's children (modExpression, etc.) if we have additive
     return codes
   }
 

@@ -107,5 +107,14 @@ describe('LET Statement Parser', () => {
       const statements = result.cst?.children.statement
       expect(Array.isArray(statements) ? statements.length : 0).toBe(1)
     })
+
+    it('should parse LET with numeric logical (A AND 1)=1 in expression (F-BASIC manual p.52)', async () => {
+      // From shooting.bas: E=E+((A AND 1)=1)*(E<27)-((A AND 2)=2)*(E>0)
+      const result = await parser.parse('120 E=E+((A AND 1)=1)*(E<27)-((A AND 2)=2)*(E>0)')
+      expect(result.success).toBe(true)
+      expect(result.cst).toBeDefined()
+      const statements = result.cst?.children.statement
+      expect(Array.isArray(statements) ? statements.length : 0).toBe(1)
+    })
   })
 })
