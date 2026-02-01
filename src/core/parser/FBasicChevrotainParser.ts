@@ -1186,13 +1186,13 @@ export function parseWithChevrotain(source: string): {
       continue
     }
 
-    // Check if line is a REM statement (comment line)
-    // Format: <lineNumber> REM <comment text>
-    // After trimming, check if line starts with a number followed by REM
+    // Check if line is a comment line: REM or apostrophe (') per F-BASIC manual p.67
+    // Format: <lineNumber> REM <comment text>  OR  <lineNumber> ' <comment text>
+    // Abbreviation for REM is ' (apostrophe); "You can use (apostrophe) instead of REM."
     const remMatch = line.match(/^\s*(\d+)\s+REM\b/i)
-    if (remMatch) {
-      // This is a REM line - skip it entirely (don't tokenize or parse)
-      // REM lines are treated as comments and ignored
+    const apostropheCommentMatch = line.match(/^\s*(\d+)\s+'/)
+    if (remMatch || apostropheCommentMatch) {
+      // Comment line - skip entirely (don't tokenize or parse)
       continue
     }
 

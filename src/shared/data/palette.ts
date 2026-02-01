@@ -1,8 +1,9 @@
 // NES/Famicom 61-color palette (0x00 to 0x3C, indices 0-60)
-// Based on PAL PPU (2C07) color table
+// Based on PAL PPU (2C07) color table, modified for F-BASIC
 // https://www.nesdev.org/wiki/PPU_palettes
+// Note: 0x00 is black in F-BASIC (not NES grey) for backdrop/transparent color
 export const COLORS = [
-  '#626262', // 0x00 (0)
+  '#000000', // 0x00 (0) - Black (F-BASIC default backdrop)
   '#002263', // 0x01 (1)
   '#0D107D', // 0x02 (2)
   '#2B027D', // 0x03 (3)

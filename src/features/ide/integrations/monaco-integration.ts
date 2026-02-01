@@ -68,6 +68,9 @@ const monarchLanguage: monaco.languages.IMonarchLanguage = {
       // REM lines (entire line as comment) - must come before line-number rule
       // Matches: <lineNumber> REM <comment text>
       [/^\d+\s+REM.*$/i, 'comment'],
+      // Apostrophe comment lines (F-BASIC manual p.67: ' is abbreviation for REM)
+      // Matches: <lineNumber> ' <comment text>
+      [/^\d+\s+'.*$/, 'comment'],
 
       // Line numbers at start of line
       [/^\d+/, 'line-number'],

@@ -145,6 +145,8 @@ export interface MessageHandlerContext {
   sharedDisplayViews?: SharedDisplayViews
   /** Called when SCREEN_CHANGED is received to schedule a render (Screen.vue reads from shared buffer). */
   scheduleRender?: () => void
+  /** Coalesced version: at most one schedule per frame. Prefer this for SCREEN_CHANGED to avoid main-thread flood. */
+  scheduleRenderForScreenChanged?: () => void
   /** Called by Screen.vue after decoding shared buffer to update refs (screenBuffer, cursorX, etc.). */
   setDecodedScreenState?: (decoded: DecodedScreenState) => void
   /** Pending INPUT/LINPUT request from worker; set when REQUEST_INPUT is received, cleared on submit/cancel. */
@@ -176,14 +178,15 @@ export function handleOutputMessage(message: AnyServiceWorkerMessage, context: M
 
 /**
  * Handle SCREEN_CHANGED message from web worker (shared buffer path).
- * Only schedules a render; Screen.vue reads from shared buffer and decodes in its render path.
+ * Uses coalesced schedule so many SCREEN_CHANGED (e.g. loop with PRINT) only trigger one render per frame.
  */
 export function handleScreenChangedMessage(
   _message: AnyServiceWorkerMessage,
   context: MessageHandlerContext
 ): void {
-  if (context.scheduleRender) {
-    context.scheduleRender()
+  const schedule = context.scheduleRenderForScreenChanged ?? context.scheduleRender
+  if (schedule) {
+    schedule()
   }
 }
 

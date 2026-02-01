@@ -78,6 +78,16 @@ const routes: RouteRecordRaw[] = [
       showInNav: false,
     },
   },
+  {
+    path: '/performance-diagnostics',
+    name: 'PerformanceDiagnostics',
+    component: () => import('@/features/ide/PerformanceDiagnosticsPage.vue'),
+    meta: {
+      title: 'Performance Diagnostics',
+      showInNav: true,
+      icon: 'mdi:speedometer',
+    },
+  },
 ]
 
 const router = createRouter({

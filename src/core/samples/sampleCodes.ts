@@ -447,6 +447,22 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 360 PRINT "          YPOS should stay at ~100"
 370 END`,
   },
+
+  screenCoalesceDemo: {
+    name: 'Screen Coalesce Demo',
+    description: 'Stress test: loop with many PRINTs. UI should stay responsive (SCREEN_CHANGED coalescing).',
+    code: `10 REM Screen Coalesce Demo - many PRINTs in a loop
+20 CLS
+30 PRINT "Screen Coalesce Demo"
+40 PRINT "If UI stays responsive, coalescing works."
+50 PRINT ""
+60 FOR I = 1 TO 500
+70   PRINT "Loop "; I
+80 NEXT
+90 PRINT ""
+100 PRINT "Done. UI stayed responsive?"
+110 END`,
+  },
 }
 
 /**

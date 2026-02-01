@@ -4,7 +4,7 @@
  * Main execution engine that orchestrates BASIC program execution.
  */
 
-import { ERROR_TYPES } from '@/core/constants'
+import { DEFAULTS, ERROR_TYPES } from '@/core/constants'
 import { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
 import type { BasicDeviceAdapter, ExecutionResult } from '@/core/interfaces'
 import { DataService } from '@/core/services/DataService'
@@ -19,6 +19,8 @@ export class ExecutionEngine {
   private variableService: VariableService
   private dataService: DataService
   private statementRouter: StatementRouter
+  private shouldYieldToEventLoop: boolean
+  private yieldInterval: number
 
   constructor(context: ExecutionContext, _deviceAdapter?: BasicDeviceAdapter) {
     this.context = context
@@ -28,6 +30,14 @@ export class ExecutionEngine {
     this.variableService = new VariableService(this.context, this.evaluator)
     this.dataService = new DataService(this.context, this.evaluator)
     this.statementRouter = new StatementRouter(this.context, this.evaluator, this.variableService, this.dataService)
+
+    // Determine if we should yield to event loop (production mode only)
+    // In test mode, we don't yield to keep tests fast and deterministic
+    const isTestMode = this.context.config.maxIterations <= 10000
+    this.shouldYieldToEventLoop = isTestMode
+      ? DEFAULTS.ASYNC_EXECUTION.ENABLED_TEST
+      : DEFAULTS.ASYNC_EXECUTION.ENABLED_PRODUCTION
+    this.yieldInterval = DEFAULTS.ASYNC_EXECUTION.YIELD_INTERVAL
   }
 
   /**
@@ -102,6 +112,12 @@ export class ExecutionEngine {
 
         // Increment iteration count
         this.context.incrementIteration()
+
+        // Yield to event loop periodically to keep UI responsive during long-running loops
+        // This allows the browser to process events (input, stop button, screen updates)
+        if (this.shouldYieldToEventLoop && this.context.iterationCount % this.yieldInterval === 0) {
+          await new Promise<void>(resolve => setTimeout(resolve, DEFAULTS.ASYNC_EXECUTION.YIELD_DURATION))
+        }
       }
 
       // Execution completed

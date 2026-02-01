@@ -132,6 +132,9 @@ export const SEPARATORS = {
 export const TIMING = {
   FRAME_RATE: 30, // Family BASIC frame rate (frames per second)
   FRAME_DURATION_MS: 1000 / 30, // Duration of one frame in milliseconds (~33.33ms)
+
+  // Screen rendering intervals (for performance optimization)
+  SCREEN_RENDER_INTERVAL_MS: 50, // Min interval between screen renders during rapid updates (20 FPS)
 } as const
 
 // Screen dimensions and coordinate limits

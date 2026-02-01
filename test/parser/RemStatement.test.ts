@@ -199,6 +199,31 @@ describe('REM Statement', () => {
       expect(result.success).toBe(true)
       expect(result.cst).toBeDefined()
     })
+
+    // F-BASIC manual p.67: apostrophe (') is abbreviation for REM; "You can use (apostrophe) instead of REM."
+    it('should parse apostrophe comment line (whole line comment)', async () => {
+      const parser = new FBasicParser()
+      const result = await parser.parse("10 ' This is a comment")
+
+      expect(result.success).toBe(true)
+      expect(result.cst).toBeDefined()
+    })
+
+    it('should parse apostrophe comment line with no text after quote', async () => {
+      const parser = new FBasicParser()
+      const result = await parser.parse("10 '")
+
+      expect(result.success).toBe(true)
+      expect(result.cst).toBeDefined()
+    })
+
+    it('should parse apostrophe comment with special characters', async () => {
+      const parser = new FBasicParser()
+      const result = await parser.parse("20 ' SAMPLE PROGRAM (p.67 style)")
+
+      expect(result.success).toBe(true)
+      expect(result.cst).toBeDefined()
+    })
   })
 
   describe('Execution Tests', () => {
@@ -283,6 +308,42 @@ describe('REM Statement', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('X')?.value).toBe(42)
+    })
+
+    it('should execute apostrophe comment line without affecting program (F-BASIC manual p.67)', async () => {
+      const code = `10 ' This is a comment
+20 LET X = 42
+30 PRINT X`
+      const result = await interpreter.execute(code)
+
+      expect(result.success).toBe(true)
+      expect(result.errors).toHaveLength(0)
+      expect(result.variables.get('X')?.value).toBe(42)
+    })
+
+    it('should handle mixed REM and apostrophe comment lines', async () => {
+      const code = `10 REM Program start
+20 ' Set variable (apostrophe = REM abbreviation)
+30 LET X = 10
+40 REM Print result
+50 PRINT X
+60 ' Program end`
+      const result = await interpreter.execute(code)
+
+      expect(result.success).toBe(true)
+      expect(result.errors).toHaveLength(0)
+      expect(result.variables.get('X')?.value).toBe(10)
+    })
+
+    it('should handle apostrophe-only comment line', async () => {
+      const code = `10 '
+20 LET X = 7
+30 PRINT X`
+      const result = await interpreter.execute(code)
+
+      expect(result.success).toBe(true)
+      expect(result.errors).toHaveLength(0)
+      expect(result.variables.get('X')?.value).toBe(7)
     })
   })
 })

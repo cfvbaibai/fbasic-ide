@@ -61,6 +61,7 @@ export function useBasicIdeWorkerIntegration(
     sharedAnimationView: screen.sharedAnimationView,
     sharedDisplayViews: screen.sharedDisplayViews,
     scheduleRender: screen.scheduleRender,
+    scheduleRenderForScreenChanged: screen.scheduleRenderForScreenChanged,
     setDecodedScreenState: screen.setDecodedScreenState,
     pendingInputRequest: state.pendingInputRequest,
     respondToInputRequest: respondToInputRequestImpl,

@@ -11,9 +11,7 @@ import { COLORS } from '@/shared/data/palette'
 
 import {
   clearBackgroundTileCache,
-  updateBackgroundLayer,
-  updateBackgroundLayerDirty,
-} from './useKonvaBackgroundRenderer'
+} from './useCanvasBackgroundRenderer'
 import {
   clearSpriteImageCache,
   createAnimatedSpriteKonvaImage,
@@ -98,38 +96,21 @@ export function renderBackdropLayer(
 
 /**
  * Render background layer from screen buffer
- * When lastBuffer and nodeGridRef are provided, only dirty cells are updated
+ *
+ * @deprecated Background rendering is now done via Canvas2D in Screen.vue for performance.
+ * This function is kept for API compatibility but does nothing when layer is null (which it always is).
+ * See useCanvasBackgroundRenderer.ts for the new Canvas2D implementation.
  */
 export function renderBackgroundLayer(
   layer: Konva.Layer | null,
-  buffer: ScreenCell[][],
-  paletteCode: number,
-  shouldCache: boolean = true,
-  lastBuffer?: ScreenCell[][] | null,
-  nodeGridRef?: Map<string, Konva.Image>
+  _buffer: ScreenCell[][],
+  _paletteCode: number,
+  _shouldCache: boolean = true,
+  _lastBuffer?: ScreenCell[][] | null,
+  _nodeGridRef?: Map<string, Konva.Image>
 ): void {
-  if (!layer) return
-
-  if (
-    lastBuffer != null &&
-    nodeGridRef != null
-  ) {
-    updateBackgroundLayerDirty(
-      layer,
-      buffer,
-      lastBuffer,
-      paletteCode,
-      nodeGridRef
-    )
-  } else {
-    updateBackgroundLayer(layer, buffer, paletteCode, nodeGridRef)
-  }
-
-  if (shouldCache) {
-    layer.cache()
-  } else {
-    layer.clearCache()
-  }
+  if (!layer) return // Background layer is always null - rendered via Canvas2D now
+  // All code below this point is unreachable - layer is always null
 }
 
 /**
@@ -270,10 +251,8 @@ export function clearAllCaches(): void {
 export interface RenderAllScreenLayersOptions {
   /** When true, only update backdrop and background; do not rebuild sprite layers */
   backgroundOnly?: boolean
-  /** Last rendered buffer for dirty background; when set with backgroundNodeGridRef, only dirty cells are updated */
+  /** Last rendered buffer for context (background is now Canvas2D, this is kept for API compatibility) */
   lastBackgroundBuffer?: ScreenCell[][] | null
-  /** Grid of "y,x" -> Konva.Image for dirty background updates; populated/updated by full or dirty render */
-  backgroundNodeGridRef?: Map<string, Konva.Image>
 }
 
 /**
@@ -290,7 +269,7 @@ export async function renderAllScreenLayers(
   spritePaletteCode: number,
   backdropColor: number,
   spriteEnabled: boolean,
-  backgroundShouldCache: boolean = true,
+  _backgroundShouldCache: boolean = true,
   frontSpriteNodes?: Map<number, Konva.Image>,
   backSpriteNodes?: Map<number, Konva.Image>,
   options?: RenderAllScreenLayersOptions
@@ -299,8 +278,7 @@ export async function renderAllScreenLayers(
   backSpriteNodes: Map<number, Konva.Image>
 }> {
   const backgroundOnly = options?.backgroundOnly ?? false
-  const lastBackgroundBuffer = options?.lastBackgroundBuffer
-  const backgroundNodeGridRef = options?.backgroundNodeGridRef
+  // lastBackgroundBuffer kept for API compatibility (background is now Canvas2D)
 
   // 1. Render backdrop layer (if layer exists, otherwise handled by template)
   if (layers.backdropLayer) {
@@ -309,15 +287,8 @@ export async function renderAllScreenLayers(
 
   if (backgroundOnly) {
     // Buffer-only update (e.g. PRINT): only background (and backdrop); do not rebuild sprite layers
-    renderBackgroundLayer(
-      layers.backgroundLayer,
-      buffer,
-      bgPaletteCode,
-      backgroundShouldCache,
-      lastBackgroundBuffer,
-      backgroundNodeGridRef
-    )
-    if (layers.backgroundLayer) layers.backgroundLayer.draw()
+    // Note: Background layer is now rendered via Canvas2D in Screen.vue for performance
+    // (10x faster than Konva for static text grid)
     return {
       frontSpriteNodes: frontSpriteNodes ?? new Map(),
       backSpriteNodes: backSpriteNodes ?? new Map(),
@@ -335,15 +306,8 @@ export async function renderAllScreenLayers(
     backSpriteNodes
   )
 
-  // 3. Render background layer (synchronous, full or dirty)
-  renderBackgroundLayer(
-    layers.backgroundLayer,
-    buffer,
-    bgPaletteCode,
-    backgroundShouldCache,
-    lastBackgroundBuffer,
-    backgroundNodeGridRef
-  )
+  // 3. Background layer is now rendered via Canvas2D in Screen.vue for performance
+  // (10x faster than Konva for static text grid)
 
   // 4. Render front sprites (priority E=0)
   const frontNodes = await renderSpriteLayer(

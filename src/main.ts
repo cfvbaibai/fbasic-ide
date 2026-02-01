@@ -41,8 +41,8 @@ app.use(VueKonva)
 // Pre-initialize background tile images early (non-blocking)
 // This ensures images are ready when the IDE page loads
 if (typeof window !== 'undefined') {
-  void import('@/features/ide/composables/useKonvaBackgroundRenderer').then(({ preInitializeBackgroundTiles }) => {
-    void preInitializeBackgroundTiles().catch(err => {
+  void import('@/features/ide/composables/useCanvasBackgroundRenderer').then(({ preInitializeBackgroundTiles }) => {
+    void preInitializeBackgroundTiles().catch((err: Error) => {
       logApp.warn('Background tile pre-initialization failed:', err)
     })
   })

@@ -7,7 +7,11 @@ import {
   readSequence,
 } from '@/core/animation/sharedDisplayBuffer'
 import type { ScreenCell } from '@/core/interfaces'
-import { preInitializeBackgroundTiles } from '@/features/ide/composables/useKonvaBackgroundRenderer'
+import {
+  preInitializeBackgroundTiles,
+  renderBackgroundToCanvas,
+  renderBackgroundToCanvasDirty,
+} from '@/features/ide/composables/useCanvasBackgroundRenderer'
 import {
   initializeKonvaLayers,
   type KonvaScreenLayers,
@@ -57,15 +61,21 @@ const { zoomLevel } = useScreenZoom()
 const BASE_WIDTH = 256
 const BASE_HEIGHT = 240
 
+// Offscreen Canvas2D for background rendering (much faster than Konva for text)
+// Rendered to Konva.Image to participate in layer stacking
+const backgroundCanvas = document.createElement('canvas')
+backgroundCanvas.width = BASE_WIDTH
+backgroundCanvas.height = BASE_HEIGHT
+
 // Computed stage display dimensions based on zoom (for CSS scaling)
 const stageDisplayWidth = computed(() => BASE_WIDTH * zoomLevel.value)
 const stageDisplayHeight = computed(() => BASE_HEIGHT * zoomLevel.value)
 
-// Konva layers
+// Konva layers (background populated from offscreen Canvas2D for performance)
 const layers = ref<KonvaScreenLayers>({
   backdropLayer: null,
   spriteBackLayer: null,
-  backgroundLayer: null,
+  backgroundLayer: null, // Populated with Konva.Image from offscreen Canvas2D
   spriteFrontLayer: null,
 })
 
@@ -73,9 +83,8 @@ const layers = ref<KonvaScreenLayers>({
 const frontSpriteNodes = ref<Map<number, Konva.Image>>(new Map())
 const backSpriteNodes = ref<Map<number, Konva.Image>>(new Map())
 
-// Dirty background: last rendered buffer for diff; grid of "y,x" -> Konva.Image for per-cell updates
+// Last rendered buffer for dirty diff (Canvas2D rendering)
 const lastBackgroundBufferRef = ref<ScreenCell[][] | null>(null)
-const backgroundNodeGridRef = ref<Map<string, Konva.Image>>(new Map())
 
 // Shared buffer path: last sequence and last decoded buffer (so we only decode when sequence changes)
 const lastSequenceRef = ref(-1)
@@ -142,15 +151,42 @@ async function render(): Promise<void> {
       bufferToRender = lastDecodedBufferRef.value ?? (ctx.screenBuffer.value ?? [])
     }
 
+    // Render background using Canvas2D to offscreen canvas (much faster than Konva for text grid)
+    const lastBuffer = lastBackgroundBufferRef.value
+    if (lastBuffer && pendingRenderReasonRef.value === 'bufferOnly') {
+      // Dirty render: only changed cells
+      renderBackgroundToCanvasDirty(backgroundCanvas, bufferToRender, lastBuffer, paletteCode.value)
+    } else {
+      // Full render
+      renderBackgroundToCanvas(backgroundCanvas, bufferToRender, paletteCode.value)
+    }
+
+    // Create/update Konva.Image from Canvas2D content to participate in layer stacking
+    if (layers.value.backgroundLayer) {
+      // Clear existing background
+      layers.value.backgroundLayer.destroyChildren()
+
+      // Create Konva.Image from offscreen canvas
+      const backgroundImage = new Konva.Image({
+        x: 0,
+        y: 0,
+        image: backgroundCanvas,
+        listening: false, // Don't need events on background
+      })
+
+      layers.value.backgroundLayer.add(backgroundImage)
+      layers.value.backgroundLayer.batchDraw()
+    }
+
     // Determine if background should be cached (static when no active movements)
     const hasActiveMovements = localMovementStates.value.some(m => m.isActive)
     const backgroundShouldCache = !hasActiveMovements
 
-    // Render all layers (backdrop is managed by template, so we pass null)
+    // Render sprites using Konva
     const layersToRender: KonvaScreenLayers = {
       backdropLayer: null, // Backdrop is managed by vue-konva template
       spriteBackLayer: layers.value.spriteBackLayer as Konva.Layer | null,
-      backgroundLayer: layers.value.backgroundLayer as Konva.Layer | null,
+      backgroundLayer: layers.value.backgroundLayer as Konva.Layer | null, // Now populated from Canvas2D
       spriteFrontLayer: layers.value.spriteFrontLayer as Konva.Layer | null,
     }
     // Use context count when ahead of local (log: all 8 START_MOVEMENTs in one rAF; sync watch can run after render())
@@ -178,9 +214,8 @@ async function render(): Promise<void> {
         reason: pendingRenderReasonRef.value,
       })
     }
-    // Only use dirty background when buffer-only; full render (palette/sprite/backdrop) does full replace
-    const lastBackgroundBuffer =
-      backgroundOnly ? lastBackgroundBufferRef.value : null
+    // Pass lastBackgroundBuffer for sprite rendering context (background uses Canvas2D now)
+    const lastBackgroundBuffer = lastBackgroundBufferRef.value
     const { frontSpriteNodes: frontNodes, backSpriteNodes: backNodes } =
       await renderAllScreenLayers(
         layersToRender,
@@ -197,10 +232,6 @@ async function render(): Promise<void> {
         {
           backgroundOnly,
           lastBackgroundBuffer,
-          backgroundNodeGridRef: backgroundNodeGridRef.value as Map<
-            string,
-            Konva.Image
-          >,
         }
       )
 
@@ -397,7 +428,8 @@ onDeactivated(cleanupScreen)
                 fill: backdropColorHex,
               }"
             />
-            <!-- Additional layers (sprite back, background, sprite front) will be added programmatically -->
+            <!-- Sprite layers (sprite back, sprite front) will be added programmatically -->
+            <!-- Background layer is now Canvas2D for performance (10-50x faster than Konva) -->
           </v-layer>
           </v-stage>
         </div>
