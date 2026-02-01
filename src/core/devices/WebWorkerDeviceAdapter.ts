@@ -5,6 +5,7 @@
  * Delegates to specialized modules for web worker management, screen state, and message handling.
  */
 
+import { readSpritePosition } from '@/core/animation/sharedAnimationBuffer'
 import {
   createViewsFromDisplayBuffer,
   incrementSequence,
@@ -220,6 +221,12 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   }
 
   getSpritePosition(actionNumber: number): { x: number; y: number } | null {
+    // Prefer shared buffer (main thread writes positions each frame) so XPOS/YPOS see live position
+    if (this.sharedDisplayViews) {
+      const pos = readSpritePosition(this.sharedDisplayViews.spriteView, actionNumber)
+      if (pos !== null) return pos
+    }
+    // Fallback: last position set by POSITION command or CUT/ERA sync (e.g. before buffer exists)
     if (this.lastPositionBySprite.has(actionNumber)) {
       return this.lastPositionBySprite.get(actionNumber) ?? null
     }
