@@ -8,15 +8,14 @@
 
 import { ref } from 'vue'
 
-import { GameBlock, GameButton, GameLayout, GameSelect, GameSwitch } from '@/shared/components/ui'
-
-import RuntimeOutput from './components/RuntimeOutput.vue'
-import { useBasicIde as useBasicIdeEnhanced } from './composables/useBasicIdeEnhanced'
+import RuntimeOutput from '@/features/ide/components/RuntimeOutput.vue'
+import { useBasicIde as useBasicIdeEnhanced } from '@/features/ide/composables/useBasicIdeEnhanced'
 import {
   RENDER_FPS_OPTIONS,
   usePerformanceDiagnosticsMetrics,
-} from './composables/usePerformanceDiagnosticsMetrics'
-import { provideScreenContext } from './composables/useScreenContext'
+} from '@/features/ide/composables/usePerformanceDiagnosticsMetrics'
+import { provideScreenContext } from '@/features/ide/composables/useScreenContext'
+import { GameBlock, GameButton, GameLayout, GameSelect, GameSwitch } from '@/shared/components/ui'
 
 defineOptions({
   name: 'PerformanceDiagnosticsPage',

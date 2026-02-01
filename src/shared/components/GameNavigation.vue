@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
+import type { RouteRecordNormalized } from 'vue-router'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useLocale } from '@/shared/composables/useLocale'
 import { useSkin } from '@/shared/composables/useSkin'
 
+import { useNavigationDropdown } from './composables/useNavigationDropdown'
 import GameIcon from './ui/GameIcon.vue'
 import GameSelect from './ui/GameSelect.vue'
 
 /**
- * GameNavigation component - Main navigation component with route navigation, skin switcher, and locale switcher.
+ * GameNavigation component - Router-driven navigation with grouped structure.
  *
  * @example
  * ```vue
@@ -28,55 +30,83 @@ const { currentLocale, setLocale, availableLocales } = useLocale()
 const route = useRoute()
 const router = useRouter()
 
-// Typed route metadata from vue-best-practices skill
-// route.meta properties (title, icon, showInNav, requiresAuth) are now fully typed
-// with IDE autocomplete support
+// Group expansion state (default to collapsed)
+const toolsExpanded = ref(false)
+const testingExpanded = ref(false)
 
-interface NavItem {
-  name: string
+// Template refs using Vue 3.5+ pattern (use unique names to avoid conflicts)
+const toolsHeaderRef = useTemplateRef<HTMLElement>('toolsHeaderEl')
+const toolsDropdownRef = useTemplateRef<HTMLElement>('toolsDropdownEl')
+const testingHeaderRef = useTemplateRef<HTMLElement>('testingHeaderEl')
+const testingDropdownRef = useTemplateRef<HTMLElement>('testingDropdownEl')
+
+// Navigation dropdowns with click-outside and ESC key handling
+const toolsDropdown = useNavigationDropdown({
+  expanded: toolsExpanded,
+  headerRef: toolsHeaderRef,
+  dropdownRef: toolsDropdownRef,
+  otherDropdowns: [testingExpanded],
+})
+
+const testingDropdown = useNavigationDropdown({
+  expanded: testingExpanded,
+  headerRef: testingHeaderRef,
+  dropdownRef: testingDropdownRef,
+  otherDropdowns: [toolsExpanded],
+})
+
+// Get translation key from route name
+const getItemKey = (routeName: string): string => {
+  const nameMap: Record<string, string> = {
+    Home: 'home',
+    Ide: 'ide',
+    CharacterSpriteViewer: 'spriteViewer',
+    ImageAnalyzer: 'imageAnalyzer',
+    MonacoEditor: 'monaco',
+    PerformanceDiagnostics: 'performanceDiagnostics',
+    KonvaSpriteTest: 'konvaSpriteTest',
+    PositionSyncLoadTest: 'positionSyncLoadTest',
+    PrintVsSpritesTest: 'printVsSpritesTest',
+  }
+  return nameMap[routeName] || routeName.toLowerCase()
+}
+
+interface NavRoute {
   path: string
+  name: string
   icon: string
+  title: string
   description: string
 }
 
-const navItems = computed<NavItem[]>(() => [
-  {
-    name: t('navigation.items.home.name'),
-    path: '/',
-    icon: 'mdi:monitor',
-    description: t('navigation.items.home.description'),
-  },
-  {
-    name: t('navigation.items.ide.name'),
-    path: '/ide',
-    icon: 'mdi:pencil',
-    description: t('navigation.items.ide.description'),
-  },
-  {
-    name: t('navigation.items.monaco.name'),
-    path: '/monaco',
-    icon: 'mdi:pencil',
-    description: t('navigation.items.monaco.description'),
-  },
-  {
-    name: t('navigation.items.imageAnalyzer.name'),
-    path: '/image-analyzer',
-    icon: 'mdi:image',
-    description: t('navigation.items.imageAnalyzer.description'),
-  },
-  {
-    name: t('navigation.items.spriteViewer.name'),
-    path: '/character-sprite-viewer',
-    icon: 'mdi:grid',
-    description: t('navigation.items.spriteViewer.description'),
-  },
-  {
-    name: t('navigation.items.konvaSpriteTest.name'),
-    path: '/konva-test',
-    icon: 'mdi:animation',
-    description: t('navigation.items.konvaSpriteTest.description'),
-  },
-])
+interface GroupedRoutes {
+  main: NavRoute[]
+  tools: NavRoute[]
+  testing: NavRoute[]
+}
+
+// Get routes from router and group them
+const groupedRoutes = computed<GroupedRoutes>(() => {
+  const groups: GroupedRoutes = { main: [], tools: [], testing: [] }
+
+  router
+    .getRoutes()
+    .filter((r: RouteRecordNormalized) => r.meta.showInNav === true)
+    .forEach((r: RouteRecordNormalized) => {
+      const group = (r.meta.group as 'main' | 'tools' | 'testing') || 'main'
+      const itemKey = getItemKey(String(r.name))
+
+      groups[group].push({
+        path: r.path,
+        name: String(r.name),
+        icon: r.meta.icon as string,
+        title: t(`navigation.items.${itemKey}.name`),
+        description: t(`navigation.items.${itemKey}.description`),
+      })
+    })
+
+  return groups
+})
 
 const isActive = (path: string) => {
   return route.path === path
@@ -84,7 +114,20 @@ const isActive = (path: string) => {
 
 const navigate = (path: string) => {
   router.push(path)
+  // Close all dropdowns after navigation
+  toolsDropdown.close()
+  testingDropdown.close()
 }
+
+const toolsDropdownPosition = computed(() => {
+  const rect = toolsHeaderRef.value?.getBoundingClientRect()
+  return { top: rect ? `${rect.bottom}px` : '0px', left: rect ? `${rect.left}px` : '0px' }
+})
+
+const testingDropdownPosition = computed(() => {
+  const rect = testingHeaderRef.value?.getBoundingClientRect()
+  return { top: rect ? `${rect.bottom}px` : '0px', left: rect ? `${rect.left}px` : '0px' }
+})
 
 const skinOptions = computed(() => {
   return availableSkins.map(skin => ({
@@ -117,18 +160,85 @@ const handleLocaleChange = (localeValue: string | number) => {
         <span>{{ t('navigation.appTitle') }}</span>
       </div>
       <div class="nav-items">
+        <!-- Main group (always visible) -->
         <button
-          v-for="item in navItems"
+          v-for="item in groupedRoutes.main"
           :key="item.path"
           :class="['nav-button', { active: isActive(item.path) }]"
           @click="navigate(item.path)"
         >
           <GameIcon :icon="item.icon" size="small" class="nav-icon" />
           <div class="nav-button-content">
-            <span class="nav-button-name">{{ item.name }}</span>
+            <span class="nav-button-name">{{ item.title }}</span>
             <span class="nav-button-desc">{{ item.description }}</span>
           </div>
         </button>
+
+        <!-- Tools group (dropdown) -->
+        <div v-if="groupedRoutes.tools.length > 0" class="nav-group">
+          <button ref="toolsHeaderEl" class="nav-group-header" @click="toolsDropdown.toggle">
+            <GameIcon
+              :icon="toolsExpanded ? 'mdi:chevron-down' : 'mdi:chevron-right'"
+              size="small"
+              class="nav-group-icon"
+            />
+            <span class="nav-group-title">{{ t('navigation.groups.tools') }}</span>
+          </button>
+          <Teleport to="body">
+            <div
+              v-if="toolsExpanded"
+              ref="toolsDropdownEl"
+              :class="['nav-group-dropdown', { expanded: toolsExpanded }]"
+              :style="toolsDropdownPosition"
+            >
+              <button
+                v-for="item in groupedRoutes.tools"
+                :key="item.path"
+                :class="['nav-button', 'nav-button-grouped', { active: isActive(item.path) }]"
+                @click="navigate(item.path)"
+              >
+                <GameIcon :icon="item.icon" size="small" class="nav-icon" />
+                <div class="nav-button-content">
+                  <span class="nav-button-name">{{ item.title }}</span>
+                  <span class="nav-button-desc">{{ item.description }}</span>
+                </div>
+              </button>
+            </div>
+          </Teleport>
+        </div>
+
+        <!-- Testing group (dropdown) -->
+        <div v-if="groupedRoutes.testing.length > 0" class="nav-group">
+          <button ref="testingHeaderEl" class="nav-group-header" @click="testingDropdown.toggle">
+            <GameIcon
+              :icon="testingExpanded ? 'mdi:chevron-down' : 'mdi:chevron-right'"
+              size="small"
+              class="nav-group-icon"
+            />
+            <span class="nav-group-title">{{ t('navigation.groups.testing') }}</span>
+          </button>
+          <Teleport to="body">
+            <div
+              v-if="testingExpanded"
+              ref="testingDropdownEl"
+              :class="['nav-group-dropdown', { expanded: testingExpanded }]"
+              :style="testingDropdownPosition"
+            >
+              <button
+                v-for="item in groupedRoutes.testing"
+                :key="item.path"
+                :class="['nav-button', 'nav-button-grouped', { active: isActive(item.path) }]"
+                @click="navigate(item.path)"
+              >
+                <GameIcon :icon="item.icon" size="small" class="nav-icon" />
+                <div class="nav-button-content">
+                  <span class="nav-button-name">{{ item.title }}</span>
+                  <span class="nav-button-desc">{{ item.description }}</span>
+                </div>
+              </button>
+            </div>
+          </Teleport>
+        </div>
       </div>
       <div class="nav-controls">
         <GameSelect
@@ -152,10 +262,7 @@ const handleLocaleChange = (localeValue: string | number) => {
 
 <style scoped>
 .game-navigation {
-  /* background: linear-gradient(135deg, var(--game-nav-bg-start) 0%, var(--game-nav-bg-end) 100%); */
   border-bottom: 1px solid var(--game-nav-border);
-
-  /* box-shadow: 0 4px 12px var(--base-alpha-gray-00-40), inset 0 1px 0 var(--base-alpha-gray-100-10); */
   flex-shrink: 0;
   z-index: 1000;
 }
@@ -173,13 +280,9 @@ const handleLocaleChange = (localeValue: string | number) => {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  font-size: 1.5rem;
-  font-weight: 700;
-  font-family: var(--game-font-family-heading);
+  font: 700 1.5rem var(--game-font-family-heading);
   color: var(--base-solid-primary);
-  text-shadow:
-    0 0 10px var(--game-accent-glow),
-    0 2px 4px var(--base-alpha-gray-00-80);
+  text-shadow: 0 0 10px var(--game-accent-glow), 0 2px 4px var(--base-alpha-gray-00-80);
   letter-spacing: 2px;
   white-space: nowrap;
 }
@@ -194,7 +297,7 @@ const handleLocaleChange = (localeValue: string | number) => {
   gap: 0.375rem;
   flex: 1;
   justify-content: flex-end;
-  flex-wrap: nowrap;
+  align-items: center;
 }
 
 .nav-controls {
@@ -205,6 +308,7 @@ const handleLocaleChange = (localeValue: string | number) => {
   flex-shrink: 0;
 }
 
+/* Nav button styles */
 .nav-button {
   position: relative;
   background: var(--game-surface-bg-gradient);
@@ -235,7 +339,11 @@ const handleLocaleChange = (localeValue: string | number) => {
 }
 
 .nav-button.active {
-  background: linear-gradient(135deg, var(--base-solid-primary) 0%, var(--base-solid-primary) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--base-solid-primary) 0%,
+    var(--base-solid-primary) 100%
+  );
   border-color: var(--base-solid-primary);
   color: var(--game-text-contrast);
   font-weight: 700;
@@ -248,9 +356,7 @@ const handleLocaleChange = (localeValue: string | number) => {
 .nav-button.active::before {
   content: '';
   position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
+  inset: 0 auto 0 0;
   width: 3px;
   background: var(--base-solid-gray-00);
   border-radius: 8px 0 0 8px;
@@ -289,51 +395,101 @@ const handleLocaleChange = (localeValue: string | number) => {
   display: none;
 }
 
+.nav-button-grouped {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+}
+
+.nav-button-grouped .nav-button-name {
+  font-size: 0.8rem;
+}
+
+/* Nav group styles */
+.nav-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.nav-group-header {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.875rem;
+  background: var(--game-surface-bg-gradient);
+  border: 2px solid var(--game-surface-border);
+  border-radius: 8px;
+  color: var(--game-text-tertiary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  box-shadow:
+    0 2px 4px var(--base-alpha-gray-00-30),
+    inset 0 1px 0 var(--base-alpha-gray-100-10);
+}
+
+.nav-group-header:hover {
+  background: var(--base-alpha-gray-100-10);
+  border-color: var(--base-solid-primary);
+  color: var(--game-text-secondary);
+}
+
+.nav-group-icon {
+  font-size: 0.875rem;
+  transition: transform 0.2s ease;
+}
+
+.nav-group-dropdown {
+  position: fixed;
+  min-width: 250px;
+  max-width: 320px;
+  background: var(--game-surface-bg-gradient);
+  border: 2px solid var(--game-surface-border);
+  border-radius: 8px;
+  padding: 0.5rem;
+  box-shadow:
+    0 4px 12px var(--base-alpha-gray-00-40),
+    0 0 8px var(--game-accent-glow);
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+  transition: all 0.2s ease;
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.nav-group-dropdown.expanded {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
 /* Responsive design */
+/* stylelint-disable declaration-block-single-line-max-declarations */
 @media (width <= 768px) {
-  .nav-container {
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1rem;
-  }
+  .nav-container { flex-direction: column; gap: 1rem; padding: 1rem; }
+  .nav-title { font-size: 1.25rem; }
+  .nav-items { width: 100%; flex-direction: column; justify-content: center; }
+  .nav-button { width: 100%; min-width: auto; padding: 0.5rem 0.875rem; }
+  .nav-button-content { align-items: center; text-align: center; }
+  .nav-group, .nav-group-header { width: 100%; }
 
-  .nav-title {
-    font-size: 1.25rem;
+  .nav-group-dropdown {
+    position: fixed; left: 1rem !important; right: 1rem;
+    width: auto; min-width: auto; max-width: none;
   }
-
-  .nav-items {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .nav-button {
-    flex: 1;
-    min-width: auto;
-    padding: 0.5rem 0.875rem;
-  }
-
-  .nav-button-content {
-    align-items: center;
-    text-align: center;
-  }
-
-  .nav-controls {
-    width: 100%;
-    margin-left: 0;
-    margin-top: 0.5rem;
-    justify-content: center;
-    gap: 0.5rem;
-  }
+  .nav-controls { width: 100%; margin: 0.5rem 0 0; justify-content: center; gap: 0.5rem; }
 }
 
 @media (width <= 480px) {
-  .nav-items {
-    flex-direction: column;
-  }
-
-  .nav-button {
-    width: 100%;
-    min-width: unset;
-  }
+  .nav-items { flex-direction: column; }
+  .nav-button { width: 100%; min-width: unset; }
 }
+/* stylelint-enable declaration-block-single-line-max-declarations */
 </style>

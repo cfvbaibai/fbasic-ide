@@ -1,7 +1,23 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { createRouter, createWebHistory } from 'vue-router'
 
+/**
+ * Route metadata for navigation and display
+ */
+declare module 'vue-router' {
+  interface RouteMeta {
+    title?: string
+    showInNav?: boolean
+    icon?: string
+    group?: 'main' | 'tools' | 'testing'
+    parent?: string
+  }
+}
+
 const routes: RouteRecordRaw[] = [
+  // ============================================
+  // Main Routes
+  // ============================================
   {
     path: '/',
     name: 'Home',
@@ -10,6 +26,7 @@ const routes: RouteRecordRaw[] = [
       title: 'Home',
       showInNav: true,
       icon: 'mdi:home',
+      group: 'main',
     },
   },
   {
@@ -20,26 +37,13 @@ const routes: RouteRecordRaw[] = [
       title: 'IDE',
       showInNav: true,
       icon: 'mdi:monitor',
+      group: 'main',
     },
   },
-  {
-    path: '/monaco',
-    name: 'MonacoEditor',
-    component: () => import('@/features/monaco-editor/MonacoEditorPage.vue'),
-    meta: {
-      title: 'Monaco Editor',
-      showInNav: false,
-    },
-  },
-  {
-    path: '/image-analyzer',
-    name: 'ImageAnalyzer',
-    component: () => import('@/features/image-analyzer/ImageAnalyzerPage.vue'),
-    meta: {
-      title: 'Image Analyzer',
-      showInNav: false,
-    },
-  },
+
+  // ============================================
+  // Development Tools
+  // ============================================
   {
     path: '/character-sprite-viewer',
     name: 'CharacterSpriteViewer',
@@ -48,6 +52,44 @@ const routes: RouteRecordRaw[] = [
       title: 'Sprite Viewer',
       showInNav: true,
       icon: 'mdi:eye',
+      group: 'tools',
+    },
+  },
+  {
+    path: '/image-analyzer',
+    name: 'ImageAnalyzer',
+    component: () => import('@/features/image-analyzer/ImageAnalyzerPage.vue'),
+    meta: {
+      title: 'Image Analyzer',
+      showInNav: true,
+      icon: 'mdi:image',
+      group: 'tools',
+    },
+  },
+  {
+    path: '/monaco',
+    name: 'MonacoEditor',
+    component: () => import('@/features/monaco-editor/MonacoEditorPage.vue'),
+    meta: {
+      title: 'Monaco Editor',
+      showInNav: true,
+      icon: 'mdi:code-tags',
+      group: 'tools',
+    },
+  },
+
+  // ============================================
+  // Testing & Diagnostics
+  // ============================================
+  {
+    path: '/performance-diagnostics',
+    name: 'PerformanceDiagnostics',
+    component: () => import('@/features/diagnostics/PerformanceDiagnosticsPage.vue'),
+    meta: {
+      title: 'Performance Diagnostics',
+      showInNav: true,
+      icon: 'mdi:speedometer',
+      group: 'testing',
     },
   },
   {
@@ -58,34 +100,29 @@ const routes: RouteRecordRaw[] = [
       title: 'Konva Sprite Test',
       showInNav: true,
       icon: 'mdi:animation',
+      group: 'testing',
     },
   },
   {
     path: '/position-sync-load-test',
     name: 'PositionSyncLoadTest',
-    component: () => import('@/features/ide/PositionSyncLoadTestPage.vue'),
+    component: () => import('@/features/testing/PositionSyncLoadTestPage.vue'),
     meta: {
       title: 'Position Sync Load Test',
-      showInNav: false,
+      showInNav: true,
+      icon: 'mdi:sync',
+      group: 'testing',
     },
   },
   {
     path: '/print-vs-sprites-test',
     name: 'PrintVsSpritesTest',
-    component: () => import('@/features/ide/PrintVsSpritesTestPage.vue'),
+    component: () => import('@/features/testing/PrintVsSpritesTestPage.vue'),
     meta: {
-      title: 'PRINT vs Sprites (Phase 6.1)',
-      showInNav: false,
-    },
-  },
-  {
-    path: '/performance-diagnostics',
-    name: 'PerformanceDiagnostics',
-    component: () => import('@/features/ide/PerformanceDiagnosticsPage.vue'),
-    meta: {
-      title: 'Performance Diagnostics',
+      title: 'PRINT vs Sprites Test',
       showInNav: true,
-      icon: 'mdi:speedometer',
+      icon: 'mdi:test-tube',
+      group: 'testing',
     },
   },
 ]

@@ -1,5 +1,10 @@
 {
   "appTitle": "F-BASIC EMU",
+  "groups": {
+    "main": "メイン",
+    "tools": "開発ツール",
+    "testing": "テスト＆診断"
+  },
   "items": {
     "home": {
       "name": "ホーム",
@@ -9,21 +14,33 @@
       "name": "IDE",
       "description": "Family Basic IDE"
     },
-    "monaco": {
-      "name": "Monacoエディタ",
-      "description": "高度なコードエディタ"
+    "spriteViewer": {
+      "name": "スプライトビューア",
+      "description": "キャラクタースプライトを表示"
     },
     "imageAnalyzer": {
       "name": "画像アナライザー",
       "description": "画像を分析"
     },
-    "spriteViewer": {
-      "name": "スプライトビューア",
-      "description": "キャラクタースプライトを表示"
+    "monaco": {
+      "name": "Monacoエディタ",
+      "description": "高度なコードエディタ"
+    },
+    "performanceDiagnostics": {
+      "name": "パフォーマンス",
+      "description": "パフォーマンス診断"
     },
     "konvaSpriteTest": {
-      "name": "Konvaスプライトテスト",
+      "name": "Konvaテスト",
       "description": "Konvaスプライトアニメーションテスト"
+    },
+    "positionSyncLoadTest": {
+      "name": "同期テスト",
+      "description": "位置同期負荷テスト"
+    },
+    "printVsSpritesTest": {
+      "name": "PRINTテスト",
+      "description": "PRINT対スプライトテスト"
     }
   }
 }

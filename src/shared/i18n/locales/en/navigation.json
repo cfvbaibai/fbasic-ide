@@ -1,5 +1,10 @@
 {
   "appTitle": "F-BASIC EMU",
+  "groups": {
+    "main": "Main",
+    "tools": "Development Tools",
+    "testing": "Testing & Diagnostics"
+  },
   "items": {
     "home": {
       "name": "Home",
@@ -9,21 +14,33 @@
       "name": "IDE",
       "description": "Family Basic IDE"
     },
-    "monaco": {
-      "name": "Monaco Editor",
-      "description": "Advanced Code Editor"
+    "spriteViewer": {
+      "name": "Sprite Viewer",
+      "description": "View Character Sprites"
     },
     "imageAnalyzer": {
       "name": "Image Analyzer",
       "description": "Analyze Images"
     },
-    "spriteViewer": {
-      "name": "Sprite Viewer",
-      "description": "View Character Sprites"
+    "monaco": {
+      "name": "Monaco Editor",
+      "description": "Advanced Code Editor"
+    },
+    "performanceDiagnostics": {
+      "name": "Performance",
+      "description": "Performance Diagnostics"
     },
     "konvaSpriteTest": {
-      "name": "Konva Sprite Test",
+      "name": "Konva Test",
       "description": "Konva Sprite Animation Test"
+    },
+    "positionSyncLoadTest": {
+      "name": "Sync Test",
+      "description": "Position Sync Load Test"
+    },
+    "printVsSpritesTest": {
+      "name": "PRINT Test",
+      "description": "PRINT vs Sprites Test"
     }
   }
 }

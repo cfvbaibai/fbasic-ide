@@ -1,5 +1,10 @@
 {
   "appTitle": "F-BASIC 模拟器",
+  "groups": {
+    "main": "主要功能",
+    "tools": "开发工具",
+    "testing": "测试与诊断"
+  },
   "items": {
     "home": {
       "name": "首页",
@@ -9,21 +14,33 @@
       "name": "IDE",
       "description": "Family Basic IDE"
     },
-    "monaco": {
-      "name": "Monaco 编辑器",
-      "description": "高级代码编辑器"
+    "spriteViewer": {
+      "name": "精灵查看器",
+      "description": "查看角色精灵"
     },
     "imageAnalyzer": {
       "name": "图像分析器",
       "description": "分析图像"
     },
-    "spriteViewer": {
-      "name": "精灵查看器",
-      "description": "查看角色精灵"
+    "monaco": {
+      "name": "Monaco 编辑器",
+      "description": "高级代码编辑器"
+    },
+    "performanceDiagnostics": {
+      "name": "性能诊断",
+      "description": "性能诊断工具"
     },
     "konvaSpriteTest": {
-      "name": "Konva 精灵测试",
+      "name": "Konva 测试",
       "description": "Konva 精灵动画测试"
+    },
+    "positionSyncLoadTest": {
+      "name": "同步测试",
+      "description": "位置同步负载测试"
+    },
+    "printVsSpritesTest": {
+      "name": "PRINT 测试",
+      "description": "PRINT 对比精灵测试"
     }
   }
 }

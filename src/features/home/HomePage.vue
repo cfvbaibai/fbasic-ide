@@ -29,14 +29,14 @@ const features = computed<FeatureCard[]>(() => [
     title: t('home.features.items.ide.title'),
     description: t('home.features.items.ide.description'),
     path: '/ide',
-    icon: 'mdi:pencil',
+    icon: 'mdi:monitor',
     color: 'var(--semantic-solid-success)',
   },
   {
-    title: t('home.features.items.monaco.title'),
-    description: t('home.features.items.monaco.description'),
-    path: '/monaco',
-    icon: 'mdi:pencil',
+    title: t('home.features.items.spriteViewer.title'),
+    description: t('home.features.items.spriteViewer.description'),
+    path: '/character-sprite-viewer',
+    icon: 'mdi:eye',
     color: 'var(--semantic-solid-info)',
   },
   {
@@ -45,13 +45,6 @@ const features = computed<FeatureCard[]>(() => [
     path: '/image-analyzer',
     icon: 'mdi:image',
     color: 'var(--semantic-solid-warning)',
-  },
-  {
-    title: t('home.features.items.spriteViewer.title'),
-    description: t('home.features.items.spriteViewer.description'),
-    path: '/character-sprite-viewer',
-    icon: 'mdi:grid',
-    color: 'var(--semantic-solid-danger)',
   },
 ])
 
