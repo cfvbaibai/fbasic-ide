@@ -99,24 +99,12 @@ export async function checkWebWorkerHealth(
   }
 
   try {
-    // Send a ping message to check if worker is responsive
+    // Send PING; worker responds with RESULT (no BASIC execution, no user-visible output)
     await sendMessageToWorkerFn({
-      type: 'EXECUTE',
+      type: 'PING',
       id: `ping-${Date.now()}`,
       timestamp: Date.now(),
-      data: {
-        code: '10 PRINT "PING"',
-        config: {
-          maxIterations: 100,
-          maxOutputLines: 10,
-          enableDebugMode: false,
-          strictMode: false,
-          deviceAdapter: undefined,
-        },
-        options: {
-          timeout: 5000,
-        },
-      },
+      data: {},
     })
 
     return true

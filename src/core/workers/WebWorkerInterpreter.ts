@@ -67,6 +67,9 @@ class WebWorkerInterpreter {
           logWorker.debug('Handling EXECUTE message')
           await this.handleExecute(message)
           break
+        case 'PING':
+          this.handlePing(message)
+          break
         case 'STOP':
           logWorker.debug('Handling STOP message')
           this.handleStop(message)
@@ -179,6 +182,17 @@ class WebWorkerInterpreter {
       const location = this.interpreter?.getExecutionLocation() ?? null
       this.sendError(message.id, err, location)
     }
+  }
+
+  handlePing(message: { id: string }) {
+    logWorker.debug('Handling PING message')
+    this.sendResult(message.id, {
+      executionId: message.id,
+      success: true,
+      errors: [],
+      variables: new Map(),
+      executionTime: 0,
+    })
   }
 
   handleStop(_message: StopMessage) {

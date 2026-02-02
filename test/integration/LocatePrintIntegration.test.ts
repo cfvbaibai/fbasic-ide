@@ -315,6 +315,8 @@ describe('LOCATE and PRINT Integration', () => {
   })
 
   it('should handle LOCATE at edge positions', async () => {
+    // LOCATE (0,0) and (25,23), PRINT "TOP" then "END". Writing "END" at last line fills
+    // cols 25-27; advancing from (27,23) wraps to next line and triggers scroll (correct behavior).
     const source = `
 10 LOCATE 0, 0
 20 PRINT "TOP"
@@ -336,14 +338,9 @@ describe('LOCATE and PRINT Integration', () => {
         ? (lastScreenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
         : undefined
 
-    // "TOP" at (0, 0)
-    expect(screenBuffer?.[0]?.[0]?.character).toBe('T')
-    expect(screenBuffer?.[0]?.[1]?.character).toBe('O')
-    expect(screenBuffer?.[0]?.[2]?.character).toBe('P')
-
-    // "END" at (25, 23) - all 3 chars should fit
-    expect(screenBuffer?.[23]?.[25]?.character).toBe('E')
-    expect(screenBuffer?.[23]?.[26]?.character).toBe('N')
-    expect(screenBuffer?.[23]?.[27]?.character).toBe('D')
+    // PRINT "END" on last line: writing 'D' at (27,23) wraps and scrolls once; then \n scrolls again. "END" ends on row 21.
+    expect(screenBuffer?.[21]?.[25]?.character).toBe('E')
+    expect(screenBuffer?.[21]?.[26]?.character).toBe('N')
+    expect(screenBuffer?.[21]?.[27]?.character).toBe('D')
   })
 })

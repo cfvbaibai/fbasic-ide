@@ -68,6 +68,20 @@ export class ScreenStateManager {
   }
 
   /**
+   * Scroll screen up by one line: drop top row, shift content up, add empty row at bottom.
+   */
+  private scrollUp(): void {
+    this.screenBuffer.shift()
+    const newRow: ScreenCell[] = []
+    for (let x = 0; x < 28; x++) {
+      newRow.push({ character: ' ', colorPattern: 0, x, y: 23 })
+    }
+    this.screenBuffer.push(newRow)
+    // Cursor stays on last line (y=23) so new content appears at bottom
+    this.cursorY = 23
+  }
+
+  /**
    * Write a character to the screen at the current cursor position
    */
   writeCharacter(char: string): void {
@@ -76,8 +90,7 @@ export class ScreenStateManager {
       this.cursorX = 0
       this.cursorY++
       if (this.cursorY >= 24) {
-        // Scroll screen up (simple implementation: reset to top)
-        this.cursorY = 0
+        this.scrollUp()
       }
       return
     }
@@ -104,8 +117,7 @@ export class ScreenStateManager {
         this.cursorX = 0
         this.cursorY++
         if (this.cursorY >= 24) {
-          // Scroll screen up (simple implementation: reset to top)
-          this.cursorY = 0
+          this.scrollUp()
         }
       }
     }

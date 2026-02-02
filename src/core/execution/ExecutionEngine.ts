@@ -132,6 +132,11 @@ export class ExecutionEngine {
         })
       }
 
+      // Emit "OK" to screen when program ends successfully (F-BASIC prompt behavior)
+      if (this.context.getErrors().length === 0) {
+        this.context.addOutput('OK\n')
+      }
+
       return {
         success: this.context.getErrors().length === 0,
         errors: this.context.getErrors(),

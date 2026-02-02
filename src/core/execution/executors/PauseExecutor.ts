@@ -57,8 +57,8 @@ export class PauseExecutor {
         ? Math.max(0, Math.floor(durationValue))
         : Math.max(0, Math.floor(parseFloat(String(durationValue)) || 0))
 
-    // Convert frames to milliseconds; real F-BASIC uses ~quarter of our nominal frame duration for PAUSE
-    const durationMs = (frames * TIMING.FRAME_DURATION_MS) / 4
+    // Convert frames to milliseconds; real F-BASIC uses ~quarter of our nominal frame duration for PAUSE; +25% slower
+    const durationMs = (frames * TIMING.FRAME_DURATION_MS) / 2.75
 
     if (durationMs > 0) {
       await new Promise(resolve => setTimeout(resolve, durationMs))

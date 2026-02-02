@@ -250,6 +250,7 @@ export interface ServiceWorkerMessage {
 // Message types enum for better type safety
 export type ServiceWorkerMessageType =
   | 'EXECUTE'
+  | 'PING'
   | 'RESULT'
   | 'ERROR'
   | 'PROGRESS'
@@ -278,6 +279,12 @@ export interface ExecuteMessage extends ServiceWorkerMessage {
       enableProgress?: boolean
     }
   }
+}
+
+// Ping message - sent from UI to worker for health check (no BASIC execution, no user-visible output)
+export interface PingMessage extends ServiceWorkerMessage {
+  type: 'PING'
+  data: Record<string, never>
 }
 
 // Result message - sent from service worker to UI
@@ -474,6 +481,7 @@ export interface PlaySoundMessage extends ServiceWorkerMessage {
 // Union type for all possible messages
 export type AnyServiceWorkerMessage =
   | ExecuteMessage
+  | PingMessage
   | ResultMessage
   | ProgressMessage
   | OutputMessage

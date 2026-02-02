@@ -1,4 +1,4 @@
 type: bug
-status: open
+status: resolved
 subject: PAUSE is longer that real fbasic system
 description: Currently, PAUSE is about 2 times as long as the real fbasic system. Make the PAUSE time half
