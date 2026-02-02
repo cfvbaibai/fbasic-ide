@@ -242,8 +242,8 @@ describe('AnimationManager', () => {
     })
 
     it('should throw for invalid Y coordinate', () => {
-      expect(() => manager.setPosition(0, 0, -1)).toThrow('Invalid Y coordinate: -1 (must be 0-239)')
-      expect(() => manager.setPosition(0, 0, 240)).toThrow('Invalid Y coordinate: 240 (must be 0-239)')
+      expect(() => manager.setPosition(0, 0, -1)).toThrow('Invalid Y coordinate: -1 (must be 0-255)')
+      expect(() => manager.setPosition(0, 0, 256)).toThrow('Invalid Y coordinate: 256 (must be 0-255)')
     })
   })
 

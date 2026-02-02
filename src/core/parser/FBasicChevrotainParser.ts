@@ -895,7 +895,7 @@ class FBasicChevrotainParser extends CstParser {
 
     // SPRITE n, X, Y
     // n: sprite number (0-7)
-    // X, Y: position in pixels (X: 0-255, Y: 0-239)
+    // X, Y: position in pixels (X: 0-255, Y: 0-255, per F-BASIC manual)
     this.spriteStatement = this.RULE('spriteStatement', () => {
       this.CONSUME(Sprite)
       this.SUBRULE(this.expression, { LABEL: 'spriteNumber' }) // n

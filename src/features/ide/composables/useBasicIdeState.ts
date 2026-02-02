@@ -42,6 +42,8 @@ export interface BasicIdeState {
   spriteStates: Ref<SpriteState[]>
   spriteEnabled: Ref<boolean>
   movementStates: Ref<MovementState[]>
+  /** Current sprite positions read from shared buffer (for inspector MOVE tab). */
+  movementPositionsFromBuffer: Ref<Map<number, { x: number; y: number }>>
   frontSpriteNodes: Ref<Map<number, unknown>>
   backSpriteNodes: Ref<Map<number, unknown>>
   spriteActionQueues: Ref<Map<number, PendingSpriteAction[]>>
@@ -77,6 +79,7 @@ export function useBasicIdeState(): BasicIdeState {
     spriteStates: ref<SpriteState[]>([]),
     spriteEnabled: ref(false),
     movementStates: ref<MovementState[]>([]),
+    movementPositionsFromBuffer: ref<Map<number, { x: number; y: number }>>(new Map()),
     frontSpriteNodes: ref<Map<number, unknown>>(new Map()),
     backSpriteNodes: ref<Map<number, unknown>>(new Map()),
     spriteActionQueues: ref<Map<number, PendingSpriteAction[]>>(new Map()),

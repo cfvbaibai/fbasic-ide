@@ -69,7 +69,7 @@ describe('PositionExecutor', () => {
     expect(deviceAdapter.errorOutputs.some(m => m.includes('X') && m.includes('0-255'))).toBe(true)
   })
 
-  it('should clamp Y coordinate to 0-239', async () => {
+  it('should validate Y coordinate to 0-255 (per F-BASIC manual)', async () => {
     const source = `
 10 DEF MOVE(0) = SPRITE(0, 3, 60, 50, 0, 0)
 20 POSITION 0, 100, 300
@@ -79,7 +79,7 @@ describe('PositionExecutor', () => {
 
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
-    expect(deviceAdapter.errorOutputs.some(m => m.includes('Y') && m.includes('0-239'))).toBe(true)
+    expect(deviceAdapter.errorOutputs.some(m => m.includes('Y') && m.includes('0-255'))).toBe(true)
   })
 
   it('should send POSITION command to frontend', async () => {

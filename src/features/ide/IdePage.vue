@@ -17,6 +17,7 @@ import JoystickControl from './components/JoystickControl.vue'
 import LogLevelPanel from './components/LogLevelPanel.vue'
 import MonacoCodeEditor from './components/MonacoCodeEditor.vue'
 import RuntimeOutput from './components/RuntimeOutput.vue'
+import StateInspector from './components/StateInspector.vue'
 import { useBasicIde as useBasicIdeEnhanced } from './composables/useBasicIdeEnhanced'
 import { provideScreenContext } from './composables/useScreenContext'
 
@@ -49,6 +50,7 @@ const {
   spriteStates,
   spriteEnabled,
   movementStates,
+  movementPositionsFromBuffer,
   frontSpriteNodes,
   backSpriteNodes,
   runCode,
@@ -82,6 +84,7 @@ provideScreenContext({
   spriteStates,
   spriteEnabled,
   movementStates,
+  movementPositionsFromBuffer,
   externalFrontSpriteNodes: frontSpriteNodes,
   externalBackSpriteNodes: backSpriteNodes,
   sharedAnimationView: ref(sharedAnimationView),
@@ -188,9 +191,26 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- Joystick Control Panel -->
-      <div class="joystick-control-wrapper">
-        <JoystickControl :send-stick-event="sendStickEvent" :send-strig-event="sendStrigEvent" />
+      <!-- Bottom area: Joystick (left) + State Inspector (right) -->
+      <div class="bottom-area">
+        <div class="bottom-left">
+          <JoystickControl :send-stick-event="sendStickEvent" :send-strig-event="sendStrigEvent" />
+        </div>
+        <div class="bottom-right">
+          <StateInspector
+            :screen-buffer="screenBuffer"
+            :cursor-x="cursorX"
+            :cursor-y="cursorY"
+            :bg-palette="bgPalette"
+            :sprite-palette="spritePalette"
+            :backdrop-color="backdropColor"
+            :cgen-mode="cgenMode"
+            :sprite-states="spriteStates"
+            :sprite-enabled="spriteEnabled"
+            :movement-states="movementStates"
+            :movement-positions-from-buffer="movementPositionsFromBuffer"
+          />
+        </div>
       </div>
 
       <!-- INPUT/LINPUT modal overlay -->
@@ -235,8 +255,9 @@ onMounted(() => {
 .ide-container {
   width: 100%;
   height: 100%;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  grid-template-columns: 1fr;
   overflow-x: hidden;
 }
 
@@ -262,9 +283,9 @@ onMounted(() => {
 }
 
 .ide-content {
-  flex: 1 1 0;
-  display: flex;
+  grid-row: 1;
   min-height: 0;
+  display: flex;
   overflow: hidden;
   gap: 1rem;
   padding: 0 1rem 1rem;
@@ -341,8 +362,26 @@ onMounted(() => {
   min-height: 0;
 }
 
-.joystick-control-wrapper {
+.bottom-area {
+  grid-row: 2;
+  display: flex;
+  align-items: stretch;
+  gap: 1rem;
   padding: 0 1rem;
+  min-height: 0;
+}
+
+.bottom-left {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.bottom-right {
+  flex: 1 1 0;
+  min-width: 500px;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 /* INPUT/LINPUT modal overlay */

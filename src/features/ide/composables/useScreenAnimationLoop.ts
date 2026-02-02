@@ -6,7 +6,11 @@
 import type Konva from 'konva'
 import { computed, type Ref, watch } from 'vue'
 
-import { MAX_SPRITES, writeSpriteState } from '@/core/animation/sharedAnimationBuffer'
+import {
+  MAX_SPRITES,
+  readSpritePosition,
+  writeSpriteState,
+} from '@/core/animation/sharedAnimationBuffer'
 import type { MovementState } from '@/core/sprite/types'
 
 import type { KonvaScreenLayers } from './useKonvaScreenRenderer'
@@ -94,6 +98,10 @@ export interface UseScreenAnimationLoopOptions {
   spritePalette: Ref<number> | number
   /** Shared animation state view; main writes positions + isActive each frame (XPOS/YPOS, MOVE(n)). */
   sharedAnimationView?: Float64Array
+  /** After writing to shared buffer, call with positions read from buffer so inspector shows live positions. */
+  setMovementPositionsFromBuffer?: (positions: Map<number, { x: number; y: number }>) => void
+  /** After updating movements (remainingDistance, isActive), call so inspector shows live rem. */
+  onMovementStatesUpdated?: (states: MovementState[]) => void
   /** When movements are active: run pending static render at end of frame (animation first, then render) */
   getPendingStaticRender?: () => boolean
   onRunPendingStaticRender?: () => Promise<void>
@@ -117,6 +125,8 @@ export function useScreenAnimationLoop(
     backSpriteNodes,
     spritePalette,
     sharedAnimationView,
+    setMovementPositionsFromBuffer,
+    onMovementStatesUpdated,
     getPendingStaticRender,
     onRunPendingStaticRender,
     onAnimationStopped,
@@ -153,6 +163,9 @@ export function useScreenAnimationLoop(
       backSpriteNodes.value as Map<number, Konva.Image>
     )
 
+    // Sync remainingDistance and isActive to context so inspector shows live rem
+    onMovementStatesUpdated?.(localMovementStates.value)
+
     // Update animated sprite Konva nodes (positions and frames)
     await updateAnimatedSprites(
       layers.value.spriteFrontLayer as Konva.Layer | null,
@@ -184,6 +197,16 @@ export function useScreenAnimationLoop(
         } else {
           writeSpriteState(sharedAnimationView, actionNumber, 0, 0, false)
         }
+      }
+
+      // Sync positions from shared buffer to ref so inspector MOVE tab shows live positions
+      if (setMovementPositionsFromBuffer) {
+        const positions = new Map<number, { x: number; y: number }>()
+        for (let actionNumber = 0; actionNumber < MAX_SPRITES; actionNumber++) {
+          const pos = readSpritePosition(sharedAnimationView, actionNumber)
+          if (pos) positions.set(actionNumber, pos)
+        }
+        setMovementPositionsFromBuffer(positions)
       }
     }
 

@@ -538,7 +538,7 @@ export function handleAnimationCommandMessage(message: AnyServiceWorkerMessage, 
         }
       }
 
-      // Create movement state immediately (without currentX/currentY - position is in Konva)
+      // Create movement state (position is in shared buffer, updated by animation loop)
       const movementState: MovementState = {
         actionNumber: command.actionNumber,
         definition: command.definition,

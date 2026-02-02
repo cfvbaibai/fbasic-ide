@@ -239,6 +239,14 @@ export class BasicInterpreter {
   }
 
   /**
+   * Clear display-related state (DEF SPRITE, DEF MOVE definitions and movement states).
+   * Called when IDE Clear button is clicked so worker has no sprite/move definitions.
+   */
+  clearDisplay(): void {
+    this.context?.clearDisplay?.()
+  }
+
+  /**
    * Get current execution location for error reporting (BASIC line number and source text).
    * Returns null if context or current statement is not available.
    */

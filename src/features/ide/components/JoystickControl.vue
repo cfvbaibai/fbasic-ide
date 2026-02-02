@@ -9,7 +9,7 @@ const props = defineProps<Props>()
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { GameBlock, GameCollapseToggle, GameSubBlock } from '@/shared/components/ui'
+import { GameBlock, GameSubBlock } from '@/shared/components/ui'
 
 import { useJoystickEvents } from '../composables/useJoystickEvents'
 import JoystickStatusTable from './JoystickStatusTable.vue'
@@ -26,9 +26,6 @@ interface Props {
 // Reactive state
 const stickStates = ref([0, 0, 0, 0]) // STICK values for joysticks 0-3
 const trigStates = ref([0, 0, 0, 0]) // STRIG values for joysticks 0-3
-
-// Collapsible state
-const isExpanded = ref(true)
 
 // Use joystick events composable
 const {
@@ -67,20 +64,9 @@ const joystickStatusData = computed(() => {
 </script>
 
 <template>
-  <GameBlock
-    :title="t('ide.joystick.control')"
-    title-icon="mdi:play"
-    :clickable-header="true"
-    class="joystick-control"
-    :class="{ collapsed: !isExpanded }"
-    @click-header="isExpanded = !isExpanded"
-  >
-    <template #right>
-      <GameCollapseToggle :expanded="isExpanded" @toggle="isExpanded = !isExpanded" />
-    </template>
-
+  <GameBlock :title="t('ide.joystick.control')" title-icon="mdi:play" class="joystick-control">
     <!-- Joystick Controls and Status Display in same row -->
-    <div class="joystick-content" :class="{ expanded: isExpanded }">
+    <div class="joystick-content">
       <div class="joystick-panels-row">
         <!-- Joystick Controls -->
         <div class="control-grid">
@@ -107,38 +93,6 @@ const joystickStatusData = computed(() => {
 </template>
 
 <style scoped>
-.joystick-content {
-  max-height: 0;
-  overflow: hidden;
-  opacity: 0;
-  transition:
-    max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.1s,
-    transform 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.1s,
-    margin-top 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  transform: translateY(-20px) scale(0.98);
-  margin-top: -1rem;
-  filter: blur(2px);
-}
-
-.joystick-content.expanded {
-  max-height: 2000px;
-  opacity: 1;
-  transform: translateY(0) scale(1);
-  margin-top: 0;
-  filter: blur(0);
-  transition:
-    max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.2s,
-    transform 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.2s,
-    margin-top 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.2s,
-    filter 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.2s;
-}
-
-.joystick-control.collapsed {
-  margin-bottom: 0.5rem;
-}
-
 .joystick-panels-row {
   display: flex;
   align-items: flex-start;

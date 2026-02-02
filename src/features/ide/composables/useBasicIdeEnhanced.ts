@@ -35,7 +35,10 @@ export function useBasicIde() {
   const screen = useBasicIdeScreenIntegration(state)
   const worker = useBasicIdeWorkerIntegration(state, screen)
   const editor = useBasicIdeEditor(state)
-  const execution = useBasicIdeExecution(state, worker, editor.parseCode)
+  const execution = useBasicIdeExecution(state, worker, editor.parseCode, {
+    clearSharedDisplay: () => screen.clearDisplayToSharedBuffer(),
+    clearWorkerDisplay: () => worker.sendClearDisplay(),
+  })
 
   const toggleDebugMode = () => {
     state.debugMode.value = !state.debugMode.value
@@ -72,6 +75,7 @@ export function useBasicIde() {
     spriteStates: state.spriteStates,
     spriteEnabled: state.spriteEnabled,
     movementStates: state.movementStates,
+    movementPositionsFromBuffer: state.movementPositionsFromBuffer,
     frontSpriteNodes: state.frontSpriteNodes,
     backSpriteNodes: state.backSpriteNodes,
     pendingInputRequest: state.pendingInputRequest,

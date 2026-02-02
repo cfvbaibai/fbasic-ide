@@ -267,6 +267,7 @@ export type ServiceWorkerMessageType =
   | 'REQUEST_INPUT'
   | 'INPUT_VALUE'
   | 'PLAY_SOUND'
+  | 'CLEAR_DISPLAY'
 
 // Execute message - sent from UI to service worker
 export interface ExecuteMessage extends ServiceWorkerMessage {
@@ -368,6 +369,12 @@ export interface StopMessage extends ServiceWorkerMessage {
     executionId: string
     reason?: 'user_request' | 'timeout' | 'error'
   }
+}
+
+// Clear display message - sent from UI to worker when Clear button is clicked
+export interface ClearDisplayMessage extends ServiceWorkerMessage {
+  type: 'CLEAR_DISPLAY'
+  data: Record<string, never>
 }
 
 // STRIG event message - sent from main thread to service worker
@@ -480,6 +487,7 @@ export interface PlaySoundMessage extends ServiceWorkerMessage {
 
 // Union type for all possible messages
 export type AnyServiceWorkerMessage =
+  | ClearDisplayMessage
   | ExecuteMessage
   | PingMessage
   | ResultMessage

@@ -49,5 +49,21 @@
             "stick": "STICK",
             "strig": "STRIG"
         }
+    },
+    "stateInspector": {
+        "title": "狀態檢查",
+        "tabPalettes": "調色盤",
+        "tabSprite": "SPRITE",
+        "tabMove": "MOVE",
+        "tabBg": "BG",
+        "palettes": "調色盤",
+        "backdrop": "背景",
+        "cgen": "CGEN",
+        "spriteStates": "SPRITE 狀態",
+        "spriteEnabled": "SPRITE ON",
+        "moveStates": "MOVE 狀態",
+        "bgBuffer": "BG 螢幕緩衝",
+        "cursor": "游標",
+        "empty": "（無）"
     }
 }

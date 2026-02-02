@@ -23,6 +23,7 @@ export interface BasicIdeWorkerIntegration {
   restartWebWorker: () => Promise<void>
   checkWebWorkerHealth: () => Promise<boolean>
   sendMessageToWorker: (message: AnyServiceWorkerMessage) => Promise<ExecutionResult>
+  sendClearDisplay: () => void
   sendStickEvent: (joystickId: number, state: number) => void
   sendStrigEvent: (joystickId: number, state: number) => void
   respondToInputRequest: (requestId: string, values: string[], cancelled: boolean) => void
@@ -100,6 +101,17 @@ export function useBasicIdeWorkerIntegration(
     return sendMessageToWorkerUtil(message, webWorkerManager)
   }
 
+  const sendClearDisplay = () => {
+    if (webWorkerManager.worker) {
+      webWorkerManager.worker.postMessage({
+        type: 'CLEAR_DISPLAY',
+        id: `clear-display-${Date.now()}`,
+        timestamp: Date.now(),
+        data: {},
+      })
+    }
+  }
+
   const sendStickEvent = (joystickId: number, state: number) => {
     if (webWorkerManager.worker) {
       webWorkerManager.worker.postMessage({
@@ -137,6 +149,7 @@ export function useBasicIdeWorkerIntegration(
     restartWebWorker: restartWebWorkerWrapper,
     checkWebWorkerHealth: checkWebWorkerHealthWrapper,
     sendMessageToWorker: sendMessageToWorkerWrapper,
+    sendClearDisplay,
     sendStickEvent,
     sendStrigEvent,
     respondToInputRequest: respondToInputRequestImpl,

@@ -65,6 +65,9 @@ export class AnimationManager {
 
   /**
    * Define a movement (DEF MOVE command). Stores the definition; does not start movement.
+   * Typical flow: DEF MOVE(0)=SPRITE(...) → POSITION 0, X, Y → MOVE 0.
+   * Position for this action is initialized to screen center here (right after the move is
+   * defined); POSITION can then override it before MOVE runs.
    * @param definition - MoveDefinition (actionNumber 0-7, characterType, direction,
    *   speed, distance, priority, colorCombination)
    * @throws Error if any parameter is out of range
@@ -96,6 +99,17 @@ export class AnimationManager {
     }
 
     this.moveDefinitions.set(definition.actionNumber, definition)
+
+    // Initialize POSITION for this action to screen center when DEF MOVE runs (like DEF SPRITE)
+    if (this.deviceAdapter?.setSpritePosition) {
+      const existing = this.deviceAdapter.getSpritePosition(definition.actionNumber)
+      if (existing === null) {
+        const halfSize = getSpriteSizeForMoveDefinition(definition) / 2
+        const centerX = SCREEN_DIMENSIONS.SPRITE.DEFAULT_X - halfSize
+        const centerY = SCREEN_DIMENSIONS.SPRITE.DEFAULT_Y - halfSize
+        this.deviceAdapter.setSpritePosition(definition.actionNumber, centerX, centerY)
+      }
+    }
   }
 
   /**
@@ -111,7 +125,7 @@ export class AnimationManager {
    * Start movement (MOVE command). Initializes state and sends START_MOVEMENT to main thread.
    * @param actionNumber - Action slot 0-7 (must have been defined with DEF MOVE)
    * @param startX - Optional pixel X (0-255); default center if omitted
-   * @param startY - Optional pixel Y (0-239); default center if omitted
+   * @param startY - Optional pixel Y (0-255); default center if omitted
    * @throws Error if no definition exists for actionNumber
    */
   startMovement(actionNumber: number, startX?: number, startY?: number): void {
@@ -237,7 +251,7 @@ export class AnimationManager {
    * Main thread sets Konva node or stores pending for next START_MOVEMENT.
    * @param actionNumber - Action slot 0-7
    * @param x - Pixel X (0-255)
-   * @param y - Pixel Y (0-239)
+   * @param y - Pixel Y (0-255, per F-BASIC manual)
    * @throws Error if actionNumber or coordinates out of range
    */
   setPosition(actionNumber: number, x: number, y: number): void {
@@ -247,8 +261,8 @@ export class AnimationManager {
     if (x < 0 || x > 255) {
       throw new Error(`Invalid X coordinate: ${x} (must be 0-255)`)
     }
-    if (y < 0 || y > 239) {
-      throw new Error(`Invalid Y coordinate: ${y} (must be 0-239)`)
+    if (y < 0 || y > 255) {
+      throw new Error(`Invalid Y coordinate: ${y} (must be 0-255)`)
     }
 
     this.deviceAdapter?.setSpritePosition?.(actionNumber, x, y)

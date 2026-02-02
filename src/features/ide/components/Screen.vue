@@ -194,22 +194,29 @@ async function render(): Promise<void> {
     const localMovementCount = localMovementStates.value.length
     const movementCount = Math.max(ctxMovementCount, localMovementCount)
     const spriteNodeCount = frontSpriteNodes.value.size + backSpriteNodes.value.size
+    const spriteStateCount = ctx.spriteStates.value?.length ?? 0
     const needSpriteBuild =
       movementCount > 0 && (spriteNodeCount === 0 || spriteNodeCount < movementCount)
+    // When Clear: 0 movements, 0 sprites, but nodes still exist — must run sprite layers to clear Konva nodes
+    const needSpriteClear =
+      movementCount === 0 && spriteStateCount === 0 && spriteNodeCount > 0
     const backgroundOnly =
-      !needSpriteBuild && pendingRenderReasonRef.value === 'bufferOnly'
+      !needSpriteBuild &&
+      !needSpriteClear &&
+      pendingRenderReasonRef.value === 'bufferOnly'
     // When context is ahead, pass context so we build all sprites; else use local (mutable state)
     const movementsToRender =
       ctxMovementCount > localMovementCount && (ctx.movementStates.value?.length ?? 0) > 0
         ? (ctx.movementStates.value ?? [])
         : localMovementStates.value
-    if (needSpriteBuild || !backgroundOnly) {
+    if (needSpriteBuild || needSpriteClear || !backgroundOnly) {
       logScreen.debug('render', {
         movementCount,
         ctxMovementCount,
         localMovementCount,
         spriteNodeCount,
         needSpriteBuild,
+        needSpriteClear,
         backgroundOnly,
         reason: pendingRenderReasonRef.value,
       })
@@ -373,6 +380,19 @@ const stopAnimationLoop = useScreenAnimationLoop({
   backSpriteNodes,
   spritePalette: computed(() => ctx.spritePalette.value ?? 1),
   sharedAnimationView: toValue(() => ctx.sharedAnimationView.value),
+  setMovementPositionsFromBuffer: (positions) => {
+    ctx.movementPositionsFromBuffer.value = positions
+  },
+  onMovementStatesUpdated: (local) => {
+    for (const m of local) {
+      const ctxM = ctx.movementStates.value?.find(x => x.actionNumber === m.actionNumber)
+      if (ctxM) {
+        ctxM.remainingDistance = m.remainingDistance
+        ctxM.isActive = m.isActive
+      }
+    }
+    ctx.movementStates.value = [...(ctx.movementStates.value ?? [])]
+  },
   getPendingStaticRender: () => pendingStaticRenderRef.value,
   onRunPendingStaticRender: async () => {
     await render()

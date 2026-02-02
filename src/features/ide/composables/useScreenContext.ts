@@ -27,6 +27,8 @@ export interface ScreenContextValue {
   spriteStates: Ref<SpriteState[]>
   spriteEnabled: Ref<boolean>
   movementStates: Ref<MovementState[]>
+  /** Current sprite positions from shared buffer (updated each frame by animation loop). */
+  movementPositionsFromBuffer: Ref<Map<number, { x: number; y: number }>>
   externalFrontSpriteNodes: Ref<Map<number, unknown>>
   externalBackSpriteNodes: Ref<Map<number, unknown>>
   sharedAnimationView: Ref<Float64Array | undefined>

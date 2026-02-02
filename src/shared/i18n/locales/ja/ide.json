@@ -49,5 +49,21 @@
             "stick": "STICK",
             "strig": "STRIG"
         }
+    },
+    "stateInspector": {
+        "title": "状態インスペクタ",
+        "tabPalettes": "パレット",
+        "tabSprite": "SPRITE",
+        "tabMove": "MOVE",
+        "tabBg": "BG",
+        "palettes": "パレット",
+        "backdrop": "バックドロップ",
+        "cgen": "CGEN",
+        "spriteStates": "SPRITE状態",
+        "spriteEnabled": "SPRITE ON",
+        "moveStates": "MOVE状態",
+        "bgBuffer": "BG画面バッファ",
+        "cursor": "カーソル",
+        "empty": "（なし）"
     }
 }

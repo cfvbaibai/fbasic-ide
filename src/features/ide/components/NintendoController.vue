@@ -42,26 +42,24 @@ const handleActionButton = (button: 'select' | 'start' | 'a' | 'b') => {
     <!-- D-Pad (Cross) on the left -->
     <Dpad @dpad-start="handleDpadStart" @dpad-stop="handleDpadStop" />
 
-    <!-- Select/Start buttons in the middle -->
-    <div class="controller-section select-start-section">
+    <!-- Select/Start and A/B groups; stack vertically when width is not enough -->
+    <div class="controller-button-groups">
       <div class="select-start-buttons">
         <ManualActionButton button="select" :active="heldButtons[`${joystickId}-select`]" @click="handleActionButton" />
         <ManualActionButton button="start" :active="heldButtons[`${joystickId}-start`]" @click="handleActionButton" />
       </div>
-    </div>
-
-    <!-- B/A buttons on the right -->
-    <div class="controller-section action-buttons-section">
-      <div class="action-buttons">
-        <ManualActionButton button="b" :active="heldButtons[`${joystickId}-b`]" @click="handleActionButton" />
-        <ManualActionButton button="a" :active="heldButtons[`${joystickId}-a`]" @click="handleActionButton" />
+      <div class="controller-section action-buttons-section">
+        <div class="action-buttons">
+          <ManualActionButton button="b" :active="heldButtons[`${joystickId}-b`]" @click="handleActionButton" />
+          <ManualActionButton button="a" :active="heldButtons[`${joystickId}-a`]" @click="handleActionButton" />
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-/* Nintendo Controller Layout */
+/* Nintendo Controller Layout: D-pad and button groups stay on one row */
 .nintendo-controller {
   display: flex;
   align-items: center;
@@ -69,7 +67,16 @@ const handleActionButton = (button: 'select' | 'start' | 'a' | 'b') => {
   gap: 0.5rem;
   padding: 0.5rem;
   width: 100%;
-  min-width: fit-content;
+  min-width: 0;
+}
+
+/* Select/Start and A/B groups: row when wide, stack vertically when narrow */
+.controller-button-groups {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 0.5rem;
+  align-items: center;
+  min-width: 0;
 }
 
 .controller-section {
@@ -92,33 +99,25 @@ const handleActionButton = (button: 'select' | 'start' | 'a' | 'b') => {
 }
 
 /* Section width variants */
-.select-start-section,
-.action-buttons-section {
-  flex: 0 0 auto;
-}
-
-.select-start-section {
-  min-width: 90px;
-}
-
-.action-buttons-section {
-  min-width: 70px;
-}
-
-/* Button container layouts */
-.select-start-buttons,
-.action-buttons {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-}
-
 .select-start-buttons {
+  flex: 0 0 0;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: center;
   gap: 0.375rem;
 }
 
+.action-buttons-section {
+  flex: 0 0 auto;
+  min-width: 70px;
+}
+
 .action-buttons {
-  gap: 0.5rem;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
   align-items: center;
+  gap: 0.5rem;
 }
 </style>

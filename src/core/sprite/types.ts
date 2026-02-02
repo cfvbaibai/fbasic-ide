@@ -33,7 +33,7 @@ export interface DefSpriteDefinition {
 export interface SpriteState {
   spriteNumber: number // 0-7
   x: number // Pixel X coordinate (0-255)
-  y: number // Pixel Y coordinate (0-239)
+  y: number // Pixel Y coordinate (0-255, per F-BASIC manual)
   visible: boolean // Whether sprite is displayed
   priority: number // 0=front, 1=behind background
   definition: DefSpriteDefinition | null // DEF SPRITE definition
@@ -55,14 +55,13 @@ export interface MoveDefinition {
 
 /**
  * Movement state (active animation)
- * Position is stored in Konva sprite nodes, not in this state object.
- * This state only tracks movement parameters and animation frames.
+ * Position is stored in shared buffer (spriteView); this state tracks movement parameters and animation frames.
  */
 export interface MovementState {
   actionNumber: number
   definition: MoveDefinition
-  startX: number // Starting X position (for reference, actual position in Konva)
-  startY: number // Starting Y position (for reference, actual position in Konva)
+  startX: number // Starting X position (for reference, actual position in shared buffer)
+  startY: number // Starting Y position (for reference, actual position in shared buffer)
   remainingDistance: number // Remaining distance in dots
   totalDistance: number // Total distance (2×D)
   speedDotsPerSecond: number // 60/C dots per second (C=0 → 60/256)

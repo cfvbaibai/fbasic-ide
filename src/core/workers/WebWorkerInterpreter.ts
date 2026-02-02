@@ -9,6 +9,7 @@ import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { WebWorkerDeviceAdapter } from '@/core/devices/WebWorkerDeviceAdapter'
 import type {
   AnyServiceWorkerMessage,
+  ClearDisplayMessage,
   ErrorMessage,
   ExecuteMessage,
   InputValueMessage,
@@ -87,6 +88,10 @@ class WebWorkerInterpreter {
           break
         case 'INPUT_VALUE':
           this.handleInputValue(message)
+          break
+        case 'CLEAR_DISPLAY':
+          logWorker.debug('Handling CLEAR_DISPLAY message')
+          this.handleClearDisplay(message)
           break
 
         default:
@@ -214,6 +219,11 @@ class WebWorkerInterpreter {
     if (this.webWorkerDeviceAdapter) {
       this.webWorkerDeviceAdapter.handleInputValueMessage(message)
     }
+  }
+
+  handleClearDisplay(_message: ClearDisplayMessage) {
+    this.interpreter?.clearDisplay?.()
+    this.webWorkerDeviceAdapter?.clearAllSpritePositions?.()
   }
 
   handleStrigEvent(message: StrigEventMessage) {

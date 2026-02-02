@@ -85,6 +85,19 @@ export class ExecutionContext {
   }
 
   /**
+   * Clear display-related state only (DEF SPRITE state, DEF MOVE definitions and movement states).
+   * Used when IDE Clear button is clicked so worker has no sprite/move definitions.
+   */
+  clearDisplay(): void {
+    if (this.spriteStateManager) {
+      this.spriteStateManager.clear()
+    }
+    if (this.animationManager) {
+      this.animationManager.reset()
+    }
+  }
+
+  /**
    * Add output to the context
    */
   addOutput(value: string): void {

@@ -533,7 +533,7 @@ export class FunctionEvaluator {
   /**
    * YPOS(n) - returns current Y position
    * n: action number (0-7)
-   * Returns: Y coordinate (0-239) or 0 if no movement/position set
+   * Returns: Y coordinate (0-255) or 0 if no movement/position set
    * 
    * Position is cached in WebWorkerDeviceAdapter, synced from Konva nodes in frontend.
    */

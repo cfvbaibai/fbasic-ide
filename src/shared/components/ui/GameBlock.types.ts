@@ -7,8 +7,6 @@ export interface GameBlockProps {
   title: string
   /** Title icon name in format "prefix:name" (e.g., "mdi:play") */
   titleIcon?: string
-  /** Whether the header is clickable */
-  clickableHeader?: boolean
   /** Whether to hide the header */
   hideHeader?: boolean
   /** Whether the block floats on hover */
@@ -18,8 +16,6 @@ export interface GameBlockProps {
 }
 
 export interface GameBlockEmits {
-  /** Header clicked */
-  clickHeader: []
   /** Block clicked */
   click: []
 }

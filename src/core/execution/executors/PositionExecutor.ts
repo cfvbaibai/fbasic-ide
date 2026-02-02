@@ -23,7 +23,7 @@ export class PositionExecutor {
    * POSITION n, X, Y
    * n: action number (0-7)
    * X: X coordinate (0-255)
-   * Y: Y coordinate (0-239)
+   * Y: Y coordinate (0-255, per F-BASIC manual)
    */
   execute(positionStmtCst: CstNode, lineNumber?: number): void {
     try {
@@ -62,7 +62,7 @@ export class PositionExecutor {
       // Validate ranges
       if (!this.validateRange(actionNumber, 0, 7, 'action number', lineNumber)) return
       if (!this.validateRange(x, 0, 255, 'X coordinate', lineNumber)) return
-      if (!this.validateRange(y, 0, 239, 'Y coordinate', lineNumber)) return
+      if (!this.validateRange(y, 0, 255, 'Y coordinate', lineNumber)) return
 
       // Set position via animation manager
       if (this.context.animationManager) {

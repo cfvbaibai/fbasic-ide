@@ -49,5 +49,21 @@
             "stick": "STICK",
             "strig": "STRIG"
         }
+    },
+    "stateInspector": {
+        "title": "State Inspector",
+        "tabPalettes": "Palettes",
+        "tabSprite": "SPRITE",
+        "tabMove": "MOVE",
+        "tabBg": "BG",
+        "palettes": "Palettes",
+        "backdrop": "Backdrop",
+        "cgen": "CGEN",
+        "spriteStates": "SPRITE States",
+        "spriteEnabled": "SPRITE ON",
+        "moveStates": "MOVE States",
+        "bgBuffer": "BG Screen Buffer",
+        "cursor": "Cursor",
+        "empty": "(none)"
     }
 }

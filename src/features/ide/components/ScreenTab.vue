@@ -2,17 +2,15 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { useScreenContext } from '@/features/ide/composables/useScreenContext'
 import { provideScreenZoom } from '@/features/ide/composables/useScreenZoom'
 import { GameButton, GameButtonGroup, GameIcon, GameTabPane } from '@/shared/components/ui'
 
-import ActivePaletteDisplay from './ActivePaletteDisplay.vue'
 import ErrorPanel from './ErrorPanel.vue'
 import Screen from './Screen.vue'
 
 /**
  * ScreenTab component - Displays the screen buffer in a tab pane format with zoom controls.
- * Screen data comes from useScreenContext (provided by IdePage).
+ * Screen data comes from useScreenContext (provided by IdePage); Screen component injects it.
  */
 defineOptions({
   name: 'ScreenTab',
@@ -25,7 +23,6 @@ const _props = withDefaults(
   { errors: () => [] }
 )
 
-const screen = useScreenContext()
 const { t } = useI18n()
 
 // Provide zoom state for child components (Screen) and use it for controls
@@ -64,11 +61,6 @@ const currentZoomLevel = computed(() => zoomLevel.value)
             {{ level.label }}
           </GameButton>
         </GameButtonGroup>
-        <ActivePaletteDisplay
-          :bg-palette="screen.bgPalette.value"
-          :sprite-palette="screen.spritePalette.value"
-          class="palette-display"
-        />
       </div>
     </template>
 
@@ -100,9 +92,5 @@ const currentZoomLevel = computed(() => zoomLevel.value)
   justify-content: center;
   gap: 1rem;
   flex-wrap: wrap;
-}
-
-.palette-display {
-  margin-left: 0.5rem;
 }
 </style>

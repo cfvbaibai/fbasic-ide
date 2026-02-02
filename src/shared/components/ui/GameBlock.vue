@@ -24,19 +24,12 @@ defineOptions({
 
 const props = withDefaults(defineProps<GameBlockProps>(), {
   titleIcon: undefined,
-  clickableHeader: false,
   hideHeader: false,
   floatOnHover: false,
   clickable: false,
 })
 
 const emit = defineEmits<GameBlockEmits>()
-
-const handleHeaderClick = () => {
-  if (props.clickableHeader) {
-    emit('clickHeader')
-  }
-}
 
 const handleClick = () => {
   if (props.clickable) {
@@ -55,12 +48,7 @@ const handleClick = () => {
     }"
     @click="handleClick"
   >
-    <div
-      v-if="!hideHeader"
-      class="game-block-header"
-      :class="{ clickable: clickableHeader }"
-      @click.stop="handleHeaderClick"
-    >
+    <div v-if="!hideHeader" class="game-block-header">
       <h3 class="game-block-title text-game-heading">
         <GameIcon v-if="titleIcon" :icon="titleIcon" size="small" />
         {{ title }}
@@ -121,11 +109,6 @@ const handleClick = () => {
   padding-bottom: 0.75rem;
   position: relative;
   transition: all 0.3s ease;
-}
-
-.game-block-header.clickable {
-  cursor: pointer;
-  user-select: none;
 }
 
 .game-block-title {

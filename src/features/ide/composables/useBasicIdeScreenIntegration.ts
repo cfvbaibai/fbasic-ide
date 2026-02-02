@@ -8,7 +8,9 @@ import { ref } from 'vue'
 import {
   createSharedDisplayBuffer,
   type DecodedScreenState,
+  incrementSequence,
   type SharedDisplayViews,
+  writeScreenState,
 } from '@/core/animation/sharedDisplayBuffer'
 import { TIMING } from '@/core/constants'
 
@@ -24,6 +26,8 @@ export interface BasicIdeScreenIntegration {
   scheduleRender: () => void
   /** Coalesced: at most one scheduleRender per frame. Use for SCREEN_CHANGED to avoid main-thread flood. */
   scheduleRenderForScreenChanged: () => void
+  /** Write current (cleared) state to shared buffer and bump sequence so Screen redraws. Call after clearOutput. */
+  clearDisplayToSharedBuffer: () => void
 }
 
 /**
@@ -50,6 +54,24 @@ export function useBasicIdeScreenIntegration(state: BasicIdeState): BasicIdeScre
   }
 
   const scheduleRender = () => scheduleScreenRenderRef.value?.()
+
+  /** Write current state to shared buffer and bump sequence so Screen re-decodes and redraws. */
+  const clearDisplayToSharedBuffer = () => {
+    writeScreenState(
+      sharedDisplayViews,
+      state.screenBuffer.value,
+      state.cursorX.value,
+      state.cursorY.value,
+      state.bgPalette.value ?? 1,
+      state.spritePalette.value ?? 1,
+      state.backdropColor.value ?? 0,
+      state.cgenMode.value ?? 2
+    )
+    // Zero sprite positions so next Run uses default center (getSpritePosition returns null for 0,0)
+    sharedDisplayViews.spriteView.fill(0)
+    incrementSequence(sharedDisplayViews)
+    scheduleRender()
+  }
 
   // Coalesce SCREEN_CHANGED with adaptive frame rate throttling
   // Throttle to ~20 FPS (50ms) during rapid PRINT operations to reduce CPU usage
@@ -92,5 +114,6 @@ export function useBasicIdeScreenIntegration(state: BasicIdeState): BasicIdeScre
     setDecodedScreenState,
     scheduleRender,
     scheduleRenderForScreenChanged,
+    clearDisplayToSharedBuffer,
   }
 }

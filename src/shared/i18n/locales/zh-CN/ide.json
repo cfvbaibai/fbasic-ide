@@ -49,5 +49,21 @@
             "stick": "STICK",
             "strig": "STRIG"
         }
+    },
+    "stateInspector": {
+        "title": "状态检查",
+        "tabPalettes": "调色板",
+        "tabSprite": "SPRITE",
+        "tabMove": "MOVE",
+        "tabBg": "BG",
+        "palettes": "调色板",
+        "backdrop": "背景",
+        "cgen": "CGEN",
+        "spriteStates": "SPRITE 状态",
+        "spriteEnabled": "SPRITE ON",
+        "moveStates": "MOVE 状态",
+        "bgBuffer": "BG 屏幕缓冲",
+        "cursor": "光标",
+        "empty": "（无）"
     }
 }

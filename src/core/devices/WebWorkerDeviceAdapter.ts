@@ -221,14 +221,15 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   }
 
   getSpritePosition(actionNumber: number): { x: number; y: number } | null {
-    // Prefer shared buffer (main thread writes positions each frame) so XPOS/YPOS see live position
-    if (this.sharedDisplayViews) {
-      const pos = readSpritePosition(this.sharedDisplayViews.spriteView, actionNumber)
-      if (pos !== null) return pos
-    }
-    // Fallback: last position set by POSITION command or CUT/ERA sync (e.g. before buffer exists)
+    // Explicit POSITION command takes precedence (including POSITION 0,0)
     if (this.lastPositionBySprite.has(actionNumber)) {
       return this.lastPositionBySprite.get(actionNumber) ?? null
+    }
+    // Shared buffer (main thread writes positions each frame) so XPOS/YPOS see live position
+    if (this.sharedDisplayViews) {
+      const pos = readSpritePosition(this.sharedDisplayViews.spriteView, actionNumber)
+      // Buffer (0,0) is uninitialized: treat as no position so MOVE uses default center (like DEF SPRITE)
+      if (pos !== null && (pos.x !== 0 || pos.y !== 0)) return pos
     }
     return null
   }
@@ -239,6 +240,11 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
 
   clearSpritePosition(actionNumber: number): void {
     this.lastPositionBySprite.delete(actionNumber)
+  }
+
+  /** Clear all stored POSITION values (e.g. when IDE Clear is clicked so next Run uses default center). */
+  clearAllSpritePositions(): void {
+    this.lastPositionBySprite.clear()
   }
 
   /**

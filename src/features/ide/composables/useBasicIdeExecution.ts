@@ -24,13 +24,21 @@ export interface BasicIdeExecution {
   clearAll: () => void
 }
 
+export interface BasicIdeExecutionOptions {
+  /** Called after clearing state so shared display buffer is updated and Screen redraws. */
+  clearSharedDisplay?: () => void
+  /** Called after clearing state so worker clears DEF SPRITE and DEF MOVE definitions. */
+  clearWorkerDisplay?: () => void
+}
+
 /**
  * Create run/stop/clear actions. Requires parseCode from editor for runCode.
  */
 export function useBasicIdeExecution(
   state: BasicIdeState,
   worker: BasicIdeWorkerIntegration,
-  parseCode: ParseCodeFn
+  parseCode: ParseCodeFn,
+  options?: BasicIdeExecutionOptions
 ): BasicIdeExecution {
   // Initialize Web Audio player for PLAY command
   const audioPlayer = useWebAudioPlayer()
@@ -65,6 +73,7 @@ export function useBasicIdeExecution(
 
       clearScreenBuffer(state.screenBuffer, state.cursorX, state.cursorY)
       state.movementStates.value = []
+      state.movementPositionsFromBuffer.value = new Map()
 
       const result = await worker.sendMessageToWorker({
         type: 'EXECUTE',
@@ -201,8 +210,18 @@ export function useBasicIdeExecution(
     state.screenBuffer.value = initializeScreenBuffer()
     state.cursorX.value = 0
     state.cursorY.value = 0
+    // Clear BG items (above), SPRITEs (DEF SPRITE + display), and MOVE states
     state.spriteStates.value = []
     state.spriteEnabled.value = false
+    state.movementStates.value = []
+    state.movementPositionsFromBuffer.value = new Map()
+    state.frontSpriteNodes.value = new Map()
+    state.backSpriteNodes.value = new Map()
+    state.spriteActionQueues.value = new Map()
+    // Flush cleared state to shared buffer and bump sequence so Screen re-decodes and redraws BG + sprites
+    options?.clearSharedDisplay?.()
+    // Clear worker DEF SPRITE and DEF MOVE definitions so next Run starts with no definitions
+    options?.clearWorkerDisplay?.()
   }
 
   const clearAll = () => {

@@ -338,7 +338,8 @@ describe('LOCATE and PRINT Integration', () => {
         ? (lastScreenMessage.data as { screenBuffer: ScreenBuffer }).screenBuffer
         : undefined
 
-    // PRINT "END" on last line: writing 'D' at (27,23) wraps and scrolls once; then \n scrolls again. "END" ends on row 21.
+    // PRINT "END" on last line: writing 'D' at (27,23) wraps and scrolls once;
+    // then \n scrolls again. "END" ends on row 21.
     expect(screenBuffer?.[21]?.[25]?.character).toBe('E')
     expect(screenBuffer?.[21]?.[26]?.character).toBe('N')
     expect(screenBuffer?.[21]?.[27]?.character).toBe('D')
