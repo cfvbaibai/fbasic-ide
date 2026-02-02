@@ -11,6 +11,7 @@ import {
   readSpritePosition,
   writeSpriteState,
 } from '@/core/animation/sharedAnimationBuffer'
+import { SCREEN_DIMENSIONS } from '@/core/constants'
 import type { MovementState } from '@/core/sprite/types'
 
 import type { KonvaScreenLayers } from './useKonvaScreenRenderer'
@@ -61,9 +62,12 @@ function updateMovements(
     currentY += movement.directionDeltaY * distanceThisFrame
     movement.remainingDistance -= distanceThisFrame
 
-    // Clamp to screen bounds
-    currentX = Math.max(0, Math.min(255, currentX))
-    currentY = Math.max(0, Math.min(239, currentY))
+    // Wrap at screen boundaries (real F-BASIC behavior: sprite reappears on opposite side)
+    // X: 0–255 (256 dots), Y: 0–239 (240 dots). Real machine also splits sprite when crossing edge.
+    const w = SCREEN_DIMENSIONS.SPRITE.WIDTH
+    const h = SCREEN_DIMENSIONS.SPRITE.HEIGHT
+    currentX = ((currentX % w) + w) % w
+    currentY = ((currentY % h) + h) % h
 
     // Write position back to Konva node
     spriteNode.x(currentX)

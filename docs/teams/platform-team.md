@@ -78,6 +78,17 @@ Total:          1548 bytes
 - `CUT` - Hide sprite
 - `ERA` - Clear movement slot
 
+### MOVE sprite boundary wrapping (real-machine confirmed)
+On real F-BASIC hardware, when a MOVE sprite reaches a screen edge and keeps moving, it **wraps** to the opposite side:
+- Right edge → reappears on left
+- Left edge → reappears on right
+- Bottom edge → reappears on top
+- Top edge → reappears on bottom
+
+Sprite screen is 256×240 dots (X: 0–255, Y: 0–239). Position wraps modulo 256 (X) and 240 (Y).
+
+When a sprite is **crossing** an edge (e.g. moving right past x=255), the real machine can show the sprite **split**: e.g. left half of Mario on the right edge and right half on the left edge. The emulator currently implements wrap-only (single draw at wrapped position); split rendering is a possible future enhancement.
+
 ## Sprite System
 
 ### Two Types of Sprites
