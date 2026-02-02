@@ -279,13 +279,15 @@ export class AnimationManager {
 
   /**
    * Get movement status (MOVE(n) function). -1 = moving, 0 = complete or not started.
-   * When shared buffer is set (worker), reads isActive from shared memory.
+   * When shared buffer is set (worker), use only the buffer: main thread writes isActive
+   * when movement completes; worker never gets setMovementsInactive, so movementStates
+   * would stay true and MOVE(n) would never return 0 otherwise.
    * @param actionNumber - Action slot 0-7
    * @returns -1 if movement is active, 0 otherwise
    */
   getMovementStatus(actionNumber: number): -1 | 0 {
-    if (this.sharedAnimationView && readSpriteIsActive(this.sharedAnimationView, actionNumber)) {
-      return -1
+    if (this.sharedAnimationView) {
+      return readSpriteIsActive(this.sharedAnimationView, actionNumber) ? -1 : 0
     }
     const movement = this.movementStates.get(actionNumber)
     if (movement?.isActive) {

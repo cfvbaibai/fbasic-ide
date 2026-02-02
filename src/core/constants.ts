@@ -48,6 +48,7 @@ export const DEFAULTS = {
     ENABLED_TEST: false,
     WORKER_SCRIPT: '/basic-interpreter-worker.js',
     MESSAGE_TIMEOUT: 30000, // 30 seconds timeout for web worker messages
+    EXECUTION_TIMEOUT: 5 * 60 * 1000, // 5 minutes for EXECUTE (long-running games)
   },
 } as const
 

@@ -2,6 +2,7 @@
  * Web worker management utilities for BASIC IDE
  */
 
+import { DEFAULTS } from '@/core/constants'
 import type { AnyServiceWorkerMessage, ExecutionResult } from '@/core/interfaces'
 import { logComposable } from '@/shared/logger'
 
@@ -164,12 +165,16 @@ export function sendMessageToWorker(
     const _messageId = (++webWorkerManager.messageId).toString()
     const messageWithId = { ...message, id: _messageId }
 
-    // Set up timeout
+    const timeoutMs =
+      message.type === 'EXECUTE'
+        ? DEFAULTS.WEB_WORKER.EXECUTION_TIMEOUT
+        : DEFAULTS.WEB_WORKER.MESSAGE_TIMEOUT
+
     const timeout = setTimeout(() => {
       logComposable.debug('Message timeout:', _messageId)
       webWorkerManager.pendingMessages.delete(_messageId)
       reject(new Error('Web worker message timeout'))
-    }, 30000) // 30 second timeout
+    }, timeoutMs)
 
     // Store pending message
     webWorkerManager.pendingMessages.set(_messageId, {
