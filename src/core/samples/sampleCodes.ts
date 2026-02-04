@@ -130,32 +130,40 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 
   spriteAnimation: {
     name: 'Sprite Animation',
-    description: 'DEF MOVE, MOVE commands',
+    description: 'Multiple sprites with DEF MOVE - animation demo',
     category: 'sprites',
     code: `10 CLS
 20 SPRITE ON
-30 DEF MOVE(0)=SPRITE(0,3,15,50,0,0)
-40 MOVE 0
-50 PAUSE 100
-60 CUT 0
-70 ERA 0
-80 END`,
+30 DEF MOVE(0)=SPRITE(0,2,15,60,0,0)
+40 DEF MOVE(1)=SPRITE(1,4,15,60,0,0)
+50 DEF MOVE(2)=SPRITE(2,6,15,60,0,0)
+60 MOVE 0: MOVE 1: MOVE 2
+70 PRINT "Three sprites moving..."
+80 PAUSE 200
+90 CUT 0: CUT 1: CUT 2
+100 PRINT "Movement stopped!"
+110 PAUSE 60
+120 ERA 0: ERA 1: ERA 2
+130 END`,
   },
 
   spriteControl: {
     name: 'Sprite Control',
-    description: 'CUT, ERA, POSITION, XPOS, YPOS',
+    description: 'POSITION, XPOS, YPOS, CUT, ERA - single sprite control',
     category: 'sprites',
     code: `10 CLS
 20 SPRITE ON
 30 POSITION 0, 50, 100
 40 DEF MOVE(0)=SPRITE(0,3,15,60,0,0)
 50 MOVE 0
-60 PRINT "XPOS="; XPOS(0)
-70 PAUSE 50
+60 PRINT "Moving..."
+70 PAUSE 100
 80 CUT 0
-90 ERA 0
-100 END`,
+90 PRINT "XPOS="; XPOS(0)
+100 PRINT "YPOS="; YPOS(0)
+110 PAUSE 100
+120 ERA 0
+130 END`,
   },
 
   spriteInteractive: {

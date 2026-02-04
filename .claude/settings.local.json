@@ -52,7 +52,12 @@
       "Bash(git mv:*)",
       "Bash(wc:*)",
       "Bash(git restore:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(pnpm check-syntax:*)",
+      "Bash(node:*)",
+      "Bash(npx tsx:*)",
+      "Bash(pnpm exec:*)",
+      "Bash(pnpm lint:style:*)"
     ]
   },
   "enabledPlugins": {

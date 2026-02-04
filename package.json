@@ -23,7 +23,8 @@
         "build-web-worker": "tsx scripts/build-service-worker.ts",
         "build-service-worker": "pnpm build-web-worker",
         "test-service-worker": "tsx scripts/test-service-worker.ts",
-        "visualize-cst": "tsx scripts/visualize-cst.ts"
+        "visualize-cst": "tsx scripts/visualize-cst.ts",
+        "check-syntax": "tsx scripts/check-syntax.ts"
     },
     "dependencies": {
         "@fontsource/exo-2": "^5.1.0",

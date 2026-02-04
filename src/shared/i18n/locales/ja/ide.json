@@ -24,6 +24,8 @@
     "combo": "コンボ"
   },
   "samples": {
+    "title": "サンプルを読み込む",
+    "load": "サンプルを読み込む",
     "placeholder": "サンプル",
     "basic": "基本",
     "pause": "一時停止デモ",

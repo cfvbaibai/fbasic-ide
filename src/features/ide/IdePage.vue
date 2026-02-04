@@ -9,7 +9,6 @@ import {
   GameIconButton,
   GameInput,
   GameLayout,
-  GameSelect,
 } from '@/shared/components/ui'
 
 import IdeControls from './components/IdeControls.vue'
@@ -17,6 +16,7 @@ import JoystickControl from './components/JoystickControl.vue'
 import LogLevelPanel from './components/LogLevelPanel.vue'
 import MonacoCodeEditor from './components/MonacoCodeEditor.vue'
 import RuntimeOutput from './components/RuntimeOutput.vue'
+import SampleSelector from './components/SampleSelector.vue'
 import StateInspector from './components/StateInspector.vue'
 import { useBasicIde as useBasicIdeEnhanced } from './composables/useBasicIdeEnhanced'
 import { provideScreenContext } from './composables/useScreenContext'
@@ -56,7 +56,6 @@ const {
   runCode,
   stopCode,
   clearOutput,
-  currentSampleType,
   loadSampleCode,
   getParserCapabilities,
   getHighlighterCapabilities,
@@ -69,8 +68,10 @@ const {
   registerScheduleRender,
   pendingInputRequest,
   respondToInputRequest,
-  sampleSelectOptions,
 } = useBasicIdeEnhanced()
+
+// Sample selector state
+const sampleSelectorOpen = ref(false)
 
 // Provide screen context so ScreenTab/Screen can inject instead of prop drilling
 provideScreenContext({
@@ -140,16 +141,15 @@ onMounted(() => {
         <GameBlock :title="t('ide.codeEditor.title')" title-icon="mdi:pencil" class="editor-panel">
           <template #right>
             <div class="editor-header-controls">
-              <div class="sample-select-wrap">
-                <GameSelect
-                  :model-value="currentSampleType ?? ''"
-                  :options="sampleSelectOptions"
-                  :placeholder="t('ide.samples.placeholder')"
-                  size="small"
-                  class="sample-select"
-                  @update:model-value="loadSampleCode($event as string)"
-                />
-              </div>
+              <GameButton
+                type="default"
+                size="small"
+                class="sample-selector-btn"
+                @click="sampleSelectorOpen = true"
+              >
+                <span class="mdi mdi-folder-open"></span>
+                {{ t('ide.samples.load', 'Load Sample') }}
+              </GameButton>
               <IdeControls
                 :is-running="isRunning"
                 :can-run="canRun"
@@ -246,6 +246,13 @@ onMounted(() => {
             </form>
           </div>
         </div>
+
+        <!-- Sample Selector -->
+        <SampleSelector
+          v-if="sampleSelectorOpen"
+          @select="loadSampleCode($event); sampleSelectorOpen = false"
+          @close="sampleSelectorOpen = false"
+        />
       </Teleport>
     </div>
   </GameLayout>
@@ -268,14 +275,8 @@ onMounted(() => {
   flex-wrap: wrap;
 }
 
-.sample-select-wrap {
-  flex-shrink: 0;
-  min-width: 0;
-}
-
-.sample-select {
-  width: 11rem;
-  max-width: 100%;
+.sample-selector-btn {
+  white-space: nowrap;
 }
 
 .parser-status {

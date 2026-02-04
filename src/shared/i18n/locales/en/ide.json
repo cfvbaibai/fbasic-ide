@@ -24,6 +24,8 @@
     "combo": "Combo"
   },
   "samples": {
+    "title": "Load Sample",
+    "load": "Load Sample",
     "placeholder": "Sample",
     "basic": "Basic",
     "pause": "Pause Demo",

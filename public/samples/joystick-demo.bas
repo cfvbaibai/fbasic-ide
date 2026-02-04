@@ -15,6 +15,6 @@
 150   PRINT "  STICK("; I; ") = "; STICK(I)
 160   PRINT "  STRIG("; I; ") = "; STRIG(I)
 170   PRINT ""
-180 NEXT I
+180 NEXT
 190 PRINT "Demo completed!"
 200 END

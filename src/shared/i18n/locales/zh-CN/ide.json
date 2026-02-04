@@ -24,6 +24,8 @@
     "combo": "组合"
   },
   "samples": {
+    "title": "加载示例",
+    "load": "加载示例",
     "placeholder": "示例",
     "basic": "基础",
     "pause": "暂停演示",
