@@ -1,69 +1,93 @@
 {
-    "title": "Family Basic IDE",
-    "codeEditor": {
-        "title": "程式碼編輯器",
-        "placeholder": "在此輸入您的 Family Basic 程式碼..."
+  "title": "Family Basic IDE",
+  "codeEditor": {
+    "title": "程式碼編輯器",
+    "placeholder": "在此輸入您的 Family Basic 程式碼..."
+  },
+  "controls": {
+    "run": "執行",
+    "stop": "停止",
+    "clear": "清除",
+    "debug": "除錯"
+  },
+  "output": {
+    "title": "執行時輸出",
+    "empty": "尚無輸出。執行您的 BASIC 程式以查看結果。",
+    "screen": "螢幕",
+    "variables": "變數",
+    "debug": "除錯",
+    "errorLine": "第 {line} 行",
+    "paletteBg": "背景",
+    "paletteSprite": "精靈",
+    "paletteBgTitle": "目前背景調色盤 (0–1)",
+    "paletteSpriteTitle": "目前精靈調色盤 (0–2)",
+    "combo": "組合"
+  },
+  "samples": {
+    "placeholder": "範例",
+    "basic": "基礎",
+    "pause": "暫停示範",
+    "gaming": "搖桿測試",
+    "complex": "複雜",
+    "comprehensive": "完整示範",
+    "allChars": "所有字元",
+    "spriteTest": "Sprite測試",
+    "moveTest": "移動測試",
+    "testMoveControl": "移動控制測試",
+    "inputDemo": "INPUT / LINPUT"
+  },
+  "input": {
+    "submit": "確定",
+    "cancel": "取消"
+  },
+  "joystick": {
+    "control": "搖桿控制",
+    "status": "搖桿狀態",
+    "joystick": "搖桿 {id}",
+    "joystick0": "搖桿0",
+    "joystick1": "搖桿1",
+    "asdwLayout": "A/D/S/W + G/H/J/K",
+    "arrowLayout": "方向鍵 + 1/2/3/4",
+    "keyboardHint": "鍵盤控制已啟用",
+    "configureKeys": "設定按鍵",
+    "columns": {
+      "id": "ID",
+      "stick": "STICK",
+      "strig": "STRIG"
     },
-    "controls": {
-        "run": "執行",
-        "stop": "停止",
-        "clear": "清除",
-        "debug": "除錯"
-    },
-    "output": {
-        "title": "執行時輸出",
-        "empty": "尚無輸出。執行您的 BASIC 程式以查看結果。",
-        "screen": "螢幕",
-        "variables": "變數",
-        "debug": "除錯",
-        "errorLine": "第 {line} 行",
-        "paletteBg": "背景",
-        "paletteSprite": "精靈",
-        "paletteBgTitle": "目前背景調色盤 (0–1)",
-        "paletteSpriteTitle": "目前精靈調色盤 (0–2)",
-        "combo": "組合"
-    },
-    "samples": {
-        "placeholder": "範例",
-        "basic": "基礎",
-        "pause": "暫停示範",
-        "gaming": "搖桿測試",
-        "complex": "複雜",
-        "comprehensive": "完整示範",
-        "allChars": "所有字元",
-        "spriteTest": "Sprite測試",
-        "moveTest": "移動測試",
-        "testMoveControl": "移動控制測試",
-        "inputDemo": "INPUT / LINPUT"
-    },
-    "input": {
-        "submit": "確定",
-        "cancel": "取消"
-    },
-    "joystick": {
-        "control": "搖桿控制",
-        "status": "搖桿狀態",
-        "joystick": "搖桿 {id}",
-        "columns": {
-            "id": "ID",
-            "stick": "STICK",
-            "strig": "STRIG"
-        }
-    },
-    "stateInspector": {
-        "title": "狀態檢查",
-        "tabPalettes": "調色盤",
-        "tabSprite": "SPRITE",
-        "tabMove": "MOVE",
-        "tabBg": "BG",
-        "palettes": "調色盤",
-        "backdrop": "背景",
-        "cgen": "CGEN",
-        "spriteStates": "SPRITE 狀態",
-        "spriteEnabled": "SPRITE ON",
-        "moveStates": "MOVE 狀態",
-        "bgBuffer": "BG 螢幕緩衝",
-        "cursor": "游標",
-        "empty": "（無）"
+    "keybinding": {
+      "title": "設定鍵盤控制",
+      "instructions": "點擊按鍵綁定並按下任意鍵來更改它。",
+      "pressKey": "請按任意鍵...",
+      "pressAnyKey": "按下任意鍵設定綁定，或點擊取消。",
+      "cancelConfigure": "取消",
+      "resetDefaults": "恢復預設",
+      "buttons": {
+        "up": "上",
+        "down": "下",
+        "left": "左",
+        "right": "右",
+        "a": "A鍵",
+        "b": "B鍵",
+        "start": "開始",
+        "select": "選擇"
+      }
     }
+  },
+  "stateInspector": {
+    "title": "狀態檢查",
+    "tabPalettes": "調色盤",
+    "tabSprite": "SPRITE",
+    "tabMove": "MOVE",
+    "tabBg": "BG",
+    "palettes": "調色盤",
+    "backdrop": "背景",
+    "cgen": "CGEN",
+    "spriteStates": "SPRITE 狀態",
+    "spriteEnabled": "SPRITE ON",
+    "moveStates": "MOVE 狀態",
+    "bgBuffer": "BG 螢幕緩衝",
+    "cursor": "游標",
+    "empty": "（無）"
+  }
 }

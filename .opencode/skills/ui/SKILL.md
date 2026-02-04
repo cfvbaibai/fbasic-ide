@@ -5,27 +5,34 @@ description: UI team skill for Vue 3 components, IDE features, and theming. Use 
 
 # UI Team Skill
 
-Build Vue 3 components, IDE features, and user interface elements.
+You are a UI Team developer for the Family Basic IDE project. You specialize in Vue 3 components, IDE features, theming, and user interaction.
 
-## Ownership
+## Workflow
 
-- **Files**: `src/features/*`, `src/shared/components/*`, `src/shared/styles/*`
-- **Responsibilities**: Vue components, IDE features, theming, user interaction
+When invoked:
 
-## Architecture
+1. **Read Context**:
+   - Read `docs/teams/ui-team.md` for Vue patterns and theme system
+   - Check existing components for patterns
 
-```
-src/
-├── features/
-│   ├── ide/                    # Main IDE interface
-│   │   ├── components/        # IDE-specific components
-│   │   ├── composables/       # IDE logic
-│   │   └── BasicIde.vue       # Main container
-│   └── sprite-viewer/         # Character sprite viewer
-└── shared/
-    ├── components/ui/         # Reusable UI components
-    └── styles/               # Global CSS (theme.css)
-```
+2. **Execute Task**:
+   - Focus on files in `src/features/`, `src/shared/components/`, `src/shared/styles/`
+   - Follow Vue 3 composition API patterns
+   - Use theme CSS variables (never hardcode colors)
+   - Add tests in `test/components/` if needed
+
+3. **Return Results**:
+   - Summary of changes made
+   - Test results (if applicable)
+   - Any integration notes for Runtime/Platform Teams
+
+## Files You Own
+
+- `src/features/ide/` - IDE components and composables
+- `src/features/sprite-viewer/` - Sprite viewer
+- `src/shared/components/ui/` - Reusable UI components
+- `src/shared/styles/` - Theme and utilities
+- `test/components/*.test.ts` - Component tests
 
 ## Vue 3 Patterns
 
@@ -33,107 +40,63 @@ src/
 
 ```vue
 <script setup lang="ts">
-// 1. Type imports
 import type { Ref } from 'vue'
-
-// 2. Value imports
 import { ref, computed } from 'vue'
 
-// 3. Props/Emits
 const props = defineProps<{ value: string }>()
 const emit = defineEmits<{ update: [value: string] }>()
 
-// 4. Composables
-// 5. Reactive state
-// 6. Computed
-// 7. Methods
-// 8. Lifecycle
+// Logic here
 </script>
 
 <template>
-  <!-- Simple templates -->
+  <div class="container">
+    {{ value }}
+  </div>
 </template>
 
 <style scoped>
-/* Always scoped, use CSS variables */
+.container {
+  color: var(--game-text-primary);
+  background: var(--game-surface-bg-gradient);
+}
 </style>
 ```
 
-### Template Refs (Vue 3.5+)
+### Theme Usage
 
-```typescript
-import { useTemplateRef } from 'vue'
-const element = useTemplateRef('myElement')
-```
+**ALWAYS use CSS variables**:
 
-## Theme System
+- Text: `var(--game-text-primary)`, `var(--game-text-muted)`
+- Backgrounds: `var(--game-surface-bg-gradient)`, `var(--game-elevated-bg)`
+- Borders: `var(--game-surface-border)`
+- Effects: `var(--game-shadow-base)`, `var(--game-accent-glow)`
 
-### Three-Layer System
-
-1. **Base Layer** (`--base-solid-*`, `--base-alpha-*`) - Raw colors
-2. **Game Layer** (`--game-*`) - Semantic game-themed (PREFERRED)
-3. **Semantic Layer** (`--semantic-solid-*`) - Status colors
-
-**Key Rule**: Always prefer `--game-*` variables.
-
-### Common Patterns
-
-```css
-/* Text */
-.primary-text {
-  color: var(--game-text-primary);
-}
-
-/* Backgrounds */
-.surface {
-  background: var(--game-surface-bg-gradient);
-}
-
-/* Effects */
-.shadow {
-  box-shadow: var(--game-shadow-base);
-}
-
-/* Borders */
-.bordered {
-  border: 1px solid var(--game-surface-border);
-}
-```
-
-## Common Tasks
-
-### Add New IDE Feature
-
-1. Create component in `src/features/ide/components/`
-2. Add to `BasicIde.vue` if needed
-3. Add tests in `test/components/`
-
-### Update Theme
-
-1. Edit `src/shared/styles/theme.css`
-2. Update both `[data-theme="dark"]` and `[data-theme="light"]`
-3. Use CSS variables in components
-
-## Composable Pattern
-
-```typescript
-export function useFeature() {
-  const state = ref(initialValue)
-  const derived = computed(() => transform(state.value))
-  function action() {
-    /* logic */
-  }
-  return { state, derived, action }
-}
-```
+**NEVER hardcode colors**.
 
 ## Testing
 
-- **Location**: `test/components/`
-- **Framework**: Vitest + Vue Test Utils
-- **Pattern**: Test user interaction and state changes
+If adding new components, add tests:
 
-## Reference
+```bash
+pnpm test:run test/components/
+```
 
-- Read `docs/teams/ui-team.md` for complete guide
-- **Vue 3 docs**: https://vuejs.org/
+## Integration Notes
+
+When integrating with Runtime (web worker):
+
+- Use `composables/useBasicIdeWebWorkerUtils.ts` for messages
+- Add handlers in `composables/useBasicIdeMessageHandlers.ts`
+
+When integrating with Platform (SharedBuffer):
+
+- Read sprite positions from SharedArrayBuffer
+- Render with Konva on main thread
+
+## Code Constraints
+
+- Files: **MAX 500 lines** (extract composables if needed)
+- Vue: `<style scoped>` only (exception: `@/shared/styles/*` imports)
+- TypeScript: strict mode, no `any`, `import type` for types
+- Styling: Prefer CSS variables and utility classes

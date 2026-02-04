@@ -1,487 +1,252 @@
 /**
- * Centralized sample codes for F-Basic IDE
- * Contains all predefined sample programs for easy maintenance and reuse
+ * Sample codes for F-Basic IDE - organized by category for testing
  */
 
 export interface SampleCode {
   name: string
   description: string
   code: string
+  category: 'basics' | 'control' | 'data' | 'screen' | 'sprites' | 'interactive' | 'comprehensive'
 }
 
 export const SAMPLE_CODES: Record<string, SampleCode> = {
-  basic: {
-    name: 'Basic',
-    description: 'Simple arithmetic and variable operations',
-    code: `10 PRINT "Basic F-Basic Program"
-20 LET A = 10
-30 LET B = 20
-40 LET C = A + B
-50 PRINT "A + B = "; C
-60 END`,
+  hello: {
+    name: 'Hello World',
+    description: 'Simple PRINT demonstration',
+    category: 'basics',
+    code: `10 PRINT "Family BASIC v3"
+20 PRINT "=============="
+30 PRINT "Hello, World"
+40 END`,
   },
 
-  inputDemo: {
+  variables: {
+    name: 'Variables & Math',
+    description: 'LET, arithmetic, functions',
+    category: 'basics',
+    code: `10 LET A = 10
+20 LET B = 25
+30 PRINT "A="; A; " B="; B
+40 PRINT "A+B="; A+B
+50 PRINT "ABS(-5)="; ABS(-5)
+60 PRINT "SGN(3)="; SGN(3)
+70 LET S$ = "Hello"
+80 PRINT "LEN="; LEN(S$)
+90 END`,
+  },
+
+  input: {
     name: 'INPUT / LINPUT',
-    description: 'Demonstrates INPUT and LINPUT for keyboard input',
-    code: `10 REM INPUT and LINPUT Demo
-20 PRINT "INPUT / LINPUT Demo"
-30 PRINT "=================="
-40 PRINT ""
-50 INPUT "Enter your name"; N$
-60 PRINT "Hello, "; N$; "!"
-70 PRINT ""
-80 INPUT "Enter two numbers (A, B)"; A, B
-90 PRINT "A + B = "; A + B
-100 PRINT "A * B = "; A * B
-110 PRINT ""
-120 LINPUT "Enter a line (commas OK)"; L$
-130 PRINT "You entered: "; L$
-140 PRINT ""
-150 PRINT "Demo complete."
-160 END`,
+    description: 'User input commands',
+    category: 'basics',
+    code: `10 INPUT "Name"; N$
+20 PRINT "Hello "; N$
+30 INPUT "Num"; X
+40 PRINT "Square="; X*X
+50 END`,
   },
 
-  pause: {
-    name: 'Pause Demo',
-    description: 'Demonstrates PAUSE command for timing delays',
-    code: `10 PRINT "PAUSE Command Demo"
-20 PRINT "Starting countdown..."
-30 FOR I = 5 TO 1 STEP -1
-40   PRINT "Countdown: "; I
-50   PAUSE 20
-60 NEXT
-70 PRINT "Blast off!"
-80 PAUSE 20
-90 PRINT "Mission complete!"
-100 END`,
+  loops: {
+    name: 'FOR-NEXT',
+    description: 'Looping statements',
+    category: 'control',
+    code: `10 FOR I = 1 TO 5
+20 PRINT I
+30 NEXT
+40 PRINT "Done"
+50 END`,
   },
 
-  gaming: {
-    name: 'Joystick Test',
-    description: 'Interactive joystick testing with continuous input monitoring',
-    code: `10 REM Interactive Joystick Test
-20 PRINT "Family BASIC v3 Interactive Joystick Test"
-30 PRINT "=========================================="
-40 PRINT ""
-50 PRINT "This program continuously monitors joystick inputs"
-60 PRINT "STICK(joystick) returns cross-button state:"
-70 PRINT "  1=right, 2=left, 4=down, 8=top"
-80 PRINT "STRIG(joystick) returns button state:"
-90 PRINT "  1=start, 2=select, 4=B, 8=A"
-100 PRINT ""
-110 PRINT "Press START button on joystick #1 to exit"
-120 PRINT "=========================================="
-130 PRINT ""
-140 REM Main input monitoring loop
-150 PRINT "Monitoring joystick inputs..."
-160 PRINT ""
-170 REM Check for any joystick input
-180 LET S0 = 0: LET S1 = 0
-185 LET T0 = 0: LET T1 = 0
-190 LET S0 = STICK(0): LET S1 = STICK(1)
-195 LET T0 = STRIG(0): LET T1 = STRIG(1)
-250 IF S0 > 0 OR T0 > 0 OR S1 > 0 OR T1 > 0 THEN PRINT "INPUT DETECTED!"
-260 IF S0 > 0 OR T0 > 0 THEN PRINT "  Joystick 0: STICK="; S0; ", STRIG="; T0
-270 IF S1 > 0 OR T1 > 0 THEN PRINT "  Joystick 1: STICK="; S1; ", STRIG="; T1
-310 REM Check for exit condition (START button on joystick #1)
-320 IF T1 = 1 THEN GOTO 360
-330 PAUSE 100
-340 GOTO 180
-350 PRINT ""
-360 PRINT "START button pressed on joystick #1"
-370 PRINT "Exiting joystick test..."
-380 END`,
-  },
-
-  complex: {
-    name: 'Complex',
-    description: 'Advanced programming with loops, conditions, and string functions',
-    code: `10 REM Complex F-Basic Program
-20 PRINT "Complex F-Basic Demo"
-30 PRINT
-40 FOR I = 1 TO 10
-50   IF I MOD 2 = 0 THEN PRINT "Even: "; I
-60   IF I MOD 2 = 1 THEN PRINT "Odd: "; I
-70 NEXT
-80 PRINT
-90 LET S = 0
-100 FOR J = 1 TO 100
-110   S = S + J
-120 NEXT
-130 PRINT "Sum of 1 to 100 = "; S
-140 PRINT
-150 PRINT "String functions demo:"
-160 LET T$ = "Hello World"
-170 PRINT "Length of '"; T$; "' = "; LEN(T$)
-180 PRINT "Left 5 chars: "; LEFT$(T$, 5)
-190 PRINT "Right 5 chars: "; RIGHT$(T$, 5)
-200 PRINT "Middle chars: "; MID$(T$, 3, 5)
-210 END`,
-  },
-
-  comprehensive: {
-    name: 'Full Demo',
-    description: 'Comprehensive demonstration of all supported F-Basic features',
-    code: `10 REM F-Basic Comprehensive Demo
-20 PRINT "F-Basic Comprehensive Demo"
-30 PRINT "=========================="
-40 PRINT ""
-50 PRINT "Mathematical functions:"
-60 PRINT "ABS(-5) = "; ABS(-5)
-70 PRINT "SGN(-10) = "; SGN(-10)
-80 PRINT "SGN(10) = "; SGN(10)
-90 PRINT "RND(100) = "; RND(100)
-100 PRINT ""
-110 PRINT "String functions:"
-120 LET T$ = "Hello World"
-130 PRINT "LEN('"; T$; "') = "; LEN(T$)
-140 PRINT "LEFT$('"; T$; "', 5) = "; LEFT$(T$, 5)
-150 PRINT "RIGHT$('"; T$; "', 5) = "; RIGHT$(T$, 5)
-160 PRINT "MID$('"; T$; "', 3, 5) = "; MID$(T$, 3, 5)
-170 PRINT ""
-180 PRINT "Control structures:"
-190 FOR I = 1 TO 3
-200   IF I MOD 2 = 0 THEN PRINT "Even: "; I
-205   IF I MOD 2 = 1 THEN PRINT "Odd: "; I
-210 NEXT
-220 PRINT ""
-230 PRINT "Variables and expressions:"
-240 LET A = 10
-250 LET B = 20
-260 LET C = A + B * 2
-270 PRINT "A = "; A; ", B = "; B; ", C = A + B * 2 = "; C
-280 PRINT ""
-290 PRINT "Demo completed successfully!"
-300 END`,
-  },
-
-  allChars: {
-    name: 'All Chars',
-    description: 'Print all characters from CHR$(0) to CHR$(255) without newline breaks',
-    code: `10 FOR I = 0 TO 255
-20   PRINT CHR$(I);
+  conditionals: {
+    name: 'IF-THEN',
+    description: 'Conditional logic',
+    category: 'control',
+    code: `10 FOR I = 1 TO 5
+20 IF I=3 THEN PRINT "Three"
 30 NEXT
 40 END`,
   },
 
-  spriteTest: {
-    name: 'Sprite测试',
-    description: 'Sprite system test - demonstrates DEF SPRITE and SPRITE commands',
-    code: `10 REM Sprite Test Program
-20 CLS
-30 PRINT "Sprite Test Program"
-40 PRINT "==================="
-50 PRINT ""
-60 PRINT "Testing sprite system..."
-70 PRINT ""
-80 REM Enable sprite screen
-90 SPRITE ON
-100 PRINT "SPRITE ON executed"
-110 PRINT ""
-120 REM Define sprite 0: 8x8 sprite with color combination 0
-130 DEF SPRITE 0, (0, 0, 0, 0, 0) = CHR$(0)
-140 PRINT "DEF SPRITE 0 defined (8x8, color 0)"
-150 REM Display sprite at position (120, 100)
-160 SPRITE 0, 120, 100
-170 PRINT "SPRITE 0 displayed at (120, 100)"
-180 PRINT ""
-190 REM Define sprite 1: 16x16 sprite with color combination 1
-200 DEF SPRITE 1, (1, 1, 0, 0, 0) = CHR$(0) + CHR$(1) + CHR$(2) + CHR$(3)
-210 PRINT "DEF SPRITE 1 defined (16x16, color 1)"
-220 REM Display sprite at position (150, 120)
-230 SPRITE 1, 150, 120
-240 PRINT "SPRITE 1 displayed at (150, 120)"
-250 PRINT ""
-260 REM Define sprite 2: 8x8 sprite with X-axis flip
-270 DEF SPRITE 2, (0, 0, 0, 1, 0) = CHR$(0)
-280 PRINT "DEF SPRITE 2 defined (8x8, X-flipped)"
-290 SPRITE 2, 100, 150
-300 PRINT "SPRITE 2 displayed at (100, 150)"
-310 PRINT ""
-320 REM Define sprite 3: 8x8 sprite with Y-axis flip
-330 DEF SPRITE 3, (0, 0, 0, 0, 1) = CHR$(0)
-340 PRINT "DEF SPRITE 3 defined (8x8, Y-flipped)"
-350 SPRITE 3, 180, 150
-360 PRINT "SPRITE 3 displayed at (180, 150)"
-370 PRINT ""
-380 PRINT "Sprite test completed!"
-390 PRINT "All sprites should be visible on screen"
-400 END`,
+  subroutines: {
+    name: 'GOSUB-RETURN',
+    description: 'Subroutines',
+    category: 'control',
+    code: `10 GOSUB 100
+20 GOSUB 200
+30 END
+100 PRINT "Sub 1"
+110 RETURN
+200 PRINT "Sub 2"
+210 RETURN`,
   },
 
-  moveTest: {
-    name: 'Move Test',
-    description: 'Animation movement test - demonstrates DEF MOVE and MOVE commands',
-    code: `10 REM Move Test Program
-20 CLS
-30 PRINT "Move Test Program"
-40 PRINT "================="
-50 PRINT ""
-60 PRINT "Testing DEF MOVE and MOVE commands..."
-70 PRINT ""
-80 REM Character type variable (0=Mario, 1=Lady, 2=Fighter Fly, etc.)
-90 LET C = 0
-100 PRINT "Character type: "; C; " (Change C to switch characters)"
-110 PRINT ""
-120 REM Enable sprite screen
-130 SPRITE ON
-140 PRINT "SPRITE ON executed"
-150 PRINT ""
-160 REM Define movements for all 8 directions (0-7)
-170 REM DEF MOVE(n) = SPRITE(A, B, C, D, E, F)
-180 REM A: character type (0=Mario, 1=Lady, etc.)
-190 REM B: direction (0=none, 1=up, 2=up-right, 3=right, 4=down-right, 5=down, 6=down-left, 7=left, 8=up-left)
-200 REM C: speed (0-255, 0=every 256 frames, 60/C dots per second)
-210 REM D: distance (1-255, total = 2*D dots)
-220 REM E: priority (0=front, 1=behind background)
-230 REM F: color combination (0-3)
-240 REM Action 0: Direction 0 (none)
-250 DEF MOVE(0) = SPRITE(C, 0, 10, 50, 0, 0)
-260 PRINT "DEF MOVE(0) defined: Direction 0 (none), Speed 10, Distance 50"
-270 REM Action 1: Direction 1 (up)
-280 DEF MOVE(1) = SPRITE(C, 1, 10, 50, 0, 0)
-290 PRINT "DEF MOVE(1) defined: Direction 1 (up), Speed 10, Distance 50"
-300 REM Action 2: Direction 2 (up-right)
-310 DEF MOVE(2) = SPRITE(C, 2, 10, 50, 0, 0)
-320 PRINT "DEF MOVE(2) defined: Direction 2 (up-right), Speed 10, Distance 50"
-330 REM Action 3: Direction 3 (right)
-340 DEF MOVE(3) = SPRITE(C, 3, 10, 50, 0, 0)
-350 PRINT "DEF MOVE(3) defined: Direction 3 (right), Speed 10, Distance 50"
-360 REM Action 4: Direction 4 (down-right)
-370 DEF MOVE(4) = SPRITE(C, 4, 10, 50, 0, 0)
-380 PRINT "DEF MOVE(4) defined: Direction 4 (down-right), Speed 10, Distance 50"
-390 REM Action 5: Direction 5 (down)
-400 DEF MOVE(5) = SPRITE(C, 5, 10, 50, 0, 0)
-410 PRINT "DEF MOVE(5) defined: Direction 5 (down), Speed 10, Distance 50"
-420 REM Action 6: Direction 6 (down-left)
-430 DEF MOVE(6) = SPRITE(C, 6, 10, 50, 0, 0)
-440 PRINT "DEF MOVE(6) defined: Direction 6 (down-left), Speed 10, Distance 50"
-450 REM Action 7: Direction 7 (left)
-460 DEF MOVE(7) = SPRITE(C, 7, 10, 50, 0, 0)
-470 PRINT "DEF MOVE(7) defined: Direction 7 (left), Speed 10, Distance 50"
-480 PRINT ""
-490 PRINT "Starting movements for all 8 directions..."
-500 PRINT ""
-510 REM Start all movements (0-7)
-520 MOVE 0
-530 PRINT "MOVE 0 started (direction 0: none)"
-540 MOVE 1
-550 PRINT "MOVE 1 started (direction 1: up)"
-560 MOVE 2
-570 PRINT "MOVE 2 started (direction 2: up-right)"
-580 MOVE 3
-590 PRINT "MOVE 3 started (direction 3: right)"
-600 MOVE 4
-610 PRINT "MOVE 4 started (direction 4: down-right)"
-620 MOVE 5
-630 PRINT "MOVE 5 started (direction 5: down)"
-640 MOVE 6
-650 PRINT "MOVE 6 started (direction 6: down-left)"
-660 MOVE 7
-670 PRINT "MOVE 7 started (direction 7: left)"
-680 PRINT ""
-690 PRINT "All movements started!"
-700 PRINT "Check the screen to see sprites moving"
-710 PRINT ""
-720 PRINT "Tip: Change variable C (line 90) to test different characters"
-730 PRINT "     C=0: Mario, C=1: Lady, C=2: Fighter Fly, etc."
-740 END`,
+  dataRead: {
+    name: 'DATA & READ',
+    description: 'Data storage',
+    category: 'data',
+    code: `10 FOR I = 1 TO 3
+20 READ N
+30 PRINT N
+40 NEXT
+50 DATA 10, 20, 30
+60 END`,
   },
 
-  testMoveControl: {
-    name: 'Move Control Test',
-    description: 'Movement control commands test - demonstrates CUT, ERA, POSITION, MOVE(n), XPOS(n), YPOS(n)',
-    code: `10 REM Move Control Test Program
-20 CLS
-30 PRINT "Move Control Test Program"
-40 PRINT "=========================="
-50 PRINT ""
-60 PRINT "Testing movement control commands:"
-70 PRINT "  CUT, ERA, POSITION, MOVE(n), XPOS(n), YPOS(n)"
-80 PRINT ""
-90 REM Enable sprite screen
-100 SPRITE ON
-110 PRINT "SPRITE ON executed"
-120 PRINT ""
-130 REM Character type (0=Mario)
-140 LET C = 0
-150 PRINT "Character type: "; C; " (Mario)"
-160 PRINT ""
-170 REM Define movement for action 0: move right
-180 DEF MOVE(0) = SPRITE(C, 3, 15, 60, 0, 0)
-190 PRINT "DEF MOVE(0) defined: Direction 3 (right), Speed 15, Distance 60"
-200 PRINT ""
-210 REM Test 1: POSITION command
-220 PRINT "Test 1: POSITION command"
-230 POSITION 0, 50, 100
-240 PRINT "POSITION 0, 50, 100 executed"
-250 PRINT "  Initial position set to (50, 100)"
-260 PRINT ""
-270 REM Test 2: Start movement and query status
-280 PRINT "Test 2: Start movement and query status"
-290 MOVE 0
-300 PRINT "MOVE 0 executed"
-310 PRINT "  MOVE(0) status: "; MOVE(0); " (-1=moving, 0=complete)"
-320 PRINT "  XPOS(0) = "; XPOS(0)
-330 PRINT "  YPOS(0) = "; YPOS(0)
-340 PRINT ""
-350 REM Wait a bit for movement to progress
-360 PAUSE 100
-370 PRINT "After 500ms pause:"
-380 PRINT "  MOVE(0) status: "; MOVE(0); " (-1=moving, 0=complete)"
-390 PRINT "  XPOS(0) = "; XPOS(0)
-400 PRINT "  YPOS(0) = "; YPOS(0)
-410 PRINT ""
-420 REM Test 3: CUT command (stop movement, keep position)
-430 PRINT "Test 3: CUT command (stop movement, keep position)"
-440 CUT 0
-450 PRINT "CUT 0 executed"
-460 PRINT "  MOVE(0) status: "; MOVE(0); " (should be 0=stopped)"
-470 PRINT "  XPOS(0) = "; XPOS(0); " (position preserved)"
-480 PRINT "  YPOS(0) = "; YPOS(0); " (position preserved)"
-490 PRINT ""
-500 REM Test 4: Start new movement from stopped position
-510 PRINT "Test 4: Start new movement from stopped position"
-520 DEF MOVE(1) = SPRITE(C, 5, 15, 40, 0, 0)
-530 PRINT "DEF MOVE(1) defined: Direction 5 (down), Speed 15, Distance 40"
-540 MOVE 1
-550 PRINT "MOVE 1 executed (should start from current position)"
-560 PRINT "  MOVE(1) status: "; MOVE(1)
-570 PRINT "  XPOS(1) = "; XPOS(1)
-580 PRINT "  YPOS(1) = "; YPOS(1)
-590 PRINT ""
-600 REM Wait for movement
-610 PAUSE 100
-620 PRINT "After 500ms pause:"
-630 PRINT "  MOVE(1) status: "; MOVE(1)
-640 PRINT "  XPOS(1) = "; XPOS(1)
-650 PRINT "  YPOS(1) = "; YPOS(1)
-660 PRINT ""
-670 REM Test 5: ERA command (erase sprite)
-680 PRINT "Test 5: ERA command (erase sprite)"
-690 ERA 1
-700 PRINT "ERA 1 executed"
-710 PRINT "  Movement 1 erased"
-720 PRINT ""
-730 REM Test 6: POSITION with multiple actions
-740 PRINT "Test 6: POSITION with multiple actions"
-750 POSITION 2, 100, 50
-760 POSITION 3, 150, 80
-770 PRINT "POSITION 2, 100, 50 executed"
-780 PRINT "POSITION 3, 150, 80 executed"
-790 DEF MOVE(2) = SPRITE(C, 1, 12, 50, 0, 0)
-800 DEF MOVE(3) = SPRITE(C, 7, 12, 50, 0, 0)
-810 PRINT "DEF MOVE(2) defined: Direction 1 (up)"
-820 PRINT "DEF MOVE(3) defined: Direction 7 (left)"
-830 MOVE 2
-840 MOVE 3
-850 PRINT "MOVE 2 and MOVE 3 executed"
-860 PRINT "  XPOS(2) = "; XPOS(2); ", YPOS(2) = "; YPOS(2)
-870 PRINT "  XPOS(3) = "; XPOS(3); ", YPOS(3) = "; YPOS(3)
-880 PRINT ""
-890 REM Test 7: CUT multiple actions
-900 PRINT "Test 7: CUT multiple actions"
-910 PAUSE 100
-920 CUT 2, 3
-930 PRINT "CUT 2, 3 executed"
-940 PRINT "  MOVE(2) status: "; MOVE(2); " (should be 0)"
-950 PRINT "  MOVE(3) status: "; MOVE(3); " (should be 0)"
-960 PRINT ""
-970 REM Test 8: ERA multiple actions
-980 PRINT "Test 8: ERA multiple actions"
-990 ERA 0, 2
-1000 PRINT "ERA 0, 2 executed"
-1010 PRINT "  Movements 0 and 2 erased"
-1020 PRINT ""
-1030 PRINT "Move Control Test completed!"
-1040 PRINT ""
-1050 PRINT "Summary:"
-1060 PRINT "  - POSITION sets initial coordinates"
-1070 PRINT "  - MOVE(n) returns -1 if moving, 0 if stopped"
-1080 PRINT "  - XPOS(n) and YPOS(n) return current positions"
-1090 PRINT "  - CUT stops movement but keeps sprite visible"
-1100 PRINT "  - ERA erases sprite completely"
-1110 PRINT "  - Multiple actions can be controlled with CUT/ERA"
-1120 END`,
+  arrays: {
+    name: 'DIM Arrays',
+    description: 'Array usage',
+    category: 'data',
+    code: `10 DIM A(3)
+20 FOR I = 1 TO 3
+30 A(I) = I*10
+40 NEXT
+50 PRINT A(1); A(2); A(3)
+60 END`,
   },
 
-  xposYposTest: {
-    name: 'XPOS/YPOS Test',
-    description: 'Test XPOS/YPOS functions return accurate positions during active movement',
-    code: `10 REM XPOS/YPOS Test - Verify positions during active movement
-20 CLS
-30 SPRITE ON
-40 PRINT "XPOS/YPOS Test Program"
-50 PRINT "======================"
-60 PRINT ""
-70 REM Define movement: Mario moving right at speed 15, distance 60
-80 DEF MOVE(0) = SPRITE(0, 3, 15, 60, 0, 0)
-90 PRINT "DEF MOVE(0) = SPRITE(0, 3, 15, 60, 0, 0)"
-100 PRINT "  Direction 3 (right), Speed 15, Distance 60"
-110 PRINT ""
-120 REM Set initial position
-130 POSITION 0, 50, 100
-140 PRINT "POSITION 0, 50, 100"
-150 PRINT "  Initial position: (50, 100)"
-160 PRINT ""
-170 REM Start movement
-180 MOVE 0
-190 PRINT "MOVE 0 executed"
-200 PRINT ""
-210 PRINT "Querying positions during movement..."
-220 PRINT "(XPOS should increase, YPOS should stay at 100)"
-230 PRINT ""
-240 REM Query positions during movement (should update as sprite moves)
-250 FOR I = 1 TO 10
-260   PRINT "Frame "; I; ":"
-270   PRINT "  XPOS(0) = "; XPOS(0)
-280   PRINT "  YPOS(0) = "; YPOS(0)
-290   PRINT "  MOVE(0) = "; MOVE(0); " (-1=moving, 0=stopped)"
-300   PAUSE 50
-310 NEXT
-320 PRINT ""
-330 PRINT "Test complete!"
-340 PRINT ""
-350 PRINT "Expected: XPOS should increase from ~50 to ~170"
-360 PRINT "          YPOS should stay at ~100"
-370 END`,
+  screen: {
+    name: 'Screen & Colors',
+    description: 'LOCATE, CGSET, PALETB',
+    category: 'screen',
+    code: `10 CLS
+20 PRINT "Screen Demo"
+30 LOCATE 10, 5
+40 PRINT "Hi"
+50 CGSET 0
+60 PALETB 0, 1, 0, 0, 0
+70 END`,
   },
 
-  screenCoalesceDemo: {
-    name: 'Screen Coalesce Demo',
-    description: 'Stress test: loop with many PRINTs. UI should stay responsive (SCREEN_CHANGED coalescing).',
-    code: `10 REM Screen Coalesce Demo - many PRINTs in a loop
-20 CLS
-30 PRINT "Screen Coalesce Demo"
-40 PRINT "If UI stays responsive, coalescing works."
-50 PRINT ""
-60 FOR I = 1 TO 500
-70   PRINT "Loop "; I
-80 NEXT
-90 PRINT ""
-100 PRINT "Done. UI stayed responsive?"
+  spriteBasic: {
+    name: 'Sprite Basics',
+    description: 'DEF SPRITE, SPRITE commands (8x8 sprite)',
+    category: 'sprites',
+    code: `10 CLS
+20 SPRITE ON
+30 DEF SPRITE 0, (0,0,0,0,0)=CHR$(0)
+40 SPRITE 0, 100, 100
+50 END`,
+  },
+
+  spriteAnimation: {
+    name: 'Sprite Animation',
+    description: 'DEF MOVE, MOVE commands',
+    category: 'sprites',
+    code: `10 CLS
+20 SPRITE ON
+30 DEF MOVE(0)=SPRITE(0,3,15,50,0,0)
+40 MOVE 0
+50 PAUSE 100
+60 CUT 0
+70 ERA 0
+80 END`,
+  },
+
+  spriteControl: {
+    name: 'Sprite Control',
+    description: 'CUT, ERA, POSITION, XPOS, YPOS',
+    category: 'sprites',
+    code: `10 CLS
+20 SPRITE ON
+30 POSITION 0, 50, 100
+40 DEF MOVE(0)=SPRITE(0,3,15,60,0,0)
+50 MOVE 0
+60 PRINT "XPOS="; XPOS(0)
+70 PAUSE 50
+80 CUT 0
+90 ERA 0
+100 END`,
+  },
+
+  spriteInteractive: {
+    name: 'Interactive Sprites',
+    description: 'Control sprites with joystick - hold DPAD to move',
+    category: 'interactive',
+    code: `10 CLS
+20 SPRITE ON
+30 DEF SPRITE 0, (0,0,0,0,0)=CHR$(0)
+40 SPRITE 0, 150, 100
+50 PX = 150
+60 PY = 100
+70 S = STICK(0)
+80 T = STRIG(0)
+90 IF T=1 THEN 170
+100 IF S=1 THEN PX = PX + 2
+110 IF S=2 THEN PX = PX - 2
+120 IF S=4 THEN PY = PY + 2
+130 IF S=8 THEN PY = PY - 2
+140 SPRITE 0, PX, PY
+150 PAUSE 5
+160 GOTO 70
+170 ERA 0
+180 END`,
+  },
+
+  joystick: {
+    name: 'Joystick Test',
+    description: 'STICK and STRIG functions',
+    category: 'interactive',
+    code: `10 PRINT "Joystick Test"
+20 S = STICK(0)
+30 T = STRIG(0)
+40 IF T=1 THEN 90
+50 IF S>0 THEN PRINT S
+60 PAUSE 5
+70 GOTO 20
+80 PRINT "Done"
+90 END`,
+  },
+
+  comprehensive: {
+    name: 'Full Demo',
+    description: 'All major features',
+    category: 'comprehensive',
+    code: `10 CLS
+20 PRINT "Full Demo"
+30 A=10 : B=20
+40 PRINT "A="; A; " B="; B
+50 FOR I = 1 TO 3
+60 PRINT "I="; I
+70 NEXT
+80 SPRITE ON
+90 DEF SPRITE 0, (0,0,0,0,0)=CHR$(0)
+100 SPRITE 0, 150, 100
 110 END`,
+  },
+
+  screenCoalesce: {
+    name: 'Performance Test',
+    description: 'Screen update test',
+    category: 'screen',
+    code: `10 CLS
+20 FOR I = 1 TO 50
+30 PRINT "Line "; I
+40 NEXT
+50 PRINT "Done"
+60 END`,
+  },
+
+  allChars: {
+    name: 'All Characters',
+    description: 'Print all CHR$(0) to CHR$(255)',
+    category: 'screen',
+    code: `10 FOR I = 0 TO 31
+20 PRINT CHR$(I);
+30 NEXT
+40 PRINT ""
+50 PRINT "Done"
+60 END`,
   },
 }
 
-/**
- * Get a sample code by key
- */
 export function getSampleCode(key: string): SampleCode | undefined {
   return SAMPLE_CODES[key]
 }
 
-/**
- * Get all available sample codes
- */
 export function getAllSampleCodes(): SampleCode[] {
   return Object.values(SAMPLE_CODES)
 }
 
-/**
- * Get sample code keys
- */
 export function getSampleCodeKeys(): string[] {
   return Object.keys(SAMPLE_CODES)
 }

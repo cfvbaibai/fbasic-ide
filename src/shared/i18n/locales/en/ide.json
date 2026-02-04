@@ -1,69 +1,93 @@
 {
-    "title": "Family Basic IDE",
-    "codeEditor": {
-        "title": "Code Editor",
-        "placeholder": "Enter your Family Basic code here..."
+  "title": "Family Basic IDE",
+  "codeEditor": {
+    "title": "Code Editor",
+    "placeholder": "Enter your Family Basic code here..."
+  },
+  "controls": {
+    "run": "Run",
+    "stop": "Stop",
+    "clear": "Clear",
+    "debug": "Debug"
+  },
+  "output": {
+    "title": "Runtime Output",
+    "empty": "No output yet. Run your BASIC program to see results here.",
+    "screen": "Screen",
+    "variables": "Variables",
+    "debug": "Debug",
+    "errorLine": "Line {line}",
+    "paletteBg": "BG",
+    "paletteSprite": "Sprite",
+    "paletteBgTitle": "Active background palette (0–1)",
+    "paletteSpriteTitle": "Active sprite palette (0–2)",
+    "combo": "Combo"
+  },
+  "samples": {
+    "placeholder": "Sample",
+    "basic": "Basic",
+    "pause": "Pause Demo",
+    "gaming": "Joystick Test",
+    "complex": "Complex",
+    "comprehensive": "Full Demo",
+    "allChars": "All Chars",
+    "spriteTest": "Sprite Test",
+    "moveTest": "Move Test",
+    "testMoveControl": "Move Control Test",
+    "inputDemo": "INPUT / LINPUT"
+  },
+  "input": {
+    "submit": "OK",
+    "cancel": "Cancel"
+  },
+  "joystick": {
+    "control": "Joystick Control",
+    "status": "Joystick Status",
+    "joystick": "Joystick {id}",
+    "joystick0": "Joystick 0",
+    "joystick1": "Joystick 1",
+    "asdwLayout": "A/D/S/W + G/H/J/K",
+    "arrowLayout": "Arrows + 1/2/3/4",
+    "keyboardHint": "Keyboard control enabled",
+    "configureKeys": "Configure Keys",
+    "columns": {
+      "id": "ID",
+      "stick": "STICK",
+      "strig": "STRIG"
     },
-    "controls": {
-        "run": "Run",
-        "stop": "Stop",
-        "clear": "Clear",
-        "debug": "Debug"
-    },
-    "output": {
-        "title": "Runtime Output",
-        "empty": "No output yet. Run your BASIC program to see results here.",
-        "screen": "Screen",
-        "variables": "Variables",
-        "debug": "Debug",
-        "errorLine": "Line {line}",
-        "paletteBg": "BG",
-        "paletteSprite": "Sprite",
-        "paletteBgTitle": "Active background palette (0–1)",
-        "paletteSpriteTitle": "Active sprite palette (0–2)",
-        "combo": "Combo"
-    },
-    "samples": {
-        "placeholder": "Sample",
-        "basic": "Basic",
-        "pause": "Pause Demo",
-        "gaming": "Joystick Test",
-        "complex": "Complex",
-        "comprehensive": "Full Demo",
-        "allChars": "All Chars",
-        "spriteTest": "Sprite Test",
-        "moveTest": "Move Test",
-        "testMoveControl": "Move Control Test",
-        "inputDemo": "INPUT / LINPUT"
-    },
-    "input": {
-        "submit": "OK",
-        "cancel": "Cancel"
-    },
-    "joystick": {
-        "control": "Joystick Control",
-        "status": "Joystick Status",
-        "joystick": "Joystick {id}",
-        "columns": {
-            "id": "ID",
-            "stick": "STICK",
-            "strig": "STRIG"
-        }
-    },
-    "stateInspector": {
-        "title": "State Inspector",
-        "tabPalettes": "Palettes",
-        "tabSprite": "SPRITE",
-        "tabMove": "MOVE",
-        "tabBg": "BG",
-        "palettes": "Palettes",
-        "backdrop": "Backdrop",
-        "cgen": "CGEN",
-        "spriteStates": "SPRITE States",
-        "spriteEnabled": "SPRITE ON",
-        "moveStates": "MOVE States",
-        "bgBuffer": "BG Screen Buffer",
-        "cursor": "Cursor",
-        "empty": "(none)"
+    "keybinding": {
+      "title": "Configure Keyboard Controls",
+      "instructions": "Click a key binding and press any key to change it.",
+      "pressKey": "Press key...",
+      "pressAnyKey": "Press any key to set the binding, or click cancel.",
+      "cancelConfigure": "Cancel",
+      "resetDefaults": "Reset to Defaults",
+      "buttons": {
+        "up": "Up",
+        "down": "Down",
+        "left": "Left",
+        "right": "Right",
+        "a": "A Button",
+        "b": "B Button",
+        "start": "Start",
+        "select": "Select"
+      }
     }
+  },
+  "stateInspector": {
+    "title": "State Inspector",
+    "tabPalettes": "Palettes",
+    "tabSprite": "SPRITE",
+    "tabMove": "MOVE",
+    "tabBg": "BG",
+    "palettes": "Palettes",
+    "backdrop": "Backdrop",
+    "cgen": "CGEN",
+    "spriteStates": "SPRITE States",
+    "spriteEnabled": "SPRITE ON",
+    "moveStates": "MOVE States",
+    "bgBuffer": "BG Screen Buffer",
+    "cursor": "Cursor",
+    "empty": "(none)"
+  }
 }

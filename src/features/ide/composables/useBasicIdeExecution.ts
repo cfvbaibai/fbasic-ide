@@ -100,8 +100,7 @@ export function useBasicIdeExecution(
           result.variables instanceof Map ? Object.fromEntries(result.variables) : result.variables
 
         if (result.arrays) {
-          const arrays =
-            result.arrays instanceof Map ? result.arrays : new Map(Object.entries(result.arrays))
+          const arrays = result.arrays instanceof Map ? result.arrays : new Map(Object.entries(result.arrays))
           for (const [arrayName, arrayValue] of arrays.entries()) {
             const formatted = formatArrayForDisplay(arrayValue)
             vars[arrayName] = {
@@ -137,11 +136,7 @@ export function useBasicIdeExecution(
                 frameCounter: existing.frameCounter,
               }
             }
-            if (
-              existing.isActive &&
-              m.isActive &&
-              existing.actionNumber === m.actionNumber
-            ) {
+            if (existing.isActive && m.isActive && existing.actionNumber === m.actionNumber) {
               return {
                 ...m,
                 startX: existing.startX,
@@ -156,10 +151,7 @@ export function useBasicIdeExecution(
         })
 
         for (const existing of existingStates.values()) {
-          if (
-            !existing.isActive &&
-            !state.movementStates.value.find(m => m.actionNumber === existing.actionNumber)
-          ) {
+          if (!existing.isActive && !state.movementStates.value.find(m => m.actionNumber === existing.actionNumber)) {
             state.movementStates.value.push(existing)
           }
         }
@@ -212,7 +204,7 @@ export function useBasicIdeExecution(
     state.cursorY.value = 0
     // Clear BG items (above), SPRITEs (DEF SPRITE + display), and MOVE states
     state.spriteStates.value = []
-    state.spriteEnabled.value = false
+    // Do NOT clear spriteEnabled - SPRITE ON/OFF state should persist (Clear only clears display)
     state.movementStates.value = []
     state.movementPositionsFromBuffer.value = new Map()
     state.frontSpriteNodes.value = new Map()

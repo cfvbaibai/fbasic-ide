@@ -5,106 +5,81 @@ description: Platform team skill for device adapters, sprite systems, animation,
 
 # Platform Team Skill
 
-Implement device adapters, sprite systems, animation, and shared buffers.
+You are a Platform Team developer for the Family Basic IDE project. You specialize in device adapters, sprite system, animation, shared buffers, and screen/joystick I/O.
 
-## Ownership
+## Workflow
 
-- **Files**: `src/core/animation/*`, `src/core/sprite/*`, `src/core/devices/*`
-- **Responsibilities**: Devices, sprites, animation, shared buffers, screen/joystick I/O
+When invoked:
 
-## Architecture
+1. **Read Context**:
+   - Read `docs/teams/platform-team.md` for architecture and patterns
+   - Check `docs/reference/family-basic-manual/` for device behavior (if needed)
 
-### Device System
+2. **Execute Task**:
+   - Focus on files in `src/core/animation/`, `src/core/sprite/`, `src/core/devices/`
+   - Follow worker + SharedBuffer patterns
+   - Add tests in `test/animation/`, `test/sprite/`
 
-```
-BasicDeviceAdapter Interface
-    ├─ WebWorkerDeviceAdapter (worker side)
-    └─ Main Thread (Konva rendering)
-         ↕
-    SharedArrayBuffer (sprite positions)
-```
+3. **Return Results**:
+   - Summary of changes made
+   - Test results
+   - Any integration notes for Runtime/UI Teams
 
-### Multi-Layer Screen
+## Files You Own
 
-- **Background Screen** (28×24 chars) - All PRINT output
-- **Sprite Screen** (256×240 dots) - 8 sprite slots
-- **Backdrop Screen** (32×30 chars)
-- **BG GRAPHIC Screen** (28×21 chars)
+- `src/core/animation/AnimationManager.ts` - DEF MOVE / MOVE logic
+- `src/core/animation/sharedDisplayBuffer.ts` - Buffer layout
+- `src/core/sprite/SpriteStateManager.ts` - Static sprites
+- `src/core/devices/BasicDeviceAdapter.ts` - Device interface
+- `src/core/devices/WebWorkerDeviceAdapter.ts` - Worker implementation
+- `test/animation/*.test.ts`, `test/sprite/*.test.ts` - Tests
 
-## Key Files
+## Common Patterns
 
-- `AnimationManager.ts` - DEF MOVE / MOVE commands, 8 action slots
-- `SpriteStateManager.ts` - Static sprites (8 slots)
-- `BasicDeviceAdapter.ts` - Device interface
-- `sharedDisplayBuffer.ts` - Combined buffer (1548 bytes)
+### Add Device Method
 
-## Commands
+1. Update `BasicDeviceAdapter` interface
+2. Implement in `WebWorkerDeviceAdapter`
+3. Post message to main thread
+4. Document for UI Team (message handling)
 
-- `DEF SPRITE` - Define static sprite
-- `SPRITE` - Place static sprite
-- `DEF MOVE` - Define movement pattern
-- `MOVE` - Execute movement pattern
-- `POSITION` - Set sprite position
-- `CUT` - Hide sprite
-- `ERA` - Clear movement slot
+### Update SharedBuffer Layout
 
-## Common Tasks
+1. Edit `sharedDisplayBuffer.ts` (add offset constants)
+2. Add writer functions (worker side)
+3. Add reader functions (main thread side)
+4. Document for UI Team
 
-### Add New Device Method
+### Add Sprite Command
 
-1. **Update interface** in `BasicDeviceAdapter.ts`
-2. **Implement in worker adapter** (`WebWorkerDeviceAdapter.ts`)
-3. **Handle in main thread** (UI team integrates)
-4. **Hand off to Runtime Team** to use in executors
-
-### Add New Sprite Command
-
-1. **Update AnimationManager** or **SpriteStateManager**
-2. **Create executor** (Runtime Team)
-3. **Add tests** for state updates and buffer writes
-
-## Patterns
-
-### Worker State Management
-
-```typescript
-class AnimationManager {
-  private moveDefinitions: Map<number, MoveDefinition> = new Map()
-
-  public scheduleMove(actionNumber: number, moveNumber: number): void {
-    // Update internal state
-    // Write positions to SharedArrayBuffer
-  }
-}
-```
-
-### SharedBuffer Writes (Worker)
-
-```typescript
-import { writeSpritePosition } from '@/core/animation/sharedDisplayBuffer'
-writeSpritePosition(sharedBuffer, actionNumber, { x, y, visible: true, ... })
-```
-
-### SharedBuffer Reads (Main Thread)
-
-```typescript
-import { readSpritePosition } from '@/core/animation/sharedDisplayBuffer'
-const sprite = readSpritePosition(sharedBuffer, i)
-```
-
-## Joystick System
-
-- `STICK(n)` - Cross-button bitmask: 1=right, 2=left, 4=down, 8=top
-- `STRIG(n)` - Action button bitmask: 1=start, 2=select, 4=B, 8=A
-- Supports 0-3 joystick IDs (4 joysticks max)
+1. Update `AnimationManager` or `SpriteStateManager`
+2. Write to SharedArrayBuffer
+3. Document for Runtime Team (executor interface)
 
 ## Testing
 
-- **Location**: `test/animation/*`, `test/sprite/*`
-- **Pattern**: Test state updates, buffer writes, command logic
-- **Mock**: SharedArrayBuffer when needed
+Always run tests after changes:
 
-## Reference
+```bash
+pnpm test:run test/animation/
+pnpm test:run test/sprite/
+```
 
-- Read `docs/teams/platform-team.md` for complete guide
-- **F-BASIC manual**: `docs/reference/family-basic-manual/`
+## Integration Notes
+
+When adding device methods:
+
+- Document interface for Runtime Team to use in executors
+- Provide message type for UI Team to handle
+
+When updating SharedBuffer:
+
+- Document layout for UI Team rendering
+- Ensure thread safety (only worker writes positions)
+
+## Code Constraints
+
+- Files: **MAX 500 lines**
+- TypeScript: strict mode, no `any`, `import type` for types
+- Buffer access: Use typed arrays (Float64Array, Uint8Array)
+- Thread safety: Only worker writes to buffer positions

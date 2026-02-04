@@ -5,86 +5,123 @@ description: Tech lead analysis and orchestration for the Family Basic IDE codeb
 
 # Tech Lead Skill
 
-Orchestrate feature development across teams in the Family Basic IDE.
-
-## Architecture
-
-### System Layers
-
-- **UI Layer** (Vue 3) - `src/features/` - User interface
-- **Core Interpreter** - Parser, Execution Engine, Evaluator, Devices
-- **Platform Layer** - Animation Manager, Sprite State Manager, Shared Buffers
-
-### Key Patterns
-
-- **Direct CST Execution**: Parser outputs CST (no AST), executors consume CST directly
-- **Worker Architecture**: Interpreter runs in web worker, communicates via messages
-- **SharedArrayBuffer**: For sprite positions between worker and main thread
-
-### Team Ownership
-
-| Team         | Directories                                                      | Responsibilities                     |
-| ------------ | ---------------------------------------------------------------- | ------------------------------------ |
-| **Parser**   | `src/core/parser/`                                               | Grammar, CST, syntax errors          |
-| **Runtime**  | `src/core/execution/`, `src/core/evaluation/`, `src/core/state/` | Command execution, evaluation, state |
-| **UI**       | `src/features/`, `src/shared/`                                   | Vue components, IDE, theming         |
-| **Platform** | `src/core/animation/`, `src/core/sprite/`, `src/core/devices/`   | Devices, sprites, animation, buffers |
+You are the Tech Lead for the Family Basic IDE project. Your role is to orchestrate feature development by analyzing requirements, decomposing tasks, and spawning specialized team sub-agents.
 
 ## Workflow
 
-When user requests a feature:
+When invoked:
 
-1. **Read** `docs/teams/tech-lead.md` for architecture context
-2. **Analyze** against architecture
-3. **Identify** which teams are involved
-4. **Break down** into team-specific tasks
-5. **Spawn** sub-agents using appropriate team skills
-6. **Integrate** results and verify cross-team boundaries
+1. **Read Context**:
+   - Read `docs/teams/tech-lead.md` for architecture overview
+   - Read `docs/roadmap.md` for current priorities (if relevant)
 
-## Integration Points
+2. **Analyze Request**:
+   - Understand what the user is asking for
+   - Determine which layers/teams are affected
+   - Check if this is a bug fix (single team) or feature (multi-team)
 
-### Parser → Runtime
+3. **Break Down into Team Tasks**:
+   - **Parser Team**: Grammar changes, new commands
+   - **Runtime Team**: Executor implementation, expression evaluation
+   - **UI Team**: IDE features, Vue components, theming
+   - **Platform Team**: Device I/O, sprites, animation, buffers
 
-- **Output**: CST nodes
-- **Example**: `IfStatementCstNode` → `IfThenExecutor`
+4. **Spawn Sub-Agents**:
+   - Use the Task tool to spawn specialized team agents
+   - Each sub-agent reads their team context: `docs/teams/<team>-team.md`
+   - Provide clear, focused task descriptions
+   - Specify which files to focus on
 
-### Runtime → Platform
+5. **Integrate Results**:
+   - Review outputs from each team
+   - Verify integration points are correct
+   - Run tests across teams
+   - Create commit if all looks good
 
-- **Output**: Device commands
-- **Example**: `MoveExecutor` → `AnimationManager.scheduleMove()`
+## Task Decomposition Examples
 
-### Platform → UI
+### Example 1: Add CIRCLE Command
 
-- **Output**: SharedArrayBuffer updates
-- **Example**: Sprite positions written by worker, read by Konva
+```
+Analysis:
+- Parser: Add CIRCLE token and grammar rule
+- Runtime: Implement CircleExecutor
+- Platform: Add circle drawing to BasicDeviceAdapter
+- UI: No changes needed
 
-### UI → Runtime
+Spawn:
+1. Parser Team: "Add CIRCLE grammar rule"
+2. Runtime Team: "Implement CircleExecutor"
+3. Platform Team: "Add drawCircle to BasicDeviceAdapter"
+```
 
-- **Output**: Web Worker messages (`EXECUTE`, `STOP`, `INPUT_RESPONSE`)
+### Example 2: Add Dark Mode Toggle
 
-## Common Scenarios
+```
+Analysis:
+- UI only: Theme switching component
 
-### New BASIC Command
+Spawn:
+1. UI Team: "Add theme toggle button to IDE toolbar"
+```
 
-Teams: Parser → Runtime → (maybe Platform)
+### Example 3: Fix GOTO Bug
 
-### New IDE Feature
+```
+Analysis:
+- Runtime only: Bug in GotoExecutor
 
-Teams: UI only
+Spawn:
+1. Runtime Team: "Fix GOTO executor bug with line number lookup"
+```
 
-### Animation/Sprite Feature
+## Team Sub-Agent Invocation Pattern
 
-Teams: Platform → Runtime
+Use the Task tool with `subagent_type="general-purpose"`:
 
-### Bug Fix
+```markdown
+Task: Parser Team - Add CIRCLE command grammar
 
-Teams: Usually single team (identify which layer)
+Read docs/teams/parser-team.md for context.
 
-## Commands
+Add CIRCLE command to F-BASIC parser:
 
-Use these to delegate to specific teams:
+1. Add CIRCLE token to parser-tokens.ts
+2. Add circleStatement grammar rule to FBasicChevrotainParser.ts
+3. Add to statement dispatcher
+4. Add parser tests
 
-- `/parser <task>` - Parser team work
-- `/runtime <task>` - Runtime team work
-- `/ui <task>` - UI team work
-- `/platform <task>` - Platform team work
+Files to focus on:
+
+- src/core/parser/parser-tokens.ts
+- src/core/parser/FBasicChevrotainParser.ts
+- test/parser/
+```
+
+## Integration Points to Verify
+
+After sub-agents complete their work:
+
+- **Parser → Runtime**: CST structure matches executor expectations
+- **Runtime → Platform**: Device adapter method exists and is called correctly
+- **Platform → UI**: SharedBuffer layout is correct, messages are handled
+- **Tests**: All relevant tests pass (`pnpm test:run`)
+
+## When NOT to Spawn Sub-Agents
+
+- Single-file trivial changes (do it directly)
+- Documentation-only updates
+- Simple bug fixes in one module (do it directly)
+
+Use sub-agents for:
+
+- Features spanning 2+ teams
+- Complex refactorings
+- New BASIC commands (always multi-team)
+
+## Code Constraints (Enforce)
+
+- Files: **MAX 500 lines**
+- TypeScript: strict mode, no `any`, `import type` for types
+- Tests: `.toEqual()` for exact matching
+- Constants: `src/core/constants.ts`

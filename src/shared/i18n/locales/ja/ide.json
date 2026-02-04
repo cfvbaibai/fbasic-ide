@@ -1,69 +1,93 @@
 {
-    "title": "Family Basic IDE",
-    "codeEditor": {
-        "title": "コードエディター",
-        "placeholder": "Family Basicコードをここに入力..."
+  "title": "Family Basic IDE",
+  "codeEditor": {
+    "title": "コードエディター",
+    "placeholder": "Family Basicコードをここに入力..."
+  },
+  "controls": {
+    "run": "実行",
+    "stop": "停止",
+    "clear": "クリア",
+    "debug": "デバッグ"
+  },
+  "output": {
+    "title": "実行出力",
+    "empty": "まだ出力がありません。BASICプログラムを実行すると、ここに結果が表示されます。",
+    "screen": "画面",
+    "variables": "変数",
+    "debug": "デバッグ",
+    "errorLine": "行 {line}",
+    "paletteBg": "BG",
+    "paletteSprite": "スプライト",
+    "paletteBgTitle": "現在の背景パレット (0–1)",
+    "paletteSpriteTitle": "現在のスプライトパレット (0–2)",
+    "combo": "コンボ"
+  },
+  "samples": {
+    "placeholder": "サンプル",
+    "basic": "基本",
+    "pause": "一時停止デモ",
+    "gaming": "ジョイスティックテスト",
+    "complex": "複雑",
+    "comprehensive": "完全デモ",
+    "allChars": "全文字",
+    "spriteTest": "スプライトテスト",
+    "moveTest": "移動テスト",
+    "testMoveControl": "移動制御テスト",
+    "inputDemo": "INPUT / LINPUT"
+  },
+  "input": {
+    "submit": "OK",
+    "cancel": "キャンセル"
+  },
+  "joystick": {
+    "control": "ジョイスティック制御",
+    "status": "ジョイスティック状態",
+    "joystick": "ジョイスティック{id}",
+    "joystick0": "ジョイスティック0",
+    "joystick1": "ジョイスティック1",
+    "asdwLayout": "A/D/S/W + G/H/J/K",
+    "arrowLayout": "矢印 + 1/2/3/4",
+    "keyboardHint": "キーボード制御有効",
+    "configureKeys": "キー設定",
+    "columns": {
+      "id": "ID",
+      "stick": "STICK",
+      "strig": "STRIG"
     },
-    "controls": {
-        "run": "実行",
-        "stop": "停止",
-        "clear": "クリア",
-        "debug": "デバッグ"
-    },
-    "output": {
-        "title": "実行出力",
-        "empty": "まだ出力がありません。BASICプログラムを実行すると、ここに結果が表示されます。",
-        "screen": "画面",
-        "variables": "変数",
-        "debug": "デバッグ",
-        "errorLine": "行 {line}",
-        "paletteBg": "BG",
-        "paletteSprite": "スプライト",
-        "paletteBgTitle": "現在の背景パレット (0–1)",
-        "paletteSpriteTitle": "現在のスプライトパレット (0–2)",
-        "combo": "コンボ"
-    },
-    "samples": {
-        "placeholder": "サンプル",
-        "basic": "基本",
-        "pause": "一時停止デモ",
-        "gaming": "ジョイスティックテスト",
-        "complex": "複雑",
-        "comprehensive": "完全デモ",
-        "allChars": "全文字",
-        "spriteTest": "スプライトテスト",
-        "moveTest": "移動テスト",
-        "testMoveControl": "移動制御テスト",
-        "inputDemo": "INPUT / LINPUT"
-    },
-    "input": {
-        "submit": "OK",
-        "cancel": "キャンセル"
-    },
-    "joystick": {
-        "control": "ジョイスティック制御",
-        "status": "ジョイスティック状態",
-        "joystick": "ジョイスティック{id}",
-        "columns": {
-            "id": "ID",
-            "stick": "STICK",
-            "strig": "STRIG"
-        }
-    },
-    "stateInspector": {
-        "title": "状態インスペクタ",
-        "tabPalettes": "パレット",
-        "tabSprite": "SPRITE",
-        "tabMove": "MOVE",
-        "tabBg": "BG",
-        "palettes": "パレット",
-        "backdrop": "バックドロップ",
-        "cgen": "CGEN",
-        "spriteStates": "SPRITE状態",
-        "spriteEnabled": "SPRITE ON",
-        "moveStates": "MOVE状態",
-        "bgBuffer": "BG画面バッファ",
-        "cursor": "カーソル",
-        "empty": "（なし）"
+    "keybinding": {
+      "title": "キーボード制御の設定",
+      "instructions": "キーバインドをクリックして、変更したいキーを押してください。",
+      "pressKey": "キーを押してください...",
+      "pressAnyKey": "任意のキーを押してバインドを設定するか、キャンセルをクリックしてください。",
+      "cancelConfigure": "キャンセル",
+      "resetDefaults": "デフォルトに戻す",
+      "buttons": {
+        "up": "上",
+        "down": "下",
+        "left": "左",
+        "right": "右",
+        "a": "Aボタン",
+        "b": "Bボタン",
+        "start": "スタート",
+        "select": "セレクト"
+      }
     }
+  },
+  "stateInspector": {
+    "title": "状態インスペクタ",
+    "tabPalettes": "パレット",
+    "tabSprite": "SPRITE",
+    "tabMove": "MOVE",
+    "tabBg": "BG",
+    "palettes": "パレット",
+    "backdrop": "バックドロップ",
+    "cgen": "CGEN",
+    "spriteStates": "SPRITE状態",
+    "spriteEnabled": "SPRITE ON",
+    "moveStates": "MOVE状態",
+    "bgBuffer": "BG画面バッファ",
+    "cursor": "カーソル",
+    "empty": "（なし）"
+  }
 }

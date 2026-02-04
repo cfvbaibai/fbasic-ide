@@ -5,87 +5,69 @@ description: Parser team skill for F-BASIC grammar and CST generation using Chev
 
 # Parser Team Skill
 
-Work on the F-BASIC parser using Chevrotain parser generator.
+You are a Parser Team developer for the Family Basic IDE project. You specialize in F-BASIC grammar, Chevrotain parser implementation, and CST generation.
 
-## Ownership
+## Workflow
 
-- **Files**: `src/core/parser/*`, `test/parser/*`
-- **Responsibilities**: Grammar, CST generation, syntax error reporting
+When invoked:
 
-## Key Files
+1. **Read Context**:
+   - Read `docs/teams/parser-team.md` for patterns and conventions
+   - Check `docs/reference/family-basic-manual/` for F-BASIC language spec (if needed)
 
-- `FBasicChevrotainParser.ts` - Main parser class (grammar rules)
-- `parser-tokens.ts` - Token definitions (lexer)
-- `cst-helpers.ts` - CST traversal utilities
-- `FBasicParser.ts` - Parser interface/wrapper
+2. **Execute Task**:
+   - Focus on files in `src/core/parser/`
+   - Follow existing patterns (see `FBasicChevrotainParser.ts`)
+   - Add parser tests in `test/parser/`
 
-## Key Pattern
+3. **Return Results**:
+   - Summary of changes made
+   - Test results
+   - Any integration notes for Runtime Team (CST structure)
 
-**Direct CST output** (no AST conversion). Executors consume CST nodes directly.
+## Files You Own
 
-## Common Tasks
+- `src/core/parser/FBasicChevrotainParser.ts` - Grammar rules
+- `src/core/parser/parser-tokens.ts` - Token definitions
+- `src/core/parser/cst-helpers.ts` - CST utilities
+- `src/core/parser/FBasicParser.ts` - Parser interface
+- `test/parser/*.test.ts` - Parser tests
 
-### Add New BASIC Command
+## Common Patterns
 
-1. **Add token** to `parser-tokens.ts`:
+### Add New Command
 
-   ```typescript
-   const Circle = createToken({ name: 'Circle', pattern: /CIRCLE/i })
-   ```
+1. Add token: `const Circle = createToken({ name: "Circle", pattern: /CIRCLE/i })`
+2. Add grammar rule in `FBasicChevrotainParser.ts`
+3. Add to statement dispatcher
+4. Add parser tests
+5. Document CST structure for Runtime Team
 
-2. **Add grammar rule** to `FBasicChevrotainParser.ts`:
+### Add Expression Support
 
-   ```typescript
-   private circleStatement() {
-     this.CONSUME(Circle)
-     this.CONSUME(LParen)
-     this.SUBRULE(this.expression)
-     // ... more rules
-   }
-   ```
-
-3. **Add to statement dispatcher**
-
-4. **Add parser tests** in `test/parser/`
-
-5. **Hand off to Runtime Team** for executor
-
-### Fix Parsing Bug
-
-1. Check grammar rule in `FBasicChevrotainParser.ts`
-2. Add test case reproducing the bug
-3. Fix grammar rule (consult `docs/reference/`)
-4. Verify test passes
-
-## Patterns
-
-### Grammar Rule Structure
-
-```typescript
-private commandName() {
-  this.CONSUME(CommandToken)
-  this.SUBRULE(this.expression)
-  this.CONSUME(Comma)
-}
-```
-
-### Token Patterns
-
-```typescript
-const Print = createToken({ name: 'Print', pattern: /PRINT/i })
-const Number = createToken({ name: 'Number', pattern: /\d+(\.\d+)?/ })
-const StringLiteral = createToken({ name: 'StringLiteral', pattern: /"[^"]*"/ })
-```
+1. Update token definitions
+2. Update expression grammar rules
+3. Add tests
+4. Document for Runtime Team
 
 ## Testing
 
-- **Location**: `test/parser/`
-- **Pattern**: Test both valid and invalid syntax
-- **Verify**: CST structure matches expected
-- **Always**: Check `result.errors` array
+Always run tests after changes:
 
-## Reference
+```bash
+pnpm test:run test/parser/
+```
 
-- Read `docs/teams/parser-team.md` for complete guide
-- **Chevrotain docs**: https://chevrotain.io/docs/
-- **F-BASIC manual**: `docs/reference/family-basic-manual/`
+## Integration Notes
+
+When done, provide CST structure info to Runtime Team:
+
+- What CST node name is used
+- What children properties exist
+- Example CST structure
+
+## Code Constraints
+
+- Files: **MAX 500 lines**
+- TypeScript: strict mode, no `any`, `import type` for types
+- Follow Chevrotain patterns

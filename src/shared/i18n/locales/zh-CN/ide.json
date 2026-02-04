@@ -1,69 +1,93 @@
 {
-    "title": "Family Basic IDE",
-    "codeEditor": {
-        "title": "代码编辑器",
-        "placeholder": "在此输入您的 Family Basic 代码..."
+  "title": "Family Basic IDE",
+  "codeEditor": {
+    "title": "代码编辑器",
+    "placeholder": "在此输入您的 Family Basic 代码..."
+  },
+  "controls": {
+    "run": "运行",
+    "stop": "停止",
+    "clear": "清除",
+    "debug": "调试"
+  },
+  "output": {
+    "title": "运行时输出",
+    "empty": "暂无输出。运行您的 BASIC 程序以查看结果。",
+    "screen": "屏幕",
+    "variables": "变量",
+    "debug": "调试",
+    "errorLine": "第 {line} 行",
+    "paletteBg": "背景",
+    "paletteSprite": "精灵",
+    "paletteBgTitle": "当前背景调色板 (0–1)",
+    "paletteSpriteTitle": "当前精灵调色板 (0–2)",
+    "combo": "组合"
+  },
+  "samples": {
+    "placeholder": "示例",
+    "basic": "基础",
+    "pause": "暂停演示",
+    "gaming": "手柄测试",
+    "complex": "复杂",
+    "comprehensive": "完整演示",
+    "allChars": "所有字符",
+    "spriteTest": "Sprite测试",
+    "moveTest": "移动测试",
+    "testMoveControl": "移动控制测试",
+    "inputDemo": "INPUT / LINPUT"
+  },
+  "input": {
+    "submit": "确定",
+    "cancel": "取消"
+  },
+  "joystick": {
+    "control": "手柄控制",
+    "status": "手柄状态",
+    "joystick": "手柄 {id}",
+    "joystick0": "手柄0",
+    "joystick1": "手柄1",
+    "asdwLayout": "A/D/S/W + G/H/J/K",
+    "arrowLayout": "方向键 + 1/2/3/4",
+    "keyboardHint": "键盘控制已启用",
+    "configureKeys": "配置按键",
+    "columns": {
+      "id": "ID",
+      "stick": "STICK",
+      "strig": "STRIG"
     },
-    "controls": {
-        "run": "运行",
-        "stop": "停止",
-        "clear": "清除",
-        "debug": "调试"
-    },
-    "output": {
-        "title": "运行时输出",
-        "empty": "暂无输出。运行您的 BASIC 程序以查看结果。",
-        "screen": "屏幕",
-        "variables": "变量",
-        "debug": "调试",
-        "errorLine": "第 {line} 行",
-        "paletteBg": "背景",
-        "paletteSprite": "精灵",
-        "paletteBgTitle": "当前背景调色板 (0–1)",
-        "paletteSpriteTitle": "当前精灵调色板 (0–2)",
-        "combo": "组合"
-    },
-    "samples": {
-        "placeholder": "示例",
-        "basic": "基础",
-        "pause": "暂停演示",
-        "gaming": "手柄测试",
-        "complex": "复杂",
-        "comprehensive": "完整演示",
-        "allChars": "所有字符",
-        "spriteTest": "Sprite测试",
-        "moveTest": "移动测试",
-        "testMoveControl": "移动控制测试",
-        "inputDemo": "INPUT / LINPUT"
-    },
-    "input": {
-        "submit": "确定",
-        "cancel": "取消"
-    },
-    "joystick": {
-        "control": "手柄控制",
-        "status": "手柄状态",
-        "joystick": "手柄 {id}",
-        "columns": {
-            "id": "ID",
-            "stick": "STICK",
-            "strig": "STRIG"
-        }
-    },
-    "stateInspector": {
-        "title": "状态检查",
-        "tabPalettes": "调色板",
-        "tabSprite": "SPRITE",
-        "tabMove": "MOVE",
-        "tabBg": "BG",
-        "palettes": "调色板",
-        "backdrop": "背景",
-        "cgen": "CGEN",
-        "spriteStates": "SPRITE 状态",
-        "spriteEnabled": "SPRITE ON",
-        "moveStates": "MOVE 状态",
-        "bgBuffer": "BG 屏幕缓冲",
-        "cursor": "光标",
-        "empty": "（无）"
+    "keybinding": {
+      "title": "配置键盘控制",
+      "instructions": "点击按键绑定并按下任意键来更改它。",
+      "pressKey": "请按任意键...",
+      "pressAnyKey": "按下任意键设置绑定，或点击取消。",
+      "cancelConfigure": "取消",
+      "resetDefaults": "恢复默认",
+      "buttons": {
+        "up": "上",
+        "down": "下",
+        "left": "左",
+        "right": "右",
+        "a": "A键",
+        "b": "B键",
+        "start": "开始",
+        "select": "选择"
+      }
     }
+  },
+  "stateInspector": {
+    "title": "状态检查",
+    "tabPalettes": "调色板",
+    "tabSprite": "SPRITE",
+    "tabMove": "MOVE",
+    "tabBg": "BG",
+    "palettes": "调色板",
+    "backdrop": "背景",
+    "cgen": "CGEN",
+    "spriteStates": "SPRITE 状态",
+    "spriteEnabled": "SPRITE ON",
+    "moveStates": "MOVE 状态",
+    "bgBuffer": "BG 屏幕缓冲",
+    "cursor": "光标",
+    "empty": "（无）"
+  }
 }

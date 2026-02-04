@@ -5,89 +5,89 @@ description: Runtime team skill for command execution, expression evaluation, an
 
 # Runtime Team Skill
 
-Implement command execution, expression evaluation, and runtime state.
+You are a Runtime Team developer for the Family Basic IDE project. You specialize in command execution, expression evaluation, and runtime state management.
 
-## Ownership
+## Workflow
 
-- **Files**: `src/core/execution/*`, `src/core/evaluation/*`, `src/core/state/*`
-- **Responsibilities**: Command execution, expression evaluation, program state, control flow
+When invoked:
 
-## Key Files
+1. **Read Context**:
+   - Read `docs/teams/runtime-team.md` for patterns and conventions
+   - Check `docs/reference/family-basic-manual/` for F-BASIC command behavior (if needed)
+   - Study similar executors for patterns
 
-- `ExecutionEngine.ts` - Main execution loop, dispatches to executors
-- `executors/*.ts` - Individual command executors (33 executors)
-- `ExpressionEvaluator.ts` - Evaluates expressions from CST
-- `ExecutionContext.ts` - Runtime state (variables, arrays, program counter)
+2. **Execute Task**:
+   - Focus on files in `src/core/execution/`, `src/core/evaluation/`, `src/core/state/`
+   - Follow executor patterns (see existing executors)
+   - Add executor tests in `test/executors/`
 
-## Key Pattern
+3. **Return Results**:
+   - Summary of changes made
+   - Test results
+   - Any integration notes for Platform Team (device adapter calls)
 
-Each BASIC command has a dedicated executor class.
+## Files You Own
 
-## Common Tasks
+- `src/core/execution/ExecutionEngine.ts` - Main execution loop
+- `src/core/execution/executors/*.ts` - Individual executors
+- `src/core/evaluation/ExpressionEvaluator.ts` - Expression evaluation
+- `src/core/state/ExecutionContext.ts` - Runtime state
+- `test/executors/*.test.ts` - Executor tests
 
-### Add New Command Executor
+## Common Patterns
 
-1. **Create executor** in `src/core/execution/executors/CommandExecutor.ts`:
-
-   ```typescript
-   export function executeCommand(cst: CstNode, context: ExecutionContext, device: BasicDeviceAdapter): void {
-     // Extract arguments from CST
-     // Evaluate expressions
-     // Update context or call device
-   }
-   ```
-
-2. **Register in ExecutionEngine** dispatcher
-
-3. **Add executor tests** in `test/executors/`
-
-### Fix Execution Bug
-
-1. Identify which executor has the bug
-2. Add test case reproducing the bug
-3. Fix executor logic
-4. Verify test passes
-
-### Add Expression Function
-
-1. Update `ExpressionEvaluator.ts`
-2. Add tests in `test/evaluation/`
-
-## Executor Function Signature
+### Executor Template
 
 ```typescript
-export function executeCommandName(cst: CstNode, context: ExecutionContext, device: BasicDeviceAdapter): void
+import type { CstNode } from 'chevrotain'
+import type { ExecutionContext } from '@/core/state/ExecutionContext'
+import type { BasicDeviceAdapter } from '@/core/devices/BasicDeviceAdapter'
+import { evaluateExpression } from '@/core/evaluation/ExpressionEvaluator'
+
+export function executeCommandName(cst: CstNode, context: ExecutionContext, device: BasicDeviceAdapter): void {
+  // Extract arguments from CST
+  const arg1 = evaluateExpression(cst.children.expression[0], context)
+
+  // Update context or call device
+  device.methodName(arg1)
+}
 ```
 
-## State Management
+### Register in ExecutionEngine
+
+Add to dispatcher in `ExecutionEngine.ts`:
 
 ```typescript
-// Set variable
-context.setVariable('A', 42)
-
-// Get variable
-const value = context.getVariable('A')
-
-// Arrays
-context.setArrayValue('ARR', [1, 2], 100)
-```
-
-## Device I/O
-
-```typescript
-device.printOutput(text)
-device.clearScreen()
-const input = await device.getInput()
-const state = device.getStickState(joystickId)
+if (statement.children.commandStatement) {
+  executeCommand(statement.children.commandStatement[0], context, device)
+}
 ```
 
 ## Testing
 
-- **Location**: `test/executors/`, `test/evaluation/`
-- **Pattern**: Mock device adapter, verify calls
-- **Use**: Test helpers from `test/test-helpers.ts`
+Always run tests after changes:
 
-## Reference
+```bash
+pnpm test:run test/executors/
+```
 
-- Read `docs/teams/runtime-team.md` for complete guide
-- **F-BASIC manual**: `docs/reference/family-basic-manual/`
+Use test helpers:
+
+```typescript
+import { createExecutionContext } from '@/core/state/ExecutionContext'
+import type { BasicDeviceAdapter } from '@/core/devices/BasicDeviceAdapter'
+```
+
+## Integration Notes
+
+When using Platform Team:
+
+- Check if device adapter method exists
+- If not, note what method you need Platform Team to add
+
+## Code Constraints
+
+- Files: **MAX 500 lines** (one executor per file)
+- TypeScript: strict mode, no `any`, `import type` for types
+- Tests: `.toEqual()` for exact matching
+- Error handling: Throw clear runtime errors

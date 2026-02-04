@@ -1,6 +1,7 @@
 <script setup lang="ts">
 /**
  * JoystickControl component - Control interface for Nintendo controller joysticks.
+ * Supports both mouse/touch input and keyboard emulation.
  */
 defineOptions({
   name: 'JoystickControl',
@@ -9,9 +10,11 @@ const props = defineProps<Props>()
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { GameBlock, GameSubBlock } from '@/shared/components/ui'
+import { GameBlock, GameButton, GameSubBlock } from '@/shared/components/ui'
 
 import { useJoystickEvents } from '../composables/useJoystickEvents'
+import { useKeyboardJoystick } from '../composables/useKeyboardJoystick'
+import JoystickKeybindingPanel from './JoystickKeybindingPanel.vue'
 import JoystickStatusTable from './JoystickStatusTable.vue'
 import NintendoController from './NintendoController.vue'
 
@@ -26,8 +29,9 @@ interface Props {
 // Reactive state
 const stickStates = ref([0, 0, 0, 0]) // STICK values for joysticks 0-3
 const trigStates = ref([0, 0, 0, 0]) // STRIG values for joysticks 0-3
+const showKeybindingPanel = ref(false)
 
-// Use joystick events composable
+// Use joystick events composable for mouse/touch input
 const {
   heldButtons,
   flashingCells,
@@ -43,6 +47,25 @@ const {
   },
   onStrigStateChange: (joystickId, state) => {
     trigStates.value[joystickId] = state
+  },
+})
+
+// Use keyboard joystick composable for keyboard input
+const { keyBindings, updateKeyBindings, resetToDefaults } = useKeyboardJoystick({
+  enabled: computed(() => !showKeybindingPanel.value), // Disable when configuring keys
+  onDirectionStart: (joystickId, direction) => {
+    // Use the same handlers as mouse input
+    startDpadHold(joystickId, direction)
+  },
+  onDirectionStop: (joystickId, direction) => {
+    stopDpadHold(joystickId, direction)
+  },
+  onButtonPress: (joystickId, button) => {
+    toggleActionButton(joystickId, button)
+  },
+  onButtonRelease: (joystickId, button) => {
+    const buttonKey = `${joystickId}-${button}`
+    heldButtons.value[buttonKey] = false
   },
 })
 
@@ -89,6 +112,28 @@ const joystickStatusData = computed(() => {
         </div>
       </div>
     </div>
+
+    <!-- Keyboard Controls Hint -->
+    <div class="keyboard-hint">
+      <p class="hint-text">
+        {{ t('ide.joystick.keyboardHint') }}
+        <span class="key-bindings">
+          {{ t('ide.joystick.joystick0') }}: {{ t('ide.joystick.asdwLayout') }} {{ t('ide.joystick.joystick1') }}:
+          {{ t('ide.joystick.arrowLayout') }}
+        </span>
+      </p>
+      <GameButton size="small" @click="showKeybindingPanel = true">
+        {{ t('ide.joystick.configureKeys') }}
+      </GameButton>
+    </div>
+
+    <!-- Key Binding Configuration Panel -->
+    <JoystickKeybindingPanel
+      v-model="showKeybindingPanel"
+      :key-bindings="keyBindings"
+      @update:key-bindings="updateKeyBindings"
+      @reset="resetToDefaults"
+    />
   </GameBlock>
 </template>
 
@@ -104,6 +149,39 @@ const joystickStatusData = computed(() => {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
   justify-content: start;
+}
+
+.keyboard-hint {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: var(--base-solid-gray-20);
+  border-radius: var(--game-radius-sm);
+  border: 1px solid var(--game-surface-border);
+}
+
+.hint-text {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--game-text-secondary);
+  line-height: 1.4;
+}
+
+.key-bindings {
+  display: block;
+  margin-top: 0.25rem;
+  font-family: var(--game-font-family-mono);
+  color: var(--base-solid-primary);
+}
+
+@media (width <= 640px) {
+  .keyboard-hint {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 /* Glowing border animations */
