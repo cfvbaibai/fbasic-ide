@@ -57,7 +57,8 @@
       "Bash(node:*)",
       "Bash(npx tsx:*)",
       "Bash(pnpm exec:*)",
-      "Bash(pnpm lint:style:*)"
+      "Bash(pnpm lint:style:*)",
+      "Bash(schtasks /create:*)"
     ]
   },
   "enabledPlugins": {
