@@ -6,7 +6,7 @@ export interface SampleCode {
   name: string
   description: string
   code: string
-  category: 'basics' | 'control' | 'data' | 'screen' | 'sprites' | 'interactive' | 'comprehensive'
+  category: 'basics' | 'control' | 'data' | 'screen' | 'sprites' | 'interactive' | 'comprehensive' | 'debug'
 }
 
 export const SAMPLE_CODES: Record<string, SampleCode> = {
@@ -236,6 +236,110 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 1000 DEF MOVE(X)=SPRITE(RND(16),RND(9),5,50,0,0):POSITION X,RND(256),RND(256):MOVE X:RETURN
 2000 CLS:PRINT "YOU PASSED!":LOCATE 4,10:PRINT "PROGRAM BY LI YA PING":PRINT:PRINT "ADDRESS: ZHENG ZHOU UNIVERSITY":PRINT "DEP.PHYSICS 91-5#"
 2010 PRINT "POST NUMBER: 450052"`,
+  },
+
+  eraMoveTest: {
+    name: 'ERA → MOVE Test (DEBUG)',
+    description: 'Minimal test for ERA followed immediately by MOVE - reproduces teleportation bug',
+    category: 'debug',
+    code: `10 CLS
+20 SPRITE ON
+30 PRINT "ERA/MOVE Test"
+40 PRINT "Watch sprite 0"
+50 PRINT "Press A button to ERA+MOVE"
+60 '
+100 ' Initialize sprite
+110 DEF MOVE(0)=SPRITE(0,3,15,60,0,0)
+120 POSITION 0,128,120
+130 MOVE 0
+140 '
+150 ' Main loop
+160 A$=INKEY$
+170 IF A$=" " THEN 200
+180 GOTO 150
+190 '
+200 ' ERA followed immediately by MOVE
+210 ERA 0
+220 DEF MOVE(0)=SPRITE(1,3,15,60,0,0)
+230 POSITION 0,RND(256),RND(256)
+240 MOVE 0
+250 PRINT "Restarted!"
+260 GOTO 150`,
+  },
+
+  eraMoveLoopTest: {
+    name: 'ERA → MOVE Loop Test (DEBUG)',
+    description: 'Auto-repeating ERA+MOVE loop - teleports should happen rapidly',
+    category: 'debug',
+    code: `10 CLS
+20 SPRITE ON
+30 PRINT "Auto ERA/MOVE Test"
+40 PRINT "Sprite should keep moving"
+50 PRINT "Press SELECT to stop"
+60 '
+100 ' Initialize sprite
+110 DEF MOVE(0)=SPRITE(0,3,15,60,0,0)
+120 POSITION 0,128,120
+130 MOVE 0
+140 '
+150 ' Auto ERA+MOVE loop
+160 IF MOVE(0)=0 THEN 200
+170 T=STRIG(0)
+180 IF (T AND 2)=2 THEN 250
+190 GOTO 160
+200 ' ERA followed immediately by MOVE (when movement completes)
+210 ERA 0
+220 DEF MOVE(0)=SPRITE(RND(8),3,15,60,0,0)
+230 POSITION 0,RND(256),RND(256)
+240 MOVE 0
+245 GOTO 160
+250 ' Stop
+260 CUT 0
+270 PRINT "Stopped. Press A to restart"
+280 GOTO 280`,
+  },
+
+  multiSpriteEraMoveTest: {
+    name: 'Multi-Sprite ERA → MOVE Test (DEBUG)',
+    description: 'Multiple sprites with simultaneous ERA+MOVE - like shooting game hit scenario',
+    category: 'debug',
+    code: `10 CLS
+20 SPRITE ON
+30 PRINT "Multi-Sprite ERA/MOVE"
+40 PRINT "Watch all 4 sprites"
+50 PRINT "Press A to ERA+MOVE sprite 0"
+60 '
+100 ' Initialize 4 sprites
+110 FOR I=0 TO 3
+120 DEF MOVE(I)=SPRITE(I*2,3,15,60,0,0)
+130 POSITION I,50+I*40,50+(I AND 1)*80
+140 MOVE I
+150 NEXT
+160 '
+170 ' Main loop
+180 S=STRIG(0)
+190 IF (S AND 8)=8 THEN 250
+200 GOTO 180
+210 '
+250 ' ERA sprite 0 and immediately MOVE it
+260 ' (simulates hitting enemy in shooting game)
+270 ERA 0
+280 DEF MOVE(0)=SPRITE(RND(8),3,15,60,0,0)
+290 POSITION 0,RND(256),RND(256)
+300 MOVE 0
+310 '
+320 ' Check other sprites for completion and restart
+330 FOR I=1 TO 3
+340 IF MOVE(I)=0 THEN 400
+350 NEXT
+360 GOTO 170
+370 '
+400 ' Sprite I completed - restart it
+410 ERA I
+420 DEF MOVE(I)=SPRITE(I*2,3,15,60,0,0)
+430 POSITION I,RND(256),RND(256)
+440 MOVE I
+450 GOTO 360`,
   },
 
   screenCoalesce: {
