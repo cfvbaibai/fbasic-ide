@@ -255,7 +255,7 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 140 '
 150 ' Main loop
 160 T=STRIG(0)
-170 IF (T AND 8)=8 THEN 200
+170 IF (T AND 8)=8 THEN 210
 180 GOTO 160
 190 '
 200 ' ERA followed immediately by MOVE
