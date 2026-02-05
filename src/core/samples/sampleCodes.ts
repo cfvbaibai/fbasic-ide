@@ -283,9 +283,9 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 130 MOVE 0
 140 '
 150 ' Auto ERA+MOVE loop
-160 IF MOVE(0)=0 THEN 200
+160 IF MOVE(0)=0 THEN 210
 170 T=STRIG(0)
-180 IF (T AND 2)=2 THEN 250
+180 IF (T AND 2)=2 THEN 260
 190 GOTO 160
 200 ' ERA followed immediately by MOVE (when movement completes)
 210 ERA 0
@@ -318,7 +318,7 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 160 '
 170 ' Main loop
 180 S=STRIG(0)
-190 IF (S AND 8)=8 THEN 250
+190 IF (S AND 8)=8 THEN 270
 200 GOTO 180
 210 '
 250 ' ERA sprite 0 and immediately MOVE it
@@ -330,9 +330,9 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 310 '
 320 ' Check other sprites for completion and restart
 330 FOR I=1 TO 3
-340 IF MOVE(I)=0 THEN 400
+340 IF MOVE(I)=0 THEN 410
 350 NEXT
-360 GOTO 170
+360 GOTO 180
 370 '
 400 ' Sprite I completed - restart it
 410 ERA I
