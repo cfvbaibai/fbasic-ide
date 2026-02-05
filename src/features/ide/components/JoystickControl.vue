@@ -84,6 +84,13 @@ const joystickStatusData = computed(() => {
     },
   ]
 })
+
+// Computed property for keyboard hint with actual keybindings
+const keyboardHint = computed(() => {
+  const j0 = keyBindings.value.joystick0
+  const j1 = keyBindings.value.joystick1
+  return `${t('ide.joystick.joystick0')}: ${j0.up.displayName}/${j0.down.displayName}/${j0.left.displayName}/${j0.right.displayName} + ${j0.select.displayName}/${j0.start.displayName}/${j0.a.displayName}/${j0.b.displayName} | ${t('ide.joystick.joystick1')}: ${j1.up.displayName}/${j1.down.displayName}/${j1.left.displayName}/${j1.right.displayName} + ${j1.select.displayName}/${j1.start.displayName}/${j1.a.displayName}/${j1.b.displayName}`
+})
 </script>
 
 <template>
@@ -116,11 +123,7 @@ const joystickStatusData = computed(() => {
     <!-- Keyboard Controls Hint -->
     <div class="keyboard-hint">
       <p class="hint-text">
-        {{ t('ide.joystick.keyboardHint') }}
-        <span class="key-bindings">
-          {{ t('ide.joystick.joystick0') }}: {{ t('ide.joystick.asdwLayout') }} {{ t('ide.joystick.joystick1') }}:
-          {{ t('ide.joystick.arrowLayout') }}
-        </span>
+        {{ t('ide.joystick.keyboardHint') }}: <span class="key-bindings">{{ keyboardHint }}</span>
       </p>
       <GameButton size="small" @click="showKeybindingPanel = true">
         {{ t('ide.joystick.configureKeys') }}
