@@ -296,7 +296,9 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 250 ' Stop
 260 CUT 0
 270 PRINT "Stopped. Press A to restart"
-280 GOTO 280`,
+280 T=STRIG(0)
+285 IF (T AND 8)=8 THEN 110
+290 GOTO 280`,
   },
 
   multiSpriteEraMoveTest: {
