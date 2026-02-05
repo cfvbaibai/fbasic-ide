@@ -256,7 +256,7 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 150 ' Main loop
 160 A$=INKEY$
 170 IF A$=" " THEN 200
-180 GOTO 150
+180 GOTO 160
 190 '
 200 ' ERA followed immediately by MOVE
 210 ERA 0
@@ -264,7 +264,7 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 230 POSITION 0,RND(256),RND(256)
 240 MOVE 0
 250 PRINT "Restarted!"
-260 GOTO 150`,
+260 GOTO 160`,
   },
 
   eraMoveLoopTest: {
