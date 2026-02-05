@@ -58,6 +58,9 @@ export function useMovementStateSync(options: UseMovementStateSyncOptions) {
               definition: { ...m.definition },
             }
           }
+          // Movement was restarted (existing.isActive=false, m.isActive=true)
+          // Use new state (fresh movement with full remainingDistance)
+          // Frame state (currentFrameIndex, frameCounter) is reset for new movement
         }
         // New movement or movement was restarted - use new state
         return {

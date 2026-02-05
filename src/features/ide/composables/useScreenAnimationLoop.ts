@@ -53,8 +53,14 @@ function updateMovements(
     let currentX = spriteNode.x()
     let currentY = spriteNode.y()
 
-    // Calculate distance per frame: speedDotsPerSecond × (deltaTime / 1000)
-    const dotsPerFrame = movement.speedDotsPerSecond * (deltaTime / 1000)
+    // Cap deltaTime to prevent huge jumps when loop is paused/restarted or browser throttles
+    // Max 100ms per frame (10fps minimum) prevents sprites from teleporting across screen
+    // This can happen when the animation loop pauses (no active movements) and then restarts
+    // with new movements, causing a large deltaTime on the second frame.
+    const cappedDeltaTime = Math.min(deltaTime, 100)
+
+    // Calculate distance per frame: speedDotsPerSecond × (cappedDeltaTime / 1000)
+    const dotsPerFrame = movement.speedDotsPerSecond * (cappedDeltaTime / 1000)
     const distanceThisFrame = Math.min(dotsPerFrame, movement.remainingDistance)
 
     // Calculate new position
@@ -139,6 +145,8 @@ export function useScreenAnimationLoop(
   let animationFrameId: number | null = null
   let lastFrameTime = 0
   let isPaused = true // Start paused, only run when movements are active
+  let gracePeriodCounter = 0 // Frames to wait before pausing (prevents pause/restart race conditions)
+  const GRACE_PERIOD_FRAMES = 5 // Wait 5 frames (~83ms at 60fps) before pausing
 
   async function animationLoop(timestamp: number): Promise<void> {
     if (lastFrameTime === 0) {
@@ -152,10 +160,21 @@ export function useScreenAnimationLoop(
     const hasActive = localMovementStates.value.some(m => m.isActive)
 
     if (!hasActive) {
-      // No active movements - pause the loop
-      isPaused = true
-      animationFrameId = null
-      return
+      // No active movements - enter grace period to prevent pause/restart race conditions
+      // When ERA is immediately followed by MOVE (e.g., when hitting an enemy in shooting game),
+      // the loop would pause and restart, causing large deltaTime and sprite teleportation.
+      gracePeriodCounter++
+      if (gracePeriodCounter >= GRACE_PERIOD_FRAMES) {
+        // Grace period expired - pause the loop
+        isPaused = true
+        animationFrameId = null
+        gracePeriodCounter = 0
+        return
+      }
+      // Still in grace period - continue loop but skip position updates
+    } else {
+      // Active movements - reset grace period
+      gracePeriodCounter = 0
     }
 
     // Active movements - update positions and frames ONLY

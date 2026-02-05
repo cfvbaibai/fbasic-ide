@@ -633,6 +633,9 @@ export function handleAnimationCommandMessage(message: AnyServiceWorkerMessage, 
           writeSpriteState(context.sharedAnimationView, actionNumber, 0, 0, false)
         }
       }
+      // Check if there are still active movements after erasing
+      // If not, the animation loop watcher will pause it
+      // But if START_MOVEMENT arrives in the same message queue, it will restart immediately
       break
     }
 
