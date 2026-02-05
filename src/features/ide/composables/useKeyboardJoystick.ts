@@ -34,7 +34,7 @@ export const defaultJoystick0Bindings: JoystickKeyBindings = {
   a: { key: 'k', displayName: 'K' },
   b: { key: 'j', displayName: 'J' },
   start: { key: 'h', displayName: 'H' },
-  select: { key: 'g', displayName: 'G' },
+  select: { key: 'f', displayName: 'F' },
 }
 
 export const defaultJoystick1Bindings: JoystickKeyBindings = {
