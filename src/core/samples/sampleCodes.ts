@@ -254,8 +254,8 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 130 MOVE 0
 140 '
 150 ' Main loop
-160 A$=INKEY$
-170 IF A$=" " THEN 200
+160 T=STRIG(0)
+170 IF (T AND 8)=8 THEN 200
 180 GOTO 160
 190 '
 200 ' ERA followed immediately by MOVE
