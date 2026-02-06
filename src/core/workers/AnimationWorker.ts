@@ -2,27 +2,35 @@
  * Animation Worker - Manages sprite state (positions, movement, physics) as the SINGLE WRITER
  * to the shared animation buffer. Main thread becomes read-only for rendering.
  *
+ * NEW: Supports direct synchronization from Executor Worker via shared buffer sync section.
+ * Polls for commands in sync section and writes acknowledgment when complete.
+ *
  * Responsibilities:
- * - Receive animation commands from Executor Worker
+ * - Poll sync section for commands from Executor Worker (direct, no message passing)
  * - Calculate sprite positions (x += dx * speed * dt)
  * - Handle screen wrapping (modulo 256×240)
  * - Manage movement lifecycle (isActive, remainingDistance)
  * - Write positions to shared buffer (ONLY writer)
+ * - Write acknowledgment when command is processed
  * - Run at fixed 60Hz tick rate
  */
 
 import {
   MAX_SPRITES,
+  notifyAck,
+  readSyncCommand,
   SHARED_ANIMATION_BUFFER_BYTES,
-  SHARED_ANIMATION_BUFFER_LENGTH,
+  SyncCommandType,
   writeSpriteState,
 } from '@/core/animation/sharedAnimationBuffer'
+import { SHARED_DISPLAY_BUFFER_BYTES } from '@/core/animation/sharedDisplayBuffer'
 import { SCREEN_DIMENSIONS } from '@/core/constants'
 import type { MoveDefinition } from '@/core/sprite/types'
 import { logWorker } from '@/shared/logger'
 
 /**
- * Animation Worker command types (Executor Worker → Animation Worker)
+ * Animation Worker command types (Main Thread → Animation Worker via message)
+ * Note: Direct sync from Executor Worker uses shared buffer instead of message passing.
  */
 export type AnimationWorkerCommand =
   | { type: 'START_MOVEMENT'; actionNumber: number; definition: MoveDefinition; startX: number; startY: number }
@@ -56,13 +64,17 @@ const MAX_DELTA_TIME_MS = 100 // Cap at 100ms to prevent teleportation
 
 /**
  * AnimationWorker class - manages sprite animation state and writes to shared buffer
+ * with direct synchronization from Executor Worker.
  */
 export class AnimationWorker {
   private movementStates: Map<number, WorkerMovementState> = new Map()
   private sharedAnimationView: Float64Array | null = null
+  private sharedSyncView: Int32Array | null = null
   private tickInterval: number | null = null
   private lastTickTime = 0
   private isRunning = false
+  /** Whether to use direct sync (poll shared buffer) instead of message-based commands. */
+  private useDirectSync: boolean = false
 
   constructor() {
     logWorker.debug('[AnimationWorker] Created')
@@ -98,15 +110,45 @@ export class AnimationWorker {
 
   /**
    * Set shared animation buffer (called by Main Thread during initialization)
+   * Extracts both Float64Array view (sprite data) and Int32Array view (sync section).
+   * Supports both standalone animation buffer (264 bytes) and combined display buffer (1620 bytes).
    */
   private handleSetSharedBuffer(buffer: SharedArrayBuffer): void {
-    if (buffer.byteLength < SHARED_ANIMATION_BUFFER_BYTES) {
+    const MIN_BUFFER_BYTES = SHARED_ANIMATION_BUFFER_BYTES
+    if (buffer.byteLength < MIN_BUFFER_BYTES) {
       throw new RangeError(
-        `Shared animation buffer too small: ${buffer.byteLength} bytes, need at least ${SHARED_ANIMATION_BUFFER_BYTES}`
+        `Shared animation buffer too small: ${buffer.byteLength} bytes, need at least ${MIN_BUFFER_BYTES}`
       )
     }
-    this.sharedAnimationView = new Float64Array(buffer, 0, SHARED_ANIMATION_BUFFER_LENGTH)
-    logWorker.debug('[AnimationWorker] Shared animation buffer set')
+
+    // Sprite data is always at the beginning (24 floats for 8 sprites)
+    this.sharedAnimationView = new Float64Array(buffer, 0, MAX_SPRITES * 3)
+
+    // Extract Int32Array sync view from the sync section
+    // The sync section can be at different offsets depending on buffer layout:
+    // - Standalone animation buffer (264 bytes): sync at byte 192 (float 24)
+    // - Combined display buffer (1624 bytes): sync at byte 1552 (with padding for alignment)
+    const syncSectionFloats = 9 // command type, action number, params (6), ack
+
+    let syncSectionByteOffset: number
+    if (buffer.byteLength === SHARED_ANIMATION_BUFFER_BYTES) {
+      // Standalone animation buffer: sync section at byte 192 (float 24)
+      syncSectionByteOffset = 24 * 8
+    } else if (buffer.byteLength === SHARED_DISPLAY_BUFFER_BYTES) {
+      // Combined display buffer: sync section at byte 1552
+      syncSectionByteOffset = 1552
+    } else {
+      // Unknown buffer type, try standalone layout
+      syncSectionByteOffset = 24 * 8
+      logWorker.warn('[AnimationWorker] Unknown buffer size:', buffer.byteLength, 'trying standalone layout')
+    }
+
+    // Create Int32Array view of sync section
+    this.sharedSyncView = new Int32Array(buffer, syncSectionByteOffset, syncSectionFloats * 2)
+    this.useDirectSync = true
+    logWorker.debug('[AnimationWorker] Direct sync enabled (sync section at byte', syncSectionByteOffset, ')')
+
+    logWorker.debug('[AnimationWorker] Shared animation buffer set, byteLength =', buffer.byteLength)
 
     // Initialize all sprite slots to inactive
     if (this.sharedAnimationView) {
@@ -221,6 +263,160 @@ export class AnimationWorker {
   }
 
   /**
+   * Poll sync section for commands from Executor Worker (direct communication).
+   * Processes any pending command and writes acknowledgment when complete.
+   */
+  private pollSyncCommands(): void {
+    if (!this.sharedAnimationView || !this.sharedSyncView) return
+
+    const command = readSyncCommand(this.sharedAnimationView)
+    if (!command) return // No pending command
+
+    logWorker.debug('[AnimationWorker] Sync command from buffer:', command.commandType, command.actionNumber)
+
+    try {
+      switch (command.commandType) {
+        case SyncCommandType.NONE:
+          // Should not happen as readSyncCommand returns null for NONE
+          break
+        case SyncCommandType.START_MOVEMENT:
+          this.handleStartMovementFromSync(command.actionNumber, command.params)
+          break
+        case SyncCommandType.STOP_MOVEMENT:
+          this.handleStopMovementFromSync(command.actionNumber)
+          break
+        case SyncCommandType.ERASE_MOVEMENT:
+          this.handleEraseMovementFromSync(command.actionNumber)
+          break
+        case SyncCommandType.SET_POSITION:
+          this.handleSetPositionFromSync(command.actionNumber, command.params.startX, command.params.startY)
+          break
+      }
+
+      // Write acknowledgment
+      if (this.sharedSyncView) {
+        notifyAck(this.sharedSyncView)
+      }
+    } catch (error) {
+      logWorker.error('[AnimationWorker] Error processing sync command:', error)
+      // Still write ack to prevent Executor Worker from hanging
+      if (this.sharedSyncView) {
+        notifyAck(this.sharedSyncView)
+      }
+    }
+  }
+
+  /**
+   * Handle START_MOVEMENT from sync buffer.
+   */
+  private handleStartMovementFromSync(
+    actionNumber: number,
+    params: {
+      startX: number
+      startY: number
+      direction: number
+      speed: number
+      distance: number
+      priority: number
+    }
+  ): void {
+    logWorker.debug('[AnimationWorker] START_MOVEMENT from sync:', { actionNumber, params })
+
+    const { deltaX, deltaY } = this.getDirectionDeltas(params.direction)
+    const speedDotsPerSecond = params.speed === 0 ? 60 / 256 : 60 / params.speed
+    const totalDistance = 2 * params.distance
+
+    const definition: MoveDefinition = {
+      actionNumber,
+      characterType: 0, // Will be set by DEF MOVE
+      direction: params.direction,
+      speed: params.speed,
+      distance: params.distance,
+      priority: params.priority as 0 | 1,
+      colorCombination: 0, // Default
+    }
+
+    const movementState: WorkerMovementState = {
+      actionNumber,
+      definition,
+      x: params.startX,
+      y: params.startY,
+      remainingDistance: totalDistance,
+      speedDotsPerSecond,
+      directionDeltaX: deltaX,
+      directionDeltaY: deltaY,
+      isActive: true,
+      currentFrameIndex: 0,
+      frameCounter: 0,
+    }
+
+    this.movementStates.set(actionNumber, movementState)
+
+    // Write initial position to shared buffer
+    if (this.sharedAnimationView) {
+      writeSpriteState(this.sharedAnimationView, actionNumber, params.startX, params.startY, true)
+    }
+
+    // Start tick loop if not already running
+    if (!this.isRunning) {
+      this.startTickLoop()
+    }
+  }
+
+  /**
+   * Handle STOP_MOVEMENT from sync buffer.
+   */
+  private handleStopMovementFromSync(actionNumber: number): void {
+    logWorker.debug('[AnimationWorker] STOP_MOVEMENT from sync:', actionNumber)
+
+    const movement = this.movementStates.get(actionNumber)
+    if (movement) {
+      movement.isActive = false
+      // Write inactive state to shared buffer
+      if (this.sharedAnimationView) {
+        writeSpriteState(this.sharedAnimationView, actionNumber, movement.x, movement.y, false)
+      }
+    }
+  }
+
+  /**
+   * Handle ERASE_MOVEMENT from sync buffer.
+   */
+  private handleEraseMovementFromSync(actionNumber: number): void {
+    logWorker.debug('[AnimationWorker] ERASE_MOVEMENT from sync:', actionNumber)
+
+    this.movementStates.delete(actionNumber)
+    // Write inactive state to shared buffer
+    if (this.sharedAnimationView) {
+      writeSpriteState(this.sharedAnimationView, actionNumber, 0, 0, false)
+    }
+
+    // Stop tick loop if no active movements
+    if (this.movementStates.size === 0 || !Array.from(this.movementStates.values()).some(m => m.isActive)) {
+      this.stopTickLoop()
+    }
+  }
+
+  /**
+   * Handle SET_POSITION from sync buffer.
+   */
+  private handleSetPositionFromSync(actionNumber: number, x: number, y: number): void {
+    logWorker.debug('[AnimationWorker] SET_POSITION from sync:', { actionNumber, x, y })
+
+    const movement = this.movementStates.get(actionNumber)
+    if (movement) {
+      movement.x = x
+      movement.y = y
+    }
+
+    // Write position to shared buffer
+    if (this.sharedAnimationView) {
+      const isActive = movement?.isActive ?? false
+      writeSpriteState(this.sharedAnimationView, actionNumber, x, y, isActive)
+    }
+  }
+
+  /**
    * Start the tick loop (60Hz fixed)
    */
   private startTickLoop(): void {
@@ -261,6 +457,11 @@ export class AnimationWorker {
    */
   private tick(deltaTime: number): void {
     if (!this.sharedAnimationView) return
+
+    // Poll for sync commands from Executor Worker (direct communication)
+    if (this.useDirectSync) {
+      this.pollSyncCommands()
+    }
 
     // Cap deltaTime to prevent teleportation
     const cappedDeltaTime = Math.min(deltaTime, MAX_DELTA_TIME_MS)

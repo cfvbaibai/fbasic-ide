@@ -338,7 +338,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
         outputType: 'print',
         timestamp: Date.now(),
       },
-    }, '*')
+    })
 
     // Process all characters and update screen buffer
     for (const char of output) {
@@ -470,23 +470,6 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   }
 
   /**
-   * Send animation worker command via main thread
-   * Main thread forwards this to the Animation Worker
-   */
-  sendAnimationWorkerCommand(command: AnimationCommand): void {
-    logWorker.debug('Forwarding animation worker command:', command.type, command)
-
-    const message: AnyServiceWorkerMessage = {
-      type: 'FORWARD_TO_ANIMATION_WORKER',
-      id: `anim-worker-${Date.now()}-${Math.random()}`,
-      timestamp: Date.now(),
-      data: { command },
-    }
-
-    self.postMessage(message)
-  }
-
-  /**
    * Request user input (INPUT/LINPUT). Used in worker; posts REQUEST_INPUT to main and waits for INPUT_VALUE.
    */
   requestInput(
@@ -513,7 +496,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
         variableCount,
         isLinput,
       },
-    }, '*')
+    })
 
     return promise
   }
@@ -722,7 +705,8 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       this.postScreenChanged()
     } else if (this.screenStateManager) {
       // In test environment (jsdom), postMessage requires targetOrigin
-      self.postMessage(this.screenStateManager.createFullScreenUpdateMessage())
+      // Use '*' for same-origin or specific origin for cross-origin
+      self.postMessage(this.screenStateManager.createFullScreenUpdateMessage(), '*')
     }
   }
 }

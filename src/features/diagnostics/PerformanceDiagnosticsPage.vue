@@ -50,7 +50,6 @@ const {
   sharedJoystickBuffer,
   setDecodedScreenState,
   registerScheduleRender,
-  forwardToAnimationWorker,
 } = useBasicIdeEnhanced()
 
 provideScreenContext({
@@ -73,7 +72,6 @@ provideScreenContext({
   sharedJoystickBuffer: ref(sharedJoystickBuffer),
   setDecodedScreenState,
   registerScheduleRender,
-  forwardToAnimationWorker,
 })
 
 const {

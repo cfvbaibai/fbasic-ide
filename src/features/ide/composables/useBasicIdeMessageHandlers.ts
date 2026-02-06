@@ -7,7 +7,6 @@
 
 import type { Ref } from 'vue'
 
-import { writeSpriteState } from '@/core/animation/sharedAnimationBuffer'
 import type {
   DecodedScreenState,
   SharedDisplayViews,
@@ -22,7 +21,6 @@ import type {
 } from '@/core/interfaces'
 import type { Note, Rest } from '@/core/sound/types'
 import type { MovementState } from '@/core/sprite/types'
-import type { AnimationWorkerCommand } from '@/core/workers/AnimationWorker'
 import { ExecutionError } from '@/features/ide/errors/ExecutionError'
 import { logComposable, logIdeMessages } from '@/shared/logger'
 
@@ -154,8 +152,6 @@ export interface MessageHandlerContext {
   pendingInputRequest?: Ref<RequestInputMessage['data'] | null>
   /** Send INPUT_VALUE to worker to resolve a pending input request. */
   respondToInputRequest?: (requestId: string, values: string[], cancelled: boolean) => void
-  /** Forward animation command to Animation Worker (if initialized). */
-  forwardToAnimationWorker?: (command: AnimationWorkerCommand) => void
 }
 
 /**
@@ -495,17 +491,9 @@ export function handleAnimationCommandMessage(message: AnyServiceWorkerMessage, 
 
   logIdeMessages.debug('🎬 Handling animation command:', command.type, command)
 
-  // Check if Animation Worker is available
-  const useAnimationWorker = context.forwardToAnimationWorker && command.type !== 'UPDATE_MOVEMENT_POSITION'
-
-  if (useAnimationWorker) {
-    logIdeMessages.debug('🎬 Forwarding to Animation Worker:', command.type)
-     
-    context.forwardToAnimationWorker!(command as AnimationWorkerCommand)
-    // DON'T return - we still need to update main thread movementStates for loop tracking
-  } else {
-    logIdeMessages.warn('🎬 Animation Worker not available, using local processing (old architecture)')
-  }
+  // Note: Animation commands are now handled via direct sync (Executor Worker → Animation Worker)
+  // through shared buffer using Atomics. This handler only updates main thread movementStates
+  // for render loop tracking. The Animation Worker is the single writer to the shared buffer.
 
   // Trace ERA→MOVE sequences for teleportation debugging
   const timestamp = performance.now()
@@ -516,140 +504,35 @@ export function handleAnimationCommandMessage(message: AnyServiceWorkerMessage, 
     case 'START_MOVEMENT': {
       logIdeMessages.warn(`🎬 START_MOVEMENT #${command.actionNumber} | startX: ${command.startX}, startY: ${command.startY}, speed: ${command.definition.speed}, direction: ${command.definition.direction}`)
 
-      // When using Animation Worker: create minimal tracking state only (Animation Worker handles position calculation)
-      // When NOT using Animation Worker: do full position calculation and write to shared buffer
-      if (useAnimationWorker) {
-        // Minimal state for render loop tracking - Animation Worker is authoritative for positions
-        const movementState: MovementState = {
-          actionNumber: command.actionNumber,
-          definition: command.definition,
-          startX: command.startX,
-          startY: command.startY,
-          remainingDistance: 2 * command.definition.distance,
-          totalDistance: 2 * command.definition.distance,
-          speedDotsPerSecond: command.definition.speed === 0 ? 60 / 256 : 60 / command.definition.speed,
-          directionDeltaX: getDirectionDeltaX(command.definition.direction),
-          directionDeltaY: getDirectionDeltaY(command.definition.direction),
-          isActive: true,
-          currentFrameIndex: 0,
-          frameCounter: 0,
-        }
-
-        console.log('[Message Handler] START_MOVEMENT (Animation Worker mode)', {
-          actionNumber: command.actionNumber,
-          speed: command.definition.speed,
-          distance: command.definition.distance,
-          totalDistance: movementState.totalDistance,
-          speedDotsPerSecond: movementState.speedDotsPerSecond,
-          isActive: movementState.isActive,
-        })
-
-        // Add or update movement state
-        const existing = context.movementStates.value.findIndex(
-          m => m.actionNumber === command.actionNumber
-        )
-
-        if (existing >= 0) {
-          context.movementStates.value[existing] = movementState
-        } else {
-          context.movementStates.value.push(movementState)
-        }
-
-        // Force reactivity by creating new array
-        context.movementStates.value = [...context.movementStates.value]
-
-        console.log('[Message Handler] Movement states after START_MOVEMENT', {
-          total: context.movementStates.value.length,
-          active: context.movementStates.value.filter(m => m.isActive).map(m => m.actionNumber),
-        })
-      } else {
-        // Full local processing (old architecture)
-        // Start position: Konva node (if exists) > last POSITION from this sprite's action queue > command from worker
-        const queue = context.spriteActionQueues?.value.get(command.actionNumber) ?? []
-        const lastPosition = [...queue].reverse().find((a): a is PendingSpriteAction => a.type === 'POSITION')
-        let startX = lastPosition?.x ?? command.startX
-        let startY = lastPosition?.y ?? command.startY
-        context.spriteActionQueues?.value.set(command.actionNumber, [])
-
-        const existingNode =
-          command.definition.priority === 0
-            ? context.frontSpriteNodes?.value?.get(command.actionNumber)
-            : context.backSpriteNodes?.value?.get(command.actionNumber)
-
-        if (existingNode && typeof existingNode === 'object' && 'x' in existingNode && 'y' in existingNode) {
-          const nodeX = typeof existingNode.x === 'function' ? (existingNode.x as () => number)() : startX
-          const nodeY = typeof existingNode.y === 'function' ? (existingNode.y as () => number)() : startY
-          startX = nodeX
-          startY = nodeY
-        }
-
-        // Check if there's an existing movement (for remaining distance)
-        const existingMovement = context.movementStates.value.find(
-          m => m.actionNumber === command.actionNumber
-        )
-
-        // Preserve remaining distance if movement was stopped (CUT), otherwise use full distance
-        const remainingDistance = existingMovement && !existingMovement.isActive
-          ? existingMovement.remainingDistance
-          : 2 * command.definition.distance
-
-        // Only set position on Konva node if movement was stopped (CUT) and we're restarting
-        // If movement is already active, don't reset position - animation loop manages it
-        if (existingNode && typeof existingNode === 'object' && 'x' in existingNode && 'y' in existingNode) {
-          if (typeof existingNode.x === 'function' && typeof existingNode.y === 'function') {
-            // Only update position if movement was stopped (restarting from CUT position)
-            // or if this is a new movement (node doesn't have a valid position yet)
-            const isNewMovement = !existingMovement
-            const isRestartingFromCut = existingMovement && !existingMovement.isActive
-
-            if (isNewMovement || isRestartingFromCut) {
-              // New movement or restarting from CUT - use the start position we determined
-              ;(existingNode.x as (x: number) => void)(startX)
-              ;(existingNode.y as (y: number) => void)(startY)
-            }
-            // If movement is already active, don't touch the position - animation loop manages it
-          }
-        }
-
-        // Create movement state (position is in shared buffer, updated by animation loop)
-        const movementState: MovementState = {
-          actionNumber: command.actionNumber,
-          definition: command.definition,
-          startX,
-          startY,
-          remainingDistance,
-          totalDistance: 2 * command.definition.distance,
-          speedDotsPerSecond:
-            command.definition.speed === 0
-              ? 60 / 256
-              : command.definition.speed > 0
-                ? 60 / command.definition.speed
-                : 0,
-          directionDeltaX: getDirectionDeltaX(command.definition.direction),
-          directionDeltaY: getDirectionDeltaY(command.definition.direction),
-          isActive: true,
-          currentFrameIndex: existingMovement?.currentFrameIndex ?? 0,
-          frameCounter: existingMovement?.frameCounter ?? 0,
-        }
-
-        // Add or update movement state
-        const existing = context.movementStates.value.findIndex(
-          m => m.actionNumber === command.actionNumber
-        )
-
-        if (existing >= 0) {
-          context.movementStates.value[existing] = movementState
-        } else {
-          context.movementStates.value.push(movementState)
-        }
-
-        // Force reactivity by creating new array
-        context.movementStates.value = [...context.movementStates.value]
-
-        if (context.sharedAnimationView) {
-          writeSpriteState(context.sharedAnimationView, command.actionNumber, startX, startY, true)
-        }
+      // Create minimal tracking state for render loop - Animation Worker is authoritative for positions
+      const movementState: MovementState = {
+        actionNumber: command.actionNumber,
+        definition: command.definition,
+        startX: command.startX,
+        startY: command.startY,
+        remainingDistance: 2 * command.definition.distance,
+        totalDistance: 2 * command.definition.distance,
+        speedDotsPerSecond: command.definition.speed === 0 ? 60 / 256 : 60 / command.definition.speed,
+        directionDeltaX: getDirectionDeltaX(command.definition.direction),
+        directionDeltaY: getDirectionDeltaY(command.definition.direction),
+        isActive: true,
+        currentFrameIndex: 0,
+        frameCounter: 0,
       }
+
+      // Add or update movement state
+      const existing = context.movementStates.value.findIndex(
+        m => m.actionNumber === command.actionNumber
+      )
+
+      if (existing >= 0) {
+        context.movementStates.value[existing] = movementState
+      } else {
+        context.movementStates.value.push(movementState)
+      }
+
+      // Force reactivity by creating new array
+      context.movementStates.value = [...context.movementStates.value]
 
       const activeAfter = context.movementStates.value.filter(m => m.isActive).map(m => m.actionNumber)
       logIdeMessages.warn(
@@ -677,32 +560,6 @@ export function handleAnimationCommandMessage(message: AnyServiceWorkerMessage, 
         }
       }
       context.movementStates.value = [...context.movementStates.value]
-
-      // Only write to shared buffer if NOT using Animation Worker
-      if (!useAnimationWorker && context.sharedAnimationView) {
-        if (command.positions) {
-          for (const pos of command.positions) {
-            writeSpriteState(context.sharedAnimationView, pos.actionNumber, pos.x, pos.y, false)
-          }
-        } else {
-          for (const actionNumber of command.actionNumbers) {
-            const movement = context.movementStates.value.find(m => m.actionNumber === actionNumber)
-            if (movement) {
-              const spriteNode =
-                movement.definition.priority === 0
-                  ? context.frontSpriteNodes?.value?.get(actionNumber)
-                  : context.backSpriteNodes?.value?.get(actionNumber)
-              const x = spriteNode && typeof spriteNode === 'object' && 'x' in spriteNode && typeof (spriteNode as { x: () => number }).x === 'function'
-                ? (spriteNode as { x: () => number; y: () => number }).x()
-                : 0
-              const y = spriteNode && typeof spriteNode === 'object' && 'y' in spriteNode && typeof (spriteNode as { y: () => number }).y === 'function'
-                ? (spriteNode as { x: () => number; y: () => number }).y()
-                : 0
-              writeSpriteState(context.sharedAnimationView, actionNumber, x, y, false)
-            }
-          }
-        }
-      }
       break
     }
 
@@ -718,16 +575,6 @@ export function handleAnimationCommandMessage(message: AnyServiceWorkerMessage, 
       for (const actionNumber of command.actionNumbers) {
         context.spriteActionQueues?.value.delete(actionNumber)
       }
-
-      // Only write to shared buffer if NOT using Animation Worker
-      if (!useAnimationWorker && context.sharedAnimationView) {
-        for (const actionNumber of command.actionNumbers) {
-          writeSpriteState(context.sharedAnimationView, actionNumber, 0, 0, false)
-        }
-      }
-      // Check if there are still active movements after erasing
-      // If not, the animation loop watcher will pause it
-      // But if START_MOVEMENT arrives in the same message queue, it will restart immediately
       break
     }
 
@@ -741,18 +588,6 @@ export function handleAnimationCommandMessage(message: AnyServiceWorkerMessage, 
           ;(spriteNode.x as (x: number) => void)(command.x)
           ;(spriteNode.y as (y: number) => void)(command.y)
           context.spriteActionQueues?.value.delete(command.actionNumber)
-
-          // Only write to shared buffer if NOT using Animation Worker
-          if (!useAnimationWorker && context.sharedAnimationView) {
-            const movement = context.movementStates?.value.find(m => m.actionNumber === command.actionNumber)
-            writeSpriteState(
-              context.sharedAnimationView,
-              command.actionNumber,
-              command.x,
-              command.y,
-              movement?.isActive ?? false
-            )
-          }
         }
       } else {
         const queues = context.spriteActionQueues?.value
@@ -760,18 +595,6 @@ export function handleAnimationCommandMessage(message: AnyServiceWorkerMessage, 
           const q = queues.get(command.actionNumber) ?? []
           q.push({ type: 'POSITION', x: command.x, y: command.y })
           queues.set(command.actionNumber, q)
-        }
-
-        // Only write to shared buffer if NOT using Animation Worker
-        if (!useAnimationWorker && context.sharedAnimationView) {
-          const movement = context.movementStates?.value.find(m => m.actionNumber === command.actionNumber)
-          writeSpriteState(
-            context.sharedAnimationView,
-            command.actionNumber,
-            command.x,
-            command.y,
-            movement?.isActive ?? false
-          )
         }
       }
       break
@@ -787,7 +610,6 @@ export function handleAnimationCommandMessage(message: AnyServiceWorkerMessage, 
     }
   }
 }
-
 /**
  * Helper to get X delta from direction
  */

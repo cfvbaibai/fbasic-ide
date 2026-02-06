@@ -68,8 +68,6 @@ const {
   sharedJoystickBuffer,
   setDecodedScreenState,
   registerScheduleRender,
-  forwardToAnimationWorker,
-  setForwardToAnimationWorker,
   pendingInputRequest,
   respondToInputRequest,
 } = useBasicIdeEnhanced()
@@ -98,8 +96,6 @@ provideScreenContext({
   sharedJoystickBuffer: ref(sharedJoystickBuffer),
   setDecodedScreenState,
   registerScheduleRender,
-  forwardToAnimationWorker,
-  setForwardToAnimationWorker,
 })
 
 // INPUT/LINPUT modal: local input value and submit/cancel

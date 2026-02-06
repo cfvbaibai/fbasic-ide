@@ -104,7 +104,5 @@ export function useBasicIde() {
     sharedJoystickBuffer: screen.sharedJoystickBuffer,
     setDecodedScreenState: screen.setDecodedScreenState,
     registerScheduleRender: screen.registerScheduleRender,
-    forwardToAnimationWorker: screen.forwardToAnimationWorker,
-    setForwardToAnimationWorker: screen.setForwardToAnimationWorker,
   }
 }

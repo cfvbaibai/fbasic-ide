@@ -132,6 +132,10 @@ class WebWorkerInterpreter {
         maxIterations: config.maxIterations,
         maxOutputLines: config.maxOutputLines,
       })
+      console.log('[WebWorkerInterpreter] Creating BasicInterpreter with sharedAnimationBuffer:', {
+        hasBuffer: !!this.sharedAnimationBuffer,
+        byteLength: this.sharedAnimationBuffer?.byteLength,
+      })
       this.interpreter = new BasicInterpreter({
         ...config,
         deviceAdapter: this.webWorkerDeviceAdapter!,
@@ -260,8 +264,17 @@ class WebWorkerInterpreter {
     }
     const { buffer } = data
     this.sharedAnimationBuffer = buffer
+    console.log('[WebWorkerInterpreter] SET_SHARED_ANIMATION_BUFFER received, buffer byteLength =', buffer.byteLength)
+    console.log('[WebWorkerInterpreter] Interpreter exists:', !!this.interpreter, 'AnimationManager exists:', !!this.interpreter?.context?.animationManager)
     if (this.webWorkerDeviceAdapter) {
       this.webWorkerDeviceAdapter.setSharedAnimationBuffer(buffer)
+    }
+    // Update AnimationManager's shared buffer for direct sync to AnimationWorker
+    if (this.interpreter?.context?.animationManager) {
+      console.log('[WebWorkerInterpreter] Updating existing AnimationManager with shared buffer')
+      this.interpreter.context.animationManager.setSharedAnimationBuffer(buffer)
+    } else {
+      console.log('[WebWorkerInterpreter] AnimationManager not created yet, will use buffer when interpreter is created')
     }
   }
 

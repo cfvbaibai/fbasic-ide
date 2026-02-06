@@ -36,21 +36,22 @@ describe('Shared Buffer Integration - Full POC', () => {
 
       expect(buffer).toBeInstanceOf(SharedArrayBuffer)
       expect(view).toBeInstanceOf(Float64Array)
-      expect(buffer.byteLength).toBe(192) // 8 sprites × 3 × 8 bytes
-      expect(view.length).toBe(24) // 8 sprites × 3
+      expect(buffer.byteLength).toBe(264) // 33 floats × 8 bytes (8 sprites × 3 + 9 sync slots)
+      expect(view.length).toBe(33) // 8 sprites × 3 + 9 sync slots
     })
 
     it('should create shared display buffer successfully', () => {
       const views = createSharedDisplayBuffer()
 
       expect(views.buffer).toBeInstanceOf(SharedArrayBuffer)
-      expect(views.buffer.byteLength).toBe(1548)
+      expect(views.buffer.byteLength).toBe(1624) // Updated to include animation sync section
       expect(views.spriteView).toBeInstanceOf(Float64Array)
       expect(views.charView).toBeInstanceOf(Uint8Array)
       expect(views.patternView).toBeInstanceOf(Uint8Array)
       expect(views.cursorView).toBeInstanceOf(Uint8Array)
       expect(views.sequenceView).toBeInstanceOf(Int32Array)
       expect(views.scalarsView).toBeInstanceOf(Uint8Array)
+      expect(views.animationSyncView).toBeInstanceOf(Float64Array) // New animation sync section
     })
 
     it('should initialize display buffer screen with spaces', () => {
@@ -713,14 +714,14 @@ describe('Shared Buffer Integration - Full POC', () => {
     })
 
     it('should handle multiple MOVE definitions', async () => {
-      const { buffer } = createSharedAnimationBuffer()
       const adapter = new SharedBufferTestAdapter()
 
       const interpreter = new BasicInterpreter({
         maxIterations: EXECUTION_LIMITS.MAX_ITERATIONS_TEST,
         maxOutputLines: EXECUTION_LIMITS.MAX_OUTPUT_LINES_TEST,
         deviceAdapter: adapter,
-        sharedAnimationBuffer: buffer,
+        // Note: Not passing sharedAnimationBuffer to test local tracking (legacy path)
+        // When buffer is provided, direct sync is enabled and requires AnimationWorker
       })
 
       await interpreter.execute(`

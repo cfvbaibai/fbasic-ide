@@ -1,8 +1,10 @@
 /**
  * Shared display state buffer for main thread ↔ worker sync.
  * Layout: sprites (0–192) + cell chars (192–864) + cell patterns (864–1536) +
- * cursor (1536–1538) + sequence (1540–1544) + scalars (1544–1548).
+ * cursor (1536–1538) + sequence (1540–1544) + scalars (1544–1548) +
+ * animation sync (1548–1620).
  * Reuses first 192 bytes for sprite state (Float64Array × 24); screen/sequence/scalars follow.
+ * Animation sync section (9 floats) at end for Executor Worker ↔ Animation Worker direct sync.
  */
 
 import type { ScreenCell } from '@/core/interfaces'
@@ -26,13 +28,22 @@ export const OFFSET_CURSOR = OFFSET_PATTERNS + CELLS // 1536
 export const OFFSET_SEQUENCE = 1540
 export const OFFSET_SCALARS = OFFSET_SEQUENCE + 4 // 1544
 
-export const SHARED_DISPLAY_BUFFER_BYTES = OFFSET_SCALARS + 4 // 1548
+// Animation sync section (same layout as standalone animation buffer)
+// 9 floats: command type, action number, params (6), ack
+// Must be aligned to 8 bytes for Float64Array (1548 + 4 = 1552)
+const SYNC_SECTION_FLOATS = 9
+const SYNC_SECTION_BYTES = SYNC_SECTION_FLOATS * 8 // 72
+// Add padding to align to 8 bytes (1544 + 4 + 4 = 1552, which is divisible by 8)
+const SYNC_PADDING = 4
+export const OFFSET_ANIMATION_SYNC = OFFSET_SCALARS + 4 + SYNC_PADDING // 1552
+
+export const SHARED_DISPLAY_BUFFER_BYTES = OFFSET_ANIMATION_SYNC + SYNC_SECTION_BYTES // 1624
 
 /**
  * Typed views over the shared display buffer (sprites + screen + cursor + sequence + scalars).
  */
 export interface SharedDisplayViews {
-  /** Raw SharedArrayBuffer (1548 bytes). */
+  /** Raw SharedArrayBuffer (1620 bytes). */
   buffer: SharedArrayBuffer
   /** Sprite positions and isActive (0-192 bytes; Float64 × 24). */
   spriteView: Float64Array
@@ -46,6 +57,8 @@ export interface SharedDisplayViews {
   sequenceView: Int32Array
   /** Scalars: bgPalette, spritePalette, backdropColor, cgenMode (4 bytes). */
   scalarsView: Uint8Array
+  /** Animation sync section (Float64Array × 9) for Executor Worker ↔ Animation Worker direct sync. */
+  animationSyncView: Float64Array
 }
 
 /** F-BASIC character code for space (empty cell). Code 0 is a picture tile, so buffer must not start as zeros. */
@@ -63,7 +76,7 @@ export function createSharedDisplayBuffer(): SharedDisplayViews {
   const buffer = new SharedArrayBuffer(SHARED_DISPLAY_BUFFER_BYTES)
   const charView = new Uint8Array(buffer, OFFSET_CHARS, CELLS)
   const patternView = new Uint8Array(buffer, OFFSET_PATTERNS, CELLS)
-  // SharedArrayBuffer is zero-initialized; 
+  // SharedArrayBuffer is zero-initialized;
   // code 0 is a picture BGITEM. Fill screen with space so initial screen is empty.
   charView.fill(CHAR_CODE_SPACE)
   patternView.fill(0)
@@ -75,6 +88,7 @@ export function createSharedDisplayBuffer(): SharedDisplayViews {
     cursorView: new Uint8Array(buffer, OFFSET_CURSOR, 2),
     sequenceView: new Int32Array(buffer, OFFSET_SEQUENCE, 1),
     scalarsView: new Uint8Array(buffer, OFFSET_SCALARS, 4),
+    animationSyncView: new Float64Array(buffer, OFFSET_ANIMATION_SYNC, SYNC_SECTION_FLOATS),
   }
 }
 
@@ -90,6 +104,7 @@ export function createViewsFromDisplayBuffer(buffer: SharedArrayBuffer): SharedD
     cursorView: new Uint8Array(buffer, OFFSET_CURSOR, 2),
     sequenceView: new Int32Array(buffer, OFFSET_SEQUENCE, 1),
     scalarsView: new Uint8Array(buffer, OFFSET_SCALARS, 4),
+    animationSyncView: new Float64Array(buffer, OFFSET_ANIMATION_SYNC, SYNC_SECTION_FLOATS),
   }
 }
 

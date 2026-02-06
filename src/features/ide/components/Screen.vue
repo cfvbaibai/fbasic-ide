@@ -367,9 +367,7 @@ const animationWorkerResult = useAnimationWorker({
   sharedJoystickBuffer: computed(() => ctx.sharedJoystickBuffer.value ?? null),
   onReady: () => {
     logScreen.debug('[Screen] Animation Worker ready')
-    // Set forward function so message handler can route commands to Animation Worker
-    // We set it via setForwardToAnimationWorker which updates the ref in useBasicIdeScreenIntegration
-    ctx.setForwardToAnimationWorker?.(animationWorkerResult.forwardCommand)
+    // Animation Worker is now ready - it polls the shared buffer for commands
   },
   onError: (error) => {
     logScreen.error('[Screen] Animation Worker error:', error)

@@ -269,7 +269,6 @@ export type ServiceWorkerMessageType =
   | 'ANIMATION_COMMAND'
   | 'SET_SHARED_ANIMATION_BUFFER'
   | 'SET_SHARED_JOYSTICK_BUFFER'
-  | 'FORWARD_TO_ANIMATION_WORKER'
   | 'REQUEST_INPUT'
   | 'INPUT_VALUE'
   | 'PLAY_SOUND'
@@ -460,14 +459,6 @@ export interface SetSharedJoystickBufferMessage extends ServiceWorkerMessage {
   }
 }
 
-// Forward to animation worker - sent from executor worker to main thread, which forwards to animation worker
-export interface ForwardToAnimationWorkerMessage extends ServiceWorkerMessage {
-  type: 'FORWARD_TO_ANIMATION_WORKER'
-  data: {
-    command: AnimationCommand
-  }
-}
-
 // Request input - sent from worker to main when INPUT/LINPUT executes
 export interface RequestInputMessage extends ServiceWorkerMessage {
   type: 'REQUEST_INPUT'
@@ -526,7 +517,6 @@ export type AnyServiceWorkerMessage =
   | AnimationCommandMessage
   | SetSharedAnimationBufferMessage
   | SetSharedJoystickBufferMessage
-  | ForwardToAnimationWorkerMessage
   | RequestInputMessage
   | InputValueMessage
   | PlaySoundMessage

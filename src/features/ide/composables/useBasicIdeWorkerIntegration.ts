@@ -66,7 +66,6 @@ export function useBasicIdeWorkerIntegration(
     setDecodedScreenState: screen.setDecodedScreenState,
     pendingInputRequest: state.pendingInputRequest,
     respondToInputRequest: respondToInputRequestImpl,
-    forwardToAnimationWorker: screen.forwardToAnimationWorker,
   }
 
   function respondToInputRequestImpl(requestId: string, values: string[], cancelled: boolean) {
