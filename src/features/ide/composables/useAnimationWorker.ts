@@ -102,13 +102,22 @@ export function useAnimationWorker(options: UseAnimationWorkerOptions) {
   }
 
   // Watch for buffer changes and send to worker when available
-  watch(sharedAnimationBuffer, () => {
+  watch(sharedAnimationBuffer, (newBuffer) => {
+    console.log('[useAnimationWorker] sharedAnimationBuffer changed:', {
+      isReady: isReady.value,
+      hasWorker: !!worker,
+      hasBuffer: !!newBuffer,
+      byteLength: newBuffer?.byteLength,
+    })
     if (isReady.value && worker) {
-      const setBufferCommand: AnimationWorkerCommand = {
-        type: 'SET_SHARED_BUFFER',
-        buffer: sharedAnimationBuffer.value,
+      if (newBuffer) {
+        const setBufferCommand: AnimationWorkerCommand = {
+          type: 'SET_SHARED_BUFFER',
+          buffer: newBuffer,
+        }
+        worker.postMessage(setBufferCommand)
+        console.log('[useAnimationWorker] Sent SET_SHARED_BUFFER to AnimationWorker, byteLength:', newBuffer.byteLength)
       }
-      worker.postMessage(setBufferCommand)
     }
   })
 

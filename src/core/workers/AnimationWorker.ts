@@ -82,6 +82,7 @@ export class AnimationWorker {
    * Handle message from Executor Worker or Main Thread
    */
   handleMessage(command: AnimationWorkerCommand): void {
+    logWorker.debug('[AnimationWorker] Received command:', command.type)
     switch (command.type) {
       case 'START_MOVEMENT':
         this.handleStartMovement(command.actionNumber, command.definition, command.startX, command.startY)
@@ -112,6 +113,7 @@ export class AnimationWorker {
    * Supports both standalone animation buffer (264 bytes) and combined display buffer (1620 bytes).
    */
   private handleSetSharedBuffer(buffer: SharedArrayBuffer): void {
+    console.log('[AnimationWorker] handleSetSharedBuffer called, byteLength =', buffer.byteLength)
     const MIN_BUFFER_BYTES = SHARED_ANIMATION_BUFFER_BYTES
     if (buffer.byteLength < MIN_BUFFER_BYTES) {
       throw new RangeError(
@@ -434,7 +436,7 @@ export class AnimationWorker {
     this.isRunning = true
     this.lastTickTime = performance.now()
 
-    logWorker.debug('[AnimationWorker] Starting tick loop at 60Hz')
+    console.log('[AnimationWorker] Starting tick loop at 60Hz')
 
     // Use setInterval for fixed 60Hz tick rate
     this.tickInterval = self.setInterval(() => {
