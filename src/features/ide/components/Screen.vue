@@ -320,9 +320,13 @@ const { schedule: scheduleRender, cleanup: cleanupRenderQueue } = useRenderQueue
   },
   {
     hasActiveMovements: () => {
-      // Check local states first
+      // Prioritize local state (immediate update from ANIMATION_COMMAND) over shared buffer (may lag)
       const localActive = localMovementStates.value.some(m => m.isActive)
-      // When shared buffer is available, read isActive directly from buffer (Animation Worker is source of truth)
+      if (localActive) {
+        // Trust local state when it says active (Animation Worker will sync buffer shortly)
+        return true
+      }
+      // If local says no active, also check shared buffer in case it has state we don't know about
       if (ctx.sharedAnimationView.value) {
         for (let actionNumber = 0; actionNumber < 8; actionNumber++) {
           const base = actionNumber * 3
@@ -332,7 +336,7 @@ const { schedule: scheduleRender, cleanup: cleanupRenderQueue } = useRenderQueue
         }
         return false
       }
-      return localActive
+      return false
     },
     setPendingStaticRender: (v: boolean) => {
       pendingStaticRenderRef.value = v

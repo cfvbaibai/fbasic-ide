@@ -79,10 +79,10 @@ export function useScreenAnimationLoopRenderOnly(
   const GRACE_PERIOD_FRAMES = 5 // Wait 5 frames (~83ms at 60fps) before pausing
 
   async function animationLoop(): Promise<void> {
-    // Check if there are active movements - read from shared buffer when available
+    // Check if there are active movements - prioritize local state over shared buffer
     let hasActive = localMovementStates.value.some(m => m.isActive)
-    if (sharedAnimationView) {
-      // Read isActive directly from shared buffer (Animation Worker is the source of truth)
+    if (!hasActive && sharedAnimationView) {
+      // If local says no active, also check shared buffer in case it has state we don't know about
       for (let actionNumber = 0; actionNumber < MAX_SPRITES; actionNumber++) {
         const base = actionNumber * 3
         if (sharedAnimationView[base + 2] !== 0) {
@@ -233,10 +233,10 @@ export function useScreenAnimationLoopRenderOnly(
    * Check if we need to start the loop
    */
   function checkAndStart(): void {
+    // Prioritize local state (immediate update from ANIMATION_COMMAND) over shared buffer (may lag)
     let hasActive = localMovementStates.value.some(m => m.isActive)
-    if (sharedAnimationView) {
-      // Read isActive directly from shared buffer
-      hasActive = false
+    if (!hasActive && sharedAnimationView) {
+      // If local says no active, also check shared buffer in case it has state we don't know about
       for (let actionNumber = 0; actionNumber < MAX_SPRITES; actionNumber++) {
         const base = actionNumber * 3
         if (sharedAnimationView[base + 2] !== 0) {
@@ -255,20 +255,23 @@ export function useScreenAnimationLoopRenderOnly(
   }
 
   // Watch for active movements to start/stop the loop
-  // When shared buffer is available, read isActive from buffer (Animation Worker is source of truth)
+  // Prioritize local state (immediate update from ANIMATION_COMMAND) over shared buffer (may lag)
   const hasActiveMovements = computed(() => {
     const localActive = localMovementStates.value.some(m => m.isActive)
+    if (localActive) {
+      // Trust local state when it says active (Animation Worker will sync buffer shortly)
+      return true
+    }
+    // If local says no active, also check shared buffer in case it has state we don't know about
     if (sharedAnimationView) {
-      // Read isActive directly from shared buffer
       for (let actionNumber = 0; actionNumber < MAX_SPRITES; actionNumber++) {
         const base = actionNumber * 3
         if (sharedAnimationView[base + 2] !== 0) {
           return true
         }
       }
-      return false
     }
-    return localActive
+    return false
   })
 
   watch(hasActiveMovements, (active, oldActive) => {
