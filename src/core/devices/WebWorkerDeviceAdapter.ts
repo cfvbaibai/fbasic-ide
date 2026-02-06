@@ -306,7 +306,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       type: 'SCREEN_CHANGED',
       id: `screen-changed-${Date.now()}`,
       timestamp: Date.now(),
-    }, '*')
+    })
   }
 
   consumeStrigState(joystickId: number): number {
@@ -389,7 +389,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       this.syncScreenStateToShared()
       this.postScreenChanged()
     } else {
-      self.postMessage(this.screenStateManager.createClearScreenUpdateMessage(), '*')
+      self.postMessage(this.screenStateManager.createClearScreenUpdateMessage())
     }
     this.cancelPendingScreenUpdate()
   }
@@ -401,7 +401,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       this.syncScreenStateToShared()
       this.postScreenChanged()
     } else {
-      self.postMessage(this.screenStateManager.createCursorUpdateMessage(), '*')
+      self.postMessage(this.screenStateManager.createCursorUpdateMessage())
     }
   }
 
@@ -412,7 +412,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       this.syncScreenStateToShared()
       this.postScreenChanged()
     } else {
-      self.postMessage(this.screenStateManager.createColorUpdateMessage(cellsToUpdate), '*')
+      self.postMessage(this.screenStateManager.createColorUpdateMessage(cellsToUpdate))
     }
   }
 
@@ -426,7 +426,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       this.syncScreenStateToShared()
       this.postScreenChanged()
     } else {
-      self.postMessage(this.screenStateManager.createPaletteUpdateMessage(), '*')
+      self.postMessage(this.screenStateManager.createPaletteUpdateMessage())
     }
   }
 
@@ -437,7 +437,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       this.syncScreenStateToShared()
       this.postScreenChanged()
     } else {
-      self.postMessage(this.screenStateManager.createBackdropUpdateMessage(), '*')
+      self.postMessage(this.screenStateManager.createBackdropUpdateMessage())
     }
   }
 
@@ -448,7 +448,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       this.syncScreenStateToShared()
       this.postScreenChanged()
     } else {
-      self.postMessage(this.screenStateManager.createCgenUpdateMessage(), '*')
+      self.postMessage(this.screenStateManager.createCgenUpdateMessage())
     }
   }
 
@@ -466,7 +466,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       data: command,
     }
 
-    self.postMessage(message, '*')
+    self.postMessage(message)
   }
 
   /**
@@ -483,7 +483,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       data: { command },
     }
 
-    self.postMessage(message, '*')
+    self.postMessage(message)
   }
 
   /**
@@ -554,7 +554,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
         this.syncScreenStateToShared()
         this.postScreenChanged()
       } else {
-        self.postMessage(this.screenStateManager.createClearScreenUpdateMessage(), '*')
+        self.postMessage(this.screenStateManager.createClearScreenUpdateMessage())
       }
       this.cancelPendingScreenUpdate()
     } else {
@@ -722,7 +722,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       this.postScreenChanged()
     } else if (this.screenStateManager) {
       // In test environment (jsdom), postMessage requires targetOrigin
-      self.postMessage(this.screenStateManager.createFullScreenUpdateMessage(), '*')
+      self.postMessage(this.screenStateManager.createFullScreenUpdateMessage())
     }
   }
 }
