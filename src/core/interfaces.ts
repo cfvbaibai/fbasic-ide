@@ -147,6 +147,8 @@ export interface InterpreterConfig {
   deviceAdapter?: BasicDeviceAdapter
   /** Shared animation state buffer (positions + isActive). Used by worker for XPOS/YPOS and MOVE(n). */
   sharedAnimationBuffer?: SharedArrayBuffer
+  /** Shared display state buffer (screen + sprites + cursor + scalars). Used for integration testing. */
+  sharedDisplayBuffer?: SharedArrayBuffer
 }
 
 /**
