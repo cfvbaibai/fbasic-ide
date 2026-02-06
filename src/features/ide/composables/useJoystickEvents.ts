@@ -1,6 +1,7 @@
 import { useIntervalFn, useTimeoutFn } from '@vueuse/core'
 import { onDeactivated, onUnmounted, ref } from 'vue'
 
+import { type JoystickBufferView,setStickState, setStrigState } from '@/core/devices'
 import { logComposable } from '@/shared/logger'
 
 interface UseJoystickEventsOptions {
@@ -9,10 +10,19 @@ interface UseJoystickEventsOptions {
   onStickStateChange?: (joystickId: number, state: number) => void
   onStrigStateChange?: (joystickId: number, state: number) => void
   onCellFlash?: (cellKey: string) => void
+  /** Shared joystick buffer view - if provided, writes directly to buffer instead of sending events */
+  sharedJoystickView?: JoystickBufferView
 }
 
 export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
-  const { sendStickEvent, sendStrigEvent, onStickStateChange, onStrigStateChange, onCellFlash } = options
+  const {
+    sendStickEvent,
+    sendStrigEvent,
+    onStickStateChange,
+    onStrigStateChange,
+    onCellFlash,
+    sharedJoystickView,
+  } = options
 
   // Track which buttons are currently "held" (toggle state)
   const heldButtons = ref<Record<string, boolean>>({})
@@ -52,6 +62,10 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
 
     // Set new timer to reset STRIG value after 300ms
     const { start, stop } = useTimeoutFn(() => {
+      if (sharedJoystickView) {
+        setStrigState(sharedJoystickView, joystickId, 0)
+        logComposable.debug('Resetting strig state in shared buffer:', { joystickId })
+      }
       onStrigStateChange?.(joystickId, 0)
       strigResetTimers.value[joystickId] = null
     }, 300)
@@ -77,16 +91,21 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
     const stickValue = directionMap[direction] ?? 0
 
     // Send STICK event to service worker
-    if (sendStickEvent && stickValue > 0) {
+    // If shared joystick buffer is available, write directly to it (zero-copy)
+    // Otherwise, fall back to message passing for backward compatibility
+    if (sharedJoystickView) {
+      setStickState(sharedJoystickView, joystickId, stickValue)
+      logComposable.debug('Writing stick state to shared buffer:', { joystickId, direction, stickValue })
+    } else if (sendStickEvent && stickValue > 0) {
       logComposable.debug('Sending STICK event:', { joystickId, direction, stickValue })
       sendStickEvent(joystickId, stickValue)
-
-      // Update local state for display
-      onStickStateChange?.(joystickId, stickValue)
-
-      // Keep the STICK cell flashing while button is held
-      flashingCells.value[`stick-${joystickId}`] = true
     }
+
+    // Update local state for display
+    onStickStateChange?.(joystickId, stickValue)
+
+    // Keep the STICK cell flashing while button is held
+    flashingCells.value[`stick-${joystickId}`] = true
 
     // Pause existing interval for this button if any
     if (heldDpadButtons.value[buttonKey]) {
@@ -97,7 +116,10 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
     // Set up repeat interval using VueUse
     // useIntervalFn starts immediately by default, so we just need to store pause
     const { pause } = useIntervalFn(() => {
-      if (sendStickEvent && stickValue > 0) {
+      if (sharedJoystickView) {
+        setStickState(sharedJoystickView, joystickId, stickValue)
+        logComposable.debug('Repeating stick state to shared buffer:', { joystickId, direction, stickValue })
+      } else if (sendStickEvent && stickValue > 0) {
         logComposable.debug('Repeating STICK event:', { joystickId, direction, stickValue })
         sendStickEvent(joystickId, stickValue)
       }
@@ -118,9 +140,14 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
     }
 
     // Only send release event and stop flashing if button was actually being held
-    if (wasHeld && sendStickEvent) {
-      logComposable.debug('Sending STICK release event:', { joystickId, direction, stickValue: 0 })
-      sendStickEvent(joystickId, 0)
+    if (wasHeld) {
+      if (sharedJoystickView) {
+        setStickState(sharedJoystickView, joystickId, 0)
+        logComposable.debug('Writing stick release to shared buffer:', { joystickId, direction, stickValue: 0 })
+      } else if (sendStickEvent) {
+        logComposable.debug('Sending STICK release event:', { joystickId, direction, stickValue: 0 })
+        sendStickEvent(joystickId, 0)
+      }
 
       // Update local state for display
       onStickStateChange?.(joystickId, 0)
@@ -171,19 +198,24 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
     const strigValue = buttonMap[button] ?? 0
 
     // Send STRIG event to service worker
-    if (sendStrigEvent && strigValue > 0) {
+    // If shared joystick buffer is available, write directly to it (zero-copy)
+    // Otherwise, fall back to message passing for backward compatibility
+    if (sharedJoystickView) {
+      setStrigState(sharedJoystickView, joystickId, strigValue)
+      logComposable.debug('Writing strig state to shared buffer:', { joystickId, button, strigValue })
+    } else if (sendStrigEvent && strigValue > 0) {
       logComposable.debug('Sending STRIG event:', { joystickId, button, strigValue })
       sendStrigEvent(joystickId, strigValue)
-
-      // Update local state for display
-      onStrigStateChange?.(joystickId, strigValue)
-
-      // Flash the STRIG cell
-      flashCell(`strig-${joystickId}`)
-
-      // Set up timer to reset STRIG value after 300ms
-      resetStrigValue(joystickId)
     }
+
+    // Update local state for display
+    onStrigStateChange?.(joystickId, strigValue)
+
+    // Flash the STRIG cell
+    flashCell(`strig-${joystickId}`)
+
+    // Set up timer to reset STRIG value after 300ms
+    resetStrigValue(joystickId)
 
     // Reset button state immediately after sending pressed event
     const { start } = useTimeoutFn(() => {

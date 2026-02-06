@@ -7,6 +7,7 @@ import {
   readSequence,
 } from '@/core/animation/sharedDisplayBuffer'
 import type { ScreenCell } from '@/core/interfaces'
+import { useAnimationWorker } from '@/features/ide/composables/useAnimationWorker'
 import {
   preInitializeBackgroundTiles,
   renderBackgroundToCanvas,
@@ -19,7 +20,7 @@ import {
 } from '@/features/ide/composables/useKonvaScreenRenderer'
 import { useMovementStateSync } from '@/features/ide/composables/useMovementStateSync'
 import { useRenderQueue } from '@/features/ide/composables/useRenderQueue'
-import { useScreenAnimationLoop } from '@/features/ide/composables/useScreenAnimationLoop'
+import { useScreenAnimationLoopRenderOnly } from '@/features/ide/composables/useScreenAnimationLoopRenderOnly'
 import { useScreenContext } from '@/features/ide/composables/useScreenContext'
 import { useScreenZoom } from '@/features/ide/composables/useScreenZoom'
 import { COLORS } from '@/shared/data/palette'
@@ -360,20 +361,42 @@ watch(
 
 // Backdrop is managed by vue-konva template via backdropColorHex computed property
 
+// Initialize Animation Worker (single writer to shared buffer)
+const animationWorkerResult = useAnimationWorker({
+  sharedAnimationBuffer: computed(() => ctx.sharedAnimationBuffer.value ?? null),
+  sharedJoystickBuffer: computed(() => ctx.sharedJoystickBuffer.value ?? null),
+  onReady: () => {
+    logScreen.debug('[Screen] Animation Worker ready')
+    // Set forward function so message handler can route commands to Animation Worker
+    // We set it via setForwardToAnimationWorker which updates the ref in useBasicIdeScreenIntegration
+    ctx.setForwardToAnimationWorker?.(animationWorkerResult.forwardCommand)
+  },
+  onError: (error) => {
+    logScreen.error('[Screen] Animation Worker error:', error)
+  },
+})
+
+const {
+  initialize: initializeAnimationWorker,
+  terminate: terminateAnimationWorker,
+} = animationWorkerResult
+
 // Initial render when stage becomes available
 watch(
   stageRef,
   async stage => {
     if (stage) {
       await initializeKonva()
+      // Initialize Animation Worker when stage is ready
+      await initializeAnimationWorker()
     }
   },
   { immediate: true }
 )
 
-// Setup animation loop - ONLY for MOVE command animations
+// Setup render-only animation loop - READS from shared buffer (Animation Worker is the single writer)
 // When movements are active, run pending static render at end of frame (animation first, then render)
-const stopAnimationLoop = useScreenAnimationLoop({
+const stopAnimationLoop = useScreenAnimationLoopRenderOnly({
   localMovementStates,
   layers,
   frontSpriteNodes,
@@ -384,11 +407,12 @@ const stopAnimationLoop = useScreenAnimationLoop({
     ctx.movementPositionsFromBuffer.value = positions
   },
   onMovementStatesUpdated: (local) => {
+    // Sync isActive from shared buffer to context (Animation Worker manages remainingDistance)
     for (const m of local) {
       const ctxM = ctx.movementStates.value?.find(x => x.actionNumber === m.actionNumber)
       if (ctxM) {
-        ctxM.remainingDistance = m.remainingDistance
         ctxM.isActive = m.isActive
+        // Note: remainingDistance is managed by Animation Worker, not updated here
       }
     }
     ctx.movementStates.value = [...(ctx.movementStates.value ?? [])]
@@ -407,6 +431,7 @@ const stopAnimationLoop = useScreenAnimationLoop({
 function cleanupScreen() {
   stopAnimationLoop()
   cleanupRenderQueue()
+  terminateAnimationWorker()
 }
 onUnmounted(cleanupScreen)
 onDeactivated(cleanupScreen)

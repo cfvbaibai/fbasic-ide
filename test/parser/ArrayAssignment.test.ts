@@ -84,8 +84,8 @@ describe('Array Assignment', () => {
       // Verify PRINT output
       // Comma separator uses tab stops, numbers get leading space
       const outputs = deviceAdapter.getAllOutputs()
-      // PRINT doesn't end with semicolon, so adds newline
-      expect(outputs).toEqual(' 10\t 20\t 30\n')
+      // PRINT doesn't end with semicolon, so adds newline, plus "OK" from END
+      expect(outputs).toEqual(' 10\t 20\t 30\nOK\n')
     })
 
     it('should assign value using expression index', async () => {
@@ -109,8 +109,8 @@ describe('Array Assignment', () => {
 
       // Verify PRINT output
       const outputs = deviceAdapter.getAllOutputs()
-      // PRINT doesn't end with semicolon, so adds newline
-      expect(outputs).toEqual(' 100\t 200\n')
+      // PRINT doesn't end with semicolon, so adds newline, plus "OK" from END
+      expect(outputs).toEqual(' 100\t 200\nOK\n')
     })
 
     it('should assign value using expression as value', async () => {
@@ -134,8 +134,8 @@ describe('Array Assignment', () => {
 
       // Verify PRINT output
       const outputs = deviceAdapter.getAllOutputs()
-      // PRINT doesn't end with semicolon, so adds newline
-      expect(outputs).toEqual(' 6\t 8\n')
+      // PRINT doesn't end with semicolon, so adds newline, plus "OK" from END
+      expect(outputs).toEqual(' 6\t 8\nOK\n')
     })
 
     it('should assign values in a loop', async () => {
@@ -161,9 +161,9 @@ describe('Array Assignment', () => {
       expect(array[4]).toBe(40)
 
       // Verify PRINT output (semicolon separator, numbers get leading space)
-      // PRINT doesn't end with semicolon (last item is A(4), not a semicolon), so adds newline
+      // PRINT doesn't end with semicolon (last item is A(4), not a semicolon), so adds newline, plus "OK" from END
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual(' 0 10 20 30 40\n')
+      expect(outputs).toEqual(' 0 10 20 30 40\nOK\n')
     })
 
     it('should overwrite array element values', async () => {
@@ -183,9 +183,9 @@ describe('Array Assignment', () => {
       expect(array[0]).toBe(99)
 
       // Verify PRINT output
-      // PRINT doesn't end with semicolon, so adds newline
+      // PRINT doesn't end with semicolon, so adds newline, plus "OK" from END
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual(' 99\n')
+      expect(outputs).toEqual(' 99\nOK\n')
     })
   })
 
@@ -215,9 +215,9 @@ describe('Array Assignment', () => {
       expect(row1[1]).toBe(4)
 
       // Verify PRINT output
-      // PRINT doesn't end with comma (last item is A(1,1), not a comma), so adds newline
+      // PRINT doesn't end with comma (last item is A(1,1), not a comma), so adds newline, plus "OK" from END
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual(' 1\t 2\t 3\t 4\n')
+      expect(outputs).toEqual(' 1\t 2\t 3\t 4\nOK\n')
     })
 
     it('should assign values to 2D array using expressions', async () => {
@@ -242,9 +242,9 @@ describe('Array Assignment', () => {
       expect(row1[0]).toBe(99)
 
       // Verify PRINT output
-      // PRINT doesn't end with comma (last item is A(1,0), not a comma), so adds newline
+      // PRINT doesn't end with comma (last item is A(1,0), not a comma), so adds newline, plus "OK" from END
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual(' 42\t 99\n')
+      expect(outputs).toEqual(' 42\t 99\nOK\n')
     })
   })
 
@@ -267,9 +267,9 @@ describe('Array Assignment', () => {
       expect(array[0]).toBe('Hello')
       expect(array[1]).toBe('World')
 
-      // Verify PRINT output (comma separator uses tab stops)
+      // Verify PRINT output (comma separator uses tab stops), plus "OK" from END
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual('Hello\tWorld\n')
+      expect(outputs).toEqual('Hello\tWorld\nOK\n')
     })
 
     it('should assign string values using expressions', async () => {
@@ -290,9 +290,9 @@ describe('Array Assignment', () => {
       expect(array[1]).toBe('Test')
       expect(array[2]).toBe('Value')
 
-      // Verify PRINT output
+      // Verify PRINT output, plus "OK" from END
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual('Test\tValue\n')
+      expect(outputs).toEqual('Test\tValue\nOK\n')
     })
 
     it('should assign empty string to array element', async () => {
@@ -310,9 +310,9 @@ describe('Array Assignment', () => {
       const array = result.arrays?.get('A$') as BasicScalarValue[]
       expect(array[0]).toBe('')
 
-      // Verify PRINT output (empty string prints nothing)
+      // Verify PRINT output (empty string prints nothing), but "OK" is still printed
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual('')
+      expect(outputs).toEqual('OK\n')
     })
   })
 
@@ -332,7 +332,7 @@ describe('Array Assignment', () => {
       expect(array[0]).toBe(42)
 
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual(' 42\n')
+      expect(outputs).toEqual(' 42\nOK\n')
     })
 
     it('should handle array assignment at maximum index', async () => {
@@ -350,7 +350,7 @@ describe('Array Assignment', () => {
       expect(array[5]).toBe(100)
 
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual(' 100\n')
+      expect(outputs).toEqual(' 100\nOK\n')
     })
 
     it('should handle negative number assignment', async () => {
@@ -369,7 +369,7 @@ describe('Array Assignment', () => {
 
       // Negative numbers don't get leading space
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual('-10\n')
+      expect(outputs).toEqual('-10\nOK\n')
     })
 
     it('should handle zero assignment', async () => {
@@ -388,7 +388,7 @@ describe('Array Assignment', () => {
 
       // Zero gets leading space
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual(' 0\n')
+      expect(outputs).toEqual(' 0\nOK\n')
     })
   })
 })

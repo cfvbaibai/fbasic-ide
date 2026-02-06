@@ -45,9 +45,12 @@ const {
   frontSpriteNodes,
   backSpriteNodes,
   sharedAnimationView,
+  sharedAnimationBuffer,
   sharedDisplayViews,
+  sharedJoystickBuffer,
   setDecodedScreenState,
   registerScheduleRender,
+  forwardToAnimationWorker,
 } = useBasicIdeEnhanced()
 
 provideScreenContext({
@@ -66,8 +69,11 @@ provideScreenContext({
   externalBackSpriteNodes: backSpriteNodes,
   sharedAnimationView: ref(sharedAnimationView),
   sharedDisplayViews: ref(sharedDisplayViews),
+  sharedAnimationBuffer: ref(sharedAnimationBuffer),
+  sharedJoystickBuffer: ref(sharedJoystickBuffer),
   setDecodedScreenState,
   registerScheduleRender,
+  forwardToAnimationWorker,
 })
 
 const {

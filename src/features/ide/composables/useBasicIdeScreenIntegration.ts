@@ -3,7 +3,7 @@
  * Worker writes to shared buffer; Screen reads and decodes; setDecodedScreenState updates refs.
  */
 
-import { ref } from 'vue'
+import { type Ref,ref } from 'vue'
 
 import {
   createSharedDisplayBuffer,
@@ -13,6 +13,8 @@ import {
   writeScreenState,
 } from '@/core/animation/sharedDisplayBuffer'
 import { TIMING } from '@/core/constants'
+import { createSharedJoystickBuffer } from '@/core/devices'
+import type { AnimationWorkerCommand } from '@/core/workers/AnimationWorker'
 
 import type { BasicIdeState } from './useBasicIdeState'
 
@@ -20,6 +22,7 @@ export interface BasicIdeScreenIntegration {
   sharedDisplayViews: SharedDisplayViews
   sharedAnimationView: Float64Array
   sharedAnimationBuffer: SharedArrayBuffer
+  sharedJoystickBuffer: SharedArrayBuffer
   registerScheduleRender: (fn: () => void) => void
   setDecodedScreenState: (decoded: DecodedScreenState) => void
   /** Called by message handlers when SCREEN_CHANGED is received. */
@@ -28,6 +31,10 @@ export interface BasicIdeScreenIntegration {
   scheduleRenderForScreenChanged: () => void
   /** Write current (cleared) state to shared buffer and bump sequence so Screen redraws. Call after clearOutput. */
   clearDisplayToSharedBuffer: () => void
+  /** Forward animation command to Animation Worker (if initialized). */
+  forwardToAnimationWorker: (command: AnimationWorkerCommand) => void
+  /** Set the forwardToAnimationWorker function (called by Screen component when Animation Worker is ready). */
+  setForwardToAnimationWorker: (fn: (command: AnimationWorkerCommand) => void) => void
 }
 
 /**
@@ -37,6 +44,12 @@ export function useBasicIdeScreenIntegration(state: BasicIdeState): BasicIdeScre
   const sharedDisplayViews = createSharedDisplayBuffer()
   const sharedAnimationBuffer = sharedDisplayViews.buffer
   const sharedAnimationView = sharedDisplayViews.spriteView
+
+  // Shared joystick buffer (main thread writes, workers read)
+  const sharedJoystickBuffer = createSharedJoystickBuffer()
+
+  // Forward function to Animation Worker (set by Screen component)
+  const forwardToAnimationWorkerRef: Ref<((command: AnimationWorkerCommand) => void) | undefined> = ref(undefined)
 
   const scheduleScreenRenderRef = ref<(() => void) | null>(null)
   const registerScheduleRender = (fn: () => void) => {
@@ -110,10 +123,18 @@ export function useBasicIdeScreenIntegration(state: BasicIdeState): BasicIdeScre
     sharedDisplayViews,
     sharedAnimationView,
     sharedAnimationBuffer,
+    sharedJoystickBuffer,
     registerScheduleRender,
     setDecodedScreenState,
     scheduleRender,
     scheduleRenderForScreenChanged,
     clearDisplayToSharedBuffer,
+    forwardToAnimationWorker: (command: AnimationWorkerCommand) => {
+      forwardToAnimationWorkerRef.value?.(command)
+    },
+    /** Set the forwardToAnimationWorker function (called by Screen component when Animation Worker is ready) */
+    setForwardToAnimationWorker: (fn: (command: AnimationWorkerCommand) => void) => {
+      forwardToAnimationWorkerRef.value = fn
+    },
   }
 }

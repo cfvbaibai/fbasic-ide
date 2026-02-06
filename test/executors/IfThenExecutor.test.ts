@@ -20,6 +20,7 @@ describe('IfThenExecutor', () => {
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
+      suppressOkPrompt: true,
       deviceAdapter: deviceAdapter,
     })
   })
@@ -45,6 +46,7 @@ describe('IfThenExecutor', () => {
     const result = await interpreter.execute(source)
 
     expect(result.success).toBe(true)
+    // No PRINT executed, but END still prints "OK"
     expect(deviceAdapter.getAllOutputs()).toEqual('')
   })
 

@@ -36,7 +36,7 @@ describe('FunctionEvaluator - Sprite Functions', () => {
 
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      expect(deviceAdapter.getAllOutputs()).toEqual('-1\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual('-1\nOK\n')
     })
 
     it('should return 0 for completed movement', async () => {
@@ -51,7 +51,7 @@ describe('FunctionEvaluator - Sprite Functions', () => {
 
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 0\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 0\nOK\n')
     })
 
     it('should return 0 for never-started movement', async () => {
@@ -64,7 +64,7 @@ describe('FunctionEvaluator - Sprite Functions', () => {
 
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 0\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 0\nOK\n')
     })
 
     it('should validate action number (0-7)', async () => {
@@ -92,7 +92,7 @@ describe('FunctionEvaluator - Sprite Functions', () => {
 
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 150\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 150\nOK\n')
     })
 
     it('should return cached X position (synced every frame from frontend)', async () => {
@@ -104,7 +104,7 @@ describe('FunctionEvaluator - Sprite Functions', () => {
       const result = await interpreter.execute(source)
 
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 75\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 75\nOK\n')
     })
 
     it('should return 0 for undefined sprite', async () => {
@@ -115,7 +115,7 @@ describe('FunctionEvaluator - Sprite Functions', () => {
       const result = await interpreter.execute(source)
 
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 0\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 0\nOK\n')
     })
 
     it('should validate sprite number (0-7)', async () => {
@@ -142,7 +142,7 @@ describe('FunctionEvaluator - Sprite Functions', () => {
 
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 120\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 120\nOK\n')
     })
 
     it('should return cached Y position (synced every frame from frontend)', async () => {
@@ -154,7 +154,7 @@ describe('FunctionEvaluator - Sprite Functions', () => {
       const result = await interpreter.execute(source)
 
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 90\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 90\nOK\n')
     })
 
     it('should return 0 for undefined sprite', async () => {
@@ -165,7 +165,7 @@ describe('FunctionEvaluator - Sprite Functions', () => {
       const result = await interpreter.execute(source)
 
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 0\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 0\nOK\n')
     })
 
     it('should validate sprite number (0-7)', async () => {

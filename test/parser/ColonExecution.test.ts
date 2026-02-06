@@ -72,9 +72,10 @@ describe('Colon-Separated Statement Execution', () => {
 
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      expect(printOutputMock).toHaveBeenCalledTimes(2)
+      expect(printOutputMock).toHaveBeenCalledTimes(3)
       expect(printOutputMock).toHaveBeenNthCalledWith(1, 'Hello\n')
       expect(printOutputMock).toHaveBeenNthCalledWith(2, 'World\n')
+      expect(printOutputMock).toHaveBeenNthCalledWith(3, 'OK\n')
     })
 
     it('should execute PRINT with empty statements', async () => {
@@ -83,10 +84,11 @@ describe('Colon-Separated Statement Execution', () => {
 
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      expect(printOutputMock).toHaveBeenCalledTimes(3)
+      expect(printOutputMock).toHaveBeenCalledTimes(4)
       expect(printOutputMock).toHaveBeenNthCalledWith(1, '\n')
       expect(printOutputMock).toHaveBeenNthCalledWith(2, 'Hello\n')
       expect(printOutputMock).toHaveBeenNthCalledWith(3, '\n')
+      expect(printOutputMock).toHaveBeenNthCalledWith(4, 'OK\n')
     })
   })
 
@@ -98,9 +100,10 @@ describe('Colon-Separated Statement Execution', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('A')?.value).toBe(5)
-      expect(printOutputMock).toHaveBeenCalledTimes(1)
+      expect(printOutputMock).toHaveBeenCalledTimes(2)
       // Numbers always have a leading space (sign position) regardless of separator
-      expect(printOutputMock).toHaveBeenCalledWith(' 5\n')
+      expect(printOutputMock).toHaveBeenNthCalledWith(1, ' 5\n')
+      expect(printOutputMock).toHaveBeenNthCalledWith(2, 'OK\n')
     })
 
     it('should execute multiple mixed statements', async () => {
@@ -111,10 +114,11 @@ describe('Colon-Separated Statement Execution', () => {
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('A')?.value).toBe(5)
       expect(result.variables.get('B')?.value).toBe(10)
-      expect(printOutputMock).toHaveBeenCalledTimes(2)
+      expect(printOutputMock).toHaveBeenCalledTimes(3)
       // Numbers always have a leading space (sign position) regardless of separator
       expect(printOutputMock).toHaveBeenNthCalledWith(1, ' 5\n')
       expect(printOutputMock).toHaveBeenNthCalledWith(2, ' 10\n')
+      expect(printOutputMock).toHaveBeenNthCalledWith(3, 'OK\n')
     })
 
     it('should use variables set earlier in the same line', async () => {
@@ -125,9 +129,10 @@ describe('Colon-Separated Statement Execution', () => {
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('X')?.value).toBe(10)
       expect(result.variables.get('Y')?.value).toBe(15)
-      expect(printOutputMock).toHaveBeenCalledTimes(1)
+      expect(printOutputMock).toHaveBeenCalledTimes(2)
       // Numbers always have a leading space (sign position) regardless of separator
-      expect(printOutputMock).toHaveBeenCalledWith(' 15\n')
+      expect(printOutputMock).toHaveBeenNthCalledWith(1, ' 15\n')
+      expect(printOutputMock).toHaveBeenNthCalledWith(2, 'OK\n')
     })
   })
 
@@ -141,7 +146,10 @@ describe('Colon-Separated Statement Execution', () => {
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('A')?.value).toBe(5)
       expect(result.variables.get('B')?.value).toBe(10)
-      expect(printOutputMock).toHaveBeenCalledTimes(2)
+      expect(printOutputMock).toHaveBeenCalledTimes(3)
+      expect(printOutputMock).toHaveBeenNthCalledWith(1, ' 5\n')
+      expect(printOutputMock).toHaveBeenNthCalledWith(2, ' 10\n')
+      expect(printOutputMock).toHaveBeenNthCalledWith(3, 'OK\n')
     })
 
     it('should handle mixed lines with and without colons', async () => {
@@ -155,7 +163,11 @@ describe('Colon-Separated Statement Execution', () => {
       expect(result.variables.get('A')?.value).toBe(5)
       expect(result.variables.get('B')?.value).toBe(10)
       expect(result.variables.get('C')?.value).toBe(15)
-      expect(printOutputMock).toHaveBeenCalledTimes(3) // Line 10: 1 PRINT, Line 20: 1 PRINT, Line 30: 1 PRINT
+      expect(printOutputMock).toHaveBeenCalledTimes(4) // Line 10: 1 PRINT, Line 20: 1 PRINT, Line 30: 1 PRINT, plus OK
+      expect(printOutputMock).toHaveBeenNthCalledWith(1, ' 5\n')
+      expect(printOutputMock).toHaveBeenNthCalledWith(2, 'Single statement\n')
+      expect(printOutputMock).toHaveBeenNthCalledWith(3, ' 10\n')
+      expect(printOutputMock).toHaveBeenNthCalledWith(4, 'OK\n')
     })
   })
 })

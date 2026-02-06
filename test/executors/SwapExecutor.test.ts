@@ -38,7 +38,7 @@ describe('SwapExecutor', () => {
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
-    expect(outputs).toEqual(' 20\t 10\n')
+    expect(outputs).toEqual(' 20\t 10\nOK\n')
   })
 
   it('should swap two simple string variables', async () => {
@@ -54,7 +54,7 @@ describe('SwapExecutor', () => {
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
-    expect(outputs).toEqual('WORLD\tHELLO\n')
+    expect(outputs).toEqual('WORLD\tHELLO\nOK\n')
   })
 
   it('should swap array elements (manual p.67 sample)', async () => {
@@ -84,7 +84,8 @@ describe('SwapExecutor', () => {
     const outputs = deviceAdapter.getAllOutputs()
     // First line: 2 3 5 1 7 4 8 9 6 0 (unsorted)
     // Second line: 0 1 2 3 4 5 6 7 8 9 (sorted)
-    expect(outputs).toEqual(' 2 3 5 1 7 4 8 9 6 0\n 0 1 2 3 4 5 6 7 8 9')
+    // The last PRINT A(I); doesn't add newline before END prints "OK"
+    expect(outputs).toEqual(' 2 3 5 1 7 4 8 9 6 0\n 0 1 2 3 4 5 6 7 8 9OK\n')
   })
 
   it('should swap simple var with array element', async () => {
@@ -101,7 +102,7 @@ describe('SwapExecutor', () => {
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
-    expect(outputs).toEqual(' 200\t 100\n')
+    expect(outputs).toEqual(' 200\t 100\nOK\n')
   })
 
   it('should report type mismatch for numeric and string', async () => {
@@ -130,7 +131,7 @@ describe('SwapExecutor', () => {
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
-    expect(outputs).toEqual(' 2\t 1\n')
+    expect(outputs).toEqual(' 2\t 1\nOK\n')
   })
 
   it('should swap uninitialized numeric vars (0 and 0)', async () => {
@@ -144,7 +145,7 @@ describe('SwapExecutor', () => {
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
-    expect(outputs).toEqual(' 0\t 0\n')
+    expect(outputs).toEqual(' 0\t 0\nOK\n')
   })
 
   it('should swap uninitialized string vars (empty)', async () => {
@@ -159,6 +160,7 @@ describe('SwapExecutor', () => {
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
     // Both A$ and B$ are empty; PRINT A$; B$ outputs nothing (implementation may or may not add newline)
-    expect(outputs === '' || outputs === '\n').toBe(true)
+    // But END prints "OK\n"
+    expect(outputs === 'OK\n' || outputs === '\nOK\n').toBe(true)
   })
 })

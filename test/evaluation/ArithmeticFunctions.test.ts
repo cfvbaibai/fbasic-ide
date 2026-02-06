@@ -30,7 +30,7 @@ describe('Arithmetic Functions', () => {
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 5\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 5\nOK\n')
     })
 
     it('should return absolute value of negative number', async () => {
@@ -38,7 +38,7 @@ describe('Arithmetic Functions', () => {
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 5\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 5\nOK\n')
     })
 
     it('should return 0 for ABS(0)', async () => {
@@ -46,7 +46,7 @@ describe('Arithmetic Functions', () => {
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 0\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 0\nOK\n')
     })
 
     it('should handle ABS with expression as per manual example', async () => {
@@ -55,7 +55,7 @@ describe('Arithmetic Functions', () => {
       expect(result.success).toBe(true)
       // ABS(10-34) = ABS(-24) = 24 per manual page 82
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 24\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 24\nOK\n')
     })
   })
 
@@ -65,7 +65,7 @@ describe('Arithmetic Functions', () => {
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 1\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 1\nOK\n')
     })
 
     it('should return -1 for negative number', async () => {
@@ -73,7 +73,7 @@ describe('Arithmetic Functions', () => {
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
       // Negative numbers don't get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual('-1\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual('-1\nOK\n')
     })
 
     it('should return 0 for zero', async () => {
@@ -81,7 +81,7 @@ describe('Arithmetic Functions', () => {
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 0\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 0\nOK\n')
     })
   })
 
@@ -104,7 +104,7 @@ describe('Arithmetic Functions', () => {
       expect(result.success).toBe(true)
       // RND(1) always returns 0 according to spec
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 0\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 0\nOK\n')
     })
 
     it('should return random number between 0 and 7 for RND(8)', async () => {
@@ -148,7 +148,7 @@ describe('Arithmetic Functions', () => {
       expect(result.success).toBe(true)
       // SGN(-5) = -1, ABS(-1) = 1
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 1\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 1\nOK\n')
     })
 
     it('should handle functions in expressions', async () => {
@@ -157,7 +157,7 @@ describe('Arithmetic Functions', () => {
       expect(result.success).toBe(true)
       // ABS(-5) = 5, SGN(10) = 1, 5 + 1 = 6
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 6\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 6\nOK\n')
     })
 
     it('should handle functions with variables', async () => {
@@ -165,7 +165,7 @@ describe('Arithmetic Functions', () => {
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 10\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 10\nOK\n')
     })
   })
 })

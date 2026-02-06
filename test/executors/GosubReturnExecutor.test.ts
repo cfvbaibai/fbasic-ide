@@ -49,7 +49,7 @@ describe('GOSUB/RETURN Executor', () => {
       // I=1: J=0,1 -> ** (2 stars), I=2: J=0,1,2 -> *** (3 stars), I=3: J=0,1,2,3 -> **** (4 stars)
       // Each PRINT "*"; outputs on same line, then PRINT adds newline
       // PRINT "END" doesn't end with semicolon, so adds newline
-      expect(outputs).toEqual('**\n***\n****\nEND\n')
+      expect(outputs).toEqual('**\n***\n****\nEND\nOK\n')
     })
 
     it('should handle nested GOSUB calls', async () => {
@@ -69,7 +69,7 @@ describe('GOSUB/RETURN Executor', () => {
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
       // PRINT "Main" doesn't end with semicolon, so adds newline
-      expect(outputs).toEqual('Sub1\nSub2\nMain\n')
+      expect(outputs).toEqual('Sub1\nSub2\nMain\nOK\n')
     })
 
     it('should error on GOSUB to non-existent line number', async () => {
@@ -108,7 +108,7 @@ describe('GOSUB/RETURN Executor', () => {
       const outputs = deviceAdapter.getAllOutputs()
       // Should execute: Before, Subroutine, After
       // PRINT "After" doesn't end with semicolon, so adds newline
-      expect(outputs).toEqual('Before\nSubroutine\nAfter\n')
+      expect(outputs).toEqual('Before\nSubroutine\nAfter\nOK\n')
     })
 
     it('should return to specific line number when specified', async () => {
@@ -127,7 +127,7 @@ describe('GOSUB/RETURN Executor', () => {
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
       // PRINT "Target" doesn't end with semicolon, so adds newline
-      expect(outputs).toEqual('Start\nSubroutine\nTarget\n')
+      expect(outputs).toEqual('Start\nSubroutine\nTarget\nOK\n')
     })
 
     it('should error on RETURN without GOSUB', async () => {
@@ -204,7 +204,7 @@ describe('GOSUB/RETURN Executor', () => {
       const outputs = deviceAdapter.getAllOutputs()
       // Numbers always get a space BEFORE them
       // PRINT I doesn't end with semicolon, so each adds newline
-      expect(outputs).toEqual(' 1\n 2\n 3\n')
+      expect(outputs).toEqual(' 1\n 2\n 3\nOK\n')
     })
   })
 })

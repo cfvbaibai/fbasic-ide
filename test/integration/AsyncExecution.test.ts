@@ -23,6 +23,7 @@ describe('Async Execution - Production Mode', () => {
       maxOutputLines: EXECUTION_LIMITS.MAX_OUTPUT_LINES_PRODUCTION,
       enableDebugMode: false,
       strictMode: false,
+      suppressOkPrompt: true,
       deviceAdapter: deviceAdapter,
     })
   })

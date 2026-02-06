@@ -39,7 +39,7 @@ describe('GotoExecutor', () => {
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
     // PRINT "Jumped here" doesn't end with semicolon, so adds newline
-    expect(outputs).toEqual('Start\nJumped here\n')
+    expect(outputs).toEqual('Start\nJumped here\nOK\n')
   })
 
   it('should handle GOTO in a loop', async () => {
@@ -58,7 +58,7 @@ describe('GotoExecutor', () => {
     const outputs = deviceAdapter.getAllOutputs()
     // Numbers always get a space BEFORE them
     // PRINT "Done" doesn't end with semicolon, so adds newline
-    expect(outputs).toEqual(' 1\n 2\n 3\nDone\n')
+    expect(outputs).toEqual(' 1\n 2\n 3\nDone\nOK\n')
   })
 
   it('should handle GOTO to earlier line (backward jump)', async () => {
@@ -76,7 +76,7 @@ describe('GotoExecutor', () => {
     const outputs = deviceAdapter.getAllOutputs()
     // Should print "Loop" 3 times (X = 0, 1, 2), then "End"
     // PRINT "End" doesn't end with semicolon, so adds newline
-    expect(outputs).toEqual('Loop\nLoop\nLoop\nEnd\n')
+    expect(outputs).toEqual('Loop\nLoop\nLoop\nEnd\nOK\n')
   })
 
   it('should handle GOTO to later line (forward jump)', async () => {
@@ -95,7 +95,7 @@ describe('GotoExecutor', () => {
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
     // PRINT "Target" doesn't end with semicolon, so adds newline
-    expect(outputs).toEqual('Start\nTarget\n')
+    expect(outputs).toEqual('Start\nTarget\nOK\n')
   })
 
   it('should handle GOTO on same line as other statements', async () => {
@@ -111,7 +111,7 @@ describe('GotoExecutor', () => {
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
     // PRINT "After" doesn't end with semicolon, so adds newline
-    expect(outputs).toEqual('Before\nAfter\n')
+    expect(outputs).toEqual('Before\nAfter\nOK\n')
   })
 
   it('should error on GOTO to non-existent line number', async () => {
@@ -151,7 +151,7 @@ describe('GotoExecutor', () => {
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
     // PRINT "E" doesn't end with semicolon, so adds newline
-    expect(outputs).toEqual('A\nC\nE\n')
+    expect(outputs).toEqual('A\nC\nE\nOK\n')
   })
 
   it('should handle GOTO with IF-THEN', async () => {
@@ -169,6 +169,6 @@ describe('GotoExecutor', () => {
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
     // PRINT "True branch" doesn't end with semicolon, so adds newline
-    expect(outputs).toEqual('True branch\n')
+    expect(outputs).toEqual('True branch\nOK\n')
   })
 })

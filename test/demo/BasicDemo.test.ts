@@ -41,6 +41,7 @@ describe('Family Basic IDE Demo Program', () => {
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
+      suppressOkPrompt: true,
       deviceAdapter: mockDeviceAdapter,
     })
   })

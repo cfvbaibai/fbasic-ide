@@ -45,7 +45,7 @@ describe('RestoreExecutor', () => {
       const outputs = deviceAdapter.getAllOutputs()
       // Should read: 10, 20, 30, 40, 50, then after RESTORE: 10, 20
       // Comma separator uses tabs, numbers have leading spaces
-      expect(outputs).toEqual(' 10\t 20\t 30\t 40\t 50\t 10\t 20\n')
+      expect(outputs).toEqual(' 10\t 20\t 30\t 40\t 50\t 10\t 20\nOK\n')
     })
 
     it('should allow reading same DATA multiple times', async () => {
@@ -65,7 +65,7 @@ describe('RestoreExecutor', () => {
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
       // All should read 1, 2 (three times)
-      expect(outputs).toEqual(' 1\t 2\t 1\t 2\t 1\t 2\n')
+      expect(outputs).toEqual(' 1\t 2\t 1\t 2\t 1\t 2\nOK\n')
     })
   })
 
@@ -97,7 +97,8 @@ describe('RestoreExecutor', () => {
       // First loop should read from line 1010: 12, 56, 34, 68, 53, 2
       // Second loop should read from line 1000: 23, 43, 55, 65, 42, 9
       // Semicolon separator concatenates on same line, then PRINT adds newline
-      expect(outputs).toEqual(' 12 56 34 68 53 2\n 23 43 55 65 42 9')
+      // But the second line's PRINT A; doesn't add newline before END prints "OK"
+      expect(outputs).toEqual(' 12 56 34 68 53 2\n 23 43 55 65 42 9OK\n')
     })
 
     it('should restore to first DATA statement when line number is before any DATA', async () => {
@@ -113,7 +114,7 @@ describe('RestoreExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual(' 10\t 20\t 30\n')
+      expect(outputs).toEqual(' 10\t 20\t 30\nOK\n')
     })
 
     it('should restore to specific DATA line in sequence', async () => {
@@ -132,7 +133,7 @@ describe('RestoreExecutor', () => {
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
       // Should read from line 20: 3, 4
-      expect(outputs).toEqual(' 3\t 4\n')
+      expect(outputs).toEqual(' 3\t 4\nOK\n')
     })
   })
 
@@ -155,7 +156,7 @@ describe('RestoreExecutor', () => {
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
       // A=10, B=30, C=10
-      expect(outputs).toEqual(' 10\t 30\t 10\n')
+      expect(outputs).toEqual(' 10\t 30\t 10\nOK\n')
     })
 
     it('should work with string DATA', async () => {
@@ -172,7 +173,7 @@ describe('RestoreExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual('FOO\tBAR\n')
+      expect(outputs).toEqual('FOO\tBAR\nOK\n')
     })
 
     it('should work with mixed numeric and string DATA', async () => {
@@ -188,7 +189,7 @@ describe('RestoreExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual(' 10\tTEN\t 20\tTWENTY\n')
+      expect(outputs).toEqual(' 10\tTEN\t 20\tTWENTY\nOK\n')
     })
   })
 
@@ -222,7 +223,7 @@ describe('RestoreExecutor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual(' 10\n')
+      expect(outputs).toEqual(' 10\nOK\n')
     })
   })
 
@@ -243,8 +244,8 @@ describe('RestoreExecutor', () => {
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
       // Should print 1 three times (each loop restores and reads first value)
-      // Semicolon separator concatenates on same line
-      expect(outputs).toEqual(' 1 1 1')
+      // Semicolon separator concatenates on same line, no newline before END prints "OK"
+      expect(outputs).toEqual(' 1 1 1OK\n')
     })
 
     it('should work with RESTORE to different lines in loop', async () => {
@@ -268,8 +269,8 @@ describe('RestoreExecutor', () => {
       const outputs = deviceAdapter.getAllOutputs()
       // First iteration: RESTORE 10, reads 10
       // Second iteration: RESTORE 20, reads 30
-      // Semicolon separator concatenates on same line
-      expect(outputs).toEqual(' 10 30')
+      // Semicolon separator concatenates on same line, no newline before END prints "OK"
+      expect(outputs).toEqual(' 10 30OK\n')
     })
   })
 })

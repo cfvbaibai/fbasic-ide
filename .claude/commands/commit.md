@@ -1,9 +1,5 @@
 Stage all code changes and commit them with a conventional commit message.
 
-## Skeptical Behavior
-
-See `.claude/SKEPTICAL_BEHAVIOR.md` - all agents are skeptical collaborators.
-
 ## Commit Types
 - `feat:` - New features
 - `fix:` - Bug fixes

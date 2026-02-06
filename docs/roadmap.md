@@ -348,9 +348,111 @@ This document outlines the remaining work for the Family Basic IDE project. Prog
 
 ---
 
-### Phase 6: Testing & Quality Assurance
+### Phase 6: Animation Worker Refactor ✅ COMPLETE
 
-**Estimated Effort**: Ongoing (per-feature; not a dedicated phase now)  
+**Estimated Effort**: 5-10 days (completed 2026-02-06)
+**Priority**: High (fixes sprite teleportation bugs)
+**Status**: Complete - Single Writer Pattern implemented
+
+#### 6.1 Problem: Race Conditions from Multiple Writers
+Previous architecture had multiple writers to the shared animation buffer:
+- Main thread position calculation (`useScreenAnimationLoop.ts`)
+- Message queue RAF updates (`handleAnimationCommandMessage`)
+- This caused race conditions → sprite teleportation bugs when ERA → MOVE was executed rapidly
+
+#### 6.2 Solution: Single Writer Pattern
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                   Animation Worker (Single Writer)              │
+│  - Receives START_MOVEMENT, STOP_MOVEMENT, ERASE_MOVEMENT      │
+│  - Calculates positions (x += dx * speed * dt)                 │
+│  - Handles screen wrapping (modulo 256×240)                   │
+│  - Manages movement lifecycle (isActive, remainingDistance)    │
+│  - Writes positions to shared buffer (ONLY writer)             │
+│  - Runs at fixed 60Hz tick rate                               │
+└────────────────────────────┬────────────────────────────────────┘
+                             │ postMessage
+                             ▼
+                      ┌──────────────┐
+                      │ Shared Buffer │
+                      │  XPOS, YPOS  │
+                      └──────────────┘
+                             │ read
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                   Main Thread (Render-Only)                    │
+│  - Reads positions from shared buffer                         │
+│  - Updates Konva nodes for rendering                          │
+│  - NO position calculation (delegated to Animation Worker)    │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+#### 6.3 Implementation - Progress Tracker
+- [x] **Phase 1**: Animation Worker Infrastructure ✅ (2026-02-06)
+  - `src/core/workers/AnimationWorker.ts` - Core worker class
+  - `src/core/workers/animation-worker.ts` - Worker entry point
+  - `AnimationWorkerCommand` types (START_MOVEMENT, STOP_MOVEMENT, ERASE_MOVEMENT, SET_POSITION, SET_SHARED_BUFFER)
+  - 60Hz fixed tick rate with position calculation
+  - Screen wrapping (modulo 256×240)
+
+- [x] **Phase 2**: Shared Joystick Buffer ✅ (2026-02-06)
+  - `src/core/devices/sharedJoystickBuffer.ts` - Zero-copy joystick state
+  - Main thread writes stick/strig state
+  - Workers read for STICK()/STRIG() functions
+
+- [x] **Phase 3**: Main Thread Integration ✅ (2026-02-06)
+  - `useAnimationWorker.ts` - Animation Worker lifecycle manager
+  - `useScreenAnimationLoopRenderOnly.ts` - Render-only loop (reads from buffer)
+  - `setForwardToAnimationWorker` - Proper registration of forward function
+
+- [x] **Phase 4**: Command Routing ✅ (2026-02-06)
+  - Executor Worker → Animation Worker via `AnimationWorkerCommand`
+  - Main thread forwards commands through `forwardToAnimationWorker`
+  - Message handler integration with proper state tracking
+
+- [x] **Phase 5**: Testing ✅ (2026-02-06)
+  - Integration tests: `test/integration/SharedBufferIntegration.test.ts`
+  - Sprite movement lifecycle tests passing
+  - Position sync tests passing
+
+- [x] **Phase 6**: Bug Fix ✅ (2026-02-06)
+  - Fixed `forwardToAnimationWorker` registration via `setForwardToAnimationWorker`
+  - Commands now properly reach Animation Worker
+  - Teleportation issue resolved
+
+#### 6.4 Files Created
+**Animation Worker:**
+- `src/core/workers/AnimationWorker.ts` - Single writer class (400+ lines)
+- `src/core/workers/animation-worker.ts` - Worker entry point
+
+**Shared Joystick Buffer:**
+- `src/core/devices/sharedJoystickBuffer.ts`
+
+**Main Thread Integration:**
+- `src/features/ide/composables/useAnimationWorker.ts` - Worker lifecycle
+- `src/features/ide/composables/useScreenAnimationLoopRenderOnly.ts` - Render-only loop
+
+#### 6.5 Files Modified
+- `src/core/devices/index.ts` - Export sharedJoystickBuffer
+- `src/core/interfaces.ts` - Add AnimationWorkerCommand types
+- `src/features/ide/composables/useBasicIdeScreenIntegration.ts` - Add setForwardToAnimationWorker
+- `src/features/ide/composables/useBasicIdeWorkerIntegration.ts` - Use forwardToAnimationWorker
+- `src/features/ide/composables/useBasicIdeMessageHandlers.ts` - Forward commands to Animation Worker
+- `src/features/ide/composables/useScreenContext.ts` - Add setForwardToAnimationWorker to interface
+- `src/features/ide/composables/useBasicIdeEnhanced.ts` - Export setForwardToAnimationWorker
+- `src/features/ide/components/Screen.vue` - Initialize Animation Worker
+- `src/features/ide/IdePage.vue` - Pass setForwardToAnimationWorker to context
+
+#### 6.6 Documentation Updates
+- `docs/teams/platform-team.md` - Updated Animation System architecture
+
+**Status**: ✅ Complete - Animation Worker is now the single writer to shared animation buffer. Teleportation issue fixed.
+
+---
+
+### Phase 7: Testing & Quality Assurance
+
+**Estimated Effort**: Ongoing (per-feature; not a dedicated phase now)
 **Priority**: Low (test new features as implemented; no broad coverage push)
 
 #### 6.1 Test Coverage
@@ -373,7 +475,7 @@ This document outlines the remaining work for the Family Basic IDE project. Prog
 
 ---
 
-### Phase 7: Documentation — Deferred
+### Phase 8: Documentation — Deferred
 
 Documentation (README, user guide, executor docs, architecture diagrams) will be revisited later. Not in scope for current planning.
 
@@ -433,8 +535,9 @@ Documentation (README, user guide, executor docs, architecture diagrams) will be
 | Phase 4: Additional Commands | Medium | 1-2 days (STOP, CONT, POKE) | Medium | None (SWAP ✅, CLEAR ✅) |
 | Phase 1: Vue Best Practices | Low | Done | Low | None |
 | Phase 5: Sprite System | Done | — | — | 6/6 phases ✅ |
-| Phase 6: Testing & QA | Low | Per-feature only | — | No broad coverage push |
-| Phase 7: Documentation | Deferred | Revisit later | — | — |
+| Phase 6: Animation Worker Refactor | High | Done | High | Phase 5 (Sprite System) ✅ |
+| Phase 7: Testing & QA | Low | Per-feature only | — | No broad coverage push |
+| Phase 8: Documentation | Deferred | Revisit later | — | — |
 
 ---
 
@@ -461,6 +564,9 @@ Documentation (README, user guide, executor docs, architecture diagrams) will be
 ## Timeline Estimate
 
 **Current focus**: Phase 4 remaining (STOP, CONT, POKE) — 1-2 days.
+
+**Recent completions**:
+- ✅ Phase 6: Animation Worker Refactor (2026-02-06) - Fixed sprite teleportation bugs
 
 **Future (when needed)**:
 - VIEW: requires BG GRAPHIC buffer + editor.
@@ -514,7 +620,22 @@ Documentation (README, user guide, executor docs, architecture diagrams) will be
 
 ---
 
-**Last Updated**: 2026-01-31  
+**Last Updated**: 2026-02-06
+
+**Revisions (2026-02-06)**:
+- ✅ Phase 6: Animation Worker Refactor completed - Fixed sprite teleportation bugs
+- Updated architecture documentation (platform-team.md) to reflect single writer pattern
+- Added new Animation Worker files to platform team ownership
+
+**Revisions (2026-01-31)**:
+- SWAP and CLEAR marked as already implemented.
+- INPUT/LINPUT integration tests: not required.
+- Test coverage: not a primary focus; add tests when implementing new commands.
+- Phase 8 (Documentation): deferred; revisit later.
+
+**Suggested next step**: Implement **STOP** and **CONT** (stop execution with resume). Optionally **POKE** (no-op or limited in web context). Then consider VIEW when BG GRAPHIC buffer/editor is planned.
+
+**Next Review**: After STOP/CONT (and optionally POKE) or when BG GRAPHIC work is planned.
 
 **Revisions (2026-01-31)**:
 - SWAP and CLEAR marked as already implemented.

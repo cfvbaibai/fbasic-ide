@@ -1,8 +1,17 @@
 # Platform Team
 
 ## Ownership
-- **Files**: `src/core/animation/*`, `src/core/sprite/*`, `src/core/devices/*`, `test/animation/*`, `test/sprite/*`
-- **Responsibilities**: Device adapters, sprite system, animation, shared buffers, screen/joystick I/O
+- **Files**:
+  - `src/core/animation/*`
+  - `src/core/sprite/*`
+  - `src/core/devices/*`
+  - `src/core/workers/AnimationWorker.ts`
+  - `src/core/workers/animation-worker.ts`
+  - `src/features/ide/composables/useAnimationWorker.ts`
+  - `src/features/ide/composables/useScreenAnimationLoopRenderOnly.ts`
+  - `test/animation/*`
+  - `test/sprite/*`
+- **Responsibilities**: Device adapters, sprite system, animation, shared buffers, screen/joystick I/O, Animation Worker
 
 ## Architecture
 
@@ -55,19 +64,67 @@ Bytes 192+:     Screen cells, cursor, sequence, scalars
 Total:          1548 bytes
 ```
 
+### Shared Joystick Buffer Layout
+```typescript
+// Shared joystick state (main thread writes, workers read)
+const JOYSTICK_BUFFER_BYTES = 2 × 2 × 8  // 2 joysticks × 2 fields × 8 bytes
+
+interface JoystickBufferView {
+  stickState: Float64Array   // [stick0, stick1]
+  strigState: Float64Array   // [strig0, strig1]
+}
+```
+
+**Files:**
+- `src/core/devices/sharedJoystickBuffer.ts` - Buffer creation and access functions
+
 ## Animation System
 
-### Architecture
-- **AnimationManager** (worker) - 8 action slots, movement state
-- **Main thread** - `requestAnimationFrame` rendering loop
-- **Sync**: SharedArrayBuffer for positions
+### Architecture (Single Writer Pattern)
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                   Animation Worker (Single Writer)              │
+│  - Receives START_MOVEMENT, STOP_MOVEMENT, ERASE_MOVEMENT      │
+│  - Calculates positions (x += dx * speed * dt)                 │
+│  - Handles screen wrapping (modulo 256×240)                   │
+│  - Manages movement lifecycle (isActive, remainingDistance)    │
+│  - Writes positions to shared buffer (ONLY writer)             │
+│  - Runs at fixed 60Hz tick rate                               │
+└────────────────────────────┬────────────────────────────────────┘
+                             │ postMessage
+                             ▼
+                      ┌──────────────┐
+                      │ Shared Buffer │
+                      │  XPOS, YPOS  │
+                      └──────────────┘
+                             │ read
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                   Main Thread (Render-Only)                    │
+│  - Reads positions from shared buffer                         │
+│  - Updates Konva nodes for rendering                          │
+│  - NO position calculation (delegated to Animation Worker)    │
+└─────────────────────────────────────────────────────────────────┘
+```
 
 ### Key Files
+**Animation Worker:**
+- `src/core/workers/AnimationWorker.ts` - Single writer for sprite positions
+- `src/core/workers/animation-worker.ts` - Worker entry point
+- `src/features/ide/composables/useAnimationWorker.ts` - Worker lifecycle manager
+- `src/core/devices/sharedJoystickBuffer.ts` - Shared joystick state
+
+**Animation Manager (Executor Worker):**
 - `AnimationManager.ts` - DEF MOVE / MOVE commands, 8 action slots
 - `CharacterAnimationBuilder.ts` - Builds animation configs from CHARACTER_SPRITES
 - `characterSequenceConfig.ts` - Direction/sprite mapping per character (0-15)
-- `sharedAnimationBuffer.ts` - Legacy (192 bytes sprite-only)
+
+**Shared Buffers:**
+- `sharedAnimationBuffer.ts` - Legacy (192 bytes sprite-only, now part of sharedDisplayBuffer)
 - `sharedDisplayBuffer.ts` - Combined buffer (1548 bytes)
+
+**Main Thread:**
+- `useScreenAnimationLoopRenderOnly.ts` - Render-only animation loop
 
 ### Commands
 - `DEF SPRITE` - Define static sprite
@@ -210,16 +267,46 @@ When a sprite is **crossing** an edge (e.g. moving right past x=255), the real m
 
 ## Patterns & Conventions
 
+### Animation Worker (Single Writer Pattern)
+The Animation Worker is the **single writer** to the shared animation buffer. This eliminates race conditions and ensures consistent sprite positions.
+
+**Why:**
+- Previous architecture had multiple writers (main thread position calculation + message queue updates)
+- This caused race conditions → sprite teleportation bugs
+- Single writer guarantees data consistency
+
+**How:**
+- Executor Worker sends commands via `AnimationWorkerCommand` (START_MOVEMENT, STOP_MOVEMENT, ERASE_MOVEMENT, SET_POSITION)
+- Animation Worker processes commands and writes to shared buffer
+- Main thread reads from shared buffer for rendering only
+
 ### Worker State Management
 ```typescript
-// State lives in worker, not shared
+// Animation Worker: State lives in AnimationWorker class
+class AnimationWorker {
+  private movementStates: Map<number, WorkerMovementState> = new Map()
+  private sharedAnimationView: Float64Array | null = null
+
+  private tick(deltaTime: number): void {
+    // Calculate new positions: x += dx * speed * dt
+    // Write to shared buffer (SINGLE WRITER)
+    writeSpriteState(this.sharedAnimationView, actionNumber, x, y, isActive)
+  }
+}
+
+// Executor Worker: AnimationManager holds definitions
 class AnimationManager {
   private moveDefinitions: Map<number, MoveDefinition> = new Map()
-  private movementStates: Map<number, MovementState> = new Map()
 
-  public scheduleMove(actionNumber: number, moveNumber: number): void {
-    // Update internal state
-    // Write positions to SharedArrayBuffer
+  public startMovement(actionNumber: number, startX: number, startY: number): void {
+    // Send command to Animation Worker
+    this.deviceAdapter.sendAnimationWorkerCommand({
+      type: 'START_MOVEMENT',
+      actionNumber,
+      definition: this.moveDefinitions.get(actionNumber),
+      startX,
+      startY
+    })
   }
 }
 ```
@@ -279,7 +366,7 @@ describe('AnimationManager', () => {
 - Files: **MAX 500 lines**
 - TypeScript: strict mode, no `any`, `import type` for types
 - Buffer access: Use typed arrays (Float64Array, Uint8Array)
-- Thread safety: Only worker writes to buffer positions
+- Thread safety: **Animation Worker is the ONLY writer to sprite positions in shared buffer**; main thread is read-only
 
 ## Reference
 

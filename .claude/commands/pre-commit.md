@@ -1,9 +1,5 @@
 Run a comprehensive pre-commit check that reviews code changes against Vue3/VueUse best practices and fixes all TypeScript, ESLint, and Stylelint issues.
 
-## Skeptical Behavior
-
-See `.claude/SKEPTICAL_BEHAVIOR.md` - all agents are skeptical collaborators.
-
 ## Workflow
 
 1. **Get Changed Files**: Identify all changed files in the current git branch compared to the base branch (typically `master` or `main`)

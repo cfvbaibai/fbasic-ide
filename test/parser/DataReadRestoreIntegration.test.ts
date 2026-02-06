@@ -61,13 +61,13 @@ describe('DATA/READ/RESTORE Integration', () => {
       expect(result.errors).toHaveLength(0)
 
       // Each PRINT X; creates a separate output (semicolon at end doesn't suppress newline in current impl)
-      // Verify all 10 values were printed
-      expect(printOutputMock).toHaveBeenCalledTimes(10)
+      // Verify all 10 values were printed, plus "OK" at the end
+      expect(printOutputMock).toHaveBeenCalledTimes(11)
       const outputs = printOutputMock.mock.calls.map(call => call[0])
 
-      // Expected values in order: 3, 4, 1, 6, 2, 7, 8, 3, 4, 9
+      // Expected values in order: 3, 4, 1, 6, 2, 7, 8, 3, 4, 9, OK
       // According to spec, positive numbers have a leading space (sign position)
-      const expectedValues = [' 3', ' 4', ' 1', ' 6', ' 2', ' 7', ' 8', ' 3', ' 4', ' 9']
+      const expectedValues = [' 3', ' 4', ' 1', ' 6', ' 2', ' 7', ' 8', ' 3', ' 4', ' 9', 'OK\n']
       expect(outputs).toEqual(expectedValues)
 
       // Verify variable X has the last read value
@@ -110,13 +110,14 @@ describe('DATA/READ/RESTORE Integration', () => {
       expect(result.variables.get('C$')?.value).toBe('EVENING')
 
       // Verify PRINT outputs
-      expect(printOutputMock).toHaveBeenCalledTimes(2)
+      expect(printOutputMock).toHaveBeenCalledTimes(3)
       const outputs = printOutputMock.mock.calls.map(call => call[0])
       // PRINT A$; " "; B$; "." creates: "GOOD" + " " + "MORNING" + "." = "GOOD MORNING."
       // Semicolon doesn't add spaces - strings print immediately, string literal " " adds a space
       // PRINT doesn't end with semicolon, so adds newline
       expect(outputs[0]).toBe('GOOD MORNING.\n')
       expect(outputs[1]).toBe('GOOD EVENING.\n')
+      expect(outputs[2]).toBe('OK\n')
     })
   })
 
@@ -138,12 +139,13 @@ describe('DATA/READ/RESTORE Integration', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
 
-      // Verify PRINT outputs (6 values printed, one per iteration)
+      // Verify PRINT outputs (6 values printed, one per iteration, plus "OK")
       // Each PRINT A(I); outputs the array element value
-      expect(printOutputMock).toHaveBeenCalledTimes(6)
+      expect(printOutputMock).toHaveBeenCalledTimes(7)
       const outputs = printOutputMock.mock.calls.map(call => call[0])
       // According to spec, positive numbers have a leading space (sign position)
-      const expectedOutputs = [' 9', ' 1', ' 8', ' 3', ' 4', ' 8']
+      // "OK" is a separate call at the end
+      const expectedOutputs = [' 9', ' 1', ' 8', ' 3', ' 4', ' 8', 'OK\n']
       expect(outputs).toEqual(expectedOutputs)
 
       // Verify that array elements were read correctly by checking the printed values
@@ -180,8 +182,8 @@ describe('DATA/READ/RESTORE Integration', () => {
       // Second loop should read from line 1000: 23, 43, 55, 65, 42, 9
       expect(result.success).toBe(true)
 
-      // Verify PRINT outputs (12 values + 1 empty line)
-      expect(printOutputMock).toHaveBeenCalledTimes(13)
+      // Verify PRINT outputs (12 values + 1 empty line + 1 "OK" call)
+      expect(printOutputMock).toHaveBeenCalledTimes(14)
       const outputs = printOutputMock.mock.calls.map(call => call[0])
 
       // First 6 outputs should be from line 1010
@@ -195,8 +197,11 @@ describe('DATA/READ/RESTORE Integration', () => {
 
       // Last 6 outputs should be from line 1000
       // PRINT A; ends with semicolon, so no newline
+      // "OK" is a separate call at the end
       const secondSet = outputs.slice(7, 13)
       expect(secondSet).toEqual([' 23', ' 43', ' 55', ' 65', ' 42', ' 9'])
+      // Verify the last call is "OK\n"
+      expect(outputs[13]).toBe('OK\n')
     })
 
     it('should restore data pointer to beginning when no line specified', async () => {
@@ -220,13 +225,14 @@ describe('DATA/READ/RESTORE Integration', () => {
       expect(result.variables.get('D')?.value).toBe(20)
 
       // Verify PRINT output
-      expect(printOutputMock).toHaveBeenCalledTimes(1)
+      expect(printOutputMock).toHaveBeenCalledTimes(2)
       const output = printOutputMock.mock.calls[0]?.[0]
       expect(output).toBeDefined()
       // PRINT A; B; C; D creates: " 10" + " 20" + " 10" + " 20" = " 10 20 10 20"
       // Each positive number has a leading space (sign position), semicolon doesn't add extra spaces
       // PRINT doesn't end with semicolon, so adds newline
       expect(output).toBe(' 10 20 10 20\n')
+      expect(printOutputMock).toHaveBeenNthCalledWith(2, 'OK\n')
     })
   })
 
@@ -249,13 +255,14 @@ describe('DATA/READ/RESTORE Integration', () => {
       expect(result.variables.get('D$')?.value).toBe('F')
 
       // Verify PRINT output
-      expect(printOutputMock).toHaveBeenCalledTimes(1)
+      expect(printOutputMock).toHaveBeenCalledTimes(2)
       const output = printOutputMock.mock.calls[0]?.[0]
       expect(output).toBeDefined()
       // PRINT A$; B$; C$; D$ creates: "ABC" + "DE" + ", " + "F" = "ABCDE, F"
       // Semicolon doesn't add spaces - strings print immediately after each other
       // PRINT doesn't end with semicolon, so adds newline
       expect(output).toBe('ABCDE, F\n')
+      expect(printOutputMock).toHaveBeenNthCalledWith(2, 'OK\n')
     })
   })
 
@@ -300,13 +307,14 @@ describe('DATA/READ/RESTORE Integration', () => {
       expect(result.variables.get('D')?.value).toBe(40)
 
       // Verify PRINT output
-      expect(printOutputMock).toHaveBeenCalledTimes(1)
+      expect(printOutputMock).toHaveBeenCalledTimes(2)
       const output = printOutputMock.mock.calls[0]?.[0]
       expect(output).toBeDefined()
       // PRINT A; B; C; D creates: " 10" + " 20" + " 30" + " 40" = " 10 20 30 40"
       // Each positive number has a leading space (sign position), semicolon doesn't add extra spaces
       // PRINT doesn't end with semicolon, so adds newline
       expect(output).toBe(' 10 20 30 40\n')
+      expect(printOutputMock).toHaveBeenNthCalledWith(2, 'OK\n')
     })
   })
 })

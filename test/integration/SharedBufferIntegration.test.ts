@@ -221,9 +221,30 @@ describe('Shared Buffer Integration - Full POC', () => {
       expect(state.buffer[2]![0]!.character).toBe('L') // Third line
     })
 
-    it.skip('should sync CLS to shared buffer', async () => {
-      // Note: This test has isolation issues within the test framework
-      // CLS functionality is tested through other tests
+    it('should sync CLS to shared buffer', async () => {
+      // Create a completely isolated buffer for this test to avoid isolation issues
+      const isolatedViews = createSharedDisplayBuffer()
+      const isolatedAdapter = new SharedBufferTestAdapter()
+      isolatedAdapter.setSharedDisplayBuffer(isolatedViews.buffer)
+      isolatedAdapter.configure({ enableDisplayBuffer: true })
+
+      const isolatedInterpreter = new BasicInterpreter({
+        maxIterations: EXECUTION_LIMITS.MAX_ITERATIONS_TEST,
+        maxOutputLines: EXECUTION_LIMITS.MAX_OUTPUT_LINES_TEST,
+        deviceAdapter: isolatedAdapter,
+        sharedDisplayBuffer: isolatedViews.buffer,
+        suppressOkPrompt: true, // Suppress "OK" to test just CLS behavior
+      })
+
+      // Execute CLS command
+      await isolatedInterpreter.execute('10 CLS\n20 END')
+
+      const state = readScreenStateFromShared(isolatedViews)
+      // After CLS, the screen should be all spaces
+      expect(state.buffer[0]![0]!.character).toBe(' ')
+      expect(state.buffer[0]![1]!.character).toBe(' ')
+      expect(state.buffer[1]![0]!.character).toBe(' ')
+      expect(state.buffer[1]![1]!.character).toBe(' ')
     })
 
     it('should sync color palette to shared buffer', async () => {
@@ -302,9 +323,33 @@ describe('Shared Buffer Integration - Full POC', () => {
       expect(state.buffer[0]![12]!.character).toBe('0')
     })
 
-    it.skip('should handle rapid PRINT operations', async () => {
-      // Note: This test has isolation issues within the test framework
-      // Rapid PRINT is tested through other means
+    it('should handle rapid PRINT operations', async () => {
+      adapter.setSharedDisplayBuffer(views.buffer)
+      adapter.configure({ enableDisplayBuffer: true })
+
+      const interpreter = new BasicInterpreter({
+        maxIterations: EXECUTION_LIMITS.MAX_ITERATIONS_TEST,
+        maxOutputLines: EXECUTION_LIMITS.MAX_OUTPUT_LINES_TEST,
+        deviceAdapter: adapter,
+        sharedDisplayBuffer: views.buffer,
+      })
+
+      // Test rapid PRINT operations (many prints in quick succession)
+      const code = [
+        '10 FOR I = 1 TO 10',
+        '20 PRINT "X";',
+        '30 NEXT',
+        '40 END',
+      ].join('\n')
+
+      await interpreter.execute(code)
+
+      const state = readScreenStateFromShared(views)
+      // All 10 X's should be on the same line (since PRINT uses semicolon)
+      const firstRow = state.buffer[0]!.map(cell => cell?.character)
+      // Count X's in first row
+      const xCount = firstRow.filter(c => c === 'X').length
+      expect(xCount).toBe(10)
     })
   })
 
@@ -502,9 +547,33 @@ describe('Shared Buffer Integration - Full POC', () => {
   })
 
   describe('Performance and Edge Cases', () => {
-    it.skip('should handle empty screen buffer', async () => {
-      // Note: This test has isolation issues within the test framework
-      // Empty buffer behavior is tested through other tests
+    it('should handle empty screen buffer', async () => {
+      // Create completely isolated buffer for this test
+      const views = createSharedDisplayBuffer()
+      const adapter = new SharedBufferTestAdapter()
+      adapter.setSharedDisplayBuffer(views.buffer)
+      adapter.configure({ enableDisplayBuffer: true })
+
+      const interpreter = new BasicInterpreter({
+        maxIterations: EXECUTION_LIMITS.MAX_ITERATIONS_TEST,
+        maxOutputLines: EXECUTION_LIMITS.MAX_OUTPUT_LINES_TEST,
+        deviceAdapter: adapter,
+        sharedDisplayBuffer: views.buffer,
+        suppressOkPrompt: true,
+      })
+
+      // Test that empty program doesn't corrupt the buffer
+      await interpreter.execute('10 END')
+
+      const state = readScreenStateFromShared(views)
+      // Check a few key positions to verify buffer is still initialized
+      expect(state.buffer[0]![0]!.character).toBe(' ')
+      expect(state.buffer[0]![27]!.character).toBe(' ')
+      expect(state.buffer[23]![0]!.character).toBe(' ')
+      expect(state.buffer[23]![27]!.character).toBe(' ')
+      // Cursor should be at initial position (0, 0)
+      expect(state.cursorX).toBe(0)
+      expect(state.cursorY).toBe(0)
     })
 
     it('should handle very long output', async () => {

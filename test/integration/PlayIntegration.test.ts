@@ -20,6 +20,7 @@ describe('PLAY Integration', () => {
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
+      suppressOkPrompt: true,
       deviceAdapter: deviceAdapter,
     })
   })

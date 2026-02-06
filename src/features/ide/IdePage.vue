@@ -63,9 +63,13 @@ const {
   sendStickEvent,
   sendStrigEvent,
   sharedAnimationView,
+  sharedAnimationBuffer,
   sharedDisplayViews,
+  sharedJoystickBuffer,
   setDecodedScreenState,
   registerScheduleRender,
+  forwardToAnimationWorker,
+  setForwardToAnimationWorker,
   pendingInputRequest,
   respondToInputRequest,
 } = useBasicIdeEnhanced()
@@ -90,8 +94,12 @@ provideScreenContext({
   externalBackSpriteNodes: backSpriteNodes,
   sharedAnimationView: ref(sharedAnimationView),
   sharedDisplayViews: ref(sharedDisplayViews),
+  sharedAnimationBuffer: ref(sharedAnimationBuffer),
+  sharedJoystickBuffer: ref(sharedJoystickBuffer),
   setDecodedScreenState,
   registerScheduleRender,
+  forwardToAnimationWorker,
+  setForwardToAnimationWorker,
 })
 
 // INPUT/LINPUT modal: local input value and submit/cancel

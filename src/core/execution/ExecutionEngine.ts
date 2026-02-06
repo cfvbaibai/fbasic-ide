@@ -133,7 +133,8 @@ export class ExecutionEngine {
       }
 
       // Emit "OK" to screen when program ends successfully (F-BASIC prompt behavior)
-      if (this.context.getErrors().length === 0) {
+      // Can be suppressed for testing via suppressOkPrompt config option
+      if (this.context.getErrors().length === 0 && !this.context.config.suppressOkPrompt) {
         this.context.addOutput('OK\n')
       }
 

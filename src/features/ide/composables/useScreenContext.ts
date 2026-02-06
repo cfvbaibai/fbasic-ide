@@ -11,6 +11,7 @@ import type {
 } from '@/core/animation/sharedDisplayBuffer'
 import type { ScreenCell } from '@/core/interfaces'
 import type { MovementState, SpriteState } from '@/core/sprite/types'
+import type { AnimationWorkerCommand } from '@/core/workers/AnimationWorker'
 
 /**
  * Screen context: refs and callbacks for the CRT screen and sprites.
@@ -33,8 +34,16 @@ export interface ScreenContextValue {
   externalBackSpriteNodes: Ref<Map<number, unknown>>
   sharedAnimationView: Ref<Float64Array | undefined>
   sharedDisplayViews: Ref<SharedDisplayViews | undefined>
+  /** Shared animation buffer (SharedArrayBuffer) for Animation Worker. */
+  sharedAnimationBuffer: Ref<SharedArrayBuffer | undefined>
+  /** Shared joystick buffer (main thread writes, workers read). */
+  sharedJoystickBuffer: Ref<SharedArrayBuffer | undefined>
   setDecodedScreenState: (decoded: DecodedScreenState) => void
   registerScheduleRender: (fn: () => void) => void
+  /** Forward animation command to Animation Worker (set by Screen component). */
+  forwardToAnimationWorker?: (command: AnimationWorkerCommand) => void
+  /** Set the forwardToAnimationWorker function (called by Screen component). */
+  setForwardToAnimationWorker?: (fn: (command: AnimationWorkerCommand) => void) => void
 }
 
 export const ScreenContextKey: InjectionKey<ScreenContextValue> = Symbol(

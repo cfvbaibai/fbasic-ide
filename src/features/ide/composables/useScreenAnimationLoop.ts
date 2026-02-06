@@ -307,11 +307,13 @@ export function useScreenAnimationLoop(
       logScreen.error(
         '[ANIMATION LOOP] startLoop() called - isPaused:', isPaused,
         '-> setting to false, lastFrameTime:', lastFrameTime,
-        '-> resetting to 0, active movements:', activeMovements
+        '-> using performance.now() for smooth restart, active movements:', activeMovements
       )
     }
     isPaused = false
-    lastFrameTime = 0
+    // Use current time instead of 0 to prevent large deltaTime on first frame after restart
+    // This fixes sprite teleportation when ERA is immediately followed by MOVE
+    lastFrameTime = performance.now()
     animationFrameId = requestAnimationFrame(animationLoop)
   }
 

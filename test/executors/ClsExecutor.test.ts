@@ -67,7 +67,7 @@ describe('ClsExecutor', () => {
     const outputs = deviceAdapter.getAllOutputs()
     // CLS clears the screen, so "Before" should be cleared
     // Only "After" should remain
-    expect(outputs).toEqual('After\n')
+    expect(outputs).toEqual('After\nOK\n')
   })
 
   it('should handle CLS at start of program', async () => {
@@ -82,7 +82,7 @@ describe('ClsExecutor', () => {
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.clearScreenCalls).toBe(1)
     const outputs = deviceAdapter.getAllOutputs()
-    expect(outputs).toEqual('Hello\n')
+    expect(outputs).toEqual('Hello\nOK\n')
   })
 
   it('should handle CLS at end of program', async () => {
@@ -127,6 +127,6 @@ describe('ClsExecutor', () => {
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.clearScreenCalls).toBe(1)
     const outputs = deviceAdapter.getAllOutputs()
-    expect(outputs).toEqual('Done\n')
+    expect(outputs).toEqual('Done\nOK\n')
   })
 })

@@ -49,6 +49,7 @@ export class BasicInterpreter {
       maxOutputLines: EXECUTION_LIMITS.MAX_OUTPUT_LINES_TEST,
       enableDebugMode: false,
       strictMode: false,
+      suppressOkPrompt: false, // Default to showing OK (F-BASIC behavior)
       ...config,
     }
 

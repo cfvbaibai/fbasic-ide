@@ -37,7 +37,8 @@ describe('Logical Operators', () => {
 
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      expect(deviceAdapter.getAllOutputs()).toEqual('')
+      // No PRINT executed, but END still prints "OK"
+      expect(deviceAdapter.getAllOutputs()).toEqual('OK\n')
     })
 
     it('should return -1 (true) when operand is false (zero)', async () => {
@@ -49,7 +50,7 @@ describe('Logical Operators', () => {
       const result = await interpreter.execute(code)
 
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual('True\nOK\n')
     })
 
     it('should work with comparison expressions', async () => {
@@ -60,7 +61,7 @@ describe('Logical Operators', () => {
       const result = await interpreter.execute(code)
 
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual('True\nOK\n')
     })
   })
 
@@ -73,7 +74,7 @@ describe('Logical Operators', () => {
       const result = await interpreter.execute(code)
 
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('Both True\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual('Both True\nOK\n')
     })
 
     it('should return 0 (false) when first operand is false', async () => {
@@ -84,7 +85,8 @@ describe('Logical Operators', () => {
       const result = await interpreter.execute(code)
 
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('')
+      // No PRINT executed, but END still prints "OK"
+      expect(deviceAdapter.getAllOutputs()).toEqual('OK\n')
     })
 
     it('should return 0 (false) when second operand is false', async () => {
@@ -95,7 +97,8 @@ describe('Logical Operators', () => {
       const result = await interpreter.execute(code)
 
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('')
+      // No PRINT executed, but END still prints "OK"
+      expect(deviceAdapter.getAllOutputs()).toEqual('OK\n')
     })
 
     it('should return 0 (false) when both operands are false', async () => {
@@ -106,7 +109,8 @@ describe('Logical Operators', () => {
       const result = await interpreter.execute(code)
 
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('')
+      // No PRINT executed, but END still prints "OK"
+      expect(deviceAdapter.getAllOutputs()).toEqual('OK\n')
     })
 
     it('should handle multiple AND operators', async () => {
@@ -117,7 +121,7 @@ describe('Logical Operators', () => {
       const result = await interpreter.execute(code)
 
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('All True\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual('All True\nOK\n')
     })
   })
 
@@ -130,7 +134,7 @@ describe('Logical Operators', () => {
       const result = await interpreter.execute(code)
 
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual('True\nOK\n')
     })
 
     it('should return -1 (true) when second operand is true', async () => {
@@ -141,7 +145,7 @@ describe('Logical Operators', () => {
       const result = await interpreter.execute(code)
 
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual('True\nOK\n')
     })
 
     it('should return -1 (true) when both operands are true', async () => {
@@ -152,7 +156,7 @@ describe('Logical Operators', () => {
       const result = await interpreter.execute(code)
 
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual('True\nOK\n')
     })
 
     it('should return 0 (false) when both operands are false', async () => {
@@ -163,7 +167,8 @@ describe('Logical Operators', () => {
       const result = await interpreter.execute(code)
 
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('')
+      // No PRINT executed, but END still prints "OK"
+      expect(deviceAdapter.getAllOutputs()).toEqual('OK\n')
     })
 
     it('should handle multiple OR operators', async () => {
@@ -174,7 +179,7 @@ describe('Logical Operators', () => {
       const result = await interpreter.execute(code)
 
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('At Least One True\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual('At Least One True\nOK\n')
     })
   })
 
@@ -187,7 +192,8 @@ describe('Logical Operators', () => {
       const result = await interpreter.execute(code)
 
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('')
+      // No PRINT executed, but END still prints "OK"
+      expect(deviceAdapter.getAllOutputs()).toEqual('OK\n')
     })
 
     it('should return -1 (true) when first operand is true and second is false', async () => {
@@ -198,7 +204,7 @@ describe('Logical Operators', () => {
       const result = await interpreter.execute(code)
 
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual('True\nOK\n')
     })
 
     it('should return -1 (true) when first operand is false and second is true', async () => {
@@ -209,7 +215,7 @@ describe('Logical Operators', () => {
       const result = await interpreter.execute(code)
 
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual('True\nOK\n')
     })
 
     it('should return 0 (false) when both operands are false', async () => {
@@ -220,7 +226,8 @@ describe('Logical Operators', () => {
       const result = await interpreter.execute(code)
 
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('')
+      // No PRINT executed, but END still prints "OK"
+      expect(deviceAdapter.getAllOutputs()).toEqual('OK\n')
     })
   })
 
@@ -235,7 +242,8 @@ describe('Logical Operators', () => {
 
       expect(result.success).toBe(true)
       // (0 > 5) OR (5 > 0 AND 0 > 10) = false OR (true AND false) = false OR false = false
-      expect(deviceAdapter.getAllOutputs()).toEqual('')
+      // No PRINT executed, but END still prints "OK"
+      expect(deviceAdapter.getAllOutputs()).toEqual('OK\n')
     })
 
     it('should evaluate NOT before AND', async () => {
@@ -247,7 +255,7 @@ describe('Logical Operators', () => {
 
       expect(result.success).toBe(true)
       // (NOT false) AND true = true AND true = true
-      expect(deviceAdapter.getAllOutputs()).toEqual('True\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual('True\nOK\n')
     })
 
     it('should evaluate OR before XOR', async () => {
@@ -261,7 +269,8 @@ describe('Logical Operators', () => {
 
       expect(result.success).toBe(true)
       // (true OR false) XOR true = true XOR true = false
-      expect(deviceAdapter.getAllOutputs()).toEqual('')
+      // No PRINT executed, but END still prints "OK"
+      expect(deviceAdapter.getAllOutputs()).toEqual('OK\n')
     })
   })
 })

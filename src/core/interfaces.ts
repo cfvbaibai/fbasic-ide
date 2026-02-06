@@ -149,6 +149,8 @@ export interface InterpreterConfig {
   sharedAnimationBuffer?: SharedArrayBuffer
   /** Shared display state buffer (screen + sprites + cursor + scalars). Used for integration testing. */
   sharedDisplayBuffer?: SharedArrayBuffer
+  /** Suppress "OK" prompt when program ends successfully (default: false for F-BASIC compatibility) */
+  suppressOkPrompt?: boolean
 }
 
 /**
@@ -266,6 +268,8 @@ export type ServiceWorkerMessageType =
   | 'STICK_EVENT'
   | 'ANIMATION_COMMAND'
   | 'SET_SHARED_ANIMATION_BUFFER'
+  | 'SET_SHARED_JOYSTICK_BUFFER'
+  | 'FORWARD_TO_ANIMATION_WORKER'
   | 'REQUEST_INPUT'
   | 'INPUT_VALUE'
   | 'PLAY_SOUND'
@@ -448,6 +452,22 @@ export interface SetSharedAnimationBufferMessage extends ServiceWorkerMessage {
   }
 }
 
+// Set shared joystick buffer - sent from main thread to worker once after worker is created
+export interface SetSharedJoystickBufferMessage extends ServiceWorkerMessage {
+  type: 'SET_SHARED_JOYSTICK_BUFFER'
+  data: {
+    buffer: SharedArrayBuffer
+  }
+}
+
+// Forward to animation worker - sent from executor worker to main thread, which forwards to animation worker
+export interface ForwardToAnimationWorkerMessage extends ServiceWorkerMessage {
+  type: 'FORWARD_TO_ANIMATION_WORKER'
+  data: {
+    command: AnimationCommand
+  }
+}
+
 // Request input - sent from worker to main when INPUT/LINPUT executes
 export interface RequestInputMessage extends ServiceWorkerMessage {
   type: 'REQUEST_INPUT'
@@ -505,6 +525,8 @@ export type AnyServiceWorkerMessage =
   | ReadyMessage
   | AnimationCommandMessage
   | SetSharedAnimationBufferMessage
+  | SetSharedJoystickBufferMessage
+  | ForwardToAnimationWorkerMessage
   | RequestInputMessage
   | InputValueMessage
   | PlaySoundMessage

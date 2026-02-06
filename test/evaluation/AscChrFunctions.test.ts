@@ -35,7 +35,7 @@ describe('ASC and CHR$ Functions', () => {
       expect(result.success).toBe(true)
       // ASC("H") = 72 per manual page 83
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 72\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 72\nOK\n')
     })
 
     it('should return character code of first character only', async () => {
@@ -44,7 +44,7 @@ describe('ASC and CHR$ Functions', () => {
       expect(result.success).toBe(true)
       // ASC("Hello") should return code of "H" only (72)
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 72\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 72\nOK\n')
     })
 
     it('should return 0 for empty string', async () => {
@@ -53,7 +53,7 @@ describe('ASC and CHR$ Functions', () => {
       expect(result.success).toBe(true)
       // ASC("") = 0 per manual page 83
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 0\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 0\nOK\n')
     })
 
     it('should work with string variable', async () => {
@@ -62,7 +62,7 @@ describe('ASC and CHR$ Functions', () => {
       expect(result.success).toBe(true)
       // ASC("A") = 65
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 65\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 65\nOK\n')
     })
 
     it('should return character code for space character', async () => {
@@ -71,7 +71,7 @@ describe('ASC and CHR$ Functions', () => {
       expect(result.success).toBe(true)
       // Space character code is 32
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 32\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 32\nOK\n')
     })
 
     it('should return character code for digit', async () => {
@@ -80,7 +80,7 @@ describe('ASC and CHR$ Functions', () => {
       expect(result.success).toBe(true)
       // "0" character code is 48
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 48\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 48\nOK\n')
     })
 
     it('should handle ASC with uninitialized string variable', async () => {
@@ -89,7 +89,7 @@ describe('ASC and CHR$ Functions', () => {
       expect(result.success).toBe(true)
       // Uninitialized string variable is empty string, ASC("") = 0
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 0\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 0\nOK\n')
     })
 
     it('should return character code in range 0-255', async () => {
@@ -116,7 +116,7 @@ describe('ASC and CHR$ Functions', () => {
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
       // CHR$(65) = "A" per manual page 83
-      expect(deviceAdapter.getAllOutputs()).toEqual('A\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual('A\nOK\n')
     })
 
     it('should convert character code 72 to "H"', async () => {
@@ -124,7 +124,7 @@ describe('ASC and CHR$ Functions', () => {
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
       // CHR$(72) = "H" per manual page 83
-      expect(deviceAdapter.getAllOutputs()).toEqual('H\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual('H\nOK\n')
     })
 
     it('should convert character code 96 to "ア" (kana)', async () => {
@@ -132,7 +132,7 @@ describe('ASC and CHR$ Functions', () => {
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
       // CHR$(96) = "ア" per manual page 108 (Character Code List B)
-      expect(deviceAdapter.getAllOutputs()).toEqual('ア\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual('ア\nOK\n')
     })
 
     it('should convert character code 0 to null character', async () => {
@@ -141,7 +141,7 @@ describe('ASC and CHR$ Functions', () => {
       expect(result.success).toBe(true)
       // CHR$(0) should produce a character (length 1)
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 1\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 1\nOK\n')
     })
 
     it('should convert character code 32 to space', async () => {
@@ -150,7 +150,7 @@ describe('ASC and CHR$ Functions', () => {
       expect(result.success).toBe(true)
       // CHR$(32) = space character
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 1\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 1\nOK\n')
     })
 
     it('should convert character code 255', async () => {
@@ -159,14 +159,14 @@ describe('ASC and CHR$ Functions', () => {
       expect(result.success).toBe(true)
       // CHR$(255) should produce a character
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 1\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 1\nOK\n')
     })
 
     it('should work with variable', async () => {
       const source = '10 LET N = 65\n20 LET A$ = CHR$(N)\n30 PRINT A$\n40 END'
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('A\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual('A\nOK\n')
     })
 
     it('should handle CHR$ in expressions', async () => {
@@ -174,7 +174,7 @@ describe('ASC and CHR$ Functions', () => {
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
       // CHR$(64 + 1) = CHR$(65) = "A"
-      expect(deviceAdapter.getAllOutputs()).toEqual('A\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual('A\nOK\n')
     })
 
     it('should clamp values outside 0-255 range', async () => {
@@ -183,7 +183,7 @@ describe('ASC and CHR$ Functions', () => {
       expect(result.success).toBe(true)
       // Should handle out of range gracefully
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 1\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 1\nOK\n')
     })
 
     it('should handle negative values', async () => {
@@ -192,7 +192,7 @@ describe('ASC and CHR$ Functions', () => {
       expect(result.success).toBe(true)
       // Should handle negative values gracefully
       // Numbers get leading space
-      expect(deviceAdapter.getAllOutputs()).toEqual(' 1\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 1\nOK\n')
     })
   })
 
@@ -202,14 +202,14 @@ describe('ASC and CHR$ Functions', () => {
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
       // ASC("H") = 72, CHR$(72) = "H"
-      expect(deviceAdapter.getAllOutputs()).toEqual('H\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual('H\nOK\n')
     })
 
     it('should roundtrip multiple characters', async () => {
       const source = '10 LET A$ = "A"\n20 LET C = ASC(A$)\n30 LET B$ = CHR$(C)\n40 PRINT B$\n50 END'
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
-      expect(deviceAdapter.getAllOutputs()).toEqual('A\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual('A\nOK\n')
     })
 
     it('should handle roundtrip with expression', async () => {
@@ -217,7 +217,7 @@ describe('ASC and CHR$ Functions', () => {
       const result = await interpreter.execute(source)
       expect(result.success).toBe(true)
       // Should still produce "Z"
-      expect(deviceAdapter.getAllOutputs()).toEqual('Z\n')
+      expect(deviceAdapter.getAllOutputs()).toEqual('Z\nOK\n')
     })
   })
 
@@ -232,7 +232,7 @@ describe('ASC and CHR$ Functions', () => {
       expect(result.variables.get('A')?.value).toBe(72)
       // Check output format
       const output = deviceAdapter.getAllOutputs()
-      expect(output).toBe('H CHARACTER CODE IS 72\n')
+      expect(output).toBe('H CHARACTER CODE IS 72\nOK\n')
     })
 
     it('should handle CHR$ sample program pattern', async () => {
@@ -245,7 +245,7 @@ describe('ASC and CHR$ Functions', () => {
       expect(result.variables.get('A$')?.value).toBe('A')
       // Check output format - PRINT with semicolon concatenates without spaces
       const output = deviceAdapter.getAllOutputs()
-      expect(output).toBe(' 65 THE MATCHING CHARACTER ISA\n')
+      expect(output).toBe(' 65 THE MATCHING CHARACTER ISA\nOK\n')
     })
   })
 })

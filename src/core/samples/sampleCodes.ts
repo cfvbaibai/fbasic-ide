@@ -10,6 +10,34 @@ export interface SampleCode {
 }
 
 export const SAMPLE_CODES: Record<string, SampleCode> = {
+  basic: {
+    name: 'Basic F-Basic Program',
+    description: 'Simple arithmetic with LET and PRINT',
+    category: 'basics',
+    code: `10 PRINT "Basic F-Basic Program"
+20 LET A = 10
+30 LET B = 20
+40 LET C = A + B
+50 PRINT "A + B = "; C
+60 END`,
+  },
+
+  pause: {
+    name: 'PAUSE Command Demo',
+    description: 'Demonstrates PAUSE with countdown and timing delays',
+    category: 'control',
+    code: `10 PRINT "PAUSE Command Demo"
+20 PRINT "Starting countdown..."
+30 FOR I = 5 TO 1 STEP -1
+40   PRINT "Countdown: "; I
+50   PAUSE 3
+60 NEXT
+70 PRINT "Blast off!"
+80 PAUSE 10
+90 PRINT "Mission complete!"
+100 END`,
+  },
+
   hello: {
     name: 'Hello World',
     description: 'Simple PRINT demonstration',

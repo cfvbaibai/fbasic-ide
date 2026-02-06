@@ -39,7 +39,7 @@ describe('ClearExecutor', () => {
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
     // After CLEAR, A and B$ are uninitialized: 0 and ""
-    expect(outputs).toEqual(' 0\t\n')
+    expect(outputs).toEqual(' 0\t\nOK\n')
   })
 
   it('should clear all arrays', async () => {
@@ -57,7 +57,7 @@ describe('ClearExecutor', () => {
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
     // After CLEAR, array is gone; getArrayElement returns 0 for missing
-    expect(outputs).toEqual(' 0\t 0\n')
+    expect(outputs).toEqual(' 0\t 0\nOK\n')
   })
 
   it('should accept CLEAR with optional address (ignored)', async () => {
@@ -72,7 +72,7 @@ describe('ClearExecutor', () => {
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
-    expect(outputs).toEqual(' 0\n')
+    expect(outputs).toEqual(' 0\nOK\n')
   })
 
   it('should handle CLEAR on same line as other commands', async () => {
@@ -86,7 +86,7 @@ describe('ClearExecutor', () => {
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
-    expect(outputs).toEqual(' 0\n')
+    expect(outputs).toEqual(' 0\nOK\n')
   })
 
   it('should allow variables to be set again after CLEAR', async () => {
@@ -102,7 +102,7 @@ describe('ClearExecutor', () => {
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
-    expect(outputs).toEqual(' 2\n')
+    expect(outputs).toEqual(' 2\nOK\n')
   })
 
   it('should handle multiple CLEAR calls', async () => {
@@ -119,6 +119,6 @@ describe('ClearExecutor', () => {
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     const outputs = deviceAdapter.getAllOutputs()
-    expect(outputs).toEqual(' 0\n')
+    expect(outputs).toEqual(' 0\nOK\n')
   })
 })

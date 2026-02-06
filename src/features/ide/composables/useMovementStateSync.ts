@@ -27,6 +27,11 @@ export function useMovementStateSync(options: UseMovementStateSyncOptions) {
   watch(
     movementStates,
     newStates => {
+      console.log('[useMovementStateSync] movementStates changed', {
+        newStatesCount: newStates?.length ?? 0,
+        activeMovements: newStates?.filter(m => m.isActive).map(m => m.actionNumber) ?? [],
+      })
+
       if (!newStates || newStates.length === 0) {
         localMovementStates.value = []
         return
@@ -69,8 +74,14 @@ export function useMovementStateSync(options: UseMovementStateSyncOptions) {
         }
       })
 
+      console.log('[useMovementStateSync] After sync, localMovementStates', {
+        total: localMovementStates.value.length,
+        active: localMovementStates.value.filter(m => m.isActive).map(m => m.actionNumber),
+      })
+
       // Trigger callback after sync
       if (onSync) {
+        console.log('[useMovementStateSync] Calling onSync callback')
         onSync()
       }
     },

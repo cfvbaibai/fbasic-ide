@@ -27,6 +27,11 @@ import { logWorker } from '@/shared/logger'
 
 import { MessageHandler } from './MessageHandler'
 import { ScreenStateManager } from './ScreenStateManager'
+import {
+  createViewsFromJoystickBuffer,
+  getStickState,
+  type JoystickBufferView,
+} from './sharedJoystickBuffer'
 import { type WebWorkerExecutionOptions, WebWorkerManager } from './WebWorkerManager'
 
 export type { WebWorkerExecutionOptions }
@@ -37,6 +42,8 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   private stickStates: Map<number, number> = new Map()
   /** Shared display buffer. Set when receiving SET_SHARED_ANIMATION_BUFFER. */
   private sharedDisplayViews: SharedDisplayViews | null = null
+  /** Shared joystick buffer. Set when receiving SET_SHARED_JOYSTICK_BUFFER. */
+  private sharedJoystickView: JoystickBufferView | null = null
   /** Last POSITION per sprite; getSpritePosition returns it so MOVE uses it (not buffer 0,0). */
   private lastPositionBySprite: Map<number, { x: number; y: number }> = new Map()
   private isEnabled = true
@@ -176,16 +183,35 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     return 2
   }
 
+  /**
+   * Get stick state from shared joystick buffer (zero-copy read)
+   * Falls back to Map if shared buffer is not set (backward compatibility)
+   */
   getStickState(joystickId: number): number {
+    if (this.sharedJoystickView) {
+      return getStickState(this.sharedJoystickView, joystickId)
+    }
     return this.stickStates.get(joystickId) ?? 0
   }
 
+  /**
+   * Set stick state (deprecated - main thread now writes directly to shared buffer)
+   * Kept for backward compatibility during transition
+   */
   setStickState(joystickId: number, state: number): void {
     this.stickStates.set(joystickId, state)
     logWorker.debug('Stick state set:', {
       joystickId,
       state,
     })
+  }
+
+  /**
+   * Set shared joystick buffer (called from worker when receiving SET_SHARED_JOYSTICK_BUFFER)
+   */
+  setSharedJoystickBuffer(buffer: SharedArrayBuffer): void {
+    this.sharedJoystickView = createViewsFromJoystickBuffer(buffer)
+    logWorker.debug('[WebWorkerDeviceAdapter] Shared joystick buffer set')
   }
 
   pushStrigState(joystickId: number, state: number): void {
@@ -280,7 +306,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       type: 'SCREEN_CHANGED',
       id: `screen-changed-${Date.now()}`,
       timestamp: Date.now(),
-    })
+    }, '*')
   }
 
   consumeStrigState(joystickId: number): number {
@@ -312,7 +338,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
         outputType: 'print',
         timestamp: Date.now(),
       },
-    })
+    }, '*')
 
     // Process all characters and update screen buffer
     for (const char of output) {
@@ -337,7 +363,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
         outputType: 'debug',
         timestamp: Date.now(),
       },
-    })
+    }, '*')
   }
 
   errorOutput(output: string): void {
@@ -353,7 +379,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
         outputType: 'error',
         timestamp: Date.now(),
       },
-    })
+    }, '*')
   }
 
   clearScreen(): void {
@@ -363,7 +389,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       this.syncScreenStateToShared()
       this.postScreenChanged()
     } else {
-      self.postMessage(this.screenStateManager.createClearScreenUpdateMessage())
+      self.postMessage(this.screenStateManager.createClearScreenUpdateMessage(), '*')
     }
     this.cancelPendingScreenUpdate()
   }
@@ -375,7 +401,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       this.syncScreenStateToShared()
       this.postScreenChanged()
     } else {
-      self.postMessage(this.screenStateManager.createCursorUpdateMessage())
+      self.postMessage(this.screenStateManager.createCursorUpdateMessage(), '*')
     }
   }
 
@@ -386,7 +412,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       this.syncScreenStateToShared()
       this.postScreenChanged()
     } else {
-      self.postMessage(this.screenStateManager.createColorUpdateMessage(cellsToUpdate))
+      self.postMessage(this.screenStateManager.createColorUpdateMessage(cellsToUpdate), '*')
     }
   }
 
@@ -400,7 +426,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       this.syncScreenStateToShared()
       this.postScreenChanged()
     } else {
-      self.postMessage(this.screenStateManager.createPaletteUpdateMessage())
+      self.postMessage(this.screenStateManager.createPaletteUpdateMessage(), '*')
     }
   }
 
@@ -411,7 +437,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       this.syncScreenStateToShared()
       this.postScreenChanged()
     } else {
-      self.postMessage(this.screenStateManager.createBackdropUpdateMessage())
+      self.postMessage(this.screenStateManager.createBackdropUpdateMessage(), '*')
     }
   }
 
@@ -422,7 +448,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       this.syncScreenStateToShared()
       this.postScreenChanged()
     } else {
-      self.postMessage(this.screenStateManager.createCgenUpdateMessage())
+      self.postMessage(this.screenStateManager.createCgenUpdateMessage(), '*')
     }
   }
 
@@ -440,7 +466,24 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       data: command,
     }
 
-    self.postMessage(message)
+    self.postMessage(message, '*')
+  }
+
+  /**
+   * Send animation worker command via main thread
+   * Main thread forwards this to the Animation Worker
+   */
+  sendAnimationWorkerCommand(command: AnimationCommand): void {
+    logWorker.debug('Forwarding animation worker command:', command.type, command)
+
+    const message: AnyServiceWorkerMessage = {
+      type: 'FORWARD_TO_ANIMATION_WORKER',
+      id: `anim-worker-${Date.now()}-${Math.random()}`,
+      timestamp: Date.now(),
+      data: { command },
+    }
+
+    self.postMessage(message, '*')
   }
 
   /**
@@ -470,7 +513,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
         variableCount,
         isLinput,
       },
-    })
+    }, '*')
 
     return promise
   }
@@ -511,7 +554,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
         this.syncScreenStateToShared()
         this.postScreenChanged()
       } else {
-        self.postMessage(this.screenStateManager.createClearScreenUpdateMessage())
+        self.postMessage(this.screenStateManager.createClearScreenUpdateMessage(), '*')
       }
       this.cancelPendingScreenUpdate()
     } else {
@@ -553,7 +596,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
           musicString,
           events: serializedEvents,
         },
-      })
+      }, '*')
     } catch (error) {
       logWorker.error('Error parsing music string:', error)
       this.errorOutput(`PLAY error: ${error instanceof Error ? error.message : String(error)}`)
@@ -678,7 +721,8 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       this.syncScreenStateToShared()
       this.postScreenChanged()
     } else if (this.screenStateManager) {
-      self.postMessage(this.screenStateManager.createFullScreenUpdateMessage())
+      // In test environment (jsdom), postMessage requires targetOrigin
+      self.postMessage(this.screenStateManager.createFullScreenUpdateMessage(), '*')
     }
   }
 }

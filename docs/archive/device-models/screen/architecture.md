@@ -1,5 +1,9 @@
 # Family BASIC Screen Device Integration - Architecture Document
 
+> **⚠️ SUPERSEDED**: This document describes the architecture prior to the Animation Worker Refactor (2026-02-06).
+> The current architecture uses a **Single Writer Pattern** where the Animation Worker is the only writer to the shared animation buffer.
+> See `docs/teams/platform-team.md` for the current Animation System architecture.
+
 ## Overview
 
 This document outlines the architectural design for integrating SCREEN device functionality into the Family BASIC interpreter. For detailed screen specifications, see [screen.md](./screen-device-model/screen.md). For animation system details, see [animation.md](./screen-device-model/animation.md).

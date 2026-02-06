@@ -99,8 +99,12 @@ export function useBasicIde() {
     sendStickEvent: worker.sendStickEvent,
     sendStrigEvent: worker.sendStrigEvent,
     sharedAnimationView: screen.sharedAnimationView,
+    sharedAnimationBuffer: screen.sharedAnimationBuffer,
     sharedDisplayViews: screen.sharedDisplayViews,
+    sharedJoystickBuffer: screen.sharedJoystickBuffer,
     setDecodedScreenState: screen.setDecodedScreenState,
     registerScheduleRender: screen.registerScheduleRender,
+    forwardToAnimationWorker: screen.forwardToAnimationWorker,
+    setForwardToAnimationWorker: screen.setForwardToAnimationWorker,
   }
 }
