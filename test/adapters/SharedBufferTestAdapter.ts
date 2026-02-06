@@ -5,16 +5,16 @@
  * Extends TestDeviceAdapter with optional shared buffer participation.
  */
 
-import type { ScreenCell } from '@/core/interfaces'
-import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
 import {
-  createViewsFromDisplayBuffer,
-  writeScreenState,
-  incrementSequence,
-  type SharedDisplayViews,
   COLS,
+  createViewsFromDisplayBuffer,
+  incrementSequence,
   ROWS,
+  type SharedDisplayViews,
+  writeScreenState,
 } from '@/core/animation/sharedDisplayBuffer'
+import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
+import type { ScreenCell } from '@/core/interfaces'
 
 /**
  * Configuration for shared buffer test adapter

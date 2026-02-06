@@ -13,9 +13,13 @@ import {
 } from '@/core/animation/sharedAnimationBuffer'
 import { SCREEN_DIMENSIONS } from '@/core/constants'
 import type { MovementState } from '@/core/sprite/types'
+import { logScreen } from '@/shared/logger'
 
 import type { KonvaScreenLayers } from './useKonvaScreenRenderer'
 import { updateAnimatedSprites } from './useKonvaScreenRenderer'
+
+/** Enable detailed animation loop tracing (set to true when debugging teleportation issue) */
+const DEBUG_ANIMATION_LOOP = true
 
 /**
  * Update movement positions and frame indices
@@ -59,6 +63,15 @@ function updateMovements(
     // with new movements, causing a large deltaTime on the second frame.
     const cappedDeltaTime = Math.min(deltaTime, 100)
 
+    // Log teleportation-inducing conditions
+    if (DEBUG_ANIMATION_LOOP && cappedDeltaTime > 30) {
+      logScreen.error(
+        `[SPRITE #${movement.actionNumber}] POTENTIAL TELEPORT: deltaTime=${deltaTime.toFixed(2)}ms, capped=${cappedDeltaTime.toFixed(2)}ms`,
+        `| speed=${movement.definition.speed} => ${movement.speedDotsPerSecond.toFixed(2)} dots/sec`,
+        `| dotsThisFrame=${(movement.speedDotsPerSecond * (cappedDeltaTime / 1000)).toFixed(2)}`
+      )
+    }
+
     // Calculate distance per frame: speedDotsPerSecond × (cappedDeltaTime / 1000)
     const dotsPerFrame = movement.speedDotsPerSecond * (cappedDeltaTime / 1000)
     const distanceThisFrame = Math.min(dotsPerFrame, movement.remainingDistance)
@@ -72,8 +85,21 @@ function updateMovements(
     // X: 0–255 (256 dots), Y: 0–239 (240 dots). Real machine also splits sprite when crossing edge.
     const w = SCREEN_DIMENSIONS.SPRITE.WIDTH
     const h = SCREEN_DIMENSIONS.SPRITE.HEIGHT
+    const oldX = currentX
+    const oldY = currentY
     currentX = ((currentX % w) + w) % w
     currentY = ((currentY % h) + h) % h
+
+    // Log position changes when deltaTime is large
+    if (DEBUG_ANIMATION_LOOP && cappedDeltaTime > 30) {
+      const deltaX = currentX - oldX + (movement.directionDeltaX * distanceThisFrame)
+      const deltaY = currentY - oldY + (movement.directionDeltaY * distanceThisFrame)
+      logScreen.error(
+        `[SPRITE #${movement.actionNumber}] POSITION JUMP: (${oldX.toFixed(1)}, ${oldY.toFixed(1)}) -> (${currentX.toFixed(1)}, ${currentY.toFixed(1)})`,
+        `| delta=(${deltaX.toFixed(2)}, ${deltaY.toFixed(2)})`,
+        `| directionDelta=(${movement.directionDeltaX}, ${movement.directionDeltaY})`
+      )
+    }
 
     // Write position back to Konva node
     spriteNode.x(currentX)
@@ -150,6 +176,9 @@ export function useScreenAnimationLoop(
 
   async function animationLoop(timestamp: number): Promise<void> {
     if (lastFrameTime === 0) {
+      if (DEBUG_ANIMATION_LOOP) {
+        logScreen.warn('[ANIMATION LOOP] First frame after startLoop(): lastFrameTime was 0, setting to', timestamp)
+      }
       lastFrameTime = timestamp
     }
 
@@ -159,13 +188,32 @@ export function useScreenAnimationLoop(
     // Check if there are active movements
     const hasActive = localMovementStates.value.some(m => m.isActive)
 
+    // Log large deltaTime that could cause teleportation
+    if (DEBUG_ANIMATION_LOOP && deltaTime > 30) {
+      // Normal deltaTime is ~16.6ms at 60fps; >30ms is abnormal
+      const activeMovements = localMovementStates.value.filter(m => m.isActive).map(m => `#${m.actionNumber}`)
+      logScreen.error(
+        '[ANIMATION LOOP] Large deltaTime detected:',
+        `${deltaTime.toFixed(2)  }ms`,
+        '(expected ~16.6ms at 60fps)',
+        '| active movements:', activeMovements.length > 0 ? activeMovements.join(', ') : 'none',
+        '| gracePeriodCounter:', gracePeriodCounter
+      )
+    }
+
     if (!hasActive) {
       // No active movements - enter grace period to prevent pause/restart race conditions
       // When ERA is immediately followed by MOVE (e.g., when hitting an enemy in shooting game),
       // the loop would pause and restart, causing large deltaTime and sprite teleportation.
       gracePeriodCounter++
+      if (DEBUG_ANIMATION_LOOP && gracePeriodCounter === 1) {
+        logScreen.warn('[ANIMATION LOOP] No active movements - entering grace period, frame 1/5')
+      }
       if (gracePeriodCounter >= GRACE_PERIOD_FRAMES) {
         // Grace period expired - pause the loop
+        if (DEBUG_ANIMATION_LOOP) {
+          logScreen.error('[ANIMATION LOOP] Grace period expired - PAUSING loop (will set lastFrameTime=0 on restart)')
+        }
         isPaused = true
         animationFrameId = null
         gracePeriodCounter = 0
@@ -174,6 +222,9 @@ export function useScreenAnimationLoop(
       // Still in grace period - continue loop but skip position updates
     } else {
       // Active movements - reset grace period
+      if (DEBUG_ANIMATION_LOOP && gracePeriodCounter > 0) {
+        logScreen.warn('[ANIMATION LOOP] Active movements detected - resetting grace period from', gracePeriodCounter, 'to 0')
+      }
       gracePeriodCounter = 0
     }
 
@@ -251,6 +302,14 @@ export function useScreenAnimationLoop(
   function startLoop(): void {
     if (animationFrameId !== null || !isPaused) return
 
+    const activeMovements = localMovementStates.value.filter(m => m.isActive).map(m => m.actionNumber)
+    if (DEBUG_ANIMATION_LOOP) {
+      logScreen.error(
+        '[ANIMATION LOOP] startLoop() called - isPaused:', isPaused,
+        '-> setting to false, lastFrameTime:', lastFrameTime,
+        '-> resetting to 0, active movements:', activeMovements
+      )
+    }
     isPaused = false
     lastFrameTime = 0
     animationFrameId = requestAnimationFrame(animationLoop)
@@ -262,6 +321,10 @@ export function useScreenAnimationLoop(
   function checkAndStart(): void {
     const hasActive = localMovementStates.value.some(m => m.isActive)
     if (hasActive && isPaused) {
+      if (DEBUG_ANIMATION_LOOP) {
+        const activeMovements = localMovementStates.value.filter(m => m.isActive).map(m => m.actionNumber)
+        logScreen.warn('[ANIMATION LOOP] checkAndStart() - has active movements:', activeMovements, 'calling startLoop()')
+      }
       startLoop()
     }
   }
@@ -271,10 +334,22 @@ export function useScreenAnimationLoop(
     localMovementStates.value.some(m => m.isActive)
   )
 
-  watch(hasActiveMovements, (active) => {
+  watch(hasActiveMovements, (active, oldActive) => {
+    if (DEBUG_ANIMATION_LOOP) {
+      const activeMovements = localMovementStates.value.filter(m => m.isActive).map(m => m.actionNumber)
+      logScreen.warn(
+        '[ANIMATION LOOP] hasActiveMovements watcher fired:',
+        oldActive, '->', active,
+        '| active movements:', activeMovements,
+        '| isPaused:', isPaused
+      )
+    }
     if (active && isPaused) {
       startLoop()
     } else if (!active && !isPaused) {
+      if (DEBUG_ANIMATION_LOOP) {
+        logScreen.error('[ANIMATION LOOP] watcher: !active && !isPaused - cancelling RAF and pausing')
+      }
       if (animationFrameId !== null) {
         cancelAnimationFrame(animationFrameId)
         animationFrameId = null

@@ -2,6 +2,49 @@
 
 All notable changes to this project are documented here.
 
+## 2026-02-06 - Shared Buffer Integration Test POC
+
+### Summary
+- **Feature**: Integration tests can now directly read and validate SharedArrayBuffer contents used for worker↔main thread communication
+- **Test Results**: 40 passing tests covering buffer creation, synchronization, screen state, sprites, cursor, scalars, and combined operations
+- **Performance Impact**: None in production—test-only code is tree-shaken from builds
+
+### Technical Details
+- **Animation Buffer**: 192-byte SharedArrayBuffer (Float64Array × 24) — 8 sprites × 3 values (x, y, isActive)
+- **Display Buffer**: 1548-byte SharedArrayBuffer with layout:
+  - Sprites: bytes 0-191
+  - Screen characters: bytes 192-863 (28×24 cells)
+  - Color patterns: bytes 864-1535 (28×24 cells)
+  - Cursor position: bytes 1536-1537 (x, y)
+  - Sequence number: bytes 1540-1543 (increments on each write)
+  - Scalars: bytes 1544-1547 (bgPalette, spritePalette, backdropColor, cgenMode)
+
+### New Files
+- `test/adapters/SharedBufferTestAdapter.ts` (219 lines)
+  - Extends `TestDeviceAdapter` with optional shared buffer synchronization
+  - Key methods: `setSharedDisplayBuffer()`, `configure()`, `syncToDisplayBuffer()`, `getScreenBuffer()`, `getDisplayViews()`, `getSpriteStates()`
+- `test/integration/SharedBufferIntegration.test.ts` (813 lines)
+  - 43 integration tests across 10 test suites
+  - Coverage: buffer creation, direct read/write, interpreter integration, screen round-trip, animation buffer, combined operations, DEF SPRITE, DEF MOVE, POSITION, performance
+
+### Modified Files
+- `src/core/interfaces.ts`: Added `sharedDisplayBuffer?: SharedArrayBuffer` to `InterpreterConfig` interface
+
+### Test Suites
+- Buffer Creation and Initialization (2 tests)
+- Direct Buffer Read and Write (3 tests)
+- Interpreter Integration with Shared Display Buffer (4 tests)
+- Screen Buffer Round-Tip (4 tests)
+- Animation Buffer Integration (3 tests)
+- Combined Operations (4 tests)
+- DEF SPRITE Command (3 tests)
+- DEF MOVE Command (4 tests)
+- POSITION Statement (3 tests)
+- Performance and Stress Tests (2 tests)
+
+### Branch
+- `feature/shared-buffer-integration-tests` — committed POC (ea4e53e) and expanded coverage (ff36e91)
+
 ## 2026-01-31 - DEF MOVE speed C=0 support (every 256 frames)
 
 ### Changes

@@ -489,8 +489,15 @@ export function handleAnimationCommandMessage(message: AnyServiceWorkerMessage, 
 
   logIdeMessages.debug('🎬 Handling animation command:', command.type, command)
 
+  // Trace ERA→MOVE sequences for teleportation debugging
+  const timestamp = performance.now()
+  const activeBefore = context.movementStates.value.filter(m => m.isActive).map(m => m.actionNumber)
+  logIdeMessages.debug(`🎬 [${timestamp.toFixed(2)}ms] ${command.type} | active movements BEFORE:`, activeBefore.length > 0 ? activeBefore : 'none')
+
   switch (command.type) {
     case 'START_MOVEMENT': {
+      logIdeMessages.warn(`🎬 START_MOVEMENT #${command.actionNumber} | startX: ${command.startX}, startY: ${command.startY}, speed: ${command.definition.speed}, direction: ${command.definition.direction}`)
+
       // Start position: Konva node (if exists) > last POSITION from this sprite's action queue > command from worker
       const queue = context.spriteActionQueues?.value.get(command.actionNumber) ?? []
       const lastPosition = [...queue].reverse().find((a): a is PendingSpriteAction => a.type === 'POSITION')
@@ -573,11 +580,9 @@ export function handleAnimationCommandMessage(message: AnyServiceWorkerMessage, 
       // Force reactivity by creating new array
       context.movementStates.value = [...context.movementStates.value]
 
-      logScreen.warn(
-        'START_MOVEMENT actionNumber=',
-        command.actionNumber,
-        'total movements=',
-        context.movementStates.value.length
+      const activeAfter = context.movementStates.value.filter(m => m.isActive).map(m => m.actionNumber)
+      logIdeMessages.warn(
+        `🎬 START_MOVEMENT COMPLETE #${command.actionNumber} | total movements: ${context.movementStates.value.length} | active: ${activeAfter.join(',') || 'none'}`
       )
 
       if (context.sharedAnimationView) {
@@ -624,6 +629,11 @@ export function handleAnimationCommandMessage(message: AnyServiceWorkerMessage, 
     }
 
     case 'ERASE_MOVEMENT': {
+      const activeAfter = context.movementStates.value.filter(
+        m => !command.actionNumbers.includes(m.actionNumber) && m.isActive
+      ).map(m => m.actionNumber)
+      logIdeMessages.warn(`🎬 ERASE_MOVEMENT [${command.actionNumbers.join(',')}] | active movements AFTER:`, activeAfter.length > 0 ? activeAfter : 'none')
+
       context.movementStates.value = context.movementStates.value.filter(
         m => !command.actionNumbers.includes(m.actionNumber)
       )

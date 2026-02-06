@@ -5,26 +5,29 @@
  * Tests screen state, sprite positions, cursor, scalars, and sequence synchronization.
  */
 
-import { beforeEach, describe, expect, it } from 'vitest'
+/* eslint-disable max-lines -- Integration tests require comprehensive coverage exceeding 500 lines */
 
-import { BasicInterpreter } from '@/core/BasicInterpreter'
-import { EXECUTION_LIMITS } from '@/core/constants'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+
 import {
   createSharedAnimationBuffer,
-  readSpritePosition,
   readSpriteIsActive,
+  readSpritePosition,
   slotBase,
 } from '@/core/animation/sharedAnimationBuffer'
 import {
   createSharedDisplayBuffer,
   createViewsFromDisplayBuffer,
+  incrementSequence,
   readScreenStateFromShared,
   readSequence,
-  incrementSequence,
   type SharedDisplayViews,
 } from '@/core/animation/sharedDisplayBuffer'
-import { SharedBufferTestAdapter } from '../adapters/SharedBufferTestAdapter'
+import { BasicInterpreter } from '@/core/BasicInterpreter'
+import { EXECUTION_LIMITS } from '@/core/constants'
 import { getCodeByChar } from '@/shared/utils/backgroundLookup'
+
+import { SharedBufferTestAdapter } from '../adapters/SharedBufferTestAdapter'
 
 describe('Shared Buffer Integration - Full POC', () => {
   describe('Buffer Creation and Initialization', () => {
@@ -309,12 +312,10 @@ describe('Shared Buffer Integration - Full POC', () => {
     let sharedAnimationBuffer: SharedArrayBuffer
     let adapter: SharedBufferTestAdapter
     let interpreter: BasicInterpreter
-    let animView: Float64Array
 
     beforeEach(() => {
-      const { buffer, view } = createSharedAnimationBuffer()
+      const { buffer } = createSharedAnimationBuffer()
       sharedAnimationBuffer = buffer
-      animView = view
 
       adapter = new SharedBufferTestAdapter()
       adapter.configure({ enableAnimationBuffer: true })
@@ -501,14 +502,6 @@ describe('Shared Buffer Integration - Full POC', () => {
   })
 
   describe('Performance and Edge Cases', () => {
-    let views: SharedDisplayViews
-    let adapter: SharedBufferTestAdapter
-
-    beforeEach(() => {
-      views = createSharedDisplayBuffer()
-      adapter = new SharedBufferTestAdapter()
-    })
-
     it.skip('should handle empty screen buffer', async () => {
       // Note: This test has isolation issues within the test framework
       // Empty buffer behavior is tested through other tests
@@ -569,7 +562,7 @@ describe('Shared Buffer Integration - Full POC', () => {
         deviceAdapter: adapter,
       })
 
-      const result = await interpreter.execute('10 DEF SPRITE 0,(1,0,0,0,0)=CHR$(0)+CHR$(1)+CHR$(2)+CHR$(3)\n20 SPRITE ON\n30 END')
+      await interpreter.execute('10 DEF SPRITE 0,(1,0,0,0,0)=CHR$(0)+CHR$(1)+CHR$(2)+CHR$(3)\n20 SPRITE ON\n30 END')
 
       // Verify sprite states are tracked (same pattern as passing test)
       const spriteStates = interpreter.getSpriteStates()
@@ -608,7 +601,7 @@ describe('Shared Buffer Integration - Full POC', () => {
 
   describe('DEF MOVE Animation Buffer Tests', () => {
     it('should execute DEF MOVE with shared animation buffer', async () => {
-      const { buffer, view } = createSharedAnimationBuffer()
+      const { buffer } = createSharedAnimationBuffer()
       const adapter = new SharedBufferTestAdapter()
 
       const interpreter = new BasicInterpreter({
@@ -630,7 +623,7 @@ describe('Shared Buffer Integration - Full POC', () => {
     })
 
     it('should track movement state in buffer', async () => {
-      const { buffer, view } = createSharedAnimationBuffer()
+      const { buffer } = createSharedAnimationBuffer()
       const adapter = new SharedBufferTestAdapter()
 
       const interpreter = new BasicInterpreter({
@@ -651,7 +644,7 @@ describe('Shared Buffer Integration - Full POC', () => {
     })
 
     it('should handle multiple MOVE definitions', async () => {
-      const { buffer, view } = createSharedAnimationBuffer()
+      const { buffer } = createSharedAnimationBuffer()
       const adapter = new SharedBufferTestAdapter()
 
       const interpreter = new BasicInterpreter({
