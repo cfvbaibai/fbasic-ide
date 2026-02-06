@@ -31,8 +31,6 @@ export class AnimationManager {
   private sharedAnimationView: Float64Array | null = null
   /** Shared animation sync view (Int32Array for Atomics operations). */
   private sharedSyncView: Int32Array | null = null
-  /** Whether to use direct sync (true) or legacy message forwarding (false). */
-  private useDirectSync: boolean = false
 
   /**
    * Set device adapter for sending animation commands to the main thread.
@@ -52,8 +50,7 @@ export class AnimationManager {
     if (!buffer) {
       this.sharedAnimationView = null
       this.sharedSyncView = null
-      this.useDirectSync = false
-      console.log('[AnimationManager] setSharedAnimationBuffer: buffer is null/undefined, useDirectSync=false')
+      console.log('[AnimationManager] setSharedAnimationBuffer: buffer is null/undefined')
       return
     }
 
@@ -92,11 +89,9 @@ export class AnimationManager {
     if (this.sharedAnimationView.length >= expectedMinLength || buffer.byteLength >= SHARED_DISPLAY_BUFFER_BYTES) {
       // Create Int32Array view of sync section (9 floats × 2 Int32 per float)
       this.sharedSyncView = new Int32Array(buffer, syncSectionByteOffset, syncSectionFloats * 2)
-      this.useDirectSync = true
       console.log('[AnimationManager] Direct sync ENABLED (buffer has sync section at byte', syncSectionByteOffset, ')')
     } else {
       this.sharedSyncView = null
-      this.useDirectSync = false
       console.log('[AnimationManager] Direct sync DISABLED (buffer too short, has no sync section)')
     }
   }
@@ -238,7 +233,7 @@ export class AnimationManager {
     this.movementStates.set(actionNumber, movementState)
 
     // Use direct sync to Animation Worker if available
-    if (this.useDirectSync && this.sharedAnimationView && this.sharedSyncView) {
+    if (this.sharedAnimationView && this.sharedSyncView) {
       // Write command to shared buffer
       writeSyncCommand(this.sharedAnimationView, SyncCommandType.START_MOVEMENT, actionNumber, {
         startX: initialX,
@@ -304,7 +299,7 @@ export class AnimationManager {
     }
 
     // Use direct sync to Animation Worker
-    if (this.useDirectSync && this.sharedAnimationView && this.sharedSyncView) {
+    if (this.sharedAnimationView && this.sharedSyncView) {
       for (const actionNumber of actionNumbers) {
         // Write command to shared buffer
         writeSyncCommand(this.sharedAnimationView, SyncCommandType.STOP_MOVEMENT, actionNumber, {})
@@ -347,7 +342,7 @@ export class AnimationManager {
     }
 
     // Use direct sync to Animation Worker
-    if (this.useDirectSync && this.sharedAnimationView && this.sharedSyncView) {
+    if (this.sharedAnimationView && this.sharedSyncView) {
       for (const actionNumber of actionNumbers) {
         // Write command to shared buffer
         writeSyncCommand(this.sharedAnimationView, SyncCommandType.ERASE_MOVEMENT, actionNumber, {})
@@ -398,7 +393,7 @@ export class AnimationManager {
     this.deviceAdapter?.setSpritePosition?.(actionNumber, x, y)
 
     // Use direct sync to Animation Worker
-    if (this.useDirectSync && this.sharedAnimationView && this.sharedSyncView) {
+    if (this.sharedAnimationView && this.sharedSyncView) {
       // Write command to shared buffer
       writeSyncCommand(this.sharedAnimationView, SyncCommandType.SET_POSITION, actionNumber, {
         startX: x,
@@ -422,7 +417,7 @@ export class AnimationManager {
       writeSyncAck(this.sharedAnimationView, 0)
       clearSyncCommand(this.sharedAnimationView)
     } else {
-      throw new Error(`AnimationManager direct sync not available (useDirectSync: ${this.useDirectSync}, hasView: ${!!this.sharedAnimationView}, hasSyncView: ${!!this.sharedSyncView})`)
+      throw new Error(`AnimationManager direct sync not available (hasView: ${!!this.sharedAnimationView}, hasSyncView: ${!!this.sharedSyncView})`)
     }
   }
 

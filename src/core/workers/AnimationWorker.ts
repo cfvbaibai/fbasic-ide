@@ -73,8 +73,6 @@ export class AnimationWorker {
   private tickInterval: number | null = null
   private lastTickTime = 0
   private isRunning = false
-  /** Whether to use direct sync (poll shared buffer) instead of message-based commands. */
-  private useDirectSync: boolean = false
 
   constructor() {
     logWorker.debug('[AnimationWorker] Created')
@@ -145,7 +143,6 @@ export class AnimationWorker {
 
     // Create Int32Array view of sync section
     this.sharedSyncView = new Int32Array(buffer, syncSectionByteOffset, syncSectionFloats * 2)
-    this.useDirectSync = true
     logWorker.debug('[AnimationWorker] Direct sync enabled (sync section at byte', syncSectionByteOffset, ')')
 
     logWorker.debug('[AnimationWorker] Shared animation buffer set, byteLength =', buffer.byteLength)
@@ -155,6 +152,12 @@ export class AnimationWorker {
       for (let actionNumber = 0; actionNumber < MAX_SPRITES; actionNumber++) {
         writeSpriteState(this.sharedAnimationView, actionNumber, 0, 0, false)
       }
+    }
+
+    // Start tick loop to poll for sync commands from Executor Worker
+    // This needs to run even when no movements are active, to handle SET_POSITION and other commands
+    if (!this.isRunning) {
+      this.startTickLoop()
     }
   }
 
@@ -237,8 +240,11 @@ export class AnimationWorker {
       }
     }
 
-    // Stop tick loop if no active movements
-    if (this.movementStates.size === 0 || !Array.from(this.movementStates.values()).some(m => m.isActive)) {
+    // Only stop tick loop if NOT using direct sync and no active movements
+    if (
+      !this.sharedSyncView &&
+      (this.movementStates.size === 0 || !Array.from(this.movementStates.values()).some(m => m.isActive))
+    ) {
       this.stopTickLoop()
     }
   }
@@ -391,8 +397,11 @@ export class AnimationWorker {
       writeSpriteState(this.sharedAnimationView, actionNumber, 0, 0, false)
     }
 
-    // Stop tick loop if no active movements
-    if (this.movementStates.size === 0 || !Array.from(this.movementStates.values()).some(m => m.isActive)) {
+    // Only stop tick loop if NOT using direct sync and no active movements
+    if (
+      !this.sharedSyncView &&
+      (this.movementStates.size === 0 || !Array.from(this.movementStates.values()).some(m => m.isActive))
+    ) {
       this.stopTickLoop()
     }
   }
@@ -459,7 +468,7 @@ export class AnimationWorker {
     if (!this.sharedAnimationView) return
 
     // Poll for sync commands from Executor Worker (direct communication)
-    if (this.useDirectSync) {
+    if (this.sharedSyncView) {
       this.pollSyncCommands()
     }
 
@@ -513,8 +522,9 @@ export class AnimationWorker {
       }
     }
 
-    // Stop tick loop if no active movements
-    if (!Array.from(this.movementStates.values()).some(m => m.isActive)) {
+    // Only stop tick loop if NOT using direct sync
+    // When using direct sync, the loop must keep running to poll for commands (SET_POSITION, etc.)
+    if (!this.sharedSyncView && !Array.from(this.movementStates.values()).some(m => m.isActive)) {
       this.stopTickLoop()
     }
   }
@@ -566,6 +576,10 @@ export class AnimationWorker {
       for (let actionNumber = 0; actionNumber < MAX_SPRITES; actionNumber++) {
         writeSpriteState(this.sharedAnimationView, actionNumber, 0, 0, false)
       }
+    }
+    // Restart tick loop if using direct sync, to keep polling for commands
+    if (this.sharedSyncView && !this.isRunning) {
+      this.startTickLoop()
     }
   }
 
