@@ -421,15 +421,14 @@ const stopAnimationLoop = useScreenAnimationLoopRenderOnly({
     ctx.movementPositionsFromBuffer.value = positions
   },
   onMovementStatesUpdated: (local) => {
-    // Sync isActive from shared buffer to context (Animation Worker manages remainingDistance)
-    for (const m of local) {
-      const ctxM = ctx.movementStates.value?.find(x => x.actionNumber === m.actionNumber)
-      if (ctxM) {
-        ctxM.isActive = m.isActive
-        // Note: remainingDistance is managed by Animation Worker, not updated here
-      }
-    }
-    ctx.movementStates.value = [...(ctx.movementStates.value ?? [])]
+    // Note: We do NOT sync isActive from shared buffer here because:
+    // 1. Main thread is authoritative for isActive (via ANIMATION_COMMAND messages)
+    // 2. Buffer may have stale data due to timing between Worker write and Main read
+    // 3. The animation loop already uses local state (which comes from ANIMATION_COMMAND)
+    //
+    // Position data comes from buffer (written by Animation Worker)
+    // Lifecycle data (isActive) comes from ANIMATION_COMMAND messages
+    // This prevents the main thread from losing track of active movements
   },
   getPendingStaticRender: () => pendingStaticRenderRef.value,
   onRunPendingStaticRender: async () => {

@@ -174,15 +174,18 @@ export function useScreenAnimationLoopRenderOnly(
       setMovementPositionsFromBuffer(positions)
     }
 
-    // Sync remainingDistance and isActive to context so inspector shows live rem
-    // Note: In render-only mode, remainingDistance is managed by Animation Worker
-    // We only update the local movement states based on shared buffer isActive
-    if (onMovementStatesUpdated && sharedAnimationView) {
-      const updatedStates = localMovementStates.value.map(movement => {
-        const isActive = readSpriteIsActive(sharedAnimationView, movement.actionNumber)
-        return { ...movement, isActive }
-      })
-      onMovementStatesUpdated(updatedStates)
+    // Note: We do NOT sync isActive from shared buffer because:
+    // 1. Main thread is authoritative for isActive (via ANIMATION_COMMAND messages)
+    // 2. Buffer may have stale data due to timing between Worker write and Main read
+    // 3. Local state already has correct isActive from START_MOVEMENT command
+    // 4. Animation Worker only manages position data, not lifecycle
+    //
+    // Position data comes from buffer (written by Animation Worker)
+    // Lifecycle data (isActive) comes from ANIMATION_COMMAND messages
+    // This prevents the animation loop from stopping due to stale buffer data
+    if (onMovementStatesUpdated) {
+      // Pass empty update - lifecycle is managed by ANIMATION_COMMAND path
+      onMovementStatesUpdated([])
     }
 
     // Prioritize animation: run pending static render at end of frame (so animation step ran first)
