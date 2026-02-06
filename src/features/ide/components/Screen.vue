@@ -364,7 +364,6 @@ watch(
 // Initialize Animation Worker (single writer to shared buffer)
 const animationWorkerResult = useAnimationWorker({
   sharedAnimationBuffer: computed(() => ctx.sharedAnimationBuffer.value ?? null),
-  sharedJoystickBuffer: computed(() => ctx.sharedJoystickBuffer.value ?? null),
   onReady: () => {
     logScreen.debug('[Screen] Animation Worker ready')
     // Animation Worker is now ready - it polls the shared buffer for commands

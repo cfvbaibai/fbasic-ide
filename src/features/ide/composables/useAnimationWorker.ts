@@ -6,13 +6,12 @@
  * Passes shared buffers to Animation Worker during initialization.
  */
 
-import { type Ref,ref } from 'vue'
+import { type Ref, ref, watch } from 'vue'
 
 import type { AnimationWorkerCommand } from '@/core/workers/AnimationWorker'
 
 export interface UseAnimationWorkerOptions {
   sharedAnimationBuffer: Ref<SharedArrayBuffer | null>
-  sharedJoystickBuffer: Ref<SharedArrayBuffer | null>
   onReady?: () => void
   onError?: (error: Error) => void
 }
@@ -80,7 +79,8 @@ export function useAnimationWorker(options: UseAnimationWorkerOptions) {
         resolve()
       })
 
-      // Send shared buffers to animation worker
+      // Send shared buffers to animation worker (if available)
+      // Buffers might be set after worker initialization, so we watch for changes
       if (sharedAnimationBuffer.value) {
         const setBufferCommand: AnimationWorkerCommand = {
           type: 'SET_SHARED_BUFFER',
@@ -100,6 +100,17 @@ export function useAnimationWorker(options: UseAnimationWorkerOptions) {
       isInitializing.value = false
     }
   }
+
+  // Watch for buffer changes and send to worker when available
+  watch(sharedAnimationBuffer, () => {
+    if (isReady.value && worker) {
+      const setBufferCommand: AnimationWorkerCommand = {
+        type: 'SET_SHARED_BUFFER',
+        buffer: sharedAnimationBuffer.value,
+      }
+      worker.postMessage(setBufferCommand)
+    }
+  })
 
   /**
    * Forward animation command to Animation Worker
