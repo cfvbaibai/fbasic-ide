@@ -420,15 +420,23 @@ const stopAnimationLoop = useScreenAnimationLoopRenderOnly({
   setMovementPositionsFromBuffer: (positions) => {
     ctx.movementPositionsFromBuffer.value = positions
   },
-  onMovementStatesUpdated: (local) => {
-    // Note: We do NOT sync isActive from shared buffer here because:
-    // 1. Main thread is authoritative for isActive (via ANIMATION_COMMAND messages)
-    // 2. Buffer may have stale data due to timing between Worker write and Main read
-    // 3. The animation loop already uses local state (which comes from ANIMATION_COMMAND)
-    //
-    // Position data comes from buffer (written by Animation Worker)
-    // Lifecycle data (isActive) comes from ANIMATION_COMMAND messages
-    // This prevents the main thread from losing track of active movements
+  onMovementStatesUpdated: (updatedStates) => {
+    // Sync ONLY true→false transitions (completion detection) from shared buffer to context.
+    // This is called by animation loop when it detects movements have completed.
+    // The false→true transition (startup) is blocked in the animation loop to prevent
+    // race conditions where main thread reads isActive=false before Animation Worker
+    // has processed START_MOVEMENT. ANIMATION_COMMAND messages are the authoritative
+    // source for activating movements.
+    for (const m of updatedStates) {
+      const ctxM = ctx.movementStates.value?.find(x => x.actionNumber === m.actionNumber)
+      if (ctxM && !m.isActive /* only deactivations */) {
+        ctxM.isActive = false
+      }
+    }
+    // Only trigger reactivity if something actually changed
+    if (updatedStates.length > 0) {
+      ctx.movementStates.value = [...(ctx.movementStates.value ?? [])]
+    }
   },
   getPendingStaticRender: () => pendingStaticRenderRef.value,
   onRunPendingStaticRender: async () => {

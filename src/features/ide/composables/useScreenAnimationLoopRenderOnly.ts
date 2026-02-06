@@ -174,18 +174,32 @@ export function useScreenAnimationLoopRenderOnly(
       setMovementPositionsFromBuffer(positions)
     }
 
-    // Note: We do NOT sync isActive from shared buffer because:
-    // 1. Main thread is authoritative for isActive (via ANIMATION_COMMAND messages)
-    // 2. Buffer may have stale data due to timing between Worker write and Main read
-    // 3. Local state already has correct isActive from START_MOVEMENT command
-    // 4. Animation Worker only manages position data, not lifecycle
-    //
-    // Position data comes from buffer (written by Animation Worker)
-    // Lifecycle data (isActive) comes from ANIMATION_COMMAND messages
-    // This prevents the animation loop from stopping due to stale buffer data
-    if (onMovementStatesUpdated) {
-      // Pass empty update - lifecycle is managed by ANIMATION_COMMAND path
-      onMovementStatesUpdated([])
+    // Sync isActive from shared buffer with one-way transition:
+    // - true → false (completion): Allow sync (Animation Worker signals completion)
+    // - false → true (startup): Block sync (prevent race condition, ANIMATION_COMMAND is authoritative)
+    // This prevents the startup race condition where main thread reads isActive=false from buffer
+    // before Animation Worker has processed START_MOVEMENT, while still detecting completion.
+    if (onMovementStatesUpdated && sharedAnimationView) {
+      const updatedStates = localMovementStates.value
+        .map(movement => {
+          const bufferIsActive = readSpriteIsActive(sharedAnimationView, movement.actionNumber)
+          // Only sync true→false transitions (completion detection)
+          // Block false→true transitions (prevent startup race condition)
+          if (movement.isActive && !bufferIsActive) {
+            return { ...movement, isActive: false }
+          }
+          // Keep current state for all other cases
+          return movement
+        })
+        .filter((m, i, arr) => {
+          // Only include states that actually changed
+          const original = localMovementStates.value[i]
+          return original.isActive !== m.isActive
+        })
+
+      if (updatedStates.length > 0) {
+        onMovementStatesUpdated(updatedStates)
+      }
     }
 
     // Prioritize animation: run pending static render at end of frame (so animation step ran first)
