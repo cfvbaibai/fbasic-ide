@@ -319,8 +319,21 @@ const { schedule: scheduleRender, cleanup: cleanupRenderQueue } = useRenderQueue
     await render()
   },
   {
-    hasActiveMovements: () =>
-      localMovementStates.value.some(m => m.isActive),
+    hasActiveMovements: () => {
+      // Check local states first
+      const localActive = localMovementStates.value.some(m => m.isActive)
+      // When shared buffer is available, read isActive directly from buffer (Animation Worker is source of truth)
+      if (ctx.sharedAnimationView.value) {
+        for (let actionNumber = 0; actionNumber < 8; actionNumber++) {
+          const base = actionNumber * 3
+          if (ctx.sharedAnimationView.value[base + 2] !== 0) {
+            return true
+          }
+        }
+        return false
+      }
+      return localActive
+    },
     setPendingStaticRender: (v: boolean) => {
       pendingStaticRenderRef.value = v
     },

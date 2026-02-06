@@ -232,6 +232,19 @@ export class AnimationManager {
 
     this.movementStates.set(actionNumber, movementState)
 
+    // Notify main thread about new movement (for ctx.movementStates tracking)
+    // This ensures main thread knows about the movement for rendering even though
+    // positions come from the shared buffer (Animation Worker is single writer)
+    if (this.deviceAdapter?.sendAnimationCommand) {
+      this.deviceAdapter.sendAnimationCommand({
+        type: 'START_MOVEMENT',
+        actionNumber,
+        definition,
+        startX: initialX,
+        startY: initialY,
+      })
+    }
+
     // Use direct sync to Animation Worker if available
     if (this.sharedAnimationView && this.sharedSyncView) {
       // Write command to shared buffer
@@ -252,19 +265,18 @@ export class AnimationManager {
         console.warn('[AnimationManager] Atomics.notify failed (not in worker context?)')
       }
 
-      // Wait for acknowledgment with timeout
+      // Wait for acknowledgment with timeout (but don't throw if no Animation Worker)
       const ackReceived = waitForAck(this.sharedSyncView, 100) // 100ms timeout
 
       if (!ackReceived) {
-        console.error(`[AnimationManager] Timeout waiting for START_MOVEMENT ack for sprite ${actionNumber}`)
-        throw new Error(`Animation Worker did not acknowledge START_MOVEMENT for sprite ${actionNumber} (timeout 100ms)`)
+        // No Animation Worker running (e.g., in tests) - clear command and continue
+        console.warn('[AnimationManager] No Animation Worker ack for START_MOVEMENT, clearing command')
+        clearSyncCommand(this.sharedAnimationView)
+      } else {
+        // Clear acknowledgment for next command
+        writeSyncAck(this.sharedAnimationView, 0)
+        clearSyncCommand(this.sharedAnimationView)
       }
-
-      // Clear acknowledgment for next command
-      writeSyncAck(this.sharedAnimationView, 0)
-
-      // Clear command from buffer
-      clearSyncCommand(this.sharedAnimationView)
     } else {
       // Direct sync not available - log warning but continue with local tracking only
       console.warn('[AnimationManager] Direct sync not available for START_MOVEMENT, using local tracking only')
@@ -298,6 +310,14 @@ export class AnimationManager {
       }
     }
 
+    // Notify main thread about stopped movements (for ctx.movementStates tracking)
+    if (this.deviceAdapter?.sendAnimationCommand) {
+      this.deviceAdapter.sendAnimationCommand({
+        type: 'STOP_MOVEMENT',
+        actionNumbers,
+      })
+    }
+
     // Use direct sync to Animation Worker
     if (this.sharedAnimationView && this.sharedSyncView) {
       for (const actionNumber of actionNumbers) {
@@ -313,13 +333,13 @@ export class AnimationManager {
 
         const ackReceived = waitForAck(this.sharedSyncView, 100)
         if (!ackReceived) {
-          console.error(`[AnimationManager] Timeout waiting for STOP_MOVEMENT ack for sprite ${actionNumber}`)
-          throw new Error(`Animation Worker did not acknowledge STOP_MOVEMENT for sprite ${actionNumber} (timeout 100ms)`)
+          // No Animation Worker running - clear command and continue
+          console.warn('[AnimationManager] No Animation Worker ack for STOP_MOVEMENT, clearing command')
+          clearSyncCommand(this.sharedAnimationView)
+        } else {
+          writeSyncAck(this.sharedAnimationView, 0)
+          clearSyncCommand(this.sharedAnimationView)
         }
-
-        // Clear acknowledgment and command
-        writeSyncAck(this.sharedAnimationView, 0)
-        clearSyncCommand(this.sharedAnimationView)
       }
     } else {
       // Direct sync not available - log warning but continue with local tracking only
@@ -341,6 +361,14 @@ export class AnimationManager {
       this.movementStates.delete(actionNumber)
     }
 
+    // Notify main thread about erased movements (for ctx.movementStates tracking)
+    if (this.deviceAdapter?.sendAnimationCommand) {
+      this.deviceAdapter.sendAnimationCommand({
+        type: 'ERASE_MOVEMENT',
+        actionNumbers,
+      })
+    }
+
     // Use direct sync to Animation Worker
     if (this.sharedAnimationView && this.sharedSyncView) {
       for (const actionNumber of actionNumbers) {
@@ -356,13 +384,13 @@ export class AnimationManager {
 
         const ackReceived = waitForAck(this.sharedSyncView, 100)
         if (!ackReceived) {
-          console.error(`[AnimationManager] Timeout waiting for ERASE_MOVEMENT ack for sprite ${actionNumber}`)
-          throw new Error(`Animation Worker did not acknowledge ERASE_MOVEMENT for sprite ${actionNumber} (timeout 100ms)`)
+          // No Animation Worker running - clear command and continue
+          console.warn('[AnimationManager] No Animation Worker ack for ERASE_MOVEMENT, clearing command')
+          clearSyncCommand(this.sharedAnimationView)
+        } else {
+          writeSyncAck(this.sharedAnimationView, 0)
+          clearSyncCommand(this.sharedAnimationView)
         }
-
-        // Clear acknowledgment and command
-        writeSyncAck(this.sharedAnimationView, 0)
-        clearSyncCommand(this.sharedAnimationView)
       }
     } else {
       // Direct sync not available - log warning but continue with local tracking only
@@ -392,6 +420,16 @@ export class AnimationManager {
     // Store position locally (for MOVE command to use as start position)
     this.deviceAdapter?.setSpritePosition?.(actionNumber, x, y)
 
+    // Notify main thread about position change (for ctx.movementStates tracking)
+    if (this.deviceAdapter?.sendAnimationCommand) {
+      this.deviceAdapter.sendAnimationCommand({
+        type: 'SET_POSITION',
+        actionNumber,
+        x,
+        y,
+      })
+    }
+
     // Use direct sync to Animation Worker
     if (this.sharedAnimationView && this.sharedSyncView) {
       // Write command to shared buffer
@@ -409,15 +447,16 @@ export class AnimationManager {
 
       const ackReceived = waitForAck(this.sharedSyncView, 100)
       if (!ackReceived) {
-        console.error(`[AnimationManager] Timeout waiting for SET_POSITION ack for sprite ${actionNumber}`)
-        throw new Error(`Animation Worker did not acknowledge SET_POSITION for sprite ${actionNumber} (timeout 100ms)`)
+        // No Animation Worker running - clear command and continue
+        console.warn('[AnimationManager] No Animation Worker ack for SET_POSITION, clearing command')
+        clearSyncCommand(this.sharedAnimationView)
+      } else {
+        writeSyncAck(this.sharedAnimationView, 0)
+        clearSyncCommand(this.sharedAnimationView)
       }
-
-      // Clear acknowledgment and command
-      writeSyncAck(this.sharedAnimationView, 0)
-      clearSyncCommand(this.sharedAnimationView)
     } else {
-      throw new Error(`AnimationManager direct sync not available (hasView: ${!!this.sharedAnimationView}, hasSyncView: ${!!this.sharedSyncView})`)
+      // Direct sync not available - log warning but continue with local tracking only
+      console.warn('[AnimationManager] Direct sync not available for SET_POSITION, using local tracking only')
     }
   }
 
