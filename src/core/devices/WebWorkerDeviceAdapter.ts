@@ -363,7 +363,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
         outputType: 'debug',
         timestamp: Date.now(),
       },
-    }, '*')
+    })
   }
 
   errorOutput(output: string): void {
@@ -379,7 +379,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
         outputType: 'error',
         timestamp: Date.now(),
       },
-    }, '*')
+    })
   }
 
   clearScreen(): void {
@@ -596,7 +596,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
           musicString,
           events: serializedEvents,
         },
-      }, '*')
+      })
     } catch (error) {
       logWorker.error('Error parsing music string:', error)
       this.errorOutput(`PLAY error: ${error instanceof Error ? error.message : String(error)}`)
