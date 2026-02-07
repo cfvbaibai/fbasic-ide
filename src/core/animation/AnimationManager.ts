@@ -197,11 +197,7 @@ export class AnimationManager {
     })
 
     // Notify Animation Worker and wait for acknowledgment
-    try {
-      Atomics.notify(this.accessor.syncInt32View, 0)
-    } catch {
-      // Atomics.notify may throw in non-worker contexts
-    }
+    this.accessor.notify()
 
     console.log('[AnimationManager] BEFORE waitForAck')
     const ackReceived = this.accessor.waitForAck(100)
@@ -228,11 +224,7 @@ export class AnimationManager {
     for (const actionNumber of actionNumbers) {
       this.accessor.writeSyncCommand(SyncCommandType.STOP_MOVEMENT, actionNumber, {})
 
-      try {
-        Atomics.notify(this.accessor.syncInt32View, 0)
-      } catch {
-        // Atomics.notify may throw in non-worker contexts
-      }
+      this.accessor.notify()
 
       const ackReceived = this.accessor.waitForAck(100)
       if (!ackReceived) {
@@ -258,11 +250,7 @@ export class AnimationManager {
     for (const actionNumber of actionNumbers) {
       this.accessor.writeSyncCommand(SyncCommandType.ERASE_MOVEMENT, actionNumber, {})
 
-      try {
-        Atomics.notify(this.accessor.syncInt32View, 0)
-      } catch {
-        // Atomics.notify may throw in non-worker contexts
-      }
+      this.accessor.notify()
 
       const ackReceived = this.accessor.waitForAck(100)
       if (!ackReceived) {
@@ -310,11 +298,7 @@ export class AnimationManager {
       startY: y,
     })
 
-    try {
-      Atomics.notify(this.accessor.syncInt32View, 0)
-    } catch {
-      // Atomics.notify may throw in non-worker contexts
-    }
+    this.accessor.notify()
 
     const ackReceived = this.accessor.waitForAck(100)
     if (!ackReceived) {

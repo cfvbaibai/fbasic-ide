@@ -62,7 +62,12 @@ export enum SyncCommandType {
 export const ACK_PENDING = 0
 export const ACK_RECEIVED = 1
 
-/** Slot base index for actionNumber i: [base]=x, [base+1]=y, [base+2]=isActive, [base+3]=isVisible, [base+4]=frameIndex, [base+5]=remainingDistance, [base+6]=totalDistance, [base+7]=direction, [base+8]=speed, [base+9]=priority, [base+10]=characterType, [base+11]=colorCombination */
+/**
+ * Slot base index for actionNumber i: 
+ * [base]=x, [base+1]=y, [base+2]=isActive, [base+3]=isVisible, [base+4]=frameIndex,
+ * [base+5]=remainingDistance, [base+6]=totalDistance, [base+7]=direction, [base+8]=speed, 
+ * [base+9]=priority, [base+10]=characterType, [base+11]=colorCombination 
+ **/
 export function slotBase(actionNumber: number): number {
   if (actionNumber < 0 || actionNumber >= MAX_SPRITES) {
     throw new RangeError(`actionNumber must be 0-${MAX_SPRITES - 1}, got ${actionNumber}`)

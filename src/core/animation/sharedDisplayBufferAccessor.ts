@@ -11,6 +11,9 @@
  * @see {@link docs/reference/shared-display-buffer.md} for full buffer layout
  */
 
+import type { ScreenCell } from '@/core/interfaces'
+import { getCharacterByCode } from '@/shared/utils/backgroundLookup'
+
 import {
   ACK_PENDING,
   ACK_RECEIVED,
@@ -29,7 +32,6 @@ import {
   writeSpriteState as helperWriteSpriteState,
 } from './sharedAnimationBuffer'
 import {
-  CELLS,
   COLS,
   OFFSET_ANIMATION_SYNC,
   OFFSET_CHARS,
@@ -40,8 +42,6 @@ import {
   ROWS,
   SHARED_DISPLAY_BUFFER_BYTES,
 } from './sharedDisplayBuffer'
-import type { ScreenCell } from '@/core/interfaces'
-import { getCharacterByCode } from '@/shared/utils/backgroundLookup'
 
 /**
  * Parameters for sync commands (varies by command type)
@@ -182,9 +182,9 @@ export class SharedDisplayBufferAccessor {
 
   /**
    * Get sync section Int32 view (18 Int32 elements) for Atomics operations.
-   * @deprecated Use notify()/waitForAck() instead for direct Atomics access
+   * @internal For internal use only - use notify()/waitForAck() instead
    */
-  get syncInt32View(): Int32Array {
+  private get syncInt32View(): Int32Array {
     return this.syncInt32ViewInternal
   }
 
