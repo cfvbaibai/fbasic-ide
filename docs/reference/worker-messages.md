@@ -115,17 +115,18 @@ No postMessage. Uses `SharedArrayBuffer` with `Atomics` for synchronization.
 
 ### Sync Flow
 ```typescript
-// Executor Worker writes
-writeSyncCommand(view, SyncCommandType.START_MOVEMENT, actionNumber, params)
-Atomics.notify(syncView, 0)
+// Executor Worker writes (via accessor)
+const accessor = new SharedDisplayBufferAccessor(sharedBuffer)
+accessor.writeSyncCommand(SyncCommandType.START_MOVEMENT, actionNumber, params)
+accessor.notify()
 
-// Animation Worker reads and acknowledges
-const command = readSyncCommand(view)
+// Animation Worker reads and acknowledges (via accessor)
+const command = accessor.readSyncCommand()
 // ... process command ...
-notifyAck(syncView)
+accessor.notifyAck()
 
 // Executor Worker waits for acknowledgment
-waitForAck(syncView, 100)
+accessor.waitForAck(100)
 ```
 
 ---
@@ -156,8 +157,8 @@ waitForAck(syncView, 100)
 | `src/core/devices/WebWorkerDeviceAdapter.ts` | Worker side device adapter |
 | `src/core/workers/AnimationWorker.ts` | Animation worker (single writer) |
 | `src/core/animation/AnimationManager.ts` | Animation manager (executor side) |
-| `src/core/animation/sharedDisplayBuffer.ts` | Combined buffer layout |
-| `src/core/animation/sharedAnimationBuffer.ts` | Animation sync helpers |
+| `src/core/animation/sharedDisplayBuffer.ts` | Buffer layout constants and factory functions |
+| `src/core/animation/sharedDisplayBufferAccessor.ts` | All buffer operations (screen, sprite, sync, Atomics) |
 | `src/features/ide/composables/useBasicIdeMessageHandlers.ts` | Main thread message handlers |
 | `src/features/ide/composables/useBasicIdeWebWorkerUtils.ts` | Worker utilities |
 

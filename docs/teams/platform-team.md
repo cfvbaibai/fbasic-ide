@@ -128,9 +128,8 @@ interface JoystickBufferView {
 - `characterSequenceConfig.ts` - Direction/sprite mapping per character (0-15)
 
 **Shared Buffers:**
-- `sharedDisplayBuffer.ts` - Combined buffer (2200 bytes: sprites + screen + cursor + scalars + animation sync)
-- `sharedDisplayBufferAccessor.ts` - Unified accessor for combined buffer
-- `sharedAnimationBuffer.ts` - Helper module for animation sync section (within combined display buffer)
+- `sharedDisplayBuffer.ts` - Buffer layout constants and factory functions (2200 bytes)
+- `sharedDisplayBufferAccessor.ts` - All buffer operations (screen, sprite, sync, Atomics)
 
 **Main Thread:**
 - `useScreenAnimationLoopRenderOnly.ts` - Render-only animation loop

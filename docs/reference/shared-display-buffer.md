@@ -188,10 +188,12 @@ Float64Array indices (relative to sync section start at byte 2128):
 
 ```typescript
 import { createSharedDisplayBuffer } from '@/core/animation/sharedDisplayBuffer'
+import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 
 const sharedViews = createSharedDisplayBuffer()
-// sharedViews.buffer → SharedArrayBuffer (1624 bytes)
-// sharedViews.spriteView → Float64Array (24)
+const accessor = new SharedDisplayBufferAccessor(sharedViews.buffer)
+// sharedViews.buffer → SharedArrayBuffer (2200 bytes)
+// sharedViews.spriteView → Float64Array (96)
 // sharedViews.charView → Uint8Array (672)
 // sharedViews.patternView → Uint8Array (672)
 // sharedViews.cursorView → Uint8Array (2)
@@ -203,10 +205,11 @@ const sharedViews = createSharedDisplayBuffer()
 ### Executor Worker (Write Screen State)
 
 ```typescript
-import { writeScreenState, incrementSequence } from '@/core/animation/sharedDisplayBuffer'
+import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 
-writeScreenState(
-  views,
+const accessor = new SharedDisplayBufferAccessor(sharedDisplayBuffer)
+
+accessor.writeScreenState(
   screenBuffer,    // ScreenCell[][]
   cursorX,         // number
   cursorY,         // number
@@ -215,42 +218,44 @@ writeScreenState(
   backdropColor,   // number
   cgenMode         // number
 )
-incrementSequence(views) // Notify main thread of change
+accessor.incrementSequence() // Notify main thread of change
 ```
 
 ### Executor Worker (Send Animation Commands)
 
 ```typescript
-import { writeSyncCommand, waitForAck } from '@/core/animation/sharedAnimationBuffer'
+import { SharedDisplayBufferAccessor, SyncCommandType } from '@/core/animation/sharedDisplayBufferAccessor'
+
+const accessor = new SharedDisplayBufferAccessor(sharedDisplayBuffer)
 
 // Write command to sync section
-writeSyncCommand(
-  views.animationSyncView,
+accessor.writeSyncCommand(
   SyncCommandType.START_MOVEMENT,
   actionNumber,
   { startX, startY, direction, speed, distance, priority }
 )
 
-// Notify and wait for acknowledgment
-Atomics.notify(syncView, 0)
-waitForAck(syncView, 100)
+// Wait for acknowledgment
+accessor.waitForAck(100)
 ```
 
 ### Animation Worker (Read Commands, Write Positions)
 
 ```typescript
-import { readSyncCommand, writeSpriteState, notifyAck } from '@/core/animation/sharedAnimationBuffer'
+import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
+
+const accessor = new SharedDisplayBufferAccessor(sharedDisplayBuffer)
 
 // Poll for commands
-const command = readSyncCommand(syncView)
+const command = accessor.readSyncCommand()
 if (command) {
   // Process command...
 
   // Write sprite positions
-  writeSpriteState(spriteView, actionNumber, x, y, isActive)
+  accessor.writeSpriteState(actionNumber, x, y, isActive)
 
   // Acknowledge
-  notifyAck(syncView)
+  accessor.notifyAck()
 }
 ```
 
@@ -278,7 +283,7 @@ if (command) {
 
 | File | Purpose |
 |------|---------|
-| `src/core/animation/sharedDisplayBuffer.ts` | Buffer creation and screen sync functions |
-| `src/core/animation/sharedAnimationBuffer.ts` | Animation sync and sprite helpers |
+| `src/core/animation/sharedDisplayBuffer.ts` | Buffer layout constants and factory functions |
+| `src/core/animation/sharedDisplayBufferAccessor.ts` | All buffer operations (screen, sprite, sync, Atomics) |
 | `src/core/animation/AnimationManager.ts` | Executor Worker animation state manager |
 | `src/core/workers/AnimationWorker.ts` | Animation Worker (sprite physics) |
