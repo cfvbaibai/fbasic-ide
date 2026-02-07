@@ -174,10 +174,9 @@ export class SharedDisplayBufferAccessor {
 
   /**
    * Get sync section view (9 Float64 elements at byte offset 2128).
-   * @deprecated Use writeSyncCommand()/readSyncCommand() instead
-   * @internal For backward compatibility during migration
+   * @internal For internal use only - use writeSyncCommand()/readSyncCommand() instead
    */
-  get syncView(): Float64Array {
+  private get syncView(): Float64Array {
     return this.syncViewInternal
   }
 
