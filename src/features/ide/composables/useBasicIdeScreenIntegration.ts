@@ -13,6 +13,7 @@ import {
   writeScreenState,
 } from '@/core/animation/sharedDisplayBuffer'
 import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
+import { SyncCommandType } from '@/core/animation/sharedAnimationBuffer'
 import { TIMING } from '@/core/constants'
 import { createSharedJoystickBuffer } from '@/core/devices'
 
@@ -79,11 +80,7 @@ export function useBasicIdeScreenIntegration(state: BasicIdeState): BasicIdeScre
 
     // Send CLEAR_ALL_MOVEMENTS command to AnimationWorker
     // AnimationWorker will clear its internal movement states when it processes this
-    const SYNC_BYTE_OFFSET = 2128
-    const syncView = new Float64Array(sharedDisplayViews.buffer, SYNC_BYTE_OFFSET, 9)
-    syncView[0] = 5 // CLEAR_ALL_MOVEMENTS
-    syncView[1] = 0 // actionNumber (unused for CLEAR_ALL)
-    syncView[8] = 0 // ACK_PENDING
+    sharedDisplayBufferAccessor.writeSyncCommand(SyncCommandType.CLEAR_ALL_MOVEMENTS, 0)
 
     // Clear local sprite node maps so render creates fresh layers (will be empty since buffer is being cleared)
     state.frontSpriteNodes.value.clear()

@@ -2,10 +2,11 @@
  * Shared Display Buffer Accessor
  *
  * Unified accessor for the combined display buffer that creates consistent views
- * for both Executor Worker (AnimationManager) and Animation Worker.
+ * for all sections: sprites, screen, cursor, sequence, scalars, and animation sync.
  *
- * This class encapsulates all offset calculations and provides type-safe
- * sync command methods, serving as the single source of truth for buffer layout.
+ * This class encapsulates all offset calculations and provides type-safe methods,
+ * serving as the single source of truth for buffer layout. Raw views are private
+ * to prevent direct array access from outside.
  *
  * @see {@link docs/reference/shared-display-buffer.md} for full buffer layout
  */
@@ -27,7 +28,20 @@ import {
   SyncCommandType,
   writeSpriteState as helperWriteSpriteState,
 } from './sharedAnimationBuffer'
-import { OFFSET_ANIMATION_SYNC, SHARED_DISPLAY_BUFFER_BYTES } from './sharedDisplayBuffer'
+import {
+  CELLS,
+  COLS,
+  OFFSET_ANIMATION_SYNC,
+  OFFSET_CHARS,
+  OFFSET_CURSOR,
+  OFFSET_PATTERNS,
+  OFFSET_SCALARS,
+  OFFSET_SEQUENCE,
+  ROWS,
+  SHARED_DISPLAY_BUFFER_BYTES,
+} from './sharedDisplayBuffer'
+import type { ScreenCell } from '@/core/interfaces'
+import { getCharacterByCode } from '@/shared/utils/backgroundLookup'
 
 /**
  * Parameters for sync commands (varies by command type)
@@ -60,19 +74,29 @@ export interface SyncCommand {
 /**
  * Unified accessor for shared display buffer.
  *
- * Creates consistent views for sprite data and sync section, with methods
- * for sync command operations.
+ * Creates consistent views for all buffer sections, with methods
+ * for all operations. Raw views are private - use accessor methods.
  */
 export class SharedDisplayBufferAccessor {
   private readonly buffer: SharedArrayBuffer
 
-  // Cached views - created once in constructor
+  // Cached views - created once in constructor (all private)
   private readonly spriteViewInternal: Float64Array
+  private readonly charViewInternal: Uint8Array
+  private readonly patternViewInternal: Uint8Array
+  private readonly cursorViewInternal: Uint8Array
+  private readonly sequenceViewInternal: Int32Array
+  private readonly scalarsViewInternal: Uint8Array
   private readonly syncViewInternal: Float64Array
   private readonly syncInt32ViewInternal: Int32Array
 
   // Section sizes
   private static readonly SPRITE_DATA_FLOATS = 96 // 8 sprites × 12 floats
+  private static readonly SCREEN_CHARS = 672 // 28 × 24
+  private static readonly SCREEN_PATTERNS = 672 // 28 × 24
+  private static readonly CURSOR_BYTES = 2
+  private static readonly SEQUENCE_INTS = 1
+  private static readonly SCALARS_BYTES = 4
   private static readonly SYNC_SECTION_FLOATS = 9 // command type + action number + 6 params + ack
   private static readonly SYNC_SECTION_BYTES = 9 * 8 // 72 bytes
 
@@ -87,6 +111,11 @@ export class SharedDisplayBufferAccessor {
   private static readonly SYNC_PARAM5_INDEX = 6
   private static readonly SYNC_PARAM6_INDEX = 7
   private static readonly SYNC_ACK_INDEX = 8
+
+  // Screen helper
+  private cellIndex(x: number, y: number): number {
+    return y * COLS + x
+  }
 
   /**
    * Create accessor from combined display buffer.
@@ -105,8 +134,22 @@ export class SharedDisplayBufferAccessor {
     // Sprite data view: 96 Float64 elements at byte offset 0
     this.spriteViewInternal = new Float64Array(buffer, 0, SharedDisplayBufferAccessor.SPRITE_DATA_FLOATS)
 
+    // Screen characters: 672 Uint8 elements at byte offset 768
+    this.charViewInternal = new Uint8Array(buffer, OFFSET_CHARS, SharedDisplayBufferAccessor.SCREEN_CHARS)
+
+    // Screen patterns: 672 Uint8 elements at byte offset 1440
+    this.patternViewInternal = new Uint8Array(buffer, OFFSET_PATTERNS, SharedDisplayBufferAccessor.SCREEN_PATTERNS)
+
+    // Cursor: 2 Uint8 elements at byte offset 2112
+    this.cursorViewInternal = new Uint8Array(buffer, OFFSET_CURSOR, SharedDisplayBufferAccessor.CURSOR_BYTES)
+
+    // Sequence: 1 Int32 element at byte offset 2116
+    this.sequenceViewInternal = new Int32Array(buffer, OFFSET_SEQUENCE, SharedDisplayBufferAccessor.SEQUENCE_INTS)
+
+    // Scalars: 4 Uint8 elements at byte offset 2120
+    this.scalarsViewInternal = new Uint8Array(buffer, OFFSET_SCALARS, SharedDisplayBufferAccessor.SCALARS_BYTES)
+
     // Sync section view: 9 Float64 elements at byte offset OFFSET_ANIMATION_SYNC (2128)
-    // This is where the sync section is located in the COMBINED display buffer
     this.syncViewInternal = new Float64Array(
       buffer,
       OFFSET_ANIMATION_SYNC,
@@ -122,16 +165,17 @@ export class SharedDisplayBufferAccessor {
   }
 
   /**
-   * Get sprite data view (88 Float64 elements).
-   * For use with helper functions in sharedAnimationBuffer.ts.
+   * Get sprite data view (96 Float64 elements).
+   * @internal For use with helper functions in sharedAnimationBuffer.ts only.
    */
-  get spriteView(): Float64Array {
+  private get spriteView(): Float64Array {
     return this.spriteViewInternal
   }
 
   /**
    * Get sync section view (9 Float64 elements at byte offset 2128).
-   * Indices are 0-8 relative to sync section start.
+   * @deprecated Use writeSyncCommand()/readSyncCommand() instead
+   * @internal For backward compatibility during migration
    */
   get syncView(): Float64Array {
     return this.syncViewInternal
@@ -139,17 +183,30 @@ export class SharedDisplayBufferAccessor {
 
   /**
    * Get sync section Int32 view (18 Int32 elements) for Atomics operations.
+   * @deprecated Use notify()/waitForAck() instead for direct Atomics access
    */
   get syncInt32View(): Int32Array {
     return this.syncInt32ViewInternal
   }
 
   /**
-   * Get Int32 index for acknowledgment (for Atomics operations).
-   * The syncInt32View starts at the sync section (byte 2128), where ack is at index 8.
-   * In Int32 terms: 8 × 2 = 16.
+   * Notify waiting threads that sync state has changed.
+   * This is a convenience wrapper around Atomics.notify for the sync section.
+   * @param count - Number of threads to notify (default: 1)
    */
-  get ackInt32Index(): number {
+  notify(count = 1): void {
+    try {
+      Atomics.notify(this.syncInt32ViewInternal, 0, count)
+    } catch {
+      // Atomics.notify may throw in some contexts, ignore
+    }
+  }
+
+  /**
+   * Get Int32 index for acknowledgment (for Atomics operations).
+   * @internal For internal use only.
+   */
+  private get ackInt32Index(): number {
     // Ack is at index 8 in sync section
     // syncInt32View starts at sync section, so ack is at Int32 index 8 * 2 = 16
     return 8 * 2
@@ -277,7 +334,217 @@ export class SharedDisplayBufferAccessor {
   }
 
   // ============================================================================
-  // Sprite State Convenience Methods
+  // Screen Section Methods
+  // ============================================================================
+
+  /**
+   * Read screen character code at position.
+   * @param x - Column (0-27)
+   * @param y - Row (0-23)
+   * @returns F-BASIC character code (0-255)
+   */
+  readScreenChar(x: number, y: number): number {
+    if (x < 0 || x >= COLS || y < 0 || y >= ROWS) return 0x20
+    return this.charViewInternal[this.cellIndex(x, y)] ?? 0x20
+  }
+
+  /**
+   * Write screen character code at position.
+   * @param x - Column (0-27)
+   * @param y - Row (0-23)
+   * @param charCode - F-BASIC character code (0-255)
+   */
+  writeScreenChar(x: number, y: number, charCode: number): void {
+    if (x < 0 || x >= COLS || y < 0 || y >= ROWS) return
+    this.charViewInternal[this.cellIndex(x, y)] = Math.max(0, Math.min(255, charCode))
+  }
+
+  /**
+   * Read screen color pattern at position.
+   * @param x - Column (0-27)
+   * @param y - Row (0-23)
+   * @returns Color pattern (0-3)
+   */
+  readScreenPattern(x: number, y: number): number {
+    if (x < 0 || x >= COLS || y < 0 || y >= ROWS) return 0
+    return (this.patternViewInternal[this.cellIndex(x, y)] ?? 0) & 3
+  }
+
+  /**
+   * Write screen color pattern at position.
+   * @param x - Column (0-27)
+   * @param y - Row (0-23)
+   * @param pattern - Color pattern (0-3)
+   */
+  writeScreenPattern(x: number, y: number, pattern: number): void {
+    if (x < 0 || x >= COLS || y < 0 || y >= ROWS) return
+    this.patternViewInternal[this.cellIndex(x, y)] = pattern & 3
+  }
+
+  /**
+   * Read entire screen as ScreenCell[][].
+   * Useful for rendering or state inspection.
+   */
+  readScreenBuffer(): ScreenCell[][] {
+    const buffer: ScreenCell[][] = []
+    for (let y = 0; y < ROWS; y++) {
+      const row: ScreenCell[] = []
+      for (let x = 0; x < COLS; x++) {
+        const idx = this.cellIndex(x, y)
+        const charCode = this.charViewInternal[idx] ?? 0x20
+        row.push({
+          character: getCharacterByCode(charCode) ?? String.fromCharCode(charCode),
+          colorPattern: (this.patternViewInternal[idx] ?? 0) & 3,
+          x,
+          y,
+        })
+      }
+      buffer.push(row)
+    }
+    return buffer
+  }
+
+  // ============================================================================
+  // Cursor Section Methods
+  // ============================================================================
+
+  /**
+   * Read cursor position.
+   * @returns Object with x (0-27) and y (0-23)
+   */
+  readCursor(): { x: number; y: number } {
+    return {
+      x: this.cursorViewInternal[0] ?? 0,
+      y: this.cursorViewInternal[1] ?? 0,
+    }
+  }
+
+  /**
+   * Write cursor position.
+   * @param x - Column (0-27)
+   * @param y - Row (0-23)
+   */
+  writeCursor(x: number, y: number): void {
+    this.cursorViewInternal[0] = Math.max(0, Math.min(COLS - 1, x))
+    this.cursorViewInternal[1] = Math.max(0, Math.min(ROWS - 1, y))
+  }
+
+  // ============================================================================
+  // Sequence Section Methods
+  // ============================================================================
+
+  /**
+   * Read sequence number (change detection counter).
+   */
+  readSequence(): number {
+    return this.sequenceViewInternal[0] ?? 0
+  }
+
+  /**
+   * Increment sequence number to signal change.
+   */
+  incrementSequence(): void {
+    this.sequenceViewInternal[0] = (this.sequenceViewInternal[0] ?? 0) + 1
+  }
+
+  // ============================================================================
+  // Scalars Section Methods
+  // ============================================================================
+
+  /**
+   * Read background palette (0-1).
+   */
+  readBgPalette(): number {
+    return this.scalarsViewInternal[0] ?? 1
+  }
+
+  /**
+   * Write background palette.
+   * @param value - Palette value (0-1)
+   */
+  writeBgPalette(value: number): void {
+    this.scalarsViewInternal[0] = value & 1
+  }
+
+  /**
+   * Read sprite palette (0-3).
+   */
+  readSpritePalette(): number {
+    return this.scalarsViewInternal[1] ?? 1
+  }
+
+  /**
+   * Write sprite palette.
+   * @param value - Palette value (0-3)
+   */
+  writeSpritePalette(value: number): void {
+    this.scalarsViewInternal[1] = value & 3
+  }
+
+  /**
+   * Read backdrop color (0-60).
+   */
+  readBackdropColor(): number {
+    return this.scalarsViewInternal[2] ?? 0
+  }
+
+  /**
+   * Write backdrop color.
+   * @param value - Color value (0-60)
+   */
+  writeBackdropColor(value: number): void {
+    this.scalarsViewInternal[2] = Math.max(0, Math.min(60, value))
+  }
+
+  /**
+   * Read character generation mode (0-3).
+   */
+  readCgenMode(): number {
+    return this.scalarsViewInternal[3] ?? 2
+  }
+
+  /**
+   * Write character generation mode.
+   * @param value - Mode value (0-3)
+   */
+  writeCgenMode(value: number): void {
+    this.scalarsViewInternal[3] = value & 3
+  }
+
+  /**
+   * Read all scalar values at once.
+   */
+  readScalars(): {
+    bgPalette: number
+    spritePalette: number
+    backdropColor: number
+    cgenMode: number
+  } {
+    return {
+      bgPalette: this.readBgPalette(),
+      spritePalette: this.readSpritePalette(),
+      backdropColor: this.readBackdropColor(),
+      cgenMode: this.readCgenMode(),
+    }
+  }
+
+  /**
+   * Write all scalar values at once.
+   */
+  writeScalars(
+    bgPalette: number,
+    spritePalette: number,
+    backdropColor: number,
+    cgenMode: number
+  ): void {
+    this.writeBgPalette(bgPalette)
+    this.writeSpritePalette(spritePalette)
+    this.writeBackdropColor(backdropColor)
+    this.writeCgenMode(cgenMode)
+  }
+
+  // ============================================================================
+  // Sync Command Methods
   // ============================================================================
 
   /**
