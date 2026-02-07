@@ -55,6 +55,9 @@ export enum SyncCommandType {
 export const ACK_PENDING = 0
 export const ACK_RECEIVED = 1
 
+// Animation constants
+export const DEFAULT_SPRITE_FRAME_RATE = 8 // Default frame rate for sprite animations
+
 // Screen grid
 export const COLS = 28
 export const ROWS = 24

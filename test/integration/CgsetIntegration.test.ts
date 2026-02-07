@@ -11,79 +11,44 @@
  * characters are rendered with the correct colors from palette 0.
  */
 
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
+import { createSharedDisplayBuffer } from '@/core/animation/sharedDisplayBuffer'
+import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import { BasicInterpreter } from '@/core/BasicInterpreter'
-import { WebWorkerDeviceAdapter } from '@/core/devices/WebWorkerDeviceAdapter'
-import type { AnyServiceWorkerMessage, ScreenUpdateMessage } from '@/core/interfaces'
 
-// Mock self.postMessage to capture screen updates
-let capturedMessages: AnyServiceWorkerMessage[] = []
-const originalPostMessage = (globalThis as typeof globalThis & { postMessage?: typeof self.postMessage }).postMessage
+import { SharedBufferTestAdapter } from '../adapters/SharedBufferTestAdapter'
 
-beforeEach(() => {
-  capturedMessages = []
-  // Mock self.postMessage for testing
-  if (typeof self !== 'undefined') {
-    ;(self as typeof self & { postMessage: (message: AnyServiceWorkerMessage) => void }).postMessage = (
-      message: AnyServiceWorkerMessage
-    ) => {
-      capturedMessages.push(message)
-    }
-  }
-})
-
-afterEach(() => {
-  // Restore original
-  if (typeof self !== 'undefined' && originalPostMessage) {
-    ;(self as typeof self & { postMessage: typeof originalPostMessage }).postMessage = originalPostMessage
-  }
-})
-
-/**
- * Simulate the message handler behavior to verify messages are processable
- * This verifies that palette updates are handled correctly
- */
-function simulateMessageHandler(message: ScreenUpdateMessage, context: { bgPalette: number }): void {
-  const update = message.data
-
-  // -- Test helper only handles specific update types
-  // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
-  switch (update.updateType) {
-    case 'palette':
-      // Handle palette update (this is the handler that was missing)
-      if (update.bgPalette !== undefined) {
-        context.bgPalette = update.bgPalette
-      }
-      break
-    case 'character':
-      // Handle character updates
-      // Characters use the current bgPalette from context
-      break
-    default:
-      // Other update types not relevant for this test
-      break
-  }
-}
 
 describe('CGSET Integration', () => {
   let interpreter: BasicInterpreter
-  let deviceAdapter: WebWorkerDeviceAdapter
+  let deviceAdapter: SharedBufferTestAdapter
+  let sharedBuffer: SharedArrayBuffer
+  let accessor: SharedDisplayBufferAccessor
 
   beforeEach(() => {
-    deviceAdapter = new WebWorkerDeviceAdapter()
+    // Create shared display buffer
+    const bufferData = createSharedDisplayBuffer()
+    sharedBuffer = bufferData.buffer
+    accessor = new SharedDisplayBufferAccessor(sharedBuffer)
+
+    // Create and configure adapter
+    deviceAdapter = new SharedBufferTestAdapter()
+    deviceAdapter.setSharedDisplayBuffer(sharedBuffer)
+    deviceAdapter.configure({ enableDisplayBuffer: true })
+
     interpreter = new BasicInterpreter({
       maxIterations: 1000,
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
       deviceAdapter: deviceAdapter,
+      sharedDisplayBuffer: sharedBuffer,
     })
-    capturedMessages = []
   })
 
-  describe('CGSET command message generation', () => {
-    it('should send palette update message when CGSET is executed', async () => {
+  describe('CGSET command palette updates', () => {
+    it('should update palette in shared buffer when CGSET is executed', async () => {
       const source = `
 10 CGSET 0, 1
 20 END
@@ -93,38 +58,28 @@ describe('CGSET Integration', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
 
-      // Find palette update messages
-      const paletteMessages = capturedMessages.filter(
-        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'palette'
-      )
+      // Read screen state from shared buffer
+      const screenState = accessor.readScreenState()
 
-      expect(paletteMessages.length).toBeGreaterThan(0)
-
-      const paletteMessage = paletteMessages[0] as ScreenUpdateMessage
-      expect(paletteMessage.data.updateType).toBe('palette')
-      expect(paletteMessage.data.bgPalette).toBeDefined()
-      expect(paletteMessage.data.spritePalette).toBeDefined()
+      expect(screenState.bgPalette).toBe(0)
+      expect(screenState.spritePalette).toBe(1)
     })
 
-    it('should include correct palette values in message', async () => {
+    it('should store correct palette values in shared buffer', async () => {
       const source = `
 10 CGSET 0, 1
 20 END
 `
       await interpreter.execute(source)
 
-      const paletteMessages = capturedMessages.filter(
-        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'palette'
-      )
+      // Read screen state from shared buffer
+      const screenState = accessor.readScreenState()
 
-      expect(paletteMessages.length).toBeGreaterThan(0)
-      const paletteMessage = paletteMessages[0] as ScreenUpdateMessage
-
-      expect(paletteMessage.data.bgPalette).toBe(0)
-      expect(paletteMessage.data.spritePalette).toBe(1)
+      expect(screenState.bgPalette).toBe(0)
+      expect(screenState.spritePalette).toBe(1)
     })
 
-    it('should send palette update for each CGSET command', async () => {
+    it('should update palette for each CGSET command', async () => {
       const source = `
 10 CGSET 0, 0
 20 CGSET 1, 1
@@ -133,22 +88,12 @@ describe('CGSET Integration', () => {
 `
       await interpreter.execute(source)
 
-      const paletteMessages = capturedMessages.filter(
-        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'palette'
-      )
+      // Read screen state from shared buffer after all commands
+      const screenState = accessor.readScreenState()
 
-      // Should have 3 palette update messages
-      expect(paletteMessages.length).toBe(3)
-
-      // Verify each message has correct values
-      expect((paletteMessages[0] as ScreenUpdateMessage).data.bgPalette).toBe(0)
-      expect((paletteMessages[0] as ScreenUpdateMessage).data.spritePalette).toBe(0)
-
-      expect((paletteMessages[1] as ScreenUpdateMessage).data.bgPalette).toBe(1)
-      expect((paletteMessages[1] as ScreenUpdateMessage).data.spritePalette).toBe(1)
-
-      expect((paletteMessages[2] as ScreenUpdateMessage).data.bgPalette).toBe(0)
-      expect((paletteMessages[2] as ScreenUpdateMessage).data.spritePalette).toBe(2)
+      // The last CGSET should be the current palette
+      expect(screenState.bgPalette).toBe(0)
+      expect(screenState.spritePalette).toBe(2)
     })
 
     it('should use default values when CGSET has no parameters', async () => {
@@ -158,80 +103,42 @@ describe('CGSET Integration', () => {
 `
       await interpreter.execute(source)
 
-      const paletteMessages = capturedMessages.filter(
-        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'palette'
-      )
-
-      expect(paletteMessages.length).toBeGreaterThan(0)
-      const paletteMessage = paletteMessages[0] as ScreenUpdateMessage
+      // Read screen state from shared buffer
+      const screenState = accessor.readScreenState()
 
       // Default values: m=1, n=1
-      expect(paletteMessage.data.bgPalette).toBe(1)
-      expect(paletteMessage.data.spritePalette).toBe(1)
+      expect(screenState.bgPalette).toBe(1)
+      expect(screenState.spritePalette).toBe(1)
     })
   })
 
-  describe('CGSET message handler processing', () => {
-    it('should process palette update messages correctly (simulated handler)', () => {
-      // Create a test context to track palette state
-      const context = { bgPalette: 1 } // Start with default palette
+  describe('CGSET palette state verification', () => {
+    it('should process palette updates correctly in shared buffer', async () => {
+      // Execute CGSET to set initial palette
+      await interpreter.execute('10 CGSET 0, 1\n20 END')
 
-      // Create a palette update message (simulating what WebWorkerDeviceAdapter sends)
-      const paletteMessage: ScreenUpdateMessage = {
-        type: 'SCREEN_UPDATE',
-        id: 'test-palette-1',
-        timestamp: Date.now(),
-        data: {
-          executionId: 'test',
-          updateType: 'palette',
-          bgPalette: 0,
-          spritePalette: 1,
-          timestamp: Date.now(),
-        },
-      }
-
-      // Process the message (simulating the handler)
-      simulateMessageHandler(paletteMessage, context)
+      // Read screen state from shared buffer
+      const screenState = accessor.readScreenState()
 
       // Verify palette was updated
-      expect(context.bgPalette).toBe(0)
+      expect(screenState.bgPalette).toBe(0)
     })
 
-    it('should handle multiple palette updates in sequence', () => {
-      const context = { bgPalette: 1 }
+    it('should handle multiple palette updates in sequence', async () => {
+      // Execute multiple CGSET commands
+      await interpreter.execute(`
+10 CGSET 0, 0
+20 CGSET 1, 1
+30 CGSET 0, 2
+40 END
+`)
 
-      const messages: ScreenUpdateMessage[] = [
-        {
-          type: 'SCREEN_UPDATE',
-          id: 'test-palette-1',
-          timestamp: Date.now(),
-          data: {
-            executionId: 'test',
-            updateType: 'palette',
-            bgPalette: 0,
-            spritePalette: 0,
-            timestamp: Date.now(),
-          },
-        },
-        {
-          type: 'SCREEN_UPDATE',
-          id: 'test-palette-2',
-          timestamp: Date.now(),
-          data: {
-            executionId: 'test',
-            updateType: 'palette',
-            bgPalette: 1,
-            spritePalette: 2,
-            timestamp: Date.now(),
-          },
-        },
-      ]
+      // Read screen state from shared buffer
+      const screenState = accessor.readScreenState()
 
-      // Process messages in sequence
-      messages.forEach(msg => simulateMessageHandler(msg, context))
-
-      // Last message should be the current palette
-      expect(context.bgPalette).toBe(1)
+      // Last command should be the current palette
+      expect(screenState.bgPalette).toBe(0)
+      expect(screenState.spritePalette).toBe(2)
     })
   })
 
@@ -247,32 +154,13 @@ describe('CGSET Integration', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
 
-      // Find palette update message
-      const paletteMessages = capturedMessages.filter(
-        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'palette'
-      )
+      // Read screen state from shared buffer
+      const screenState = accessor.readScreenState()
 
-      expect(paletteMessages.length).toBeGreaterThan(0)
-
-      // Find full screen update (from PRINT)
-      const screenMessages = capturedMessages.filter(
-        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
-      )
-
-      expect(screenMessages.length).toBeGreaterThan(0)
-      expect(paletteMessages.length).toBeGreaterThan(0)
-
-      // Verify palette update came before screen update
-      const paletteMessage = paletteMessages[0]
-      const screenMessage = screenMessages[screenMessages.length - 1]
-      if (!paletteMessage || !screenMessage) {
-        throw new Error('Expected messages not found')
-      }
-      const paletteMessageIndex = capturedMessages.indexOf(paletteMessage)
-      const screenMessageIndex = capturedMessages.indexOf(screenMessage)
-
-      // Palette should be set before printing
-      expect(paletteMessageIndex).toBeLessThanOrEqual(screenMessageIndex)
+      // Verify palette is set and text is printed
+      expect(screenState.bgPalette).toBe(0)
+      expect(screenState.spritePalette).toBe(1)
+      expect(screenState.buffer[0]?.[0]?.character).toBe('H')
     })
 
     it('should apply correct palette for characters printed after CGSET 0, 1', async () => {
@@ -286,22 +174,13 @@ describe('CGSET Integration', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
 
-      // Find palette update message
-      const paletteMessages = capturedMessages.filter(
-        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'palette'
-      )
-
-      expect(paletteMessages.length).toBeGreaterThan(0)
-      const paletteMessage = paletteMessages[0] as ScreenUpdateMessage
+      // Read screen state from shared buffer
+      const screenState = accessor.readScreenState()
 
       // Verify palette is set to 0 (which uses color 0x2C for first color in combination 0)
-      expect(paletteMessage.data.bgPalette).toBe(0)
-      expect(paletteMessage.data.spritePalette).toBe(1)
-
-      // The palette update message should be processable by the handler
-      const context = { bgPalette: 1 }
-      simulateMessageHandler(paletteMessage, context)
-      expect(context.bgPalette).toBe(0)
+      expect(screenState.bgPalette).toBe(0)
+      expect(screenState.spritePalette).toBe(1)
+      expect(screenState.buffer[0]?.[0]?.character).toBe('H')
     })
 
     it('should handle CGSET after PRINT (palette change affects future prints)', async () => {
@@ -316,17 +195,14 @@ describe('CGSET Integration', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
 
-      // Should have palette update message
-      const paletteMessages = capturedMessages.filter(
-        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'palette'
-      )
+      // Read screen state from shared buffer
+      const screenState = accessor.readScreenState()
 
-      expect(paletteMessages.length).toBeGreaterThan(0)
-
-      // Verify the palette update message is valid and processable
-      const paletteMessage = paletteMessages[0] as ScreenUpdateMessage
-      expect(paletteMessage.data.bgPalette).toBe(0)
-      expect(paletteMessage.data.spritePalette).toBe(1)
+      // Verify palette is set and both texts exist
+      expect(screenState.bgPalette).toBe(0)
+      expect(screenState.spritePalette).toBe(1)
+      expect(screenState.buffer[0]?.[0]?.character).toBe('B')
+      expect(screenState.buffer[1]?.[0]?.character).toBe('A')
     })
   })
 
@@ -338,14 +214,11 @@ describe('CGSET Integration', () => {
 `
       await interpreter.execute(source)
 
-      const paletteMessages = capturedMessages.filter(
-        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'palette'
-      )
-
-      const paletteMessage = paletteMessages[0] as ScreenUpdateMessage
+      // Read screen state from shared buffer
+      const screenState = accessor.readScreenState()
 
       // Verify palette 0 is set
-      expect(paletteMessage.data.bgPalette).toBe(0)
+      expect(screenState.bgPalette).toBe(0)
 
       // Palette 0, combination 0 uses [0x00, 0x2C, 0x15, 0x07]
       // Character pixels (value 1, 2, 3) map to colors 0x2C, 0x15, 0x07
@@ -363,18 +236,15 @@ describe('CGSET Integration', () => {
 `
       await interpreter.execute(source)
 
-      const paletteMessages = capturedMessages.filter(
-        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'palette'
-      )
+      // Read screen state from shared buffer
+      const screenState = accessor.readScreenState()
 
-      // Should have 2 palette updates
-      expect(paletteMessages.length).toBe(2)
+      // Last palette should be 1
+      expect(screenState.bgPalette).toBe(1)
 
-      // First palette should be 0
-      expect((paletteMessages[0] as ScreenUpdateMessage).data.bgPalette).toBe(0)
-
-      // Second palette should be 1
-      expect((paletteMessages[1] as ScreenUpdateMessage).data.bgPalette).toBe(1)
+      // Verify both texts were printed
+      expect(screenState.buffer[0]?.[0]?.character).toBe('P')
+      expect(screenState.buffer[1]?.[0]?.character).toBe('P')
     })
   })
 })

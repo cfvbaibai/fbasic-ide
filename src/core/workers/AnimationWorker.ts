@@ -15,7 +15,7 @@
  * - Run at fixed 60Hz tick rate
  */
 
-import { MAX_SPRITES, SyncCommandType } from '@/core/animation/sharedDisplayBuffer'
+import { DEFAULT_SPRITE_FRAME_RATE, MAX_SPRITES, SyncCommandType } from '@/core/animation/sharedDisplayBuffer'
 import { SHARED_DISPLAY_BUFFER_BYTES } from '@/core/animation/sharedDisplayBuffer'
 import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import { SCREEN_DIMENSIONS } from '@/core/constants'
@@ -437,7 +437,7 @@ export class AnimationWorker {
 
       // Update frame animation
       movement.frameCounter++
-      const frameRate = 8 // Default frame rate
+      const frameRate = DEFAULT_SPRITE_FRAME_RATE
       if (movement.frameCounter >= frameRate) {
         movement.frameCounter = 0
         movement.currentFrameIndex++

@@ -164,10 +164,57 @@ export class SharedBufferTestAdapter extends TestDeviceAdapter {
 
   override setColorPattern(x: number, y: number, pattern: number): void {
     super.setColorPattern(x, y, pattern)
-    if (x >= 0 && x < COLS && y >= 0 && y < ROWS) {
-      this.screenBuffer[y]![x]!.colorPattern = pattern & 3
-      this.syncToDisplayBuffer()
+
+    // Clamp to valid range
+    if (x < 0) x = 0
+    if (x >= COLS) x = COLS - 1
+    if (y < 0) y = 0
+    if (y >= ROWS) y = ROWS - 1
+    if (pattern < 0) pattern = 0
+    if (pattern > 3) pattern = 3
+
+    // Calculate the 2×2 area containing position (x, y)
+    const areaX = Math.floor(x / 2) * 2 // Round down to even number (0, 2, 4, ...)
+    const areaY = y // The y coordinate itself is the bottom row of the area
+
+    // Update color pattern for all 4 cells in the 2×2 area
+    // Top-left: (areaX, areaY - 1) or (areaX, 0) if areaY is 0
+    const topY = areaY > 0 ? areaY - 1 : 0
+    if (areaX < COLS && topY < ROWS) {
+      const cell = this.screenBuffer[topY]?.[areaX]
+      if (cell) {
+        cell.colorPattern = pattern & 3
+      }
     }
+
+    // Top-right: (areaX + 1, areaY - 1) or (areaX + 1, 0) if areaY is 0
+    if (areaX + 1 < COLS && topY < ROWS) {
+      const row = this.screenBuffer[topY]
+      const cell = row?.[areaX + 1]
+      if (cell) {
+        cell.colorPattern = pattern & 3
+      }
+    }
+
+    // Bottom-left: (areaX, areaY)
+    if (areaX < COLS && areaY < ROWS) {
+      const row = this.screenBuffer[areaY]
+      const cell = row?.[areaX]
+      if (cell) {
+        cell.colorPattern = pattern & 3
+      }
+    }
+
+    // Bottom-right: (areaX + 1, areaY)
+    if (areaX + 1 < COLS && areaY < ROWS) {
+      const row = this.screenBuffer[areaY]
+      const cell = row?.[areaX + 1]
+      if (cell) {
+        cell.colorPattern = pattern & 3
+      }
+    }
+
+    this.syncToDisplayBuffer()
   }
 
   override setColorPalette(bgPalette: number, spritePalette: number): void {

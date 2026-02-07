@@ -5,13 +5,7 @@
  * Delegates to specialized modules for web worker management, screen state, and message handling.
  */
 
-import {
-  createViewsFromDisplayBuffer,
-  MAX_SPRITES,
-  type SharedDisplayViews,
-  slotBase,
-} from '@/core/animation/sharedDisplayBuffer'
-import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
+import type { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import type {
   AnyServiceWorkerMessage,
   BasicDeviceAdapter,
@@ -33,27 +27,12 @@ import {
 } from './sharedJoystickBuffer'
 import { type WebWorkerExecutionOptions, WebWorkerManager } from './WebWorkerManager'
 
-/**
- * Helper function to read sprite position from view.
- * Inlined from sharedAnimationBuffer to avoid circular dependency.
- */
-function readSpritePosition(
-  view: Float64Array,
-  actionNumber: number
-): { x: number; y: number } | null {
-  if (actionNumber < 0 || actionNumber >= MAX_SPRITES) return null
-  const base = slotBase(actionNumber)
-  return { x: view[base] ?? 0, y: view[base + 1] ?? 0 }
-}
-
 export type { WebWorkerExecutionOptions }
 
 export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   // === DEVICE STATE ===
   private strigClickBuffer: Map<number, number[]> = new Map()
   private stickStates: Map<number, number> = new Map()
-  /** Shared display buffer. Set when receiving SET_SHARED_ANIMATION_BUFFER. */
-  private sharedDisplayViews: SharedDisplayViews | null = null
   /** Shared display buffer accessor for buffer operations. */
   private sharedDisplayAccessor: SharedDisplayBufferAccessor | null = null
   /** Shared joystick buffer. Set when receiving SET_SHARED_JOYSTICK_BUFFER. */
@@ -253,12 +232,10 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   // === SPRITE POSITION QUERY ===
 
   /**
-   * Set shared display buffer (called from worker when receiving SET_SHARED_ANIMATION_BUFFER).
-   * Creates views for sprites, screen cells, cursor, sequence, and scalars.
+   * Set shared display buffer accessor (called from worker when receiving SET_SHARED_ANIMATION_BUFFER).
    */
-  setSharedAnimationBuffer(buffer: SharedArrayBuffer): void {
-    this.sharedDisplayViews = createViewsFromDisplayBuffer(buffer)
-    this.sharedDisplayAccessor = new SharedDisplayBufferAccessor(buffer)
+  setSharedDisplayBufferAccessor(accessor: SharedDisplayBufferAccessor): void {
+    this.sharedDisplayAccessor = accessor
   }
 
   getSpritePosition(actionNumber: number): { x: number; y: number } | null {
@@ -267,8 +244,8 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       return this.lastPositionBySprite.get(actionNumber) ?? null
     }
     // Shared buffer (main thread writes positions each frame) so XPOS/YPOS see live position
-    if (this.sharedDisplayViews) {
-      const pos = readSpritePosition(this.sharedDisplayViews.spriteView, actionNumber)
+    if (this.sharedDisplayAccessor) {
+      const pos = this.sharedDisplayAccessor.readSpritePosition(actionNumber)
       // Buffer (0,0) is uninitialized: treat as no position so MOVE uses default center (like DEF SPRITE)
       if (pos !== null && (pos.x !== 0 || pos.y !== 0)) return pos
     }
@@ -317,11 +294,16 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   }
 
   private postScreenChanged(): void {
-    self.postMessage({
-      type: 'SCREEN_CHANGED',
-      id: `screen-changed-${Date.now()}`,
-      timestamp: Date.now(),
-    })
+    // In test environment (jsdom), postMessage requires targetOrigin
+    // Use '*' for same-origin (works in both browser and test)
+    self.postMessage(
+      {
+        type: 'SCREEN_CHANGED',
+        id: `screen-changed-${Date.now()}`,
+        timestamp: Date.now(),
+      },
+      '*'
+    )
   }
 
   consumeStrigState(joystickId: number): number {
@@ -400,35 +382,23 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   clearScreen(): void {
     logWorker.debug('Clear screen')
     this.screenStateManager.initializeScreen()
-    if (this.sharedDisplayViews) {
-      this.syncScreenStateToShared()
-      this.postScreenChanged()
-    } else {
-      self.postMessage(this.screenStateManager.createClearScreenUpdateMessage())
-    }
+    this.syncScreenStateToShared()
+    this.postScreenChanged()
     this.cancelPendingScreenUpdate()
   }
 
   setCursorPosition(x: number, y: number): void {
     logWorker.debug('Set cursor position:', { x, y })
     this.screenStateManager.setCursorPosition(x, y)
-    if (this.sharedDisplayViews) {
-      this.syncScreenStateToShared()
-      this.postScreenChanged()
-    } else {
-      self.postMessage(this.screenStateManager.createCursorUpdateMessage())
-    }
+    this.syncScreenStateToShared()
+    this.postScreenChanged()
   }
 
   setColorPattern(x: number, y: number, pattern: number): void {
     logWorker.debug('Set color pattern:', { x, y, pattern })
-    const cellsToUpdate = this.screenStateManager.setColorPattern(x, y, pattern)
-    if (this.sharedDisplayViews) {
-      this.syncScreenStateToShared()
-      this.postScreenChanged()
-    } else {
-      self.postMessage(this.screenStateManager.createColorUpdateMessage(cellsToUpdate))
-    }
+    this.screenStateManager.setColorPattern(x, y, pattern)
+    this.syncScreenStateToShared()
+    this.postScreenChanged()
   }
 
   setColorPalette(bgPalette: number, spritePalette: number): void {
@@ -437,34 +407,22 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       spritePalette,
     })
     this.screenStateManager.setColorPalette(bgPalette, spritePalette)
-    if (this.sharedDisplayViews) {
-      this.syncScreenStateToShared()
-      this.postScreenChanged()
-    } else {
-      self.postMessage(this.screenStateManager.createPaletteUpdateMessage())
-    }
+    this.syncScreenStateToShared()
+    this.postScreenChanged()
   }
 
   setBackdropColor(colorCode: number): void {
     logWorker.debug('Set backdrop color:', colorCode)
     this.screenStateManager.setBackdropColor(colorCode)
-    if (this.sharedDisplayViews) {
-      this.syncScreenStateToShared()
-      this.postScreenChanged()
-    } else {
-      self.postMessage(this.screenStateManager.createBackdropUpdateMessage())
-    }
+    this.syncScreenStateToShared()
+    this.postScreenChanged()
   }
 
   setCharacterGeneratorMode(mode: number): void {
     logWorker.debug('Set character generator mode:', mode)
     this.screenStateManager.setCharacterGeneratorMode(mode)
-    if (this.sharedDisplayViews) {
-      this.syncScreenStateToShared()
-      this.postScreenChanged()
-    } else {
-      self.postMessage(this.screenStateManager.createCgenUpdateMessage())
-    }
+    this.syncScreenStateToShared()
+    this.postScreenChanged()
   }
 
   /**
@@ -531,12 +489,8 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     this.screenStateManager.setCurrentExecutionId(executionId)
     if (executionId) {
       this.screenStateManager.initializeScreen()
-      if (this.sharedDisplayViews) {
-        this.syncScreenStateToShared()
-        this.postScreenChanged()
-      } else {
-        self.postMessage(this.screenStateManager.createClearScreenUpdateMessage())
-      }
+      this.syncScreenStateToShared()
+      this.postScreenChanged()
       this.cancelPendingScreenUpdate()
     } else {
       this.flushScreenUpdate()
@@ -698,13 +652,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     }
     this.pendingScreenUpdate = false
     this.lastScreenUpdateTime = performance.now()
-    if (this.sharedDisplayViews) {
-      this.syncScreenStateToShared()
-      this.postScreenChanged()
-    } else if (this.screenStateManager) {
-      // In test environment (jsdom), postMessage requires targetOrigin
-      // Use '*' for same-origin or specific origin for cross-origin
-      self.postMessage(this.screenStateManager.createFullScreenUpdateMessage(), '*')
-    }
+    this.syncScreenStateToShared()
+    this.postScreenChanged()
   }
 }

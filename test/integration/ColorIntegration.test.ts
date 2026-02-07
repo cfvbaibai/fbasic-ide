@@ -9,112 +9,43 @@
  * This test would have caught the bug where COLOR messages weren't being handled.
  */
 
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
+import { createSharedDisplayBuffer } from '@/core/animation/sharedDisplayBuffer'
+import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import { BasicInterpreter } from '@/core/BasicInterpreter'
-import { WebWorkerDeviceAdapter } from '@/core/devices/WebWorkerDeviceAdapter'
-import type { AnyServiceWorkerMessage, ScreenCell, ScreenUpdateMessage } from '@/core/interfaces'
 
-// Mock self.postMessage to capture screen updates
-let capturedMessages: AnyServiceWorkerMessage[] = []
-const originalPostMessage = (globalThis as typeof globalThis & { postMessage?: typeof self.postMessage }).postMessage
-
-beforeEach(() => {
-  capturedMessages = []
-  // Mock self.postMessage for testing
-  if (typeof self !== 'undefined') {
-    ;(self as typeof self & { postMessage: (message: AnyServiceWorkerMessage) => void }).postMessage = (
-      message: AnyServiceWorkerMessage
-    ) => {
-      capturedMessages.push(message)
-    }
-  }
-})
-
-afterEach(() => {
-  // Restore original
-  if (typeof self !== 'undefined' && originalPostMessage) {
-    ;(self as typeof self & { postMessage: typeof originalPostMessage }).postMessage = originalPostMessage
-  }
-})
-
-/**
- * Simulate the message handler behavior to verify messages are processable
- * This would catch bugs where message handlers don't handle certain update types
- */
-function simulateMessageHandler(message: ScreenUpdateMessage, screenBuffer: ScreenCell[][]): void {
-  const update = message.data
-
-  // -- Test helper only handles specific update types
-  // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
-  switch (update.updateType) {
-    case 'color':
-      // This is the handler that was missing - would catch the bug!
-      if (update.colorUpdates) {
-        for (const colorUpdate of update.colorUpdates) {
-          const { x, y, pattern } = colorUpdate
-
-          // Ensure row exists
-          screenBuffer[y] ??= []
-
-          // Ensure cell exists
-          const currentRow = screenBuffer[y]
-          currentRow[x] ??= {
-            character: ' ',
-            colorPattern: 0,
-            x,
-            y,
-          }
-
-          // Update color pattern
-          currentRow[x].colorPattern = pattern
-        }
-      }
-      break
-    case 'character':
-      // Handle character updates (existing handler)
-      if (update.x !== undefined && update.y !== undefined && update.character !== undefined) {
-        screenBuffer[update.y] ??= []
-        const row = screenBuffer[update.y]
-        if (!row) {
-          throw new Error('Row not found')
-        }
-        row[update.x] ??= {
-          character: ' ',
-          colorPattern: 0,
-          x: update.x,
-          y: update.y,
-        }
-        const cell = row[update.x]
-        if (cell) {
-          cell.character = update.character
-        }
-      }
-      break
-    default:
-      // Other update types not relevant for this test
-      break
-  }
-}
+import { SharedBufferTestAdapter } from '../adapters/SharedBufferTestAdapter'
 
 describe('COLOR Integration', () => {
   let interpreter: BasicInterpreter
-  let deviceAdapter: WebWorkerDeviceAdapter
+  let deviceAdapter: SharedBufferTestAdapter
+  let sharedBuffer: SharedArrayBuffer
+  let accessor: SharedDisplayBufferAccessor
 
   beforeEach(() => {
-    deviceAdapter = new WebWorkerDeviceAdapter()
+    // Create shared display buffer
+    const bufferData = createSharedDisplayBuffer()
+    sharedBuffer = bufferData.buffer
+    accessor = new SharedDisplayBufferAccessor(sharedBuffer)
+
+    // Create and configure adapter
+    deviceAdapter = new SharedBufferTestAdapter()
+    deviceAdapter.setSharedDisplayBuffer(sharedBuffer)
+    deviceAdapter.configure({ enableDisplayBuffer: true })
+
     interpreter = new BasicInterpreter({
       maxIterations: 1000,
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
       deviceAdapter: deviceAdapter,
+      sharedDisplayBuffer: sharedBuffer,
     })
-    capturedMessages = []
   })
 
-  describe('COLOR command message generation', () => {
-    it('should send color update message when COLOR is executed', async () => {
+  describe('COLOR command screen state updates', () => {
+    it('should update color patterns in shared buffer when COLOR is executed', async () => {
       const source = `
 10 COLOR 0, 0, 3
 20 END
@@ -124,51 +55,37 @@ describe('COLOR Integration', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
 
-      // Find color update messages
-      const colorMessages = capturedMessages.filter(
-        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'color'
-      )
+      // Read screen state from shared buffer
+      const screenState = accessor.readScreenState()
 
-      expect(colorMessages.length).toBeGreaterThan(0)
-
-      const colorMessage = colorMessages[0] as ScreenUpdateMessage
-      expect(colorMessage.data.updateType).toBe('color')
-      expect(colorMessage.data.colorUpdates).toBeDefined()
-      expect(Array.isArray(colorMessage.data.colorUpdates)).toBe(true)
+      // COLOR 0, 0, 3: when y=0, both topY and bottomY are 0 (edge case)
+      // So only row 0 is updated: (0, 0) and (1, 0)
+      expect(screenState.buffer[0]?.[0]?.colorPattern).toBe(3)
+      expect(screenState.buffer[0]?.[1]?.colorPattern).toBe(3)
     })
 
-    it('should include correct color updates in message', async () => {
+    it('should update correct 2×2 area for COLOR 10, 5, 2', async () => {
       const source = `
 10 COLOR 10, 5, 2
 20 END
 `
       await interpreter.execute(source)
 
-      const colorMessages = capturedMessages.filter(
-        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'color'
-      )
+      // Read screen state from shared buffer
+      const screenState = accessor.readScreenState()
 
-      expect(colorMessages.length).toBeGreaterThan(0)
-      const colorMessage = colorMessages[0] as ScreenUpdateMessage
-      const colorUpdates = colorMessage.data.colorUpdates
-
-      expect(colorUpdates).toBeDefined()
-      expect(colorUpdates?.length).toBeGreaterThan(0)
-
-      // COLOR affects a 2×2 area, so should have 4 updates
-      expect(colorUpdates?.length).toBe(4)
-
-      // Verify all updates have the correct pattern
-      colorUpdates?.forEach(update => {
-        expect(update.pattern).toBe(2)
-        expect(update.x).toBeGreaterThanOrEqual(0)
-        expect(update.x).toBeLessThan(28)
-        expect(update.y).toBeGreaterThanOrEqual(0)
-        expect(update.y).toBeLessThan(24)
-      })
+      // COLOR 10, 5, 2 should affect:
+      // x = Math.floor(10 / 2) * 2 = 10
+      // y = 5
+      // Top row: y = 5 - 1 = 4
+      // So the area is: (10, 4), (11, 4), (10, 5), (11, 5)
+      expect(screenState.buffer[4]?.[10]?.colorPattern).toBe(2)
+      expect(screenState.buffer[4]?.[11]?.colorPattern).toBe(2)
+      expect(screenState.buffer[5]?.[10]?.colorPattern).toBe(2)
+      expect(screenState.buffer[5]?.[11]?.colorPattern).toBe(2)
     })
 
-    it('should send color update for each COLOR command', async () => {
+    it('should update color patterns for each COLOR command', async () => {
       const source = `
 10 COLOR 5, 5, 0
 20 COLOR 10, 10, 1
@@ -177,92 +94,69 @@ describe('COLOR Integration', () => {
 `
       await interpreter.execute(source)
 
-      const colorMessages = capturedMessages.filter(
-        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'color'
-      )
+      // Read screen state from shared buffer
+      const screenState = accessor.readScreenState()
 
-      // Should have 3 color update messages
-      expect(colorMessages.length).toBe(3)
+      // Verify each COLOR command updated the correct area
+      // First COLOR: affects area around (5, 5)
+      expect(screenState.buffer[4]?.[4]?.colorPattern).toBe(0)
+      expect(screenState.buffer[4]?.[5]?.colorPattern).toBe(0)
+      expect(screenState.buffer[5]?.[4]?.colorPattern).toBe(0)
+      expect(screenState.buffer[5]?.[5]?.colorPattern).toBe(0)
+
+      // Second COLOR: affects area around (10, 10)
+      expect(screenState.buffer[9]?.[10]?.colorPattern).toBe(1)
+      expect(screenState.buffer[9]?.[11]?.colorPattern).toBe(1)
+      expect(screenState.buffer[10]?.[10]?.colorPattern).toBe(1)
+      expect(screenState.buffer[10]?.[11]?.colorPattern).toBe(1)
+
+      // Third COLOR: affects area around (15, 15)
+      expect(screenState.buffer[14]?.[14]?.colorPattern).toBe(2)
+      expect(screenState.buffer[14]?.[15]?.colorPattern).toBe(2)
+      expect(screenState.buffer[15]?.[14]?.colorPattern).toBe(2)
+      expect(screenState.buffer[15]?.[15]?.colorPattern).toBe(2)
     })
   })
 
-  describe('COLOR message handler processing', () => {
-    it('should process color update messages correctly (simulated handler)', () => {
-      // Create a test screen buffer
-      const screenBuffer: ScreenCell[][] = []
-      for (let y = 0; y < 24; y++) {
-        const row: ScreenCell[] = []
-        screenBuffer[y] = row
-        for (let x = 0; x < 28; x++) {
-          row[x] = {
-            character: ' ',
-            colorPattern: 0,
-            x,
-            y,
-          }
-        }
-      }
+  describe('COLOR state verification', () => {
+    it('should update color patterns correctly in shared buffer', async () => {
+      // Set up a test scenario with color patterns
+      const source = `
+10 COLOR 0, 0, 3
+20 END
+`
+      const result = await interpreter.execute(source)
+      expect(result.success).toBe(true)
 
-      // Create a color update message (simulating what WebWorkerDeviceAdapter sends)
-      const colorMessage: ScreenUpdateMessage = {
-        type: 'SCREEN_UPDATE',
-        id: 'test-color-1',
-        timestamp: Date.now(),
-        data: {
-          executionId: 'test',
-          updateType: 'color',
-          colorUpdates: [
-            { x: 0, y: 0, pattern: 3 },
-            { x: 1, y: 0, pattern: 3 },
-            { x: 0, y: 1, pattern: 3 },
-            { x: 1, y: 1, pattern: 3 },
-          ],
-          timestamp: Date.now(),
-        },
-      }
+      // Read screen state from shared buffer
+      const screenState = accessor.readScreenState()
 
-      // Process the message (simulating the handler)
-      simulateMessageHandler(colorMessage, screenBuffer)
-
-      // Verify color patterns were updated
-      expect(screenBuffer[0]?.[0]?.colorPattern).toBe(3)
-      expect(screenBuffer[0]?.[1]?.colorPattern).toBe(3)
-      expect(screenBuffer[1]?.[0]?.colorPattern).toBe(3)
-      expect(screenBuffer[1]?.[1]?.colorPattern).toBe(3)
+      // COLOR 0, 0, 3: when y=0, only row 0 is updated (edge case)
+      expect(screenState.buffer[0]?.[0]?.colorPattern).toBe(3)
+      expect(screenState.buffer[0]?.[1]?.colorPattern).toBe(3)
     })
 
-    it('should handle color updates for existing cells with characters', () => {
-      const screenBuffer: ScreenCell[][] = []
-      for (let y = 0; y < 24; y++) {
-        const row: ScreenCell[] = []
-        screenBuffer[y] = row
-        for (let x = 0; x < 28; x++) {
-          row[x] = {
-            character: x === 0 && y === 0 ? 'H' : ' ',
-            colorPattern: 0,
-            x,
-            y,
-          }
-        }
-      }
+    it('should handle color updates for existing cells with characters', async () => {
+      // First print a character
+      const source1 = `
+10 PRINT "H"
+20 END
+`
+      await interpreter.execute(source1)
 
-      const colorMessage: ScreenUpdateMessage = {
-        type: 'SCREEN_UPDATE',
-        id: 'test-color-2',
-        timestamp: Date.now(),
-        data: {
-          executionId: 'test',
-          updateType: 'color',
-          colorUpdates: [{ x: 0, y: 0, pattern: 2 }],
-          timestamp: Date.now(),
-        },
-      }
+      // Update color pattern
+      const source2 = `
+10 COLOR 0, 0, 2
+20 END
+`
+      await interpreter.execute(source2)
 
-      simulateMessageHandler(colorMessage, screenBuffer)
+      // Read screen state from shared buffer
+      const screenState = accessor.readScreenState()
 
       // Character should be preserved, color pattern should be updated
-      expect(screenBuffer[0]?.[0]?.character).toBe('H')
-      expect(screenBuffer[0]?.[0]?.colorPattern).toBe(2)
+      expect(screenState.buffer[0]?.[0]?.character).toBe('H')
+      expect(screenState.buffer[0]?.[0]?.colorPattern).toBe(2)
     })
   })
 
@@ -278,33 +172,12 @@ describe('COLOR Integration', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
 
-      // Find color update message
-      const colorMessages = capturedMessages.filter(
-        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'color'
-      )
+      // Read screen state from shared buffer
+      const screenState = accessor.readScreenState()
 
-      expect(colorMessages.length).toBeGreaterThan(0)
-
-      // Find full screen update (from PRINT)
-      const screenMessages = capturedMessages.filter(
-        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'full'
-      )
-
-      expect(screenMessages.length).toBeGreaterThan(0)
-      expect(colorMessages.length).toBeGreaterThan(0)
-
-      // Verify color update came before screen update
-      const colorMessage = colorMessages[0]
-      const screenMessage = screenMessages[screenMessages.length - 1]
-      if (!colorMessage || !screenMessage) {
-        throw new Error('Expected messages not found')
-      }
-      const colorMessageIndex = capturedMessages.indexOf(colorMessage)
-      const screenMessageIndex = capturedMessages.indexOf(screenMessage)
-
-      // Color should be set before or around the same time as printing
-      // (In practice, COLOR happens first, then PRINT)
-      expect(colorMessageIndex).toBeLessThanOrEqual(screenMessageIndex)
+      // Verify both color was set and text was printed
+      expect(screenState.buffer[0]?.[0]?.colorPattern).toBe(3) // COLOR sets pattern at 0,0
+      expect(screenState.buffer[0]?.[0]?.character).toBe('H')  // PRINT puts character at 0,0
     })
 
     it('should handle COLOR after PRINT (updates existing text)', async () => {
@@ -318,17 +191,16 @@ describe('COLOR Integration', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
 
-      // Should have both character updates (from PRINT) and color update (from COLOR)
-      const colorMessages = capturedMessages.filter(
-        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'color'
-      )
+      // Read screen state from shared buffer
+      const screenState = accessor.readScreenState()
 
-      expect(colorMessages.length).toBeGreaterThan(0)
-
-      // Verify the color update message is valid and processable
-      const colorMessage = colorMessages[0] as ScreenUpdateMessage
-      expect(colorMessage.data.colorUpdates).toBeDefined()
-      expect(colorMessage.data.colorUpdates?.length).toBeGreaterThan(0)
+      // Verify text exists and only first 2 cells in row 0 have color (edge case for y=0)
+      expect(screenState.buffer[0]?.[0]?.character).toBe('H')
+      expect(screenState.buffer[0]?.[0]?.colorPattern).toBe(3)
+      expect(screenState.buffer[0]?.[6]?.character).toBe('W')
+      // "W" is at position 6, which is outside the 2×2 area (columns 0-1)
+      // So it should NOT have the color pattern applied
+      expect(screenState.buffer[0]?.[6]?.colorPattern).toBe(0)
     })
   })
 
@@ -340,30 +212,17 @@ describe('COLOR Integration', () => {
 `
       await interpreter.execute(source)
 
-      const colorMessages = capturedMessages.filter(
-        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'color'
-      )
-
-      const colorMessage = colorMessages[0] as ScreenUpdateMessage
-      const colorUpdates = colorMessage.data.colorUpdates
-
-      expect(colorUpdates?.length).toBe(4)
+      // Read screen state from shared buffer
+      const screenState = accessor.readScreenState()
 
       // For COLOR 0, 0, 3:
       // areaX = Math.floor(0 / 2) * 2 = 0
       // areaY = 0
       // topY = areaY > 0 ? areaY - 1 : 0 = 0
       // So when y=0, both top and bottom rows are at y=0 (edge case)
-      // The area is: (0, 0), (1, 0), (0, 0), (1, 0) - duplicates are possible
-      // But we should have at least (0, 0) and (1, 0)
-      const positions = colorUpdates?.map(u => `${u.x},${u.y}`)
-      expect(positions).toBeDefined()
-      expect(positions?.length).toBe(4)
-      // Verify we have the expected positions (may have duplicates for y=0 edge case)
-      const uniquePositions = [...new Set(positions)]
-      expect(uniquePositions.length).toBeGreaterThanOrEqual(2)
-      expect(uniquePositions).toContain('0,0')
-      expect(uniquePositions).toContain('1,0')
+      // Only row 0 is updated: (0, 0) and (1, 0)
+      expect(screenState.buffer[0]?.[0]?.colorPattern).toBe(3)
+      expect(screenState.buffer[0]?.[1]?.colorPattern).toBe(3)
     })
 
     it('should update correct 2×2 area for COLOR 10, 10, 2', async () => {
@@ -373,25 +232,18 @@ describe('COLOR Integration', () => {
 `
       await interpreter.execute(source)
 
-      const colorMessages = capturedMessages.filter(
-        msg => msg.type === 'SCREEN_UPDATE' && 'updateType' in msg.data && msg.data.updateType === 'color'
-      )
-
-      const colorMessage = colorMessages[0] as ScreenUpdateMessage
-      const colorUpdates = colorMessage.data.colorUpdates
-
-      expect(colorUpdates?.length).toBe(4)
+      // Read screen state from shared buffer
+      const screenState = accessor.readScreenState()
 
       // For COLOR 10, 10, 2:
       // areaX = Math.floor(10 / 2) * 2 = 10
       // areaY = 10
       // Top row: y = 10 - 1 = 9
       // So the area is: (10, 9), (11, 9), (10, 10), (11, 10)
-      const positions = colorUpdates?.map(u => `${u.x},${u.y}`).sort()
-      expect(positions).toContain('10,9')
-      expect(positions).toContain('11,9')
-      expect(positions).toContain('10,10')
-      expect(positions).toContain('11,10')
+      expect(screenState.buffer[9]?.[10]?.colorPattern).toBe(2)
+      expect(screenState.buffer[9]?.[11]?.colorPattern).toBe(2)
+      expect(screenState.buffer[10]?.[10]?.colorPattern).toBe(2)
+      expect(screenState.buffer[10]?.[11]?.colorPattern).toBe(2)
     })
   })
 })

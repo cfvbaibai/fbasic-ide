@@ -5,6 +5,7 @@
  * with the interpreter code.
  */
 
+import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { WebWorkerDeviceAdapter } from '@/core/devices/WebWorkerDeviceAdapter'
 import type {
@@ -264,10 +265,11 @@ class WebWorkerInterpreter {
     const { buffer } = data
     this.sharedAnimationBuffer = buffer
     console.log('[WebWorkerInterpreter] SET_SHARED_ANIMATION_BUFFER received, buffer byteLength =', buffer.byteLength)
+    const accessor = new SharedDisplayBufferAccessor(buffer)
     const animationManager = this.interpreter?.getAnimationManager()
     console.log('[WebWorkerInterpreter] Interpreter exists:', !!this.interpreter, 'AnimationManager exists:', !!animationManager)
     if (this.webWorkerDeviceAdapter) {
-      this.webWorkerDeviceAdapter.setSharedAnimationBuffer(buffer)
+      this.webWorkerDeviceAdapter.setSharedDisplayBufferAccessor(accessor)
     }
     // Update AnimationManager's shared buffer for direct sync to AnimationWorker
     if (animationManager) {
