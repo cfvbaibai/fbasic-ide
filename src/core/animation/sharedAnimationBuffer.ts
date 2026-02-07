@@ -25,8 +25,8 @@
  *   [103]    - Sync parameter 6 (priority for START_MOVEMENT)
  *   [104]    - Acknowledgment flag (0=pending, 1=acknowledged)
  *
- * In the combined display buffer (2160 bytes), the animation sync section starts
- * at byte offset 2112 (Float64 index 264 when viewing from buffer start).
+ * In the combined display buffer (2200 bytes), the animation sync section starts
+ * at byte offset 2128 (Float64 index 266 when viewing from buffer start).
  */
 
 export const MAX_SPRITES = 8
