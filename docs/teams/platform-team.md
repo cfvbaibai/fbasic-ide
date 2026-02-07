@@ -59,10 +59,18 @@ interface BasicDeviceAdapter {
 
 ### SharedDisplayBuffer Layout
 ```
-Bytes 0-191:    Sprite positions (8 slots × 24 bytes)
-Bytes 192+:     Screen cells, cursor, sequence, scalars
-Total:          1548 bytes
+Bytes 0-767:    Sprite positions (8 sprites × 12 floats × 8 bytes)
+Bytes 768-1439: Screen characters (672 cells)
+Bytes 1440-2111: Screen patterns (672 cells)
+Bytes 2112-2113: Cursor (2 bytes)
+Bytes 2116-2119: Sequence (4 bytes)
+Bytes 2120-2123: Scalars (4 bytes)
+Bytes 2124-2127: Padding (4 bytes)
+Bytes 2128-2199: Animation sync (72 bytes)
+Total:          2200 bytes
 ```
+
+See `docs/reference/shared-display-buffer.md` for complete layout.
 
 ### Shared Joystick Buffer Layout
 ```typescript
@@ -120,7 +128,8 @@ interface JoystickBufferView {
 - `characterSequenceConfig.ts` - Direction/sprite mapping per character (0-15)
 
 **Shared Buffers:**
-- `sharedDisplayBuffer.ts` - Combined buffer (1624 bytes: sprites + screen + cursor + scalars + animation sync)
+- `sharedDisplayBuffer.ts` - Combined buffer (2200 bytes: sprites + screen + cursor + scalars + animation sync)
+- `sharedDisplayBufferAccessor.ts` - Unified accessor for combined buffer
 - `sharedAnimationBuffer.ts` - Helper module for animation sync section (within combined display buffer)
 
 **Main Thread:**
@@ -225,11 +234,13 @@ When a sprite is **crossing** an edge (e.g. moving right past x=255), the real m
 
 ### Extend SharedBuffer Layout
 
+To extend the buffer with new sections:
+
 1. **Update** `sharedDisplayBuffer.ts`:
    ```typescript
    export const BUFFER_LAYOUT = {
-     // ... existing
-     NEW_SECTION_OFFSET: 1548,
+     // ... existing offsets
+     NEW_SECTION_OFFSET: 2200,  // SHARED_DISPLAY_BUFFER_BYTES (current end)
      NEW_SECTION_SIZE: 32,
    }
    ```
@@ -348,7 +359,7 @@ import { AnimationManager } from '@/core/animation/AnimationManager'
 
 describe('AnimationManager', () => {
   test('schedules move correctly', () => {
-    const buffer = new SharedArrayBuffer(1548)
+    const buffer = new SharedArrayBuffer(2200)  // SHARED_DISPLAY_BUFFER_BYTES
     const manager = new AnimationManager(buffer)
 
     manager.defineMove(1, movePattern)

@@ -111,6 +111,7 @@ No postMessage. Uses `SharedArrayBuffer` with `Atomics` for synchronization.
 | `STOP_MOVEMENT` | 2 | - |
 | `ERASE_MOVEMENT` | 3 | - |
 | `SET_POSITION` | 4 | `x`, `y` |
+| `CLEAR_ALL_MOVEMENTS` | 5 | - (clears all sprite data) |
 
 ### Sync Flow
 ```typescript

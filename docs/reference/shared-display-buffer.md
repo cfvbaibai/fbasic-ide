@@ -1,6 +1,6 @@
 # Shared Display Buffer
 
-Single `SharedArrayBuffer` (2136 bytes) for zero-copy data sharing between:
+Single `SharedArrayBuffer` (2200 bytes) for zero-copy data sharing between:
 - **Executor Worker** → Main Thread (screen state)
 - **Animation Worker** → Main Thread (sprite positions)
 - **Executor Worker** ↔ Animation Worker (direct sync commands)
@@ -9,16 +9,16 @@ Single `SharedArrayBuffer` (2136 bytes) for zero-copy data sharing between:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                    SHARED DISPLAY BUFFER (2136 bytes)                   │
+│                    SHARED DISPLAY BUFFER (2200 bytes)                   │
 ├─────────────────────────────────────────────────────────────────────────┤
-│  [0-703]     Sprites (88 Float64)        Animation Worker writes        │
-│  [704-1375]  Screen chars (672 Uint8)    Executor Worker writes         │
-│  [1376-2047] Screen patterns (672 Uint8) Executor Worker writes         │
-│  [2048-2049] Cursor (2 Uint8)            Executor Worker writes         │
-│  [2052-2055] Sequence (4 Int32)          Executor Worker writes         │
-│  [2056-2059] Scalars (4 Uint8)           Executor Worker writes         │
-│  [2060-2063] Padding (4 bytes)           -                              │
-│  [2064-2135] Animation sync (9 Float64)  Executor ↔ Animation direct    │
+│  [0-767]     Sprites (96 Float64)        Animation Worker writes        │
+│  [768-1439]  Screen chars (672 Uint8)    Executor Worker writes         │
+│  [1440-2111] Screen patterns (672 Uint8) Executor Worker writes         │
+│  [2112-2113] Cursor (2 Uint8)            Executor Worker writes         │
+│  [2116-2119] Sequence (4 Int32)          Executor Worker writes         │
+│  [2120-2123] Scalars (4 Uint8)           Executor Worker writes         │
+│  [2124-2127] Padding (4 bytes)           -                              │
+│  [2128-2199] Animation sync (9 Float64)  Executor ↔ Animation direct    │
 └─────────────────────────────────────────────────────────────────────────┘
                                     ▲
                                     │ Main thread reads all sections
@@ -27,40 +27,41 @@ Single `SharedArrayBuffer` (2136 bytes) for zero-copy data sharing between:
 
 ## Section Details
 
-### 1. Sprite Data (0-703 bytes)
+### 1. Sprite Data (0-767 bytes)
 
-**Type:** `Float64Array` (88 elements)
+**Type:** `Float64Array` (96 elements = 8 sprites × 12 floats)
 **Writer:** Animation Worker (single writer)
 **Reader:** Main Thread (render only), Inspector (read-only)
 
 ```
 Float64Array indices (relative to buffer start):
 ┌─────┬─────┬───────────┬──────────────┬───────────────┬──────────┬──────────┬──────────┬──────────┬───────────┬────────────┬────────────────┐
-│  x  │  y  │ isActive  │ frameIndex   │ remainingDist │ totalDist │ direction │  speed   │ priority │ charType  │ colorCombo  │ padding        │  Sprite 0
+│  x  │  y  │ isActive  │ isVisible    │ frameIndex    │ remainingDist │ totalDist │ direction │  speed   │ priority │ charType  │ colorCombo  │  Sprite 0
 └─────┴─────┴───────────┴──────────────┴───────────────┴──────────┴──────────┴──────────┴───────────┴────────────┴────────────────┘
   [0]   [1]      [2]         [3]            [4]            [5]        [6]        [7]        [8]        [9]        [10]         [11]
 
 ┌─────┬─────┬───────────┬──────────────┬───────────────┬──────────┬──────────┬──────────┬──────────┬───────────┬────────────┬────────────────┐
-│  x  │  y  │ isActive  │ frameIndex   │ remainingDist │ totalDist │ direction │  speed   │ priority │ charType  │ colorCombo  │ padding        │  Sprite 1
+│  x  │  y  │ isActive  │ isVisible    │ frameIndex    │ remainingDist │ totalDist │ direction │  speed   │ priority │ charType  │ colorCombo  │  Sprite 1
 └─────┴─────┴───────────┴──────────────┴───────────────┴──────────┴──────────┴──────────┴───────────┴────────────┴────────────────┘
   [12]  [13]     [14]        [15]           [16]           [17]       [18]       [19]       [20]       [21]       [22]        [23]
 
-... repeated for sprites 0-7 (88 total floats)
+... repeated for sprites 0-7 (96 total floats)
 ```
 
 - `x`, `y`: Pixel coordinates (0-255)
 - `isActive`: Movement state (0 = inactive, 1 = active)
+- `isVisible`: Sprite visibility (0 = invisible, 1 = visible)
 - `frameIndex`: Which animation frame to display (0-based index)
 - `remainingDistance`: Remaining distance in dots (tracked by Animation Worker)
 - `totalDistance`: Total distance in dots (from MOVE command)
 - `direction`: Direction code (0-8, where 0=none, 1=up, 2=up-right, etc.)
 - `speed`: Speed parameter C from MOVE command
 - `priority`: Sprite priority (0=front, 1=back)
-- `characterType`: Character type from DEF MOVE
+- `characterType`: Character type from DEF MOVE (-1 = uninitialized, 0-7 = valid)
 - `colorCombination`: Color combination
-- Slot base formula: `slotBase(actionNumber) = actionNumber × 11`
+- Slot base formula: `slotBase(actionNumber) = actionNumber × 12`
 
-### 2. Screen Characters (704-1375 bytes)
+### 2. Screen Characters (768-1439 bytes)
 
 **Type:** `Uint8Array` (672 elements = 28 × 24)
 **Writer:** Executor Worker
@@ -72,7 +73,7 @@ F-BASIC character codes for each cell:
 
 Grid layout: 28 columns × 24 rows
 
-### 3. Screen Color Patterns (1376-2047 bytes)
+### 3. Screen Color Patterns (1440-2111 bytes)
 
 **Type:** `Uint8Array` (672 elements = 28 × 24)
 **Writer:** Executor Worker
@@ -84,7 +85,7 @@ Color pattern for each cell (0-3):
 - 2: Pattern 2
 - 3: Pattern 3
 
-### 4. Cursor Position (2048-2049 bytes)
+### 4. Cursor Position (2112-2113 bytes)
 
 **Type:** `Uint8Array` (2 elements)
 **Writer:** Executor Worker
@@ -95,7 +96,7 @@ Color pattern for each cell (0-3):
 | 0 | cursorX | 0-27 |
 | 1 | cursorY | 0-23 |
 
-### 5. Sequence Number (2052-2055 bytes)
+### 5. Sequence Number (2116-2119 bytes)
 
 **Type:** `Int32Array` (1 element)
 **Writer:** Executor Worker (only)
@@ -105,7 +106,7 @@ Change detection counter:
 - Increments on each screen update
 - Main thread polls to detect changes
 
-### 6. Scalars (2056-2059 bytes)
+### 6. Scalars (2120-2123 bytes)
 
 **Type:** `Uint8Array` (4 elements)
 **Writer:** Executor Worker
@@ -118,35 +119,35 @@ Change detection counter:
 | 2 | backdropColor | 0-60 | Backdrop color |
 | 3 | cgenMode | 0-3 | Character generation mode |
 
-### 7. Padding (2060-2063 bytes)
+### 7. Padding (2124-2127 bytes)
 
 **Type:** 4 bytes (unused)
 **Purpose:** Alignment for Float64Array sync section
 
-### 8. Animation Sync Section (2064-2135 bytes)
+### 8. Animation Sync Section (2128-2199 bytes)
 
 **Type:** `Float64Array` (9 elements)
 **Writer:** Executor Worker (commands), Animation Worker (ack)
 **Reader:** Both workers
 
 ```
-Float64Array indices (relative to animation section):
+Float64Array indices (relative to sync section start at byte 2128):
 ┌─────────┬───────────────┐
 │ Index   │ Value         │
 ├─────────┼───────────────┤
-│ 0 (32)  │ commandType   │ 0=none, 1=START, 2=STOP, 3=ERASE, 4=SET
-│ 1 (33)  │ actionNumber  │ 0-7
-│ 2 (34)  │ param1        │ startX / x
-│ 3 (35)  │ param2        │ startY / y
-│ 4 (36)  │ param3        │ direction
-│ 5 (37)  │ param4        │ speed
-│ 6 (38)  │ param5        │ distance
-│ 7 (39)  │ param6        │ priority
-│ 8 (40)  │ ack           │ 0=pending, 1=received
+│ 0       │ commandType   │ 0=none, 1=START, 2=STOP, 3=ERASE, 4=SET, 5=CLEAR_ALL
+│ 1       │ actionNumber  │ 0-7
+│ 2       │ param1        │ startX / x
+│ 3       │ param2        │ startY / y
+│ 4       │ param3        │ direction
+│ 5       │ param4        │ speed
+│ 6       │ param5        │ distance
+│ 7       │ param6        │ priority
+│ 8       │ ack           │ 0=pending, 1=received
 └─────────┴───────────────┘
 ```
 
-**Global Float64 indices:** 258-266 (buffer start + 2064 bytes ÷ 8)
+**Note:** The sync section is at byte offset 2128, which is Float64 index 266 from buffer start.
 
 #### Sync Command Types
 
@@ -157,6 +158,7 @@ Float64Array indices (relative to animation section):
 | STOP_MOVEMENT | 2 | - |
 | ERASE_MOVEMENT | 3 | - |
 | SET_POSITION | 4 | x (param1), y (param2) |
+| CLEAR_ALL_MOVEMENTS | 5 | - (clears all sprite data) |
 
 ## Communication Flow
 
@@ -256,14 +258,21 @@ if (command) {
 
 | Constant | Value | Description |
 |----------|-------|-------------|
-| `SHARED_DISPLAY_BUFFER_BYTES` | 2136 | Total buffer size |
+| `SHARED_DISPLAY_BUFFER_BYTES` | 2200 | Total buffer size |
 | `MAX_SPRITES` | 8 | Maximum sprite count |
-| `SPRITE_DATA_FLOATS` | 88 | Sprite section size (Float64) |
-| `ANIMATION_SECTION_FLOATS` | 97 | Full animation section (88 + 9) |
+| `FLOATS_PER_SPRITE` | 12 | Float64 elements per sprite |
+| `SPRITE_DATA_FLOATS` | 96 | Sprite section size (8 × 12) |
+| `ANIMATION_SECTION_FLOATS` | 105 | Full animation section (96 + 9) |
 | `COLS` | 28 | Screen columns |
 | `ROWS` | 24 | Screen rows |
 | `CELLS` | 672 | Total screen cells |
-| `OFFSET_ANIMATION_SYNC` | 2064 | Animation sync byte offset |
+| `OFFSET_SPRITES` | 0 | Sprite data byte offset |
+| `OFFSET_CHARS` | 768 | Screen characters byte offset |
+| `OFFSET_PATTERNS` | 1440 | Screen patterns byte offset |
+| `OFFSET_CURSOR` | 2112 | Cursor byte offset |
+| `OFFSET_SEQUENCE` | 2116 | Sequence byte offset |
+| `OFFSET_SCALARS` | 2120 | Scalars byte offset |
+| `OFFSET_ANIMATION_SYNC` | 2128 | Animation sync byte offset |
 
 ## Related Files
 
