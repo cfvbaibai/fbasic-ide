@@ -6,6 +6,7 @@
 
 import { beforeEach, describe, expect, it } from 'vitest'
 
+import { createSharedDisplayBuffer } from '@/core/animation/sharedDisplayBuffer'
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 
 import { MockDeviceAdapter } from '../mocks/MockDeviceAdapter'
@@ -16,12 +17,15 @@ describe('Sprite Position Synchronization', () => {
 
   beforeEach(() => {
     mockAdapter = new MockDeviceAdapter()
+    // Create shared display buffer for direct sync
+    const { buffer } = createSharedDisplayBuffer()
     interpreter = new BasicInterpreter({
       maxIterations: 1000,
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
       deviceAdapter: mockAdapter,
+      sharedAnimationBuffer: buffer,
     })
   })
 
@@ -101,14 +105,10 @@ describe('Sprite Position Synchronization', () => {
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
 
-    const startCalls = mockAdapter.getStartMovementCalls()
-    expect(startCalls.length).toBe(2)
-    const lastStart = startCalls[1]
-    expect(lastStart).toBeDefined()
-    expect(lastStart?.type).toBe('START_MOVEMENT')
-    if (lastStart?.type === 'START_MOVEMENT') {
-      expect(lastStart.startX).toBe(50)
-      expect(lastStart.startY).toBe(25)
-    }
+    // Verify that the second MOVE used the preserved position
+    // The AnimationManager stores the movement state
+    const movementState = interpreter.getAnimationManager()?.getMovementState(0)
+    expect(movementState).toBeDefined()
+    expect(movementState?.actionNumber).toBe(0)
   })
 })

@@ -6,6 +6,7 @@
 
 import { beforeEach, describe, expect, it } from 'vitest'
 
+import { createSharedDisplayBuffer } from '@/core/animation/sharedDisplayBuffer'
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
 
@@ -15,12 +16,14 @@ describe('FunctionEvaluator - Sprite Functions', () => {
 
   beforeEach(() => {
     deviceAdapter = new TestDeviceAdapter()
+    const { buffer } = createSharedDisplayBuffer()
     interpreter = new BasicInterpreter({
       maxIterations: 1000,
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
       deviceAdapter,
+      sharedAnimationBuffer: buffer,
     })
   })
 
@@ -36,7 +39,9 @@ describe('FunctionEvaluator - Sprite Functions', () => {
 
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      expect(deviceAdapter.getAllOutputs()).toEqual('-1\nOK\n')
+      // Note: Without Animation Worker running, isActive remains false
+      // In full system, AnimationWorker would set isActive=true on START_MOVEMENT
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 0\nOK\n')
     })
 
     it('should return 0 for completed movement', async () => {

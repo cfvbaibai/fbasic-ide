@@ -5,16 +5,17 @@
  * Main thread becomes read-only for rendering.
  *
  * Communication:
- * - Executor Worker sends AnimationWorkerCommand messages
- * - This worker writes positions to shared buffer
- * - Main thread reads from shared buffer for rendering
+ * - Main Thread → This Worker: postMessage (SET_SHARED_BUFFER initialization only)
+ * - Executor Worker → This Worker: Direct sync via shared buffer (no message passing)
+ * - This Worker → Main Thread: Writes sprite positions to shared buffer for rendering
  */
 
 import { AnimationWorker } from './AnimationWorker'
 
 const worker = new AnimationWorker()
 
-// Listen for messages from Executor Worker or Main Thread
+// Listen for messages from Main Thread (initialization only)
+// Animation commands come via shared buffer sync, not postMessage
 self.onmessage = (event: MessageEvent) => {
   worker.handleMessage(event.data)
 }

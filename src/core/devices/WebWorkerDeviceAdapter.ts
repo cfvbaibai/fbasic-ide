@@ -13,7 +13,6 @@ import {
   writeScreenState,
 } from '@/core/animation/sharedDisplayBuffer'
 import type {
-  AnimationCommand,
   AnyServiceWorkerMessage,
   BasicDeviceAdapter,
   ExecutionResult,
@@ -450,23 +449,6 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     } else {
       self.postMessage(this.screenStateManager.createCgenUpdateMessage())
     }
-  }
-
-  /**
-   * Send animation command to main thread immediately
-   * This allows movements to start as soon as MOVE is called
-   */
-  sendAnimationCommand(command: AnimationCommand): void {
-    logWorker.debug('Sending animation command:', command.type, command)
-
-    const message: AnyServiceWorkerMessage = {
-      type: 'ANIMATION_COMMAND',
-      id: `anim-${Date.now()}-${Math.random()}`,
-      timestamp: Date.now(),
-      data: command,
-    }
-
-    self.postMessage(message)
   }
 
   /**

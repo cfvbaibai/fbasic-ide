@@ -14,7 +14,9 @@ Historical analysis and status reports:
 - `konva-sprite-test-page.md` - Documentation of Konva sprite test page implementation (2026-01-25)
 
 ### `device-models/screen/`
-Historical design documents:
+Historical design documents (superseded by Animation Worker Single Writer Pattern - see `docs/teams/platform-team.md`):
+- `architecture.md` - Pre-refactor screen device architecture (ANIMATION_COMMAND postMessage pattern)
+- `animation.md` - Pre-refactor animation frame system and position state management
 - `canvas-sprite-animation-design.md` - Original canvas-based sprite animation design (superseded by Konva.js implementation)
 
 ## Note

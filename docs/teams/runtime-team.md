@@ -108,6 +108,12 @@ Example: Add `ABS()` function
 - **BasicDeviceAdapter** for I/O operations
 - **AnimationManager** for sprite commands (via device adapter)
 
+### Communication with UI Team (via Worker Messages)
+- **Receives**: `EXECUTE`, `STOP`, `INPUT_VALUE`, `SET_SHARED_ANIMATION_BUFFER`, `SET_SHARED_JOYSTICK_BUFFER`, `STRIG_EVENT`, `STICK_EVENT`
+- **Sends**: `OUTPUT`, `SCREEN_CHANGED`, `ERROR`, `RESULT`, `REQUEST_INPUT`, `PLAY_SOUND`, `PROGRESS`
+
+**See**: `docs/reference/worker-messages.md` for complete message type reference.
+
 ### Manages
 - **ExecutionContext** - Variables, arrays, program state
 - **Control flow** - GOTO, GOSUB, FOR/NEXT, IF/THEN
@@ -238,3 +244,5 @@ describe('CommandExecutor', () => {
 
 - **F-BASIC manual**: `docs/reference/family-basic-manual/` (command behavior)
 - **Existing executors**: Study similar commands for patterns
+- **Worker message types**: `docs/reference/worker-messages.md`
+- **Shared buffer layout**: `docs/reference/shared-display-buffer.md`

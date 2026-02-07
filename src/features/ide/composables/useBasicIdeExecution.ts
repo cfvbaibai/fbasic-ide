@@ -72,7 +72,7 @@ export function useBasicIdeExecution(
       }
 
       clearScreenBuffer(state.screenBuffer, state.cursorX, state.cursorY)
-      state.movementStates.value = []
+      // movementStates no longer needed - read from shared buffer instead
       state.movementPositionsFromBuffer.value = new Map()
 
       const result = await worker.sendMessageToWorker({
@@ -120,42 +120,7 @@ export function useBasicIdeExecution(
         state.spriteEnabled.value = result.spriteEnabled
       }
 
-      if (result?.movementStates) {
-        const existingStates = new Map(state.movementStates.value.map(m => [m.actionNumber, m]))
-
-        state.movementStates.value = result.movementStates.map(m => {
-          const existing = existingStates.get(m.actionNumber)
-          if (existing) {
-            if (!m.isActive && !existing.isActive) {
-              return {
-                ...m,
-                startX: existing.startX,
-                startY: existing.startY,
-                remainingDistance: existing.remainingDistance,
-                currentFrameIndex: existing.currentFrameIndex,
-                frameCounter: existing.frameCounter,
-              }
-            }
-            if (existing.isActive && m.isActive && existing.actionNumber === m.actionNumber) {
-              return {
-                ...m,
-                startX: existing.startX,
-                startY: existing.startY,
-                remainingDistance: existing.remainingDistance,
-                currentFrameIndex: existing.currentFrameIndex,
-                frameCounter: existing.frameCounter,
-              }
-            }
-          }
-          return m
-        })
-
-        for (const existing of existingStates.values()) {
-          if (!existing.isActive && !state.movementStates.value.find(m => m.actionNumber === existing.actionNumber)) {
-            state.movementStates.value.push(existing)
-          }
-        }
-      }
+      // movementStates no longer received in RESULT - read from shared buffer instead
     } catch (error) {
       logComposable.error('Execution error:', error)
       if (error instanceof ExecutionError) {
@@ -202,10 +167,10 @@ export function useBasicIdeExecution(
     state.screenBuffer.value = initializeScreenBuffer()
     state.cursorX.value = 0
     state.cursorY.value = 0
-    // Clear BG items (above), SPRITEs (DEF SPRITE + display), and MOVE states
+    // Clear BG items (above), SPRITEs (DEF SPRITE + display)
     state.spriteStates.value = []
     // Do NOT clear spriteEnabled - SPRITE ON/OFF state should persist (Clear only clears display)
-    state.movementStates.value = []
+    // movementStates no longer tracked locally - read from shared buffer instead
     state.movementPositionsFromBuffer.value = new Map()
     state.frontSpriteNodes.value = new Map()
     state.backSpriteNodes.value = new Map()

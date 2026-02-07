@@ -74,17 +74,14 @@ const spriteAnimation = computed(() =>
 /** Reset all movements to initial positions */
 function resetMovements(): void {
   const CANVAS_SCALE = 2
-  movements.value.forEach((m: MovementState) => {
-    m.remainingDistance = m.totalDistance
-    m.isActive = true
-    m.currentFrameIndex = 0
-    m.frameCounter = 0
-    const sprite = spriteRefs.value.get(m.actionNumber)
-    if (sprite) {
-      sprite.x(m.startX * CANVAS_SCALE)
-      sprite.y(m.startY * CANVAS_SCALE)
-    }
-  })
+  // Note: currentFrameIndex is now tracked by Animation Worker in shared buffer
+  // This demo page would need to integrate with Animation Worker for full functionality
+  const sprite = spriteRefs.value.get(0)
+  if (sprite) {
+    // Set default center position for demo
+    sprite.x(128 * CANVAS_SCALE)
+    sprite.y(120 * CANVAS_SCALE)
+  }
 }
 
 watch([spriteCount, spriteSpeed], () => {
@@ -131,7 +128,7 @@ onUnmounted(() => {
         <p>Testing Konva.js for sprite animation with Family BASIC sprites</p>
         <div class="test-info">
           <p><strong>Movements:</strong> {{ movements.length }}</p>
-          <p><strong>Active:</strong> {{ movements.filter(m => m.isActive).length }}</p>
+          <p><strong>Note:</strong> This demo uses simplified animation; full animation is handled by Animation Worker</p>
         </div>
       </div>
 

@@ -164,13 +164,13 @@ class WebWorkerInterpreter {
         this.webWorkerDeviceAdapter.setCurrentExecutionId(null)
       }
 
-      // Get sprite states and movement states from interpreter
+      // Get sprite states from interpreter
       if (!this.interpreter) {
         throw new Error('Interpreter not initialized')
       }
       const spriteStates = this.interpreter.getSpriteStates()
       const spriteEnabled = this.interpreter.isSpriteEnabled()
-      const movementStates = this.interpreter.getMovementStates()
+      // movementStates no longer sent in RESULT - read from shared buffer instead
 
       // Create enhanced result with execution metadata
       const enhancedResult: ResultMessage['data'] = {
@@ -179,7 +179,6 @@ class WebWorkerInterpreter {
         workerId: 'web-worker-1',
         spriteStates,
         spriteEnabled,
-        movementStates,
       }
 
       this.sendResult(message.id, enhancedResult)
@@ -265,14 +264,15 @@ class WebWorkerInterpreter {
     const { buffer } = data
     this.sharedAnimationBuffer = buffer
     console.log('[WebWorkerInterpreter] SET_SHARED_ANIMATION_BUFFER received, buffer byteLength =', buffer.byteLength)
-    console.log('[WebWorkerInterpreter] Interpreter exists:', !!this.interpreter, 'AnimationManager exists:', !!this.interpreter?.context?.animationManager)
+    const animationManager = this.interpreter?.getAnimationManager()
+    console.log('[WebWorkerInterpreter] Interpreter exists:', !!this.interpreter, 'AnimationManager exists:', !!animationManager)
     if (this.webWorkerDeviceAdapter) {
       this.webWorkerDeviceAdapter.setSharedAnimationBuffer(buffer)
     }
     // Update AnimationManager's shared buffer for direct sync to AnimationWorker
-    if (this.interpreter?.context?.animationManager) {
+    if (animationManager) {
       console.log('[WebWorkerInterpreter] Updating existing AnimationManager with shared buffer')
-      this.interpreter.context.animationManager.setSharedAnimationBuffer(buffer)
+      animationManager.setSharedAnimationBuffer(buffer)
     } else {
       console.log('[WebWorkerInterpreter] AnimationManager not created yet, will use buffer when interpreter is created')
     }

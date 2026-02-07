@@ -212,8 +212,10 @@ Otherwise, use existing variables or inline values.
 ## Integration Points
 
 ### Uses Runtime Team (via Worker)
-- **Sends**: `EXECUTE`, `STOP`, `INPUT_RESPONSE` messages
-- **Receives**: `OUTPUT`, `SCREEN_UPDATE`, `ERROR` messages
+- **Sends**: `EXECUTE`, `STOP`, `INPUT_VALUE`, `SET_SHARED_ANIMATION_BUFFER`, `SET_SHARED_JOYSTICK_BUFFER`, `STRIG_EVENT`, `STICK_EVENT`
+- **Receives**: `OUTPUT`, `SCREEN_CHANGED`, `ERROR`, `RESULT`, `REQUEST_INPUT`, `PLAY_SOUND`, `PROGRESS`
+
+**See**: `docs/reference/worker-messages.md` for complete message type reference.
 
 ### Uses Platform Team (via SharedBuffer)
 - **Reads**: Sprite positions from SharedArrayBuffer
@@ -306,3 +308,5 @@ describe('MyComponent', () => {
 
 - **Vue 3 docs**: https://vuejs.org/
 - **Composition API**: https://vuejs.org/guide/extras/composition-api-faq.html
+- **Worker message types**: `docs/reference/worker-messages.md`
+- **Shared buffer layout**: `docs/reference/shared-display-buffer.md`

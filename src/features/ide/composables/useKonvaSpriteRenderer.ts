@@ -6,6 +6,7 @@
 import Konva from 'konva'
 
 import { buildAllCharacterAnimationConfigs, getSequenceForMovement } from '@/core/animation/CharacterAnimationBuilder'
+import type { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import type { ColorCombination, MovementState, SpriteState } from '@/core/sprite/types'
 import { COLORS, SPRITE_PALETTES } from '@/shared/data/palette'
 import type { Tile } from '@/shared/data/types'
@@ -198,27 +199,37 @@ export async function createStaticSpriteKonvaImage(
 /**
  * Get or create frame images for a movement with the given sprite palette.
  * Cache key includes spritePaletteCode so CGSET palette changes apply to MOVE sprites.
+ * Reads movement definition from shared buffer (pure buffer read).
  */
-async function getOrCreateMovementFrameImages(
-  movement: MovementState,
-  spritePaletteCode: number
+export async function getOrCreateMovementFrameImages(
+  actionNumber: number,
+  spritePaletteCode: number,
+  accessor: SharedDisplayBufferAccessor
 ): Promise<HTMLImageElement[] | null> {
   animationConfigs ??= buildAllCharacterAnimationConfigs()
 
+  const characterType = accessor.readSpriteCharacterType(actionNumber)
+  const direction = accessor.readSpriteDirection(actionNumber)
+
   const { sequence, invertX, invertY } = getSequenceForMovement(
-    movement.definition.characterType,
-    movement.definition.direction,
+    characterType,
+    direction,
     animationConfigs
   )
 
   if (!sequence || sequence.frames.length === 0) return null
 
+  const colorCombination = accessor.readSpriteColorCombination(actionNumber)
   const spritePalette = SPRITE_PALETTES[spritePaletteCode] ?? SPRITE_PALETTES[1]
-  const colorCombination = spritePalette[movement.definition.colorCombination] ?? spritePalette[0]
+  const paletteColorCombination = spritePalette[colorCombination] ?? spritePalette[0]
 
-  const cacheKey = `${movement.actionNumber}-${movement.definition.characterType}-${movement.definition.direction}-${movement.definition.colorCombination}-${spritePaletteCode}`
+  const cacheKey = `${actionNumber}-${characterType}-${direction}-${colorCombination}-${spritePaletteCode}`
 
   if (!frameImageCache.has(cacheKey)) {
+    console.log('[getOrCreateMovementFrameImages] Creating frame images for action', actionNumber, {
+      characterType,
+      direction,
+    })
     const frameImages: HTMLImageElement[] = []
     for (let i = 0; i < sequence.frames.length; i++) {
       const frameTiles = sequence.frames[i]
@@ -226,7 +237,7 @@ async function getOrCreateMovementFrameImages(
         const frameInversion = sequence.frameInversions?.[i]
         const frameInvertX = frameInversion?.invertX ?? invertX
         const frameInvertY = frameInversion?.invertY ?? invertY
-        const frameImg = await createSpriteImageFromTiles(frameTiles, colorCombination, frameInvertX, frameInvertY)
+        const frameImg = await createSpriteImageFromTiles(frameTiles, paletteColorCombination, frameInvertX, frameInvertY)
         frameImages.push(frameImg)
       }
     }
@@ -238,27 +249,47 @@ async function getOrCreateMovementFrameImages(
 
 /**
  * Create Konva.Image for an animated sprite (DEF MOVE)
+ * Reads movement definition from shared buffer (pure buffer read).
  */
 export async function createAnimatedSpriteKonvaImage(
-  movement: MovementState,
-  spritePaletteCode: number
+  actionNumber: number,
+  spritePaletteCode: number,
+  accessor: SharedDisplayBufferAccessor
 ): Promise<Konva.Image | null> {
-  const frameImages = await getOrCreateMovementFrameImages(movement, spritePaletteCode)
+  const frameImages = await getOrCreateMovementFrameImages(actionNumber, spritePaletteCode, accessor)
   if (!frameImages || frameImages.length === 0) {
-    logScreen.warn(`No sequence found for movement ${movement.actionNumber}`)
+    logScreen.warn(`No sequence found for movement ${actionNumber}`)
     return null
   }
 
-  const frameIndex = movement.currentFrameIndex % frameImages.length
+  // Read currentFrameIndex from shared buffer (Animation Worker is the source of truth)
+  const frameIndex = accessor.readSpriteFrameIndex(actionNumber) % frameImages.length
   const currentFrameImage = frameImages[frameIndex]
   if (!currentFrameImage) return null
 
+  // Read position from shared buffer (Animation Worker is the source of truth)
+  const pos = accessor.readSpritePosition(actionNumber)
+  const x = pos?.x ?? 0
+  const y = pos?.y ?? 0
+
+  const characterType = accessor.readSpriteCharacterType(actionNumber)
+  const direction = accessor.readSpriteDirection(actionNumber)
+
   const konvaImage = new Konva.Image({
-    x: movement.startX,
-    y: movement.startY,
+    x,
+    y,
     image: currentFrameImage,
     scaleX: 1,
     scaleY: 1,
+  })
+
+  console.log('[createAnimatedSpriteKonvaImage] Created sprite node:', {
+    action: actionNumber,
+    characterType,
+    direction,
+    x: konvaImage.x(),
+    y: konvaImage.y(),
+    frameCount: frameImages.length,
   })
 
   return konvaImage
@@ -267,16 +298,19 @@ export async function createAnimatedSpriteKonvaImage(
 /**
  * Update existing Konva.Image node for animated sprite
  * Updates frame image (and palette when CGSET changed); position is updated by animation loop
+ * Reads movement definition from shared buffer (pure buffer read).
  */
 export async function updateAnimatedSpriteKonvaImage(
-  movement: MovementState,
+  actionNumber: number,
   konvaImage: Konva.Image,
-  spritePaletteCode: number
+  spritePaletteCode: number,
+  accessor: SharedDisplayBufferAccessor
 ): Promise<void> {
-  const frameImages = await getOrCreateMovementFrameImages(movement, spritePaletteCode)
+  const frameImages = await getOrCreateMovementFrameImages(actionNumber, spritePaletteCode, accessor)
   if (!frameImages || frameImages.length === 0) return
 
-  const frameIndex = movement.currentFrameIndex % frameImages.length
+  // Read currentFrameIndex from shared buffer (Animation Worker is the source of truth)
+  const frameIndex = accessor.readSpriteFrameIndex(actionNumber) % frameImages.length
   const newFrameImage = frameImages[frameIndex]
   if (newFrameImage && konvaImage.image() !== newFrameImage) {
     konvaImage.image(newFrameImage)

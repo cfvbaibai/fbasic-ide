@@ -4,20 +4,13 @@
  */
 
 import { getSpriteSizeForMoveDefinition } from '@/core/animation/CharacterAnimationBuilder'
-import {
-  clearSyncCommand,
-  readSpriteIsActive,
-  SHARED_ANIMATION_BUFFER_BYTES,
-  SHARED_ANIMATION_BUFFER_LENGTH,
-  SyncCommandType,
-  waitForAck,
-  writeSyncAck,
-  writeSyncCommand,
-} from '@/core/animation/sharedAnimationBuffer'
+import { SyncCommandType } from '@/core/animation/sharedAnimationBuffer'
 import { SHARED_DISPLAY_BUFFER_BYTES } from '@/core/animation/sharedDisplayBuffer'
+import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import { SCREEN_DIMENSIONS } from '@/core/constants'
 import type { BasicDeviceAdapter } from '@/core/interfaces'
 import type { MoveDefinition, MovementState } from '@/core/sprite/types'
+import { logWorker } from '@/shared/logger'
 
 /**
  * AnimationManager - Manages 8 action slots (0-7) for animated sprite movement
@@ -25,17 +18,13 @@ import type { MoveDefinition, MovementState } from '@/core/sprite/types'
  */
 export class AnimationManager {
   private moveDefinitions: Map<number, MoveDefinition> = new Map()
-  private movementStates: Map<number, MovementState> = new Map()
   private deviceAdapter?: BasicDeviceAdapter
-  /** Shared animation state view (Float64Array for sprite data and sync commands). */
-  private sharedAnimationView: Float64Array | null = null
-  /** Shared animation sync view (Int32Array for Atomics operations). */
-  private sharedSyncView: Int32Array | null = null
+  /** Accessor for shared display buffer (creates consistent views). */
+  private accessor?: SharedDisplayBufferAccessor
 
   /**
-   * Set device adapter for sending animation commands to the main thread.
-   * @param adapter - Device adapter implementing sendAnimationCommand
-   *   (and optional setSpritePosition, clearSpritePosition)
+   * Set device adapter for device operations (sprite position queries, etc.).
+   * @param adapter - Device adapter implementing setSpritePosition, clearSpritePosition
    */
   setDeviceAdapter(adapter: BasicDeviceAdapter): void {
     this.deviceAdapter = adapter
@@ -43,81 +32,32 @@ export class AnimationManager {
 
   /**
    * Set shared animation buffer (used by worker for getMovementStatus / MOVE(n)).
-   * Accepts either the standalone animation buffer or the combined display buffer.
-   * Extracts both Float64Array view (for sprite data) and Int32Array view (for Atomics sync).
+   * Expects the combined display buffer (sharedDisplayBuffer.ts).
+   * Creates accessor with consistent views for sprite data and sync section.
    */
   setSharedAnimationBuffer(buffer: SharedArrayBuffer | undefined): void {
     if (!buffer) {
-      this.sharedAnimationView = null
-      this.sharedSyncView = null
-      console.log('[AnimationManager] setSharedAnimationBuffer: buffer is null/undefined')
+      this.accessor = undefined
+      logWorker.debug('[AnimationManager] setSharedAnimationBuffer: buffer is null/undefined')
       return
     }
 
-    this.sharedAnimationView = this.viewFromBuffer(buffer)
-    console.log('[AnimationManager] setSharedAnimationBuffer: view length =', this.sharedAnimationView.length, 'buffer.byteLength =', buffer.byteLength)
-
-    // Extract Int32Array sync view from the sync section
-    // The sync section can be at different offsets depending on buffer layout:
-    // - Standalone animation buffer (264 bytes): sync at float index 24 (byte 192)
-    // - Combined display buffer (1624 bytes): sync at float index 193 (byte 1552)
-    const syncSectionFloats = 9 // command type, action number, params (6), ack
-
-    // Detect buffer type by size
-    let syncSectionByteOffset: number
-    if (buffer.byteLength === SHARED_ANIMATION_BUFFER_BYTES) {
-      // Standalone animation buffer: sync section at float 24 (byte 192)
-      syncSectionByteOffset = 24 * 8
-    } else if (buffer.byteLength === SHARED_DISPLAY_BUFFER_BYTES) {
-      // Combined display buffer: sync section at byte 1552 (with padding for alignment)
-      syncSectionByteOffset = 1552
-    } else {
-      // Unknown buffer type, try standalone layout
-      syncSectionByteOffset = 24 * 8
-      console.warn('[AnimationManager] Unknown buffer size:', buffer.byteLength, 'trying standalone layout')
+    if (buffer.byteLength < SHARED_DISPLAY_BUFFER_BYTES) {
+      throw new RangeError(
+        `Buffer too small: ${buffer.byteLength} bytes, need at least ${SHARED_DISPLAY_BUFFER_BYTES}`
+      )
     }
 
-    // Check if buffer has sync section
-    const expectedMinLength = 24 + syncSectionFloats // 33 floats for standalone
-    console.log('[AnimationManager] Buffer check:', {
-      viewLength: this.sharedAnimationView.length,
-      expectedMinLength,
-      bufferByteLength: buffer.byteLength,
-      sharedDisplayBufferBytes: SHARED_DISPLAY_BUFFER_BYTES,
-      syncSectionByteOffset,
-    })
-    if (this.sharedAnimationView.length >= expectedMinLength || buffer.byteLength >= SHARED_DISPLAY_BUFFER_BYTES) {
-      // Create Int32Array view of sync section (9 floats × 2 Int32 per float)
-      this.sharedSyncView = new Int32Array(buffer, syncSectionByteOffset, syncSectionFloats * 2)
-      console.log('[AnimationManager] Direct sync ENABLED (buffer has sync section at byte', syncSectionByteOffset, ')')
-    } else {
-      this.sharedSyncView = null
-      console.log('[AnimationManager] Direct sync DISABLED (buffer too short, has no sync section)')
-    }
-  }
-
-  /** Create Float64Array view from buffer (standalone 192 bytes or combined display buffer). */
-  private viewFromBuffer(buffer: SharedArrayBuffer): Float64Array {
-    const byteLen = buffer.byteLength
-    if (byteLen === SHARED_ANIMATION_BUFFER_BYTES) {
-      return new Float64Array(buffer)
-    }
-    if (byteLen >= SHARED_ANIMATION_BUFFER_BYTES) {
-      return new Float64Array(buffer, 0, SHARED_ANIMATION_BUFFER_LENGTH)
-    }
-    throw new RangeError(
-      `Shared animation buffer too small: ${byteLen} bytes, need at least ${SHARED_ANIMATION_BUFFER_BYTES}`
-    )
+    this.accessor = new SharedDisplayBufferAccessor(buffer)
+    logWorker.debug('[AnimationManager] setSharedAnimationBuffer: accessor created, buffer.byteLength =', buffer.byteLength)
   }
 
   constructor(sharedAnimationBuffer?: SharedArrayBuffer) {
-    console.log('[AnimationManager] Constructor called with sharedAnimationBuffer:', {
+    logWorker.debug('[AnimationManager] Constructor called with sharedAnimationBuffer:', {
       hasBuffer: !!sharedAnimationBuffer,
       byteLength: sharedAnimationBuffer?.byteLength,
     })
     if (sharedAnimationBuffer) {
-      this.sharedAnimationView = this.viewFromBuffer(sharedAnimationBuffer)
-      // Also set up sync view and enable direct sync
       this.setSharedAnimationBuffer(sharedAnimationBuffer)
     }
   }
@@ -158,6 +98,40 @@ export class AnimationManager {
     }
 
     this.moveDefinitions.set(definition.actionNumber, definition)
+    console.log('[AnimationManager] defineMovement: stored definition for action', definition.actionNumber, 'total definitions:', this.moveDefinitions.size)
+
+    // Write movement definition to shared buffer so Main Thread can create sprites immediately
+    // This includes: characterType, colorCombination, direction, speed, priority
+    // Position and isActive will be set later by START_MOVEMENT
+    if (this.accessor) {
+      // Get current position (or default to screen center)
+      let x: number = SCREEN_DIMENSIONS.SPRITE.DEFAULT_X
+      let y: number = SCREEN_DIMENSIONS.SPRITE.DEFAULT_Y
+      if (this.deviceAdapter?.getSpritePosition) {
+        const existing = this.deviceAdapter.getSpritePosition(definition.actionNumber)
+        if (existing) {
+          x = existing.x
+          y = existing.y
+        }
+      }
+
+      this.accessor.writeSpriteState(
+        definition.actionNumber,
+        x,
+        y,
+        false, // isActive = false (DEF MOVE doesn't start movement)
+        false, // isVisible = false (not visible until MOVE is executed)
+        0, // frameIndex = 0 (initial frame)
+        0, // remainingDistance = 0 (not moving yet)
+        definition.distance * 2, // totalDistance (stored but not used until MOVE)
+        definition.direction,
+        definition.speed,
+        definition.priority,
+        definition.characterType,
+        definition.colorCombination
+      )
+      console.log('[AnimationManager] defineMovement: wrote definition to shared buffer for action', definition.actionNumber)
+    }
 
     // Initialize POSITION for this action to screen center when DEF MOVE runs (like DEF SPRITE)
     if (this.deviceAdapter?.setSpritePosition) {
@@ -181,14 +155,15 @@ export class AnimationManager {
   }
 
   /**
-   * Start movement (MOVE command). Initializes state and sends START_MOVEMENT.
-   * Uses direct synchronization to Animation Worker when available (no main thread forwarding).
+   * Start movement (MOVE command). Sends START_MOVEMENT command to Animation Worker.
    * @param actionNumber - Action slot 0-7 (must have been defined with DEF MOVE)
    * @param startX - Optional pixel X (0-255); default center if omitted
    * @param startY - Optional pixel Y (0-255); default center if omitted
    * @throws Error if no definition exists for actionNumber
    */
   startMovement(actionNumber: number, startX?: number, startY?: number): void {
+    console.log('[AnimationManager] startMovement called for sprite', actionNumber)
+
     const definition = this.moveDefinitions.get(actionNumber)
     if (!definition) {
       throw new Error(`No movement definition for action number ${actionNumber} (use DEF MOVE first)`)
@@ -204,96 +179,39 @@ export class AnimationManager {
     const initialX = startX ?? screenCenterX - halfSize
     const initialY = startY ?? screenCenterY - halfSize
 
-    // Calculate direction deltas
-    const { deltaX, deltaY } = this.getDirectionDeltas(definition.direction)
+    console.log('[AnimationManager] Starting movement at position:', initialX, initialY)
 
-    // Calculate speed: 60/C dots per second; C=0 means every 256 frames (manual: 60/256 dots/sec)
-    const speedDotsPerSecond =
-      definition.speed === 0 ? 60 / 256 : definition.speed > 0 ? 60 / definition.speed : 0
+    // Write START_MOVEMENT command to shared buffer
+    if (!this.accessor) {
+      throw new Error('[AnimationManager] Shared buffer not available - cannot start movement')
+    }
 
-    // Calculate total distance: 2×D dots
-    const totalDistance = 2 * definition.distance
-
-    // Store movement state; startX/startY sent in command and stored for result sync (default = center)
-    const movementState: MovementState = {
-      actionNumber,
-      definition,
+    console.log('[AnimationManager] Writing START_MOVEMENT command to buffer...')
+    this.accessor.writeSyncCommand(SyncCommandType.START_MOVEMENT, actionNumber, {
       startX: initialX,
       startY: initialY,
-      remainingDistance: totalDistance,
-      totalDistance,
-      speedDotsPerSecond,
-      directionDeltaX: deltaX,
-      directionDeltaY: deltaY,
-      isActive: true,
-      currentFrameIndex: 0,
-      frameCounter: 0,
+      direction: definition.direction,
+      speed: definition.speed,
+      distance: definition.distance,
+      priority: definition.priority,
+    })
+
+    // Notify Animation Worker and wait for acknowledgment
+    try {
+      Atomics.notify(this.accessor.syncInt32View, 0)
+    } catch {
+      // Atomics.notify may throw in non-worker contexts
     }
 
-    this.movementStates.set(actionNumber, movementState)
-
-    // Notify main thread about new movement (for ctx.movementStates tracking)
-    // This ensures main thread knows about the movement for rendering even though
-    // positions come from the shared buffer (Animation Worker is single writer)
-    if (this.deviceAdapter?.sendAnimationCommand) {
-      this.deviceAdapter.sendAnimationCommand({
-        type: 'START_MOVEMENT',
-        actionNumber,
-        definition,
-        startX: initialX,
-        startY: initialY,
-      })
-    }
-
-    // Use direct sync to Animation Worker if available
-    if (this.sharedAnimationView && this.sharedSyncView) {
-      // Write command to shared buffer
-      writeSyncCommand(this.sharedAnimationView, SyncCommandType.START_MOVEMENT, actionNumber, {
-        startX: initialX,
-        startY: initialY,
-        direction: definition.direction,
-        speed: definition.speed,
-        distance: definition.distance,
-        priority: definition.priority,
-      })
-
-      // Notify Animation Worker and wait for acknowledgment
-      try {
-        Atomics.notify(this.sharedSyncView, 0) // Notify at index 0 (any index works)
-      } catch {
-        // Atomics.notify may throw in non-worker contexts
-        console.warn('[AnimationManager] Atomics.notify failed (not in worker context?)')
-      }
-
-      // Wait for acknowledgment with timeout (but don't throw if no Animation Worker)
-      const ackReceived = waitForAck(this.sharedSyncView, 100) // 100ms timeout
-
-      if (!ackReceived) {
-        // No Animation Worker running (e.g., in tests) - clear command and continue
-        console.warn('[AnimationManager] No Animation Worker ack for START_MOVEMENT, clearing command')
-        clearSyncCommand(this.sharedAnimationView)
-      } else {
-        // Clear acknowledgment for next command
-        writeSyncAck(this.sharedAnimationView, 0)
-        clearSyncCommand(this.sharedAnimationView)
-      }
+    console.log('[AnimationManager] BEFORE waitForAck')
+    const ackReceived = this.accessor.waitForAck(100)
+    console.log('[AnimationManager] AFTER waitForAck, ackReceived=', ackReceived)
+    if (!ackReceived) {
+      console.warn('[AnimationManager] No Animation Worker ack for START_MOVEMENT, clearing command')
+      this.accessor.clearSyncCommand()
     } else {
-      // Direct sync not available - log warning but continue with local tracking only
-      console.warn('[AnimationManager] Direct sync not available for START_MOVEMENT, using local tracking only')
-    }
-  }
-
-  /**
-   * Set movements inactive (main thread notified that they completed naturally).
-   * Only updates worker state; does not send any command to main thread.
-   * @param actionNumbers - Action slots 0-7 to mark inactive
-   */
-  setMovementsInactive(actionNumbers: number[]): void {
-    for (const actionNumber of actionNumbers) {
-      const movement = this.movementStates.get(actionNumber)
-      if (movement) {
-        movement.isActive = false
-      }
+      this.accessor.writeAck(0)
+      this.accessor.clearSyncCommand()
     }
   }
 
@@ -303,98 +221,60 @@ export class AnimationManager {
    * @param actionNumbers - Action slots 0-7 to stop
    */
   stopMovement(actionNumbers: number[]): void {
+    if (!this.accessor) {
+      throw new Error('[AnimationManager] Shared buffer not available - cannot stop movement')
+    }
+
     for (const actionNumber of actionNumbers) {
-      const movement = this.movementStates.get(actionNumber)
-      if (movement) {
-        movement.isActive = false
+      this.accessor.writeSyncCommand(SyncCommandType.STOP_MOVEMENT, actionNumber, {})
+
+      try {
+        Atomics.notify(this.accessor.syncInt32View, 0)
+      } catch {
+        // Atomics.notify may throw in non-worker contexts
       }
-    }
 
-    // Notify main thread about stopped movements (for ctx.movementStates tracking)
-    if (this.deviceAdapter?.sendAnimationCommand) {
-      this.deviceAdapter.sendAnimationCommand({
-        type: 'STOP_MOVEMENT',
-        actionNumbers,
-      })
-    }
-
-    // Use direct sync to Animation Worker
-    if (this.sharedAnimationView && this.sharedSyncView) {
-      for (const actionNumber of actionNumbers) {
-        // Write command to shared buffer
-        writeSyncCommand(this.sharedAnimationView, SyncCommandType.STOP_MOVEMENT, actionNumber, {})
-
-        // Notify and wait for acknowledgment
-        try {
-          Atomics.notify(this.sharedSyncView, 0)
-        } catch {
-          // Atomics.notify may throw in non-worker contexts
-        }
-
-        const ackReceived = waitForAck(this.sharedSyncView, 100)
-        if (!ackReceived) {
-          // No Animation Worker running - clear command and continue
-          console.warn('[AnimationManager] No Animation Worker ack for STOP_MOVEMENT, clearing command')
-          clearSyncCommand(this.sharedAnimationView)
-        } else {
-          writeSyncAck(this.sharedAnimationView, 0)
-          clearSyncCommand(this.sharedAnimationView)
-        }
+      const ackReceived = this.accessor.waitForAck(100)
+      if (!ackReceived) {
+        console.warn('[AnimationManager] No Animation Worker ack for STOP_MOVEMENT, clearing command')
+        this.accessor.clearSyncCommand()
+      } else {
+        this.accessor.writeAck(0)
+        this.accessor.clearSyncCommand()
       }
-    } else {
-      // Direct sync not available - log warning but continue with local tracking only
-      console.warn('[AnimationManager] Direct sync not available, using local tracking only')
     }
   }
 
   /**
-   * Erase movement (ERA command). Stops movement and hides sprite.
+   * Erase movement (ERA command). Stops movement, hides sprite, and clears the definition.
    * Uses direct synchronization to Animation Worker.
    * @param actionNumbers - Action slots 0-7 to erase
    */
   eraseMovement(actionNumbers: number[]): void {
+    if (!this.accessor) {
+      throw new Error('[AnimationManager] Shared buffer not available - cannot erase movement')
+    }
+
     for (const actionNumber of actionNumbers) {
-      const movement = this.movementStates.get(actionNumber)
-      if (movement) {
-        movement.isActive = false
+      this.accessor.writeSyncCommand(SyncCommandType.ERASE_MOVEMENT, actionNumber, {})
+
+      try {
+        Atomics.notify(this.accessor.syncInt32View, 0)
+      } catch {
+        // Atomics.notify may throw in non-worker contexts
       }
-      this.movementStates.delete(actionNumber)
-    }
 
-    // Notify main thread about erased movements (for ctx.movementStates tracking)
-    if (this.deviceAdapter?.sendAnimationCommand) {
-      this.deviceAdapter.sendAnimationCommand({
-        type: 'ERASE_MOVEMENT',
-        actionNumbers,
-      })
-    }
-
-    // Use direct sync to Animation Worker
-    if (this.sharedAnimationView && this.sharedSyncView) {
-      for (const actionNumber of actionNumbers) {
-        // Write command to shared buffer
-        writeSyncCommand(this.sharedAnimationView, SyncCommandType.ERASE_MOVEMENT, actionNumber, {})
-
-        // Notify and wait for acknowledgment
-        try {
-          Atomics.notify(this.sharedSyncView, 0)
-        } catch {
-          // Atomics.notify may throw in non-worker contexts
-        }
-
-        const ackReceived = waitForAck(this.sharedSyncView, 100)
-        if (!ackReceived) {
-          // No Animation Worker running - clear command and continue
-          console.warn('[AnimationManager] No Animation Worker ack for ERASE_MOVEMENT, clearing command')
-          clearSyncCommand(this.sharedAnimationView)
-        } else {
-          writeSyncAck(this.sharedAnimationView, 0)
-          clearSyncCommand(this.sharedAnimationView)
-        }
+      const ackReceived = this.accessor.waitForAck(100)
+      if (!ackReceived) {
+        console.warn('[AnimationManager] No Animation Worker ack for ERASE_MOVEMENT, clearing command')
+        this.accessor.clearSyncCommand()
+      } else {
+        this.accessor.writeAck(0)
+        this.accessor.clearSyncCommand()
       }
-    } else {
-      // Direct sync not available - log warning but continue with local tracking only
-      console.warn('[AnimationManager] Direct sync not available, using local tracking only')
+
+      // Clear the move definition
+      this.moveDefinitions.delete(actionNumber)
     }
   }
 
@@ -417,66 +297,46 @@ export class AnimationManager {
       throw new Error(`Invalid Y coordinate: ${y} (must be 0-255)`)
     }
 
-    // Store position locally (for MOVE command to use as start position)
-    this.deviceAdapter?.setSpritePosition?.(actionNumber, x, y)
-
-    // Notify main thread about position change (for ctx.movementStates tracking)
-    if (this.deviceAdapter?.sendAnimationCommand) {
-      this.deviceAdapter.sendAnimationCommand({
-        type: 'SET_POSITION',
-        actionNumber,
-        x,
-        y,
-      })
+    if (!this.accessor) {
+      throw new Error('[AnimationManager] Shared buffer not available - cannot set position')
     }
 
-    // Use direct sync to Animation Worker
-    if (this.sharedAnimationView && this.sharedSyncView) {
-      // Write command to shared buffer
-      writeSyncCommand(this.sharedAnimationView, SyncCommandType.SET_POSITION, actionNumber, {
-        startX: x,
-        startY: y,
-      })
+    // Store position locally for device adapter (for MOVE command to use as start position)
+    this.deviceAdapter?.setSpritePosition?.(actionNumber, x, y)
 
-      // Notify and wait for acknowledgment
-      try {
-        Atomics.notify(this.sharedSyncView, 0)
-      } catch {
-        // Atomics.notify may throw in non-worker contexts
-      }
+    // Write SET_POSITION command to shared buffer
+    this.accessor.writeSyncCommand(SyncCommandType.SET_POSITION, actionNumber, {
+      startX: x,
+      startY: y,
+    })
 
-      const ackReceived = waitForAck(this.sharedSyncView, 100)
-      if (!ackReceived) {
-        // No Animation Worker running - clear command and continue
-        console.warn('[AnimationManager] No Animation Worker ack for SET_POSITION, clearing command')
-        clearSyncCommand(this.sharedAnimationView)
-      } else {
-        writeSyncAck(this.sharedAnimationView, 0)
-        clearSyncCommand(this.sharedAnimationView)
-      }
+    try {
+      Atomics.notify(this.accessor.syncInt32View, 0)
+    } catch {
+      // Atomics.notify may throw in non-worker contexts
+    }
+
+    const ackReceived = this.accessor.waitForAck(100)
+    if (!ackReceived) {
+      console.warn('[AnimationManager] No Animation Worker ack for SET_POSITION, clearing command')
+      this.accessor.clearSyncCommand()
     } else {
-      // Direct sync not available - log warning but continue with local tracking only
-      console.warn('[AnimationManager] Direct sync not available for SET_POSITION, using local tracking only')
+      this.accessor.writeAck(0)
+      this.accessor.clearSyncCommand()
     }
   }
 
   /**
    * Get movement status (MOVE(n) function). -1 = moving, 0 = complete or not started.
-   * When shared buffer is set (worker), use only the buffer: main thread writes isActive
-   * when movement completes; worker never gets setMovementsInactive, so movementStates
-   * would stay true and MOVE(n) would never return 0 otherwise.
+   * Reads from shared buffer managed by Animation Worker.
    * @param actionNumber - Action slot 0-7
    * @returns -1 if movement is active, 0 otherwise
    */
   getMovementStatus(actionNumber: number): -1 | 0 {
-    if (this.sharedAnimationView) {
-      return readSpriteIsActive(this.sharedAnimationView, actionNumber) ? -1 : 0
+    if (!this.accessor) {
+      throw new Error('[AnimationManager] Shared buffer not available - cannot get movement status')
     }
-    const movement = this.movementStates.get(actionNumber)
-    if (movement?.isActive) {
-      return -1
-    }
-    return 0
+    return this.accessor.readSpriteIsActive(actionNumber) ? -1 : 0
   }
 
   /**
@@ -492,53 +352,34 @@ export class AnimationManager {
   }
 
   /**
-   * Get all movement states (active and inactive).
+   * Get all movement states (for testing/inspector).
+   * Returns minimal MovementState objects from moveDefinitions.
+   * Actual animation state is tracked by Animation Worker in shared buffer.
    * @returns Array of MovementState for all defined movements
    */
   getAllMovementStates(): MovementState[] {
-    return Array.from(this.movementStates.values())
+    console.log('[AnimationManager] getAllMovementStates: moveDefinitions size:', this.moveDefinitions.size)
+    const states = Array.from(this.moveDefinitions.values()).map(definition => ({
+      actionNumber: definition.actionNumber,
+      definition,
+    }))
+    console.log('[AnimationManager] getAllMovementStates: returning', states.length, 'states')
+    return states
   }
 
   /**
-   * Get movement state for a specific action slot.
+   * Get movement state for a specific action slot (for testing/inspector).
+   * Returns minimal MovementState from moveDefinition.
+   * Actual animation state is tracked by Animation Worker in shared buffer.
    * @param actionNumber - Action slot 0-7
-   * @returns MovementState if present, otherwise undefined
+   * @returns MovementState if defined, otherwise undefined
    */
   getMovementState(actionNumber: number): MovementState | undefined {
-    return this.movementStates.get(actionNumber)
-  }
-
-  /**
-   * Calculate direction deltas from direction code
-   * Direction: 0=none, 1=up, 2=up-right, 3=right, 4=down-right,
-   *            5=down, 6=down-left, 7=left, 8=up-left
-   * Returns dx, dy in range [-1, 0, 1]
-   */
-  private getDirectionDeltas(direction: number): {
-    deltaX: number
-    deltaY: number
-  } {
-    switch (direction) {
-      case 0: // None
-        return { deltaX: 0, deltaY: 0 }
-      case 1: // Up
-        return { deltaX: 0, deltaY: -1 }
-      case 2: // Up-right
-        return { deltaX: 1, deltaY: -1 }
-      case 3: // Right
-        return { deltaX: 1, deltaY: 0 }
-      case 4: // Down-right
-        return { deltaX: 1, deltaY: 1 }
-      case 5: // Down
-        return { deltaX: 0, deltaY: 1 }
-      case 6: // Down-left
-        return { deltaX: -1, deltaY: 1 }
-      case 7: // Left
-        return { deltaX: -1, deltaY: 0 }
-      case 8: // Up-left
-        return { deltaX: -1, deltaY: -1 }
-      default:
-        return { deltaX: 0, deltaY: 0 }
+    const definition = this.moveDefinitions.get(actionNumber)
+    if (!definition) return undefined
+    return {
+      actionNumber,
+      definition,
     }
   }
 
@@ -546,7 +387,6 @@ export class AnimationManager {
    * Reset all movement states (for program reset)
    */
   reset(): void {
-    this.movementStates.clear()
     this.moveDefinitions.clear()
   }
 }

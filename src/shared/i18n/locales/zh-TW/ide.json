@@ -8,7 +8,8 @@
     "run": "執行",
     "stop": "停止",
     "clear": "清除",
-    "debug": "除錯"
+    "debug": "除錯",
+    "debugBuffer": "緩衝區"
   },
   "output": {
     "title": "執行時輸出",

@@ -15,28 +15,20 @@
  * - Run at fixed 60Hz tick rate
  */
 
-import {
-  MAX_SPRITES,
-  notifyAck,
-  readSyncCommand,
-  SHARED_ANIMATION_BUFFER_BYTES,
-  SyncCommandType,
-  writeSpriteState,
-} from '@/core/animation/sharedAnimationBuffer'
+import { MAX_SPRITES, SyncCommandType } from '@/core/animation/sharedAnimationBuffer'
 import { SHARED_DISPLAY_BUFFER_BYTES } from '@/core/animation/sharedDisplayBuffer'
+import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import { SCREEN_DIMENSIONS } from '@/core/constants'
 import type { MoveDefinition } from '@/core/sprite/types'
 import { logWorker } from '@/shared/logger'
 
 /**
  * Animation Worker command types (Main Thread → Animation Worker via message)
- * Note: Direct sync from Executor Worker uses shared buffer instead of message passing.
+ *
+ * Note: Animation commands (START/STOP/ERASE/SET_POSITION) come from Executor Worker
+ * via direct shared buffer sync, not via postMessage.
  */
 export type AnimationWorkerCommand =
-  | { type: 'START_MOVEMENT'; actionNumber: number; definition: MoveDefinition; startX: number; startY: number }
-  | { type: 'STOP_MOVEMENT'; actionNumbers: number[] }
-  | { type: 'ERASE_MOVEMENT'; actionNumbers: number[] }
-  | { type: 'SET_POSITION'; actionNumber: number; x: number; y: number }
   | { type: 'SET_SHARED_BUFFER'; buffer: SharedArrayBuffer }
   | { type: 'TICK'; deltaTime: number }
 
@@ -50,6 +42,7 @@ interface WorkerMovementState {
   x: number
   y: number
   remainingDistance: number
+  totalDistance: number // Total distance in dots (2 × MOVE distance parameter)
   speedDotsPerSecond: number
   directionDeltaX: number
   directionDeltaY: number
@@ -68,8 +61,7 @@ const MAX_DELTA_TIME_MS = 100 // Cap at 100ms to prevent teleportation
  */
 export class AnimationWorker {
   private movementStates: Map<number, WorkerMovementState> = new Map()
-  private sharedAnimationView: Float64Array | null = null
-  private sharedSyncView: Int32Array | null = null
+  private accessor?: SharedDisplayBufferAccessor
   private tickInterval: number | null = null
   private lastTickTime = 0
   private isRunning = false
@@ -79,23 +71,13 @@ export class AnimationWorker {
   }
 
   /**
-   * Handle message from Executor Worker or Main Thread
+   * Handle message from Main Thread.
+   * Note: Animation commands (START/STOP/ERASE/SET_POSITION) come from Executor Worker
+   * via direct shared buffer sync, not via postMessage.
    */
   handleMessage(command: AnimationWorkerCommand): void {
     logWorker.debug('[AnimationWorker] Received command:', command.type)
     switch (command.type) {
-      case 'START_MOVEMENT':
-        this.handleStartMovement(command.actionNumber, command.definition, command.startX, command.startY)
-        break
-      case 'STOP_MOVEMENT':
-        this.handleStopMovement(command.actionNumbers)
-        break
-      case 'ERASE_MOVEMENT':
-        this.handleEraseMovement(command.actionNumbers)
-        break
-      case 'SET_POSITION':
-        this.handleSetPosition(command.actionNumber, command.x, command.y)
-        break
       case 'SET_SHARED_BUFFER':
         this.handleSetSharedBuffer(command.buffer)
         break
@@ -109,164 +91,29 @@ export class AnimationWorker {
 
   /**
    * Set shared animation buffer (called by Main Thread during initialization)
-   * Extracts both Float64Array view (sprite data) and Int32Array view (sync section).
-   * Supports both standalone animation buffer (264 bytes) and combined display buffer (1620 bytes).
+   * Creates accessor with consistent views for sprite data and sync section.
+   * Expects the combined display buffer (sharedDisplayBuffer.ts).
    */
   private handleSetSharedBuffer(buffer: SharedArrayBuffer): void {
     console.log('[AnimationWorker] handleSetSharedBuffer called, byteLength =', buffer.byteLength)
-    const MIN_BUFFER_BYTES = SHARED_ANIMATION_BUFFER_BYTES
-    if (buffer.byteLength < MIN_BUFFER_BYTES) {
+    if (buffer.byteLength < SHARED_DISPLAY_BUFFER_BYTES) {
       throw new RangeError(
-        `Shared animation buffer too small: ${buffer.byteLength} bytes, need at least ${MIN_BUFFER_BYTES}`
+        `Shared buffer too small: ${buffer.byteLength} bytes, need at least ${SHARED_DISPLAY_BUFFER_BYTES}`
       )
     }
 
-    // Sprite data is always at the beginning (24 floats for 8 sprites)
-    this.sharedAnimationView = new Float64Array(buffer, 0, MAX_SPRITES * 3)
-
-    // Extract Int32Array sync view from the sync section
-    // The sync section can be at different offsets depending on buffer layout:
-    // - Standalone animation buffer (264 bytes): sync at byte 192 (float 24)
-    // - Combined display buffer (1624 bytes): sync at byte 1552 (with padding for alignment)
-    const syncSectionFloats = 9 // command type, action number, params (6), ack
-
-    let syncSectionByteOffset: number
-    if (buffer.byteLength === SHARED_ANIMATION_BUFFER_BYTES) {
-      // Standalone animation buffer: sync section at byte 192 (float 24)
-      syncSectionByteOffset = 24 * 8
-    } else if (buffer.byteLength === SHARED_DISPLAY_BUFFER_BYTES) {
-      // Combined display buffer: sync section at byte 1552
-      syncSectionByteOffset = 1552
-    } else {
-      // Unknown buffer type, try standalone layout
-      syncSectionByteOffset = 24 * 8
-      logWorker.warn('[AnimationWorker] Unknown buffer size:', buffer.byteLength, 'trying standalone layout')
-    }
-
-    // Create Int32Array view of sync section
-    this.sharedSyncView = new Int32Array(buffer, syncSectionByteOffset, syncSectionFloats * 2)
-    logWorker.debug('[AnimationWorker] Direct sync enabled (sync section at byte', syncSectionByteOffset, ')')
-
+    this.accessor = new SharedDisplayBufferAccessor(buffer)
+    logWorker.debug('[AnimationWorker] Direct sync enabled (combined display buffer, sync section at byte 2128)')
     logWorker.debug('[AnimationWorker] Shared animation buffer set, byteLength =', buffer.byteLength)
 
-    // Initialize all sprite slots to inactive
-    if (this.sharedAnimationView) {
-      for (let actionNumber = 0; actionNumber < MAX_SPRITES; actionNumber++) {
-        writeSpriteState(this.sharedAnimationView, actionNumber, 0, 0, false)
-      }
+    // Initialize all sprite slots to inactive with characterType=-1 to mark as uninitialized
+    for (let actionNumber = 0; actionNumber < MAX_SPRITES; actionNumber++) {
+      this.accessor.writeSpriteState(actionNumber, 0, 0, false, false, 0, 0, 0, 0, 0, 0, -1, 0)
     }
 
     // Start tick loop to poll for sync commands from Executor Worker
-    // This needs to run even when no movements are active, to handle SET_POSITION and other commands
     if (!this.isRunning) {
       this.startTickLoop()
-    }
-  }
-
-  /**
-   * Start movement for a sprite (MOVE command)
-   */
-  private handleStartMovement(
-    actionNumber: number,
-    definition: MoveDefinition,
-    startX: number,
-    startY: number
-  ): void {
-    logWorker.debug('[AnimationWorker] START_MOVEMENT:', { actionNumber, startX, startY, definition })
-
-    // Calculate direction deltas
-    const { deltaX, deltaY } = this.getDirectionDeltas(definition.direction)
-
-    // Calculate speed: 60/C dots per second
-    const speedDotsPerSecond = definition.speed === 0 ? 60 / 256 : 60 / definition.speed
-
-    // Calculate total distance: 2×D dots
-    const totalDistance = 2 * definition.distance
-
-    const movementState: WorkerMovementState = {
-      actionNumber,
-      definition,
-      x: startX,
-      y: startY,
-      remainingDistance: totalDistance,
-      speedDotsPerSecond,
-      directionDeltaX: deltaX,
-      directionDeltaY: deltaY,
-      isActive: true,
-      currentFrameIndex: 0,
-      frameCounter: 0,
-    }
-
-    this.movementStates.set(actionNumber, movementState)
-
-    // Write initial position to shared buffer
-    if (this.sharedAnimationView) {
-      writeSpriteState(this.sharedAnimationView, actionNumber, startX, startY, true)
-    }
-
-    // Start tick loop if not already running
-    if (!this.isRunning) {
-      this.startTickLoop()
-    }
-  }
-
-  /**
-   * Stop movement for sprites (CUT command)
-   */
-  private handleStopMovement(actionNumbers: number[]): void {
-    logWorker.debug('[AnimationWorker] STOP_MOVEMENT:', actionNumbers)
-
-    for (const actionNumber of actionNumbers) {
-      const movement = this.movementStates.get(actionNumber)
-      if (movement) {
-        movement.isActive = false
-        // Write inactive state to shared buffer
-        if (this.sharedAnimationView) {
-          writeSpriteState(this.sharedAnimationView, actionNumber, movement.x, movement.y, false)
-        }
-      }
-    }
-  }
-
-  /**
-   * Erase movement for sprites (ERA command)
-   */
-  private handleEraseMovement(actionNumbers: number[]): void {
-    logWorker.debug('[AnimationWorker] ERASE_MOVEMENT:', actionNumbers)
-
-    for (const actionNumber of actionNumbers) {
-      this.movementStates.delete(actionNumber)
-      // Write inactive state to shared buffer
-      if (this.sharedAnimationView) {
-        writeSpriteState(this.sharedAnimationView, actionNumber, 0, 0, false)
-      }
-    }
-
-    // Only stop tick loop if NOT using direct sync and no active movements
-    if (
-      !this.sharedSyncView &&
-      (this.movementStates.size === 0 || !Array.from(this.movementStates.values()).some(m => m.isActive))
-    ) {
-      this.stopTickLoop()
-    }
-  }
-
-  /**
-   * Set sprite position (POSITION command)
-   */
-  private handleSetPosition(actionNumber: number, x: number, y: number): void {
-    logWorker.debug('[AnimationWorker] SET_POSITION:', { actionNumber, x, y })
-
-    const movement = this.movementStates.get(actionNumber)
-    if (movement) {
-      movement.x = x
-      movement.y = y
-    }
-
-    // Write position to shared buffer
-    if (this.sharedAnimationView) {
-      const isActive = movement?.isActive ?? false
-      writeSpriteState(this.sharedAnimationView, actionNumber, x, y, isActive)
     }
   }
 
@@ -275,12 +122,10 @@ export class AnimationWorker {
    * Processes any pending command and writes acknowledgment when complete.
    */
   private pollSyncCommands(): void {
-    if (!this.sharedAnimationView || !this.sharedSyncView) return
+    if (!this.accessor) return
 
-    const command = readSyncCommand(this.sharedAnimationView)
+    const command = this.accessor.readSyncCommand()
     if (!command) return // No pending command
-
-    logWorker.debug('[AnimationWorker] Sync command from buffer:', command.commandType, command.actionNumber)
 
     try {
       switch (command.commandType) {
@@ -299,18 +144,20 @@ export class AnimationWorker {
         case SyncCommandType.SET_POSITION:
           this.handleSetPositionFromSync(command.actionNumber, command.params.startX, command.params.startY)
           break
+        case SyncCommandType.CLEAR_ALL_MOVEMENTS:
+          console.log('[AnimationWorker] CLEAR_ALL_MOVEMENTS: clearing all sprite data')
+          this.handleClearAllMovementsFromSync()
+          // Clear the command immediately after processing so it's not re-read every tick
+          this.accessor.clearSyncCommand()
+          break
       }
 
       // Write acknowledgment
-      if (this.sharedSyncView) {
-        notifyAck(this.sharedSyncView)
-      }
+      this.accessor.notifyAck()
     } catch (error) {
-      logWorker.error('[AnimationWorker] Error processing sync command:', error)
+      console.error('[AnimationWorker] Error processing sync command:', error)
       // Still write ack to prevent Executor Worker from hanging
-      if (this.sharedSyncView) {
-        notifyAck(this.sharedSyncView)
-      }
+      this.accessor.notifyAck()
     }
   }
 
@@ -328,7 +175,7 @@ export class AnimationWorker {
       priority: number
     }
   ): void {
-    logWorker.debug('[AnimationWorker] START_MOVEMENT from sync:', { actionNumber, params })
+    console.log('[AnimationWorker] START_MOVEMENT from sync:', { actionNumber, params })
 
     const { deltaX, deltaY } = this.getDirectionDeltas(params.direction)
     const speedDotsPerSecond = params.speed === 0 ? 60 / 256 : 60 / params.speed
@@ -350,6 +197,7 @@ export class AnimationWorker {
       x: params.startX,
       y: params.startY,
       remainingDistance: totalDistance,
+      totalDistance,
       speedDotsPerSecond,
       directionDeltaX: deltaX,
       directionDeltaY: deltaY,
@@ -360,9 +208,25 @@ export class AnimationWorker {
 
     this.movementStates.set(actionNumber, movementState)
 
+    console.log('[AnimationWorker] Movement state created:', { actionNumber, x: params.startX, y: params.startY, isActive: true })
+
     // Write initial position to shared buffer
-    if (this.sharedAnimationView) {
-      writeSpriteState(this.sharedAnimationView, actionNumber, params.startX, params.startY, true)
+    if (this.accessor) {
+      this.accessor.writeSpriteState(
+        actionNumber,
+        params.startX,
+        params.startY,
+        true, // isActive = true (moving)
+        true, // isVisible = true (becomes visible on MOVE)
+        0, // frameIndex
+        totalDistance, // remainingDistance
+        totalDistance, // totalDistance
+        params.direction,
+        params.speed,
+        params.priority,
+        definition.characterType,
+        definition.colorCombination
+      )
     }
 
     // Start tick loop if not already running
@@ -378,12 +242,25 @@ export class AnimationWorker {
     logWorker.debug('[AnimationWorker] STOP_MOVEMENT from sync:', actionNumber)
 
     const movement = this.movementStates.get(actionNumber)
-    if (movement) {
+    if (movement && this.accessor) {
       movement.isActive = false
-      // Write inactive state to shared buffer
-      if (this.sharedAnimationView) {
-        writeSpriteState(this.sharedAnimationView, actionNumber, movement.x, movement.y, false)
-      }
+      // Write inactive state to shared buffer with all animation parameters
+      // isVisible stays true after CUT (sprite remains visible but stops moving)
+      this.accessor.writeSpriteState(
+        actionNumber,
+        movement.x,
+        movement.y,
+        false, // isActive = false (stopped)
+        true, // isVisible = true (remains visible after CUT)
+        movement.currentFrameIndex,
+        movement.remainingDistance,
+        movement.totalDistance,
+        movement.definition.direction,
+        movement.definition.speed,
+        movement.definition.priority,
+        movement.definition.characterType,
+        movement.definition.colorCombination
+      )
     }
   }
 
@@ -393,15 +270,16 @@ export class AnimationWorker {
   private handleEraseMovementFromSync(actionNumber: number): void {
     logWorker.debug('[AnimationWorker] ERASE_MOVEMENT from sync:', actionNumber)
 
+    const movement = this.movementStates.get(actionNumber)
     this.movementStates.delete(actionNumber)
-    // Write inactive state to shared buffer
-    if (this.sharedAnimationView) {
-      writeSpriteState(this.sharedAnimationView, actionNumber, 0, 0, false)
+    // Write inactive state to shared buffer (reset all values, characterType=-1 marks as uninitialized)
+    if (this.accessor) {
+      this.accessor.writeSpriteState(actionNumber, 0, 0, false, false, 0, 0, 0, 0, 0, 0, -1, 0)
     }
 
     // Only stop tick loop if NOT using direct sync and no active movements
     if (
-      !this.sharedSyncView &&
+      !this.accessor &&
       (this.movementStates.size === 0 || !Array.from(this.movementStates.values()).some(m => m.isActive))
     ) {
       this.stopTickLoop()
@@ -412,7 +290,7 @@ export class AnimationWorker {
    * Handle SET_POSITION from sync buffer.
    */
   private handleSetPositionFromSync(actionNumber: number, x: number, y: number): void {
-    logWorker.debug('[AnimationWorker] SET_POSITION from sync:', { actionNumber, x, y })
+    console.log('[AnimationWorker] SET_POSITION from sync:', { actionNumber, x, y })
 
     const movement = this.movementStates.get(actionNumber)
     if (movement) {
@@ -420,12 +298,52 @@ export class AnimationWorker {
       movement.y = y
     }
 
-    // Write position to shared buffer
-    if (this.sharedAnimationView) {
+    // Write position to shared buffer with all animation parameters
+    if (this.accessor) {
       const isActive = movement?.isActive ?? false
-      writeSpriteState(this.sharedAnimationView, actionNumber, x, y, isActive)
+      const isVisible = movement ? true : false // isVisible is true if movement exists (has been MOVE'd without ERA)
+      const frameIndex = movement?.currentFrameIndex ?? 0
+      const def = movement?.definition
+      this.accessor.writeSpriteState(
+        actionNumber,
+        x,
+        y,
+        isActive,
+        isVisible,
+        frameIndex,
+        movement?.remainingDistance ?? 0,
+        movement?.totalDistance ?? 0,
+        def?.direction ?? 0,
+        def?.speed ?? 0,
+        def?.priority ?? 0,
+        def?.characterType ?? 0,
+        def?.colorCombination ?? 0
+      )
+    }
+
+    console.log('[AnimationWorker] SET_POSITION state written to buffer')
+  }
+
+  /**
+   * Handle CLEAR_ALL_MOVEMENTS from sync buffer.
+   * Called when user clicks CLEAR button - clears all internal movement states and sprite buffer.
+   */
+  private handleClearAllMovementsFromSync(): void {
+    console.log('[AnimationWorker] CLEAR_ALL_MOVEMENTS: clearing', this.movementStates.size, 'movement states and all sprite data')
+
+    // Clear all internal movement states
+    this.movementStates.clear()
+
+    // Clear sprite buffer (single writer: only AnimationWorker writes to sprite portion)
+    // This sets all positions to 0, isActive=false, isVisible=false, characterType=-1
+    if (this.accessor) {
+      this.accessor.clearAllSprites()
     }
   }
+
+  /**
+   * Start the tick loop (60Hz fixed)
+   */
 
   /**
    * Start the tick loop (60Hz fixed)
@@ -467,12 +385,10 @@ export class AnimationWorker {
    * This is the core animation loop
    */
   private tick(deltaTime: number): void {
-    if (!this.sharedAnimationView) return
+    if (!this.accessor) return
 
     // Poll for sync commands from Executor Worker (direct communication)
-    if (this.sharedSyncView) {
-      this.pollSyncCommands()
-    }
+    this.pollSyncCommands()
 
     // Cap deltaTime to prevent teleportation
     const cappedDeltaTime = Math.min(deltaTime, MAX_DELTA_TIME_MS)
@@ -485,8 +401,23 @@ export class AnimationWorker {
           completed.push(movement.actionNumber)
         }
         movement.isActive = false
-        // Write inactive state to shared buffer
-        writeSpriteState(this.sharedAnimationView, movement.actionNumber, movement.x, movement.y, false)
+        // Write inactive state to shared buffer with all animation parameters
+        // isVisible stays true (sprite remains visible even after movement completes)
+        this.accessor.writeSpriteState(
+          movement.actionNumber,
+          movement.x,
+          movement.y,
+          false, // isActive = false (not moving)
+          true, // isVisible = true (remains visible after movement completes)
+          movement.currentFrameIndex,
+          movement.remainingDistance,
+          0, // totalDistance (computed from definition)
+          movement.definition.direction,
+          movement.definition.speed,
+          movement.definition.priority,
+          movement.definition.characterType,
+          movement.definition.colorCombination
+        )
         continue
       }
 
@@ -513,20 +444,49 @@ export class AnimationWorker {
         movement.currentFrameIndex++
       }
 
-      // Write position to shared buffer (SINGLE WRITER)
-      writeSpriteState(this.sharedAnimationView, movement.actionNumber, movement.x, movement.y, movement.isActive)
+      // Write position to shared buffer (SINGLE WRITER) with all animation parameters
+      // isVisible stays true throughout movement
+      this.accessor.writeSpriteState(
+        movement.actionNumber,
+        movement.x,
+        movement.y,
+        movement.isActive,
+        true, // isVisible = true (sprite is visible during movement)
+        movement.currentFrameIndex,
+        movement.remainingDistance,
+        movement.totalDistance,
+        movement.definition.direction,
+        movement.definition.speed,
+        movement.definition.priority,
+        movement.definition.characterType,
+        movement.definition.colorCombination
+      )
 
       // Check if movement is complete
       if (movement.remainingDistance <= 0) {
         completed.push(movement.actionNumber)
         movement.isActive = false
-        writeSpriteState(this.sharedAnimationView, movement.actionNumber, movement.x, movement.y, false)
+        this.accessor.writeSpriteState(
+          movement.actionNumber,
+          movement.x,
+          movement.y,
+          false, // isActive = false (movement complete)
+          true, // isVisible = true (remains visible after movement completes)
+          movement.currentFrameIndex,
+          0, // remainingDistance (completed)
+          movement.totalDistance,
+          movement.definition.direction,
+          movement.definition.speed,
+          movement.definition.priority,
+          movement.definition.characterType,
+          movement.definition.colorCombination
+        )
       }
     }
 
     // Only stop tick loop if NOT using direct sync
     // When using direct sync, the loop must keep running to poll for commands (SET_POSITION, etc.)
-    if (!this.sharedSyncView && !Array.from(this.movementStates.values()).some(m => m.isActive)) {
+    if (!this.accessor && !Array.from(this.movementStates.values()).some(m => m.isActive)) {
       this.stopTickLoop()
     }
   }
@@ -574,13 +534,13 @@ export class AnimationWorker {
   reset(): void {
     this.stopTickLoop()
     this.movementStates.clear()
-    if (this.sharedAnimationView) {
+    if (this.accessor) {
       for (let actionNumber = 0; actionNumber < MAX_SPRITES; actionNumber++) {
-        writeSpriteState(this.sharedAnimationView, actionNumber, 0, 0, false)
+        this.accessor.writeSpriteState(actionNumber, 0, 0, false, false, 0, 0, 0, 0, 0, 0, -1, 0)
       }
     }
     // Restart tick loop if using direct sync, to keep polling for commands
-    if (this.sharedSyncView && !this.isRunning) {
+    if (this.accessor && !this.isRunning) {
       this.startTickLoop()
     }
   }
@@ -590,6 +550,6 @@ export class AnimationWorker {
    */
   terminate(): void {
     this.reset()
-    this.sharedAnimationView = null
+    this.accessor = undefined
   }
 }

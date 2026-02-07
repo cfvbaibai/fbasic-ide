@@ -1,4 +1,11 @@
-## Animation Frame System
+# Animation System - Historical Documentation
+
+> **⚠️ SUPERSEDED**: This document describes the animation system prior to the Animation Worker Refactor (2026-02-06).
+> The current architecture uses a **Single Writer Pattern** where the Animation Worker is the only writer to the shared animation buffer.
+> Main thread is **read-only** for animation state.
+> See `docs/teams/platform-team.md` and `docs/reference/shared-display-buffer.md` for the current architecture.
+
+## Animation Frame System (Historical)
 
 ### Frame Rate and Timing
 

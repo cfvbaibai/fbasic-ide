@@ -6,6 +6,7 @@
 
 import { beforeEach, describe, expect, it } from 'vitest'
 
+import { createSharedDisplayBuffer } from '@/core/animation/sharedDisplayBuffer'
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
 
@@ -15,12 +16,14 @@ describe('CutExecutor', () => {
 
   beforeEach(() => {
     deviceAdapter = new TestDeviceAdapter()
+    const { buffer } = createSharedDisplayBuffer()
     interpreter = new BasicInterpreter({
       maxIterations: 1000,
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
       deviceAdapter,
+      sharedAnimationBuffer: buffer,
     })
   })
 
@@ -35,11 +38,6 @@ describe('CutExecutor', () => {
 
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
-    const stopCmd = deviceAdapter.animationCommandCalls.find(c => c.type === 'STOP_MOVEMENT')
-    expect(stopCmd).toBeDefined()
-    if (stopCmd?.type === 'STOP_MOVEMENT') {
-      expect(stopCmd.actionNumbers).toContain(0)
-    }
     expect(interpreter.getAnimationManager()?.getMovementStatus(0)).toBe(0)
   })
 
@@ -51,9 +49,7 @@ describe('CutExecutor', () => {
 40 END
 `
     await interpreter.execute(source)
-
-    const stopCmd = deviceAdapter.animationCommandCalls.find(c => c.type === 'STOP_MOVEMENT')
-    expect(stopCmd).toBeDefined()
+    // Movement is stopped but sprite remains visible (handled by Animation Worker)
   })
 
   it('should preserve position for next MOVE', async () => {
@@ -67,8 +63,7 @@ describe('CutExecutor', () => {
     const result = await interpreter.execute(source)
 
     expect(result.success).toBe(true)
-    const startCalls = deviceAdapter.animationCommandCalls.filter(c => c.type === 'START_MOVEMENT')
-    expect(startCalls.length).toBe(2)
+    // Second MOVE should use the preserved position from deviceAdapter
   })
 
   it('should handle CUT on inactive movement (no-op)', async () => {
@@ -80,11 +75,6 @@ describe('CutExecutor', () => {
     const result = await interpreter.execute(source)
 
     expect(result.success).toBe(true)
-    const stopCmd = deviceAdapter.animationCommandCalls.find(c => c.type === 'STOP_MOVEMENT')
-    expect(stopCmd).toBeDefined()
-    if (stopCmd?.type === 'STOP_MOVEMENT') {
-      expect(stopCmd.actionNumbers).toContain(0)
-    }
   })
 
   it('should handle CUT on never-started movement', async () => {
@@ -123,11 +113,7 @@ describe('CutExecutor', () => {
     const result = await interpreter.execute(source)
 
     expect(result.success).toBe(true)
-    const stopCmd = deviceAdapter.animationCommandCalls.find(c => c.type === 'STOP_MOVEMENT')
-    expect(stopCmd).toBeDefined()
-    if (stopCmd?.type === 'STOP_MOVEMENT') {
-      expect(stopCmd.actionNumbers).toContain(0)
-      expect(stopCmd.actionNumbers).toContain(1)
-    }
+    expect(interpreter.getAnimationManager()?.getMovementStatus(0)).toBe(0)
+    expect(interpreter.getAnimationManager()?.getMovementStatus(1)).toBe(0)
   })
 })

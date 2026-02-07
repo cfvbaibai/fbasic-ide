@@ -9,6 +9,7 @@ import type {
   DecodedScreenState,
   SharedDisplayViews,
 } from '@/core/animation/sharedDisplayBuffer'
+import type { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import type { ScreenCell } from '@/core/interfaces'
 import type { MovementState, SpriteState } from '@/core/sprite/types'
 
@@ -26,15 +27,19 @@ export interface ScreenContextValue {
   cgenMode: Ref<number>
   spriteStates: Ref<SpriteState[]>
   spriteEnabled: Ref<boolean>
-  movementStates: Ref<MovementState[]>
+  /** Movement states for animated sprites (DEF MOVE) - optional, read from shared buffer instead */
+  movementStates?: Ref<MovementState[] | undefined>
   /** Current sprite positions from shared buffer (updated each frame by animation loop). */
   movementPositionsFromBuffer: Ref<Map<number, { x: number; y: number }>>
   externalFrontSpriteNodes: Ref<Map<number, unknown>>
   externalBackSpriteNodes: Ref<Map<number, unknown>>
-  sharedAnimationView: Ref<Float64Array | undefined>
   sharedDisplayViews: Ref<SharedDisplayViews | undefined>
+  /** Shared animation buffer accessor for reading sprite positions and animation state. */
+  sharedDisplayBufferAccessor: SharedDisplayBufferAccessor
   /** Shared animation buffer (SharedArrayBuffer) for Animation Worker. */
   sharedAnimationBuffer: Ref<SharedArrayBuffer | undefined>
+  /** Shared animation view (Float64Array) for reading sprite positions and isActive */
+  sharedAnimationView?: Ref<Float64Array | undefined>
   /** Shared joystick buffer (main thread writes, workers read). */
   sharedJoystickBuffer: Ref<SharedArrayBuffer | undefined>
   setDecodedScreenState: (decoded: DecodedScreenState) => void

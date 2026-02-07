@@ -72,16 +72,6 @@ export function generateMovements(count: number, speed: number): MovementState[]
         priority: 0,
         colorCombination: i % 4,
       },
-      startX: clampedX,
-      startY: clampedY,
-      remainingDistance: 100,
-      totalDistance: 100,
-      speedDotsPerSecond,
-      directionDeltaX: dir.deltaX,
-      directionDeltaY: dir.deltaY,
-      isActive: true,
-      currentFrameIndex: 0,
-      frameCounter: 0,
     })
   }
 

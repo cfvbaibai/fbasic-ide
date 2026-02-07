@@ -49,7 +49,7 @@ const {
   cgenMode,
   spriteStates,
   spriteEnabled,
-  movementStates,
+  // movementStates removed - read from shared buffer instead
   movementPositionsFromBuffer,
   frontSpriteNodes,
   backSpriteNodes,
@@ -60,9 +60,10 @@ const {
   getParserCapabilities,
   getHighlighterCapabilities,
   toggleDebugMode,
+  debugBuffer,
   sendStickEvent,
   sendStrigEvent,
-  sharedAnimationView,
+  sharedDisplayBufferAccessor,
   sharedAnimationBuffer,
   sharedDisplayViews,
   sharedJoystickBuffer,
@@ -86,12 +87,12 @@ provideScreenContext({
   cgenMode,
   spriteStates,
   spriteEnabled,
-  movementStates,
+  // movementStates removed - read from shared buffer instead
   movementPositionsFromBuffer,
   externalFrontSpriteNodes: frontSpriteNodes,
   externalBackSpriteNodes: backSpriteNodes,
-  sharedAnimationView: ref(sharedAnimationView),
   sharedDisplayViews: ref(sharedDisplayViews),
+  sharedDisplayBufferAccessor,
   sharedAnimationBuffer: ref(sharedAnimationBuffer),
   sharedJoystickBuffer: ref(sharedJoystickBuffer),
   setDecodedScreenState,
@@ -163,6 +164,7 @@ onMounted(() => {
                 @stop="stopCode"
                 @clear="clearOutput"
                 @toggle-debug="toggleDebugMode"
+                @debug-buffer="debugBuffer"
               />
             </div>
           </template>
@@ -211,8 +213,8 @@ onMounted(() => {
             :cgen-mode="cgenMode"
             :sprite-states="spriteStates"
             :sprite-enabled="spriteEnabled"
-            :movement-states="movementStates"
             :movement-positions-from-buffer="movementPositionsFromBuffer"
+            :shared-display-buffer-accessor="sharedDisplayBufferAccessor"
           />
         </div>
       </div>

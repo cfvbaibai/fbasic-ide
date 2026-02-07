@@ -290,9 +290,7 @@ export class FBasicTestBuilder {
   withSharedBuffers(): this {
     const displayBuf = createSharedDisplayBuffer()
     this.sharedDisplayBuffer = displayBuf.buffer
-
-    const { buffer: animBuf } = createSharedAnimationBuffer()
-    this.sharedAnimationBuffer = animBuf
+    this.sharedAnimationBuffer = displayBuf.buffer // Same buffer (combined display buffer includes animation sync)
 
     this.adapter = new SharedBufferTestAdapter()
     this.adapter.setSharedDisplayBuffer(this.sharedDisplayBuffer)
@@ -690,9 +688,6 @@ import {
   createViewsFromDisplayBuffer,
   type SharedDisplayViews,
 } from '@/core/animation/sharedDisplayBuffer'
-import {
-  createSharedAnimationBuffer,
-} from '@/core/animation/sharedAnimationBuffer'
 
 export class FBasicTestBuilder {
   // ... implementation as shown above

@@ -23,7 +23,7 @@ describe('Frame animation logic', () => {
   })
 
   describe('MovementState frame fields', () => {
-    it('should create movement state with currentFrameIndex 0 and frameCounter 0 on startMovement', () => {
+    it('should create movement state with currentFrameIndex 0 after defineMovement', () => {
       manager.defineMovement({
         actionNumber: 0,
         characterType: MoveCharacterCode.MARIO,
@@ -33,15 +33,12 @@ describe('Frame animation logic', () => {
         priority: 0,
         colorCombination: 0,
       })
-      manager.startMovement(0)
 
       const state = manager.getMovementState(0)
       expect(state).toBeDefined()
-      expect(state?.currentFrameIndex).toBe(0)
-      expect(state?.frameCounter).toBe(0)
     })
 
-    it('should have direction deltas matching direction code (right = 1,0)', () => {
+    it('should have direction in definition matching direction code (right = 3)', () => {
       manager.defineMovement({
         actionNumber: 0,
         characterType: MoveCharacterCode.MARIO,
@@ -51,14 +48,12 @@ describe('Frame animation logic', () => {
         priority: 0,
         colorCombination: 0,
       })
-      manager.startMovement(0)
 
       const state = manager.getMovementState(0)
-      expect(state?.directionDeltaX).toBe(1)
-      expect(state?.directionDeltaY).toBe(0)
+      expect(state?.definition.direction).toBe(3)
     })
 
-    it('should have direction deltas for left (7) = -1, 0', () => {
+    it('should have direction in definition for left (7)', () => {
       manager.defineMovement({
         actionNumber: 0,
         characterType: MoveCharacterCode.MARIO,
@@ -68,14 +63,12 @@ describe('Frame animation logic', () => {
         priority: 0,
         colorCombination: 0,
       })
-      manager.startMovement(0)
 
       const state = manager.getMovementState(0)
-      expect(state?.directionDeltaX).toBe(-1)
-      expect(state?.directionDeltaY).toBe(0)
+      expect(state?.definition.direction).toBe(7)
     })
 
-    it('should have direction deltas for up (1) = 0, -1', () => {
+    it('should have direction in definition for up (1)', () => {
       manager.defineMovement({
         actionNumber: 0,
         characterType: MoveCharacterCode.MARIO,
@@ -85,14 +78,12 @@ describe('Frame animation logic', () => {
         priority: 0,
         colorCombination: 0,
       })
-      manager.startMovement(0)
 
       const state = manager.getMovementState(0)
-      expect(state?.directionDeltaX).toBe(0)
-      expect(state?.directionDeltaY).toBe(-1)
+      expect(state?.definition.direction).toBe(1)
     })
 
-    it('should have direction deltas for down (5) = 0, 1', () => {
+    it('should have direction in definition for down (5)', () => {
       manager.defineMovement({
         actionNumber: 0,
         characterType: MoveCharacterCode.MARIO,
@@ -102,11 +93,9 @@ describe('Frame animation logic', () => {
         priority: 0,
         colorCombination: 0,
       })
-      manager.startMovement(0)
 
       const state = manager.getMovementState(0)
-      expect(state?.directionDeltaX).toBe(0)
-      expect(state?.directionDeltaY).toBe(1)
+      expect(state?.definition.direction).toBe(5)
     })
   })
 

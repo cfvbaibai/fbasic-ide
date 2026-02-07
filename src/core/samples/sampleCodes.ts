@@ -194,6 +194,27 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 130 END`,
   },
 
+  spriteSimpleMove: {
+    name: 'Simple MOVE Test (DEBUG)',
+    description: 'Minimal DEF MOVE + POSITION + MOVE test - loop keeps program alive for animation',
+    category: 'debug',
+    code: `10 CLS
+20 SPRITE ON
+30 PRINT "Simple MOVE Test"
+40 DEF MOVE(0)=SPRITE(0,3,15,60,0,0)
+50 POSITION 0,128,120
+60 MOVE 0
+70 PRINT "Movement started"
+80 PRINT "Watch sprite animate..."
+90 ' Wait for movement to complete (MOVE(0) returns 0 when done)
+100 FOR I = 1 TO 200
+110 IF MOVE(0)=0 THEN PRINT "Done!": GOTO 140
+120 PAUSE 1
+130 NEXT
+140 PRINT "Movement complete"
+150 END`,
+  },
+
   spriteInteractive: {
     name: 'Interactive Sprites',
     description: 'Control sprites with joystick - hold DPAD to move',

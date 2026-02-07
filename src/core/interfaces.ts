@@ -94,9 +94,6 @@ export interface BasicDeviceAdapter {
     options?: { variableCount?: number; isLinput?: boolean }
   ): Promise<string[]>
 
-  // === ANIMATION COMMANDS ===
-  sendAnimationCommand?(command: AnimationCommand): void
-
   // === SOUND OUTPUT ===
   /**
    * Play sound using F-BASIC PLAY music DSL
@@ -104,37 +101,6 @@ export interface BasicDeviceAdapter {
    */
   playSound?(musicString: string): void
 }
-
-/**
- * Animation command types for real-time communication from web worker to main thread
- */
-export type AnimationCommand =
-  | {
-      type: 'START_MOVEMENT'
-      actionNumber: number
-      definition: MoveDefinition
-      startX: number
-      startY: number
-    }
-  | {
-      type: 'STOP_MOVEMENT'
-      actionNumbers: number[]
-      positions?: Array<{ actionNumber: number; x: number; y: number; remainingDistance: number }>
-    }
-  | { type: 'ERASE_MOVEMENT'; actionNumbers: number[] }
-  | {
-      type: 'UPDATE_MOVEMENT_POSITION'
-      actionNumber: number
-      x: number
-      y: number
-      remainingDistance: number
-    }
-  | {
-      type: 'SET_POSITION'
-      actionNumber: number
-      x: number
-      y: number
-    }
 
 /**
  * Configuration for the BASIC interpreter
@@ -164,7 +130,7 @@ export interface ExecutionResult {
   executionTime: number
   spriteStates?: SpriteState[] // Sprite states from DEF SPRITE and SPRITE commands
   spriteEnabled?: boolean // Whether sprite display is enabled (SPRITE ON/OFF)
-  movementStates?: MovementState[] // Movement states from DEF MOVE and MOVE commands
+  // movementStates removed - read from shared buffer instead
 }
 
 /**
@@ -266,7 +232,6 @@ export type ServiceWorkerMessageType =
   | 'READY'
   | 'STRIG_EVENT'
   | 'STICK_EVENT'
-  | 'ANIMATION_COMMAND'
   | 'SET_SHARED_ANIMATION_BUFFER'
   | 'SET_SHARED_JOYSTICK_BUFFER'
   | 'REQUEST_INPUT'
@@ -392,12 +357,6 @@ export interface StrigEventMessage extends ServiceWorkerMessage {
   }
 }
 
-// Animation command message - sent from web worker to main thread during execution
-export interface AnimationCommandMessage extends ServiceWorkerMessage {
-  type: 'ANIMATION_COMMAND'
-  data: AnimationCommand
-}
-
 // STICK event message - sent from main thread to service worker
 export interface StickEventMessage extends ServiceWorkerMessage {
   type: 'STICK_EVENT'
@@ -514,7 +473,6 @@ export type AnyServiceWorkerMessage =
   | ErrorMessage
   | InitMessage
   | ReadyMessage
-  | AnimationCommandMessage
   | SetSharedAnimationBufferMessage
   | SetSharedJoystickBufferMessage
   | RequestInputMessage

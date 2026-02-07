@@ -54,12 +54,11 @@ export function useBasicIdeWorkerIntegration(
     backdropColor: state.backdropColor,
     spritePalette: state.spritePalette,
     cgenMode: state.cgenMode,
-    movementStates: state.movementStates,
+    // movementStates removed - read from shared buffer instead
     frontSpriteNodes: state.frontSpriteNodes,
     backSpriteNodes: state.backSpriteNodes,
     spriteActionQueues: state.spriteActionQueues,
     webWorkerManager,
-    sharedAnimationView: screen.sharedAnimationView,
     sharedDisplayViews: screen.sharedDisplayViews,
     scheduleRender: screen.scheduleRender,
     scheduleRenderForScreenChanged: screen.scheduleRenderForScreenChanged,

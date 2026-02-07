@@ -6,7 +6,6 @@
  */
 
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
-import type { AnimationCommand } from '@/core/interfaces'
 
 export interface SimulateAnimationFrameState {
   actionNumber: number
@@ -17,7 +16,7 @@ export interface SimulateAnimationFrameState {
 
 export class MockDeviceAdapter extends TestDeviceAdapter {
   /**
-   * Simulate frontend sending a position update (e.g. UPDATE_MOVEMENT_POSITION).
+   * Simulate frontend sending a position update.
    * Updates getSpritePosition() so XPOS/YPOS return this position.
    */
   simulatePositionUpdate(actionNumber: number, position: { x: number; y: number }): void {
@@ -38,28 +37,5 @@ export class MockDeviceAdapter extends TestDeviceAdapter {
    */
   simulateAnimationFrame(state: SimulateAnimationFrameState): void {
     this.setSpritePositionForTest(state.actionNumber, state.currentX, state.currentY)
-  }
-
-  /** All START_MOVEMENT commands sent to frontend */
-  getStartMovementCalls(): AnimationCommand[] {
-    return this.animationCommandCalls.filter(
-      (c): c is AnimationCommand & { type: 'START_MOVEMENT' } => c.type === 'START_MOVEMENT'
-    )
-  }
-
-  /** All SET_POSITION commands sent to frontend */
-  getPositionCalls(): AnimationCommand[] {
-    return this.animationCommandCalls.filter(
-      (c): c is AnimationCommand & { type: 'SET_POSITION' } => c.type === 'SET_POSITION'
-    )
-  }
-
-  /** Last animation command sent (for assertions on type, actionNumber, x, y, etc.) */
-  get lastMessage(): AnimationCommand {
-    const len = this.animationCommandCalls.length
-    if (len === 0) {
-      throw new Error('MockDeviceAdapter: no animation commands sent yet')
-    }
-    return this.animationCommandCalls[len - 1]!
   }
 }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Konva from 'konva'
-import { computed, onDeactivated, onUnmounted, ref, toValue, useTemplateRef, watch } from 'vue'
+import { computed, onDeactivated, onUnmounted, ref, useTemplateRef, watch } from 'vue'
 
 import {
   readScreenStateFromShared,
@@ -18,8 +18,6 @@ import {
   type KonvaScreenLayers,
   renderAllScreenLayers,
 } from '@/features/ide/composables/useKonvaScreenRenderer'
-import { useMovementStateSync } from '@/features/ide/composables/useMovementStateSync'
-import { useRenderQueue } from '@/features/ide/composables/useRenderQueue'
 import { useScreenAnimationLoopRenderOnly } from '@/features/ide/composables/useScreenAnimationLoopRenderOnly'
 import { useScreenContext } from '@/features/ide/composables/useScreenContext'
 import { useScreenZoom } from '@/features/ide/composables/useScreenZoom'
@@ -180,7 +178,16 @@ async function render(): Promise<void> {
     }
 
     // Determine if background should be cached (static when no active movements)
-    const hasActiveMovements = localMovementStates.value.some(m => m.isActive)
+    // Pure Buffer Read: check isActive directly from shared buffer
+    const hasActiveMovements = (() => {
+      if (!ctx.sharedDisplayBufferAccessor) return false
+      for (let actionNumber = 0; actionNumber < 8; actionNumber++) {
+        if (ctx.sharedDisplayBufferAccessor.readSpriteIsActive(actionNumber)) {
+          return true
+        }
+      }
+      return false
+    })()
     const backgroundShouldCache = !hasActiveMovements
 
     // Render sprites using Konva
@@ -190,38 +197,39 @@ async function render(): Promise<void> {
       backgroundLayer: layers.value.backgroundLayer as Konva.Layer | null, // Now populated from Canvas2D
       spriteFrontLayer: layers.value.spriteFrontLayer as Konva.Layer | null,
     }
-    // Use context count when ahead of local (log: all 8 START_MOVEMENTs in one rAF; sync watch can run after render())
-    const ctxMovementCount = ctx.movementStates.value?.length ?? 0
-    const localMovementCount = localMovementStates.value.length
-    const movementCount = Math.max(ctxMovementCount, localMovementCount)
+
+    // Read movement states from shared buffer (DEF MOVE definitions are stored there)
+    // This is the source of truth for which sprites should be rendered
+    const movementsFromBuffer = ctx.sharedDisplayBufferAccessor?.readAllMovementStates() ?? []
+    const movementCount = movementsFromBuffer.length
     const spriteNodeCount = frontSpriteNodes.value.size + backSpriteNodes.value.size
     const spriteStateCount = ctx.spriteStates.value?.length ?? 0
     const needSpriteBuild =
       movementCount > 0 && (spriteNodeCount === 0 || spriteNodeCount < movementCount)
-    // When Clear: 0 movements, 0 sprites, but nodes still exist — must run sprite layers to clear Konva nodes
+    // When Clear: 0 movements, nodes still exist — must run sprite layers to clear Konva nodes
     const needSpriteClear =
-      movementCount === 0 && spriteStateCount === 0 && spriteNodeCount > 0
+      movementCount === 0 && spriteNodeCount > 0
     const backgroundOnly =
       !needSpriteBuild &&
       !needSpriteClear &&
       pendingRenderReasonRef.value === 'bufferOnly'
-    // When context is ahead, pass context so we build all sprites; else use local (mutable state)
-    const movementsToRender =
-      ctxMovementCount > localMovementCount && (ctx.movementStates.value?.length ?? 0) > 0
-        ? (ctx.movementStates.value ?? [])
-        : localMovementStates.value
+
     if (needSpriteBuild || needSpriteClear || !backgroundOnly) {
+      const movementsDebug = movementsFromBuffer.map(m => ({
+        actionNumber: m.actionNumber,
+        characterType: m.definition.characterType,
+      }))
       logScreen.debug('render', {
         movementCount,
-        ctxMovementCount,
-        localMovementCount,
         spriteNodeCount,
         needSpriteBuild,
         needSpriteClear,
         backgroundOnly,
         reason: pendingRenderReasonRef.value,
+        movementsFromBuffer: movementsDebug,
       })
     }
+
     // Pass lastBackgroundBuffer for sprite rendering context (background uses Canvas2D now)
     const lastBackgroundBuffer = lastBackgroundBufferRef.value
     const { frontSpriteNodes: frontNodes, backSpriteNodes: backNodes } =
@@ -229,12 +237,12 @@ async function render(): Promise<void> {
         layersToRender,
         bufferToRender,
         ctx.spriteStates.value ?? [],
-        movementsToRender,
         paletteCode.value,
         ctx.spritePalette.value ?? 1,
         ctx.backdropColor.value ?? 0,
         ctx.spriteEnabled.value ?? false,
-        backgroundShouldCache,
+        ctx.sharedDisplayBufferAccessor,
+        true,
         frontSpriteNodes.value as Map<number, Konva.Image>,
         backSpriteNodes.value as Map<number, Konva.Image>,
         {
@@ -271,22 +279,8 @@ async function render(): Promise<void> {
   }
 }
 
-// Synchronize movement states from parent (with local mutable copy for animation)
-// When new MOVE commands are added, trigger a full render to show initial state
-const { localMovementStates } = useMovementStateSync({
-  movementStates: computed(() => ctx.movementStates.value),
-  onSync: () => {
-    logScreen.debug(
-      'sync',
-      'ctx.movementStates=',
-      ctx.movementStates.value?.length ?? 0,
-      'localMovementStates=',
-      localMovementStates.value.length
-    )
-    pendingRenderReasonRef.value = 'full'
-    scheduleRender()
-  },
-})
+// Pure Buffer Read: movement states are read directly from shared buffer (DEF MOVE definitions are stored there)
+// When new MOVE commands are added, Animation Worker writes to buffer, triggering watcher below
 
 // Watch paletteCode, backdropColor, spritePalette, sprite states, and sprite enabled to trigger re-render
 // These are STATIC rendering changes (CGSET, COLOR, SPRITE, etc.) - render immediately
@@ -314,35 +308,30 @@ watch(
 )
 
 // Render queue: when animation is active, sets pending static render so animation loop runs render at end of frame
-const { schedule: scheduleRender, cleanup: cleanupRenderQueue } = useRenderQueue(
-  async () => {
-    await render()
-  },
-  {
-    hasActiveMovements: () => {
-      // Prioritize local state (immediate update from ANIMATION_COMMAND) over shared buffer (may lag)
-      const localActive = localMovementStates.value.some(m => m.isActive)
-      if (localActive) {
-        // Trust local state when it says active (Animation Worker will sync buffer shortly)
+function scheduleRender() {
+  // Check if there are active movements - Pure Buffer Read
+  const hasActiveMovements = (() => {
+    if (!ctx.sharedDisplayBufferAccessor) return false
+    for (let actionNumber = 0; actionNumber < 8; actionNumber++) {
+      if (ctx.sharedDisplayBufferAccessor.readSpriteIsActive(actionNumber)) {
         return true
       }
-      // If local says no active, also check shared buffer in case it has state we don't know about
-      if (ctx.sharedAnimationView.value) {
-        for (let actionNumber = 0; actionNumber < 8; actionNumber++) {
-          const base = actionNumber * 3
-          if (ctx.sharedAnimationView.value[base + 2] !== 0) {
-            return true
-          }
-        }
-        return false
-      }
-      return false
-    },
-    setPendingStaticRender: (v: boolean) => {
-      pendingStaticRenderRef.value = v
-    },
+    }
+    return false
+  })()
+
+  if (hasActiveMovements) {
+    // Animation is active, set pending flag
+    pendingStaticRenderRef.value = true
+  } else {
+    // No active animation, render immediately
+    render()
   }
-)
+}
+
+function cleanupRenderQueue() {
+  // No-op - pendingStaticRenderRef will be cleared on unmount
+}
 
 // Register scheduleRender with parent so SCREEN_CHANGED can trigger a redraw (shared buffer path)
 watch(
@@ -358,7 +347,7 @@ watch(
 watch(
   () => ctx.screenBuffer.value,
   () => {
-    const movementCount = ctx.movementStates.value?.length ?? 0
+    const movementCount = ctx.movementStates?.value?.length ?? 0
     const spriteNodeCount = frontSpriteNodes.value.size + backSpriteNodes.value.size
     const useFull = movementCount > spriteNodeCount
     if (useFull) {
@@ -409,42 +398,24 @@ watch(
 )
 
 // Setup render-only animation loop - READS from shared buffer (Animation Worker is the single writer)
-// When movements are active, run pending static render at end of frame (animation first, then render)
+// Runs continuously at 60fps, detecting missing sprite nodes and triggering render as needed
 const stopAnimationLoop = useScreenAnimationLoopRenderOnly({
-  localMovementStates,
   layers,
   frontSpriteNodes,
   backSpriteNodes,
   spritePalette: computed(() => ctx.spritePalette.value ?? 1),
-  sharedAnimationView: toValue(() => ctx.sharedAnimationView.value),
+  sharedDisplayBufferAccessor: ctx.sharedDisplayBufferAccessor,
   setMovementPositionsFromBuffer: (positions) => {
     ctx.movementPositionsFromBuffer.value = positions
-  },
-  onMovementStatesUpdated: (updatedStates) => {
-    // Sync ONLY true→false transitions (completion detection) from shared buffer to context.
-    // This is called by animation loop when it detects movements have completed.
-    // The false→true transition (startup) is blocked in the animation loop to prevent
-    // race conditions where main thread reads isActive=false before Animation Worker
-    // has processed START_MOVEMENT. ANIMATION_COMMAND messages are the authoritative
-    // source for activating movements.
-    for (const m of updatedStates) {
-      const ctxM = ctx.movementStates.value?.find(x => x.actionNumber === m.actionNumber)
-      if (ctxM && !m.isActive /* only deactivations */) {
-        ctxM.isActive = false
-      }
-    }
-    // Only trigger reactivity if something actually changed
-    if (updatedStates.length > 0) {
-      ctx.movementStates.value = [...(ctx.movementStates.value ?? [])]
-    }
   },
   getPendingStaticRender: () => pendingStaticRenderRef.value,
   onRunPendingStaticRender: async () => {
     await render()
     pendingStaticRenderRef.value = false
   },
-  onAnimationStopped: () => {
-    if (pendingStaticRenderRef.value) scheduleRender()
+  onRenderNeeded: () => {
+    pendingRenderReasonRef.value = 'full'
+    scheduleRender()
   },
 })
 

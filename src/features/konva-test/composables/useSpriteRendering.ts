@@ -178,16 +178,16 @@ export async function createKonvaImage(movement: MovementState): Promise<Konva.I
   const frameImages = frameImageCache.get(cacheKey)!
   if (frameImages.length === 0) return null
 
-  // Get current frame
-  const frameIndex = movement.currentFrameIndex % frameImages.length
+  // Get current frame - demo page just uses frame 0
+  const frameIndex = 0
   const currentFrameImage = frameImages[frameIndex]
 
   // Create Konva Image with scale
   // Canvas is displayed at 2x scale, so positions need to be scaled by 2
   const CANVAS_SCALE = 2
   const konvaImage = new Konva.Image({
-    x: movement.startX * CANVAS_SCALE,
-    y: movement.startY * CANVAS_SCALE,
+    x: 128 * CANVAS_SCALE, // Default center position
+    y: 120 * CANVAS_SCALE,
     image: currentFrameImage,
     scaleX: SPRITE_SCALE,
     scaleY: SPRITE_SCALE,
@@ -206,19 +206,15 @@ export async function updateSprites(
   animationConfigs ??= buildAllCharacterAnimationConfigs()
 
   for (const movement of movements) {
-    if (!movement.isActive) continue
-
     const sprite = spriteRefs.get(movement.actionNumber)
     if (!sprite) continue
 
-    // Update position based on movement progress
-    // Calculate current position from start position and remaining distance
+    // Update position from shared buffer (Animation Worker is the source of truth)
     const CANVAS_SCALE = 2
-    const distanceTraveled = movement.totalDistance - movement.remainingDistance
-    const currentX = movement.startX + movement.directionDeltaX * distanceTraveled
-    const currentY = movement.startY + movement.directionDeltaY * distanceTraveled
-    sprite.x(currentX * CANVAS_SCALE)
-    sprite.y(currentY * CANVAS_SCALE)
+    // Note: This demo page should read from sharedAnimationView instead of local state
+    // For now, set a default position since position is tracked by Animation Worker
+    sprite.x(128 * CANVAS_SCALE) // Center of screen
+    sprite.y(120 * CANVAS_SCALE)
 
     // Update frame image
     const { sequence } = getSequenceForMovement(
@@ -232,7 +228,7 @@ export async function updateSprites(
       const cacheKey = `${movement.actionNumber}-${movement.definition.characterType}-${movement.definition.direction}-${movement.definition.colorCombination}`
       const frameImages = frameImageCache.get(cacheKey)
       if (frameImages && frameImages.length > 0) {
-        const frameIndex = movement.currentFrameIndex % frameImages.length
+        const frameIndex = 0 // Demo page just uses frame 0
         const newFrameImage = frameImages[frameIndex]
         if (newFrameImage && sprite.image() !== newFrameImage) {
           sprite.image(newFrameImage)

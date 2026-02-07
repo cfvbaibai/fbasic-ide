@@ -6,6 +6,7 @@
 
 import { beforeEach, describe, expect, it } from 'vitest'
 
+import { createSharedDisplayBuffer } from '@/core/animation/sharedDisplayBuffer'
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
 
@@ -15,12 +16,14 @@ describe('PositionExecutor', () => {
 
   beforeEach(() => {
     deviceAdapter = new TestDeviceAdapter()
+    const { buffer } = createSharedDisplayBuffer()
     interpreter = new BasicInterpreter({
       maxIterations: 1000,
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
       deviceAdapter,
+      sharedAnimationBuffer: buffer,
     })
   })
 
@@ -34,13 +37,9 @@ describe('PositionExecutor', () => {
 
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
-    const posCmd = deviceAdapter.animationCommandCalls.find(c => c.type === 'SET_POSITION')
-    expect(posCmd).toBeDefined()
-    if (posCmd?.type === 'SET_POSITION') {
-      expect(posCmd.actionNumber).toBe(0)
-      expect(posCmd.x).toBe(100)
-      expect(posCmd.y).toBe(50)
-    }
+    // Position is stored via setSpritePosition for MOVE command to use
+    const storedPos = deviceAdapter.getSpritePosition(0)
+    expect(storedPos).toEqual({ x: 100, y: 50 })
   })
 
   it('should validate action number (0-7)', async () => {
@@ -90,15 +89,9 @@ describe('PositionExecutor', () => {
 `
     await interpreter.execute(source)
 
-    const posCalls = deviceAdapter.animationCommandCalls.filter(c => c.type === 'SET_POSITION')
-    expect(posCalls).toHaveLength(1)
-    const pos0 = posCalls[0]
-    expect(pos0).toBeDefined()
-    if (pos0?.type === 'SET_POSITION') {
-      expect(pos0.actionNumber).toBe(0)
-      expect(pos0.x).toBe(100)
-      expect(pos0.y).toBe(50)
-    }
+    // Position is stored via setSpritePosition for MOVE command to use
+    const storedPos = deviceAdapter.getSpritePosition(0)
+    expect(storedPos).toEqual({ x: 100, y: 50 })
   })
 
   it('should work on both active and inactive movements', async () => {
@@ -112,8 +105,9 @@ describe('PositionExecutor', () => {
     const result = await interpreter.execute(source)
 
     expect(result.success).toBe(true)
-    const posCalls = deviceAdapter.animationCommandCalls.filter(c => c.type === 'SET_POSITION')
-    expect(posCalls.length).toBe(2)
+    // Both POSITION commands should have stored position (last one wins)
+    const storedPos = deviceAdapter.getSpritePosition(0)
+    expect(storedPos).toEqual({ x: 75, y: 75 })
   })
 
   it('should handle negative coordinates', async () => {

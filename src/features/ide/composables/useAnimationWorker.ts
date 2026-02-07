@@ -2,8 +2,10 @@
  * Animation Worker Manager Composable
  *
  * Manages the Animation Worker lifecycle from the main thread.
- * Forwards animation commands from Executor Worker to Animation Worker.
  * Passes shared buffers to Animation Worker during initialization.
+ *
+ * Note: Animation commands are sent via direct sync (Executor Worker → Animation Worker)
+ * through the shared buffer using Atomics, not via postMessage forwarding.
  */
 
 import { type Ref, ref, watch } from 'vue'
@@ -34,6 +36,13 @@ export function useAnimationWorker(options: UseAnimationWorkerOptions) {
    * Initialize the Animation Worker
    */
   async function initialize(): Promise<void> {
+    console.log('[useAnimationWorker] initialize() called', {
+      isReady: isReady.value,
+      isInitializing: isInitializing.value,
+      hasBuffer: !!sharedAnimationBuffer.value,
+      bufferByteLength: sharedAnimationBuffer.value?.byteLength,
+    })
+
     if (isReady.value) {
       return
     }
@@ -46,6 +55,7 @@ export function useAnimationWorker(options: UseAnimationWorkerOptions) {
     initError.value = null
 
     try {
+      console.log('[useAnimationWorker] Creating Animation Worker...')
       // Create Animation Worker
       // Vite will bundle this automatically with the ?worker suffix pattern
       worker = new Worker(
@@ -122,20 +132,6 @@ export function useAnimationWorker(options: UseAnimationWorkerOptions) {
   })
 
   /**
-   * Forward animation command to Animation Worker
-   */
-  function forwardCommand(cmd: AnimationWorkerCommand): void {
-    if (!worker) {
-      throw new Error('Animation Worker not initialized. Call initialize() first.')
-    }
-    if (!isReady.value) {
-      throw new Error('Animation Worker not ready. Wait for initialization to complete.')
-    }
-
-    worker.postMessage(cmd)
-  }
-
-  /**
    * Terminate the Animation Worker
    */
   function terminate(): void {
@@ -164,7 +160,6 @@ export function useAnimationWorker(options: UseAnimationWorkerOptions) {
 
     // Methods
     initialize,
-    forwardCommand,
     terminate,
     reset,
 

@@ -12,6 +12,7 @@ import {
   type SharedDisplayViews,
   writeScreenState,
 } from '@/core/animation/sharedDisplayBuffer'
+import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import { TIMING } from '@/core/constants'
 import { createSharedJoystickBuffer } from '@/core/devices'
 
@@ -19,7 +20,7 @@ import type { BasicIdeState } from './useBasicIdeState'
 
 export interface BasicIdeScreenIntegration {
   sharedDisplayViews: SharedDisplayViews
-  sharedAnimationView: Float64Array
+  sharedDisplayBufferAccessor: SharedDisplayBufferAccessor
   sharedAnimationBuffer: SharedArrayBuffer
   sharedJoystickBuffer: SharedArrayBuffer
   registerScheduleRender: (fn: () => void) => void
@@ -38,7 +39,7 @@ export interface BasicIdeScreenIntegration {
 export function useBasicIdeScreenIntegration(state: BasicIdeState): BasicIdeScreenIntegration {
   const sharedDisplayViews = createSharedDisplayBuffer()
   const sharedAnimationBuffer = sharedDisplayViews.buffer
-  const sharedAnimationView = sharedDisplayViews.spriteView
+  const sharedDisplayBufferAccessor = new SharedDisplayBufferAccessor(sharedAnimationBuffer)
 
   // Shared joystick buffer (main thread writes, workers read)
   const sharedJoystickBuffer = createSharedJoystickBuffer()
@@ -72,8 +73,21 @@ export function useBasicIdeScreenIntegration(state: BasicIdeState): BasicIdeScre
       state.backdropColor.value ?? 0,
       state.cgenMode.value ?? 2
     )
-    // Zero sprite positions so next Run uses default center (getSpritePosition returns null for 0,0)
-    sharedDisplayViews.spriteView.fill(0)
+    // Clear shared sprite buffer FIRST so render immediately sees empty data
+    // This prevents race condition where render happens before AnimationWorker processes command
+    sharedDisplayBufferAccessor.clearAllSprites()
+
+    // Send CLEAR_ALL_MOVEMENTS command to AnimationWorker
+    // AnimationWorker will clear its internal movement states when it processes this
+    const SYNC_BYTE_OFFSET = 2128
+    const syncView = new Float64Array(sharedDisplayViews.buffer, SYNC_BYTE_OFFSET, 9)
+    syncView[0] = 5 // CLEAR_ALL_MOVEMENTS
+    syncView[1] = 0 // actionNumber (unused for CLEAR_ALL)
+    syncView[8] = 0 // ACK_PENDING
+
+    // Clear local sprite node maps so render creates fresh layers (will be empty since buffer is being cleared)
+    state.frontSpriteNodes.value.clear()
+    state.backSpriteNodes.value.clear()
     incrementSequence(sharedDisplayViews)
     scheduleRender()
   }
@@ -113,7 +127,7 @@ export function useBasicIdeScreenIntegration(state: BasicIdeState): BasicIdeScre
 
   return {
     sharedDisplayViews,
-    sharedAnimationView,
+    sharedDisplayBufferAccessor,
     sharedAnimationBuffer,
     sharedJoystickBuffer,
     registerScheduleRender,

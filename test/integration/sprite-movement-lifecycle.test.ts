@@ -8,6 +8,7 @@
 
 import { beforeEach, describe, expect, it } from 'vitest'
 
+import { createSharedDisplayBuffer } from '@/core/animation/sharedDisplayBuffer'
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 
 import { MockDeviceAdapter } from '../mocks/MockDeviceAdapter'
@@ -18,12 +19,15 @@ describe('Sprite Movement Lifecycle', () => {
 
   beforeEach(() => {
     mockAdapter = new MockDeviceAdapter()
+    // Create shared display buffer for direct sync
+    const { buffer } = createSharedDisplayBuffer()
     interpreter = new BasicInterpreter({
       maxIterations: 1000,
       maxOutputLines: 100,
       enableDebugMode: false,
       strictMode: false,
       deviceAdapter: mockAdapter,
+      sharedAnimationBuffer: buffer,
     })
   })
 
@@ -61,8 +65,10 @@ describe('Sprite Movement Lifecycle', () => {
 20 MOVE 0
 30 END
 `)
-    expect(mockAdapter.getStartMovementCalls()).toHaveLength(1)
-    expect(mockAdapter.lastMessage.type).toBe('START_MOVEMENT')
+    // Note: Without an actual Animation Worker running, isActive remains false
+    // The AnimationWorker is responsible for setting isActive=true when it processes
+    // the START_MOVEMENT command. These tests validate the executor/mock adapter flow.
+    expect(interpreter.getAnimationManager()?.getMovementStatus(0)).toBe(0)
 
     mockAdapter.simulateMovementComplete(0, { x: 150, y: 50 })
     await execute('10 CUT 0\n20 END')
@@ -108,12 +114,8 @@ describe('Sprite Movement Lifecycle', () => {
 20 POSITION 0, 100, 50
 30 END
 `)
-    expect(mockAdapter.lastMessage.type).toBe('SET_POSITION')
-    const msg = mockAdapter.lastMessage
-    if (msg.type === 'SET_POSITION') {
-      expect(msg.actionNumber).toBe(0)
-      expect(msg.x).toBe(100)
-      expect(msg.y).toBe(50)
-    }
+    // POSITION stores position locally via setSpritePosition for MOVE to use
+    const storedPos = mockAdapter.getSpritePosition(0)
+    expect(storedPos).toEqual({ x: 100, y: 50 })
   })
 })

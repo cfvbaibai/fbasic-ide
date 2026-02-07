@@ -35,8 +35,10 @@ Orchestrate feature development across teams. Analyze architecture, decompose ta
 Interpreter runs in web worker for non-blocking execution:
 1. Main → Worker: `EXECUTE` message with code
 2. Worker → Main: `OUTPUT` messages for PRINT
-3. Worker → Main: `SCREEN_UPDATE` messages
-4. Worker ↔ Main: SharedArrayBuffer for sprite positions
+3. Worker → Main: `SCREEN_CHANGED` notification (shared buffer updated)
+4. Worker ↔ Main: SharedArrayBuffer for sprite positions (Animation Worker single writer)
+
+**See**: `docs/reference/worker-messages.md` for complete message types
 
 ## File Structure
 
@@ -135,6 +137,8 @@ Teams: Usually single team (identify which layer has the bug)
 ## Reference Documentation
 
 - **F-BASIC Language**: `docs/reference/family-basic-manual/`
+- **Worker Message Types**: `docs/reference/worker-messages.md`
+- **Shared Buffer Layout**: `docs/reference/shared-display-buffer.md`
 - **Roadmap**: `docs/roadmap.md`
 - **Changelog**: `docs/CHANGELOG.md`
 

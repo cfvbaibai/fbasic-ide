@@ -8,7 +8,8 @@
     "run": "実行",
     "stop": "停止",
     "clear": "クリア",
-    "debug": "デバッグ"
+    "debug": "デバッグ",
+    "debugBuffer": "バッファ"
   },
   "output": {
     "title": "実行出力",

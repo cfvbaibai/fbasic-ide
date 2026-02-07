@@ -55,21 +55,21 @@ export interface MoveDefinition {
 
 /**
  * Movement state (active animation)
- * Position is stored in shared buffer (spriteView); this state tracks movement parameters and animation frames.
+ *
+ * Minimal state for main thread rendering when using Animation Worker.
+ * All animation state (position, remainingDistance, currentFrameIndex, etc.) is tracked by
+ * Animation Worker and read from shared buffer via sharedAnimationView.
+ *
+ * Main thread needs:
+ * - actionNumber: Sprite slot identification
+ * - definition: Contains priority (front/back layer) and characterType (for rendering)
+ * - isActive: Local cache of isActive from shared buffer (for startup detection)
  */
 export interface MovementState {
   actionNumber: number
   definition: MoveDefinition
-  startX: number // Starting X position (for reference, actual position in shared buffer)
-  startY: number // Starting Y position (for reference, actual position in shared buffer)
-  remainingDistance: number // Remaining distance in dots
-  totalDistance: number // Total distance (2×D)
-  speedDotsPerSecond: number // 60/C dots per second (C=0 → 60/256)
-  directionDeltaX: number // X direction component (-1, 0, or 1)
-  directionDeltaY: number // Y direction component (-1, 0, or 1)
-  isActive: boolean // Whether movement is active
-  currentFrameIndex: number // Current frame in animation sequence
-  frameCounter: number // Frame counter for timing (0-7)
+  /** Local cache of isActive from shared buffer (Animation Worker is source of truth) */
+  isActive?: boolean
 }
 
 /**

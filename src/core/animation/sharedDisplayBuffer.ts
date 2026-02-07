@@ -1,9 +1,12 @@
 /**
  * Shared display state buffer for main thread ↔ worker sync.
- * Layout: sprites (0–192) + cell chars (192–864) + cell patterns (864–1536) +
- * cursor (1536–1538) + sequence (1540–1544) + scalars (1544–1548) +
- * animation sync (1548–1620).
- * Reuses first 192 bytes for sprite state (Float64Array × 24); screen/sequence/scalars follow.
+ *
+ * @see {@link docs/reference/shared-display-buffer.md} for full buffer layout documentation
+ *
+ * Layout: sprites (0–767) + cell chars (768–1439) + cell patterns (1440–2111) +
+ * cursor (2112–2113) + sequence (2116–2119) + scalars (2120–2123) +
+ * animation sync (2128–2199).
+ * Reuses first 768 bytes for sprite state (Float64Array × 96); screen/sequence/scalars follow.
  * Animation sync section (9 floats) at end for Executor Worker ↔ Animation Worker direct sync.
  */
 
@@ -19,33 +22,35 @@ export const ROWS = 24
 export const CELLS = COLS * ROWS // 672
 
 // Byte offsets (plan: §1)
-const SPRITES_BYTES = MAX_SPRITES * 3 * 8 // 192
+// Sprite data: 8 sprites × 12 floats × 8 bytes = 768 bytes
+// (x, y, isActive, isVisible, frameIndex, remainingDistance, totalDistance, direction, speed, priority, characterType, colorCombination)
+const SPRITES_BYTES = MAX_SPRITES * 12 * 8 // 768
 export const OFFSET_SPRITES = 0
-export const OFFSET_CHARS = SPRITES_BYTES // 192
-export const OFFSET_PATTERNS = OFFSET_CHARS + CELLS // 864
-export const OFFSET_CURSOR = OFFSET_PATTERNS + CELLS // 1536
-// Sequence at 1540 for Int32 alignment (cursor ends at 1538)
-export const OFFSET_SEQUENCE = 1540
-export const OFFSET_SCALARS = OFFSET_SEQUENCE + 4 // 1544
+export const OFFSET_CHARS = SPRITES_BYTES // 768
+export const OFFSET_PATTERNS = OFFSET_CHARS + CELLS // 1440
+export const OFFSET_CURSOR = OFFSET_PATTERNS + CELLS // 2112
+// Sequence at 2116 for Int32 alignment (cursor ends at 2114)
+export const OFFSET_SEQUENCE = 2116
+export const OFFSET_SCALARS = OFFSET_SEQUENCE + 4 // 2120
 
 // Animation sync section (same layout as standalone animation buffer)
 // 9 floats: command type, action number, params (6), ack
-// Must be aligned to 8 bytes for Float64Array (1548 + 4 = 1552)
+// Must be aligned to 8 bytes for Float64Array (2124 + 4 = 2128)
 const SYNC_SECTION_FLOATS = 9
 const SYNC_SECTION_BYTES = SYNC_SECTION_FLOATS * 8 // 72
-// Add padding to align to 8 bytes (1544 + 4 + 4 = 1552, which is divisible by 8)
+// Add padding to align to 8 bytes (2120 + 4 + 4 = 2128, which is divisible by 8)
 const SYNC_PADDING = 4
-export const OFFSET_ANIMATION_SYNC = OFFSET_SCALARS + 4 + SYNC_PADDING // 1552
+export const OFFSET_ANIMATION_SYNC = OFFSET_SCALARS + 4 + SYNC_PADDING // 2128
 
-export const SHARED_DISPLAY_BUFFER_BYTES = OFFSET_ANIMATION_SYNC + SYNC_SECTION_BYTES // 1624
+export const SHARED_DISPLAY_BUFFER_BYTES = OFFSET_ANIMATION_SYNC + SYNC_SECTION_BYTES // 2200
 
 /**
  * Typed views over the shared display buffer (sprites + screen + cursor + sequence + scalars).
  */
 export interface SharedDisplayViews {
-  /** Raw SharedArrayBuffer (1620 bytes). */
+  /** Raw SharedArrayBuffer (2200 bytes). */
   buffer: SharedArrayBuffer
-  /** Sprite positions and isActive (0-192 bytes; Float64 × 24). */
+  /** Sprite animation state (0-767 bytes; Float64 × 96). */
   spriteView: Float64Array
   /** Screen character codes (28×24 cells). */
   charView: Uint8Array
@@ -82,7 +87,7 @@ export function createSharedDisplayBuffer(): SharedDisplayViews {
   patternView.fill(0)
   return {
     buffer,
-    spriteView: new Float64Array(buffer, OFFSET_SPRITES, MAX_SPRITES * 3),
+    spriteView: new Float64Array(buffer, OFFSET_SPRITES, MAX_SPRITES * 12),
     charView,
     patternView,
     cursorView: new Uint8Array(buffer, OFFSET_CURSOR, 2),
@@ -98,7 +103,7 @@ export function createSharedDisplayBuffer(): SharedDisplayViews {
 export function createViewsFromDisplayBuffer(buffer: SharedArrayBuffer): SharedDisplayViews {
   return {
     buffer,
-    spriteView: new Float64Array(buffer, OFFSET_SPRITES, MAX_SPRITES * 3),
+    spriteView: new Float64Array(buffer, OFFSET_SPRITES, MAX_SPRITES * 12),
     charView: new Uint8Array(buffer, OFFSET_CHARS, CELLS),
     patternView: new Uint8Array(buffer, OFFSET_PATTERNS, CELLS),
     cursorView: new Uint8Array(buffer, OFFSET_CURSOR, 2),

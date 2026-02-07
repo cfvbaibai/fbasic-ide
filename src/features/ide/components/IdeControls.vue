@@ -54,6 +54,8 @@ interface Emits {
   (e: 'clear'): void
   /** Emitted when the debug toggle is changed */
   (e: 'toggleDebug'): void
+  /** Emitted when the buffer debug button is clicked */
+  (e: 'debugBuffer'): void
 }
 
 const handleRun = () => {
@@ -70,6 +72,10 @@ const handleClear = () => {
 
 const handleDebugToggle = () => {
   emit('toggleDebug')
+}
+
+const handleDebugBuffer = () => {
+  emit('debugBuffer')
 }
 </script>
 
@@ -109,6 +115,14 @@ const handleDebugToggle = () => {
       :selected="debugMode"
       :title="t('ide.controls.debug')"
       @click="handleDebugToggle"
+    />
+
+    <GameIconButton
+      type="default"
+      icon="mdi:memory"
+      size="small"
+      :title="t('ide.controls.debugBuffer')"
+      @click="handleDebugBuffer"
     />
   </div>
 </template>

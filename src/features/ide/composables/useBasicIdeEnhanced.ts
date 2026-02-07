@@ -44,6 +44,35 @@ export function useBasicIde() {
     state.debugMode.value = !state.debugMode.value
   }
 
+  const debugBuffer = () => {
+    const accessor = screen.sharedDisplayBufferAccessor
+    console.group('🔍 Shared Animation/Sprite Buffer')
+
+    // Show ALL sprite slots (0-7), no filtering
+    for (let i = 0; i < 8; i++) {
+      console.log(`Sprite ${i}:`, {
+        actionNumber: i,
+        position: accessor.readSpritePosition(i),
+        isActive: accessor.readSpriteIsActive(i),
+        isVisible: accessor.readSpriteIsVisible(i),
+        frameIndex: accessor.readSpriteFrameIndex(i),
+        remainingDistance: accessor.readSpriteRemainingDistance(i),
+        totalDistance: accessor.readSpriteTotalDistance(i),
+        direction: accessor.readSpriteDirection(i),
+        speed: accessor.readSpriteSpeed(i),
+        priority: accessor.readSpritePriority(i),
+        characterType: accessor.readSpriteCharacterType(i),
+        colorCombination: accessor.readSpriteColorCombination(i),
+      })
+    }
+
+    // Show sync command state
+    const syncCommand = accessor.readSyncCommand()
+    console.log('Sync Command:', syncCommand ?? '(none)')
+
+    console.groupEnd()
+  }
+
   watch(
     state.code,
     () => {
@@ -74,7 +103,7 @@ export function useBasicIde() {
     cgenMode: state.cgenMode,
     spriteStates: state.spriteStates,
     spriteEnabled: state.spriteEnabled,
-    movementStates: state.movementStates,
+    // movementStates removed - read from shared buffer instead
     movementPositionsFromBuffer: state.movementPositionsFromBuffer,
     frontSpriteNodes: state.frontSpriteNodes,
     backSpriteNodes: state.backSpriteNodes,
@@ -94,11 +123,12 @@ export function useBasicIde() {
     getParserCapabilities: editor.getParserCapabilities,
     getHighlighterCapabilities: editor.getHighlighterCapabilities,
     toggleDebugMode,
+    debugBuffer,
 
     // Web worker / screen
     sendStickEvent: worker.sendStickEvent,
     sendStrigEvent: worker.sendStrigEvent,
-    sharedAnimationView: screen.sharedAnimationView,
+    sharedDisplayBufferAccessor: screen.sharedDisplayBufferAccessor,
     sharedAnimationBuffer: screen.sharedAnimationBuffer,
     sharedDisplayViews: screen.sharedDisplayViews,
     sharedJoystickBuffer: screen.sharedJoystickBuffer,

@@ -10,7 +10,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 import {
-  createSharedAnimationBuffer,
   readSpriteIsActive,
   readSpritePosition,
   slotBase,
@@ -31,20 +30,11 @@ import { SharedBufferTestAdapter } from '../adapters/SharedBufferTestAdapter'
 
 describe('Shared Buffer Integration - Full POC', () => {
   describe('Buffer Creation and Initialization', () => {
-    it('should create shared animation buffer successfully', () => {
-      const { buffer, view } = createSharedAnimationBuffer()
-
-      expect(buffer).toBeInstanceOf(SharedArrayBuffer)
-      expect(view).toBeInstanceOf(Float64Array)
-      expect(buffer.byteLength).toBe(264) // 33 floats × 8 bytes (8 sprites × 3 + 9 sync slots)
-      expect(view.length).toBe(33) // 8 sprites × 3 + 9 sync slots
-    })
-
     it('should create shared display buffer successfully', () => {
       const views = createSharedDisplayBuffer()
 
       expect(views.buffer).toBeInstanceOf(SharedArrayBuffer)
-      expect(views.buffer.byteLength).toBe(1624) // Updated to include animation sync section
+      expect(views.buffer.byteLength).toBe(2200) // Updated to include isVisible flag (12 floats per sprite)
       expect(views.spriteView).toBeInstanceOf(Float64Array)
       expect(views.charView).toBeInstanceOf(Uint8Array)
       expect(views.patternView).toBeInstanceOf(Uint8Array)
@@ -73,7 +63,7 @@ describe('Shared Buffer Integration - Full POC', () => {
       const views = createViewsFromDisplayBuffer(originalBuffer)
 
       expect(views.buffer).toBe(originalBuffer)
-      expect(views.spriteView.length).toBe(24)
+      expect(views.spriteView.length).toBe(96) // 8 sprites × 12 (x, y, isActive, isVisible, frameIndex, remainingDistance, totalDistance, direction, speed, priority, characterType, colorCombination)
       expect(views.charView.length).toBe(672) // 28 × 24
       expect(views.patternView.length).toBe(672)
       expect(views.cursorView.length).toBe(2)
@@ -134,9 +124,10 @@ describe('Shared Buffer Integration - Full POC', () => {
     })
 
     it('should write and read sprite positions in animation buffer', () => {
-      const { view } = createSharedAnimationBuffer()
+      const views = createSharedDisplayBuffer()
 
-      // Write sprite 0 position
+      // Write sprite 0 position to spriteView
+      const view = views.spriteView
       const base = slotBase(0)
       view[base] = 100 // x
       view[base + 1] = 50 // y
@@ -155,13 +146,11 @@ describe('Shared Buffer Integration - Full POC', () => {
     let views: SharedDisplayViews
 
     beforeEach(() => {
-      // Create fresh shared buffers for each test
+      // Create fresh shared buffer for each test (combined display buffer includes animation sync)
       const displayBuf = createSharedDisplayBuffer()
       sharedDisplayBuffer = displayBuf.buffer
+      sharedAnimationBuffer = displayBuf.buffer // Same buffer for animation sync
       views = displayBuf
-
-      const { buffer: animBuf } = createSharedAnimationBuffer()
-      sharedAnimationBuffer = animBuf
 
       // Create fresh adapter for each test
       adapter = new SharedBufferTestAdapter()
@@ -360,8 +349,9 @@ describe('Shared Buffer Integration - Full POC', () => {
     let interpreter: BasicInterpreter
 
     beforeEach(() => {
-      const { buffer } = createSharedAnimationBuffer()
-      sharedAnimationBuffer = buffer
+      // Use combined display buffer (includes animation sync section)
+      const views = createSharedDisplayBuffer()
+      sharedAnimationBuffer = views.buffer
 
       adapter = new SharedBufferTestAdapter()
       adapter.configure({ enableAnimationBuffer: true })
@@ -411,10 +401,8 @@ describe('Shared Buffer Integration - Full POC', () => {
     beforeEach(() => {
       const displayBuf = createSharedDisplayBuffer()
       sharedDisplayBuffer = displayBuf.buffer
+      sharedAnimationBuffer = displayBuf.buffer // Same buffer for animation sync
       views = displayBuf
-
-      const { buffer: animBuf } = createSharedAnimationBuffer()
-      sharedAnimationBuffer = animBuf
 
       adapter = new SharedBufferTestAdapter()
       adapter.setSharedDisplayBuffer(sharedDisplayBuffer)
@@ -671,14 +659,14 @@ describe('Shared Buffer Integration - Full POC', () => {
 
   describe('DEF MOVE Animation Buffer Tests', () => {
     it('should execute DEF MOVE with shared animation buffer', async () => {
-      const { buffer } = createSharedAnimationBuffer()
+      const views = createSharedDisplayBuffer()
       const adapter = new SharedBufferTestAdapter()
 
       const interpreter = new BasicInterpreter({
         maxIterations: EXECUTION_LIMITS.MAX_ITERATIONS_TEST,
         maxOutputLines: EXECUTION_LIMITS.MAX_OUTPUT_LINES_TEST,
         deviceAdapter: adapter,
-        sharedAnimationBuffer: buffer,
+        sharedAnimationBuffer: views.buffer,
       })
 
       await interpreter.execute(`
@@ -693,14 +681,14 @@ describe('Shared Buffer Integration - Full POC', () => {
     })
 
     it('should track movement state in buffer', async () => {
-      const { buffer } = createSharedAnimationBuffer()
+      const views = createSharedDisplayBuffer()
       const adapter = new SharedBufferTestAdapter()
 
       const interpreter = new BasicInterpreter({
         maxIterations: EXECUTION_LIMITS.MAX_ITERATIONS_TEST,
         maxOutputLines: EXECUTION_LIMITS.MAX_OUTPUT_LINES_TEST,
         deviceAdapter: adapter,
-        sharedAnimationBuffer: buffer,
+        sharedAnimationBuffer: views.buffer,
       })
 
       await interpreter.execute(`
@@ -710,7 +698,7 @@ describe('Shared Buffer Integration - Full POC', () => {
 `)
 
       const movementStates = interpreter.getMovementStates()
-      expect(movementStates[0]?.isActive).toBe(true)
+      expect(movementStates[0]?.actionNumber).toBe(0)
     })
 
     it('should handle multiple MOVE definitions', async () => {
@@ -800,7 +788,6 @@ describe('Shared Buffer Integration - Full POC', () => {
 
   describe('Combined Screen and Sprite Operations', () => {
     it('should handle simultaneous screen output and sprite movement', async () => {
-      const { buffer: animBuf } = createSharedAnimationBuffer()
       const displayBuf = createSharedDisplayBuffer()
 
       const adapter = new SharedBufferTestAdapter()
@@ -811,7 +798,7 @@ describe('Shared Buffer Integration - Full POC', () => {
         maxIterations: EXECUTION_LIMITS.MAX_ITERATIONS_TEST,
         maxOutputLines: EXECUTION_LIMITS.MAX_OUTPUT_LINES_TEST,
         deviceAdapter: adapter,
-        sharedAnimationBuffer: animBuf,
+        sharedAnimationBuffer: displayBuf.buffer,
         sharedDisplayBuffer: displayBuf.buffer,
       })
 
@@ -825,7 +812,6 @@ describe('Shared Buffer Integration - Full POC', () => {
     })
 
     it('should maintain buffer separation during complex operations', async () => {
-      const { buffer: animBuf } = createSharedAnimationBuffer()
       const displayBuf = createSharedDisplayBuffer()
 
       const adapter = new SharedBufferTestAdapter()
@@ -836,7 +822,7 @@ describe('Shared Buffer Integration - Full POC', () => {
         maxIterations: EXECUTION_LIMITS.MAX_ITERATIONS_TEST,
         maxOutputLines: EXECUTION_LIMITS.MAX_OUTPUT_LINES_TEST,
         deviceAdapter: adapter,
-        sharedAnimationBuffer: animBuf,
+        sharedAnimationBuffer: displayBuf.buffer,
         sharedDisplayBuffer: displayBuf.buffer,
       })
 

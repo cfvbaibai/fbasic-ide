@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import type { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import type { ScreenCell } from '@/core/interfaces'
 import type { MovementState, SpriteState } from '@/core/sprite/types'
 import { GameBlock, GameIcon, GameTabPane,GameTabs } from '@/shared/components/ui'
@@ -25,9 +26,12 @@ const props = withDefaults(
     cgenMode?: number
     spriteStates?: SpriteState[]
     spriteEnabled?: boolean
+    /** @deprecated Use sharedAnimationView instead - local state will be removed */
     movementStates?: MovementState[]
-    /** Current positions from shared buffer (updated each frame when movements are active). */
+    /** @deprecated All data now read from sharedDisplayBufferAccessor */
     movementPositionsFromBuffer?: Map<number, { x: number; y: number }>
+    /** Shared display buffer accessor for reading sprite state */
+    sharedDisplayBufferAccessor?: SharedDisplayBufferAccessor
   }>(),
   {
     screenBuffer: () => [],
@@ -54,21 +58,43 @@ function hexFor(index: number): string {
 
 const MOVE_SLOT_COUNT = 8
 
-/** Always 8 slots (action 0–7); each slot has movement data if it exists, else empty. */
+/** Always 8 slots (action 0–7); each slot has movement data from shared buffer. */
 const moveSlots = computed(() => {
+  const accessor = props.sharedDisplayBufferAccessor
   const states = props.movementStates ?? []
-  const buf = props.movementPositionsFromBuffer
   const byAction = new Map(states.map(m => [m.actionNumber, m]))
   return Array.from({ length: MOVE_SLOT_COUNT }, (_, actionNumber) => {
+    // Read all animation state from shared buffer via accessor
+    const pos = accessor?.readSpritePosition(actionNumber)
+    const x = pos?.x ?? 0
+    const y = pos?.y ?? 0
+    const isActive = accessor?.readSpriteIsActive(actionNumber) ?? false
+    const remainingDistance = accessor?.readSpriteRemainingDistance(actionNumber) ?? 0
+    const totalDistance = accessor?.readSpriteTotalDistance(actionNumber) ?? 0
+    const direction = accessor?.readSpriteDirection(actionNumber) ?? 0
+    const speed = accessor?.readSpriteSpeed(actionNumber) ?? 0
+    const priority = accessor?.readSpritePriority(actionNumber) ?? 0
+    const characterType = accessor?.readSpriteCharacterType(actionNumber) ?? 0
+    const colorCombination = accessor?.readSpriteColorCombination(actionNumber) ?? 0
+
+    // Fall back to local state for definition if not in buffer yet
     const m = byAction.get(actionNumber)
-    const pos = m
-      ? (buf?.get(actionNumber) ?? { x: m.startX, y: m.startY })
-      : { x: 0, y: 0 }
+    const hasData = isActive || (accessor && (x !== 0 || y !== 0))
+
     return {
       actionNumber,
       m: m ?? undefined,
-      x: Math.round(pos.x),
-      y: Math.round(pos.y),
+      hasData,
+      x: Math.round(x),
+      y: Math.round(y),
+      isActive,
+      remainingDistance,
+      totalDistance,
+      direction,
+      speed,
+      priority,
+      characterType,
+      colorCombination,
     }
   })
 })
@@ -156,24 +182,24 @@ function characterTypeLabel(code: number): string {
                   <span class="move-card-id" title="Action number">
                     <span>{{ slot.actionNumber }}</span>
                   </span>
-                  <template v-if="slot.m">
-                    <span class="move-card-char" :title="characterTypeLabel(slot.m.definition.characterType)">
-                      {{ characterTypeLabel(slot.m.definition.characterType).slice(0, 5) }}
+                  <template v-if="slot.hasData || slot.m">
+                    <span class="move-card-char" :title="characterTypeLabel(slot.characterType || slot.m?.definition.characterType || 0)">
+                      {{ characterTypeLabel(slot.characterType || slot.m?.definition.characterType || 0).slice(0, 5) }}
                     </span>
-                    <span class="move-card-status" :title="slot.m.isActive ? 'Active' : 'Paused'">
+                    <span class="move-card-status" :title="slot.isActive ? 'Active' : 'Paused'">
                       <GameIcon
-                        :icon="slot.m.isActive ? 'mdi:play' : 'mdi:pause'"
+                        :icon="slot.isActive ? 'mdi:play' : 'mdi:pause'"
                         size="small"
                         class="move-card-icon"
                       />
                     </span>
                     <span
                       class="move-card-dir"
-                      :title="directionTitle(slot.m.definition.direction)"
-                      aria-label="direction {{ directionTitle(slot.m.definition.direction) }}"
+                      :title="directionTitle(slot.direction || slot.m?.definition.direction || 0)"
+                      aria-label="direction {{ directionTitle(slot.direction || slot.m?.definition.direction || 0) }}"
                     >
                       <GameIcon
-                        :icon="directionIcon(slot.m.definition.direction)"
+                        :icon="directionIcon(slot.direction || slot.m?.definition.direction || 0)"
                         size="small"
                         class="move-card-icon"
                       />
@@ -182,16 +208,16 @@ function characterTypeLabel(code: number): string {
                 </div>
                 <div class="move-card-body">
                   <div class="move-card-cell">
-                    <GameIcon v-if="slot.m" icon="mdi:crosshairs-gps" size="small" class="move-card-icon" />
-                    <span class="move-card-value">{{ slot.m ? `${slot.x},${slot.y}` : '' }}</span>
+                    <GameIcon v-if="slot.hasData || slot.m" icon="mdi:crosshairs-gps" size="small" class="move-card-icon" />
+                    <span class="move-card-value">{{ (slot.hasData || slot.m) ? `${slot.x},${slot.y}` : '' }}</span>
                   </div>
                   <div class="move-card-cell move-card-cell-left">
-                    <GameIcon v-if="slot.m" icon="mdi:ruler" size="small" class="move-card-icon" />
-                    <span class="move-card-value">{{ slot.m ? Math.round(slot.m.remainingDistance) : '' }}</span>
+                    <GameIcon v-if="slot.hasData || slot.m" icon="mdi:ruler" size="small" class="move-card-icon" />
+                    <span class="move-card-value">{{ (slot.hasData || slot.m) ? Math.round(slot.remainingDistance) : '' }}</span>
                   </div>
                   <div class="move-card-cell move-card-cell-right">
-                    <GameIcon v-if="slot.m" icon="mdi:speedometer" size="small" class="move-card-icon" />
-                    <span class="move-card-value">{{ slot.m ? slot.m.definition.speed : '' }}</span>
+                    <GameIcon v-if="slot.hasData || slot.m" icon="mdi:speedometer" size="small" class="move-card-icon" />
+                    <span class="move-card-value">{{ (slot.hasData || slot.m) ? slot.speed : '' }}</span>
                   </div>
                 </div>
               </div>

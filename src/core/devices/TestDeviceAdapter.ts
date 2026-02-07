@@ -5,7 +5,7 @@
  * Provides controlled behavior for testing without external dependencies.
  */
 
-import type { AnimationCommand, BasicDeviceAdapter } from '@/core/interfaces'
+import type { BasicDeviceAdapter } from '@/core/interfaces'
 import { logDevice } from '@/shared/logger'
 
 export class TestDeviceAdapter implements BasicDeviceAdapter {
@@ -34,8 +34,6 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
   public cgenModeCalls: number[] = []
   public currentCgenMode: number = 2 // Default is 2 (B on BG, A on sprite)
 
-  // === ANIMATION COMMANDS (for sprite/move executor tests) ===
-  public animationCommandCalls: AnimationCommand[] = []
   private spritePositions: Map<number, { x: number; y: number }> = new Map()
 
   // === INPUT (for INPUT/LINPUT executor tests) ===
@@ -100,10 +98,19 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
   }
 
   /**
-   * Set sprite position for XPOS/YPOS tests
+   * Store position for sprite (called when POSITION runs).
+   * Used so MOVE uses it when no prior START_MOVEMENT.
+   */
+  setSpritePosition(actionNumber: number, x: number, y: number): void {
+    this.spritePositions.set(actionNumber, { x, y })
+    logDevice.debug('Set sprite position:', { actionNumber, x, y })
+  }
+
+  /**
+   * Set sprite position for XPOS/YPOS tests (alias for test helper)
    */
   setSpritePositionForTest(actionNumber: number, x: number, y: number): void {
-    this.spritePositions.set(actionNumber, { x, y })
+    this.setSpritePosition(actionNumber, x, y)
   }
 
   // === INPUT (INPUT/LINPUT) ===
@@ -124,12 +131,6 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
   playSound?(musicString: string): void {
     this.playSoundCalls.push(musicString)
     logDevice.debug('Play sound:', musicString)
-  }
-
-  // === ANIMATION COMMANDS ===
-
-  sendAnimationCommand(command: AnimationCommand): void {
-    this.animationCommandCalls.push(command)
   }
 
   // === TEXT OUTPUT METHODS ===
@@ -254,7 +255,6 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
   reset(): void {
     this.clearOutputs()
     this.clearJoystickState()
-    this.animationCommandCalls = []
     this.spritePositions.clear()
   }
 

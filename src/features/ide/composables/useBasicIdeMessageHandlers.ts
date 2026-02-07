@@ -3,7 +3,7 @@
  *
  * Use loglevel: log.getLogger('ide-messages').setLevel('debug') in console for verbose logs.
  */
-/* eslint-disable max-lines -- multiple handlers; extract to useBasicIdeScreenUpdateHandler etc. when adding more */
+ 
 
 import type { Ref } from 'vue'
 
@@ -12,7 +12,6 @@ import type {
   SharedDisplayViews,
 } from '@/core/animation/sharedDisplayBuffer'
 import type {
-  AnimationCommand,
   AnyServiceWorkerMessage,
   ErrorMessage,
   RequestInputMessage,
@@ -111,8 +110,8 @@ function flushMessageQueue(): void {
 }
 
 /**
- * Pending action for a sprite when its Konva node does not exist yet; 
- * applied when node is created or START_MOVEMENT is handled. 
+ * Pending action for a sprite when its Konva node does not exist yet;
+ * applied when node is created or START_MOVEMENT is handled.
  */
 export type PendingSpriteAction = { type: 'POSITION'; x: number; y: number }
 
@@ -132,14 +131,12 @@ export interface MessageHandlerContext {
   backdropColor?: Ref<number>
   spritePalette?: Ref<number>
   cgenMode?: Ref<number>
-  movementStates?: Ref<MovementState[]>
+  // movementStates removed - read from shared buffer instead
   frontSpriteNodes?: Ref<Map<number, unknown>>
   backSpriteNodes?: Ref<Map<number, unknown>>
   /** Per-sprite action queue; POSITION etc. when node does not exist; consumed when START_MOVEMENT is handled. */
   spriteActionQueues?: Ref<SpriteActionQueues>
   webWorkerManager: WebWorkerManager
-  /** Shared animation state view; main thread reads positions from buffer (Animation Worker is the only writer). */
-  sharedAnimationView?: Float64Array
   /** Shared display buffer views; main reads screen/cursor/scalars when SCREEN_CHANGED. */
   sharedDisplayViews?: SharedDisplayViews
   /** Called when SCREEN_CHANGED is received to schedule a render (Screen.vue reads from shared buffer). */
@@ -194,7 +191,7 @@ export function handleScreenChangedMessage(
  */
 export function handleScreenUpdateMessage(message: AnyServiceWorkerMessage, context: MessageHandlerContext): void {
   if (message.type !== 'SCREEN_UPDATE') return
-  
+
   const update = message.data
   if (!update) {
     logComposable.warn('SCREEN_UPDATE message has no data')
@@ -477,163 +474,19 @@ export function handlePlaySoundMessage(message: AnyServiceWorkerMessage, _contex
 
 /**
  * Handle animation command message from web worker
- * These commands are sent immediately when MOVE is executed
  *
- * FORWARDS to Animation Worker if available (single-writer architecture).
- * Falls back to local processing if Animation Worker is not initialized.
+ * NOTE: All animation commands are now handled via direct sync (Executor Worker → Animation Worker)
+ * through shared buffer using Atomics. Main thread reads animation state ONLY from shared buffer.
+ *
+ * Per real F-BASIC hardware behavior:
+ * - POSITION on inactive sprite: No immediate screen change; stores as start position for next MOVE
+ * - POSITION on active sprite: Takes effect immediately (render loop reads from shared buffer)
+ *
+ * This handler is obsolete and should no longer receive messages.
  */
-export function handleAnimationCommandMessage(message: AnyServiceWorkerMessage, context: MessageHandlerContext): void {
-  if (message.type !== 'ANIMATION_COMMAND') return
-  if (!context.movementStates) return
-
-  // TypeScript narrows message.data to AnimationCommand after type check
-  const command: AnimationCommand = message.data
-
-  logIdeMessages.debug('🎬 Handling animation command:', command.type, command)
-
-  // Note: Animation commands are now handled via direct sync (Executor Worker → Animation Worker)
-  // through shared buffer using Atomics. This handler only updates main thread movementStates
-  // for render loop tracking. The Animation Worker is the single writer to the shared buffer.
-
-  // Trace ERA→MOVE sequences for teleportation debugging
-  const timestamp = performance.now()
-  const activeBefore = context.movementStates.value.filter(m => m.isActive).map(m => m.actionNumber)
-  logIdeMessages.debug(`🎬 [${timestamp.toFixed(2)}ms] ${command.type} | active movements BEFORE:`, activeBefore.length > 0 ? activeBefore : 'none')
-
-  switch (command.type) {
-    case 'START_MOVEMENT': {
-      logIdeMessages.warn(`🎬 START_MOVEMENT #${command.actionNumber} | startX: ${command.startX}, startY: ${command.startY}, speed: ${command.definition.speed}, direction: ${command.definition.direction}`)
-
-      // Create minimal tracking state for render loop - Animation Worker is authoritative for positions
-      const movementState: MovementState = {
-        actionNumber: command.actionNumber,
-        definition: command.definition,
-        startX: command.startX,
-        startY: command.startY,
-        remainingDistance: 2 * command.definition.distance,
-        totalDistance: 2 * command.definition.distance,
-        speedDotsPerSecond: command.definition.speed === 0 ? 60 / 256 : 60 / command.definition.speed,
-        directionDeltaX: getDirectionDeltaX(command.definition.direction),
-        directionDeltaY: getDirectionDeltaY(command.definition.direction),
-        isActive: true,
-        currentFrameIndex: 0,
-        frameCounter: 0,
-      }
-
-      // Add or update movement state
-      const existing = context.movementStates.value.findIndex(
-        m => m.actionNumber === command.actionNumber
-      )
-
-      if (existing >= 0) {
-        context.movementStates.value[existing] = movementState
-      } else {
-        context.movementStates.value.push(movementState)
-      }
-
-      // Force reactivity by creating new array
-      context.movementStates.value = [...context.movementStates.value]
-
-      const activeAfter = context.movementStates.value.filter(m => m.isActive).map(m => m.actionNumber)
-      logIdeMessages.warn(
-        `🎬 START_MOVEMENT COMPLETE #${command.actionNumber} | total movements: ${context.movementStates.value.length} | active: ${activeAfter.join(',') || 'none'}`
-      )
-      break
-    }
-
-    case 'STOP_MOVEMENT': {
-      // Always update main thread state (for tracking)
-      if (command.positions) {
-        for (const pos of command.positions) {
-          const movement = context.movementStates.value.find(m => m.actionNumber === pos.actionNumber)
-          if (movement) {
-            movement.isActive = false
-            movement.remainingDistance = pos.remainingDistance
-          }
-        }
-      } else {
-        for (const actionNumber of command.actionNumbers) {
-          const movement = context.movementStates.value.find(m => m.actionNumber === actionNumber)
-          if (movement) {
-            movement.isActive = false
-          }
-        }
-      }
-      context.movementStates.value = [...context.movementStates.value]
-      break
-    }
-
-    case 'ERASE_MOVEMENT': {
-      const activeAfter = context.movementStates.value.filter(
-        m => !command.actionNumbers.includes(m.actionNumber) && m.isActive
-      ).map(m => m.actionNumber)
-      logIdeMessages.warn(`🎬 ERASE_MOVEMENT [${command.actionNumbers.join(',')}] | active movements AFTER:`, activeAfter.length > 0 ? activeAfter : 'none')
-
-      context.movementStates.value = context.movementStates.value.filter(
-        m => !command.actionNumbers.includes(m.actionNumber)
-      )
-      for (const actionNumber of command.actionNumbers) {
-        context.spriteActionQueues?.value.delete(actionNumber)
-      }
-      break
-    }
-
-    case 'SET_POSITION': {
-      const spriteNode =
-        context.frontSpriteNodes?.value?.get(command.actionNumber) ??
-        context.backSpriteNodes?.value?.get(command.actionNumber)
-
-      if (spriteNode && typeof spriteNode === 'object' && 'x' in spriteNode && 'y' in spriteNode) {
-        if (typeof spriteNode.x === 'function' && typeof spriteNode.y === 'function') {
-          ;(spriteNode.x as (x: number) => void)(command.x)
-          ;(spriteNode.y as (y: number) => void)(command.y)
-          context.spriteActionQueues?.value.delete(command.actionNumber)
-        }
-      } else {
-        const queues = context.spriteActionQueues?.value
-        if (queues) {
-          const q = queues.get(command.actionNumber) ?? []
-          q.push({ type: 'POSITION', x: command.x, y: command.y })
-          queues.set(command.actionNumber, q)
-        }
-      }
-      break
-    }
-
-    case 'UPDATE_MOVEMENT_POSITION': {
-      // Update movement remaining distance (position is in Konva node)
-      const movement = context.movementStates.value.find(m => m.actionNumber === command.actionNumber)
-      if (movement) {
-        movement.remainingDistance = command.remainingDistance
-      }
-      break
-    }
-  }
-}
-/**
- * Helper to get X delta from direction
- */
-function getDirectionDeltaX(direction: number): number {
-  switch (direction) {
-    case 2:
-    case 3:
-    case 4:
-      return 1 // Right directions
-    case 6:
-    case 7:
-    case 8:
-      return -1 // Left directions
-    default:
-      return 0
-  }
-}
+// Omitted: handleAnimationCommandMessage - Animation commands now handled via shared buffer sync
 
 /**
- * Helper to get Y delta from direction
- */
-function getDirectionDeltaY(direction: number): number {
-  switch (direction) {
-    case 1:
     case 2:
     case 8:
       return -1 // Up directions
@@ -648,18 +501,18 @@ function getDirectionDeltaY(direction: number): number {
 
 /**
  * Route message to appropriate handler
- * 
+ *
  * Event loop execution order in browsers:
  * 1. Execute macrotask (worker.onmessage callback) - WE ARE HERE
  * 2. Execute all microtasks (Promise.then, queueMicrotask)
  * 3. Execute requestAnimationFrame callbacks (rendering phase)
  * 4. Browser rendering (paint)
  * 5. Execute requestIdleCallback (idle time)
- * 
+ *
  * Strategy:
  * - Critical messages (RESULT, ERROR): Process immediately (synchronously)
  * - Non-critical messages (SCREEN_UPDATE, OUTPUT): Queue for processing in requestAnimationFrame
- * 
+ *
  * This ensures:
  * - Vue state updates happen in the same frame as rendering
  * - State updates and rendering are synchronized
@@ -706,9 +559,6 @@ function processMessage(message: AnyServiceWorkerMessage, context: MessageHandle
       break
     case 'SCREEN_UPDATE':
       handleScreenUpdateMessage(message, context)
-      break
-    case 'ANIMATION_COMMAND':
-      handleAnimationCommandMessage(message, context)
       break
     case 'RESULT':
       handleResultMessage(message, context)

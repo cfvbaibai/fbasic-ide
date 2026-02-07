@@ -314,7 +314,7 @@ This document outlines the remaining work for the Family Basic IDE project. Prog
   - MOVE(n) status query ✅
   - Position preservation fix for CUT command ✅
 - [x] **Phase 6**: Integration & Polish ✅ (2026-01-29)
-  - Performance: dirty background, animation-first prioritization, buffer-only render (useKonvaBackgroundRenderer, useScreenAnimationLoop, useRenderQueue)
+  - Performance: dirty background, animation-first prioritization, buffer-only render (useKonvaBackgroundRenderer, useScreenAnimationLoopRenderOnly - inlined render scheduling)
   - State sync: SharedArrayBuffer (sharedDisplayBuffer, sharedAnimationBuffer)
   - Error handling: executor audit, consistent messages
   - Testing: Layer 1/2 + `test/animation/` (AnimationManager, CharacterAnimationBuilder, FrameAnimation)

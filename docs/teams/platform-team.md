@@ -120,8 +120,8 @@ interface JoystickBufferView {
 - `characterSequenceConfig.ts` - Direction/sprite mapping per character (0-15)
 
 **Shared Buffers:**
-- `sharedAnimationBuffer.ts` - Legacy (192 bytes sprite-only, now part of sharedDisplayBuffer)
-- `sharedDisplayBuffer.ts` - Combined buffer (1548 bytes)
+- `sharedDisplayBuffer.ts` - Combined buffer (1624 bytes: sprites + screen + cursor + scalars + animation sync)
+- `sharedAnimationBuffer.ts` - Helper module for animation sync section (within combined display buffer)
 
 **Main Thread:**
 - `useScreenAnimationLoopRenderOnly.ts` - Render-only animation loop
@@ -371,4 +371,5 @@ describe('AnimationManager', () => {
 ## Reference
 
 - **F-BASIC manual**: `docs/reference/family-basic-manual/` (device behavior)
-- **Shared buffer layout**: See `sharedDisplayBuffer.ts` comments
+- **Shared buffer layout**: `docs/reference/shared-display-buffer.md`
+- **Worker message types**: `docs/reference/worker-messages.md`

@@ -5,6 +5,7 @@
 
 import Konva from 'konva'
 
+import type { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import type { ScreenCell } from '@/core/interfaces'
 import type { MovementState, SpriteState } from '@/core/sprite/types'
 import { COLORS } from '@/shared/data/palette'
@@ -62,6 +63,10 @@ export function initializeKonvaLayers(stage: Konva.Stage): KonvaScreenLayers {
   layers.spriteFrontLayer = new Konva.Layer()
   stage.add(layers.spriteFrontLayer)
 
+  console.log('[initializeKonvaLayers] Created layers:', {
+    stageChildren: stage.getChildren().length,
+  })
+
   return layers
 }
 
@@ -116,19 +121,20 @@ export function renderBackgroundLayer(
 /**
  * Render sprites on a sprite layer (back or front)
  * Returns a Map of actionNumber -> Konva.Image for animated sprites
+ * Reads movement definitions from shared buffer (pure buffer read).
  */
 export async function renderSpriteLayer(
   layer: Konva.Layer | null,
   spriteStates: SpriteState[],
-  movementStates: MovementState[],
   priority: number,
   spritePaletteCode: number,
   spriteEnabled: boolean,
+  accessor: SharedDisplayBufferAccessor | null,
   spriteNodeMap?: Map<number, Konva.Image>
 ): Promise<Map<number, Konva.Image>> {
   const nodeMap = spriteNodeMap ?? new Map<number, Konva.Image>()
 
-  if (!layer) return nodeMap
+  if (!layer || !accessor) return nodeMap
 
   // Preserve existing node positions before destroying (to maintain position during re-render)
   const preservedPositions = new Map<number, { x: number; y: number }>()
@@ -149,12 +155,11 @@ export async function renderSpriteLayer(
     for (const spriteState of staticSprites) {
       // Check if this sprite is moving (has active movement state)
       // Note: In Family BASIC, action numbers and sprite numbers are separate
-      // For now, we check if there's a movement with matching action number
-      const movement = movementStates.find(
-        m => m.actionNumber === spriteState.spriteNumber && m.isActive
-      )
+      // Read isActive from shared buffer (Animation Worker is the source of truth)
+      const actionNumber = spriteState.spriteNumber
+      const isActive = accessor.readSpriteIsActive(actionNumber)
 
-      if (!movement) {
+      if (!isActive) {
         // Render static sprite (DEF SPRITE) - only if not moving
         const konvaImage = await createStaticSpriteKonvaImage(spriteState, spritePaletteCode)
         if (konvaImage) {
@@ -166,27 +171,55 @@ export async function renderSpriteLayer(
 
   // Second, render movements (DEF MOVE) - both active and stopped (CUT)
   // These work independently of SPRITE ON/OFF
-  // Filter movements by priority (include both active and inactive for CUT command)
-  const movementsToRender = movementStates.filter(m => {
-    if (!m?.definition) return false
-    return m.definition.priority === priority
+  // Filter by priority AND visibility (isVisible from shared buffer)
+  // State matrix: isActive=false, isVisible=false → not rendered (ERA/undefined)
+  //              isActive=true, isVisible=true → rendered (moving)
+  //              isActive=false, isVisible=true → rendered (CUT/stopped)
+  const movementsToRender: number[] = []
+
+  for (let actionNumber = 0; actionNumber < 8; actionNumber++) {
+    // Check if slot has DEF MOVE (characterType >= 0)
+    const characterType = accessor.readSpriteCharacterType(actionNumber)
+    if (characterType < 0) continue
+
+    const slotPriority = accessor.readSpritePriority(actionNumber)
+    if (slotPriority !== priority) continue
+
+    // Check isVisible flag from shared buffer (AnimationWorker controls visibility)
+    const isVisible = accessor.readSpriteIsVisible(actionNumber)
+    if (!isVisible) continue
+
+    movementsToRender.push(actionNumber)
+  }
+
+  console.log('[renderSpriteLayer] Rendering', {
+    priority,
+    movementsToRender: movementsToRender.length,
+    actions: movementsToRender,
   })
 
-  for (const movement of movementsToRender) {
+  for (const actionNumber of movementsToRender) {
     // Render animated sprite (DEF MOVE) - both active and stopped movements
-    const konvaImage = await createAnimatedSpriteKonvaImage(movement, spritePaletteCode)
+    const konvaImage = await createAnimatedSpriteKonvaImage(actionNumber, spritePaletteCode, accessor)
+    console.log('[renderSpriteLayer] After createAnimatedSpriteKonvaImage:', {
+      action: actionNumber,
+      hasImage: !!konvaImage,
+      x: konvaImage?.x() ?? 'null',
+      y: konvaImage?.y() ?? 'null',
+    })
     if (konvaImage) {
       // Restore preserved position if available (maintains position during re-render)
-      const preservedPos = preservedPositions.get(movement.actionNumber)
+      const preservedPos = preservedPositions.get(actionNumber)
       if (preservedPos) {
         konvaImage.x(preservedPos.x)
         konvaImage.y(preservedPos.y)
       }
       layer.add(konvaImage)
-      nodeMap.set(movement.actionNumber, konvaImage)
+      nodeMap.set(actionNumber, konvaImage)
     }
   }
 
+  console.log('[renderSpriteLayer] Before layer.draw(), nodeMap size:', nodeMap.size, 'layer children:', layer.getChildren().length)
   // Draw the layer
   layer.draw()
 
@@ -196,38 +229,68 @@ export async function renderSpriteLayer(
 /**
  * Update sprite positions and frames for animated sprites
  * Called each frame during animation loop
+ * Handles visibility changes (CUT/ERA) via isVisible flag
+ * Reads movement definitions from shared buffer (pure buffer read)
  */
 export async function updateAnimatedSprites(
   spriteFrontLayer: Konva.Layer | null,
   spriteBackLayer: Konva.Layer | null,
-  movementStates: MovementState[],
   spritePaletteCode: number,
   frontSpriteNodes: Map<number, Konva.Image>,
-  backSpriteNodes: Map<number, Konva.Image>
+  backSpriteNodes: Map<number, Konva.Image>,
+  accessor?: SharedDisplayBufferAccessor | null
 ): Promise<void> {
+  if (!accessor) return
+
   // Update sprites on front layer (priority E=0)
   // Include both active and stopped movements (stopped movements need position updates)
-  for (const movement of movementStates) {
-    if (movement.definition?.priority !== 0) continue
+  for (let actionNumber = 0; actionNumber < 8; actionNumber++) {
+    const characterType = accessor.readSpriteCharacterType(actionNumber)
+    // Skip if no DEF MOVE (characterType = -1 means uninitialized)
+    if (characterType < 0) continue
 
-    const spriteNode = frontSpriteNodes.get(movement.actionNumber)
-    if (spriteNode) {
-      // Update position for both active and stopped movements
-      // Active movements: full update (position + frame)
-      // Stopped movements: position only (to ensure correct location after CUT)
-      await updateAnimatedSpriteKonvaImage(movement, spriteNode, spritePaletteCode)
+    const priority = accessor.readSpritePriority(actionNumber)
+    if (priority !== 0) continue // Skip non-front sprites
+
+    const spriteNode = frontSpriteNodes.get(actionNumber)
+    if (!spriteNode) continue
+
+    // Check isVisible flag from shared buffer
+    const isVisible = accessor.readSpriteIsVisible(actionNumber)
+
+    if (isVisible) {
+      spriteNode.visible(true)
+      // Update frame for visible sprites (position is updated by animation loop)
+      await updateAnimatedSpriteKonvaImage(actionNumber, spriteNode, spritePaletteCode, accessor)
+    } else {
+      // Hide sprite when isVisible=false (ERA or not yet moved)
+      spriteNode.visible(false)
     }
   }
 
   // Update sprites on back layer (priority E=1)
   // Include both active and stopped movements
-  for (const movement of movementStates) {
-    if (movement.definition?.priority !== 1) continue
+  for (let actionNumber = 0; actionNumber < 8; actionNumber++) {
+    const characterType = accessor.readSpriteCharacterType(actionNumber)
+    // Skip if no DEF MOVE (characterType = -1 means uninitialized)
+    if (characterType < 0) continue
 
-    const spriteNode = backSpriteNodes.get(movement.actionNumber)
-    if (spriteNode) {
-      // Update position for both active and stopped movements
-      await updateAnimatedSpriteKonvaImage(movement, spriteNode, spritePaletteCode)
+    const priority = accessor.readSpritePriority(actionNumber)
+    if (priority !== 1) continue // Skip non-back sprites
+
+    const spriteNode = backSpriteNodes.get(actionNumber)
+    if (!spriteNode) continue
+
+    // Check isVisible flag from shared buffer
+    const isVisible = accessor.readSpriteIsVisible(actionNumber)
+
+    if (isVisible) {
+      spriteNode.visible(true)
+      // Update frame for visible sprites
+      await updateAnimatedSpriteKonvaImage(actionNumber, spriteNode, spritePaletteCode, accessor)
+    } else {
+      // Hide sprite when isVisible=false (ERA or not yet moved)
+      spriteNode.visible(false)
     }
   }
 
@@ -264,11 +327,11 @@ export async function renderAllScreenLayers(
   layers: KonvaScreenLayers,
   buffer: ScreenCell[][],
   spriteStates: SpriteState[],
-  movementStates: MovementState[],
   bgPaletteCode: number,
   spritePaletteCode: number,
   backdropColor: number,
   spriteEnabled: boolean,
+  accessor: SharedDisplayBufferAccessor | null,
   _backgroundShouldCache: boolean = true,
   frontSpriteNodes?: Map<number, Konva.Image>,
   backSpriteNodes?: Map<number, Konva.Image>,
@@ -279,6 +342,14 @@ export async function renderAllScreenLayers(
 }> {
   const backgroundOnly = options?.backgroundOnly ?? false
   // lastBackgroundBuffer kept for API compatibility (background is now Canvas2D)
+
+  console.log('[renderAllScreenLayers] Called with', {
+    backgroundOnly,
+    spriteStatesCount: spriteStates.length,
+    hasFrontLayer: !!layers.spriteFrontLayer,
+    hasBackLayer: !!layers.spriteBackLayer,
+    spriteEnabled,
+  })
 
   // 1. Render backdrop layer (if layer exists, otherwise handled by template)
   if (layers.backdropLayer) {
@@ -299,10 +370,10 @@ export async function renderAllScreenLayers(
   const backNodes = await renderSpriteLayer(
     layers.spriteBackLayer,
     spriteStates,
-    movementStates,
     1,
     spritePaletteCode,
     spriteEnabled,
+    accessor,
     backSpriteNodes
   )
 
@@ -313,10 +384,10 @@ export async function renderAllScreenLayers(
   const frontNodes = await renderSpriteLayer(
     layers.spriteFrontLayer,
     spriteStates,
-    movementStates,
     0,
     spritePaletteCode,
     spriteEnabled,
+    accessor,
     frontSpriteNodes
   )
 
