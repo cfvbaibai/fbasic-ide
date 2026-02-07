@@ -128,7 +128,7 @@ onUnmounted(() => {
         <p>Testing Konva.js for sprite animation with Family BASIC sprites</p>
         <div class="test-info">
           <p><strong>Movements:</strong> {{ movements.length }}</p>
-          <p><strong>Note:</strong> This demo uses simplified animation; full animation is handled by Animation Worker</p>
+          <p><strong>Note:</strong> Simplified animation; full animation is handled by Animation Worker</p>
         </div>
       </div>
 

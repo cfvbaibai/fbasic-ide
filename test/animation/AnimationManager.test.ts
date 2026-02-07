@@ -8,9 +8,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { AnimationManager } from '@/core/animation/AnimationManager'
-import { getSpriteSizeForMoveDefinition } from '@/core/animation/CharacterAnimationBuilder'
 import { SHARED_DISPLAY_BUFFER_BYTES } from '@/core/animation/sharedDisplayBuffer'
-import { SCREEN_DIMENSIONS } from '@/core/constants'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
 import type { MoveDefinition } from '@/core/sprite/types'
 import { MoveCharacterCode } from '@/shared/data/types'

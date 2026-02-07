@@ -3,7 +3,7 @@
  */
 
 import type { ERROR_TYPES, VARIABLE_TYPES } from './constants'
-import type { MoveDefinition, MovementState, SpriteState } from './sprite/types'
+import type { SpriteState } from './sprite/types'
 import type { ExecutionContext } from './state/ExecutionContext'
 import type { BasicArrayValue } from './types/BasicTypes'
 

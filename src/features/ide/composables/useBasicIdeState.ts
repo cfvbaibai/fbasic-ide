@@ -8,7 +8,7 @@ import { type Ref, ref } from 'vue'
 import type { BasicVariable } from '@/core/interfaces'
 import type { RequestInputMessage } from '@/core/interfaces'
 import type { ScreenCell } from '@/core/interfaces'
-import type { MovementState, SpriteState } from '@/core/sprite/types'
+import type { SpriteState } from '@/core/sprite/types'
 
 import type { PendingSpriteAction } from './useBasicIdeMessageHandlers'
 import { initializeScreenBuffer } from './useBasicIdeScreenUtils'

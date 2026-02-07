@@ -7,7 +7,7 @@ import Konva from 'konva'
 
 import type { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import type { ScreenCell } from '@/core/interfaces'
-import type { MovementState, SpriteState } from '@/core/sprite/types'
+import type { SpriteState } from '@/core/sprite/types'
 import { COLORS } from '@/shared/data/palette'
 
 import {

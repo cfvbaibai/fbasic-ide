@@ -179,7 +179,7 @@ async function render(): Promise<void> {
 
     // Determine if background should be cached (static when no active movements)
     // Pure Buffer Read: check isActive directly from shared buffer
-    const hasActiveMovements = (() => {
+    ;(() => {
       if (!ctx.sharedDisplayBufferAccessor) return false
       for (let actionNumber = 0; actionNumber < 8; actionNumber++) {
         if (ctx.sharedDisplayBufferAccessor.readSpriteIsActive(actionNumber)) {
@@ -188,7 +188,6 @@ async function render(): Promise<void> {
       }
       return false
     })()
-    const backgroundShouldCache = !hasActiveMovements
 
     // Render sprites using Konva
     const layersToRender: KonvaScreenLayers = {
@@ -203,7 +202,6 @@ async function render(): Promise<void> {
     const movementsFromBuffer = ctx.sharedDisplayBufferAccessor?.readAllMovementStates() ?? []
     const movementCount = movementsFromBuffer.length
     const spriteNodeCount = frontSpriteNodes.value.size + backSpriteNodes.value.size
-    const spriteStateCount = ctx.spriteStates.value?.length ?? 0
     const needSpriteBuild =
       movementCount > 0 && (spriteNodeCount === 0 || spriteNodeCount < movementCount)
     // When Clear: 0 movements, nodes still exist — must run sprite layers to clear Konva nodes

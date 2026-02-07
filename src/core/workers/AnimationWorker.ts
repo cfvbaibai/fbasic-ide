@@ -270,7 +270,6 @@ export class AnimationWorker {
   private handleEraseMovementFromSync(actionNumber: number): void {
     logWorker.debug('[AnimationWorker] ERASE_MOVEMENT from sync:', actionNumber)
 
-    const movement = this.movementStates.get(actionNumber)
     this.movementStates.delete(actionNumber)
     // Write inactive state to shared buffer (reset all values, characterType=-1 marks as uninitialized)
     if (this.accessor) {

@@ -5,11 +5,11 @@ import { useI18n } from 'vue-i18n'
 import type { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import type { ScreenCell } from '@/core/interfaces'
 import type { MovementState, SpriteState } from '@/core/sprite/types'
-import { GameBlock, GameIcon, GameTabPane,GameTabs } from '@/shared/components/ui'
+import { GameBlock, GameTabPane, GameTabs } from '@/shared/components/ui'
 import { COLORS } from '@/shared/data/palette'
-import { MoveCharacterCode } from '@/shared/data/types'
 
 import ActivePaletteDisplay from './ActivePaletteDisplay.vue'
+import MovementCard, { type MovementSlotData } from './MovementCard.vue'
 
 defineOptions({
   name: 'StateInspector',
@@ -59,7 +59,7 @@ function hexFor(index: number): string {
 const MOVE_SLOT_COUNT = 8
 
 /** Always 8 slots (action 0–7); each slot has movement data from shared buffer. */
-const moveSlots = computed(() => {
+const moveSlots = computed<MovementSlotData[]>(() => {
   const accessor = props.sharedDisplayBufferAccessor
   const states = props.movementStates ?? []
   const byAction = new Map(states.map(m => [m.actionNumber, m]))
@@ -79,7 +79,7 @@ const moveSlots = computed(() => {
 
     // Fall back to local state for definition if not in buffer yet
     const m = byAction.get(actionNumber)
-    const hasData = isActive || (accessor && (x !== 0 || y !== 0))
+    const hasData = Boolean(isActive || (accessor && (x !== 0 || y !== 0)))
 
     return {
       actionNumber,
@@ -98,37 +98,6 @@ const moveSlots = computed(() => {
     }
   })
 })
-
-/** Direction 0–8 as MDI arrow icon names (0=none, 1=up … 8=up-left). */
-const DIRECTION_ICONS: Record<number, string> = {
-  0: 'mdi:circle-outline',   // none
-  1: 'mdi:arrow-up',         // up
-  2: 'mdi:arrow-top-right',  // up-right
-  3: 'mdi:arrow-right',     // right
-  4: 'mdi:arrow-bottom-right', // down-right
-  5: 'mdi:arrow-down',       // down
-  6: 'mdi:arrow-bottom-left',  // down-left
-  7: 'mdi:arrow-left',       // left
-  8: 'mdi:arrow-top-left',   // up-left
-}
-
-const DIRECTION_NAMES: Record<number, string> = {
-  0: 'none', 1: 'up', 2: 'up-right', 3: 'right', 4: 'down-right',
-  5: 'down', 6: 'down-left', 7: 'left', 8: 'up-left',
-}
-
-function directionIcon(dir: number): string {
-  return DIRECTION_ICONS[dir] ?? 'mdi:circle-outline'
-}
-
-function directionTitle(dir: number): string {
-  return DIRECTION_NAMES[dir] ?? `dir ${dir}`
-}
-
-function characterTypeLabel(code: number): string {
-  const name = MoveCharacterCode[code as MoveCharacterCode]
-  return name ?? String(code)
-}
 </script>
 
 <template>
@@ -173,54 +142,11 @@ function characterTypeLabel(code: number): string {
         <GameTabPane name="move" :label="t('ide.stateInspector.tabMove')">
           <div class="tab-pane horizontal move-tab">
             <div class="grid-cards move-cards">
-              <div
+              <MovementCard
                 v-for="slot in moveSlots"
                 :key="slot.actionNumber"
-                class="card move-card"
-              >
-                <div class="move-card-header">
-                  <span class="move-card-id" title="Action number">
-                    <span>{{ slot.actionNumber }}</span>
-                  </span>
-                  <template v-if="slot.hasData || slot.m">
-                    <span class="move-card-char" :title="characterTypeLabel(slot.characterType || slot.m?.definition.characterType || 0)">
-                      {{ characterTypeLabel(slot.characterType || slot.m?.definition.characterType || 0).slice(0, 5) }}
-                    </span>
-                    <span class="move-card-status" :title="slot.isActive ? 'Active' : 'Paused'">
-                      <GameIcon
-                        :icon="slot.isActive ? 'mdi:play' : 'mdi:pause'"
-                        size="small"
-                        class="move-card-icon"
-                      />
-                    </span>
-                    <span
-                      class="move-card-dir"
-                      :title="directionTitle(slot.direction || slot.m?.definition.direction || 0)"
-                      aria-label="direction {{ directionTitle(slot.direction || slot.m?.definition.direction || 0) }}"
-                    >
-                      <GameIcon
-                        :icon="directionIcon(slot.direction || slot.m?.definition.direction || 0)"
-                        size="small"
-                        class="move-card-icon"
-                      />
-                    </span>
-                  </template>
-                </div>
-                <div class="move-card-body">
-                  <div class="move-card-cell">
-                    <GameIcon v-if="slot.hasData || slot.m" icon="mdi:crosshairs-gps" size="small" class="move-card-icon" />
-                    <span class="move-card-value">{{ (slot.hasData || slot.m) ? `${slot.x},${slot.y}` : '' }}</span>
-                  </div>
-                  <div class="move-card-cell move-card-cell-left">
-                    <GameIcon v-if="slot.hasData || slot.m" icon="mdi:ruler" size="small" class="move-card-icon" />
-                    <span class="move-card-value">{{ (slot.hasData || slot.m) ? Math.round(slot.remainingDistance) : '' }}</span>
-                  </div>
-                  <div class="move-card-cell move-card-cell-right">
-                    <GameIcon v-if="slot.hasData || slot.m" icon="mdi:speedometer" size="small" class="move-card-icon" />
-                    <span class="move-card-value">{{ (slot.hasData || slot.m) ? slot.speed : '' }}</span>
-                  </div>
-                </div>
-              </div>
+                :slot="slot"
+              />
             </div>
           </div>
         </GameTabPane>
@@ -329,12 +255,8 @@ function characterTypeLabel(code: number): string {
 }
 
 /* MOVE tab: structured cards with icons */
-.move-tab .card,
 .move-tab .empty {
   font-size: 1rem;
-}
-
-.move-tab .empty {
   padding: 0.5rem;
 }
 
@@ -343,87 +265,6 @@ function characterTypeLabel(code: number): string {
   grid-template-columns: repeat(auto-fill, minmax(5rem, 11rem));
   gap: 0.5rem;
   width: 100%;
-}
-
-.move-card {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding: 0.3rem 0.6rem 0.5rem;
-  font-variant-numeric: tabular-nums;
-}
-
-.move-card-header {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  border-bottom: 1px solid var(--game-surface-border);
-}
-
-.move-card-id {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.2rem;
-  font-weight: 700;
-}
-
-.move-card-char {
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  color: var(--game-text-secondary);
-  padding: 0.1rem 0.25rem;
-  background: var(--game-surface-bg-start);
-  border-radius: 3px;
-}
-
-.move-card-dir {
-  font-size: 1.1em;
-  font-weight: 700;
-  min-width: 1em;
-  text-align: center;
-  display: flex;
-  align-items: center;
-}
-
-.move-card-header .move-card-status {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  font-weight: 600;
-}
-
-.move-card-body {
-  display: grid;
-  grid-template-columns: 3fr 2fr 2fr;
-  gap: 0.25rem 0.5rem;
-}
-
-.move-card-cell {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  min-height: 1.2rem;
-}
-
-.move-card-cell-center {
-  justify-content: center;
-}
-
-.move-card-cell-right {
-  justify-content: flex-end;
-}
-
-.move-card-icon {
-  flex-shrink: 0;
-  color: var(--game-text-secondary);
-}
-
-.move-card-value {
-  font-size: 0.85rem;
-  min-width: 0;
 }
 
 /* Palettes tab: larger labels, swatches, and extras for readability */

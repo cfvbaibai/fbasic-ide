@@ -23,7 +23,8 @@ export const CELLS = COLS * ROWS // 672
 
 // Byte offsets (plan: §1)
 // Sprite data: 8 sprites × 12 floats × 8 bytes = 768 bytes
-// (x, y, isActive, isVisible, frameIndex, remainingDistance, totalDistance, direction, speed, priority, characterType, colorCombination)
+// (x, y, isActive, isVisible, frameIndex, remainingDistance, totalDistance,
+//  direction, speed, priority, characterType, colorCombination)
 const SPRITES_BYTES = MAX_SPRITES * 12 * 8 // 768
 export const OFFSET_SPRITES = 0
 export const OFFSET_CHARS = SPRITES_BYTES // 768

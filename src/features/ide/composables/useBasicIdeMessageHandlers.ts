@@ -19,7 +19,6 @@ import type {
   ScreenCell,
 } from '@/core/interfaces'
 import type { Note, Rest } from '@/core/sound/types'
-import type { MovementState } from '@/core/sprite/types'
 import { ExecutionError } from '@/features/ide/errors/ExecutionError'
 import { logComposable, logIdeMessages } from '@/shared/logger'
 

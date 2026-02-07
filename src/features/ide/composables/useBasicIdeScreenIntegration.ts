@@ -5,6 +5,7 @@
 
 import { ref } from 'vue'
 
+import { SyncCommandType } from '@/core/animation/sharedAnimationBuffer'
 import {
   createSharedDisplayBuffer,
   type DecodedScreenState,
@@ -13,7 +14,6 @@ import {
   writeScreenState,
 } from '@/core/animation/sharedDisplayBuffer'
 import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
-import { SyncCommandType } from '@/core/animation/sharedAnimationBuffer'
 import { TIMING } from '@/core/constants'
 import { createSharedJoystickBuffer } from '@/core/devices'
 

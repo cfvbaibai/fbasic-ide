@@ -23,7 +23,6 @@ const directions = [
  */
 export function generateMovements(count: number, speed: number): MovementState[] {
   const newMovements: MovementState[] = []
-  const speedDotsPerSecond = speed === 0 ? 60 / 256 : 60 / speed
 
   // Account for sprite size when calculating available space
   const spriteSize = 16 * SPRITE_SCALE
@@ -36,7 +35,7 @@ export function generateMovements(count: number, speed: number): MovementState[]
   const aspectRatio = CANVAS_WIDTH / CANVAS_HEIGHT
   let cols = Math.ceil(Math.sqrt(count * aspectRatio))
   let rows = Math.ceil(count / cols)
-  
+
   // Adjust to ensure we use the full canvas
   while (cols * rows < count) {
     if (cols <= rows) {
@@ -58,8 +57,8 @@ export function generateMovements(count: number, speed: number): MovementState[]
     const startY = margin + (row / Math.max(1, rows - 1)) * (usableHeight - margin * 2)
 
     // Round to integer positions and ensure within bounds
-    const clampedX = Math.round(Math.max(margin, Math.min(usableWidth, startX)))
-    const clampedY = Math.round(Math.max(margin, Math.min(usableHeight, startY)))
+    Math.round(Math.max(margin, Math.min(usableWidth, startX)))
+    Math.round(Math.max(margin, Math.min(usableHeight, startY)))
 
     newMovements.push({
       actionNumber: i,

@@ -10,11 +10,6 @@ import type { MovementState } from '@/core/sprite/types'
 
 import { updateSprites } from './useSpriteRendering'
 
-const CANVAS_WIDTH = 256
-const CANVAS_HEIGHT = 240
-const SPRITE_SCALE = 3
-const CANVAS_SCALE = 2
-
 export interface UseSpriteAnimationOptions {
   movements: Ref<MovementState[]>
   spriteRefs: Ref<Map<number, Konva.Image>>
@@ -32,12 +27,11 @@ export function useSpriteAnimation(options: UseSpriteAnimationOptions) {
       lastFrameTime = timestamp
     }
 
-    const deltaTime = timestamp - lastFrameTime
+    timestamp - lastFrameTime
     lastFrameTime = timestamp
 
     // Note: Position animation now handled by Animation Worker in main app
     // This demo page shows static sprites at center positions
-    const CANVAS_SCALE = 2
 
     // Frame animation is handled by Animation Worker in main app
     // This demo page only shows static sprites

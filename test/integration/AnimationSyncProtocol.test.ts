@@ -409,7 +409,7 @@ describe('Animation Sync Protocol', () => {
     })
 
     it('should handle slotBase calculation correctly', () => {
-      // Verify slotBase formula: actionNumber × 12 (x, y, isActive, isVisible, frameIndex, remainingDistance, totalDistance, direction, speed, priority, characterType, colorCombination)
+      // Verify slotBase formula: actionNumber × 12 (all sprite fields)
       expect(slotBase(0)).toBe(0)
       expect(slotBase(1)).toBe(12)
       expect(slotBase(2)).toBe(24)

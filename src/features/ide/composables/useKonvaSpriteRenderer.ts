@@ -7,7 +7,7 @@ import Konva from 'konva'
 
 import { buildAllCharacterAnimationConfigs, getSequenceForMovement } from '@/core/animation/CharacterAnimationBuilder'
 import type { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
-import type { ColorCombination, MovementState, SpriteState } from '@/core/sprite/types'
+import type { ColorCombination, SpriteState } from '@/core/sprite/types'
 import { COLORS, SPRITE_PALETTES } from '@/shared/data/palette'
 import type { Tile } from '@/shared/data/types'
 import { logScreen } from '@/shared/logger'
@@ -237,7 +237,12 @@ export async function getOrCreateMovementFrameImages(
         const frameInversion = sequence.frameInversions?.[i]
         const frameInvertX = frameInversion?.invertX ?? invertX
         const frameInvertY = frameInversion?.invertY ?? invertY
-        const frameImg = await createSpriteImageFromTiles(frameTiles, paletteColorCombination, frameInvertX, frameInvertY)
+        const frameImg = await createSpriteImageFromTiles(
+          frameTiles,
+          paletteColorCombination,
+          frameInvertX,
+          frameInvertY
+        )
         frameImages.push(frameImg)
       }
     }
