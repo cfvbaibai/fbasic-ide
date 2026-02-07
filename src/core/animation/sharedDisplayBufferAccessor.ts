@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /**
  * Shared Display Buffer Accessor
  *
@@ -8,31 +9,21 @@
  * serving as the single source of truth for buffer layout. Raw views are private
  * to prevent direct array access from outside.
  *
+ * All operation logic (read/write functions, sync protocol) is in this accessor.
+ * The sharedDisplayBuffer.ts file contains only structure (constants, types, factory).
+ *
  * @see {@link docs/reference/shared-display-buffer.md} for full buffer layout
  */
 
 import type { ScreenCell } from '@/core/interfaces'
-import { getCharacterByCode } from '@/shared/utils/backgroundLookup'
+import { logCore } from '@/shared/logger'
+import { getCharacterByCode, getCodeByChar } from '@/shared/utils/backgroundLookup'
 
 import {
   ACK_PENDING,
   ACK_RECEIVED,
-  readSpriteCharacterType,
-  readSpriteColorCombination,
-  readSpriteDirection,
-  readSpriteFrameIndex,
-  readSpriteIsActive,
-  readSpriteIsVisible,
-  readSpritePosition,
-  readSpritePriority,
-  readSpriteRemainingDistance,
-  readSpriteSpeed,
-  readSpriteTotalDistance,
-  SyncCommandType,
-  writeSpriteState as helperWriteSpriteState,
-} from './sharedAnimationBuffer'
-import {
   COLS,
+  MAX_SPRITES,
   OFFSET_ANIMATION_SYNC,
   OFFSET_CHARS,
   OFFSET_CURSOR,
@@ -41,7 +32,26 @@ import {
   OFFSET_SEQUENCE,
   ROWS,
   SHARED_DISPLAY_BUFFER_BYTES,
+  slotBase,
+  SyncCommandType,
 } from './sharedDisplayBuffer'
+
+// Re-export types for convenience
+export type { SyncCommandType } from './sharedDisplayBuffer'
+
+/**
+ * Decoded screen state read from shared buffer.
+ * Used to transfer state from buffer to IDE refs.
+ */
+export interface DecodedScreenState {
+  buffer: ScreenCell[][]
+  cursorX: number
+  cursorY: number
+  bgPalette: number
+  spritePalette: number
+  backdropColor: number
+  cgenMode: number
+}
 
 /**
  * Parameters for sync commands (varies by command type)
@@ -100,6 +110,10 @@ export class SharedDisplayBufferAccessor {
   private static readonly SYNC_SECTION_FLOATS = 9 // command type + action number + 6 params + ack
   private static readonly SYNC_SECTION_BYTES = 9 * 8 // 72 bytes
 
+  // Sprite layout constants
+  private static readonly FLOATS_PER_SPRITE = 12
+  private static readonly SPRITE_DATA_FLOATS_CHECK = MAX_SPRITES * 12 // 96
+
   // Offsets within sync section (relative to sync section start in combined buffer)
   // In combined display buffer, sync section starts at byte OFFSET_ANIMATION_SYNC (2128)
   private static readonly SYNC_COMMAND_TYPE_INDEX = 0
@@ -124,9 +138,7 @@ export class SharedDisplayBufferAccessor {
    */
   constructor(buffer: SharedArrayBuffer) {
     if (buffer.byteLength < SHARED_DISPLAY_BUFFER_BYTES) {
-      throw new RangeError(
-        `Buffer too small: ${buffer.byteLength} bytes, need at least ${SHARED_DISPLAY_BUFFER_BYTES}`
-      )
+      throw new RangeError(`Buffer too small: ${buffer.byteLength} bytes, need at least ${SHARED_DISPLAY_BUFFER_BYTES}`)
     }
 
     this.buffer = buffer
@@ -218,11 +230,7 @@ export class SharedDisplayBufferAccessor {
   /**
    * Write a sync command to the shared buffer for Animation Worker to process.
    */
-  writeSyncCommand(
-    commandType: SyncCommandType,
-    actionNumber: number,
-    params: SyncCommandParams = {}
-  ): void {
+  writeSyncCommand(commandType: SyncCommandType, actionNumber: number, params: SyncCommandParams = {}): void {
     const sync = this.syncViewInternal
     sync[SharedDisplayBufferAccessor.SYNC_COMMAND_TYPE_INDEX] = commandType
     sync[SharedDisplayBufferAccessor.SYNC_ACTION_NUMBER_INDEX] = actionNumber
@@ -447,6 +455,113 @@ export class SharedDisplayBufferAccessor {
   }
 
   // ============================================================================
+  // Bulk Screen Operations
+  // ============================================================================
+
+  /**
+   * Write screen state from ScreenCell[][] buffer into shared views.
+   * Writes characters, patterns, cursor, and scalar values.
+   * Does not increment sequence (caller should call incrementSequence after).
+   *
+   * @param screenBuffer - ScreenCell[][] array (28×24)
+   * @param cursorX - Cursor X position (0-27)
+   * @param cursorY - Cursor Y position (0-23)
+   * @param bgPalette - Background palette (0-1)
+   * @param spritePalette - Sprite palette (0-3)
+   * @param backdropColor - Backdrop color (0-60)
+   * @param cgenMode - Character generation mode (0-3)
+   */
+  writeScreenState(
+    screenBuffer: ScreenCell[][],
+    cursorX: number,
+    cursorY: number,
+    bgPalette: number,
+    spritePalette: number,
+    backdropColor: number,
+    cgenMode: number
+  ): void {
+    if (screenBuffer == null) {
+      logCore.warn('[SharedDisplayBufferAccessor] writeScreenState: screenBuffer is required, skipping')
+      return
+    }
+
+    const {
+      charViewInternal: charView,
+      patternViewInternal: patternView,
+      cursorViewInternal: cursorView,
+      scalarsViewInternal: scalarsView,
+    } = this
+
+    for (let y = 0; y < ROWS; y++) {
+      const row = screenBuffer[y]
+      for (let x = 0; x < COLS; x++) {
+        const cell = row?.[x]
+        const idx = this.cellIndex(x, y)
+        const ch = cell?.character ?? ' '
+        // Store F-BASIC code (0-255); use mapping so e.g. '「' → 91, not Unicode 12300
+        const code = getCodeByChar(ch) ?? (ch.length === 1 ? ch.charCodeAt(0) : 0x20)
+        charView[idx] = Math.max(0, Math.min(255, code))
+        patternView[idx] = (cell?.colorPattern ?? 0) & 3
+      }
+    }
+
+    cursorView[0] = Math.max(0, Math.min(COLS - 1, cursorX))
+    cursorView[1] = Math.max(0, Math.min(ROWS - 1, cursorY))
+    scalarsView[0] = bgPalette & 1
+    scalarsView[1] = spritePalette & 3
+    scalarsView[2] = Math.max(0, Math.min(60, backdropColor))
+    scalarsView[3] = cgenMode & 3
+  }
+
+  /**
+   * Read complete screen state from shared views.
+   * Returns ScreenCell[][] buffer plus cursor and scalar values.
+   *
+   * @returns Decoded screen state with buffer, cursor position, and scalars
+   */
+  readScreenState(): {
+    buffer: ScreenCell[][]
+    cursorX: number
+    cursorY: number
+    bgPalette: number
+    spritePalette: number
+    backdropColor: number
+    cgenMode: number
+  } {
+    const {
+      charViewInternal: charView,
+      patternViewInternal: patternView,
+      cursorViewInternal: cursorView,
+      scalarsViewInternal: scalarsView,
+    } = this
+    const buffer: ScreenCell[][] = []
+
+    for (let y = 0; y < ROWS; y++) {
+      const row: ScreenCell[] = []
+      for (let x = 0; x < COLS; x++) {
+        const idx = this.cellIndex(x, y)
+        row.push({
+          character: getCharacterByCode(charView[idx] ?? 0x20) ?? String.fromCharCode(charView[idx] ?? 0x20),
+          colorPattern: (patternView[idx] ?? 0) & 3,
+          x,
+          y,
+        })
+      }
+      buffer.push(row)
+    }
+
+    return {
+      buffer,
+      cursorX: cursorView[0] ?? 0,
+      cursorY: cursorView[1] ?? 0,
+      bgPalette: scalarsView[0] ?? 1,
+      spritePalette: scalarsView[1] ?? 1,
+      backdropColor: scalarsView[2] ?? 0,
+      cgenMode: scalarsView[3] ?? 2,
+    }
+  }
+
+  // ============================================================================
   // Scalars Section Methods
   // ============================================================================
 
@@ -530,12 +645,7 @@ export class SharedDisplayBufferAccessor {
   /**
    * Write all scalar values at once.
    */
-  writeScalars(
-    bgPalette: number,
-    spritePalette: number,
-    backdropColor: number,
-    cgenMode: number
-  ): void {
+  writeScalars(bgPalette: number, spritePalette: number, backdropColor: number, cgenMode: number): void {
     this.writeBgPalette(bgPalette)
     this.writeSpritePalette(spritePalette)
     this.writeBackdropColor(backdropColor)
@@ -545,6 +655,139 @@ export class SharedDisplayBufferAccessor {
   // ============================================================================
   // Sync Command Methods
   // ============================================================================
+
+  /**
+   * Internal helper: Write one sprite's full animation state to shared buffer.
+   */
+  private writeSpriteStateToView(
+    view: Float64Array,
+    actionNumber: number,
+    x: number,
+    y: number,
+    isActive: boolean,
+    isVisible: boolean,
+    frameIndex: number = 0,
+    remainingDistance: number = 0,
+    totalDistance: number = 0,
+    direction: number = 0,
+    speed: number = 0,
+    priority: number = 0,
+    characterType: number = 0,
+    colorCombination: number = 0
+  ): void {
+    const base = slotBase(actionNumber)
+    view[base] = x
+    view[base + 1] = y
+    view[base + 2] = isActive ? 1 : 0
+    view[base + 3] = isVisible ? 1 : 0
+    view[base + 4] = frameIndex
+    view[base + 5] = remainingDistance
+    view[base + 6] = totalDistance
+    view[base + 7] = direction
+    view[base + 8] = speed
+    view[base + 9] = priority
+    view[base + 10] = characterType
+    view[base + 11] = colorCombination
+  }
+
+  /**
+   * Internal helper: Read one sprite's position from the shared view. Returns null if slot not used.
+   */
+  private readSpritePositionFromView(view: Float64Array, actionNumber: number): { x: number; y: number } | null {
+    if (actionNumber < 0 || actionNumber >= MAX_SPRITES) return null
+    const base = slotBase(actionNumber)
+    return { x: view[base] ?? 0, y: view[base + 1] ?? 0 }
+  }
+
+  /**
+   * Internal helper: Read isActive for one sprite (1 = active, 0 = inactive).
+   */
+  private readSpriteIsActiveFromView(view: Float64Array, actionNumber: number): boolean {
+    if (actionNumber < 0 || actionNumber >= MAX_SPRITES) return false
+    const base = slotBase(actionNumber)
+    return view[base + 2] !== 0
+  }
+
+  /**
+   * Internal helper: Read isVisible for one sprite (1 = visible, 0 = invisible).
+   */
+  private readSpriteIsVisibleFromView(view: Float64Array, actionNumber: number): boolean {
+    if (actionNumber < 0 || actionNumber >= MAX_SPRITES) return false
+    const base = slotBase(actionNumber)
+    return view[base + 3] !== 0
+  }
+
+  /**
+   * Internal helper: Read frameIndex for one sprite (which animation frame to show).
+   */
+  private readSpriteFrameIndexFromView(view: Float64Array, actionNumber: number): number {
+    if (actionNumber < 0 || actionNumber >= MAX_SPRITES) return 0
+    const base = slotBase(actionNumber)
+    return view[base + 4] ?? 0
+  }
+
+  /**
+   * Internal helper: Read remainingDistance for one sprite (dots remaining in movement).
+   */
+  private readSpriteRemainingDistanceFromView(view: Float64Array, actionNumber: number): number {
+    if (actionNumber < 0 || actionNumber >= MAX_SPRITES) return 0
+    const base = slotBase(actionNumber)
+    return view[base + 5] ?? 0
+  }
+
+  /**
+   * Internal helper: Read totalDistance for one sprite (total distance in dots).
+   */
+  private readSpriteTotalDistanceFromView(view: Float64Array, actionNumber: number): number {
+    if (actionNumber < 0 || actionNumber >= MAX_SPRITES) return 0
+    const base = slotBase(actionNumber)
+    return view[base + 6] ?? 0
+  }
+
+  /**
+   * Internal helper: Read direction for one sprite (0-8 direction code).
+   */
+  private readSpriteDirectionFromView(view: Float64Array, actionNumber: number): number {
+    if (actionNumber < 0 || actionNumber >= MAX_SPRITES) return 0
+    const base = slotBase(actionNumber)
+    return view[base + 7] ?? 0
+  }
+
+  /**
+   * Internal helper: Read speed for one sprite (MOVE command speed parameter C).
+   */
+  private readSpriteSpeedFromView(view: Float64Array, actionNumber: number): number {
+    if (actionNumber < 0 || actionNumber >= MAX_SPRITES) return 0
+    const base = slotBase(actionNumber)
+    return view[base + 8] ?? 0
+  }
+
+  /**
+   * Internal helper: Read priority for one sprite (0=front, 1=back).
+   */
+  private readSpritePriorityFromView(view: Float64Array, actionNumber: number): number {
+    if (actionNumber < 0 || actionNumber >= MAX_SPRITES) return 0
+    const base = slotBase(actionNumber)
+    return view[base + 9] ?? 0
+  }
+
+  /**
+   * Internal helper: Read characterType for one sprite (DEF MOVE character type).
+   */
+  private readSpriteCharacterTypeFromView(view: Float64Array, actionNumber: number): number {
+    if (actionNumber < 0 || actionNumber >= MAX_SPRITES) return 0
+    const base = slotBase(actionNumber)
+    return view[base + 10] ?? 0
+  }
+
+  /**
+   * Internal helper: Read colorCombination for one sprite.
+   */
+  private readSpriteColorCombinationFromView(view: Float64Array, actionNumber: number): number {
+    if (actionNumber < 0 || actionNumber >= MAX_SPRITES) return 0
+    const base = slotBase(actionNumber)
+    return view[base + 11] ?? 0
+  }
 
   /**
    * Write one sprite's full animation state to shared buffer.
@@ -565,7 +808,7 @@ export class SharedDisplayBufferAccessor {
     characterType: number = 0,
     colorCombination: number = 0
   ): void {
-    helperWriteSpriteState(
+    this.writeSpriteStateToView(
       this.spriteViewInternal,
       actionNumber,
       x,
@@ -599,77 +842,77 @@ export class SharedDisplayBufferAccessor {
    * Returns null if slot not used.
    */
   readSpritePosition(actionNumber: number): { x: number; y: number } | null {
-    return readSpritePosition(this.spriteViewInternal, actionNumber)
+    return this.readSpritePositionFromView(this.spriteViewInternal, actionNumber)
   }
 
   /**
    * Read isActive for one sprite (1 = active, 0 = inactive).
    */
   readSpriteIsActive(actionNumber: number): boolean {
-    return readSpriteIsActive(this.spriteViewInternal, actionNumber)
+    return this.readSpriteIsActiveFromView(this.spriteViewInternal, actionNumber)
   }
 
   /**
    * Read isVisible for one sprite (1 = visible, 0 = invisible).
    */
   readSpriteIsVisible(actionNumber: number): boolean {
-    return readSpriteIsVisible(this.spriteViewInternal, actionNumber)
+    return this.readSpriteIsVisibleFromView(this.spriteViewInternal, actionNumber)
   }
 
   /**
    * Read frameIndex for one sprite (which animation frame to show).
    */
   readSpriteFrameIndex(actionNumber: number): number {
-    return readSpriteFrameIndex(this.spriteViewInternal, actionNumber)
+    return this.readSpriteFrameIndexFromView(this.spriteViewInternal, actionNumber)
   }
 
   /**
    * Read remainingDistance for one sprite (dots remaining in movement).
    */
   readSpriteRemainingDistance(actionNumber: number): number {
-    return readSpriteRemainingDistance(this.spriteViewInternal, actionNumber)
+    return this.readSpriteRemainingDistanceFromView(this.spriteViewInternal, actionNumber)
   }
 
   /**
    * Read totalDistance for one sprite (total distance in dots).
    */
   readSpriteTotalDistance(actionNumber: number): number {
-    return readSpriteTotalDistance(this.spriteViewInternal, actionNumber)
+    return this.readSpriteTotalDistanceFromView(this.spriteViewInternal, actionNumber)
   }
 
   /**
    * Read direction for one sprite (0-8 direction code).
    */
   readSpriteDirection(actionNumber: number): number {
-    return readSpriteDirection(this.spriteViewInternal, actionNumber)
+    return this.readSpriteDirectionFromView(this.spriteViewInternal, actionNumber)
   }
 
   /**
    * Read speed for one sprite (MOVE command speed parameter C).
    */
   readSpriteSpeed(actionNumber: number): number {
-    return readSpriteSpeed(this.spriteViewInternal, actionNumber)
+    return this.readSpriteSpeedFromView(this.spriteViewInternal, actionNumber)
   }
 
   /**
    * Read priority for one sprite (0=front, 1=back).
    */
   readSpritePriority(actionNumber: number): number {
-    return readSpritePriority(this.spriteViewInternal, actionNumber)
+    return this.readSpritePriorityFromView(this.spriteViewInternal, actionNumber)
   }
 
   /**
    * Read characterType for one sprite (DEF MOVE character type).
    */
   readSpriteCharacterType(actionNumber: number): number {
-    return readSpriteCharacterType(this.spriteViewInternal, actionNumber)
+    return this.readSpriteCharacterTypeFromView(this.spriteViewInternal, actionNumber)
   }
 
   /**
    * Read colorCombination for one sprite.
    */
   readSpriteColorCombination(actionNumber: number): number {
-    return readSpriteColorCombination(this.spriteViewInternal, actionNumber)
+    return this.readSpriteColorCombinationFromView(this.spriteViewInternal, actionNumber)
   }
 
   /**

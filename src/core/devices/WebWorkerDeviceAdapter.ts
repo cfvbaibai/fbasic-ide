@@ -5,13 +5,13 @@
  * Delegates to specialized modules for web worker management, screen state, and message handling.
  */
 
-import { readSpritePosition } from '@/core/animation/sharedAnimationBuffer'
 import {
   createViewsFromDisplayBuffer,
-  incrementSequence,
+  MAX_SPRITES,
   type SharedDisplayViews,
-  writeScreenState,
+  slotBase,
 } from '@/core/animation/sharedDisplayBuffer'
+import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import type {
   AnyServiceWorkerMessage,
   BasicDeviceAdapter,
@@ -33,6 +33,19 @@ import {
 } from './sharedJoystickBuffer'
 import { type WebWorkerExecutionOptions, WebWorkerManager } from './WebWorkerManager'
 
+/**
+ * Helper function to read sprite position from view.
+ * Inlined from sharedAnimationBuffer to avoid circular dependency.
+ */
+function readSpritePosition(
+  view: Float64Array,
+  actionNumber: number
+): { x: number; y: number } | null {
+  if (actionNumber < 0 || actionNumber >= MAX_SPRITES) return null
+  const base = slotBase(actionNumber)
+  return { x: view[base] ?? 0, y: view[base + 1] ?? 0 }
+}
+
 export type { WebWorkerExecutionOptions }
 
 export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
@@ -41,6 +54,8 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   private stickStates: Map<number, number> = new Map()
   /** Shared display buffer. Set when receiving SET_SHARED_ANIMATION_BUFFER. */
   private sharedDisplayViews: SharedDisplayViews | null = null
+  /** Shared display buffer accessor for buffer operations. */
+  private sharedDisplayAccessor: SharedDisplayBufferAccessor | null = null
   /** Shared joystick buffer. Set when receiving SET_SHARED_JOYSTICK_BUFFER. */
   private sharedJoystickView: JoystickBufferView | null = null
   /** Last POSITION per sprite; getSpritePosition returns it so MOVE uses it (not buffer 0,0). */
@@ -243,6 +258,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
    */
   setSharedAnimationBuffer(buffer: SharedArrayBuffer): void {
     this.sharedDisplayViews = createViewsFromDisplayBuffer(buffer)
+    this.sharedDisplayAccessor = new SharedDisplayBufferAccessor(buffer)
   }
 
   getSpritePosition(actionNumber: number): { x: number; y: number } | null {
@@ -277,7 +293,8 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
    * Caller must then postMessage(SCREEN_CHANGED).
    */
   private syncScreenStateToShared(): void {
-    if (!this.sharedDisplayViews) return
+    const accessor = this.sharedDisplayAccessor
+    if (!accessor) return
     const manager = this.screenStateManager
     if (!manager) return
     const buffer = manager.getScreenBuffer()
@@ -287,8 +304,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     }
     const { x: cursorX, y: cursorY } = manager.getCursorPosition()
     const { bgPalette, spritePalette } = manager.getPalette()
-    writeScreenState(
-      this.sharedDisplayViews,
+    accessor.writeScreenState(
       buffer,
       cursorX,
       cursorY,
@@ -297,7 +313,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       manager.getBackdropColor(),
       manager.getCgenMode()
     )
-    incrementSequence(this.sharedDisplayViews)
+    accessor.incrementSequence()
   }
 
   private postScreenChanged(): void {

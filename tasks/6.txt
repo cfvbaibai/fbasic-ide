@@ -1,0 +1,29 @@
+type: refactor
+status: open
+subject: Remove direct buffer array creation from test code
+description:
+Test files currently create raw TypedArray views directly on the buffer, which bypasses the SharedDisplayBufferAccessor and creates maintenance issues when buffer layout changes.
+
+Example from test/integration/AnimationSyncProtocol.test.ts:
+```typescript
+// Direct view creation - should be refactored
+const syncView = new Float64Array(views.buffer, 0, ANIMATION_SECTION_FLOATS)
+const syncIntView = new Int32Array(views.buffer, SYNC_SECTION_BYTE_OFFSET, SYNC_SECTION_FLOATS * 2)
+```
+
+Tests should instead:
+1. Use SharedDisplayBufferAccessor for all buffer reads/writes
+2. Only use raw views when testing the low-level buffer functions themselves
+3. Create helper functions for common test patterns
+
+Refactoring approach:
+1. Create test helper functions in test/helpers/bufferTestHelpers.ts:
+   - createTestAccessor() - wraps buffer creation + accessor
+   - writeTestSyncCommand() - uses accessor or low-level functions as needed
+2. Update tests to use helpers instead of direct view creation
+3. Keep direct view creation ONLY in tests that specifically test the low-level sync protocol
+
+Files affected:
+- test/integration/AnimationSyncProtocol.test.ts (many direct view creations)
+- test/integration/SharedBufferIntegration.test.ts
+- test/animation/AnimationManager.test.ts

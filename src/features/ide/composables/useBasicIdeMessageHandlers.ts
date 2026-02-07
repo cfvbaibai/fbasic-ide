@@ -7,10 +7,8 @@
 
 import type { Ref } from 'vue'
 
-import type {
-  DecodedScreenState,
-  SharedDisplayViews,
-} from '@/core/animation/sharedDisplayBuffer'
+import type { SharedDisplayViews } from '@/core/animation/sharedDisplayBuffer'
+import type { DecodedScreenState } from '@/core/animation/sharedDisplayBufferAccessor'
 import type {
   AnyServiceWorkerMessage,
   ErrorMessage,

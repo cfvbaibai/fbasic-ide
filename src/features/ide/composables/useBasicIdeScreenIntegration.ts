@@ -5,15 +5,15 @@
 
 import { ref } from 'vue'
 
-import { SyncCommandType } from '@/core/animation/sharedAnimationBuffer'
 import {
   createSharedDisplayBuffer,
-  type DecodedScreenState,
-  incrementSequence,
   type SharedDisplayViews,
-  writeScreenState,
 } from '@/core/animation/sharedDisplayBuffer'
-import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
+import { SyncCommandType } from '@/core/animation/sharedDisplayBuffer'
+import {
+  type DecodedScreenState,
+  SharedDisplayBufferAccessor,
+} from '@/core/animation/sharedDisplayBufferAccessor'
 import { TIMING } from '@/core/constants'
 import { createSharedJoystickBuffer } from '@/core/devices'
 
@@ -64,8 +64,7 @@ export function useBasicIdeScreenIntegration(state: BasicIdeState): BasicIdeScre
 
   /** Write current state to shared buffer and bump sequence so Screen re-decodes and redraws. */
   const clearDisplayToSharedBuffer = () => {
-    writeScreenState(
-      sharedDisplayViews,
+    sharedDisplayBufferAccessor.writeScreenState(
       state.screenBuffer.value,
       state.cursorX.value,
       state.cursorY.value,
@@ -85,7 +84,7 @@ export function useBasicIdeScreenIntegration(state: BasicIdeState): BasicIdeScre
     // Clear local sprite node maps so render creates fresh layers (will be empty since buffer is being cleared)
     state.frontSpriteNodes.value.clear()
     state.backSpriteNodes.value.clear()
-    incrementSequence(sharedDisplayViews)
+    sharedDisplayBufferAccessor.incrementSequence()
     scheduleRender()
   }
 

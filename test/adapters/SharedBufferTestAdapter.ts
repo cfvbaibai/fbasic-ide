@@ -8,11 +8,10 @@
 import {
   COLS,
   createViewsFromDisplayBuffer,
-  incrementSequence,
   ROWS,
   type SharedDisplayViews,
-  writeScreenState,
 } from '@/core/animation/sharedDisplayBuffer'
+import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
 import type { ScreenCell } from '@/core/interfaces'
 
@@ -33,6 +32,7 @@ export interface SharedBufferTestConfig {
  */
 export class SharedBufferTestAdapter extends TestDeviceAdapter {
   private displayViews: SharedDisplayViews | null = null
+  private displayAccessor: SharedDisplayBufferAccessor | null = null
   private enableDisplaySync: boolean = false
   private enableAnimationSync: boolean = false
 
@@ -70,8 +70,10 @@ export class SharedBufferTestAdapter extends TestDeviceAdapter {
   setSharedDisplayBuffer(buffer: SharedArrayBuffer | undefined): void {
     if (buffer) {
       this.displayViews = createViewsFromDisplayBuffer(buffer)
+      this.displayAccessor = new SharedDisplayBufferAccessor(buffer)
     } else {
       this.displayViews = null
+      this.displayAccessor = null
     }
   }
 
@@ -99,12 +101,11 @@ export class SharedBufferTestAdapter extends TestDeviceAdapter {
 
   /** Sync current state to shared display buffer */
   private syncToDisplayBuffer(): void {
-    if (!this.enableDisplaySync || !this.displayViews) {
+    if (!this.enableDisplaySync || !this.displayAccessor) {
       return
     }
 
-    writeScreenState(
-      this.displayViews,
+    this.displayAccessor.writeScreenState(
       this.screenBuffer,
       this.cursorX,
       this.cursorY,
@@ -113,7 +114,7 @@ export class SharedBufferTestAdapter extends TestDeviceAdapter {
       this.backdropColor,
       this.cgenMode
     )
-    incrementSequence(this.displayViews)
+    this.displayAccessor.incrementSequence()
   }
 
   // === OVERRIDDEN METHODS WITH BUFFER SYNC ===
@@ -202,9 +203,8 @@ export class SharedBufferTestAdapter extends TestDeviceAdapter {
     this.cgenMode = 2
 
     // Reset shared buffer if enabled
-    if (this.enableDisplaySync && this.displayViews) {
-      writeScreenState(
-        this.displayViews,
+    if (this.enableDisplaySync && this.displayAccessor) {
+      this.displayAccessor.writeScreenState(
         this.screenBuffer,
         0,
         0,
@@ -213,7 +213,7 @@ export class SharedBufferTestAdapter extends TestDeviceAdapter {
         0,
         2
       )
-      incrementSequence(this.displayViews)
+      this.displayAccessor.incrementSequence()
     }
   }
 }

@@ -5,11 +5,8 @@
 
 import { inject, type InjectionKey, provide, type Ref } from 'vue'
 
-import type {
-  DecodedScreenState,
-  SharedDisplayViews,
-} from '@/core/animation/sharedDisplayBuffer'
-import type { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
+import type { SharedDisplayViews } from '@/core/animation/sharedDisplayBuffer'
+import type { DecodedScreenState, SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import type { ScreenCell } from '@/core/interfaces'
 import type { MovementState, SpriteState } from '@/core/sprite/types'
 

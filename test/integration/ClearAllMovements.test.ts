@@ -8,11 +8,45 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  slotBase,
   SyncCommandType,
-  writeSpriteState,
-} from '@/core/animation/sharedAnimationBuffer'
+} from '@/core/animation/sharedDisplayBuffer'
 import { createSharedDisplayBuffer, OFFSET_ANIMATION_SYNC } from '@/core/animation/sharedDisplayBuffer'
 import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
+
+/**
+ * Helper function for testing (inlined from sharedAnimationBuffer)
+ */
+function writeSpriteState(
+  view: Float64Array,
+  actionNumber: number,
+  x: number,
+  y: number,
+  isActive: boolean,
+  isVisible: boolean,
+  frameIndex: number = 0,
+  remainingDistance: number = 0,
+  totalDistance: number = 0,
+  direction: number = 0,
+  speed: number = 0,
+  priority: number = 0,
+  characterType: number = 0,
+  colorCombination: number = 0
+): void {
+  const base = slotBase(actionNumber)
+  view[base] = x
+  view[base + 1] = y
+  view[base + 2] = isActive ? 1 : 0
+  view[base + 3] = isVisible ? 1 : 0
+  view[base + 4] = frameIndex
+  view[base + 5] = remainingDistance
+  view[base + 6] = totalDistance
+  view[base + 7] = direction
+  view[base + 8] = speed
+  view[base + 9] = priority
+  view[base + 10] = characterType
+  view[base + 11] = colorCombination
+}
 
 describe('CLEAR_ALL_MOVEMENTS Integration', () => {
   describe('SharedDisplayBufferAccessor.readSyncCommand() with CLEAR_ALL_MOVEMENTS', () => {

@@ -10,23 +10,38 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 import {
-  readSpriteIsActive,
-  readSpritePosition,
+  MAX_SPRITES,
   slotBase,
-} from '@/core/animation/sharedAnimationBuffer'
+} from '@/core/animation/sharedDisplayBuffer'
 import {
   createSharedDisplayBuffer,
   createViewsFromDisplayBuffer,
-  incrementSequence,
-  readScreenStateFromShared,
-  readSequence,
   type SharedDisplayViews,
 } from '@/core/animation/sharedDisplayBuffer'
+import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { EXECUTION_LIMITS } from '@/core/constants'
 import { getCodeByChar } from '@/shared/utils/backgroundLookup'
 
 import { SharedBufferTestAdapter } from '../adapters/SharedBufferTestAdapter'
+
+/**
+ * Helper functions for testing (inlined from sharedAnimationBuffer)
+ */
+function readSpritePosition(
+  view: Float64Array,
+  actionNumber: number
+): { x: number; y: number } | null {
+  if (actionNumber < 0 || actionNumber >= MAX_SPRITES) return null
+  const base = slotBase(actionNumber)
+  return { x: view[base] ?? 0, y: view[base + 1] ?? 0 }
+}
+
+function readSpriteIsActive(view: Float64Array, actionNumber: number): boolean {
+  if (actionNumber < 0 || actionNumber >= MAX_SPRITES) return false
+  const base = slotBase(actionNumber)
+  return view[base + 2] !== 0
+}
 
 describe('Shared Buffer Integration - Full POC', () => {
   describe('Buffer Creation and Initialization', () => {
@@ -103,10 +118,11 @@ describe('Shared Buffer Integration - Full POC', () => {
     it('should increment sequence number', () => {
       expect(views.sequenceView[0]).toBe(0)
 
-      incrementSequence(views)
+      const accessor = new SharedDisplayBufferAccessor(views.buffer)
+      accessor.incrementSequence()
       expect(views.sequenceView[0]).toBe(1)
 
-      incrementSequence(views)
+      accessor.incrementSequence()
       expect(views.sequenceView[0]).toBe(2)
     })
 
@@ -177,7 +193,8 @@ describe('Shared Buffer Integration - Full POC', () => {
     it('should sync PRINT output to shared buffer', async () => {
       await interpreter.execute('10 PRINT "HELLO"\n20 END')
 
-      const state = readScreenStateFromShared(views)
+      const accessor = new SharedDisplayBufferAccessor(views.buffer)
+      const state = accessor.readScreenState()
       // First character should be 'H'
       expect(state.buffer[0]![0]!.character).toBe('H')
       expect(state.buffer[0]![1]!.character).toBe('E')
@@ -189,7 +206,8 @@ describe('Shared Buffer Integration - Full POC', () => {
     it('should sync cursor position to shared buffer', async () => {
       await interpreter.execute('10 LOCATE 10, 5\n20 PRINT "X"\n30 END')
 
-      const state = readScreenStateFromShared(views)
+      const accessor = new SharedDisplayBufferAccessor(views.buffer)
+      const state = accessor.readScreenState()
       // LOCATE 10, 5 moves cursor to column 10, row 5
       // PRINT "X" prints at that position
       expect(state.buffer[5]![10]!.character).toBe('X')
@@ -205,7 +223,8 @@ describe('Shared Buffer Integration - Full POC', () => {
 40 END
 `)
 
-      const state = readScreenStateFromShared(views)
+      const accessor = new SharedDisplayBufferAccessor(views.buffer)
+      const state = accessor.readScreenState()
       expect(state.buffer[0]![0]!.character).toBe('L')
       expect(state.buffer[1]![0]!.character).toBe('L') // Second line
       expect(state.buffer[2]![0]!.character).toBe('L') // Third line
@@ -229,7 +248,8 @@ describe('Shared Buffer Integration - Full POC', () => {
       // Execute CLS command
       await isolatedInterpreter.execute('10 CLS\n20 END')
 
-      const state = readScreenStateFromShared(isolatedViews)
+      const accessor = new SharedDisplayBufferAccessor(isolatedViews.buffer)
+      const state = accessor.readScreenState()
       // After CLS, the screen should be all spaces
       expect(state.buffer[0]![0]!.character).toBe(' ')
       expect(state.buffer[0]![1]!.character).toBe(' ')
@@ -240,7 +260,8 @@ describe('Shared Buffer Integration - Full POC', () => {
     it('should sync color palette to shared buffer', async () => {
       await interpreter.execute('10 CGSET 0,1\n20 CGSET 1,2\n30 END')
 
-      const state = readScreenStateFromShared(views)
+      const accessor = new SharedDisplayBufferAccessor(views.buffer)
+      const state = accessor.readScreenState()
       expect(state.bgPalette).toBe(1)
       expect(state.spritePalette).toBe(2)
     })
@@ -253,11 +274,12 @@ describe('Shared Buffer Integration - Full POC', () => {
     })
 
     it('should increment sequence on each update', async () => {
-      const initialSeq = readSequence(views)
+      const accessor = new SharedDisplayBufferAccessor(views.buffer)
+      const initialSeq = accessor.readSequence()
 
       await interpreter.execute('10 PRINT "A"\n20 END')
 
-      const finalSeq = readSequence(views)
+      const finalSeq = accessor.readSequence()
       expect(finalSeq).toBeGreaterThan(initialSeq)
     })
   })
@@ -296,7 +318,8 @@ describe('Shared Buffer Integration - Full POC', () => {
 60 END
 `)
 
-      const state = readScreenStateFromShared(views)
+      const accessor = new SharedDisplayBufferAccessor(views.buffer)
+      const state = accessor.readScreenState()
 
       // Verify scalars
       expect(state.bgPalette).toBe(1)
@@ -334,7 +357,8 @@ describe('Shared Buffer Integration - Full POC', () => {
 
       await interpreter.execute(code)
 
-      const state = readScreenStateFromShared(views)
+      const accessor = new SharedDisplayBufferAccessor(views.buffer)
+      const state = accessor.readScreenState()
       // All 10 X's should be on the same line (since PRINT uses semicolon)
       const firstRow = state.buffer[0]!.map(cell => cell?.character)
       // Count X's in first row
@@ -429,7 +453,8 @@ describe('Shared Buffer Integration - Full POC', () => {
 50 END
 `)
 
-      const state = readScreenStateFromShared(views)
+      const accessor = new SharedDisplayBufferAccessor(views.buffer)
+      const state = accessor.readScreenState()
 
       // Verify screen output
       expect(state.buffer[0]![0]!.character).toBe('G')
@@ -554,7 +579,8 @@ describe('Shared Buffer Integration - Full POC', () => {
       // Test that empty program doesn't corrupt the buffer
       await interpreter.execute('10 END')
 
-      const state = readScreenStateFromShared(views)
+      const accessor = new SharedDisplayBufferAccessor(views.buffer)
+      const state = accessor.readScreenState()
       // Check a few key positions to verify buffer is still initialized
       expect(state.buffer[0]![0]!.character).toBe(' ')
       expect(state.buffer[0]![27]!.character).toBe(' ')
@@ -587,7 +613,8 @@ describe('Shared Buffer Integration - Full POC', () => {
 
       await interpreter.execute(code.join('\n'))
 
-      const state = readScreenStateFromShared(views)
+      const accessor = new SharedDisplayBufferAccessor(views.buffer)
+      const state = accessor.readScreenState()
       // Should have content on multiple lines
       expect(state.buffer[0]![0]!.character).toBe('L')
       expect(state.buffer[1]![0]!.character).toBe('L')
@@ -807,7 +834,8 @@ describe('Shared Buffer Integration - Full POC', () => {
       // Just verify execution completed
       expect(result).toBeDefined()
 
-      const state = readScreenStateFromShared(displayBuf)
+      const accessor = new SharedDisplayBufferAccessor(displayBuf.buffer)
+      const state = accessor.readScreenState()
       expect(state.buffer[0]![0]!.character).toBe('G')
     })
 
@@ -831,7 +859,8 @@ describe('Shared Buffer Integration - Full POC', () => {
 
       expect(result.success).toBe(true)
 
-      const state = readScreenStateFromShared(displayBuf)
+      const accessor = new SharedDisplayBufferAccessor(displayBuf.buffer)
+      const state = accessor.readScreenState()
       expect(state.buffer[0]![0]!.character).toBe('L')
     })
   })

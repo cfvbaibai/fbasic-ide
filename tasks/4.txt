@@ -1,0 +1,41 @@
+type: refactor
+status: completed
+subject: Consolidate sharedAnimationBuffer.ts and sharedDisplayBuffer
+description:
+The codebase currently has two buffer-related files:
+- src/core/animation/sharedAnimationBuffer.ts (animation sync protocol + operations)
+- src/core/animation/sharedDisplayBuffer.ts (combined display buffer + operations)
+
+These should be consolidated into a single module with clear separation of concerns:
+
+**Consolidated file: src/core/animation/sharedDisplayBuffer.ts**
+- ONLY raw structure code (buffer layout constants, byte offsets)
+- Factory function: createSharedDisplayBuffer() - creates SharedArrayBuffer and returns typed views
+- NO operation logic - all read/write functions moved to accessor
+
+**Operations moved to: src/core/animation/sharedDisplayBufferAccessor.ts**
+- All sync protocol functions: writeSyncCommand(), readSyncCommand(), clearSyncCommand()
+- All sprite state functions: writeSpriteState(), readSpritePosition(), readSpriteIsActive(), etc.
+- All Atomics wrapper functions: notifyAck(), waitForAck(), notify()
+- Already contains: screen, cursor, sequence, scalars access methods
+
+**Rationale:**
+- Buffer file = "what" (structure, layout, factory)
+- Accessor file = "how" (operations, protocol, encapsulation)
+- This creates a clear boundary: tests can import buffer constants, but all code should use accessor
+
+**Files affected:**
+- src/core/animation/sharedAnimationBuffer.ts (DELETE - move operations to accessor)
+- src/core/animation/sharedDisplayBuffer.ts (CONSOLIDATE - keep only structure)
+- src/core/animation/sharedDisplayBufferAccessor.ts (EXPAND - add all operations)
+- All files importing from sharedAnimationBuffer.ts (update imports)
+
+**Import migration:**
+```typescript
+// OLD:
+import { writeSyncCommand, readSyncCommand } from './sharedAnimationBuffer'
+
+// NEW:
+import type { SharedDisplayBufferAccessor } from './sharedDisplayBufferAccessor'
+// Use accessor.writeSyncCommand(), accessor.readSyncCommand()
+```

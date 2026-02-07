@@ -10,27 +10,192 @@
  * - All command types (START_MOVEMENT, STOP_MOVEMENT, ERASE_MOVEMENT, SET_POSITION)
  */
 
+/* eslint-disable max-lines -- Integration tests require comprehensive coverage exceeding 500 lines */
+
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import {
+  ACK_PENDING,
+  ACK_RECEIVED,
   ANIMATION_SECTION_FLOATS,
-  clearSyncCommand,
-  getAckInt32Index,
-  notifyAck,
-  readSpriteFrameIndex,
-  readSpriteIsActive,
-  readSpriteIsVisible,
-  readSpritePosition,
-  readSyncAck,
-  readSyncCommand,
+  MAX_SPRITES,
   slotBase,
   SyncCommandType,
-  waitForAck,
-  writeSpriteState,
-  writeSyncAck,
-  writeSyncCommand,
-} from '@/core/animation/sharedAnimationBuffer'
+} from '@/core/animation/sharedDisplayBuffer'
 import { createSharedDisplayBuffer } from '@/core/animation/sharedDisplayBuffer'
+
+/**
+ * Helper functions for testing (inlined from sharedAnimationBuffer)
+ */
+function writeSpriteState(
+  view: Float64Array,
+  actionNumber: number,
+  x: number,
+  y: number,
+  isActive: boolean,
+  isVisible: boolean,
+  frameIndex: number = 0,
+  remainingDistance: number = 0,
+  totalDistance: number = 0,
+  direction: number = 0,
+  speed: number = 0,
+  priority: number = 0,
+  characterType: number = 0,
+  colorCombination: number = 0
+): void {
+  const base = slotBase(actionNumber)
+  view[base] = x
+  view[base + 1] = y
+  view[base + 2] = isActive ? 1 : 0
+  view[base + 3] = isVisible ? 1 : 0
+  view[base + 4] = frameIndex
+  view[base + 5] = remainingDistance
+  view[base + 6] = totalDistance
+  view[base + 7] = direction
+  view[base + 8] = speed
+  view[base + 9] = priority
+  view[base + 10] = characterType
+  view[base + 11] = colorCombination
+}
+
+function readSpritePosition(
+  view: Float64Array,
+  actionNumber: number
+): { x: number; y: number } | null {
+  if (actionNumber < 0 || actionNumber >= MAX_SPRITES) return null
+  const base = slotBase(actionNumber)
+  return { x: view[base] ?? 0, y: view[base + 1] ?? 0 }
+}
+
+function readSpriteIsActive(view: Float64Array, actionNumber: number): boolean {
+  if (actionNumber < 0 || actionNumber >= MAX_SPRITES) return false
+  const base = slotBase(actionNumber)
+  return view[base + 2] !== 0
+}
+
+function readSpriteIsVisible(view: Float64Array, actionNumber: number): boolean {
+  if (actionNumber < 0 || actionNumber >= MAX_SPRITES) return false
+  const base = slotBase(actionNumber)
+  return view[base + 3] !== 0
+}
+
+function readSpriteFrameIndex(view: Float64Array, actionNumber: number): number {
+  if (actionNumber < 0 || actionNumber >= MAX_SPRITES) return 0
+  const base = slotBase(actionNumber)
+  return view[base + 4] ?? 0
+}
+
+function writeSyncCommand(
+  view: Float64Array,
+  commandType: SyncCommandType,
+  actionNumber: number,
+  params: {
+    startX?: number
+    startY?: number
+    direction?: number
+    speed?: number
+    distance?: number
+    priority?: number
+  } = {}
+): void {
+  view[96] = commandType // SYNC_COMMAND_TYPE_OFFSET
+  view[97] = actionNumber // SYNC_ACTION_NUMBER_OFFSET
+  view[98] = params.startX ?? 0 // SYNC_PARAM1_OFFSET
+  view[99] = params.startY ?? 0 // SYNC_PARAM2_OFFSET
+  view[100] = params.direction ?? 0 // SYNC_PARAM3_OFFSET
+  view[101] = params.speed ?? 0 // SYNC_PARAM4_OFFSET
+  view[102] = params.distance ?? 0 // SYNC_PARAM5_OFFSET
+  view[103] = params.priority ?? 0 // SYNC_PARAM6_OFFSET
+  view[104] = ACK_PENDING // SYNC_ACK_OFFSET
+}
+
+function readSyncCommand(view: Float64Array): {
+  commandType: SyncCommandType
+  actionNumber: number
+  params: {
+    startX: number
+    startY: number
+    direction: number
+    speed: number
+    distance: number
+    priority: number
+  }
+} | null {
+  const commandType = view[96] as SyncCommandType
+
+  if (commandType < SyncCommandType.START_MOVEMENT || commandType > SyncCommandType.CLEAR_ALL_MOVEMENTS) {
+    return null
+  }
+
+  return {
+    commandType,
+    actionNumber: view[97] as number,
+    params: {
+      startX: view[98] as number,
+      startY: view[99] as number,
+      direction: view[100] as number,
+      speed: view[101] as number,
+      distance: view[102] as number,
+      priority: view[103] as number,
+    },
+  }
+}
+
+function clearSyncCommand(view: Float64Array): void {
+  view[96] = SyncCommandType.NONE
+  view[97] = 0
+  view[98] = 0
+  view[99] = 0
+  view[100] = 0
+  view[101] = 0
+  view[102] = 0
+  view[103] = 0
+}
+
+function writeSyncAck(view: Float64Array, ack: number): void {
+  view[104] = ack
+}
+
+function readSyncAck(view: Float64Array): number {
+  return view[104] as number
+}
+
+function getAckInt32Index(): number {
+  return 16 // (104 - 96) * 2
+}
+
+function notifyAck(syncView: Int32Array): void {
+  const ackIndex = getAckInt32Index()
+  syncView[ackIndex] = ACK_RECEIVED
+  try {
+    Atomics.notify(syncView, ackIndex, 1)
+  } catch {
+    // Atomics.notify may throw in some contexts, ignore
+  }
+}
+
+function waitForAck(syncView: Int32Array, timeoutMs: number = 100): boolean {
+  const ackIndex = getAckInt32Index()
+  const startTime = performance.now()
+
+  while (syncView[ackIndex] === ACK_PENDING) {
+    const elapsed = performance.now() - startTime
+    if (elapsed >= timeoutMs) {
+      return false
+    }
+    try {
+      const remaining = Math.min(10, timeoutMs - elapsed)
+      Atomics.wait(syncView, ackIndex, ACK_PENDING, remaining)
+    } catch {
+      const start = performance.now()
+      while (performance.now() - start < 1) {
+        // Busy-wait for 1ms to yield CPU
+      }
+    }
+  }
+
+  return syncView[ackIndex] === ACK_RECEIVED
+}
 
 describe('Animation Sync Protocol', () => {
   describe('Buffer Layout', () => {

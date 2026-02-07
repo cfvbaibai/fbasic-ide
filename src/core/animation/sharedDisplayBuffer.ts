@@ -8,13 +8,52 @@
  * animation sync (2128–2199).
  * Reuses first 768 bytes for sprite state (Float64Array × 96); screen/sequence/scalars follow.
  * Animation sync section (9 floats) at end for Executor Worker ↔ Animation Worker direct sync.
+ *
+ * This module contains ONLY raw structure code (buffer layout constants, byte offsets, types, enums)
+ * and factory functions. All operation logic is in SharedDisplayBufferAccessor.
  */
 
-import type { ScreenCell } from '@/core/interfaces'
-import { logCore } from '@/shared/logger'
-import { getCharacterByCode, getCodeByChar } from '@/shared/utils/backgroundLookup'
+// ============================================================================
+// SPRITE SECTION CONSTANTS
+// ============================================================================
 
-import { MAX_SPRITES } from './sharedAnimationBuffer'
+export const MAX_SPRITES = 8
+// 12 floats per sprite: x, y, isActive, isVisible, frameIndex, remainingDistance, totalDistance,
+// direction, speed, priority, characterType, colorCombination
+const FLOATS_PER_SPRITE = 12
+export const SPRITE_DATA_FLOATS = MAX_SPRITES * FLOATS_PER_SPRITE // 96
+
+// ============================================================================
+// SYNC SECTION CONSTANTS (within animation section)
+// ============================================================================
+
+const SYNC_SECTION_FLOATS = 9 // command type, action number, params (6), ack
+export const ANIMATION_SECTION_FLOATS = SPRITE_DATA_FLOATS + SYNC_SECTION_FLOATS // 105
+
+// Sync section offsets (in Float64Array indices, relative to animation section)
+export const SYNC_COMMAND_TYPE_OFFSET = SPRITE_DATA_FLOATS // 96
+export const SYNC_ACTION_NUMBER_OFFSET = 97
+export const SYNC_PARAM1_OFFSET = 98
+export const SYNC_PARAM2_OFFSET = 99
+export const SYNC_PARAM3_OFFSET = 100
+export const SYNC_PARAM4_OFFSET = 101
+export const SYNC_PARAM5_OFFSET = 102
+export const SYNC_PARAM6_OFFSET = 103
+export const SYNC_ACK_OFFSET = 104
+
+// Sync command types
+export enum SyncCommandType {
+  NONE = 0,
+  START_MOVEMENT = 1,
+  STOP_MOVEMENT = 2,
+  ERASE_MOVEMENT = 3,
+  SET_POSITION = 4,
+  CLEAR_ALL_MOVEMENTS = 5,
+}
+
+// Acknowledgment values
+export const ACK_PENDING = 0
+export const ACK_RECEIVED = 1
 
 // Screen grid
 export const COLS = 28
@@ -37,7 +76,6 @@ export const OFFSET_SCALARS = OFFSET_SEQUENCE + 4 // 2120
 // Animation sync section (same layout as standalone animation buffer)
 // 9 floats: command type, action number, params (6), ack
 // Must be aligned to 8 bytes for Float64Array (2124 + 4 = 2128)
-const SYNC_SECTION_FLOATS = 9
 const SYNC_SECTION_BYTES = SYNC_SECTION_FLOATS * 8 // 72
 // Add padding to align to 8 bytes (2120 + 4 + 4 = 2128, which is divisible by 8)
 const SYNC_PADDING = 4
@@ -114,98 +152,15 @@ export function createViewsFromDisplayBuffer(buffer: SharedArrayBuffer): SharedD
   }
 }
 
-function cellIndex(x: number, y: number): number {
-  return y * COLS + x
-}
-
 /**
- * Write screen state from ScreenStateManager into shared views.
- * Does not increment sequence (caller calls incrementSequence after).
+ * Slot base index for actionNumber i:
+ * [base]=x, [base+1]=y, [base+2]=isActive, [base+3]=isVisible, [base+4]=frameIndex,
+ * [base+5]=remainingDistance, [base+6]=totalDistance, [base+7]=direction, [base+8]=speed,
+ * [base+9]=priority, [base+10]=characterType, [base+11]=colorCombination
  */
-export function writeScreenState(
-  views: SharedDisplayViews,
-  screenBuffer: ScreenCell[][],
-  cursorX: number,
-  cursorY: number,
-  bgPalette: number,
-  spritePalette: number,
-  backdropColor: number,
-  cgenMode: number
-): void {
-  if (screenBuffer == null) {
-    logCore.warn('[sharedDisplayBuffer] writeScreenState: screenBuffer is required, skipping')
-    return
+export function slotBase(actionNumber: number): number {
+  if (actionNumber < 0 || actionNumber >= MAX_SPRITES) {
+    throw new RangeError(`actionNumber must be 0-${MAX_SPRITES - 1}, got ${actionNumber}`)
   }
-  const { charView, patternView, cursorView, scalarsView } = views
-  for (let y = 0; y < ROWS; y++) {
-    const row = screenBuffer[y]
-    for (let x = 0; x < COLS; x++) {
-      const cell = row?.[x]
-      const idx = cellIndex(x, y)
-      const ch = cell?.character ?? ' '
-      // Store F-BASIC code (0-255); use mapping so e.g. '「' → 91, not Unicode 12300
-      const code = getCodeByChar(ch) ?? (ch.length === 1 ? ch.charCodeAt(0) : 0x20)
-      charView[idx] = Math.max(0, Math.min(255, code))
-      patternView[idx] = (cell?.colorPattern ?? 0) & 3
-    }
-  }
-  cursorView[0] = Math.max(0, Math.min(COLS - 1, cursorX))
-  cursorView[1] = Math.max(0, Math.min(ROWS - 1, cursorY))
-  scalarsView[0] = bgPalette & 1
-  scalarsView[1] = spritePalette & 3
-  scalarsView[2] = Math.max(0, Math.min(60, backdropColor))
-  scalarsView[3] = cgenMode & 3
+  return actionNumber * FLOATS_PER_SPRITE
 }
-
-export interface DecodedScreenState {
-  buffer: ScreenCell[][]
-  cursorX: number
-  cursorY: number
-  bgPalette: number
-  spritePalette: number
-  backdropColor: number
-  cgenMode: number
-}
-
-/**
- * Read screen state from shared views into ScreenCell[][] and scalars.
- */
-export function readScreenStateFromShared(views: SharedDisplayViews): DecodedScreenState {
-  const { charView, patternView, cursorView, scalarsView } = views
-  const buffer: ScreenCell[][] = []
-  for (let y = 0; y < ROWS; y++) {
-    const row: ScreenCell[] = []
-    for (let x = 0; x < COLS; x++) {
-      const idx = cellIndex(x, y)
-      row.push({
-        character: getCharacterByCode(charView[idx] ?? 0x20) ?? String.fromCharCode(charView[idx] ?? 0x20),
-        colorPattern: (patternView[idx] ?? 0) & 3,
-        x,
-        y,
-      })
-    }
-    buffer.push(row)
-  }
-  return {
-    buffer,
-    cursorX: cursorView[0] ?? 0,
-    cursorY: cursorView[1] ?? 0,
-    bgPalette: scalarsView[0] ?? 1,
-    spritePalette: scalarsView[1] ?? 1,
-    backdropColor: scalarsView[2] ?? 0,
-    cgenMode: scalarsView[3] ?? 2,
-  }
-}
-
-export function readSequence(views: SharedDisplayViews): number {
-  return views.sequenceView[0] ?? 0
-}
-
-/**
- * Increment sequence (worker only). Main thread only reads.
- */
-export function incrementSequence(views: SharedDisplayViews): void {
-  views.sequenceView[0] = (views.sequenceView[0] ?? 0) + 1
-}
-
-// Sprite helpers: use sharedAnimationBuffer with views.spriteView (Float64Array on first 192 bytes)

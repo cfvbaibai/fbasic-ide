@@ -2,10 +2,6 @@
 import Konva from 'konva'
 import { computed, onDeactivated, onUnmounted, ref, useTemplateRef, watch } from 'vue'
 
-import {
-  readScreenStateFromShared,
-  readSequence,
-} from '@/core/animation/sharedDisplayBuffer'
 import type { ScreenCell } from '@/core/interfaces'
 import { useAnimationWorker } from '@/features/ide/composables/useAnimationWorker'
 import {
@@ -137,12 +133,12 @@ async function render(): Promise<void> {
   renderInProgress = true
   try {
     // Shared buffer path: read sequence; if changed (or first run), decode and update parent refs
-    const sharedViews = ctx.sharedDisplayViews.value
+    const accessor = ctx.sharedDisplayBufferAccessor
     let bufferToRender: ScreenCell[][] = ctx.screenBuffer.value ?? []
-    if (sharedViews) {
-      const seq = readSequence(sharedViews)
+    if (accessor) {
+      const seq = accessor.readSequence()
       if (seq !== lastSequenceRef.value || lastDecodedBufferRef.value === null) {
-        const decoded = readScreenStateFromShared(sharedViews)
+        const decoded = accessor.readScreenState()
         ctx.setDecodedScreenState(decoded)
         lastSequenceRef.value = seq
         lastDecodedBufferRef.value = decoded.buffer

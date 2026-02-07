@@ -11,7 +11,7 @@
 import type Konva from 'konva'
 import { type Ref } from 'vue'
 
-import { MAX_SPRITES } from '@/core/animation/sharedAnimationBuffer'
+import { MAX_SPRITES } from '@/core/animation/sharedDisplayBuffer'
 import type { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import { logScreen } from '@/shared/logger'
 

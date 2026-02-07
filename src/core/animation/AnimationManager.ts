@@ -4,8 +4,7 @@
  */
 
 import { getSpriteSizeForMoveDefinition } from '@/core/animation/CharacterAnimationBuilder'
-import { SyncCommandType } from '@/core/animation/sharedAnimationBuffer'
-import { SHARED_DISPLAY_BUFFER_BYTES } from '@/core/animation/sharedDisplayBuffer'
+import { SHARED_DISPLAY_BUFFER_BYTES, SyncCommandType } from '@/core/animation/sharedDisplayBuffer'
 import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import { SCREEN_DIMENSIONS } from '@/core/constants'
 import type { BasicDeviceAdapter } from '@/core/interfaces'
