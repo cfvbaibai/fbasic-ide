@@ -82,14 +82,14 @@ export function useBasicIdeWorkerIntegration(
   const initializeWebWorkerWrapper = async (): Promise<void> => {
     await initializeWebWorker(webWorkerManager, message => {
       handleWorkerMessage(message, messageHandlerContext)
-    }, screen.sharedAnimationBuffer)
+    }, screen.sharedAnimationBuffer, screen.sharedJoystickBuffer)
   }
 
   const restartWebWorkerWrapper = async (): Promise<void> => {
     state.spriteActionQueues.value?.clear()
     await restartWebWorker(webWorkerManager, message => {
       handleWorkerMessage(message, messageHandlerContext)
-    }, screen.sharedAnimationBuffer)
+    }, screen.sharedAnimationBuffer, screen.sharedJoystickBuffer)
   }
 
   const checkWebWorkerHealthWrapper = async (): Promise<boolean> => {

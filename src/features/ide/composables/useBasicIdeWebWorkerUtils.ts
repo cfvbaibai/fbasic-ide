@@ -25,7 +25,8 @@ export interface WebWorkerManager {
 export async function initializeWebWorker(
   webWorkerManager: WebWorkerManager,
   onMessage: (message: AnyServiceWorkerMessage) => void,
-  sharedAnimationBuffer: SharedArrayBuffer
+  sharedAnimationBuffer: SharedArrayBuffer,
+  sharedJoystickBuffer?: SharedArrayBuffer
 ): Promise<void> {
   if (webWorkerManager.worker) {
     logComposable.debug('Web worker already initialized')
@@ -64,6 +65,16 @@ export async function initializeWebWorker(
       timestamp: Date.now(),
       data: { buffer: sharedAnimationBuffer },
     })
+
+    if (sharedJoystickBuffer) {
+      webWorkerManager.worker.postMessage({
+        type: 'SET_SHARED_JOYSTICK_BUFFER',
+        id: `init-joystick-${Date.now()}`,
+        timestamp: Date.now(),
+        data: { buffer: sharedJoystickBuffer },
+      })
+      logComposable.debug('Shared joystick buffer sent to worker')
+    }
 
     logComposable.debug('Web worker initialized successfully')
   } catch (error) {

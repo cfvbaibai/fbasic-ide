@@ -61,7 +61,6 @@ const {
   getHighlighterCapabilities,
   toggleDebugMode,
   debugBuffer,
-  sendStickEvent,
   sendStrigEvent,
   sharedDisplayBufferAccessor,
   sharedAnimationBuffer,
@@ -200,7 +199,10 @@ onMounted(() => {
       <!-- Bottom area: Joystick (left) + State Inspector (right) -->
       <div class="bottom-area">
         <div class="bottom-left">
-          <JoystickControl :send-stick-event="sendStickEvent" :send-strig-event="sendStrigEvent" />
+          <JoystickControl
+            :send-strig-event="sendStrigEvent"
+            :shared-joystick-buffer="sharedJoystickBuffer"
+          />
         </div>
         <div class="bottom-right">
           <StateInspector

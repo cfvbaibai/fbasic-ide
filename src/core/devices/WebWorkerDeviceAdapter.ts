@@ -32,10 +32,9 @@ export type { WebWorkerExecutionOptions }
 export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   // === DEVICE STATE ===
   private strigClickBuffer: Map<number, number[]> = new Map()
-  private stickStates: Map<number, number> = new Map()
   /** Shared display buffer accessor for buffer operations. */
   private sharedDisplayAccessor: SharedDisplayBufferAccessor | null = null
-  /** Shared joystick buffer. Set when receiving SET_SHARED_JOYSTICK_BUFFER. */
+  /** Shared joystick buffer view. Set when receiving SET_SHARED_JOYSTICK_BUFFER. */
   private sharedJoystickView: JoystickBufferView | null = null
   /** Last POSITION per sprite; getSpritePosition returns it so MOVE uses it (not buffer 0,0). */
   private lastPositionBySprite: Map<number, { x: number; y: number }> = new Map()
@@ -178,25 +177,25 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
 
   /**
    * Get stick state from shared joystick buffer (zero-copy read)
-   * Falls back to Map if shared buffer is not set (backward compatibility)
+   * @throws Error if shared joystick buffer is not set
    */
   getStickState(joystickId: number): number {
-    if (this.sharedJoystickView) {
-      return getStickState(this.sharedJoystickView, joystickId)
+    if (!this.sharedJoystickView) {
+      throw new Error(
+        'Shared joystick buffer not set. Worker must receive SET_SHARED_JOYSTICK_BUFFER message before reading joystick state.'
+      )
     }
-    return this.stickStates.get(joystickId) ?? 0
+    return getStickState(this.sharedJoystickView, joystickId)
   }
 
   /**
    * Set stick state (deprecated - main thread now writes directly to shared buffer)
-   * Kept for backward compatibility during transition
+   * @throws Error - this method is deprecated and should not be used
    */
-  setStickState(joystickId: number, state: number): void {
-    this.stickStates.set(joystickId, state)
-    logWorker.debug('Stick state set:', {
-      joystickId,
-      state,
-    })
+  setStickState(_joystickId: number, _state: number): void {
+    throw new Error(
+      'setStickState() is deprecated. Main thread writes directly to shared joystick buffer. This method is no longer supported.'
+    )
   }
 
   /**

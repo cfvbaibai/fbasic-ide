@@ -10,6 +10,7 @@ const props = defineProps<Props>()
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { createViewsFromJoystickBuffer } from '@/core/devices'
 import { GameBlock, GameButton, GameSubBlock } from '@/shared/components/ui'
 
 import { useJoystickEvents } from '../composables/useJoystickEvents'
@@ -22,14 +23,22 @@ const { t } = useI18n()
 
 // Props
 interface Props {
-  sendStickEvent?: (joystickId: number, state: number) => void
   sendStrigEvent?: (joystickId: number, state: number) => void
+  sharedJoystickBuffer?: SharedArrayBuffer
 }
 
 // Reactive state
 const stickStates = ref([0, 0, 0, 0]) // STICK values for joysticks 0-3
 const trigStates = ref([0, 0, 0, 0]) // STRIG values for joysticks 0-3
 const showKeybindingPanel = ref(false)
+
+// Create shared joystick buffer view from buffer prop
+const sharedJoystickView = computed(() => {
+  if (props.sharedJoystickBuffer) {
+    return createViewsFromJoystickBuffer(props.sharedJoystickBuffer)
+  }
+  return null
+})
 
 // Use joystick events composable for mouse/touch input
 const {
@@ -40,7 +49,6 @@ const {
   toggleActionButton,
   // eslint-disable-next-line vue/no-setup-props-reactivity-loss -- Function props don't need reactivity wrapping
 } = useJoystickEvents({
-  sendStickEvent: props.sendStickEvent,
   sendStrigEvent: props.sendStrigEvent,
   onStickStateChange: (joystickId, state) => {
     stickStates.value[joystickId] = state
@@ -48,6 +56,8 @@ const {
   onStrigStateChange: (joystickId, state) => {
     trigStates.value[joystickId] = state
   },
+  // Pass a function that returns the current view (for reactive access to computed)
+  sharedJoystickView: () => sharedJoystickView.value,
 })
 
 // Use keyboard joystick composable for keyboard input

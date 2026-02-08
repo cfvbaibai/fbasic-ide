@@ -5,24 +5,37 @@ import { type JoystickBufferView,setStickState, setStrigState } from '@/core/dev
 import { logComposable } from '@/shared/logger'
 
 interface UseJoystickEventsOptions {
-  sendStickEvent?: (joystickId: number, state: number) => void
   sendStrigEvent?: (joystickId: number, state: number) => void
   onStickStateChange?: (joystickId: number, state: number) => void
   onStrigStateChange?: (joystickId: number, state: number) => void
   onCellFlash?: (cellKey: string) => void
-  /** Shared joystick buffer view - if provided, writes directly to buffer instead of sending events */
-  sharedJoystickView?: JoystickBufferView
+  /**
+   * Shared joystick buffer view - REQUIRED for STICK (no fallback)
+   * Can be a direct JoystickBufferView or a function that returns one (for reactive sources).
+   *
+   * NOTE: STICK requires sharedJoystickView (zero-copy buffer reads).
+   * STRIG can use sendStrigEvent fallback (message passing with consume pattern).
+   */
+  sharedJoystickView?: JoystickBufferView | (() => JoystickBufferView | null | undefined)
 }
 
 export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
   const {
-    sendStickEvent,
     sendStrigEvent,
     onStickStateChange,
     onStrigStateChange,
     onCellFlash,
     sharedJoystickView,
   } = options
+
+  // Helper to get the current shared joystick view (handles both direct value and function)
+  const getSharedJoystickView = (): JoystickBufferView | null => {
+    if (!sharedJoystickView) return null
+    if (typeof sharedJoystickView === 'function') {
+      return sharedJoystickView() ?? null
+    }
+    return sharedJoystickView
+  }
 
   // Track which buttons are currently "held" (toggle state)
   const heldButtons = ref<Record<string, boolean>>({})
@@ -62,9 +75,9 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
 
     // Set new timer to reset STRIG value after 300ms
     const { start, stop } = useTimeoutFn(() => {
-      if (sharedJoystickView) {
-        setStrigState(sharedJoystickView, joystickId, 0)
-        logComposable.debug('Resetting strig state in shared buffer:', { joystickId })
+      if (sendStrigEvent) {
+        sendStrigEvent(joystickId, 0)
+        logComposable.debug('Sending STRIG reset (message passing):', { joystickId })
       }
       onStrigStateChange?.(joystickId, 0)
       strigResetTimers.value[joystickId] = null
@@ -90,16 +103,16 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
 
     const stickValue = directionMap[direction] ?? 0
 
-    // Send STICK event to service worker
-    // If shared joystick buffer is available, write directly to it (zero-copy)
-    // Otherwise, fall back to message passing for backward compatibility
-    if (sharedJoystickView) {
-      setStickState(sharedJoystickView, joystickId, stickValue)
-      logComposable.debug('Writing stick state to shared buffer:', { joystickId, direction, stickValue })
-    } else if (sendStickEvent && stickValue > 0) {
-      logComposable.debug('Sending STICK event:', { joystickId, direction, stickValue })
-      sendStickEvent(joystickId, stickValue)
+    // Write STICK state to shared joystick buffer (zero-copy)
+    // STICK requires sharedJoystickView - no fallback
+    const view = getSharedJoystickView()
+    if (!view) {
+      throw new Error(
+        'Shared joystick buffer is required for STICK input. Ensure sharedJoystickBuffer is set in JoystickControl.'
+      )
     }
+    setStickState(view, joystickId, stickValue)
+    logComposable.debug('Writing stick state to shared buffer:', { joystickId, direction, stickValue })
 
     // Update local state for display
     onStickStateChange?.(joystickId, stickValue)
@@ -116,13 +129,14 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
     // Set up repeat interval using VueUse
     // useIntervalFn starts immediately by default, so we just need to store pause
     const { pause } = useIntervalFn(() => {
-      if (sharedJoystickView) {
-        setStickState(sharedJoystickView, joystickId, stickValue)
-        logComposable.debug('Repeating stick state to shared buffer:', { joystickId, direction, stickValue })
-      } else if (sendStickEvent && stickValue > 0) {
-        logComposable.debug('Repeating STICK event:', { joystickId, direction, stickValue })
-        sendStickEvent(joystickId, stickValue)
+      const view = getSharedJoystickView()
+      if (!view) {
+        throw new Error(
+          'Shared joystick buffer is required for STICK input. Ensure sharedJoystickBuffer is set in JoystickControl.'
+        )
       }
+      setStickState(view, joystickId, stickValue)
+      logComposable.debug('Repeating stick state to shared buffer:', { joystickId, direction, stickValue })
     }, dpadRepeatInterval)
     heldDpadButtons.value[buttonKey] = pause
   }
@@ -141,13 +155,14 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
 
     // Only send release event and stop flashing if button was actually being held
     if (wasHeld) {
-      if (sharedJoystickView) {
-        setStickState(sharedJoystickView, joystickId, 0)
-        logComposable.debug('Writing stick release to shared buffer:', { joystickId, direction, stickValue: 0 })
-      } else if (sendStickEvent) {
-        logComposable.debug('Sending STICK release event:', { joystickId, direction, stickValue: 0 })
-        sendStickEvent(joystickId, 0)
+      const view = getSharedJoystickView()
+      if (!view) {
+        throw new Error(
+          'Shared joystick buffer is required for STICK input. Ensure sharedJoystickBuffer is set in JoystickControl.'
+        )
       }
+      setStickState(view, joystickId, 0)
+      logComposable.debug('Writing stick release to shared buffer:', { joystickId, direction, stickValue: 0 })
 
       // Update local state for display
       onStickStateChange?.(joystickId, 0)
@@ -200,8 +215,9 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
     // Send STRIG event to service worker
     // If shared joystick buffer is available, write directly to it (zero-copy)
     // Otherwise, fall back to message passing for backward compatibility
-    if (sharedJoystickView) {
-      setStrigState(sharedJoystickView, joystickId, strigValue)
+    const view = getSharedJoystickView()
+    if (view) {
+      setStrigState(view, joystickId, strigValue)
       logComposable.debug('Writing strig state to shared buffer:', { joystickId, button, strigValue })
     } else if (sendStrigEvent && strigValue > 0) {
       logComposable.debug('Sending STRIG event:', { joystickId, button, strigValue })

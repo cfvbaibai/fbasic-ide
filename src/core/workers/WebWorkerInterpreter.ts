@@ -17,7 +17,7 @@ import type {
   OutputMessage,
   ResultMessage,
   SetSharedAnimationBufferMessage,
-  StickEventMessage,
+  SetSharedJoystickBufferMessage,
   StopMessage,
   StrigEventMessage,
 } from '@/core/interfaces'
@@ -80,12 +80,11 @@ class WebWorkerInterpreter {
           logWorker.debug('Handling STRIG_EVENT message')
           this.handleStrigEvent(message)
           break
-        case 'STICK_EVENT':
-          logWorker.debug('Handling STICK_EVENT message')
-          this.handleStickEvent(message)
-          break
         case 'SET_SHARED_ANIMATION_BUFFER':
           this.handleSetSharedAnimationBuffer(message)
+          break
+        case 'SET_SHARED_JOYSTICK_BUFFER':
+          this.handleSetSharedJoystickBuffer(message)
           break
         case 'INPUT_VALUE':
           this.handleInputValue(message)
@@ -243,19 +242,6 @@ class WebWorkerInterpreter {
     }
   }
 
-  handleStickEvent(message: StickEventMessage) {
-    const { joystickId, state } = message.data
-    logWorker.debug('Processing STICK event:', { joystickId, state })
-
-    // Update the WebWorkerDeviceAdapter directly
-    if (this.webWorkerDeviceAdapter) {
-      logWorker.debug('Updating WebWorkerDeviceAdapter STICK state')
-      this.webWorkerDeviceAdapter.setStickState(joystickId, state)
-    } else {
-      logWorker.debug('No WebWorkerDeviceAdapter available for STICK event')
-    }
-  }
-
   handleSetSharedAnimationBuffer(message: SetSharedAnimationBufferMessage) {
     const data = message.data
     if (!data?.buffer) {
@@ -277,6 +263,22 @@ class WebWorkerInterpreter {
       animationManager.setSharedAnimationBuffer(buffer)
     } else {
       console.log('[WebWorkerInterpreter] AnimationManager not created yet, will use buffer when interpreter is created')
+    }
+  }
+
+  handleSetSharedJoystickBuffer(message: SetSharedJoystickBufferMessage) {
+    const data = message.data
+    if (!data?.buffer) {
+      logWorker.warn('SET_SHARED_JOYSTICK_BUFFER: message.data or buffer missing')
+      return
+    }
+    const { buffer } = data
+    console.log('[WebWorkerInterpreter] SET_SHARED_JOYSTICK_BUFFER received, buffer byteLength =', buffer.byteLength)
+    if (this.webWorkerDeviceAdapter) {
+      this.webWorkerDeviceAdapter.setSharedJoystickBuffer(buffer)
+      logWorker.debug('[WebWorkerInterpreter] Shared joystick buffer set in WebWorkerDeviceAdapter')
+    } else {
+      logWorker.warn('[WebWorkerInterpreter] No WebWorkerDeviceAdapter available for SET_SHARED_JOYSTICK_BUFFER')
     }
   }
 

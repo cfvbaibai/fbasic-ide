@@ -2,6 +2,22 @@
  * STICK and STRIG Functions Tests
  *
  * Tests for controller input functions: STICK and STRIG
+ *
+ * IMPORTANT: STICK vs STRIG Behavior
+ * - STICK: LASTING STATE (direct buffer read in production)
+ *   • Hold button → value persists in buffer
+ *   • Release → writes 0 to buffer
+ *   • Multiple reads get same value while held
+ *   • Production: reads from shared joystick buffer (zero-copy)
+ *   • Tests: use Map-based TestDeviceAdapter (same behavior)
+ *
+ * - STRIG: PULSE/CONSUME (queue-based)
+ *   • Press → queued in strigClickBuffer Map
+ *   • First read → returns value and removes from queue (consume)
+ *   • Subsequent reads → return 0 until next press
+ *   • Production: reads from Map (consume pattern)
+ *   • Tests: use Map-based TestDeviceAdapter (same behavior)
+ *
  * According to Family BASIC spec:
  * - STICK(x): Returns D-pad input value (0=nothing, 1=RIGHT, 2=LEFT, 4=DOWN, 8=UP)
  * - STRIG(x): Returns trigger button input value (0=nothing, or button value when pressed)
@@ -138,6 +154,74 @@ describe('STICK and STRIG Functions', () => {
 
       expect(result.success).toBe(true)
       expect(deviceAdapter.getAllOutputs()).toEqual('RIGHT\n')
+    })
+
+    it('should return lasting state (multiple reads return same value)', async () => {
+      deviceAdapter.setStickState(0, 4) // DOWN
+      const code = `
+10 LET S1 = STICK(0)
+20 LET S2 = STICK(0)
+30 LET S3 = STICK(0)
+40 PRINT S1; S2; S3
+50 END
+`
+      const result = await interpreter.execute(code)
+
+      expect(result.success).toBe(true)
+      expect(result.errors).toHaveLength(0)
+      // All three reads should return 4 (DOWN) - lasting state behavior
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 4 4 4\n')
+    })
+
+    it('should update to new state when changed', async () => {
+      // First execution: set to RIGHT (1)
+      deviceAdapter.setStickState(0, 1)
+      await interpreter.execute(`
+10 LET S1 = STICK(0)
+20 PRINT S1
+30 END
+`)
+
+      // Second execution: change to UP (8)
+      deviceAdapter.setStickState(0, 8)
+      await interpreter.execute(`
+10 LET S2 = STICK(0)
+20 PRINT S2
+30 END
+`)
+
+      const outputs = deviceAdapter.getAllOutputs()
+      // Should see both outputs: first 1 (RIGHT), then 8 (UP)
+      expect(outputs).toContain(' 1\n')
+      expect(outputs).toContain(' 8\n')
+    })
+
+    it('should return 0 after release', async () => {
+      // Set to RIGHT
+      deviceAdapter.setStickState(0, 1)
+
+      // Read once
+      await interpreter.execute(`
+10 LET S = STICK(0)
+20 PRINT S
+30 END
+`)
+
+      // Clear outputs before second execution
+      deviceAdapter.clearOutputs()
+
+      // Release (set to 0)
+      deviceAdapter.setStickState(0, 0)
+
+      // Read again - should be 0
+      const result = await interpreter.execute(`
+10 LET S = STICK(0)
+20 PRINT S
+30 END
+`)
+
+      expect(result.success).toBe(true)
+      expect(deviceAdapter.getAllOutputs()).toEqual(' 0\n')
     })
   })
 
