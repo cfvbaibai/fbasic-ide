@@ -25,9 +25,9 @@ beforeEach(() => {
   // The mock accepts the worker signature since that's what the production code uses.
   if (typeof self !== 'undefined') {
     const selfTyped = self as typeof self & {
-      postMessage: ((message: any, transfer?: Transferable[]) => void) & typeof self.postMessage
+      postMessage: ((message: unknown, transfer?: Transferable[]) => void) & typeof self.postMessage
     }
-    selfTyped.postMessage = ((message: any, _transfer?: Transferable[]) => {
+    selfTyped.postMessage = ((message: unknown, _transfer?: Transferable[]) => {
       capturedMessages.push(message as AnyServiceWorkerMessage)
     }) as typeof selfTyped.postMessage
   }

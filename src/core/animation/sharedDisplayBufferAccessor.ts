@@ -23,6 +23,7 @@ import {
   ACK_PENDING,
   ACK_RECEIVED,
   COLS,
+  FLOATS_PER_SPRITE,
   MAX_SPRITES,
   OFFSET_ANIMATION_SYNC,
   OFFSET_CHARS,
@@ -33,6 +34,7 @@ import {
   ROWS,
   SHARED_DISPLAY_BUFFER_BYTES,
   slotBase,
+  SPRITE_DATA_FLOATS,
   SyncCommandType,
 } from './sharedDisplayBuffer'
 
@@ -101,7 +103,7 @@ export class SharedDisplayBufferAccessor {
   private readonly syncInt32ViewInternal: Int32Array
 
   // Section sizes
-  private static readonly SPRITE_DATA_FLOATS = 96 // 8 sprites × 12 floats
+  private static readonly SPRITE_DATA_FLOATS_CHECK = SPRITE_DATA_FLOATS
   private static readonly SCREEN_CHARS = 672 // 28 × 24
   private static readonly SCREEN_PATTERNS = 672 // 28 × 24
   private static readonly CURSOR_BYTES = 2
@@ -110,9 +112,8 @@ export class SharedDisplayBufferAccessor {
   private static readonly SYNC_SECTION_FLOATS = 9 // command type + action number + 6 params + ack
   private static readonly SYNC_SECTION_BYTES = 9 * 8 // 72 bytes
 
-  // Sprite layout constants
-  private static readonly FLOATS_PER_SPRITE = 12
-  private static readonly SPRITE_DATA_FLOATS_CHECK = MAX_SPRITES * 12 // 96
+  // Sprite layout constants (imported from sharedDisplayBuffer)
+  private static readonly FLOATS_PER_SPRITE = FLOATS_PER_SPRITE
 
   // Offsets within sync section (relative to sync section start in combined buffer)
   // In combined display buffer, sync section starts at byte OFFSET_ANIMATION_SYNC (2128)
@@ -144,7 +145,7 @@ export class SharedDisplayBufferAccessor {
     this.buffer = buffer
 
     // Sprite data view: 96 Float64 elements at byte offset 0
-    this.spriteViewInternal = new Float64Array(buffer, 0, SharedDisplayBufferAccessor.SPRITE_DATA_FLOATS)
+    this.spriteViewInternal = new Float64Array(buffer, 0, SharedDisplayBufferAccessor.SPRITE_DATA_FLOATS_CHECK)
 
     // Screen characters: 672 Uint8 elements at byte offset 768
     this.charViewInternal = new Uint8Array(buffer, OFFSET_CHARS, SharedDisplayBufferAccessor.SCREEN_CHARS)

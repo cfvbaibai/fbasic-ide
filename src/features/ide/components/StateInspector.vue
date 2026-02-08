@@ -56,7 +56,9 @@ function hexFor(index: number): string {
   return COLORS[i] ?? '#000000'
 }
 
-const MOVE_SLOT_COUNT = 8
+// Import MAX_SPRITES from buffer constants (was MOVE_SLOT_COUNT = 8)
+import { MAX_SPRITES } from '@/core/animation/sharedDisplayBuffer'
+const MOVE_SLOT_COUNT = MAX_SPRITES
 
 /** Always 8 slots (action 0–7); each slot has movement data from shared buffer. */
 const moveSlots = computed<MovementSlotData[]>(() => {

@@ -20,7 +20,7 @@
 export const MAX_SPRITES = 8
 // 12 floats per sprite: x, y, isActive, isVisible, frameIndex, remainingDistance, totalDistance,
 // direction, speed, priority, characterType, colorCombination
-const FLOATS_PER_SPRITE = 12
+export const FLOATS_PER_SPRITE = 12
 export const SPRITE_DATA_FLOATS = MAX_SPRITES * FLOATS_PER_SPRITE // 96
 
 // ============================================================================
