@@ -19,12 +19,15 @@ const originalPostMessage = (globalThis as typeof globalThis & {
 
 beforeEach(() => {
   capturedMessages = []
-  // Mock self.postMessage for testing (matches new signature with targetOrigin)
+  // Mock self.postMessage for testing.
+  // In jsdom, self.postMessage has the window.postMessage signature (message, targetOrigin, transfer).
+  // In real workers, postMessage has the worker signature (message, transfer).
+  // The mock accepts the worker signature since that's what the production code uses.
   if (typeof self !== 'undefined') {
     const selfTyped = self as typeof self & {
-      postMessage: ((message: any, targetOrigin: string) => void) & typeof self.postMessage
+      postMessage: ((message: any, transfer?: Transferable[]) => void) & typeof self.postMessage
     }
-    selfTyped.postMessage = ((message: any, _targetOrigin: string) => {
+    selfTyped.postMessage = ((message: any, _transfer?: Transferable[]) => {
       capturedMessages.push(message as AnyServiceWorkerMessage)
     }) as typeof selfTyped.postMessage
   }

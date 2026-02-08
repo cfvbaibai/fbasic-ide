@@ -371,6 +371,55 @@ describe('AnimationManager', () => {
 })
 ```
 
+## Common Pitfalls
+
+### postMessage Signature Mismatch (Worker vs Main Thread)
+
+**Problem**: `postMessage()` has different signatures in web workers vs main thread. Mixing them causes runtime errors.
+
+**Worker signature** (DedicatedWorkerGlobalScope):
+```typescript
+self.postMessage(message: any, transfer?: Transferable[]): void
+```
+
+**Main thread signature** (window.postMessage):
+```typescript
+window.postMessage(message: any, targetOrigin: string, transfer?: Transferable[]): void
+```
+
+**The Pitfall**: In a web worker, passing `'*'` as the second argument causes "Overload resolution failed" error:
+```typescript
+// ❌ WRONG in web worker (fails in browser)
+self.postMessage({ type: 'SCREEN_CHANGED' }, '*')
+// Error: Failed to execute 'postMessage' on 'DedicatedWorkerGlobalScope': Overload resolution failed.
+// '*' is not a valid Transferable
+```
+
+**The Fix**: Use worker signature in worker code:
+```typescript
+// ✅ CORRECT in web worker
+self.postMessage({ type: 'SCREEN_CHANGED' })
+```
+
+**Why this is confusing**: Tests in jsdom use `window.postMessage` signature, so `'*'` works in tests but fails in real workers. When writing worker code:
+- Use `postMessage(message)` or `postMessage(message, transfer[])`
+- NEVER use `postMessage(message, '*')` or other `targetOrigin` strings
+
+**Affected files**:
+- `src/core/devices/WebWorkerDeviceAdapter.ts:296-304` (postScreenChanged method)
+
+**Test mocks**: When mocking `postMessage` in tests, use the worker signature:
+```typescript
+const selfTyped = self as typeof self & {
+  postMessage: ((message: any, transfer?: Transferable[]) => void) & typeof self.postMessage
+}
+selfTyped.postMessage = ((message: any, _transfer?: Transferable[]) => {
+  capturedMessages.push(message)
+}) as typeof selfTyped.postMessage
+```
+
+---
+
 ## Code Constraints
 
 - Files: **MAX 500 lines**

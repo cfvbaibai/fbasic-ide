@@ -11,6 +11,18 @@ This document outlines the remaining work for the Family Basic IDE project. Prog
 1. **F-BASIC language** — Remaining commands: STOP, CONT, POKE (SWAP ✅, CLEAR ✅). Screen: VIEW deferred until BG GRAPHIC buffer + editor.
 2. **Code quality** — Vue best practices and file-size limits (mostly complete). Testing: per-feature only; no broad coverage push. Documentation: deferred; revisit later.
 
+## Active Todo Folder
+
+**Location**: `todo/` (project root)
+
+The `todo/` folder contains current work items tracked as individual text files. Each file contains:
+- `type`: bug, refactor, feature
+- `status`: open, resolved, completed
+- `subject`: Brief description
+- `description`: Full details
+
+**Tech Lead Workflow**: When planning work, ALWAYS check the `todo/` folder first for existing items before creating new tasks.
+
 ## Progress Assessment
 
 ### ✅ Completed Work

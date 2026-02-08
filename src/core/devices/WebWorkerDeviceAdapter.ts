@@ -294,16 +294,13 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   }
 
   private postScreenChanged(): void {
-    // In test environment (jsdom), postMessage requires targetOrigin
-    // Use '*' for same-origin (works in both browser and test)
-    self.postMessage(
-      {
-        type: 'SCREEN_CHANGED',
-        id: `screen-changed-${Date.now()}`,
-        timestamp: Date.now(),
-      },
-      '*'
-    )
+    // In web worker context, postMessage takes (message, transfer[]) not targetOrigin
+    // The '*' parameter is only valid for window.postMessage() in main thread
+    self.postMessage({
+      type: 'SCREEN_CHANGED',
+      id: `screen-changed-${Date.now()}`,
+      timestamp: Date.now(),
+    })
   }
 
   consumeStrigState(joystickId: number): number {

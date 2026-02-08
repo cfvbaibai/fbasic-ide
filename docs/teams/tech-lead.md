@@ -96,11 +96,12 @@ src/
 
 When user requests a feature:
 
-1. **Analyze** against architecture (above)
-2. **Identify** which teams are involved
-3. **Break down** into team-specific tasks
-4. **Spawn** sub-agents via Task tool
-5. **Integrate** results and verify cross-team boundaries
+1. **Check `tasks/` folder FIRST** - Review existing task files in `tasks/` directory for any related open work
+2. **Analyze** against architecture (above)
+3. **Identify** which teams are involved
+4. **Break down** into team-specific tasks
+5. **Spawn** sub-agents via Task tool
+6. **Integrate** results and verify cross-team boundaries
 
 ### Example: Add CIRCLE Command
 
