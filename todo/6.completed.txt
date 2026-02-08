@@ -1,0 +1,14 @@
+type: refactor
+status: completed
+subject: Remove direct buffer array creation from test code
+description:
+Test files currently create raw TypedArray views directly on the buffer, which bypasses the SharedDisplayBufferAccessor and creates maintenance issues when buffer layout changes.
+
+Resolution:
+- Verified that remaining direct buffer array creations are INTENTIONAL
+- AnimationSyncProtocol.test.ts: Tests low-level sync protocol directly (appropriate)
+- ClearAllMovements.test.ts: Tests accessor reading raw buffer writes (appropriate)
+- All other tests use SharedDisplayBufferAccessor
+
+The remaining direct view creations follow the guideline:
+"Keep direct view creation ONLY in tests that specifically test the low-level sync protocol"
