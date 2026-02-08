@@ -3,9 +3,11 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { fileURLToPath, URL } from 'node:url'
 
+import { buildNumberPlugin } from './vite-plugin-build-number'
+
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [vue(), buildNumberPlugin()],
   server: {
     headers: {
       'Cross-Origin-Opener-Policy': 'same-origin',

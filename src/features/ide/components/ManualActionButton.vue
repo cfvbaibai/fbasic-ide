@@ -35,7 +35,12 @@ const handleClick = () => {
 </script>
 
 <template>
-  <button class="manual-action-button" :class="[buttonType, { active }]" @mousedown="handleClick" tabindex="-1">
+  <button
+    class="manual-action-button"
+    :class="[buttonType, { active }]"
+    @mousedown="handleClick"
+    tabindex="-1"
+  >
     <slot>{{ label }}</slot>
   </button>
 </template>

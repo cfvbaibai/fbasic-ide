@@ -351,6 +351,7 @@ export default [
       'node_modules',
       '**/*.config.ts',
       '**/*.config.js',
+      'vite-plugin-*.ts',
       '**/*.js',
       '**/*.html',
       'scripts/**/*',

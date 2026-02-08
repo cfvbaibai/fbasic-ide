@@ -343,13 +343,14 @@ export async function renderAllScreenLayers(
   const backgroundOnly = options?.backgroundOnly ?? false
   // lastBackgroundBuffer kept for API compatibility (background is now Canvas2D)
 
-  console.log('[renderAllScreenLayers] Called with', {
-    backgroundOnly,
-    spriteStatesCount: spriteStates.length,
-    hasFrontLayer: !!layers.spriteFrontLayer,
-    hasBackLayer: !!layers.spriteBackLayer,
-    spriteEnabled,
-  })
+  // Commented out to reduce log flooding
+  // console.log('[renderAllScreenLayers] Called with', {
+  //   backgroundOnly,
+  //   spriteStatesCount: spriteStates.length,
+  //   hasFrontLayer: !!layers.spriteFrontLayer,
+  //   hasBackLayer: !!layers.spriteBackLayer,
+  //   spriteEnabled,
+  // })
 
   // 1. Render backdrop layer (if layer exists, otherwise handled by template)
   if (layers.backdropLayer) {

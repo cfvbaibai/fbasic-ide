@@ -44,22 +44,24 @@ class WebWorkerInterpreter {
     if (typeof self === 'undefined') return
 
     self.addEventListener('message', event => {
-      logWorker.debug('Web worker received message from main thread:', {
-        type: event.data.type,
-        id: event.data.id,
-        timestamp: event.data.timestamp,
-        dataSize: JSON.stringify(event.data).length,
-      })
+      // Commented out to reduce log flooding
+      // logWorker.debug('Web worker received message from main thread:', {
+      //   type: event.data.type,
+      //   id: event.data.id,
+      //   timestamp: event.data.timestamp,
+      //   dataSize: JSON.stringify(event.data).length,
+      // })
       void this.handleMessage(event.data)
     })
   }
 
   async handleMessage(message: AnyServiceWorkerMessage) {
-    logWorker.debug('Processing message:', {
-      type: message.type,
-      id: message.id,
-      timestamp: message.timestamp,
-    })
+    // Commented out to reduce log flooding
+    // logWorker.debug('Processing message:', {
+    //   type: message.type,
+    //   id: message.id,
+    //   timestamp: message.timestamp,
+    // })
 
     try {
       // -- Only handling request messages, not response messages
@@ -77,7 +79,6 @@ class WebWorkerInterpreter {
           this.handleStop(message)
           break
         case 'STRIG_EVENT':
-          logWorker.debug('Handling STRIG_EVENT message')
           this.handleStrigEvent(message)
           break
         case 'SET_SHARED_ANIMATION_BUFFER':
@@ -231,14 +232,10 @@ class WebWorkerInterpreter {
 
   handleStrigEvent(message: StrigEventMessage) {
     const { joystickId, state } = message.data
-    logWorker.debug('Processing STRIG event:', { joystickId, state })
 
     // Update the WebWorkerDeviceAdapter directly
     if (this.webWorkerDeviceAdapter) {
-      logWorker.debug('Updating WebWorkerDeviceAdapter STRIG buffer')
       this.webWorkerDeviceAdapter.pushStrigState(joystickId, state)
-    } else {
-      logWorker.debug('No WebWorkerDeviceAdapter available for STRIG event')
     }
   }
 

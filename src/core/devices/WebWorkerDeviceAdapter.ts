@@ -209,22 +209,12 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   pushStrigState(joystickId: number, state: number): void {
     if (!this.isEnabled) return
 
-    logWorker.debug('pushStrigState called:', {
-      joystickId,
-      state,
-    })
-
     if (state > 0) {
       if (!this.strigClickBuffer.has(joystickId)) {
         this.strigClickBuffer.set(joystickId, [])
       }
       const buffer = this.strigClickBuffer.get(joystickId)!
       buffer.push(state)
-      logWorker.debug('STRIG pulse buffered:', {
-        joystickId,
-        state,
-        bufferSize: buffer.length,
-      })
     }
   }
 

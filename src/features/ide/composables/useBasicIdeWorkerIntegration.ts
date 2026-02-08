@@ -89,7 +89,7 @@ export function useBasicIdeWorkerIntegration(
     state.spriteActionQueues.value?.clear()
     await restartWebWorker(webWorkerManager, message => {
       handleWorkerMessage(message, messageHandlerContext)
-    }, screen.sharedAnimationBuffer, screen.sharedJoystickBuffer)
+    }, screen.sharedAnimationBuffer)
   }
 
   const checkWebWorkerHealthWrapper = async (): Promise<boolean> => {

@@ -1,9 +1,11 @@
 <script setup lang="ts">
+/* eslint-disable max-lines -- Navigation component requires template styles that exceed 500 lines */
 import { computed, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { RouteRecordNormalized } from 'vue-router'
 import { useRoute, useRouter } from 'vue-router'
 
+import { buildInfo } from '@/buildInfo'
 import { useLocale } from '@/shared/composables/useLocale'
 import { useSkin } from '@/shared/composables/useSkin'
 
@@ -241,6 +243,9 @@ const handleLocaleChange = (localeValue: string | number) => {
         </div>
       </div>
       <div class="nav-controls">
+        <div class="build-number" title="Build number - increments on each build and hot reload">
+          #{{ buildInfo.buildNumber }}
+        </div>
         <GameSelect
           :model-value="currentLocale"
           :options="localeOptions"
@@ -306,6 +311,18 @@ const handleLocaleChange = (localeValue: string | number) => {
   gap: 0.75rem;
   margin-left: 1rem;
   flex-shrink: 0;
+}
+
+.build-number {
+  font-family: var(--game-font-family-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--game-text-tertiary);
+  padding: 0.25rem 0.5rem;
+  background: var(--base-alpha-gray-100-10);
+  border: 1px solid var(--game-surface-border);
+  border-radius: 4px;
+  white-space: nowrap;
 }
 
 /* Nav button styles */

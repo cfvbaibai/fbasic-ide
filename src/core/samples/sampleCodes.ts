@@ -254,6 +254,29 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 90 END`,
   },
 
+  strigTest: {
+    name: 'STRIG Button Test (DEBUG)',
+    description: 'Dedicated STRIG button test - shows button presses with values',
+    category: 'debug',
+    code: `10 CLS
+20 PRINT "=== STRIG BUTTON TEST ==="
+30 PRINT "Press buttons: START(1) SELECT(2) B(4) A(8)"
+40 PRINT "Watch value below change"
+50 PRINT ""
+60 PRINT "Last button: "
+70 LOCATE 0,6
+80 T = STRIG(0)
+90 IF T = 0 THEN 110
+100 PRINT "Button pressed: ";T
+110 IF T = 1 THEN CLS:PRINT "START pressed!":PAUSE 60:GOTO 10
+120 IF T = 2 THEN CLS:PRINT "SELECT pressed!":PAUSE 60:GOTO 10
+130 IF T = 4 THEN CLS:PRINT "B button pressed!":PAUSE 60:GOTO 10
+140 IF T = 8 THEN CLS:PRINT "A button pressed!":PAUSE 60:GOTO 10
+150 PAUSE 2
+160 GOTO 70
+170 END`,
+  },
+
   shooting: {
     name: 'Shooting Game',
     description: 'Full shooting game with levels, sprites, and scoring',

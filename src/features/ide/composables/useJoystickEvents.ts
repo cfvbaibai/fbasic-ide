@@ -1,7 +1,7 @@
 import { useIntervalFn, useTimeoutFn } from '@vueuse/core'
 import { onDeactivated, onUnmounted, ref } from 'vue'
 
-import { type JoystickBufferView,setStickState, setStrigState } from '@/core/devices'
+import { type JoystickBufferView, setStickState } from '@/core/devices'
 import { logComposable } from '@/shared/logger'
 
 interface UseJoystickEventsOptions {
@@ -112,7 +112,7 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
       )
     }
     setStickState(view, joystickId, stickValue)
-    logComposable.debug('Writing stick state to shared buffer:', { joystickId, direction, stickValue })
+    // logComposable.debug('Writing stick state to shared buffer:', { joystickId, direction, stickValue })
 
     // Update local state for display
     onStickStateChange?.(joystickId, stickValue)
@@ -136,7 +136,7 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
         )
       }
       setStickState(view, joystickId, stickValue)
-      logComposable.debug('Repeating stick state to shared buffer:', { joystickId, direction, stickValue })
+      // logComposable.debug('Repeating stick state to shared buffer:', { joystickId, direction, stickValue })
     }, dpadRepeatInterval)
     heldDpadButtons.value[buttonKey] = pause
   }
@@ -212,15 +212,9 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
 
     const strigValue = buttonMap[button] ?? 0
 
-    // Send STRIG event to service worker
-    // If shared joystick buffer is available, write directly to it (zero-copy)
-    // Otherwise, fall back to message passing for backward compatibility
-    const view = getSharedJoystickView()
-    if (view) {
-      setStrigState(view, joystickId, strigValue)
-      logComposable.debug('Writing strig state to shared buffer:', { joystickId, button, strigValue })
-    } else if (sendStrigEvent && strigValue > 0) {
-      logComposable.debug('Sending STRIG event:', { joystickId, button, strigValue })
+    // Send STRIG event via message passing (consume pattern)
+    // STRIG always uses message passing, NOT shared buffer (unlike STICK)
+    if (sendStrigEvent && strigValue > 0) {
       sendStrigEvent(joystickId, strigValue)
     }
 
