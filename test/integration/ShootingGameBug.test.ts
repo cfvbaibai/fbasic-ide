@@ -46,7 +46,7 @@ describe('Shooting Game Bug - All enemies show as MARIO', () => {
     const source = `
 10 SPRITE ON:FOR X=0 TO 7:GOSUB 1000:NEXT
 20 END
-1000 DEF MOVE(X)=SPRITE(RND(16),RND(9),5,50,0,0):POSITION X,RND(256),RND(256):MOVE X:RETURN
+1000 DEF MOVE(X)=SPRITE(RND(16),RND(9),5,255,0,0):POSITION X,RND(255),RND(255):MOVE X:RETURN
 `
     const result = await interpreter.execute(source)
 
