@@ -217,7 +217,10 @@ export async function getOrCreateMovementFrameImages(
     animationConfigs
   )
 
-  if (!sequence || sequence.frames.length === 0) return null
+  if (!sequence || sequence.frames.length === 0) {
+    logScreen.warn(`No sequence found for action ${actionNumber} (characterType=${characterType}, direction=${direction})`)
+    return null
+  }
 
   const colorCombination = accessor.readSpriteColorCombination(actionNumber)
   const spritePalette = SPRITE_PALETTES[spritePaletteCode] ?? SPRITE_PALETTES[1]
@@ -226,10 +229,6 @@ export async function getOrCreateMovementFrameImages(
   const cacheKey = `${actionNumber}-${characterType}-${direction}-${colorCombination}-${spritePaletteCode}`
 
   if (!frameImageCache.has(cacheKey)) {
-    console.log('[getOrCreateMovementFrameImages] Creating frame images for action', actionNumber, {
-      characterType,
-      direction,
-    })
     const frameImages: HTMLImageElement[] = []
     for (let i = 0; i < sequence.frames.length; i++) {
       const frameTiles = sequence.frames[i]
@@ -277,24 +276,12 @@ export async function createAnimatedSpriteKonvaImage(
   const x = pos?.x ?? 0
   const y = pos?.y ?? 0
 
-  const characterType = accessor.readSpriteCharacterType(actionNumber)
-  const direction = accessor.readSpriteDirection(actionNumber)
-
   const konvaImage = new Konva.Image({
     x,
     y,
     image: currentFrameImage,
     scaleX: 1,
     scaleY: 1,
-  })
-
-  console.log('[createAnimatedSpriteKonvaImage] Created sprite node:', {
-    action: actionNumber,
-    characterType,
-    direction,
-    x: konvaImage.x(),
-    y: konvaImage.y(),
-    frameCount: frameImages.length,
   })
 
   return konvaImage

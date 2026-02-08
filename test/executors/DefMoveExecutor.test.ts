@@ -209,4 +209,98 @@ describe('DefMoveExecutor', () => {
     const def = interpreter.getAnimationManager()?.getMoveDefinition(0)
     expect(def?.distance).toBe(255)
   })
+
+  describe('RND function in DEF MOVE', () => {
+    it('should evaluate RND function in SPRITE arguments', async () => {
+      const source = `
+10 DEF MOVE(0) = SPRITE(RND(16), RND(9), 5, 50, 0, 0)
+20 END
+`
+      const result = await interpreter.execute(source)
+
+      expect(result.success).toBe(true)
+      const def = interpreter.getAnimationManager()?.getMoveDefinition(0)
+      expect(def).toBeDefined()
+      // Character type should be between 0 and 15 (RND(16) returns 0-15)
+      expect(def?.characterType).toBeGreaterThanOrEqual(0)
+      expect(def?.characterType).toBeLessThanOrEqual(15)
+      // Direction should be between 0 and 8 (RND(9) returns 0-8)
+      expect(def?.direction).toBeGreaterThanOrEqual(0)
+      expect(def?.direction).toBeLessThanOrEqual(8)
+    })
+
+    it('should evaluate RND multiple times with different results', async () => {
+      const source = `
+10 FOR X = 0 TO 7
+20 DEF MOVE(X) = SPRITE(RND(16), RND(9), 5, 50, 0, 0)
+30 NEXT
+40 END
+`
+      const result = await interpreter.execute(source)
+      expect(result.success).toBe(true)
+
+      const characterTypes: number[] = []
+      const directions: number[] = []
+
+      for (let i = 0; i < 8; i++) {
+        const def = interpreter.getAnimationManager()?.getMoveDefinition(i)
+        expect(def).toBeDefined()
+        characterTypes.push(def?.characterType ?? -1)
+        directions.push(def?.direction ?? -1)
+      }
+
+      // All character types should be valid (0-15)
+      for (let i = 0; i < 8; i++) {
+        expect(characterTypes[i]).toBeGreaterThanOrEqual(0)
+        expect(characterTypes[i]).toBeLessThanOrEqual(15)
+        expect(directions[i]).toBeGreaterThanOrEqual(0)
+        expect(directions[i]).toBeLessThanOrEqual(8)
+      }
+
+      // With 8 iterations and RND(16) (16 possible values),
+      // we should NOT always get the same value (all MARIO=0)
+      // This is the bug: all enemies show as MARIO
+      const uniqueCharacterTypes = new Set(characterTypes)
+      expect(uniqueCharacterTypes.size).toBeGreaterThan(1)
+    })
+
+    it('should reproduce the shooting game bug - same subroutine called in loop', async () => {
+      // This mimics the actual shooting game pattern
+      const source = `
+10 FOR X = 0 TO 7
+20 GOSUB 1000
+30 NEXT
+40 END
+1000 DEF MOVE(X)=SPRITE(RND(16),RND(9),5,50,0,0)
+1010 RETURN
+`
+      const result = await interpreter.execute(source)
+      expect(result.success).toBe(true)
+
+      const characterTypes: number[] = []
+
+      for (let i = 0; i < 8; i++) {
+        const def = interpreter.getAnimationManager()?.getMoveDefinition(i)
+        expect(def).toBeDefined()
+        characterTypes.push(def?.characterType ?? -1)
+      }
+
+      // All character types should be valid (0-15)
+      for (let i = 0; i < 8; i++) {
+        expect(characterTypes[i]).toBeGreaterThanOrEqual(0)
+        expect(characterTypes[i]).toBeLessThanOrEqual(15)
+      }
+
+      // BUG: All 8 enemies are MARIO (character type 0)
+      // With RND(16) giving 16 possible values, we should get variety
+      const uniqueCharacterTypes = new Set(characterTypes)
+
+      // Debug: print what we got
+      console.log('Character types:', characterTypes)
+      console.log('Unique character types:', uniqueCharacterTypes.size)
+
+      // This assertion will fail if the bug exists
+      expect(uniqueCharacterTypes.size).toBeGreaterThan(1)
+    })
+  })
 })

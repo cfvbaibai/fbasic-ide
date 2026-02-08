@@ -139,6 +139,48 @@ describe('Arithmetic Functions', () => {
       expect(result.success).toBe(false)
       expect(result.errors.length).toBeGreaterThan(0)
     })
+
+    it('should return different values when called multiple times with RND(16)', async () => {
+      const source = '10 FOR X=0 TO 9: PRINT RND(16): NEXT'
+      const result = await interpreter.execute(source)
+      expect(result.success).toBe(true)
+      // Get all printed values
+      const outputs = deviceAdapter.printOutputs
+      // Filter out non-numeric outputs (like "OK\n")
+      const numericOutputs = outputs.filter((s) => s !== null && s !== undefined && /^\s*\d+\s*$/.test(s.replace('\n', '')))
+      expect(numericOutputs.length).toBeGreaterThanOrEqual(10)
+      // Parse all numeric values
+      const values = numericOutputs.map((s) => parseInt(s ?? '0', 10))
+      // All values should be in range 0-15
+      for (const value of values) {
+        expect(value).toBeGreaterThanOrEqual(0)
+        expect(value).toBeLessThanOrEqual(15)
+      }
+      // Not all values should be the same (probabilistic test)
+      const uniqueValues = new Set(values)
+      expect(uniqueValues.size).toBeGreaterThan(1)
+    })
+
+    it('should return different values when called multiple times with RND(9)', async () => {
+      const source = '10 FOR X=0 TO 9: PRINT RND(9): NEXT'
+      const result = await interpreter.execute(source)
+      expect(result.success).toBe(true)
+      // Get all printed values
+      const outputs = deviceAdapter.printOutputs
+      // Filter out non-numeric outputs (like "OK\n")
+      const numericOutputs = outputs.filter((s) => s !== null && s !== undefined && /^\s*\d+\s*$/.test(s.replace('\n', '')))
+      expect(numericOutputs.length).toBeGreaterThanOrEqual(10)
+      // Parse all numeric values
+      const values = numericOutputs.map((s) => parseInt(s ?? '0', 10))
+      // All values should be in range 0-8
+      for (const value of values) {
+        expect(value).toBeGreaterThanOrEqual(0)
+        expect(value).toBeLessThanOrEqual(8)
+      }
+      // Not all values should be the same (probabilistic test)
+      const uniqueValues = new Set(values)
+      expect(uniqueValues.size).toBeGreaterThan(1)
+    })
   })
 
   describe('Function composition', () => {
