@@ -21,7 +21,30 @@ The `todo/` folder contains current work items tracked as individual text files.
 - `subject`: Brief description
 - `description`: Full details
 
-**Tech Lead Workflow**: When planning work, ALWAYS check the `todo/` folder first for existing items before creating new tasks.
+### File Naming Convention
+
+Files are named: `{number}.{status}.txt`
+
+- `{number}`: Sequential ID (1, 2, 3, ...)
+- `{status}`: Current status (open, resolved, completed)
+
+**Example**: `5.open.txt`, `1.resolved.txt`, `4.completed.txt`
+
+### Status Transitions
+
+When a todo item changes status:
+1. **Update the `status` field** in the file content
+2. **Rename the file** to reflect the new status
+   - `5.open.txt` → `5.resolved.txt` (when resolved)
+   - `5.resolved.txt` → `5.completed.txt` (when fully implemented)
+
+### Tech Lead Workflow
+
+When planning work:
+1. **ALWAYS check `todo/` folder first** for existing items before creating new tasks
+2. **Read all `.open.txt` files** to understand current work in progress
+3. **Update todo files** when work status changes (rename + update content)
+4. **Commit todo file changes** along with code changes
 
 ## Progress Assessment
 
