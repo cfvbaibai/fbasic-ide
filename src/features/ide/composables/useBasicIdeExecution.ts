@@ -12,6 +12,7 @@ import { formatArrayForDisplay } from './useBasicIdeFormatting'
 import { clearScreenBuffer, initializeScreenBuffer } from './useBasicIdeScreenUtils'
 import type { BasicIdeState } from './useBasicIdeState'
 import type { BasicIdeWorkerIntegration } from './useBasicIdeWorkerIntegration'
+import { clearAllCaches } from './useKonvaScreenRenderer'
 import { useWebAudioPlayer } from './useWebAudioPlayer'
 
 /** Parser returns CST or null; used by runCode. */
@@ -72,6 +73,8 @@ export function useBasicIdeExecution(
       }
 
       clearScreenBuffer(state.screenBuffer, state.cursorX, state.cursorY)
+      // Clear sprite image cache to prevent stale images from previous runs
+      clearAllCaches()
       // movementStates no longer needed - read from shared buffer instead
       state.movementPositionsFromBuffer.value = new Map()
 

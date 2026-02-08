@@ -1,0 +1,46 @@
+type: bug
+subject: Shooting game only shows MARIO as enemies
+description: The enemy character types should be random, but we always see 8 MARIOs
+
+## Summary
+
+**Status**: 🔶 PENDING USER TESTING - Code changed, awaiting browser verification
+
+### Root Cause
+
+`AnimationWorker.handleStartMovementFromSync()` was creating a MoveDefinition with hardcoded `characterType: 0` and `colorCombination: 0`, ignoring values already written to buffer by DEF MOVE.
+
+**Command sequence issue:**
+1. DEF MOVE writes `characterType=RND(16)` to buffer ✓
+2. START_MOVEMENT creates NEW MoveDefinition with `characterType: 0` ✗
+3. START_MOVEMENT writes this to buffer, overwriting correct value ✗
+
+### The Fix
+
+Modified `handleStartMovementFromSync` to read `characterType` and `colorCombination` from buffer before creating MoveDefinition:
+
+```typescript
+// Read characterType and colorCombination from buffer (set by DEF MOVE)
+const characterType = this.accessor?.readSpriteCharacterType(actionNumber) ?? 0
+const colorCombination = this.accessor?.readSpriteColorCombination(actionNumber) ?? 0
+
+const definition: MoveDefinition = {
+  actionNumber,
+  characterType,  // ← Use value from buffer
+  direction: params.direction,
+  speed: params.speed,
+  distance: params.distance,
+  priority: params.priority as 0 | 1,
+  colorCombination,  // ← Use value from buffer
+}
+```
+
+### Files Modified
+
+- `src/core/workers/AnimationWorker.ts` (lines 167-190)
+  - Read characterType/colorCombination from buffer in handleStartMovementFromSync
+  - Removed debug logging
+
+### Verification
+
+Integration test (`test/integration/ShootingGameBug.test.ts`) passes with 6 unique characterTypes out of 8.

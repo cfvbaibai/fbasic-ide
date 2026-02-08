@@ -8,21 +8,19 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import { createSharedDisplayBuffer } from '@/core/animation/sharedDisplayBuffer'
-import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import { BasicInterpreter } from '@/core/BasicInterpreter'
+
 import { SharedBufferTestAdapter } from '../adapters/SharedBufferTestAdapter'
 
 describe('Shooting Game Bug - All enemies show as MARIO', () => {
   let interpreter: BasicInterpreter
   let deviceAdapter: SharedBufferTestAdapter
   let sharedBuffer: SharedArrayBuffer
-  let accessor: SharedDisplayBufferAccessor
 
   beforeEach(() => {
     // Create shared display buffer
     const bufferData = createSharedDisplayBuffer()
     sharedBuffer = bufferData.buffer
-    accessor = new SharedDisplayBufferAccessor(sharedBuffer)
 
     // Create and configure adapter
     deviceAdapter = new SharedBufferTestAdapter()

@@ -67,3 +67,4 @@ Use `/commit` command. Format: `feat:`, `fix:`, `refactor:`, `chore:`, `docs:`
 - `docs/teams/` - Team contexts (start here for your role)
 - `docs/reference/` - F-BASIC language manual
 - `docs/roadmap.md` - Active work planning
+- `docs/debugging-best-practices.md` - **Read before investigating bugs**

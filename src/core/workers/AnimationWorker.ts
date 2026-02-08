@@ -175,20 +175,23 @@ export class AnimationWorker {
       priority: number
     }
   ): void {
-    console.log('[AnimationWorker] START_MOVEMENT from sync:', { actionNumber, params })
-
     const { deltaX, deltaY } = this.getDirectionDeltas(params.direction)
     const speedDotsPerSecond = params.speed === 0 ? 60 / 256 : 60 / params.speed
     const totalDistance = 2 * params.distance
 
+    // Read characterType and colorCombination from buffer (set by DEF MOVE)
+    // These values are already in the buffer from the DEF MOVE command
+    const characterType = this.accessor?.readSpriteCharacterType(actionNumber) ?? 0
+    const colorCombination = this.accessor?.readSpriteColorCombination(actionNumber) ?? 0
+
     const definition: MoveDefinition = {
       actionNumber,
-      characterType: 0, // Will be set by DEF MOVE
+      characterType,
       direction: params.direction,
       speed: params.speed,
       distance: params.distance,
       priority: params.priority as 0 | 1,
-      colorCombination: 0, // Default
+      colorCombination,
     }
 
     const movementState: WorkerMovementState = {
@@ -207,8 +210,6 @@ export class AnimationWorker {
     }
 
     this.movementStates.set(actionNumber, movementState)
-
-    console.log('[AnimationWorker] Movement state created:', { actionNumber, x: params.startX, y: params.startY, isActive: true })
 
     // Write initial position to shared buffer
     if (this.accessor) {
@@ -289,20 +290,24 @@ export class AnimationWorker {
    * Handle SET_POSITION from sync buffer.
    */
   private handleSetPositionFromSync(actionNumber: number, x: number, y: number): void {
-    console.log('[AnimationWorker] SET_POSITION from sync:', { actionNumber, x, y })
-
     const movement = this.movementStates.get(actionNumber)
     if (movement) {
       movement.x = x
       movement.y = y
     }
 
-    // Write position to shared buffer with all animation parameters
+    // Write position to shared buffer while preserving characterType and colorCombination
+    // These are set by DEF MOVE and should NOT be overwritten by SET_POSITION
     if (this.accessor) {
+      // Read existing characterType and colorCombination before overwriting
+      const existingCharacterType = this.accessor.readSpriteCharacterType(actionNumber)
+      const existingColorCombination = this.accessor.readSpriteColorCombination(actionNumber)
+
       const isActive = movement?.isActive ?? false
       const isVisible = movement ? true : false // isVisible is true if movement exists (has been MOVE'd without ERA)
       const frameIndex = movement?.currentFrameIndex ?? 0
       const def = movement?.definition
+
       this.accessor.writeSpriteState(
         actionNumber,
         x,
@@ -315,12 +320,12 @@ export class AnimationWorker {
         def?.direction ?? 0,
         def?.speed ?? 0,
         def?.priority ?? 0,
-        def?.characterType ?? 0,
-        def?.colorCombination ?? 0
+        // IMPORTANT: Preserve characterType and colorCombination from DEF MOVE
+        // Don't use def?.characterType ?? 0 because movement may not exist yet
+        existingCharacterType,
+        existingColorCombination
       )
     }
-
-    console.log('[AnimationWorker] SET_POSITION state written to buffer')
   }
 
   /**

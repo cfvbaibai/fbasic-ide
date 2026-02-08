@@ -373,6 +373,23 @@ describe('AnimationManager', () => {
 
 ## Common Pitfalls
 
+### Debugging Shared Buffer Issues
+
+**See**: `docs/debugging-best-practices.md` for full debugging methodology.
+
+**Quick pattern for buffer bugs**: Log writes and reads on both sides:
+```typescript
+// Writer: Log what you write
+this.accessor.writeSpriteState(actionNumber, /* ... */, characterType, colorCombination)
+console.log('[WRITE] action', actionNumber, 'characterType:', characterType)
+
+// Reader: Log what you read
+const charType = this.accessor.readSpriteCharacterType(actionNumber)
+console.log('[READ] action', actionNumber, 'characterType:', charType)
+```
+
+If write shows correct value but read shows wrong value → bug is in buffer write/read logic.
+
 ### postMessage Signature Mismatch (Worker vs Main Thread)
 
 **Problem**: `postMessage()` has different signatures in web workers vs main thread. Mixing them causes runtime errors.
