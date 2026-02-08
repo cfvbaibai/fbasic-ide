@@ -34,7 +34,11 @@ export async function initializeWebWorker(
 
   try {
     logComposable.debug('Initializing web worker...')
-    webWorkerManager.worker = new Worker('/basic-interpreter-worker.js')
+    // Vite bundles this automatically with the ?worker suffix pattern
+    webWorkerManager.worker = new Worker(
+      new URL('../../core/workers/WebWorkerInterpreter.ts?worker', import.meta.url),
+      { type: 'module' }
+    )
 
     // Set up message handling
     webWorkerManager.worker.onmessage = event => {

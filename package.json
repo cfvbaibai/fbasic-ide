@@ -7,8 +7,8 @@
         "node": ">=24.13.0"
     },
     "scripts": {
-        "dev": "tsx scripts/build-service-worker.ts && vite",
-        "build": "tsx scripts/build-service-worker.ts && vue-tsc && vite build",
+        "dev": "vite",
+        "build": "vue-tsc && vite build",
         "preview": "vite preview",
         "lint": "eslint . --fix && pnpm lint:style",
         "lint:style": "stylelint \"src/**/*.{css,vue}\"",

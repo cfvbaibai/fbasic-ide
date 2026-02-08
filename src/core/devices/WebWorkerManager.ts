@@ -2,6 +2,7 @@
  * Web Worker Manager
  *
  * Handles web worker lifecycle, initialization, and communication.
+ * Uses Vite's native worker bundling with ?worker suffix pattern.
  */
 
 import { DEFAULTS } from '@/core/constants'
@@ -59,9 +60,10 @@ export class WebWorkerManager {
 
   /**
    * Initialize the web worker
+   * @param _workerScript - Ignored (kept for API compatibility). Uses Vite-bundled worker.
    */
-  async initialize(workerScript?: string): Promise<void> {
-    logWorker.debug('WebWorkerManager.initialize called with script:', workerScript)
+  async initialize(_workerScript?: string): Promise<void> {
+    logWorker.debug('WebWorkerManager.initialize called')
     if (!WebWorkerManager.isSupported()) {
       logWorker.error('Web workers are not supported in this environment')
       throw new Error('Web workers are not supported in this environment')
@@ -72,11 +74,15 @@ export class WebWorkerManager {
       return // Already initialized
     }
 
-    const script = workerScript ?? DEFAULTS.WEB_WORKER.WORKER_SCRIPT
-    logWorker.debug('Creating worker with script:', script)
+    // Vite bundles the worker automatically with ?worker suffix pattern
+    // workerScript parameter is ignored (kept for API compatibility)
+    logWorker.debug('Creating worker using Vite ?worker pattern')
 
     try {
-      this.worker = new Worker(script)
+      this.worker = new Worker(
+        new URL('../workers/WebWorkerInterpreter.ts?worker', import.meta.url),
+        { type: 'module' }
+      )
       logWorker.debug('Worker created successfully')
     } catch (error) {
       logWorker.error('Failed to create worker:', error)
@@ -110,7 +116,7 @@ export class WebWorkerManager {
     logWorker.debug(`executeInWorker called with code: ${code.substring(0, 50)}...`)
     if (!this.worker) {
       logWorker.debug('Worker not initialized, initializing...')
-      await this.initialize(DEFAULTS.WEB_WORKER.WORKER_SCRIPT)
+      await this.initialize()
     }
 
     if (!this.worker) {
