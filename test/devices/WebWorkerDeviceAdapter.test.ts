@@ -372,3 +372,115 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
     expect(screenState.buffer[0]?.[0]?.character).toBe('E')
   })
 })
+
+describe('WebWorkerDeviceAdapter - Sprite Position Sync', () => {
+  let adapter: WebWorkerDeviceAdapter
+  let accessor: SharedDisplayBufferAccessor
+
+  beforeEach(() => {
+    // Create shared buffer and accessor
+    const sharedViews = createSharedDisplayBuffer()
+    accessor = new SharedDisplayBufferAccessor(sharedViews.buffer)
+
+    adapter = new WebWorkerDeviceAdapter()
+    adapter.setSharedDisplayBufferAccessor(accessor)
+    capturedMessages = []
+  })
+
+  describe('getSpritePosition - live position sync from shared buffer', () => {
+    it('should return live position from shared buffer, not cached POSITION value', () => {
+      // Step 1: Set initial POSITION (this caches the position in lastPositionBySprite)
+      adapter.setSpritePosition(0, 100, 50)
+
+      // Verify the cached position is returned
+      expect(adapter.getSpritePosition(0)).toEqual({ x: 100, y: 50 })
+
+      // Step 2: Simulate animation by writing a new live position to shared buffer
+      // This represents the AnimationWorker updating the sprite position during movement
+      accessor.writeSpriteState(0, 200, 150, true, true, 0, 50, 100, 3, 5, 0, 0, 0)
+
+      // Step 3: Verify getSpritePosition returns the LIVE position from shared buffer
+      // NOT the cached POSITION value (100, 50)
+      const pos = adapter.getSpritePosition(0)
+      expect(pos).toEqual({ x: 200, y: 150 })
+      expect(pos?.x).not.toBe(100) // Should NOT be the cached POSITION value
+      expect(pos?.y).not.toBe(50)
+    })
+
+    it('should update cache with live position from shared buffer', () => {
+      // Set initial POSITION
+      adapter.setSpritePosition(0, 100, 50)
+
+      // Write live animated position to shared buffer
+      accessor.writeSpriteState(0, 200, 150, true, true, 0, 50, 100, 3, 5, 0, 0, 0)
+
+      // First call reads from shared buffer and updates cache
+      expect(adapter.getSpritePosition(0)).toEqual({ x: 200, y: 150 })
+
+      // Second call should still return the live position (cache was updated)
+      expect(adapter.getSpritePosition(0)).toEqual({ x: 200, y: 150 })
+    })
+
+    it('should handle multiple sprites with independent live positions', () => {
+      // Set initial POSITIONs for multiple sprites
+      adapter.setSpritePosition(0, 100, 50)
+      adapter.setSpritePosition(1, 120, 60)
+      adapter.setSpritePosition(2, 140, 70)
+
+      // Animate all sprites to new positions
+      accessor.writeSpriteState(0, 200, 150, true, true, 0, 50, 100, 3, 5, 0, 0, 0)
+      accessor.writeSpriteState(1, 220, 160, true, true, 0, 40, 80, 2, 4, 0, 1, 0)
+      accessor.writeSpriteState(2, 240, 170, true, true, 0, 30, 60, 1, 3, 0, 2, 0)
+
+      // Each sprite should return its own live position
+      expect(adapter.getSpritePosition(0)).toEqual({ x: 200, y: 150 })
+      expect(adapter.getSpritePosition(1)).toEqual({ x: 220, y: 160 })
+      expect(adapter.getSpritePosition(2)).toEqual({ x: 240, y: 170 })
+    })
+
+    it('should return null when sprite has no position and buffer is uninitialized', () => {
+      // No POSITION set, and buffer is (0,0) which means uninitialized
+      const pos = adapter.getSpritePosition(5)
+      expect(pos).toBeNull()
+    })
+
+    it('should prefer shared buffer over cached POSITION when both exist', () => {
+      // This is the key fix: shared buffer should take priority
+      // Set cached POSITION
+      adapter.setSpritePosition(0, 100, 50)
+
+      // Write different position to shared buffer (simulating animation)
+      accessor.writeSpriteState(0, 999, 888, true, true, 0, 50, 100, 3, 5, 0, 0, 0)
+
+      // Should return shared buffer position, NOT cached POSITION
+      expect(adapter.getSpritePosition(0)).toEqual({ x: 999, y: 888 })
+    })
+
+    it('should fall back to cached POSITION when shared buffer is (0,0)', () => {
+      // Set cached POSITION
+      adapter.setSpritePosition(0, 100, 50)
+
+      // Shared buffer at (0,0) means uninitialized/invalid - should use cache
+      accessor.writeSpriteState(0, 0, 0, true, true, 0, 0, 0, 0, 0, 0, -1, 0)
+
+      // Should return cached POSITION since buffer (0,0) is treated as uninitialized
+      expect(adapter.getSpritePosition(0)).toEqual({ x: 100, y: 50 })
+    })
+
+    it('should sync position continuously as sprite animates', () => {
+      adapter.setSpritePosition(0, 100, 50)
+
+      // Simulate animation frame 1
+      accessor.writeSpriteState(0, 110, 55, true, true, 0, 90, 100, 3, 5, 0, 0, 0)
+      expect(adapter.getSpritePosition(0)).toEqual({ x: 110, y: 55 })
+
+      // Simulate animation frame 2
+      accessor.writeSpriteState(0, 120, 60, true, true, 0, 80, 100, 3, 5, 0, 0, 0)
+      expect(adapter.getSpritePosition(0)).toEqual({ x: 120, y: 60 })
+
+      // Simulate animation frame 3
+      accessor.writeSpriteState(0, 130, 65, true, true, 0, 70, 100, 3, 5, 0, 0, 0)
+      expect(adapter.getSpritePosition(0)).toEqual({ x: 130, y: 65 })
+    })
+  })
+})

@@ -228,17 +228,18 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   }
 
   getSpritePosition(actionNumber: number): { x: number; y: number } | null {
-    // Explicit POSITION command takes precedence (including POSITION 0,0)
-    if (this.lastPositionBySprite.has(actionNumber)) {
-      return this.lastPositionBySprite.get(actionNumber) ?? null
-    }
-    // Shared buffer (main thread writes positions each frame) so XPOS/YPOS see live position
+    // First, sync from shared buffer if available (main thread writes live animation positions each frame)
     if (this.sharedDisplayAccessor) {
-      const pos = this.sharedDisplayAccessor.readSpritePosition(actionNumber)
-      // Buffer (0,0) is uninitialized: treat as no position so MOVE uses default center (like DEF SPRITE)
-      if (pos !== null && (pos.x !== 0 || pos.y !== 0)) return pos
+      const livePos = this.sharedDisplayAccessor.readSpritePosition(actionNumber)
+      // Buffer (0,0) means uninitialized or off-screen - don't cache it
+      if (livePos !== null && (livePos.x !== 0 || livePos.y !== 0)) {
+        // Update cache with live position so XPOS/YPOS see animated movement
+        this.lastPositionBySprite.set(actionNumber, livePos)
+        return livePos
+      }
     }
-    return null
+    // Fall back to cached explicit POSITION command (or null if never positioned)
+    return this.lastPositionBySprite.get(actionNumber) ?? null
   }
 
   setSpritePosition(actionNumber: number, x: number, y: number): void {
