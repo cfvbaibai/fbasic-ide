@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import type { HighlighterInfo, ParserInfo } from '@/core/interfaces'
@@ -75,6 +75,9 @@ const {
 // Sample selector state
 const sampleSelectorOpen = ref(false)
 
+// StateInspector ref for animation loop to call updateMoveSlotsData
+const stateInspectorRef = useTemplateRef<{ updateMoveSlotsData: () => void }>('stateInspectorRef')
+
 // Provide screen context so ScreenTab/Screen can inject instead of prop drilling
 provideScreenContext({
   screenBuffer,
@@ -96,6 +99,8 @@ provideScreenContext({
   sharedJoystickBuffer: ref(sharedJoystickBuffer),
   setDecodedScreenState,
   registerScheduleRender,
+  // Callback for animation loop to update inspector MOVE tab data
+  updateInspectorMoveSlots: () => stateInspectorRef.value?.updateMoveSlotsData(),
 })
 
 // INPUT/LINPUT modal: local input value and submit/cancel
@@ -206,6 +211,7 @@ onMounted(() => {
         </div>
         <div class="bottom-right">
           <StateInspector
+            ref="stateInspectorRef"
             :screen-buffer="screenBuffer"
             :cursor-x="cursorX"
             :cursor-y="cursorY"

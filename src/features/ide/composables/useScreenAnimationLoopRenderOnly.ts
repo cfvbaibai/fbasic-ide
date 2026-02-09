@@ -30,6 +30,8 @@ export interface UseScreenAnimationLoopRenderOnlyOptions {
   sharedDisplayBufferAccessor?: SharedDisplayBufferAccessor | null
   /** After reading from shared buffer, call with positions so inspector shows live positions. */
   setMovementPositionsFromBuffer?: (positions: Map<number, { x: number; y: number }>) => void
+  /** After reading from shared buffer, call this to update inspector MOVE tab data. */
+  updateInspectorMoveSlots?: () => void
   /** When movements are active: run pending static render at end of frame (animation first, then render) */
   getPendingStaticRender?: () => boolean
   onRunPendingStaticRender?: () => Promise<void>
@@ -58,6 +60,7 @@ export function useScreenAnimationLoopRenderOnly(
     spritePalette,
     sharedDisplayBufferAccessor,
     setMovementPositionsFromBuffer,
+    updateInspectorMoveSlots,
     getPendingStaticRender,
     onRunPendingStaticRender,
     onRenderNeeded,
@@ -162,6 +165,11 @@ export function useScreenAnimationLoopRenderOnly(
     // Sync positions from shared buffer to ref so inspector MOVE tab shows live positions
     if (setMovementPositionsFromBuffer) {
       setMovementPositionsFromBuffer(positions)
+    }
+
+    // Update inspector MOVE tab data with all sprite state (position, direction, speed, etc.)
+    if (updateInspectorMoveSlots) {
+      updateInspectorMoveSlots()
     }
 
     // Run pending static render at end of frame (animation first, then render)

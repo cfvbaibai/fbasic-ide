@@ -41,6 +41,8 @@ export interface ScreenContextValue {
   sharedJoystickBuffer: Ref<SharedArrayBuffer | undefined>
   setDecodedScreenState: (decoded: DecodedScreenState) => void
   registerScheduleRender: (fn: () => void) => void
+  /** Callback to update inspector MOVE tab data (called by animation loop every frame). */
+  updateInspectorMoveSlots?: () => void
 }
 
 export const ScreenContextKey: InjectionKey<ScreenContextValue> = Symbol(

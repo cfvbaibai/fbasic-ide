@@ -106,9 +106,14 @@ export class AnimationWorker {
     logWorker.debug('[AnimationWorker] Direct sync enabled (combined display buffer, sync section at byte 2128)')
     logWorker.debug('[AnimationWorker] Shared animation buffer set, byteLength =', buffer.byteLength)
 
-    // Initialize all sprite slots to inactive with characterType=-1 to mark as uninitialized
+    // Only initialize slots that haven't been set by DEF MOVE yet (characterType = -1 or missing)
+    // DEF MOVE may have already written to the buffer before worker initialized
     for (let actionNumber = 0; actionNumber < MAX_SPRITES; actionNumber++) {
-      this.accessor.writeSpriteState(actionNumber, 0, 0, false, false, 0, 0, 0, 0, 0, 0, -1, 0)
+      const existingCharacterType = this.accessor.readSpriteCharacterType(actionNumber)
+      // Only initialize if truly uninitialized (characterType is exactly -1, which is our sentinel for "never set")
+      if (existingCharacterType === -1) {
+        this.accessor.writeSpriteState(actionNumber, 0, 0, false, false, 0, 0, 0, 0, 0, 0, -1, 0)
+      }
     }
 
     // Start tick loop to poll for sync commands from Executor Worker

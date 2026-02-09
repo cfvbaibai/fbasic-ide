@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import type { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
@@ -60,12 +60,21 @@ function hexFor(index: number): string {
 import { MAX_SPRITES } from '@/core/animation/sharedDisplayBuffer'
 const MOVE_SLOT_COUNT = MAX_SPRITES
 
-/** Always 8 slots (action 0–7); each slot has movement data from shared buffer. */
-const moveSlots = computed<MovementSlotData[]>(() => {
+/** MOVE slot data - updated directly by animation loop (no reactivity needed) */
+const moveSlots = ref<MovementSlotData[]>([])
+
+/**
+ * Update MOVE slot data from shared buffer.
+ * Called by animation loop every frame with fresh data from the buffer.
+ * This avoids Vue reactivity overhead - the animation loop is the source of truth.
+ */
+function updateMoveSlotsData(): void {
   const accessor = props.sharedDisplayBufferAccessor
   const states = props.movementStates ?? []
   const byAction = new Map(states.map(m => [m.actionNumber, m]))
-  return Array.from({ length: MOVE_SLOT_COUNT }, (_, actionNumber) => {
+
+  const slots: MovementSlotData[] = []
+  for (let actionNumber = 0; actionNumber < MOVE_SLOT_COUNT; actionNumber++) {
     // Read all animation state from shared buffer via accessor
     const pos = accessor?.readSpritePosition(actionNumber)
     const x = pos?.x ?? 0
@@ -81,9 +90,10 @@ const moveSlots = computed<MovementSlotData[]>(() => {
 
     // Fall back to local state for definition if not in buffer yet
     const m = byAction.get(actionNumber)
+    // Show slot if: active moving, OR has non-zero position
     const hasData = Boolean(isActive || (accessor && (x !== 0 || y !== 0)))
 
-    return {
+    slots.push({
       actionNumber,
       m: m ?? undefined,
       hasData,
@@ -97,8 +107,15 @@ const moveSlots = computed<MovementSlotData[]>(() => {
       priority,
       characterType,
       colorCombination,
-    }
-  })
+    })
+  }
+
+  moveSlots.value = slots
+}
+
+// Expose update function for animation loop to call
+defineExpose({
+  updateMoveSlotsData,
 })
 </script>
 

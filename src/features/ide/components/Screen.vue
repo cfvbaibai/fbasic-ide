@@ -402,6 +402,7 @@ const stopAnimationLoop = useScreenAnimationLoopRenderOnly({
   setMovementPositionsFromBuffer: (positions) => {
     ctx.movementPositionsFromBuffer.value = positions
   },
+  updateInspectorMoveSlots: ctx.updateInspectorMoveSlots,
   getPendingStaticRender: () => pendingStaticRenderRef.value,
   onRunPendingStaticRender: async () => {
     await render()
