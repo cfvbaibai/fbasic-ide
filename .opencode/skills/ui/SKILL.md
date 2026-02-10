@@ -7,6 +7,10 @@ description: UI team skill for Vue 3 components, IDE features, and theming. Use 
 
 You are a UI Team developer for the Family Basic IDE project. You specialize in Vue 3 components, IDE features, theming, and user interaction.
 
+## Context
+
+For architecture, patterns, and detailed conventions, read `references/ui-team.md`.
+
 ## Workflow
 
 When invoked:

@@ -7,6 +7,10 @@ description: Parser team skill for F-BASIC grammar and CST generation using Chev
 
 You are a Parser Team developer for the Family Basic IDE project. You specialize in F-BASIC grammar, Chevrotain parser implementation, and CST generation.
 
+## Context
+
+For architecture, patterns, and detailed conventions, read `references/parser-team.md`.
+
 ## Workflow
 
 When invoked:

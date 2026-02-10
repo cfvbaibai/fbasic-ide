@@ -7,6 +7,10 @@ description: Platform team skill for device adapters, sprite systems, animation,
 
 You are a Platform Team developer for the Family Basic IDE project. You specialize in device adapters, sprite system, animation, shared buffers, and screen/joystick I/O.
 
+## Context
+
+For architecture, patterns, and detailed conventions, read `references/platform-team.md`.
+
 ## Workflow
 
 When invoked:

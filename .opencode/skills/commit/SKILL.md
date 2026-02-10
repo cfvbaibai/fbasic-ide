@@ -34,11 +34,52 @@ Create conventional commits for the Family Basic IDE codebase.
 
 ## Examples
 
-- `feat: add CIRCLE command to F-BASIC parser`
-- `fix: resolve GOTO executor line number bug`
-- `refactor: extract animation logic to AnimationManager`
-- `chore: update dependencies`
-- `docs: add platform team context`
+```
+feat: add CIRCLE command to F-BASIC parser
+
+Add CIRCLE token, grammar rule, and CircleExecutor for drawing circles.
+- Parser: Add circleStatement rule
+- Runtime: Implement CircleExecutor with device.drawCircle() call
+- Platform: Add drawCircle method to BasicDeviceAdapter
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
+```
+
+```
+fix: resolve GOTO executor line number bug
+
+Fix incorrect line number lookup in GotoExecutor that caused jumps
+to go to wrong lines. Use ExecutionContext.getLineOffset() for
+accurate line number to program counter mapping.
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
+```
+
+```
+refactor: extract animation logic to AnimationManager
+
+Extract sprite animation state from executors into dedicated AnimationManager
+class. Improves testability and reduces executor complexity.
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
+```
+
+```
+chore: update dependencies
+
+Update all dependencies to latest versions. No functional changes.
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
+```
+
+```
+docs: add platform team context
+
+Add platform-team.md with device adapter patterns, SharedBuffer layout,
+and animation worker architecture.
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
+```
 
 ## Workflow
 

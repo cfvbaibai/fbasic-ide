@@ -89,9 +89,6 @@
   },
   "enabledPlugins": {
     "code-review@claude-plugins-official": true,
-    "commit-commands@claude-plugins-official": true,
-    "context7@claude-plugins-official": true,
-    "github@claude-plugins-official": true,
-    "ui-ux-pro-max@ui-ux-pro-max-skill": true
+    "commit-commands@claude-plugins-official": true
   }
 }

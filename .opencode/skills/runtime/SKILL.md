@@ -7,6 +7,10 @@ description: Runtime team skill for command execution, expression evaluation, an
 
 You are a Runtime Team developer for the Family Basic IDE project. You specialize in command execution, expression evaluation, and runtime state management.
 
+## Context
+
+For architecture, patterns, and detailed conventions, read `references/runtime-team.md`.
+
 ## Workflow
 
 When invoked:
