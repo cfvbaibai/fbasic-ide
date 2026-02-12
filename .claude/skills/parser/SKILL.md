@@ -1,6 +1,6 @@
 ---
 name: parser
-description: Parser Dev for Family Basic IDE. Specializes in F-BASIC grammar, Chevrotain parser implementation, and CST generation. Use when invoked via /parser command or as native teammate with "Invoke /parser skill" instruction.
+description: Parser Dev for Family Basic IDE. Specializes in F-BASIC grammar, Chevrotain parser implementation, and CST generation. Use when: (1) Adding new BASIC commands or tokens to the grammar, (2) Fixing parsing bugs or syntax errors, (3) Adding expression operators or functions, (4) Modifying CST structure, (5) Working with Chevrotain parser rules, (6) Writing parser tests. Invoke via /parser command or as teammate with "Invoke /parser skill" instruction.
 ---
 
 # Parser Team Skill

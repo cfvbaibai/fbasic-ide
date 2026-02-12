@@ -1,6 +1,6 @@
 ---
 name: lead
-description: Tech Lead for Family Basic IDE. Orchestrates development by analyzing requirements and choosing coordination approach (Pipeline vs Collaborative). Use /lead when you need to coordinate multi-team features, cross-layer debugging, or parallel code reviews.
+description: Tech Lead for Family Basic IDE. Orchestrates development by analyzing requirements and choosing coordination approach (Pipeline vs Collaborative). Use /lead when: (1) Coordinating multi-team features (commands, sprites, UI), (2) Cross-layer debugging where root cause is unclear, (3) Parallel code reviews (security, performance, tests), (4) Architecture exploration comparing multiple approaches, (5) Any task requiring multiple team skills to be invoked.
 ---
 
 # Tech Lead Skill

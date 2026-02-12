@@ -1,6 +1,6 @@
 ---
 name: platform
-description: Platform Dev for Family Basic IDE. Specializes in device adapters, sprite system, animation, shared buffers, and screen/joystick I/O. Use when invoked via /platform command or as native teammate with "Invoke /platform skill" instruction.
+description: Platform Dev for Family Basic IDE. Specializes in device adapters, sprite system, animation, shared buffers, and screen/joystick I/O. Use when: (1) Adding device adapter methods or interfaces, (2) Working with sprite commands (DEF SPRITE, SPRITE, DEF MOVE, MOVE, POSITION, CUT, ERA), (3) Modifying SharedBuffer layout or accessors, (4) Animation Worker changes (single-writer pattern), (5) Joystick input handling, (6) Multi-layer screen system (background, sprite, backdrop, BG GRAPHIC). Invoke via /platform command or as teammate with "Invoke /platform skill" instruction.
 ---
 
 # Platform Team Skill

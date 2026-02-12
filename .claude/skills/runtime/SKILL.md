@@ -1,6 +1,6 @@
 ---
 name: runtime
-description: Runtime Dev for Family Basic IDE. Specializes in command execution, expression evaluation, and runtime state management. Use when invoked via /runtime command or as native teammate with "Invoke /runtime skill" instruction.
+description: Runtime Dev for Family Basic IDE. Specializes in command execution, expression evaluation, and runtime state management. Use when: (1) Implementing new command executors, (2) Fixing execution bugs, (3) Adding expression functions or operators, (4) Modifying runtime state or variables, (5) Working with ExecutionContext, (6) Writing executor tests, (7) Registering executors in ExecutionEngine. Invoke via /runtime command or as teammate with "Invoke /runtime skill" instruction.
 ---
 
 # Runtime Team Skill

@@ -1,6 +1,6 @@
 ---
 name: ui
-description: UI Dev for Family Basic IDE. Specializes in Vue 3 components, IDE features, theming, and user interaction. Use when invoked via /ui command or as native teammate with "Invoke /ui skill" instruction.
+description: UI Dev for Family Basic IDE. Specializes in Vue 3 components, IDE features, theming, and user interaction. Use when: (1) Creating or modifying Vue components, (2) Adding IDE features, (3) Working with theme system (CSS variables), (4) Web Worker message handling, (5) Konva rendering and SharedBuffer reading, (6) User interaction and event handling, (7) Component testing. Invoke via /ui command or as teammate with "Invoke /ui skill" instruction.
 ---
 
 # UI Team Skill
