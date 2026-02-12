@@ -4,13 +4,13 @@
  * Utility script to visualize CST (Concrete Syntax Tree) structure for debugging.
  * 
  * Usage:
- *   tsx scripts/visualize-cst.ts "10 PRINT X"
- *   tsx scripts/visualize-cst.ts --file path/to/file.bas
- *   tsx scripts/visualize-cst.ts --json "10 IF X=0 THEN PRINT X"
- *   echo "10 PRINT X" | tsx scripts/visualize-cst.ts
+ *   tsx scripts/dev/visualize-cst.ts "10 PRINT X"
+ *   tsx scripts/dev/visualize-cst.ts --file path/to/file.bas
+ *   tsx scripts/dev/visualize-cst.ts --json "10 IF X=0 THEN PRINT X"
+ *   echo "10 PRINT X" | tsx scripts/dev/visualize-cst.ts
  */
 
-import { FBasicParser } from '../src/core/parser/FBasicParser'
+import { FBasicParser } from '../../src/core/parser/FBasicParser'
 import type { CstNode, CstElement, IToken } from 'chevrotain'
 import { readFileSync } from 'fs'
 import { fileURLToPath } from 'url'
@@ -93,11 +93,11 @@ function getCode(): string {
 CST Tree Visualizer
 
 Usage:
-  tsx scripts/visualize-cst.ts "10 PRINT X"
-  tsx scripts/visualize-cst.ts --file path/to/file.bas
-  tsx scripts/visualize-cst.ts --json "10 IF X=0 THEN PRINT X"
-  tsx scripts/visualize-cst.ts --depth 5 "10 PRINT X"
-  echo "10 PRINT X" | tsx scripts/visualize-cst.ts
+  tsx scripts/dev/visualize-cst.ts "10 PRINT X"
+  tsx scripts/dev/visualize-cst.ts --file path/to/file.bas
+  tsx scripts/dev/visualize-cst.ts --json "10 IF X=0 THEN PRINT X"
+  tsx scripts/dev/visualize-cst.ts --depth 5 "10 PRINT X"
+  echo "10 PRINT X" | tsx scripts/dev/visualize-cst.ts
 
 Options:
   --file <path>    Read code from a file
@@ -106,9 +106,9 @@ Options:
   --help, -h        Show this help message
 
 Examples:
-  tsx scripts/visualize-cst.ts "10 IF X=0 THEN PRINT X"
-  tsx scripts/visualize-cst.ts --file sample/shooting.bas
-  tsx scripts/visualize-cst.ts --json "10 FOR I=1 TO 3: PRINT I: NEXT"
+  tsx scripts/dev/visualize-cst.ts "10 IF X=0 THEN PRINT X"
+  tsx scripts/dev/visualize-cst.ts --file sample/shooting.bas
+  tsx scripts/dev/visualize-cst.ts --json "10 FOR I=1 TO 3: PRINT I: NEXT"
 `)
     process.exit(0)
   }

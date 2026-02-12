@@ -7,7 +7,7 @@
  * - Current background items implementation in src/shared/data/bg/
  */
 
-import { getBackgroundItemByCode } from '../src/shared/utils/backgroundLookup'
+import { getBackgroundItemByCode } from '../../src/shared/utils/backgroundLookup'
 
 /**
  * Check all CHR$ codes from 0-255 and identify which ones don't have pixel data

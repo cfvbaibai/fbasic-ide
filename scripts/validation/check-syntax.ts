@@ -7,7 +7,7 @@
 
 import { readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
-import { parseWithChevrotain } from '../src/core/parser/FBasicChevrotainParser'
+import { parseWithChevrotain } from '../../src/core/parser/FBasicChevrotainParser'
 
 interface SyntaxCheckResult {
   file: string
@@ -49,7 +49,7 @@ export function checkSyntax(code: string, filename = '<unknown>'): SyntaxCheckRe
  */
 export async function checkAllSampleCodes(): Promise<SyntaxCheckReport> {
   // Import sample codes (dynamic import for ESM compatibility)
-  const samplesModule = await import('../src/core/samples/sampleCodes.js')
+  const samplesModule = await import('../../src/core/samples/sampleCodes.js')
   const { SAMPLE_CODES } = samplesModule
 
   const results: SyntaxCheckResult[] = []
