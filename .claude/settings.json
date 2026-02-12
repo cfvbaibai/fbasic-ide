@@ -1,4 +1,7 @@
 {
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
   "permissions": {
     "allow": [
       "Bash(cat:*)",
@@ -69,6 +72,7 @@
       "Bash(powershell.exe -Command \"[System.Environment]::GetEnvironmentVariable\\(''npm_config_verify_deps_before_run'', ''User''\\)\")",
       "Bash(powershell.exe -Command:*)",
       "Bash(powershell.exe:*)",
+      "Bash(powershell -NoProfile -ExecutionPolicy Bypass -File:*)",
       "Bash(printenv:*)",
       "Bash(python:*)",
       "Bash(schtasks /create:*)",

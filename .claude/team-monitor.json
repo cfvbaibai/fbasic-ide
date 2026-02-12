@@ -1,0 +1,6 @@
+{
+  "enabled": true,
+  "eventDirectory": "~/.claude/team-events",
+  "eventRetentionDays": 30,
+  "agents": ["parser-dev", "runtime-dev", "platform-dev", "ui-dev"]
+}

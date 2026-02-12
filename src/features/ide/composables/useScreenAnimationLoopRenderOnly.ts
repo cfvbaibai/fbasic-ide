@@ -68,11 +68,16 @@ export function useScreenAnimationLoopRenderOnly(
 
   let animationFrameId: number | null = null
 
+  // Track last positions to detect changes (dirty tracking)
+  const lastPositions = new Map<number, { x: number; y: number }>()
+  let needsRedraw = false
+
   /**
    * Animation loop - runs continuously at 60fps
    * Reads positions from buffer and updates Konva nodes
    * Detects missing sprite nodes and triggers render if needed
    * Detects orphaned nodes (nodes that exist but shouldn't be visible) and removes them
+   * Uses dirty tracking to only redraw when positions actually change
    */
   async function animationLoop(): Promise<void> {
     if (!sharedDisplayBufferAccessor) {
@@ -83,6 +88,7 @@ export function useScreenAnimationLoopRenderOnly(
     const frontNodes = frontSpriteNodes.value as Map<number, Konva.Image>
     const backNodes = backSpriteNodes.value as Map<number, Konva.Image>
     const positions = new Map<number, { x: number; y: number }>()
+    needsRedraw = false
 
     // Check for orphaned nodes (nodes that exist but sprite is not visible)
     // This handles CLEAR command where AnimationWorker sets isVisible=false
@@ -135,6 +141,7 @@ export function useScreenAnimationLoopRenderOnly(
     }
 
     // Read all sprite positions from shared buffer and update Konva nodes
+    // Only trigger redraw if positions actually changed (dirty tracking)
     for (let actionNumber = 0; actionNumber < MAX_SPRITES; actionNumber++) {
       const pos = sharedDisplayBufferAccessor.readSpritePosition(actionNumber)
       if (pos) {
@@ -146,13 +153,20 @@ export function useScreenAnimationLoopRenderOnly(
           : backNodes.get(actionNumber)
 
         if (spriteNode) {
-          spriteNode.x(pos.x)
-          spriteNode.y(pos.y)
+          const lastPos = lastPositions.get(actionNumber)
+          // Check if position actually changed
+          if (!lastPos || lastPos.x !== pos.x || lastPos.y !== pos.y) {
+            needsRedraw = true
+            lastPositions.set(actionNumber, { x: pos.x, y: pos.y })
+            spriteNode.x(pos.x)
+            spriteNode.y(pos.y)
+          }
         }
       }
     }
 
     // Update animated sprite Konva nodes (frames only, positions already updated)
+    // Always run for frame updates, but layer draw will be conditional
     await updateAnimatedSprites(
       layers.value.spriteFrontLayer as Konva.Layer | null,
       layers.value.spriteBackLayer as Konva.Layer | null,
@@ -168,7 +182,8 @@ export function useScreenAnimationLoopRenderOnly(
     }
 
     // Update inspector MOVE tab data with all sprite state (position, direction, speed, etc.)
-    if (updateInspectorMoveSlots) {
+    // Throttle to ~15fps instead of 60fps to reduce Vue reactivity overhead
+    if (updateInspectorMoveSlots && needsRedraw) {
       updateInspectorMoveSlots()
     }
 

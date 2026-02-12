@@ -134,11 +134,11 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 
   screen: {
     name: 'Screen & Colors',
-    description: 'LOCATE, CGSET, PALETB',
+    description: 'LOCATEE, CGSET, PALETB',
     category: 'screen',
     code: `10 CLS
 20 PRINT "Screen Demo"
-30 LOCATE 10, 5
+30 LOCATEE 10, 5
 40 PRINT "Hi"
 50 CGSET 0
 60 PALETB 0, 1, 0, 0, 0
@@ -216,8 +216,8 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
   },
 
   spriteInteractive: {
-    name: 'Interactive Sprites',
-    description: 'Control sprites with joystick - hold DPAD to move',
+    name: 'Interactive Sprites (Adaptive Timing)',
+    description: 'Control sprites with joystick - adaptive PAUSE for responsive input + controlled speed',
     category: 'interactive',
     code: `10 CLS
 20 SPRITE ON
@@ -225,33 +225,46 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 40 SPRITE 0, 150, 100
 50 PX = 150
 60 PY = 100
-70 S = STICK(0)
-80 T = STRIG(0)
-90 IF T=1 THEN 170
-100 IF S=1 THEN PX = PX + 2
-110 IF S=2 THEN PX = PX - 2
-120 IF S=4 THEN PY = PY + 2
-130 IF S=8 THEN PY = PY - 2
-140 SPRITE 0, PX, PY
-150 PAUSE 5
-160 GOTO 70
-170 ERA 0
-180 END`,
+70 L1 = 0
+80 S = STICK(0)
+90 T = STRIG(0)
+100 IF T=1 THEN 190
+110 REM === Adaptive PAUSE: responsive input when idle, controlled speed when moving ===
+120 IF S <> L1 THEN L1 = S: GOTO 150
+130 REM No input change - short pause for quick response to new button presses
+140 PAUSE 1
+145 GOTO 80
+150 REM Input changed - process movement with longer pause to control speed
+160 IF S=1 THEN PX = PX + 2
+165 IF S=2 THEN PX = PX - 2
+170 IF S=4 THEN PY = PY + 2
+175 IF S=8 THEN PY = PY - 2
+180 SPRITE 0, PX, PY
+185 PAUSE 5
+190 GOTO 80
+200 ERA 0
+210 END`,
   },
 
   joystick: {
-    name: 'Joystick Test',
-    description: 'STICK and STRIG functions',
+    name: 'Joystick Test (Adaptive Timing)',
+    description: 'STICK and STRIG functions - adaptive PAUSE for responsive input',
     category: 'interactive',
     code: `10 PRINT "Joystick Test"
+15 L1 = 0
 20 S = STICK(0)
 30 T = STRIG(0)
-40 IF T=1 THEN 90
-50 IF S>0 THEN PRINT S
-60 PAUSE 5
-70 GOTO 20
-80 PRINT "Done"
-90 END`,
+40 IF T=1 THEN 100
+45 REM === Adaptive PAUSE: responsive when idle, controlled when active ===
+50 IF S <> L1 THEN L1 = S: GOTO 70
+55 REM No input change - short pause for quick response
+60 PAUSE 1
+65 GOTO 20
+70 REM Input changed - longer pause when processing
+80 IF S>0 THEN PRINT S
+90 PAUSE 5
+95 GOTO 20
+100 END`,
   },
 
   strigTest: {
@@ -264,7 +277,7 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 40 PRINT "Watch value below change"
 50 PRINT ""
 60 PRINT "Last button: "
-70 LOCATE 0,6
+70 LOCATEE 0,6
 80 T = STRIG(0)
 90 IF T = 0 THEN 110
 100 PRINT "Button pressed: ";T
@@ -282,31 +295,31 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
     description: 'Full shooting game with levels, sprites, and scoring',
     category: 'comprehensive',
     code: `5 S=4:CLS
-7 LOCATE 10,12:IF S=0 THEN 2000
+7 LOCATEE 10,12:IF S=0 THEN 2000
 8 PRINT "LEVEL:";5-S: PAUSE 53:CLS
 10 SPRITE ON:FOR X=0 TO 7:GOSUB 1000:NEXT
 20 PLAY "T1CDEFAB1O5"
 30 PRINT "SCORE:";K
-100 E=14:F=12:C=14:D=12:LOCATE E,F:PRINT CHR$(&HDD);
+100 E=14:F=12:C=14:D=12:LOCATEE E,F:PRINT CHR$(&HDD);
 110 A=STICK(0)
-111 IF E<>C OR F<>D THEN LOCATE C,D:PRINT " ":LOCATE E,F:PRINT CHR$(&HDD):C=E:D=F
+111 IF E<>C OR F<>D THEN LOCATEE C,D:PRINT " ":LOCATEE E,F:PRINT CHR$(&HDD):C=E:D=F
 115 IF STRIG(0)=8 THEN 130
 117 'MOVE AIM CONTINUOUSLY WHILE HOLDING BUTTONS
 120 E=E+((A AND 1)=1)*(E<27)-((A AND 2)=2)*(E>0):F=F+((A AND 4)=4)*(F<23)-((A AND 8)=8)*(F>0):GOTO 180
 125 'IF NOT SHOT, GOTO 200 FOR REST OF LOGIC
-130 PLAY "B":LOCATE E,F:PRINT "*";:PAUSE 1:LOCATE E,F:PRINT " ":LOCATE E,F:PRINT CHR$(&HDD);
+130 PLAY "B":LOCATEE E,F:PRINT "*";:PAUSE 1:LOCATEE E,F:PRINT " ":LOCATEE E,F:PRINT CHR$(&HDD);
 135 'MOVE SPRITES AND CHECK HIT ONE BY ONE
 140 FOR X=0 TO 7
-150 IF C=(XPOS(X)+7)/8-2 AND D=(YPOS(X)+7)/8-3 THEN ERA X:GOSUB 1000:PLAY "ABFEAFEFCDGF":K=K+1:LOCATE 7,0:PRINT K;
+150 IF C=(XPOS(X)+7)/8-2 AND D=(YPOS(X)+7)/8-3 THEN ERA X:GOSUB 1000:PLAY "ABFEAFEFCDGF":K=K+1:LOCATEE 7,0:PRINT K;
 155 'IF SPRITE'S LAST MOVE IS DONE, GIVE ANOTHER MOVE
 160 NEXT
 180 FOR Y=0 TO 7
 181 IF MOVE(Y)=0 THEN X=Y:GOSUB 1000
 182 NEXT
 190 IF K<(5-S)*1000 THEN PAUSE 3:GOTO 110
-200 SPRITE OFF:CLS:LOCATE 10,12:PRINT "ALL RIGHT":PAUSE 54:S=S-1:CLS:GOTO 7
+200 SPRITE OFF:CLS:LOCATEE 10,12:PRINT "ALL RIGHT":PAUSE 54:S=S-1:CLS:GOTO 7
 1000 DEF MOVE(X)=SPRITE(RND(16),RND(9),5,255,0,0):POSITION X,RND(255),RND(255):MOVE X:RETURN
-2000 CLS:PRINT "YOU PASSED!":LOCATE 4,10:PRINT "PROGRAM BY LI YA PING":PRINT:PRINT "ADDRESS: ZHENG ZHOU UNIVERSITY":PRINT "DEP.PHYSICS 91-5#"
+2000 CLS:PRINT "YOU PASSED!":LOCATEE 4,10:PRINT "PROGRAM BY LI YA PING":PRINT:PRINT "ADDRESS: ZHENG ZHOU UNIVERSITY":PRINT "DEP.PHYSICS 91-5#"
 2010 PRINT "POST NUMBER: 450052"`,
   },
 
@@ -438,6 +451,70 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 40 PRINT ""
 50 PRINT "Done"
 60 END`,
+  },
+
+  shootingGame: {
+    name: 'Shooting Game (Adaptive PAUSE)',
+    description: 'Simple shooting game with PRINT-based aim - demonstrates adaptive PAUSE for responsive input + controlled speed',
+    category: 'interactive',
+    code: `10 CLS
+20 SPRITE ON
+30 REM === Initialize ===
+40 DEF SPRITE 0, (0,0,0,0,0)=CHR$(0)
+45 DEF SPRITE 1, (0,0,0,0,0)=CHR$(255)
+50 SPRITE 0, 100, 50
+60 DEF MOVE(1)=SPRITE(1,0,15,40,0,0)
+70 POSITION 1, 120, 100
+80 MOVE 1
+90 REM === Aim position (PRINT-based, not sprite) ===
+100 AX = 14
+110 AY = 12
+120 L1 = 0
+130 REM === Game loop ===
+140 S = STICK(0)
+150 T = STRIG(0)
+160 REM === Adaptive PAUSE for responsive aim control ===
+170 IF S <> L1 THEN L1 = S: GOTO 220
+180 REM No input change - short pause for quick response
+190 PAUSE 1
+200 GOTO 140
+210 REM === Process input ===
+220 REM Aim movement with longer pause (controlled speed)
+230 IF S=1 THEN AX = AX + 1
+240 IF S=2 THEN AX = AX - 1
+250 IF S=4 THEN AY = AY + 1
+260 IF S=8 THEN AY = AY - 1
+270 REM Keep aim on screen
+280 IF AX < 0 THEN AX = 0
+290 IF AX > 27 THEN AX = 27
+300 IF AY < 0 THEN AY = 0
+310 IF AY > 15 THEN AY = 15
+320 REM Draw aim (character at cursor)
+330 LOCATEE AX, AY
+340 PRINT "+"
+350 PAUSE 5
+360 REM === Shooting ===
+370 IF T=8 THEN 400
+380 GOTO 140
+390 REM === Fire shot ===
+400 LOCATEE AX, AY
+410 PRINT "!"
+420 PLAY "B"
+430 REM Check collision with sprite (simple distance check)
+440 SX = XPOS(0)
+450 SY = YPOS(0)
+460 IF ABS(SX - AX*8) < 16 AND ABS(SY - AY*8) < 16 THEN 500
+470 PAUSE 1
+480 REM Erase bullet
+490 LOCATEE AX, AY
+500 PRINT " "
+510 GOTO 140
+520 REM === Hit! ===
+530 CUT 1
+540 LOCATEE 10, 10
+550 PRINT "HIT!"
+560 PAUSE 60
+570 GOTO 80`,
   },
 }
 

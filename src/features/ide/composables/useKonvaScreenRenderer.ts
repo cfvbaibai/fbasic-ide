@@ -96,7 +96,7 @@ export function renderBackdropLayer(
   })
 
   layer.add(rect)
-  layer.draw()
+  layer.batchDraw()
 }
 
 /**
@@ -219,9 +219,9 @@ export async function renderSpriteLayer(
     }
   }
 
-  console.log('[renderSpriteLayer] Before layer.draw(), nodeMap size:', nodeMap.size, 'layer children:', layer.getChildren().length)
-  // Draw the layer
-  layer.draw()
+  console.log('[renderSpriteLayer] Before layer.batchDraw(), nodeMap size:', nodeMap.size, 'layer children:', layer.getChildren().length)
+  // Draw the layer using batchDraw() for better performance with multiple sprite updates
+  layer.batchDraw()
 
   return nodeMap
 }
@@ -295,11 +295,12 @@ export async function updateAnimatedSprites(
   }
 
   // Redraw layers if they have sprites (active or stopped)
+  // Use batchDraw() for better performance with multiple sprite updates
   if (spriteFrontLayer && frontSpriteNodes.size > 0) {
-    spriteFrontLayer.draw()
+    spriteFrontLayer.batchDraw()
   }
   if (spriteBackLayer && backSpriteNodes.size > 0) {
-    spriteBackLayer.draw()
+    spriteBackLayer.batchDraw()
   }
 }
 
