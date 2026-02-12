@@ -392,6 +392,32 @@ describe('PrintExecutor', () => {
     })
   })
 
+  describe('PRINT with Empty String', () => {
+    it('should print a newline for PRINT "" (empty string)', async () => {
+      const printStmtCst = await parsePrintStatement('10 PRINT ""')
+      expect(printStmtCst).not.toBeNull()
+
+      executor.execute(printStmtCst!)
+
+      expect(printOutputMock).toHaveBeenCalledTimes(1)
+      const output = printOutputMock.mock.calls[0]?.[0]
+      // PRINT "" should print just a newline (blank line)
+      expect(output).toEqual('\n')
+    })
+
+    it('should print a newline for PRINT "" after content with semicolon', async () => {
+      const printStmtCst = await parsePrintStatement('10 PRINT "A"; ""')
+      expect(printStmtCst).not.toBeNull()
+
+      executor.execute(printStmtCst!)
+
+      expect(printOutputMock).toHaveBeenCalledTimes(1)
+      const output = printOutputMock.mock.calls[0]?.[0]
+      // "A"; "" -> "A" followed by empty string, then newline
+      expect(output).toEqual('A\n')
+    })
+  })
+
   describe('PRINT with Mixed Separators', () => {
     it('should handle comma and semicolon together', async () => {
       const printStmtCst = await parsePrintStatement('10 PRINT "A", "B"; "C"')

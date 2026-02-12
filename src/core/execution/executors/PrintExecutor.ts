@@ -152,8 +152,10 @@ export class PrintExecutor {
     const endsWithSeparator = endsWithSemicolon || endsWithComma
 
     // In BASIC, PRINT statements automatically add a newline at the end
-    // unless they end with a semicolon or comma. Add newline immediately if needed.
-    if (!endsWithSeparator && output.length > 0) {
+    // unless they end with a semicolon or comma.
+    // We check items.length > 0 (not output.length > 0) because PRINT "" should
+    // still print a newline (blank line), even though output is empty.
+    if (!endsWithSeparator && items.length > 0) {
       output += '\n'
     }
 

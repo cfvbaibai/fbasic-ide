@@ -452,6 +452,22 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 50 PRINT "Done"
 60 END`,
   },
+
+  bgItems: {
+    name: 'BG Items Display',
+    description: 'Display all BG character items - numbers, letters, symbols, kana, and picture tiles',
+    category: 'screen',
+    code: `10 CLS
+20 FOR I=0 TO 31:PRINT CHR$(I);:NEXT:PRINT "":PRINT ""
+30 FOR I=33 TO 47:PRINT CHR$(I);:NEXT:PRINT "":PRINT ""
+40 FOR I=48 TO 57:PRINT CHR$(I);:NEXT:PRINT "":PRINT ""
+50 FOR I=65 TO 90:PRINT CHR$(I);:NEXT:PRINT "":PRINT ""
+60 FOR I=91 TO 95:PRINT CHR$(I);:NEXT:PRINT "":PRINT ""
+70 FOR I=96 TO 175:PRINT CHR$(I);:NEXT:PRINT "":PRINT ""
+80 FOR I=176 TO 183:PRINT CHR$(I);:NEXT:PRINT "":PRINT ""
+90 FOR I=184 TO 255:PRINT CHR$(I);:NEXT:PRINT "":PRINT ""
+100 END`,
+  },
 }
 
 export function getSampleCode(key: string): SampleCode | undefined {

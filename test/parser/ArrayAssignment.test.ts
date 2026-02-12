@@ -310,9 +310,9 @@ describe('Array Assignment', () => {
       const array = result.arrays?.get('A$') as BasicScalarValue[]
       expect(array[0]).toBe('')
 
-      // Verify PRINT output (empty string prints nothing), but "OK" is still printed
+      // Verify PRINT output (empty string prints newline), then "OK" from END
       const outputs = deviceAdapter.getAllOutputs()
-      expect(outputs).toEqual('OK\n')
+      expect(outputs).toEqual('\nOK\n')
     })
   })
 
