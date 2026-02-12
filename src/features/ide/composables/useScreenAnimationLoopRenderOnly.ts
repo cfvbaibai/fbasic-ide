@@ -155,7 +155,7 @@ export function useScreenAnimationLoopRenderOnly(
         if (spriteNode) {
           const lastPos = lastPositions.get(actionNumber)
           // Check if position actually changed
-          if (!lastPos || lastPos.x !== pos.x || lastPos.y !== pos.y) {
+          if (lastPos?.x !== pos.x || lastPos.y !== pos.y) {
             needsRedraw = true
             lastPositions.set(actionNumber, { x: pos.x, y: pos.y })
             spriteNode.x(pos.x)

@@ -1,6 +1,17 @@
+# Outstanding Work Plan V1 (Archived)
+
+**Archived**: 2026-02-12
+**Status**: Superseded by new roadmap
+
+This file tracked remaining F-BASIC commands. See the new roadmap for current planning.
+
+---
+
+## Original Content
+
 # Outstanding Work Plan
 
-**Status**: Active  
+**Status**: Active
 **Purpose**: Not-done-yet work for the Family Basic IDE project (completed work removed)
 
 ---
@@ -35,7 +46,7 @@
 - [ ] Register in `StatementRouter.ts`
 - [ ] Add tests
 
-**Reference**: `docs/reference/family-basic-manual/page-69.md`  
+**Reference**: `docs/reference/family-basic-manual/page-69.md`
 **Note**: Web security limits direct memory access; implement as no-op or limited behavior.
 
 ### 1.4 PLAY (Sound / Music) — ✅ Complete
@@ -47,7 +58,7 @@
 - [x] Register in `StatementRouter.ts`
 - [x] Add tests (`test/executors/PlayExecutor.test.ts`, parser, integration, `test/sound/`)
 
-**Reference**: `docs/reference/family-basic-manual/page-80.md`  
+**Reference**: `docs/reference/family-basic-manual/page-80.md`
 **Status**: Implemented with Web Audio API. Parser: F-BASIC length codes 0–9, same-as-previous length. See `docs/planning/play-parser-validation.md`.
 
 ---
