@@ -70,6 +70,11 @@ const handleClick = () => {
   position: relative;
   transition: all 0.3s ease;
   overflow: hidden;
+
+  /* Flex layout support for nested content */
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .game-block::before {
@@ -136,6 +141,12 @@ const handleClick = () => {
 .game-block-content {
   padding-top: 0.75rem;
   position: relative;
+
+  /* Flex layout support for nested content */
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .game-block.no-header .game-block-content {

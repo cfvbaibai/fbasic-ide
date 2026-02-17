@@ -45,6 +45,7 @@ import { ReturnExecutor } from './executors/ReturnExecutor'
 import { SpriteExecutor } from './executors/SpriteExecutor'
 import { SpriteOnOffExecutor } from './executors/SpriteOnOffExecutor'
 import { SwapExecutor } from './executors/SwapExecutor'
+import { ViewExecutor } from './executors/ViewExecutor'
 import type { ExpandedStatement } from './statement-expander'
 
 export class StatementRouter {
@@ -82,6 +83,7 @@ export class StatementRouter {
   private eraExecutor: EraExecutor
   private positionExecutor: PositionExecutor
   private playExecutor: PlayExecutor
+  private viewExecutor: ViewExecutor
 
   constructor(
     private context: ExecutionContext,
@@ -123,6 +125,7 @@ export class StatementRouter {
     this.eraExecutor = new EraExecutor(context, evaluator)
     this.positionExecutor = new PositionExecutor(context, evaluator)
     this.playExecutor = new PlayExecutor(context, evaluator)
+    this.viewExecutor = new ViewExecutor(context)
   }
 
   /**
@@ -437,6 +440,11 @@ export class StatementRouter {
       const playStmtCst = getFirstCstNode(singleCommandCst.children.playStatement)
       if (playStmtCst) {
         this.playExecutor.execute(playStmtCst, expandedStatement.lineNumber)
+      }
+    } else if (singleCommandCst.children.viewStatement) {
+      const viewStmtCst = getFirstCstNode(singleCommandCst.children.viewStatement)
+      if (viewStmtCst) {
+        this.viewExecutor.execute(viewStmtCst, expandedStatement.lineNumber)
       }
     } else {
       // Other statement types not yet implemented

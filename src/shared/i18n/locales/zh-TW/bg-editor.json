@@ -1,0 +1,28 @@
+{
+  "title": "BG圖形編輯器",
+  "toolbar": {
+    "select": "選擇",
+    "copy": "複製",
+    "move": "移動",
+    "char": "字元",
+    "clear": "清除",
+    "clearConfirm": "確定要清除整個網格嗎？"
+  },
+  "grid": {
+    "title": "網格",
+    "selectDestination": "點擊選擇目標位置",
+    "showGridLines": "顯示網格線",
+    "hideGridLines": "隱藏網格線"
+  },
+  "palette": {
+    "title": "字元面板",
+    "pictures": "圖形",
+    "letters": "字母",
+    "numbers": "數字",
+    "symbols": "符號",
+    "kana": "假名"
+  },
+  "colorPattern": {
+    "label": "顏色模式"
+  }
+}

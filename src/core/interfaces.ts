@@ -100,6 +100,15 @@ export interface BasicDeviceAdapter {
    * @param musicString - Music string with tempo, notes, rests, and channel separators
    */
   playSound?(musicString: string): void
+
+  // === BG GRAPHIC (VIEW command) ===
+  /**
+   * Copy BG GRAPHIC data to the background screen.
+   * Called by VIEW command to display the BG Editor content on screen.
+   * Per F-BASIC Manual page 36: "Upon executing the VIEW command,
+   * the BG GRAPHIC Screen will be copied to the Background Screen."
+   */
+  copyBgGraphicToBackground?(): void
 }
 
 /**

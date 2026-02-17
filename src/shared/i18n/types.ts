@@ -5,6 +5,7 @@
  * The types are derived from the English locale files (master schema).
  */
 
+import type enBgEditor from './locales/en/bg-editor.json'
 import type enCommon from './locales/en/common.json'
 import type enHome from './locales/en/home.json'
 import type enIde from './locales/en/ide.json'
@@ -22,6 +23,7 @@ export type MessageSchema = {
   spriteViewer: typeof enSpriteViewer
   imageAnalyzer: typeof enImageAnalyzer
   monacoEditor: typeof enMonacoEditor
+  bgEditor: typeof enBgEditor
 }
 
 // Define available locales

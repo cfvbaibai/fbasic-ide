@@ -3,6 +3,7 @@ import { computed, onMounted, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import type { HighlighterInfo, ParserInfo } from '@/core/interfaces'
+import BgEditorPanel from '@/features/bg-editor/components/BgEditorPanel.vue'
 import {
   GameBlock,
   GameButton,
@@ -74,6 +75,9 @@ const {
 
 // Sample selector state
 const sampleSelectorOpen = ref(false)
+
+// Editor view state: 'code' | 'bg'
+const editorView = ref<'code' | 'bg'>('code')
 
 // StateInspector ref for animation loop to call updateMoveSlotsData
 const stateInspectorRef = useTemplateRef<{ updateMoveSlotsData: () => void }>('stateInspectorRef')
@@ -150,6 +154,25 @@ onMounted(() => {
         <GameBlock :title="t('ide.codeEditor.title')" title-icon="mdi:pencil" class="editor-panel">
           <template #right>
             <div class="editor-header-controls">
+              <!-- Editor view toggle -->
+              <div class="editor-view-toggle">
+                <button
+                  :class="['view-toggle-btn', { active: editorView === 'code' }]"
+                  @click="editorView = 'code'"
+                  type="button"
+                >
+                  <span class="mdi mdi-code-tags"></span>
+                  Code
+                </button>
+                <button
+                  :class="['view-toggle-btn', { active: editorView === 'bg' }]"
+                  @click="editorView = 'bg'"
+                  type="button"
+                >
+                  <span class="mdi mdi-view-grid"></span>
+                  BG
+                </button>
+              </div>
               <GameButton
                 type="default"
                 size="small"
@@ -172,7 +195,10 @@ onMounted(() => {
               />
             </div>
           </template>
-          <MonacoCodeEditor v-model="code" />
+          <!-- Code Editor View -->
+          <MonacoCodeEditor v-show="editorView === 'code'" v-model="code" />
+          <!-- BG Editor View -->
+          <BgEditorPanel v-show="editorView === 'bg'" />
         </GameBlock>
 
         <!-- Right Panel - Runtime Output -->
@@ -287,6 +313,38 @@ onMounted(() => {
   align-items: center;
   gap: 0.5rem;
   flex-wrap: wrap;
+}
+
+.editor-view-toggle {
+  display: flex;
+  gap: 0.125rem;
+  margin-right: 0.5rem;
+}
+
+.view-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--game-text-secondary);
+  background: var(--game-surface-bg-start);
+  border: 1px solid var(--game-surface-border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.view-toggle-btn:hover {
+  color: var(--game-text-primary);
+  border-color: var(--base-solid-primary);
+}
+
+.view-toggle-btn.active {
+  color: var(--game-text-contrast);
+  background: var(--base-solid-primary);
+  border-color: var(--base-solid-primary);
 }
 
 .sample-selector-btn {
@@ -435,44 +493,5 @@ onMounted(() => {
   display: flex;
   gap: 0.75rem;
   justify-content: flex-end;
-}
-
-/* Glowing animations */
-@keyframes border-shimmer {
-  0%,
-  100% {
-    background-position: -200% center;
-    opacity: 0.6;
-  }
-
-  50% {
-    background-position: 200% center;
-    opacity: 0.9;
-  }
-}
-
-@keyframes border-rotate {
-  0% {
-    transform: rotate(0deg);
-    opacity: 0;
-  }
-
-  25% {
-    opacity: 0.2;
-  }
-
-  50% {
-    transform: rotate(180deg);
-    opacity: 0.3;
-  }
-
-  75% {
-    opacity: 0.2;
-  }
-
-  100% {
-    transform: rotate(360deg);
-    opacity: 0;
-  }
 }
 </style>

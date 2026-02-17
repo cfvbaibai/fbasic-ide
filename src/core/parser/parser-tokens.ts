@@ -47,6 +47,7 @@ export const Cgen = createToken({ name: 'Cgen', pattern: /\bCGEN\b/i })
 export const Paletb = createToken({ name: 'Paletb', pattern: /\bPALETB\b/i })
 export const Palets = createToken({ name: 'Palets', pattern: /\bPALETS\b/i })
 export const Palet = createToken({ name: 'Palet', pattern: /\bPALET\b/i })
+export const View = createToken({ name: 'View', pattern: /\bVIEW\b/i })
 
 // Sprite commands
 export const Def = createToken({ name: 'Def', pattern: /\bDEF\b/i })
@@ -202,6 +203,7 @@ export const allTokens = [
   Paletb,
   Palets,
   Palet,
+  View,
   Def,
   Sprite,
   Move,

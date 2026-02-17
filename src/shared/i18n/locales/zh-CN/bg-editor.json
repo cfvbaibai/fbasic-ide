@@ -1,0 +1,28 @@
+{
+  "title": "BG图形编辑器",
+  "toolbar": {
+    "select": "选择",
+    "copy": "复制",
+    "move": "移动",
+    "char": "字符",
+    "clear": "清除",
+    "clearConfirm": "确定要清除整个网格吗？"
+  },
+  "grid": {
+    "title": "网格",
+    "selectDestination": "点击选择目标位置",
+    "showGridLines": "显示网格线",
+    "hideGridLines": "隐藏网格线"
+  },
+  "palette": {
+    "title": "字符面板",
+    "pictures": "图形",
+    "letters": "字母",
+    "numbers": "数字",
+    "symbols": "符号",
+    "kana": "假名"
+  },
+  "colorPattern": {
+    "label": "颜色模式"
+  }
+}

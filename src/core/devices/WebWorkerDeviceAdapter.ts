@@ -16,6 +16,7 @@ import type {
 } from '@/core/interfaces'
 import { parseMusic } from '@/core/sound/MusicDSLParser'
 import { SoundStateManager } from '@/core/sound/SoundStateManager'
+import type { BgGridData } from '@/features/bg-editor/types'
 import { logWorker } from '@/shared/logger'
 
 import { MessageHandler } from './MessageHandler'
@@ -39,6 +40,8 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   /** Last POSITION per sprite; getSpritePosition returns it so MOVE uses it (not buffer 0,0). */
   private lastPositionBySprite: Map<number, { x: number; y: number }> = new Map()
   private isEnabled = true
+  /** BG GRAPHIC data for VIEW command. Set via SET_BG_DATA message from main thread. */
+  private bgGridData: BgGridData | null = null
 
   // === MANAGERS ===
   private webWorkerManager: WebWorkerManager
@@ -253,6 +256,68 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   /** Clear all stored POSITION values (e.g. when IDE Clear is clicked so next Run uses default center). */
   clearAllSpritePositions(): void {
     this.lastPositionBySprite.clear()
+  }
+
+  // === BG GRAPHIC METHODS (VIEW command) ===
+
+  /**
+   * Set BG grid data for VIEW command.
+   * Called from WebWorkerInterpreter when receiving SET_BG_DATA message.
+   */
+  setBgGridData(data: BgGridData): void {
+    this.bgGridData = data
+    logWorker.debug('[WebWorkerDeviceAdapter] BG grid data set, rows:', data.length)
+  }
+
+  /**
+   * Copy BG GRAPHIC to Background Screen.
+   * Per F-BASIC Manual page 36: "Upon executing the VIEW command,
+   * the BG GRAPHIC Screen will be copied to the Background Screen."
+   *
+   * This method writes the stored BG grid data directly to the screen buffer.
+   * The BG grid covers rows 3-23 (21 rows, leaving top 3 rows for system use).
+   */
+  copyBgGraphicToBackground(): void {
+    if (!this.bgGridData) {
+      logWorker.warn('[WebWorkerDeviceAdapter] VIEW: No BG grid data available')
+      return
+    }
+
+    logWorker.debug('[WebWorkerDeviceAdapter] VIEW: Copying BG GRAPHIC to Background Screen')
+
+    // Get the screen buffer from the state manager
+    const screenBuffer = this.screenStateManager.getScreenBuffer()
+
+    // Copy BG data to screen buffer
+    // BG grid has 21 rows (rows 0-20 in grid), which map to screen rows 3-23
+    // BG grid has 28 columns, same as screen width
+    for (let gridRow = 0; gridRow < this.bgGridData.length; gridRow++) {
+      const bgRow = this.bgGridData[gridRow]
+      if (!bgRow) continue
+
+      // Screen rows start at 3 (top 3 rows are system area)
+      const screenRow = gridRow + 3
+      if (screenRow >= 24) break // Don't exceed screen height
+
+      for (let col = 0; col < bgRow.length && col < 28; col++) {
+        const bgCell = bgRow[col]
+        if (!bgCell) continue
+
+        const screenCell = screenBuffer[screenRow]?.[col]
+        if (screenCell) {
+          // Convert character code to character
+          // In F-BASIC, character codes 0-255 map to CHR$ values
+          screenCell.character = String.fromCharCode(bgCell.charCode)
+          screenCell.colorPattern = bgCell.colorPattern
+        }
+      }
+    }
+
+    // Sync to shared buffer and notify main thread
+    this.syncScreenStateToShared()
+    this.postScreenChanged()
+
+    logWorker.debug('[WebWorkerDeviceAdapter] VIEW: BG GRAPHIC copied successfully')
   }
 
   /**

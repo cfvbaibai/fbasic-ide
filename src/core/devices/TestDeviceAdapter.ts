@@ -133,6 +133,16 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
     logDevice.debug('Play sound:', musicString)
   }
 
+  // === BG GRAPHIC (VIEW command) ===
+
+  /** Count of copyBgGraphicToBackground calls for testing */
+  public copyBgGraphicToBackgroundCalls = 0
+
+  copyBgGraphicToBackground?(): void {
+    this.copyBgGraphicToBackgroundCalls++
+    logDevice.debug('Copy BG GRAPHIC to Background Screen called')
+  }
+
   // === TEXT OUTPUT METHODS ===
 
   printOutput(output: string): void {

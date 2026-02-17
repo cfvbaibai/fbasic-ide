@@ -4,6 +4,8 @@
 
 A BG GRAPHIC editor for creating background screens that integrate with the F-BASIC emulator via the VIEW command.
 
+**Important:** BG Editor is NOT a standalone route. It is integrated into the IDE page as a view toggle alongside the code editor. Background data is bound to the program context (a game consists of foreground, print, and background).
+
 ## Requirements Summary
 
 | Aspect | Decision |
@@ -13,7 +15,7 @@ A BG GRAPHIC editor for creating background screens that integrate with the F-BA
 | Features | SELECT, COPY, MOVE, CLEAR, CHAR |
 | Palette | By category (Pictures, Letters, Numbers, Symbols, Kana) |
 | Storage | Editor state in localStorage; VIEW loads to SharedBuffer |
-| UI | Separate editor view, named "BG Editor" |
+| UI | Integrated into IDE as view toggle (Code / BG Editor) |
 
 ---
 

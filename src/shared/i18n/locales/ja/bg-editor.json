@@ -1,0 +1,28 @@
+{
+  "title": "BGグラフィックエディタ",
+  "toolbar": {
+    "select": "選択",
+    "copy": "コピー",
+    "move": "移動",
+    "char": "文字",
+    "clear": "クリア",
+    "clearConfirm": "グリッド全体をクリアしてもよろしいですか？"
+  },
+  "grid": {
+    "title": "グリッド",
+    "selectDestination": "クリックして移動先を選択",
+    "showGridLines": "グリッド線を表示",
+    "hideGridLines": "グリッド線を非表示"
+  },
+  "palette": {
+    "title": "文字パレット",
+    "pictures": "絵文字",
+    "letters": "英字",
+    "numbers": "数字",
+    "symbols": "記号",
+    "kana": "かな"
+  },
+  "colorPattern": {
+    "label": "カラーパターン"
+  }
+}

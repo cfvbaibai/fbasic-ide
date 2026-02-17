@@ -47,6 +47,7 @@ import {
   Palet,
   Paletb,
   Palets,
+  View,
   Def,
   Sprite,
   Move,
@@ -158,6 +159,7 @@ class FBasicChevrotainParser extends CstParser {
   declare cgenStatement: () => CstNode
   declare paletStatement: () => CstNode
   declare paletParameterList: () => CstNode
+  declare viewStatement: () => CstNode
   declare defSpriteStatement: () => CstNode
   declare spriteStatement: () => CstNode
   declare spriteOnOffStatement: () => CstNode
@@ -863,6 +865,13 @@ class FBasicChevrotainParser extends CstParser {
       ])
     })
 
+    // VIEW - Copies BG GRAPHIC to Background Screen
+    // Per F-BASIC Manual page 36: "Upon executing the VIEW command,
+    // the BG GRAPHIC Screen will be copied to the Background Screen."
+    this.viewStatement = this.RULE('viewStatement', () => {
+      this.CONSUME(View)
+    })
+
     // DEF SPRITE n, (A, B, C, D, E) = character set
     // n: sprite number (0-7)
     // A: color combination (0-3)
@@ -1123,6 +1132,10 @@ class FBasicChevrotainParser extends CstParser {
           GATE: () =>
             this.LA(1).tokenType === Paletb || this.LA(1).tokenType === Palets || this.LA(1).tokenType === Palet,
           ALT: () => this.SUBRULE(this.paletStatement),
+        },
+        {
+          GATE: () => this.LA(1).tokenType === View,
+          ALT: () => this.SUBRULE(this.viewStatement),
         },
         {
           GATE: () => this.LA(1).tokenType === Def && this.LA(2).tokenType === Move,

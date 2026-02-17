@@ -1,0 +1,28 @@
+{
+  "title": "BG Graphic Editor",
+  "toolbar": {
+    "select": "SELECT",
+    "copy": "COPY",
+    "move": "MOVE",
+    "char": "CHAR",
+    "clear": "CLEAR",
+    "clearConfirm": "Are you sure you want to clear the entire grid?"
+  },
+  "grid": {
+    "title": "Grid",
+    "selectDestination": "Click to select destination",
+    "showGridLines": "Show grid lines",
+    "hideGridLines": "Hide grid lines"
+  },
+  "palette": {
+    "title": "Character Palette",
+    "pictures": "Pictures",
+    "letters": "Letters",
+    "numbers": "Numbers",
+    "symbols": "Symbols",
+    "kana": "Kana"
+  },
+  "colorPattern": {
+    "label": "Color Pattern"
+  }
+}
