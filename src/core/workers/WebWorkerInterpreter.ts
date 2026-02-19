@@ -16,11 +16,13 @@ import type {
   InputValueMessage,
   OutputMessage,
   ResultMessage,
+  SetBgDataMessage,
   SetSharedAnimationBufferMessage,
   SetSharedJoystickBufferMessage,
   StopMessage,
   StrigEventMessage,
 } from '@/core/interfaces'
+import type { BgGridData } from '@/features/bg-editor/types'
 import { logWorker } from '@/shared/logger'
 
 // Web Worker Interpreter Implementation
@@ -86,6 +88,9 @@ class WebWorkerInterpreter {
           break
         case 'SET_SHARED_JOYSTICK_BUFFER':
           this.handleSetSharedJoystickBuffer(message)
+          break
+        case 'SET_BG_DATA':
+          this.handleSetBgData(message)
           break
         case 'INPUT_VALUE':
           this.handleInputValue(message)
@@ -276,6 +281,23 @@ class WebWorkerInterpreter {
       logWorker.debug('[WebWorkerInterpreter] Shared joystick buffer set in WebWorkerDeviceAdapter')
     } else {
       logWorker.warn('[WebWorkerInterpreter] No WebWorkerDeviceAdapter available for SET_SHARED_JOYSTICK_BUFFER')
+    }
+  }
+
+  handleSetBgData(message: SetBgDataMessage) {
+    const data = message.data
+    if (!data?.grid) {
+      logWorker.warn('SET_BG_DATA: message.data or grid missing')
+      return
+    }
+    logWorker.debug('[WebWorkerInterpreter] SET_BG_DATA received, grid size =', data.grid.length, 'x', data.grid[0]?.length ?? 0)
+    if (this.webWorkerDeviceAdapter) {
+      // Cast to BgGridData since the message type uses number for colorPattern
+      // but the actual values are always 0-3 (ColorPattern)
+      this.webWorkerDeviceAdapter.setBgGridData(data.grid as BgGridData)
+      logWorker.debug('[WebWorkerInterpreter] BG grid data set in WebWorkerDeviceAdapter')
+    } else {
+      logWorker.warn('[WebWorkerInterpreter] No WebWorkerDeviceAdapter available for SET_BG_DATA')
     }
   }
 

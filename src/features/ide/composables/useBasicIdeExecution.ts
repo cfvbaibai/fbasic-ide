@@ -5,6 +5,7 @@
 
 import { EXECUTION_LIMITS } from '@/core/constants'
 import type { BasicVariable } from '@/core/interfaces'
+import { useBgEditorState } from '@/features/bg-editor/composables/useBgEditorState'
 import { ExecutionError } from '@/features/ide/errors/ExecutionError'
 import { logComposable } from '@/shared/logger'
 
@@ -77,6 +78,12 @@ export function useBasicIdeExecution(
       clearAllCaches()
       // movementStates no longer needed - read from shared buffer instead
       state.movementPositionsFromBuffer.value = new Map()
+
+      // Send BG Editor data to worker for VIEW command
+      const bgEditorState = useBgEditorState()
+      const bgGridData = bgEditorState.exportGridData()
+      worker.sendBgData(bgGridData)
+      logComposable.debug('[IDE] Sent BG grid data to worker for VIEW command')
 
       const result = await worker.sendMessageToWorker({
         type: 'EXECUTE',

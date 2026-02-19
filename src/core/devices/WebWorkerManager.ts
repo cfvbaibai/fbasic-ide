@@ -11,6 +11,7 @@ import type {
   ExecuteMessage,
   ExecutionResult,
   InterpreterConfig,
+  SetBgDataMessage,
   StopMessage,
 } from '@/core/interfaces'
 import { logWorker } from '@/shared/logger'
@@ -212,6 +213,26 @@ export class WebWorkerManager {
     if (this.worker) {
       this.worker.postMessage(message)
     }
+  }
+
+  /**
+   * Send BG grid data to the web worker (for VIEW command)
+   */
+  sendBgData(grid: Array<Array<{ charCode: number; colorPattern: number }>>): void {
+    if (!this.worker) {
+      logWorker.warn('[WebWorkerManager] Cannot send BG data: worker not initialized')
+      return
+    }
+
+    const message: SetBgDataMessage = {
+      type: 'SET_BG_DATA',
+      id: `bg-data-${Date.now()}`,
+      timestamp: Date.now(),
+      data: { grid },
+    }
+
+    logWorker.debug('[WebWorkerManager] Sending SET_BG_DATA message, grid size =', grid.length, 'x', grid[0]?.length ?? 0)
+    this.worker.postMessage(message)
   }
 
   /**

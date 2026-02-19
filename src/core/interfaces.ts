@@ -243,6 +243,7 @@ export type ServiceWorkerMessageType =
   | 'STICK_EVENT'
   | 'SET_SHARED_ANIMATION_BUFFER'
   | 'SET_SHARED_JOYSTICK_BUFFER'
+  | 'SET_BG_DATA'
   | 'REQUEST_INPUT'
   | 'INPUT_VALUE'
   | 'PLAY_SOUND'
@@ -427,6 +428,15 @@ export interface SetSharedJoystickBufferMessage extends ServiceWorkerMessage {
   }
 }
 
+// Set BG data - sent from main thread to worker before execution (for VIEW command)
+export interface SetBgDataMessage extends ServiceWorkerMessage {
+  type: 'SET_BG_DATA'
+  data: {
+    /** BG grid data (28x21 grid of cells with charCode and colorPattern) */
+    grid: Array<Array<{ charCode: number; colorPattern: number }>>
+  }
+}
+
 // Request input - sent from worker to main when INPUT/LINPUT executes
 export interface RequestInputMessage extends ServiceWorkerMessage {
   type: 'REQUEST_INPUT'
@@ -484,6 +494,7 @@ export type AnyServiceWorkerMessage =
   | ReadyMessage
   | SetSharedAnimationBufferMessage
   | SetSharedJoystickBufferMessage
+  | SetBgDataMessage
   | RequestInputMessage
   | InputValueMessage
   | PlaySoundMessage

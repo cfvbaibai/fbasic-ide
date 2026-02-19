@@ -203,3 +203,25 @@ export function sendMessageToWorker(
     webWorkerManager.worker.postMessage(messageWithId)
   })
 }
+
+/**
+ * Send BG grid data to web worker (for VIEW command)
+ */
+export function sendBgData(
+  grid: Array<Array<{ charCode: number; colorPattern: number }>>,
+  webWorkerManager: WebWorkerManager
+): void {
+  if (!webWorkerManager.worker) {
+    logComposable.warn('[sendBgData] Web worker not initialized')
+    return
+  }
+
+  webWorkerManager.worker.postMessage({
+    type: 'SET_BG_DATA',
+    id: `bg-data-${Date.now()}`,
+    timestamp: Date.now(),
+    data: { grid },
+  })
+
+  logComposable.debug('[sendBgData] BG grid data sent to worker, size =', grid.length, 'x', grid[0]?.length ?? 0)
+}

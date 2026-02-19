@@ -1,0 +1,61 @@
+type: bug
+status: resolved
+subject: BG Editor Scale Issues and UX Enhancements
+description: |
+  BG Editor scale bugs and UX improvements - all resolved.
+
+  ## Bug Fixes
+
+  ### Bug 1: Scale switch display issue (2026-02-19)
+
+  **Was**: Switching scale doesn't display existing bg-items until a new placement.
+
+  **Fix**: Added `await nextTick()` in watch callback to wait for DOM canvas dimensions to update before rendering.
+
+  **File**: `src/features/bg-editor/components/BgGrid.vue`
+
+  ### Bug 2: Non-integer scale display corruption (2026-02-19)
+
+  **Was**: Using 1.75x scale causes corrupted/garbled display (花屏).
+
+  **Cause**: The rendering code assumed integer scale factors. Loop `for (let sy = 0; sy < scale; sy++)` doesn't work for non-integers.
+
+  **Fix**: Split rendering into two paths:
+  - Integer scales: Use pixel-perfect direct rendering
+  - Non-integer scales: Render at 1x, then use `drawImage` with `imageSmoothingEnabled = false`
+
+  **File**: `src/features/bg-editor/composables/useBgRenderer.ts`
+
+  ---
+
+  ## UX Enhancements
+
+  ### Responsive Character Palette Tabs (2026-02-19)
+
+  **Change**: Tab headers now show icons only with labels as hover tooltips.
+
+  **Files**:
+  - `src/features/bg-editor/components/BgPalette.vue` - Added icons, CSS for icon-only display
+  - `src/shared/components/ui/GameTabButton.vue` - Added title prop, wrapped label in span
+  - `src/shared/components/ui/GameTabPane.vue` - Pass through title prop
+
+  ### Hover Preview in CHAR Mode (2026-02-19)
+
+  **Change**: When in CHAR mode, hovering over a cell shows a preview of the selected BG item (70% opacity) instead of white rectangle.
+
+  **Files**:
+  - `src/features/bg-editor/components/BgGrid.vue` - Added hover preview rendering
+
+  ### Rendering Performance Optimization (2026-02-19)
+
+  **Change**: Added cell canvas caching to improve painting performance.
+
+  **Files**:
+  - `src/features/bg-editor/composables/useBgRenderer.ts` - Added `cellCanvasCache`, `getCachedCellCanvas()`, `clearCellCanvasCache()`
+  - `src/features/bg-editor/components/BgGrid.vue` - Added hover preview canvas caching
+
+  ### Scale Options Update (2026-02-19)
+
+  **Change**: Changed scale options from [1.75, 2, 3, 4] to [1.5, 2, 3, 4].
+
+  **File**: `src/features/bg-editor/constants.ts`

@@ -40,9 +40,53 @@ function parseHexColor(hex: string): { r: number; g: number; b: number } {
 }
 
 /**
- * Render a single cell to ImageData
+ * Render a single cell to ImageData at 1x scale (8x8 pixels)
  */
-function renderCellToImageData(
+function renderCellToImageDataAt1x(
+  imageData: ImageData,
+  cell: BgCell,
+  paletteCode: number
+): void {
+  const { r: bgR, g: bgG, b: bgB } = parseHexColor(getColorForPixel(cell.colorPattern, 0, paletteCode))
+
+  const bgItem = getBackgroundItemByCode(cell.charCode)
+  const data = imageData.data
+
+  if (!bgItem) {
+    // Empty cell - fill with background color
+    for (let i = 0; i < data.length; i += 4) {
+      data[i] = bgR
+      data[i + 1] = bgG
+      data[i + 2] = bgB
+      data[i + 3] = 255
+    }
+    return
+  }
+
+  // Render tile with color pattern at 1x scale
+  const tile = bgItem.tile
+  for (let row = 0; row < BG_GRID.CELL_SIZE; row++) {
+    const tileRow = tile[row]
+    if (!tileRow) continue
+
+    for (let col = 0; col < BG_GRID.CELL_SIZE; col++) {
+      const pixelValue = tileRow[col] ?? 0
+      const color = getColorForPixel(cell.colorPattern, pixelValue, paletteCode)
+      const { r, g, b } = parseHexColor(color)
+
+      const pixelIndex = (row * BG_GRID.CELL_SIZE + col) * 4
+      data[pixelIndex] = r
+      data[pixelIndex + 1] = g
+      data[pixelIndex + 2] = b
+      data[pixelIndex + 3] = 255
+    }
+  }
+}
+
+/**
+ * Render a single cell to ImageData with integer scale (pixel-perfect)
+ */
+function renderCellToImageDataWithIntegerScale(
   imageData: ImageData,
   cell: BgCell,
   paletteCode: number,
@@ -76,7 +120,7 @@ function renderCellToImageData(
       const color = getColorForPixel(cell.colorPattern, pixelValue, paletteCode)
       const { r, g, b } = parseHexColor(color)
 
-      // Scale each pixel to scale x scale
+      // Scale each pixel to scale x scale (integer only)
       for (let sy = 0; sy < scale; sy++) {
         for (let sx = 0; sx < scale; sx++) {
           const pixelIndex = ((row * scale + sy) * scaledCellSize + col * scale + sx) * 4
@@ -92,20 +136,66 @@ function renderCellToImageData(
 
 /**
  * Create an offscreen canvas for a cell
+ * Uses pixel-perfect rendering for integer scales, drawImage scaling for non-integer
  */
 function createCellCanvas(cell: BgCell, paletteCode: number, scale: number): HTMLCanvasElement {
   const scaledCellSize = getScaledCellSize(scale)
+  const isIntegerScale = Number.isInteger(scale)
+
   const canvas = document.createElement('canvas')
   canvas.width = scaledCellSize
   canvas.height = scaledCellSize
   const ctx = canvas.getContext('2d', { alpha: false })
   if (!ctx) throw new Error('Failed to get canvas context')
 
-  const imageData = ctx.createImageData(scaledCellSize, scaledCellSize)
-  renderCellToImageData(imageData, cell, paletteCode, scale)
-  ctx.putImageData(imageData, 0, 0)
+  if (isIntegerScale) {
+    // Integer scale: use pixel-perfect rendering
+    const imageData = ctx.createImageData(scaledCellSize, scaledCellSize)
+    renderCellToImageDataWithIntegerScale(imageData, cell, paletteCode, scale)
+    ctx.putImageData(imageData, 0, 0)
+  } else {
+    // Non-integer scale: render at 1x then scale with drawImage
+    // First create a 1x canvas
+    const baseCanvas = document.createElement('canvas')
+    baseCanvas.width = BG_GRID.CELL_SIZE
+    baseCanvas.height = BG_GRID.CELL_SIZE
+    const baseCtx = baseCanvas.getContext('2d', { alpha: false })
+    if (!baseCtx) throw new Error('Failed to get base canvas context')
+
+    const imageData = baseCtx.createImageData(BG_GRID.CELL_SIZE, BG_GRID.CELL_SIZE)
+    renderCellToImageDataAt1x(imageData, cell, paletteCode)
+    baseCtx.putImageData(imageData, 0, 0)
+
+    // Disable smoothing for pixelated look
+    ctx.imageSmoothingEnabled = false
+    ctx.drawImage(baseCanvas, 0, 0, scaledCellSize, scaledCellSize)
+  }
 
   return canvas
+}
+
+/** Cell canvas cache for rendering performance */
+const cellCanvasCache = new Map<string, HTMLCanvasElement>()
+
+/**
+ * Get or create cached cell canvas
+ */
+function getCachedCellCanvas(cell: BgCell, paletteCode: number, scale: number): HTMLCanvasElement {
+  const key = `${cell.charCode}-${cell.colorPattern}-${paletteCode}-${scale}`
+
+  let cached = cellCanvasCache.get(key)
+  if (cached) return cached
+
+  cached = createCellCanvas(cell, paletteCode, scale)
+  cellCanvasCache.set(key, cached)
+  return cached
+}
+
+/**
+ * Clear the cell canvas cache (call when scale or palette changes)
+ */
+export function clearCellCanvasCache(): void {
+  cellCanvasCache.clear()
 }
 
 /**
@@ -136,11 +226,11 @@ export function renderGridToCanvas(
   ctx.fillStyle = '#000000'
   ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-  // Render all cells
+  // Render all cells using cached canvases
   for (let y = 0; y < BG_GRID.ROWS; y++) {
     for (let x = 0; x < BG_GRID.COLS; x++) {
       const cell = grid[y]?.[x] ?? { charCode: 0, colorPattern: 0 }
-      const cellCanvas = createCellCanvas(cell, paletteCode, scale)
+      const cellCanvas = getCachedCellCanvas(cell, paletteCode, scale)
       ctx.drawImage(cellCanvas, x * scaledCellSize, y * scaledCellSize)
     }
   }
@@ -193,14 +283,12 @@ export function renderTilePreview(
   paletteCode: number = DEFAULT_BG_PALETTE_CODE,
   scale: number = DEFAULT_RENDER_SCALE
 ): void {
-  const scaledCellSize = getScaledCellSize(scale)
   const ctx = canvas.getContext('2d', { alpha: false })
   if (!ctx) return
 
   const cell: BgCell = { charCode, colorPattern }
-  const imageData = ctx.createImageData(scaledCellSize, scaledCellSize)
-  renderCellToImageData(imageData, cell, paletteCode, scale)
-  ctx.putImageData(imageData, 0, 0)
+  const cellCanvas = getCachedCellCanvas(cell, paletteCode, scale)
+  ctx.drawImage(cellCanvas, 0, 0)
 }
 
 /**

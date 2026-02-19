@@ -21,6 +21,7 @@ defineOptions({
 const props = withDefaults(defineProps<Props>(), {
   label: '',
   icon: null,
+  title: '',
   disabled: false,
 })
 
@@ -31,6 +32,8 @@ interface Props {
   label?: string
   /** Icon to display (from iconify) */
   icon?: string | null
+  /** Tooltip text on hover */
+  title?: string
   /** Whether the tab button is disabled */
   disabled?: boolean
 }
@@ -51,13 +54,16 @@ const handleClick = () => {
 <template>
   <button
     :class="['game-tab-button', { active: isActive, disabled: props.disabled }]"
+    :title="title || label || name"
     @click="handleClick"
     type="button"
   >
     <GameIcon v-if="icon" :icon="icon" size="small" class="game-tab-icon" />
-    <slot name="label">
-      {{ label || name }}
-    </slot>
+    <span class="game-tab-label">
+      <slot name="label">
+        {{ label || name }}
+      </slot>
+    </span>
   </button>
 </template>
 
@@ -145,8 +151,9 @@ const handleClick = () => {
   cursor: not-allowed;
 }
 
-.game-tab-icon {
-  flex-shrink: 0;
-  transition: filter 0.3s ease;
+.game-tab-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 </style>

@@ -14,6 +14,7 @@ import {
   initializeWebWorker,
   rejectAllPendingMessages,
   restartWebWorker,
+  sendBgData as sendBgDataUtil,
   sendMessageToWorker as sendMessageToWorkerUtil,
 } from './useBasicIdeWebWorkerUtils'
 
@@ -23,6 +24,7 @@ export interface BasicIdeWorkerIntegration {
   restartWebWorker: () => Promise<void>
   checkWebWorkerHealth: () => Promise<boolean>
   sendMessageToWorker: (message: AnyServiceWorkerMessage) => Promise<ExecutionResult>
+  sendBgData: (grid: Array<Array<{ charCode: number; colorPattern: number }>>) => void
   sendClearDisplay: () => void
   sendStickEvent: (joystickId: number, state: number) => void
   sendStrigEvent: (joystickId: number, state: number) => void
@@ -133,6 +135,10 @@ export function useBasicIdeWorkerIntegration(
     }
   }
 
+  const sendBgData = (grid: Array<Array<{ charCode: number; colorPattern: number }>>) => {
+    sendBgDataUtil(grid, webWorkerManager)
+  }
+
   const cleanupWebWorker = () => {
     logComposable.debug('Cleaning up web worker...')
     if (webWorkerManager.worker) {
@@ -148,6 +154,7 @@ export function useBasicIdeWorkerIntegration(
     restartWebWorker: restartWebWorkerWrapper,
     checkWebWorkerHealth: checkWebWorkerHealthWrapper,
     sendMessageToWorker: sendMessageToWorkerWrapper,
+    sendBgData,
     sendClearDisplay,
     sendStickEvent,
     sendStrigEvent,

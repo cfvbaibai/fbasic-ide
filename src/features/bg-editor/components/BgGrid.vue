@@ -7,18 +7,39 @@
  * - Top layer: Hover highlight (redrawn on mouse move)
  */
 
-import { computed, onMounted, reactive, ref, useTemplateRef, watch } from 'vue'
+import { computed, nextTick, onMounted, reactive, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { GameBlock, GameIconButton, GameSelect } from '@/shared/components/ui'
 
 import { useBgEditorState } from '../composables/useBgEditorState'
-import { getCanvasDimensions, getScaledCellSize, renderGridToCanvas } from '../composables/useBgRenderer'
-import { BG_EDITOR_MODES, BG_GRID, DEFAULT_RENDER_SCALE, SCALE_OPTIONS } from '../constants'
+import {
+  getCanvasDimensions,
+  getScaledCellSize,
+  renderGridToCanvas,
+  renderTilePreview,
+} from '../composables/useBgRenderer'
+import {
+  BG_EDITOR_MODES,
+  BG_GRID,
+  DEFAULT_BG_PALETTE_CODE,
+  DEFAULT_RENDER_SCALE,
+  SCALE_OPTIONS,
+} from '../constants'
 import type { BgEditorMode } from '../types'
 
 const { t } = useI18n()
-const { grid, mode, setMode, clearGrid, copySource, moveSource, handleCellClick } = useBgEditorState()
+const {
+  grid,
+  mode,
+  setMode,
+  clearGrid,
+  copySource,
+  moveSource,
+  handleCellClick,
+  selectedCharCode,
+  selectedColorPattern,
+} = useBgEditorState()
 
 /** Canvas refs - two layers for performance */
 const gridCanvasRef = useTemplateRef<HTMLCanvasElement>('gridCanvasRef')
@@ -35,6 +56,37 @@ const hoverPosition = reactive({ x: -1, y: -1 })
 
 /** Show grid lines toggle */
 const showGridLines = ref(false)
+
+/** Cached preview canvas for CHAR mode hover (recreated when selection/scale changes) */
+let cachedPreviewCanvas: HTMLCanvasElement | null = null
+let cachedPreviewKey = ''
+
+/**
+ * Get or create cached preview canvas for hover
+ */
+function getPreviewCanvas(): HTMLCanvasElement {
+  const scaledCellSize = getScaledCellSize(currentScale.value)
+  const key = `${selectedCharCode.value}-${selectedColorPattern.value}-${currentScale.value}`
+
+  if (cachedPreviewCanvas && cachedPreviewKey === key) {
+    return cachedPreviewCanvas
+  }
+
+  // Create new cached canvas
+  cachedPreviewCanvas = document.createElement('canvas')
+  cachedPreviewCanvas.width = scaledCellSize
+  cachedPreviewCanvas.height = scaledCellSize
+  renderTilePreview(
+    cachedPreviewCanvas,
+    selectedCharCode.value,
+    selectedColorPattern.value,
+    DEFAULT_BG_PALETTE_CODE,
+    currentScale.value
+  )
+  cachedPreviewKey = key
+
+  return cachedPreviewCanvas
+}
 
 /** Scale options for select */
 const scaleSelectOptions = computed(() =>
@@ -148,9 +200,19 @@ function renderHover(): void {
     const hx = hoverPosition.x * scaledCellSize
     const hy = hoverPosition.y * scaledCellSize
 
-    // Semi-transparent highlight overlay
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)'
-    ctx.fillRect(hx, hy, scaledCellSize, scaledCellSize)
+    // In CHAR mode, show preview of selected item
+    if (mode.value === BG_EDITOR_MODES.CHAR) {
+      const previewCanvas = getPreviewCanvas()
+
+      // Draw with semi-transparency
+      ctx.globalAlpha = 0.7
+      ctx.drawImage(previewCanvas, hx, hy)
+      ctx.globalAlpha = 1
+    } else {
+      // Semi-transparent highlight overlay for other modes
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.2)'
+      ctx.fillRect(hx, hy, scaledCellSize, scaledCellSize)
+    }
 
     // Border highlight
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)'
@@ -159,8 +221,9 @@ function renderHover(): void {
   }
 }
 
-// Re-render when scale changes
-watch(currentScale, () => {
+// Re-render when scale changes (wait for DOM to update canvas dimensions)
+watch(currentScale, async () => {
+  await nextTick()
   renderGrid()
   renderHover()
 })
@@ -173,6 +236,18 @@ watch(grid, () => {
 // Re-render grid when grid lines toggle changes
 watch(showGridLines, () => {
   renderGrid()
+})
+
+// Re-render hover when selected item changes (for CHAR mode preview)
+watch([selectedCharCode, selectedColorPattern], () => {
+  if (mode.value === BG_EDITOR_MODES.CHAR) {
+    renderHover()
+  }
+})
+
+// Re-render hover when mode changes
+watch(mode, () => {
+  renderHover()
 })
 
 // Setup canvas on mount

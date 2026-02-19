@@ -1,6 +1,6 @@
 # Roadmap
 
-**Last Updated**: 2026-02-12
+**Last Updated**: 2026-02-19
 
 ---
 
@@ -12,26 +12,42 @@ Family Basic IDE is feature-complete for core F-BASIC functionality. Major syste
 - **Runtime**: Executors for all core statements
 - **Platform**: Screen, sprites, animation, sound, joystick
 - **UI**: Vue 3 IDE with i18n support
+- **BG Editor**: Integrated BG GRAPHIC editor with VIEW command support (complete)
 
 ---
 
 ## Active Work
 
-### Priority 1: BG GRAPHIC Editor
+_No active work items._
 
-**Goal**: Enable users to create/edit BG GRAPHIC, making VIEW command usable.
+---
 
-**Why**: VIEW command is blocked — users have no tool to populate the BG GRAPHIC buffer.
+## Completed
 
-**Scope**:
-- BG GRAPHIC buffer storage (28×21 tiles)
-- UI editor for drawing BG GRAPHIC
-- Integration with VIEW command
-- Load/save functionality (optional)
+### BG Editor UX Enhancements (2026-02-19)
 
-**Reference**: `docs/reference/family-basic-manual/page-36.md` (Screen Display Process)
+**What was implemented**:
+- Responsive character palette tabs (icon-only with tooltip on hover)
+- Hover preview in CHAR mode shows selected BG item before placement
+- Cell canvas caching for improved painting performance
+- Scale options updated (1.5x, 2x, 3x, 4x)
 
-**Status**: Planning — see `todo/9.open.txt`
+### BG Editor Scale Issues (2026-02-19)
+
+**Issues fixed**:
+- Scale switch display issue: Added `nextTick()` for DOM sync
+- Non-integer scale rendering: Split into integer/non-integer rendering paths
+
+### BG GRAPHIC Editor + VIEW Command Integration (2026-02-19)
+
+**What was implemented**:
+- BG Editor UI with 28×21 grid, character palette, color patterns
+- Canvas-based rendering with localStorage persistence
+- VIEW command executor to copy BG GRAPHIC to background screen
+- Worker communication to send BG data from main thread to web worker
+- Sample code "BG VIEW Test" for manual testing
+
+**Key fix**: BG data now sent to web worker before code execution, enabling VIEW command to access BG Editor content during runtime.
 
 ---
 
@@ -51,7 +67,6 @@ Check `todo/` folder for all work items. Each file contains:
 
 | Command | Description | Notes |
 |---------|-------------|-------|
-| VIEW | Display BG GRAPHIC | Unblocked after BG editor complete |
 | STOP | Stop execution with resume | Requires CONT |
 | CONT | Continue after STOP | Requires STOP |
 | POKE | Memory write | No-op or limited in web |

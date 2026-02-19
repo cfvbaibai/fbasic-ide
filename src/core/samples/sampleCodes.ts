@@ -468,6 +468,16 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 90 FOR I=184 TO 255:PRINT CHR$(I);:NEXT:PRINT "":PRINT ""
 100 END`,
   },
+
+  bgView: {
+    name: 'BG VIEW Test',
+    description: 'Copy BG GRAPHIC to background screen - draw in BG Editor first, then run',
+    category: 'screen',
+    code: `10 CLS
+20 VIEW
+30 LOCATE 12,11:PRINT "BG content displayed"
+40 END`,
+  },
 }
 
 export function getSampleCode(key: string): SampleCode | undefined {

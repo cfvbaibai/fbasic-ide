@@ -40,6 +40,16 @@ description: |
      - All 1216 tests passing
      - ViewStatement parser tests included
 
+  5. **Worker Communication Fix** (2026-02-19)
+     - Added SET_BG_DATA message type for main thread → worker communication
+     - BG Editor data now sent to worker before code execution
+     - Enables VIEW command to access BG content during runtime
+     - Files: `interfaces.ts`, `WebWorkerInterpreter.ts`, `useBasicIdeWebWorkerUtils.ts`,
+       `useBasicIdeWorkerIntegration.ts`, `useBasicIdeExecution.ts`
+
+  6. **Sample Code**
+     - Added "BG VIEW Test" sample to sampleCodes.ts for manual testing
+
   ## Files Created/Modified:
 
   - `src/features/bg-editor/` - New feature directory
@@ -54,6 +64,7 @@ description: |
   - `src/core/devices/TestDeviceAdapter.ts` - copyBgGraphicToBackground for testing
   - `src/shared/i18n/` - BG Editor translations
   - `src/router/index.ts` - Removed /bg-editor route (integrated into IDE)
+  - `src/core/samples/sampleCodes.ts` - Added BG VIEW Test sample
 
   ## Reference
 

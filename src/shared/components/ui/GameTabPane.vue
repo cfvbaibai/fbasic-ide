@@ -23,6 +23,7 @@ defineOptions({
 const props = withDefaults(defineProps<Props>(), {
   label: '',
   icon: null,
+  title: '',
   disabled: false,
 })
 
@@ -33,6 +34,8 @@ interface Props {
   label?: string
   /** Icon to display (from iconify) */
   icon?: string | null
+  /** Tooltip text on hover */
+  title?: string
   /** Whether the tab pane is disabled */
   disabled?: boolean
 }
@@ -52,6 +55,7 @@ const renderButton = () => {
       name: props.name,
       label: props.label,
       icon: props.icon,
+      title: props.title,
       disabled: props.disabled,
     },
     slots.label ? { label: slots.label } : {}

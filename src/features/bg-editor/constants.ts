@@ -35,7 +35,7 @@ export const DEFAULT_BG_PALETTE_CODE = 1
 export const DEFAULT_BG_CHAR_CODE = 32
 
 /** Available scale options for grid rendering */
-export const SCALE_OPTIONS = [1.75, 2, 3, 4] as const
+export const SCALE_OPTIONS = [1.5, 2, 3, 4] as const
 
 /** Default scale factor for rendering */
 export const DEFAULT_RENDER_SCALE = 2

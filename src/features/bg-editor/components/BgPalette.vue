@@ -26,12 +26,12 @@ const { selectedCharCode, selectedColorPattern, setSelectedCharCode } = useBgEdi
 
 const activeTab = ref<string>('pictures')
 
-const categories: { key: BgCharCategory; label: string; items: BackgroundItem[] }[] = [
-  { key: 'pictures', label: t('bgEditor.palette.pictures'), items: PICTURE_BG_ITEMS },
-  { key: 'letters', label: t('bgEditor.palette.letters'), items: LETTER_BG_ITEMS },
-  { key: 'numbers', label: t('bgEditor.palette.numbers'), items: NUMBER_BG_ITEMS },
-  { key: 'symbols', label: t('bgEditor.palette.symbols'), items: SYMBOL_BG_ITEMS },
-  { key: 'kana', label: t('bgEditor.palette.kana'), items: KANA_BG_ITEMS },
+const categories: { key: BgCharCategory; label: string; icon: string; items: BackgroundItem[] }[] = [
+  { key: 'pictures', label: t('bgEditor.palette.pictures'), icon: 'mdi:image', items: PICTURE_BG_ITEMS },
+  { key: 'letters', label: t('bgEditor.palette.letters'), icon: 'mdi:alphabetical-variant', items: LETTER_BG_ITEMS },
+  { key: 'numbers', label: t('bgEditor.palette.numbers'), icon: 'mdi:numeric', items: NUMBER_BG_ITEMS },
+  { key: 'symbols', label: t('bgEditor.palette.symbols'), icon: 'mdi:symbol', items: SYMBOL_BG_ITEMS },
+  { key: 'kana', label: t('bgEditor.palette.kana'), icon: 'mdi:translate', items: KANA_BG_ITEMS },
 ]
 
 const currentItems = computed(() => {
@@ -120,6 +120,7 @@ onMounted(() => {
       :key="category.key"
       :name="category.key"
       :label="category.label"
+      :icon="category.icon"
     >
       <div class="palette-grid">
         <div
@@ -147,6 +148,19 @@ onMounted(() => {
 
 .bg-palette :deep(.game-tab-pane-body) {
   padding: 0;
+}
+
+/* Show icons only - hide label text (labels shown as tooltip on hover) */
+.bg-palette :deep(.game-tab-button) {
+  padding: 0.75rem;
+}
+
+.bg-palette :deep(.game-tab-button .game-icon) {
+  margin: 0;
+}
+
+.bg-palette :deep(.game-tab-button .game-tab-label) {
+  display: none;
 }
 
 .palette-grid {
