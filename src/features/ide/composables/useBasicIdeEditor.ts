@@ -4,10 +4,12 @@
 
 import type { HighlighterInfo, ParserInfo } from '@/core/interfaces'
 import { FBasicParser } from '@/core/parser/FBasicParser'
+import { getSampleBgData, hasSampleBgData } from '@/core/samples/sampleBgData'
 import { getSampleCode, getSampleCodeKeys, type SampleCode } from '@/core/samples/sampleCodes'
 import { logComposable } from '@/shared/logger'
 
 import type { BasicIdeState } from './useBasicIdeState'
+import { useProgramStore } from './useProgramStore'
 
 export interface BasicIdeEditor {
   updateHighlighting: () => Promise<void>
@@ -65,8 +67,17 @@ export function useBasicIdeEditor(state: BasicIdeState): BasicIdeEditor {
     if (!sampleType) return
     const sample = getSampleCode(sampleType)
     if (sample) {
+      // Load code into IDE state (triggers sync to program store via watch)
       state.code.value = sample.code
       state.currentSampleType.value = sampleType
+
+      // Load BG data into program store if sample has associated BG
+      const programStore = useProgramStore()
+      if (hasSampleBgData(sampleType)) {
+        const bgData = getSampleBgData(sampleType)
+        programStore.setBg(bgData)
+      }
+
       void updateHighlighting()
     }
   }

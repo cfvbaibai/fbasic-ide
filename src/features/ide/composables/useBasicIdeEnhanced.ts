@@ -26,6 +26,7 @@ import { useBasicIdeExecution } from './useBasicIdeExecution'
 import { useBasicIdeScreenIntegration } from './useBasicIdeScreenIntegration'
 import { useBasicIdeState } from './useBasicIdeState'
 import { useBasicIdeWorkerIntegration } from './useBasicIdeWorkerIntegration'
+import { useProgramStore } from './useProgramStore'
 
 /**
  * Enhanced composable: reactive state and methods for IDE (AST-based parser, worker, screen).
@@ -39,6 +40,30 @@ export function useBasicIde() {
     clearSharedDisplay: () => screen.clearDisplayToSharedBuffer(),
     clearWorkerDisplay: () => worker.sendClearDisplay(),
   })
+
+  // Program store integration
+  const programStore = useProgramStore()
+
+  // Sync code from program store to IDE state on mount and when program changes
+  watch(
+    () => programStore.code,
+    (newCode) => {
+      if (newCode !== state.code.value) {
+        state.code.value = newCode
+      }
+    },
+    { immediate: true }
+  )
+
+  // Sync code from IDE state back to program store when user edits
+  watch(
+    state.code,
+    (newCode) => {
+      if (newCode !== programStore.code) {
+        programStore.setCode(newCode)
+      }
+    }
+  )
 
   const toggleDebugMode = () => {
     state.debugMode.value = !state.debugMode.value

@@ -16,6 +16,7 @@ import IdeControls from './components/IdeControls.vue'
 import JoystickControl from './components/JoystickControl.vue'
 import LogLevelPanel from './components/LogLevelPanel.vue'
 import MonacoCodeEditor from './components/MonacoCodeEditor.vue'
+import ProgramToolbar from './components/ProgramToolbar.vue'
 import RuntimeOutput from './components/RuntimeOutput.vue'
 import SampleSelector from './components/SampleSelector.vue'
 import StateInspector from './components/StateInspector.vue'
@@ -31,8 +32,6 @@ defineOptions({
 })
 
 const { t } = useI18n()
-
-// Use the enhanced AST-based parser system
 const {
   code,
   isRunning,
@@ -154,34 +153,34 @@ onMounted(() => {
         <GameBlock :title="t('ide.codeEditor.title')" title-icon="mdi:pencil" class="editor-panel">
           <template #right>
             <div class="editor-header-controls">
-              <!-- Editor view toggle -->
+              <ProgramToolbar />
               <div class="editor-view-toggle">
-                <button
-                  :class="['view-toggle-btn', { active: editorView === 'code' }]"
+                <GameIconButton
+                  variant="toggle"
+                  type="default"
+                  icon="mdi:code-tags"
+                  size="small"
+                  title="Code"
+                  :selected="editorView === 'code'"
                   @click="editorView = 'code'"
-                  type="button"
-                >
-                  <span class="mdi mdi-code-tags"></span>
-                  Code
-                </button>
-                <button
-                  :class="['view-toggle-btn', { active: editorView === 'bg' }]"
+                />
+                <GameIconButton
+                  variant="toggle"
+                  type="default"
+                  icon="mdi:view-grid"
+                  size="small"
+                  title="BG"
+                  :selected="editorView === 'bg'"
                   @click="editorView = 'bg'"
-                  type="button"
-                >
-                  <span class="mdi mdi-view-grid"></span>
-                  BG
-                </button>
+                />
               </div>
-              <GameButton
+              <GameIconButton
                 type="default"
+                icon="mdi:folder-open"
                 size="small"
-                class="sample-selector-btn"
+                :title="t('ide.samples.load', 'Load Sample')"
                 @click="sampleSelectorOpen = true"
-              >
-                <span class="mdi mdi-folder-open"></span>
-                {{ t('ide.samples.load', 'Load Sample') }}
-              </GameButton>
+              />
               <IdeControls
                 :is-running="isRunning"
                 :can-run="canRun"
@@ -319,36 +318,6 @@ onMounted(() => {
   display: flex;
   gap: 0.125rem;
   margin-right: 0.5rem;
-}
-
-.view-toggle-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.375rem 0.75rem;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--game-text-secondary);
-  background: var(--game-surface-bg-start);
-  border: 1px solid var(--game-surface-border);
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.view-toggle-btn:hover {
-  color: var(--game-text-primary);
-  border-color: var(--base-solid-primary);
-}
-
-.view-toggle-btn.active {
-  color: var(--game-text-contrast);
-  background: var(--base-solid-primary);
-  border-color: var(--base-solid-primary);
-}
-
-.sample-selector-btn {
-  white-space: nowrap;
 }
 
 .parser-status {

@@ -5,7 +5,6 @@
 
 import { EXECUTION_LIMITS } from '@/core/constants'
 import type { BasicVariable } from '@/core/interfaces'
-import { useBgEditorState } from '@/features/bg-editor/composables/useBgEditorState'
 import { ExecutionError } from '@/features/ide/errors/ExecutionError'
 import { logComposable } from '@/shared/logger'
 
@@ -14,6 +13,7 @@ import { clearScreenBuffer, initializeScreenBuffer } from './useBasicIdeScreenUt
 import type { BasicIdeState } from './useBasicIdeState'
 import type { BasicIdeWorkerIntegration } from './useBasicIdeWorkerIntegration'
 import { clearAllCaches } from './useKonvaScreenRenderer'
+import { useProgramStore } from './useProgramStore'
 import { useWebAudioPlayer } from './useWebAudioPlayer'
 
 /** Parser returns CST or null; used by runCode. */
@@ -79,9 +79,9 @@ export function useBasicIdeExecution(
       // movementStates no longer needed - read from shared buffer instead
       state.movementPositionsFromBuffer.value = new Map()
 
-      // Send BG Editor data to worker for VIEW command
-      const bgEditorState = useBgEditorState()
-      const bgGridData = bgEditorState.exportGridData()
+      // Send BG data from program store to worker for VIEW command
+      const programStore = useProgramStore()
+      const bgGridData = programStore.bg
       worker.sendBgData(bgGridData)
       logComposable.debug('[IDE] Sent BG grid data to worker for VIEW command')
 
