@@ -35,13 +35,6 @@ export type BgEditorMode = 'SELECT' | 'COPY' | 'MOVE' | 'CHAR'
 /** Category for character palette */
 export type BgCharCategory = 'pictures' | 'letters' | 'numbers' | 'symbols' | 'kana'
 
-/** Editor state for localStorage */
-export interface BgEditorStorage {
-  grid: BgGridData
-  version: number
-  lastModified: number
-}
-
 /** Position on the grid */
 export interface GridPosition {
   x: number

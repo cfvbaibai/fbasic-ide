@@ -1,39 +1,59 @@
 /**
  * useBgEditorState composable
  *
- * Central state management for the BG Editor
+ * UI state management for the BG Editor.
+ * Grid data is managed by useProgramStore (program-bound).
+ * This composable manages editor modes and selection state.
  */
 
-import { readonly, ref, watch } from 'vue'
+import { computed, readonly, ref } from 'vue'
+
+import { useProgramStore } from '@/features/ide/composables/useProgramStore'
 
 import { BG_EDITOR_MODES, DEFAULT_BG_CHAR_CODE } from '../constants'
 import type { BgCell, BgEditorMode, BgGridData, ColorPattern, GridPosition } from '../types'
 import { EMPTY_CELL } from '../types'
-import { createEmptyGrid, getCell, isValidPosition, setCell } from './useBgGrid'
-import { loadGrid, saveGrid } from './useBgStorage'
+import { cloneGrid, createEmptyGrid, getCell, isValidPosition, setCell } from './useBgGrid'
 
-// Singleton state
-const grid = ref<BgGridData>(createEmptyGrid())
+// ============================================================================
+// Editor Mode State (local UI state, not program-bound)
+// ============================================================================
+
 const mode = ref<BgEditorMode>(BG_EDITOR_MODES.CHAR)
 const selectedCharCode = ref<number>(DEFAULT_BG_CHAR_CODE)
 const selectedColorPattern = ref<ColorPattern>(0)
 const cursorPosition = ref<GridPosition>({ x: 0, y: 0 })
 const copySource = ref<GridPosition | null>(null)
 const moveSource = ref<GridPosition | null>(null)
-const isInitialized = ref(false)
+
+// ============================================================================
+// Program Store Integration
+// ============================================================================
 
 /**
- * Initialize editor state (load from storage)
+ * Get the program store instance (singleton)
  */
-function initialize(): void {
-  if (isInitialized.value) return
-
-  const savedGrid = loadGrid()
-  if (savedGrid) {
-    grid.value = savedGrid
-  }
-  isInitialized.value = true
+function getProgramStore() {
+  return useProgramStore()
 }
+
+/**
+ * Get current grid from program store
+ */
+function getGrid(): BgGridData {
+  return getProgramStore().bg
+}
+
+/**
+ * Save modified grid back to program store
+ */
+function saveGrid(grid: BgGridData): void {
+  getProgramStore().setBg(grid)
+}
+
+// ============================================================================
+// Grid Modification Functions
+// ============================================================================
 
 /**
  * Place a cell at the specified position using current selection
@@ -41,11 +61,13 @@ function initialize(): void {
 function placeCell(x: number, y: number): void {
   if (!isValidPosition(x, y)) return
 
+  const grid = cloneGrid(getGrid())
   const cell: BgCell = {
     charCode: selectedCharCode.value,
     colorPattern: selectedColorPattern.value,
   }
-  setCell(grid.value, x, y, cell)
+  setCell(grid, x, y, cell)
+  saveGrid(grid)
 }
 
 /**
@@ -54,8 +76,10 @@ function placeCell(x: number, y: number): void {
 function copyCell(fromX: number, fromY: number, toX: number, toY: number): void {
   if (!isValidPosition(fromX, fromY) || !isValidPosition(toX, toY)) return
 
-  const sourceCell = getCell(grid.value, fromX, fromY)
-  setCell(grid.value, toX, toY, sourceCell)
+  const grid = cloneGrid(getGrid())
+  const sourceCell = getCell(grid, fromX, fromY)
+  setCell(grid, toX, toY, sourceCell)
+  saveGrid(grid)
 }
 
 /**
@@ -65,19 +89,25 @@ function copyCell(fromX: number, fromY: number, toX: number, toY: number): void 
 function moveCell(fromX: number, fromY: number, toX: number, toY: number): void {
   if (!isValidPosition(fromX, fromY) || !isValidPosition(toX, toY)) return
 
-  const sourceCell = getCell(grid.value, fromX, fromY)
-  setCell(grid.value, toX, toY, sourceCell)
-  setCell(grid.value, fromX, fromY, { ...EMPTY_CELL })
+  const grid = cloneGrid(getGrid())
+  const sourceCell = getCell(grid, fromX, fromY)
+  setCell(grid, toX, toY, sourceCell)
+  setCell(grid, fromX, fromY, { ...EMPTY_CELL })
+  saveGrid(grid)
 }
 
 /**
  * Clear the entire grid
  */
 function clearGrid(): void {
-  grid.value = createEmptyGrid()
+  saveGrid(createEmptyGrid())
   copySource.value = null
   moveSource.value = null
 }
+
+// ============================================================================
+// Editor Mode Functions
+// ============================================================================
 
 /**
  * Set editor mode
@@ -153,34 +183,25 @@ function handleCellClick(x: number, y: number): void {
   }
 }
 
-/**
- * Export grid as BG GET/BG PUT compatible format
- */
-function exportGridData(): BgGridData {
-  return grid.value.map(row => row.map(cell => ({ ...cell })))
-}
-
-// Auto-save on grid changes
-watch(
-  grid,
-  () => {
-    if (isInitialized.value) {
-      saveGrid(grid.value)
-    }
-  },
-  { deep: true }
-)
+// ============================================================================
+// Composable Export
+// ============================================================================
 
 /**
  * Composable for BG Editor state management
+ *
+ * Grid data is bound to the current program via useProgramStore.
+ * Editor mode and selection state are local UI state.
  */
 export function useBgEditorState() {
-  // Initialize on first use
-  initialize()
+  // Computed grid from program store (read-only view)
+  const grid = computed(() => getProgramStore().bg)
 
   return {
-    // State (readonly to prevent direct mutation)
+    // Grid state (from program store)
     grid: readonly(grid),
+
+    // Editor mode state (local UI state)
     mode: readonly(mode),
     selectedCharCode: readonly(selectedCharCode),
     selectedColorPattern: readonly(selectedColorPattern),
@@ -198,6 +219,5 @@ export function useBgEditorState() {
     placeCell,
     copyCell,
     moveCell,
-    exportGridData,
   }
 }

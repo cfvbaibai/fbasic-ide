@@ -2,7 +2,8 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { getSampleCodeKeys,SAMPLE_CODES } from '@/core/samples/sampleCodes'
+import { hasSampleBgData } from '@/core/samples/sampleBgData'
+import { getSampleCodeKeys, SAMPLE_CODES } from '@/core/samples/sampleCodes'
 import { GameButton } from '@/shared/components/ui'
 
 /**
@@ -25,17 +26,20 @@ const allSampleKeys = getSampleCodeKeys()
 
 // Categories - group samples by category
 const categories = computed(() => {
-  const cats = new Map<string, Array<{ key: string; name: string; description: string }>>()
+  const cats = new Map<string, Array<{ key: string; name: string; description: string; hasBg: boolean }>>()
   for (const key of allSampleKeys) {
     const sample = SAMPLE_CODES[key]
     if (sample) {
       if (!cats.has(sample.category)) {
         cats.set(sample.category, [])
       }
+      // Check if sample has BG data (either via bgKey or direct BG data)
+      const hasBg = sample.bgKey ? hasSampleBgData(sample.bgKey) : false
       cats.get(sample.category)!.push({
         key,
         name: sample.name,
         description: sample.description,
+        hasBg,
       })
     }
   }
@@ -104,7 +108,10 @@ const categoryColors: Record<string, string> = {
           @click="emit('select', sample.key)"
         >
           <div class="sample-card-header">
-            <h3 class="sample-card-name">{{ sample.name }}</h3>
+            <h3 class="sample-card-name">
+              {{ sample.name }}
+              <span v-if="sample.hasBg" class="bg-indicator" title="Includes BG data">BG</span>
+            </h3>
             <span
               class="sample-card-tag"
               :style="{ backgroundColor: categoryColors[selectedCategory] }"
@@ -255,6 +262,20 @@ const categoryColors: Record<string, string> = {
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--game-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.bg-indicator {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.125rem 0.25rem;
+  background: var(--base-solid-primary);
+  color: var(--game-text-contrast);
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .sample-card-tag {

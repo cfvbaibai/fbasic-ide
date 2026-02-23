@@ -22,12 +22,6 @@ export const BG_EDITOR_MODES = {
   CHAR: 'CHAR',
 } as const
 
-/** LocalStorage key for saving editor state */
-export const STORAGE_KEY = 'fbasic-bg-editor'
-
-/** Storage version for migration compatibility */
-export const STORAGE_VERSION = 1
-
 /** Default palette code for BG rendering */
 export const DEFAULT_BG_PALETTE_CODE = 1
 

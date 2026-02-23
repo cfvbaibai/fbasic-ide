@@ -7,6 +7,8 @@ export interface SampleCode {
   description: string
   code: string
   category: 'basics' | 'control' | 'data' | 'screen' | 'sprites' | 'interactive' | 'comprehensive' | 'debug'
+  /** Optional BG data key for samples that use VIEW command */
+  bgKey?: string
 }
 
 export const SAMPLE_CODES: Record<string, SampleCode> = {
@@ -471,12 +473,39 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 
   bgView: {
     name: 'BG VIEW Test',
-    description: 'Copy BG GRAPHIC to background screen - draw in BG Editor first, then run',
+    description: 'Copy BG GRAPHIC to background screen - includes demo BG pattern',
     category: 'screen',
+    bgKey: 'bgView',
     code: `10 CLS
 20 VIEW
 30 LOCATE 12,11:PRINT "BG content displayed"
 40 END`,
+  },
+
+  bgViewTitle: {
+    name: 'BG Title Screen',
+    description: 'Display a decorative title screen using BG GRAPHIC',
+    category: 'screen',
+    bgKey: 'titleScreen',
+    code: `10 CLS
+20 VIEW
+30 REM Add your title text here
+40 LOCATE 10,8:PRINT "MY GAME"
+50 LOCATE 8,12:PRINT "Press START"
+60 END`,
+  },
+
+  bgViewPlatform: {
+    name: 'BG Platform Level',
+    description: 'Platform game level background with ground and platforms',
+    category: 'screen',
+    bgKey: 'platformGame',
+    code: `10 CLS
+20 VIEW
+30 REM Player would move on this level
+40 LOCATE 3,4:PRINT "LEVEL 1"
+50 LOCATE 20,4:PRINT "x3"
+60 END`,
   },
 }
 
