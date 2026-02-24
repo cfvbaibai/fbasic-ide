@@ -1,0 +1,146 @@
+<script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
+import BgEditorPanel from '@/features/bg-editor/components/BgEditorPanel.vue'
+import { GameBlock, GameButton, GameIconButton } from '@/shared/components/ui'
+
+import EditorViewToggle from './EditorViewToggle.vue'
+import IdeControls from './IdeControls.vue'
+import MonacoCodeEditor from './MonacoCodeEditor.vue'
+import ProgramToolbar from './ProgramToolbar.vue'
+
+/**
+ * IdeEditorPanel - Editor panel with toolbar, view toggle, and code/BG editors.
+ * Extracted from IdePage to reduce file size.
+ */
+
+defineOptions({
+  name: 'IdeEditorPanel',
+})
+
+const props = defineProps<Props>()
+
+const emit = defineEmits<{
+  (e: 'update:code', value: string): void
+  (e: 'update:editorView', value: 'code' | 'bg'): void
+  (e: 'run'): void
+  (e: 'stop'): void
+  (e: 'clear'): void
+  (e: 'toggleDebug'): void
+  (e: 'debugBuffer'): void
+  (e: 'openSampleSelector'): void
+}>()
+
+interface Props {
+  /** Code content (v-model) */
+  code: string
+  /** Current editor view */
+  editorView: 'code' | 'bg'
+  /** Whether toolbar should be compact */
+  isToolbarCompact: boolean
+  /** Whether program is running */
+  isRunning: boolean
+  /** Whether run button is enabled */
+  canRun: boolean
+  /** Whether stop button is enabled */
+  canStop: boolean
+  /** Whether debug mode is active */
+  debugMode: boolean
+}
+
+const { t } = useI18n()
+</script>
+
+<template>
+  <GameBlock :title="t('ide.codeEditor.title')" title-icon="mdi:pencil" class="editor-panel">
+    <template #right>
+      <div class="editor-header-controls">
+        <ProgramToolbar :is-compact="props.isToolbarCompact" />
+        <EditorViewToggle
+          :model-value="props.editorView"
+          :is-compact="props.isToolbarCompact"
+          @update:model-value="emit('update:editorView', $event)"
+        />
+        <template v-if="props.isToolbarCompact">
+          <GameIconButton
+            type="default"
+            icon="mdi:folder-open"
+            size="small"
+            :title="t('ide.samples.load', 'Load Sample')"
+            @click="emit('openSampleSelector')"
+          />
+        </template>
+        <template v-else>
+          <GameButton
+            type="default"
+            icon="mdi:folder-open"
+            size="small"
+            @click="emit('openSampleSelector')"
+          >
+            {{ t('ide.samples.load') }}
+          </GameButton>
+        </template>
+        <IdeControls
+          :is-running="props.isRunning"
+          :can-run="props.canRun"
+          :can-stop="props.canStop"
+          :debug-mode="props.debugMode"
+          @run="emit('run')"
+          @stop="emit('stop')"
+          @clear="emit('clear')"
+          @toggle-debug="emit('toggleDebug')"
+          @debug-buffer="emit('debugBuffer')"
+        />
+      </div>
+    </template>
+    <!-- Code Editor View -->
+    <MonacoCodeEditor
+      v-show="props.editorView === 'code'"
+      :model-value="props.code"
+      @update:model-value="emit('update:code', $event)"
+    />
+    <!-- BG Editor View -->
+    <BgEditorPanel v-show="props.editorView === 'bg'" />
+  </GameBlock>
+</template>
+
+<style scoped>
+.editor-panel {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.editor-panel :deep(.game-block-header) {
+  padding-bottom: 0.5rem;
+  min-height: auto;
+}
+
+.editor-panel :deep(.game-block-title) {
+  font-size: 0.95rem;
+}
+
+.editor-panel :deep(.game-block-content) {
+  flex: 1 1 0;
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.editor-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Match Sample button size with toolbar buttons */
+.editor-header-controls > :deep(.game-button) {
+  min-width: auto;
+  padding: 0.375rem 0.625rem;
+  font-size: 0.8rem;
+}
+</style>
