@@ -101,7 +101,7 @@ const modes: { key: BgEditorMode; icon: string; title: string }[] = [
   { key: BG_EDITOR_MODES.SELECT, icon: 'mdi:cursor-default', title: t('bgEditor.toolbar.select') },
   { key: BG_EDITOR_MODES.COPY, icon: 'mdi:content-copy', title: t('bgEditor.toolbar.copy') },
   { key: BG_EDITOR_MODES.MOVE, icon: 'mdi:arrow-all', title: t('bgEditor.toolbar.move') },
-  { key: BG_EDITOR_MODES.CHAR, icon: 'mdi:format-text', title: t('bgEditor.toolbar.char') },
+  { key: BG_EDITOR_MODES.CHAR, icon: 'mdi:brush', title: t('bgEditor.toolbar.char') },
 ]
 
 const currentMode = computed({
@@ -257,7 +257,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <GameBlock :title="t('bgEditor.grid.title')" class="bg-grid-block">
+  <GameBlock :title="t('bgEditor.grid.title')" class="bg-grid-block" no-hover-effect>
     <template #right>
       <div class="toolbar-controls">
         <!-- Mode buttons -->
@@ -376,15 +376,6 @@ onMounted(() => {
   border-radius: 4px;
   box-shadow:
     0 0 20px var(--base-alpha-gray-00-80),
-    inset 0 0 20px var(--base-alpha-primary-10);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.canvas-wrapper:hover {
-  border-color: var(--base-solid-primary);
-  box-shadow:
-    0 0 20px var(--base-alpha-gray-00-80),
-    0 0 12px var(--game-accent-glow),
     inset 0 0 20px var(--base-alpha-primary-10);
 }
 

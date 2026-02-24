@@ -1,9 +1,16 @@
 <script setup lang="ts">
 import { nextTick, onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import { useProgramStore } from '@/features/ide/composables/useProgramStore'
-import { GameIconButton } from '@/shared/components/ui'
+import { GameButton, GameIconButton } from '@/shared/components/ui'
+import GameIcon from '@/shared/components/ui/GameIcon.vue'
 
+const props = withDefaults(defineProps<{ isCompact?: boolean }>(), {
+  isCompact: false,
+})
+
+const { t } = useI18n()
 const programStore = useProgramStore()
 
 // Renaming state
@@ -116,28 +123,55 @@ onUnmounted(() => {
   <div class="program-toolbar">
     <!-- File operations -->
     <div class="file-buttons">
-      <GameIconButton
-        type="default"
-        icon="mdi:file-plus"
-        size="small"
-        title="New (Ctrl+N)"
-        @click="handleNew"
-      />
-      <GameIconButton
-        type="default"
-        icon="mdi:folder-open"
-        size="small"
-        title="Open (Ctrl+O)"
-        @click="handleOpen"
-      />
-      <GameIconButton
-        type="primary"
-        icon="mdi:content-save"
-        size="small"
-        title="Save (Ctrl+S)"
-        :disabled="!programStore.isDirty.value"
-        @click="handleSave"
-      />
+      <template v-if="props.isCompact">
+        <GameIconButton
+          type="default"
+          icon="mdi:file-plus"
+          size="small"
+          :title="`${t('ide.toolbar.new')} (Ctrl+N)`"
+          @click="handleNew"
+        />
+        <GameIconButton
+          type="default"
+          icon="mdi:import"
+          size="small"
+          :title="`${t('ide.toolbar.import')} (Ctrl+O)`"
+          @click="handleOpen"
+        />
+        <GameIconButton
+          type="primary"
+          icon="mdi:export"
+          size="small"
+          :title="`${t('ide.toolbar.export')} (Ctrl+S)`"
+          @click="handleSave"
+        />
+      </template>
+      <template v-else>
+        <GameButton
+          type="default"
+          icon="mdi:file-plus"
+          size="small"
+          @click="handleNew"
+        >
+          {{ t('ide.toolbar.new') }}
+        </GameButton>
+        <GameButton
+          type="default"
+          icon="mdi:import"
+          size="small"
+          @click="handleOpen"
+        >
+          {{ t('ide.toolbar.import') }}
+        </GameButton>
+        <GameButton
+          type="primary"
+          icon="mdi:export"
+          size="small"
+          @click="handleSave"
+        >
+          {{ t('ide.toolbar.export') }}
+        </GameButton>
+      </template>
     </div>
 
     <!-- Program name -->
@@ -154,14 +188,16 @@ onUnmounted(() => {
         />
       </template>
       <template v-else>
-        <button
-          class="program-name-btn"
-          @click="startRename"
+        <div
+          class="program-name-editable"
           :title="programStore.programName"
-          type="button"
+          @click="startRename"
         >
-          {{ programStore.programName }}
-        </button>
+          <span class="program-name-text">
+            {{ programStore.programName }}
+          </span>
+          <GameIcon icon="mdi:pencil" class="edit-icon" :size="14" />
+        </div>
       </template>
 
       <!-- Dirty indicator -->
@@ -186,6 +222,13 @@ onUnmounted(() => {
   gap: 0.375rem;
 }
 
+/* Override GameButton min-width for toolbar buttons */
+.file-buttons :deep(.game-button) {
+  min-width: auto;
+  padding: 0.375rem 0.625rem;
+  font-size: 0.8rem;
+}
+
 .program-name-container {
   display: flex;
   align-items: center;
@@ -193,25 +236,38 @@ onUnmounted(() => {
   margin-left: 0.25rem;
 }
 
-.program-name-btn {
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 4px;
+.program-name-editable {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
   padding: 0.375rem 0.5rem;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.program-name-editable:hover {
+  background: var(--game-surface-bg-start);
+}
+
+.edit-icon {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  color: var(--game-text-secondary);
+}
+
+.program-name-editable:hover .edit-icon {
+  opacity: 1;
+}
+
+.program-name-text {
   color: var(--game-text-primary);
   font-size: 0.9375rem;
   font-weight: 500;
-  cursor: pointer;
   max-width: 200px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  transition: all 0.15s ease;
-}
-
-.program-name-btn:hover {
-  background: var(--game-surface-bg-start);
-  border-color: var(--game-surface-border);
 }
 
 .program-name-input {

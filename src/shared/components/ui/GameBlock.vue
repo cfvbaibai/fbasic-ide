@@ -27,6 +27,7 @@ const props = withDefaults(defineProps<GameBlockProps>(), {
   hideHeader: false,
   floatOnHover: false,
   clickable: false,
+  noHoverEffect: false,
 })
 
 const emit = defineEmits<GameBlockEmits>()
@@ -45,6 +46,7 @@ const handleClick = () => {
       'no-header': hideHeader,
       'float-on-hover': floatOnHover,
       clickable: clickable,
+      'no-hover-effect': noHoverEffect,
     }"
     @click="handleClick"
   >
@@ -96,6 +98,15 @@ const handleClick = () => {
 
 .game-block:hover::before {
   transform: scaleX(1);
+}
+
+.game-block.no-hover-effect:hover {
+  border-color: inherit;
+  box-shadow: var(--game-shadow-base);
+}
+
+.game-block.no-hover-effect:hover::before {
+  transform: scaleX(0);
 }
 
 .game-block.float-on-hover:hover {

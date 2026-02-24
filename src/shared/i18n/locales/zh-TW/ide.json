@@ -1,5 +1,10 @@
 {
   "title": "Family Basic IDE",
+  "toolbar": {
+    "new": "新建",
+    "import": "匯入",
+    "export": "匯出"
+  },
   "codeEditor": {
     "title": "程式碼編輯器",
     "placeholder": "在此輸入您的 Family Basic 程式碼..."
@@ -26,7 +31,7 @@
   },
   "samples": {
     "title": "載入範例",
-    "load": "載入範例",
+    "load": "範例",
     "placeholder": "範例",
     "basic": "基礎",
     "pause": "暫停示範",
@@ -59,6 +64,8 @@
       "strig": "STRIG"
     },
     "keybinding": {
+      "joystick0": "搖桿0",
+      "joystick1": "搖桿1",
       "title": "設定鍵盤控制",
       "instructions": "點擊按鍵綁定並按下任意鍵來更改它。",
       "pressKey": "請按任意鍵...",

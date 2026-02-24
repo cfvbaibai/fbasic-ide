@@ -168,7 +168,6 @@ onMounted(() => {
   grid-template-columns: repeat(auto-fill, minmax(28px, 1fr));
   gap: 4px;
   padding: 0.5rem;
-  max-height: 300px;
   overflow-y: auto;
 }
 
@@ -181,8 +180,31 @@ onMounted(() => {
   border: 2px solid transparent;
   border-radius: 4px;
   cursor: pointer;
-  background: var(--game-surface-bg-start);
   transition: all 0.15s ease;
+
+  /* Chessboard pattern for transparency (Photoshop-style) */
+  background-color: var(--base-solid-gray-00);
+  background-image:
+    linear-gradient(45deg, var(--base-alpha-gray-100-20) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--base-alpha-gray-100-20) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--base-alpha-gray-100-20) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--base-alpha-gray-100-20) 75%);
+  background-size: 6px 6px;
+  background-position:
+    0 0,
+    0 3px,
+    3px -3px,
+    -3px 0;
+}
+
+/* Light theme chessboard adjustment */
+:global(.light-theme) .palette-item {
+  background-image:
+    linear-gradient(45deg, var(--base-solid-gray-10) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--base-solid-gray-10) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--base-solid-gray-10) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--base-solid-gray-10) 75%);
+  background-color: var(--base-solid-gray-00);
 }
 
 .palette-item:hover {
@@ -192,7 +214,6 @@ onMounted(() => {
 
 .palette-item-selected {
   border-color: var(--base-solid-primary);
-  background: var(--game-surface-bg-start);
   box-shadow: 0 0 12px var(--game-accent-glow);
 }
 

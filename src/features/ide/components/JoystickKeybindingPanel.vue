@@ -141,7 +141,12 @@ const isConfiguring = (joystickId: number, button: keyof JoystickKeyBindings): b
     aria-labelledby="keybinding-title"
     tabindex="-1"
   >
-    <GameBlock :title="t('ide.joystick.keybinding.title')" title-icon="mdi:keyboard" class="keybinding-panel">
+    <GameBlock
+      :title="t('ide.joystick.keybinding.title')"
+      title-icon="mdi:keyboard"
+      class="keybinding-panel"
+      no-hover-effect
+    >
       <div class="keybinding-content">
         <!-- Instructions -->
         <p class="keybinding-instructions">

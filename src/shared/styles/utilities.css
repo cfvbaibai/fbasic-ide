@@ -11,6 +11,35 @@
 }
 
 
+/* Chessboard Pattern (Photoshop-style transparency indicator) */
+
+.bg-chessboard {
+    background-color: var(--base-solid-gray-00);
+    background-image:
+        linear-gradient(45deg, var(--base-alpha-gray-100-20) 25%, transparent 25%),
+        linear-gradient(-45deg, var(--base-alpha-gray-100-20) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, var(--base-alpha-gray-100-20) 75%),
+        linear-gradient(-45deg, transparent 75%, var(--base-alpha-gray-100-20) 75%);
+    background-size: 8px 8px;
+    background-position:
+        0 0,
+        0 4px,
+        4px -4px,
+        -4px 0;
+}
+
+/* Light theme chessboard adjustment */
+/* stylelint-disable-next-line selector-pseudo-class-no-unknown */
+:global(.light-theme) .bg-chessboard {
+    background-image:
+        linear-gradient(45deg, var(--base-solid-gray-10) 25%, transparent 25%),
+        linear-gradient(-45deg, var(--base-solid-gray-10) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, var(--base-solid-gray-10) 75%),
+        linear-gradient(-45deg, transparent 75%, var(--base-solid-gray-10) 75%);
+    background-color: var(--base-solid-gray-00);
+}
+
+
 /* Text Styles */
 
 .text-game-heading {

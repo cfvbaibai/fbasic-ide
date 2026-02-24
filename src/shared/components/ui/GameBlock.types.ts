@@ -13,6 +13,8 @@ export interface GameBlockProps {
   floatOnHover?: boolean
   /** Whether the block is clickable */
   clickable?: boolean
+  /** Whether to disable hover border highlight effect */
+  noHoverEffect?: boolean
 }
 
 export interface GameBlockEmits {
