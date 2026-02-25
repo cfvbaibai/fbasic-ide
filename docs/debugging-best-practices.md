@@ -9,7 +9,7 @@
 ```
 1. Read code, hypothesize "this must be the bug"
 2. Make fix based on hypothesis
-3. Mark todo as "FIXED"
+3. Mark issue as "FIXED"
 4. User tests → bug still exists
 5. Repeat with new hypothesis
 ```

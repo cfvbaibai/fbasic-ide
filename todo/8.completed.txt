@@ -1,3 +1,0 @@
-type: bug
-subject: Shooting game only shows MARIO as enemies
-description: The enemy character types should be random, but we always see 8 MARIOs

@@ -96,25 +96,22 @@ src/
 
 When user requests a feature:
 
-1. **Check `todo/` folder FIRST** - Review existing todo files for any related open work
+1. **Check GitHub Issues FIRST** - Review existing issues for any related open work
 2. **Analyze** against architecture (above)
 3. **Identify** which teams are involved
 4. **Break down** into team-specific tasks
 5. **Spawn** sub-agents via Task tool
 6. **Integrate** results and verify cross-team boundaries
-7. **Update todo files** - Rename and update status when work is complete
+7. **Close issues** - Comment and close when work is complete
 
-### Todo File Management
+### Issue Management
 
-The `todo/` folder contains work items as individual text files. Each file is named `{number}.{status}.txt`:
-- `1.open.txt` - Work in progress
-- `1.resolved.txt` - Issue resolved, awaiting commit/verification
-- `1.completed.txt` - Work fully implemented and committed
+Track work via [GitHub Issues](https://github.com/cfvbaibai/fbasic-ide/issues).
 
-**When work status changes**:
-1. Update the `status` field in the file content
-2. Rename the file to reflect new status (e.g., `5.open.txt` → `5.resolved.txt`)
-3. Commit the todo file change along with code changes
+**When work is complete**:
+1. Add a comment summarizing the implementation
+2. Close the issue
+3. Reference the issue in commit messages (e.g., "fixes #123")
 
 ### Example: Add CIRCLE Command
 

@@ -109,13 +109,14 @@ These are program editing/system commands for the original Famicom tape system:
 
 ---
 
-### Todo Folder
+### Issue Tracking
 
-Check `todo/` folder for all work items. Each file contains:
-- `type`: bug, refactor, feature
-- `status`: open, resolved, completed
-- `subject`: Brief description
-- `description`: Full details
+Track work items via [GitHub Issues](https://github.com/cfvbaibai/fbasic-ide/issues).
+
+Labels:
+- `bug` - Bug fixes
+- `enhancement` - New features
+- `refactor` - Code improvements
 
 ---
 
