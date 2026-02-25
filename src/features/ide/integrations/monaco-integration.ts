@@ -20,44 +20,107 @@ import { parseWithChevrotain } from '@/core/parser/FBasicChevrotainParser'
 // ============================================================================
 
 const monarchLanguage: monaco.languages.IMonarchLanguage = {
-  // Keywords
+  // Keywords - comprehensive list matching parser-tokens.ts
   keywords: [
-    'PRINT',
-    'LET',
+    // Control flow
     'IF',
     'THEN',
     'ELSE',
     'FOR',
-    'NEXT',
     'TO',
     'STEP',
+    'NEXT',
     'GOTO',
     'GOSUB',
     'RETURN',
+    'ON',
+    'OFF',
     'END',
     'STOP',
     'PAUSE',
+    // I/O
+    'PRINT',
+    'LET',
     'INPUT',
     'LINPUT',
     'DATA',
     'READ',
     'RESTORE',
+    // Variables
     'DIM',
-    'DEF',
-    'FN',
-    'REM',
-    'CLS',
     'SWAP',
     'CLEAR',
+    // Graphics
+    'CLS',
+    'LOCATE',
     'COLOR',
+    'CGSET',
+    'CGEN',
+    'PALETB',
+    'PALETS',
+    'PALET',
+    'VIEW',
     'PSET',
     'LINE',
     'CIRCLE',
     'PAINT',
+    // Sprite commands
+    'DEF',
+    'SPRITE',
+    'MOVE',
+    'CUT',
+    'ERA',
+    'POSITION',
+    // Music
+    'PLAY',
+    'BEEP',
+    // Comments
+    'REM',
+    // REPL-only (included for completeness)
+    'LIST',
+    'NEW',
+    'RUN',
+    'SAVE',
+    'LOAD',
+    'KEY',
+    'KEYLIST',
+    'CONT',
+    'SYSTEM',
+    // Limited utility
+    'POKE',
+    'PEEK',
+    'FRE',
   ],
 
   // Functions (Family BASIC supported functions)
-  functions: ['ABS', 'SGN', 'RND', 'VAL', 'LEN', 'LEFT$', 'RIGHT$', 'MID$', 'STR$', 'HEX$', 'STICK', 'STRIG'],
+  functions: [
+    // String functions
+    'LEN',
+    'LEFT$',
+    'RIGHT$',
+    'MID$',
+    'STR$',
+    'HEX$',
+    'CHR$',
+    'ASC',
+    'SCR$',
+    // Arithmetic functions
+    'ABS',
+    'SGN',
+    'RND',
+    'VAL',
+    // Controller input
+    'STICK',
+    'STRIG',
+    // Sprite query
+    'XPOS',
+    'YPOS',
+    // Cursor position
+    'CSRLIN',
+    'POS',
+    // Keyboard
+    'INKEY$',
+  ],
 
   // Operators (arithmetic, relational, logical)
   operators: ['+', '-', '*', '/', 'MOD', '=', '<>', '<', '>', '<=', '>=', 'AND', 'OR', 'NOT', 'XOR'],
@@ -79,18 +142,22 @@ const monarchLanguage: monaco.languages.IMonarchLanguage = {
       [/"[^"]*"/, 'string'],
 
       // String functions with $ suffix (must come before identifiers)
-      // Match function name followed by $ and then ( for function call
-      // Pattern: LEFT$(, RIGHT$(, MID$(, STR$(, HEX$(
-      [/\b(LEFT\$|RIGHT\$|MID\$|STR\$|HEX\$)(?=\s*\()/i, 'function'],
+      // Match function name followed by $ and optionally ( for function call
+      // Note: No trailing \b because $ is not a word character
+      // Pattern: LEFT$(, RIGHT$(, MID$(, STR$(, HEX$(, CHR$(, SCR$(, INKEY$
+      [/\b(LEFT\$|RIGHT\$|MID\$|STR\$|HEX\$|CHR\$|SCR\$|INKEY\$)/i, 'function'],
 
       // Numeric functions (Family BASIC supported)
       // Match function name followed by ( for function call
-      // Pattern: ABS(, SGN(, RND(, VAL(, LEN(, STICK(, STRIG(
-      [/\b(ABS|SGN|RND|VAL|LEN|STICK|STRIG)(?=\s*\()/i, 'function'],
+      [/\b(ABS|SGN|RND|VAL|LEN|STICK|STRIG|ASC|XPOS|YPOS|POS|MOVE)(?=\s*\()/i, 'function'],
+
+      // CSRLIN - cursor line function (no parentheses needed)
+      [/\bCSRLIN\b/i, 'function'],
 
       // Keywords (case-insensitive)
       // Note: REM is excluded here since REM lines are handled above as comments
-      [/\b(PRINT|LET|IF|THEN|FOR|NEXT|TO|STEP|GOTO|END|PAUSE|INPUT|LINPUT|DIM|DATA|READ|RESTORE|SWAP|CLEAR)\b/i, 'keyword'],
+      // Comprehensive list matching parser-tokens.ts
+      [/\b(PRINT|LET|IF|THEN|ELSE|FOR|NEXT|TO|STEP|GOTO|GOSUB|RETURN|ON|OFF|END|STOP|PAUSE|INPUT|LINPUT|DIM|DATA|READ|RESTORE|SWAP|CLEAR|CLS|LOCATE|COLOR|CGSET|CGEN|PALETB|PALETS|PALET|VIEW|PSET|LINE|CIRCLE|PAINT|DEF|SPRITE|MOVE|CUT|ERA|POSITION|PLAY|BEEP|POKE|PEEK|FRE|LIST|NEW|RUN|SAVE|LOAD|KEY|KEYLIST|CONT|SYSTEM)\b/i, 'keyword'],
 
       // Multi-character relational operators (must come before single-character operators)
       [/<>|<=|>=/, 'operator'],
@@ -179,20 +246,8 @@ export function setupMonacoLanguage(): void {
     },
   })
 
-  // Register hover provider (optional)
-  monaco.languages.registerHoverProvider('fbasic', {
-    provideHover: async (model, position) => {
-      // Use your Chevrotain parser to provide hover information
-      const word = model.getWordAtPosition(position)
-      if (word) {
-        return {
-          range: new monaco.Range(position.lineNumber, word.startColumn, position.lineNumber, word.endColumn),
-          contents: [{ value: `**${word.word}**` }, { value: 'F-BASIC identifier' }],
-        }
-      }
-      return null
-    },
-  })
+  // Hover provider disabled - generic tooltip not useful for F-BASIC
+  // Can be re-enabled later with proper keyword/function documentation
 
   // Register completion provider (optional)
   monaco.languages.registerCompletionItemProvider('fbasic', {
