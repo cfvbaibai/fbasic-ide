@@ -57,6 +57,24 @@ export const Cut = createToken({ name: 'Cut', pattern: /\bCUT\b/i })
 export const Era = createToken({ name: 'Era', pattern: /\bERA\b/i })
 export const Position = createToken({ name: 'Position', pattern: /\bPOSITION\b/i })
 
+// REPL-only commands (not applicable in IDE version)
+export const List = createToken({ name: 'List', pattern: /\bLIST\b/i })
+export const New = createToken({ name: 'New', pattern: /\bNEW\b/i })
+export const Run = createToken({ name: 'Run', pattern: /\bRUN\b/i })
+export const Save = createToken({ name: 'Save', pattern: /\bSAVE\b/i })
+export const Load = createToken({ name: 'Load', pattern: /\bLOAD\b/i })
+export const Key = createToken({ name: 'Key', pattern: /\bKEY\b/i })
+export const Keylist = createToken({ name: 'Keylist', pattern: /\bKEYLIST\b/i })
+export const Cont = createToken({ name: 'Cont', pattern: /\bCONT\b/i })
+export const System = createToken({ name: 'System', pattern: /\bSYSTEM\b/i })
+
+// Limited utility commands (not applicable in IDE version)
+export const Poke = createToken({ name: 'Poke', pattern: /\bPOKE\b/i })
+export const Peek = createToken({ name: 'Peek', pattern: /\bPEEK\b/i })
+export const Fre = createToken({ name: 'Fre', pattern: /\bFRE\b/i })
+export const Inkey = createToken({ name: 'Inkey', pattern: /\bINKEY\$/i })
+export const Stop = createToken({ name: 'Stop', pattern: /\bSTOP\b/i })
+
 // String function keywords (must be before Identifier)
 export const Len = createToken({ name: 'Len', pattern: /\bLEN\b/i })
 export const Left = createToken({ name: 'Left', pattern: /\bLEFT\$/i })
@@ -217,6 +235,22 @@ export const allTokens = [
   Cut,
   Era,
   Position,
+  // REPL-only commands (must come before Identifier)
+  List,
+  New,
+  Run,
+  Save,
+  Load,
+  Key,
+  Keylist,
+  Cont,
+  System,
+  // Limited utility commands (must come before Identifier)
+  Poke,
+  Peek,
+  Fre,
+  Inkey,
+  Stop,
   // String functions (must come before Identifier)
   Len,
   Left,
