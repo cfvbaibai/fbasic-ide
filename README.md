@@ -67,7 +67,7 @@ To preserve and modernize the Family Basic programming language by providing an 
 ## 📁 Folder Structure
 
 ```
-fbasic-emu/
+fbasic-ide/
 ├── public/                          # Static assets
 ├── src/
 │   ├── features/                    # Feature-based organization
@@ -296,7 +296,7 @@ The project uses a **Concrete Syntax Tree (CST)** based approach for parsing and
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd fbasic-emu
+cd fbasic-ide
 
 # Install dependencies
 pnpm install

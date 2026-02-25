@@ -12,7 +12,7 @@ import { type SkinConfig, skinConfigs } from './skinConfig'
 
 export type SkinName = 'default' | 'retro-blue' | 'nintendo' | 'classic-light' | 'y2k-futuristic' | 'sunset-vaporwave'
 
-const SKIN_STORAGE_KEY = 'fbasic-emu-skin'
+const SKIN_STORAGE_KEY = 'fbasic-ide-skin'
 const SKIN_ATTRIBUTE = 'data-skin'
 
 const isValidSkinName = (value: unknown): value is SkinName => {

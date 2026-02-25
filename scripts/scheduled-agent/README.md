@@ -35,7 +35,7 @@ $env:ANTHROPIC_AUTH_TOKEN = "your-api-token-here"
 Run PowerShell as Administrator and execute:
 
 ```powershell
-cd C:\Users\Tony\code\private\fbasic-emu\scripts\scheduled-agent
+cd C:\Users\Tony\code\private\fbasic-ide\scripts\scheduled-agent
 .\setup-task.ps1
 ```
 

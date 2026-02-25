@@ -661,7 +661,7 @@ export class SpritePlugin extends Plugin {
 ### Monorepo Structure
 
 ```
-fbasic-emu/
+fbasic-ide/
 ├── packages/
 │   ├── cli/                    # Command-line interface
 │   │   ├── src/
