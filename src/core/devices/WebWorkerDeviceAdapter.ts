@@ -606,12 +606,12 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   beep(): void {
     logWorker.debug('Playing beep')
 
-    // Use a simple beep: middle C (C4) for a short duration
-    // Channel 0, duty 2 (50%), envelope 0 (no envelope), volume 15, duration ~0.1s
+    // Use a beep: higher frequency for better audibility, longer duration
+    // Channel 0, duty 2 (50%), envelope 0 (no envelope), volume 15
     const beepEvents = [
       {
-        frequency: 262, // C4 ~262 Hz
-        duration: 6, // ~0.1 seconds (6 frames at 60fps)
+        frequency: 1200, // ~5 seconds at 60fps
+        duration: 300,
         channel: 0,
         duty: 2,
         envelope: 0,
