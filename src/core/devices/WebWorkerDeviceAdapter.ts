@@ -446,6 +446,14 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     this.postScreenChanged()
   }
 
+  getCursorPosition(): { x: number; y: number } {
+    return this.screenStateManager.getCursorPosition()
+  }
+
+  getScreenCell(x: number, y: number, colorSwitch = 0): string | number {
+    return this.screenStateManager.getScreenCell(x, y, colorSwitch)
+  }
+
   setColorPattern(x: number, y: number, pattern: number): void {
     logWorker.debug('Set color pattern:', { x, y, pattern })
     this.screenStateManager.setColorPattern(x, y, pattern)
@@ -588,6 +596,39 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       logWorker.error('Error parsing music string:', error)
       this.errorOutput(`PLAY error: ${error instanceof Error ? error.message : String(error)}`)
     }
+  }
+
+  /**
+   * Play a beep sound (BEEP statement)
+   * Per F-BASIC Manual page 80: "Outputs a 'beep' type of sound"
+   * Uses a simple note on channel 0
+   */
+  beep(): void {
+    logWorker.debug('Playing beep')
+
+    // Use a simple beep: middle C (C4) for a short duration
+    // Channel 0, duty 2 (50%), envelope 0 (no envelope), volume 15, duration ~0.1s
+    const beepEvents = [
+      {
+        frequency: 262, // C4 ~262 Hz
+        duration: 6, // ~0.1 seconds (6 frames at 60fps)
+        channel: 0,
+        duty: 2,
+        envelope: 0,
+        volumeOrLength: 15,
+      },
+    ]
+
+    self.postMessage({
+      type: 'PLAY_SOUND',
+      id: `beep-${Date.now()}`,
+      timestamp: Date.now(),
+      data: {
+        executionId: this.screenStateManager.getCurrentExecutionId() ?? 'unknown',
+        musicString: 'BEEP',
+        events: beepEvents,
+      },
+    })
   }
 
   // === PRIVATE METHODS ===

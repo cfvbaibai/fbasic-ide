@@ -76,6 +76,8 @@ export interface BasicDeviceAdapter {
   errorOutput(output: string): void
   clearScreen(): void
   setCursorPosition(x: number, y: number): void
+  getCursorPosition(): { x: number; y: number }
+  getScreenCell(x: number, y: number, colorSwitch?: number): string | number
   setColorPattern(x: number, y: number, pattern: number): void
   setColorPalette(bgPalette: number, spritePalette: number): void
   setBackdropColor(colorCode: number): void
@@ -100,6 +102,12 @@ export interface BasicDeviceAdapter {
    * @param musicString - Music string with tempo, notes, rests, and channel separators
    */
   playSound?(musicString: string): void
+
+  /**
+   * Play a beep sound (BEEP statement)
+   * Produces a short beep tone using Web Audio API
+   */
+  beep?(): void
 
   // === BG GRAPHIC (VIEW command) ===
   /**

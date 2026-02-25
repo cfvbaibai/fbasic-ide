@@ -80,6 +80,13 @@ export const Strig = createToken({ name: 'Strig', pattern: /\bSTRIG\b/i })
 // Sprite query function keywords (must be before Identifier)
 export const Xpos = createToken({ name: 'Xpos', pattern: /\bXPOS\b/i })
 export const Ypos = createToken({ name: 'Ypos', pattern: /\bYPOS\b/i })
+// Cursor position function keywords (must be before Identifier)
+export const Csrlin = createToken({ name: 'Csrlin', pattern: /\bCSRLIN\b/i })
+export const Pos = createToken({ name: 'Pos', pattern: /\bPOS\b/i })
+// Screen read function keyword (string function with $ suffix)
+export const Scr = createToken({ name: 'Scr', pattern: /\bSCR\$/i })
+// BEEP statement keyword (must be before Identifier)
+export const Beep = createToken({ name: 'Beep', pattern: /\bBEEP\b/i })
 
 // Logical operators (must be before Identifier)
 export const And = createToken({ name: 'And', pattern: /\bAND\b/i })
@@ -231,6 +238,13 @@ export const allTokens = [
   // Sprite query function keywords (must come before Identifier)
   Xpos,
   Ypos,
+  // Cursor position function keywords (must come before Identifier)
+  Csrlin,
+  Pos,
+  // Screen read function keyword (string function with $ suffix)
+  Scr,
+  // BEEP statement keyword (must come before Identifier)
+  Beep,
   // Logical operators (must come before Identifier)
   And,
   Or,

@@ -21,7 +21,11 @@ export class ExpressionEvaluator {
   constructor(private context: ExecutionContext) {
     // Create function evaluator with reference to evaluateExpression method
     // We'll set it up after construction to avoid circular dependency
-    this.functionEvaluator = new FunctionEvaluator(context, (exprCst: CstNode) => this.evaluateExpression(exprCst))
+    this.functionEvaluator = new FunctionEvaluator(
+      context,
+      (exprCst: CstNode) => this.evaluateExpression(exprCst),
+      context.deviceAdapter
+    )
   }
 
   /**
@@ -454,6 +458,12 @@ export class ExpressionEvaluator {
       return this.evaluateFunctionCall(functionCallCst)
     }
 
+    // Check for CSRLIN (cursor line - no parentheses, consumed directly in primary)
+    const csrlinToken = getFirstToken(cst.children.Csrlin)
+    if (csrlinToken) {
+      return this.evaluateCsrlin()
+    }
+
     // Check for parenthesized expression
     if (cst.children.LParen && !functionCallCst && !arrayAccessCst) {
       const exprCst = getFirstCstNode(cst.children.expression)
@@ -563,6 +573,23 @@ export class ExpressionEvaluator {
    */
   private evaluateFunctionCall(cst: CstNode): number | string {
     return this.functionEvaluator.evaluateFunctionCall(cst)
+  }
+
+  // ============================================================================
+  // Cursor Position Functions
+  // ============================================================================
+
+  /**
+   * Evaluate CSRLIN - returns current cursor line (Y position)
+   * Range: 0-23
+   * Reference: F-BASIC Manual page 87
+   */
+  private evaluateCsrlin(): number {
+    if (!this.context.deviceAdapter) {
+      return 0
+    }
+    const position = this.context.deviceAdapter.getCursorPosition()
+    return position.y
   }
 
   /**

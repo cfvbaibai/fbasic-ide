@@ -11,6 +11,7 @@ import type { DataService } from '@/core/services/DataService'
 import type { VariableService } from '@/core/services/VariableService'
 import type { ExecutionContext } from '@/core/state/ExecutionContext'
 
+import { BeepExecutor } from './executors/BeepExecutor'
 import { CgenExecutor } from './executors/CgenExecutor'
 import { CgsetExecutor } from './executors/CgsetExecutor'
 import { ClearExecutor } from './executors/ClearExecutor'
@@ -84,6 +85,7 @@ export class StatementRouter {
   private positionExecutor: PositionExecutor
   private playExecutor: PlayExecutor
   private viewExecutor: ViewExecutor
+  private beepExecutor: BeepExecutor
 
   constructor(
     private context: ExecutionContext,
@@ -126,6 +128,7 @@ export class StatementRouter {
     this.positionExecutor = new PositionExecutor(context, evaluator)
     this.playExecutor = new PlayExecutor(context, evaluator)
     this.viewExecutor = new ViewExecutor(context)
+    this.beepExecutor = new BeepExecutor(context)
   }
 
   /**
@@ -445,6 +448,11 @@ export class StatementRouter {
       const viewStmtCst = getFirstCstNode(singleCommandCst.children.viewStatement)
       if (viewStmtCst) {
         this.viewExecutor.execute(viewStmtCst, expandedStatement.lineNumber)
+      }
+    } else if (singleCommandCst.children.beepStatement) {
+      const beepStmtCst = getFirstCstNode(singleCommandCst.children.beepStatement)
+      if (beepStmtCst) {
+        this.beepExecutor.execute(beepStmtCst)
       }
     } else {
       // Other statement types not yet implemented

@@ -30,6 +30,8 @@ describe('Family Basic IDE Demo Program', () => {
       errorOutput: vi.fn(),
       clearScreen: vi.fn(),
       setCursorPosition: vi.fn(),
+      getCursorPosition: vi.fn(() => ({ x: 0, y: 0 })),
+      getScreenCell: vi.fn(() => ' '),
       setColorPattern: vi.fn(),
       setColorPalette: vi.fn(),
       setBackdropColor: vi.fn(),

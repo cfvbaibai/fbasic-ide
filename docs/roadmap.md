@@ -1,6 +1,6 @@
 # Roadmap
 
-**Last Updated**: 2026-02-19
+**Last Updated**: 2026-02-25
 
 ---
 
@@ -18,7 +18,65 @@ Family Basic IDE is feature-complete for core F-BASIC functionality. Major syste
 
 ## Active Work
 
-_No active work items._
+### Command Coverage Enhancement
+
+Tracking implementation status of remaining F-BASIC commands.
+
+#### Implemented Functions (51 commands/functions)
+All core F-BASIC commands are implemented. See [Command Analysis](#command-analysis) below.
+
+#### Remaining Work
+
+| Priority | Commands | Status | Notes |
+|----------|----------|--------|-------|
+| High | CSRLIN, POS, SCR$, BEEP | Pending | Implementable in web context |
+| Medium | LIST, NEW, RUN, SAVE, LOAD, etc. | Pending | Parse but report "Not applicable for IDE version" |
+
+---
+
+## Command Analysis
+
+### Fully Implemented (~51 commands/functions)
+
+**Statements**: CGEN, CGSET, CLEAR, CLS, COLOR, CUT, DATA, DEF MOVE, DEF SPRITE, DIM, END, ERA, FOR/NEXT, GOTO, GOSUB, IF/THEN, INPUT, LET, LINPUT, LOCATE, MOVE, ON, PALET/PALETB/PALETS, PAUSE, PLAY, POSITION, PRINT, READ, REM, RESTORE, RETURN, SPRITE/SPRITE ON/OFF, SWAP, VIEW
+
+**Functions**: ABS, ASC, CHR$, HEX$, LEFT$, LEN, MID$, MOVE(n), RIGHT$, RND, SGN, STICK, STR$, STRIG, VAL, XPOS, YPOS
+
+### REPL-Only (Not Applicable to Web IDE)
+
+These are program editing/system commands for the original Famicom tape system:
+
+| Command | Description | Reason |
+|---------|-------------|--------|
+| LIST | List program | IDE has code viewer |
+| NEW | Erase program | IDE manages code |
+| RUN | Execute program | IDE has Run button |
+| SAVE | Save to tape | No tape drive |
+| LOAD | Load from tape | No tape drive |
+| LOAD? | Verify tape | No tape drive |
+| KEY | Define function keys | No F-keys |
+| KEYLIST | List function keys | No F-keys |
+| CONT | Continue after STOP | REPL-only |
+| SYSTEM | Exit to menu | No system menu |
+
+### Limited Utility in Web Context
+
+| Command | Description | Consideration |
+|---------|-------------|---------------|
+| POKE | Write memory | No real memory access |
+| PEEK | Read memory | No real memory access |
+| FRE | Free memory | Not meaningful |
+| INKEY$ | Immediate keypress | Different input model |
+| STOP | Pause execution | Needs CONT to resume |
+
+### Could Implement
+
+| Command | Description | Notes |
+|---------|-------------|-------|
+| CSRLIN | Cursor line | Screen state query |
+| POS | Cursor column | Screen state query |
+| SCR$ | Read screen char | Screen buffer read |
+| BEEP | Beep sound | Web Audio API |
 
 ---
 

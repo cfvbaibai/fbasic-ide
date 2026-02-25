@@ -2,6 +2,8 @@
  * Sample codes for F-Basic IDE - organized by category for testing
  */
 
+/* eslint-disable max-lines -- This is a data file containing sample code snippets */
+
 export interface SampleCode {
   name: string
   description: string
@@ -506,6 +508,81 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 40 LOCATE 3,4:PRINT "LEVEL 1"
 50 LOCATE 20,4:PRINT "x3"
 60 END`,
+  },
+
+  cursorPosition: {
+    name: 'Cursor Position (CSRLIN/POS)',
+    description: 'CSRLIN and POS functions - get current cursor position',
+    category: 'screen',
+    code: `10 REM * CSRLIN and POS Demo *
+20 CLS
+30 FOR I=0 TO 15
+40 LOCATE I, I
+50 PRINT "POS=";POS(0);" LINE=";CSRLIN
+60 PAUSE 20
+70 NEXT
+80 PRINT "Done!"
+90 END`,
+  },
+
+  screenRead: {
+    name: 'Screen Read (SCR$)',
+    description: 'SCR$ function - read characters from screen',
+    category: 'screen',
+    code: `10 CLS
+20 LOCATE 0,5
+30 PRINT "FAMILY BASIC"
+40 PRINT "============"
+50 LOCATE 0,10
+60 PRINT "Reading chars..."
+70 FOR X=0 TO 11
+80 A$=SCR$(X,5)
+90 PRINT A$;
+100 NEXT
+110 PRINT ""
+120 PRINT "Done!"
+130 END`,
+  },
+
+  screenReadColor: {
+    name: 'Screen Read with Color (SCR$)',
+    description: 'SCR$ with color switch - read character and color from screen',
+    category: 'screen',
+    code: `10 CLS
+20 LOCATE 0,5
+30 PRINT "HELLO"
+40 LOCATE 0,10
+50 A$=SCR$(0,5)
+60 C$=SCR$(0,5,1)
+70 PRINT "CHAR: ";A$
+80 PRINT "COLOR: ";ASC(C$)
+90 END`,
+  },
+
+  beep: {
+    name: 'BEEP Sound',
+    description: 'BEEP statement - produce a beep sound',
+    category: 'basics',
+    code: `10 PRINT "BEEP Demo"
+20 PRINT "Beeping..."
+30 BEEP
+40 PRINT "Done!"
+50 END`,
+  },
+
+  beepInteractive: {
+    name: 'BEEP Interactive',
+    description: 'BEEP on button press - interactive sound demo',
+    category: 'interactive',
+    code: `10 CLS
+20 PRINT "Press A to BEEP"
+30 PRINT "Press START to exit"
+40 T=STRIG(0)
+50 IF (T AND 8)=8 THEN BEEP:PAUSE 10
+60 IF (T AND 1)=1 THEN 100
+70 GOTO 40
+100 PRINT "Goodbye!"
+110 END`,
   },
 }
 

@@ -133,6 +133,14 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
     logDevice.debug('Play sound:', musicString)
   }
 
+  /** Captured beep calls for testing */
+  public beepCalls: number = 0
+
+  beep?(): void {
+    this.beepCalls++
+    logDevice.debug('Beep')
+  }
+
   // === BG GRAPHIC (VIEW command) ===
 
   /** Count of copyBgGraphicToBackground calls for testing */
@@ -171,6 +179,17 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
   setCursorPosition(x: number, y: number): void {
     this.cursorPosition = { x, y }
     logDevice.debug('Set cursor position:', { x, y })
+  }
+
+  getCursorPosition(): { x: number; y: number } {
+    return this.cursorPosition
+  }
+
+  getScreenCell(x: number, y: number, _colorSwitch = 0): string | number {
+    // Simple implementation for testing - returns space character
+    // Real implementation would use screen buffer
+    logDevice.debug('Get screen cell:', { x, y })
+    return ' '
   }
 
   setColorPattern(x: number, y: number, pattern: number): void {

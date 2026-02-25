@@ -73,6 +73,13 @@ import {
   Strig,
   Xpos,
   Ypos,
+  // Cursor position functions
+  Csrlin,
+  Pos,
+  // Screen read function
+  Scr,
+  // BEEP statement
+  Beep,
   // Logical operators
   And,
   Or,
@@ -128,6 +135,7 @@ class FBasicChevrotainParser extends CstParser {
   declare endStatement: () => CstNode
   declare pauseStatement: () => CstNode
   declare playStatement: () => CstNode
+  declare beepStatement: () => CstNode
   declare bitwiseNotExpression: () => CstNode
   declare bitwiseAndExpression: () => CstNode
   declare bitwiseOrExpression: () => CstNode
@@ -198,7 +206,8 @@ class FBasicChevrotainParser extends CstParser {
 
     // FunctionCall = (StringFunction | ArithmeticFunction) LParen ExpressionList? RParen
     // Family BASIC arithmetic functions: ABS, SGN, RND, VAL
-    // String functions: LEN, LEFT$, RIGHT$, MID$, STR$, HEX$, CHR$, ASC
+    // String functions: LEN, LEFT$, RIGHT$, MID$, STR$, HEX$, CHR$, ASC, SCR$
+    // Cursor functions: POS(n)
     this.functionCall = this.RULE('functionCall', () => {
       this.OR([
         // String functions
@@ -210,6 +219,7 @@ class FBasicChevrotainParser extends CstParser {
         { ALT: () => this.CONSUME(Hex) },
         { ALT: () => this.CONSUME(Chr) },
         { ALT: () => this.CONSUME(Asc) },
+        { ALT: () => this.CONSUME(Scr) }, // SCR$(X, Y, Sw) - screen read function
         // Arithmetic functions (Family BASIC only supports these)
         { ALT: () => this.CONSUME(Abs) },
         { ALT: () => this.CONSUME(Sgn) },
@@ -222,6 +232,8 @@ class FBasicChevrotainParser extends CstParser {
         { ALT: () => this.CONSUME(Move) }, // MOVE(n) - status query function
         { ALT: () => this.CONSUME(Xpos) },
         { ALT: () => this.CONSUME(Ypos) },
+        // Cursor position function
+        { ALT: () => this.CONSUME(Pos) }, // POS(n) - cursor column
       ])
       this.CONSUME(LParen)
       this.OPTION(() => {
@@ -249,11 +261,17 @@ class FBasicChevrotainParser extends CstParser {
         { ALT: () => this.CONSUME(NumberLiteral) },
         { ALT: () => this.CONSUME(HexLiteral) },
         {
+          // CSRLIN - cursor line function (no parentheses, returns value directly)
+          GATE: () => this.LA(1).tokenType === Csrlin,
+          ALT: () => this.CONSUME(Csrlin),
+        },
+        {
           // Function call: String functions, arithmetic functions, controller input functions, and sprite query functions
           // Family BASIC arithmetic functions: ABS, SGN, RND, VAL
-          // String functions: LEN, LEFT$, RIGHT$, MID$, STR$, HEX$, CHR$, ASC
+          // String functions: LEN, LEFT$, RIGHT$, MID$, STR$, HEX$, CHR$, ASC, SCR$
           // Controller input functions: STICK, STRIG
           // Sprite query functions: MOVE(n), XPOS(n), YPOS(n)
+          // Cursor position function: POS(n)
           GATE: () =>
             this.LA(1).tokenType === Len ||
             this.LA(1).tokenType === Left ||
@@ -263,6 +281,7 @@ class FBasicChevrotainParser extends CstParser {
             this.LA(1).tokenType === Hex ||
             this.LA(1).tokenType === Chr ||
             this.LA(1).tokenType === Asc ||
+            this.LA(1).tokenType === Scr ||
             this.LA(1).tokenType === Abs ||
             this.LA(1).tokenType === Sgn ||
             this.LA(1).tokenType === Rnd ||
@@ -271,7 +290,8 @@ class FBasicChevrotainParser extends CstParser {
             this.LA(1).tokenType === Strig ||
             (this.LA(1).tokenType === Move && this.LA(2).tokenType === LParen) ||
             this.LA(1).tokenType === Xpos ||
-            this.LA(1).tokenType === Ypos,
+            this.LA(1).tokenType === Ypos ||
+            this.LA(1).tokenType === Pos,
           ALT: () => this.SUBRULE(this.functionCall),
         },
         {
@@ -517,6 +537,12 @@ class FBasicChevrotainParser extends CstParser {
     this.playStatement = this.RULE('playStatement', () => {
       this.CONSUME(Play)
       this.SUBRULE(this.expression) // String expression with music data
+    })
+
+    // BEEP
+    // Outputs a 'beep' type of sound
+    this.beepStatement = this.RULE('beepStatement', () => {
+      this.CONSUME(Beep)
     })
 
     // GOTO NumberLiteral
@@ -1075,6 +1101,10 @@ class FBasicChevrotainParser extends CstParser {
         {
           GATE: () => this.LA(1).tokenType === Play,
           ALT: () => this.SUBRULE(this.playStatement),
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Beep,
+          ALT: () => this.SUBRULE(this.beepStatement),
         },
         {
           GATE: () => this.LA(1).tokenType === Dim,

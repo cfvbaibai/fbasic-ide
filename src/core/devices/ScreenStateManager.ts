@@ -53,6 +53,30 @@ export class ScreenStateManager {
   }
 
   /**
+   * Get screen cell at position (x, y)
+   * Returns character or color pattern based on colorSwitch
+   * @param x - Column (0-27)
+   * @param y - Row (0-23)
+   * @param colorSwitch - 0 for character (default), 1 for color pattern
+   * @returns Character string or color pattern number (0-3)
+   */
+  getScreenCell(x: number, y: number, colorSwitch = 0): string | number {
+    // Clamp coordinates to valid range
+    x = Math.max(0, Math.min(27, x))
+    y = Math.max(0, Math.min(23, y))
+
+    const cell = this.screenBuffer[y]?.[x]
+    if (!cell) {
+      return colorSwitch === 1 ? 0 : ' '
+    }
+
+    if (colorSwitch === 1) {
+      return cell.colorPattern
+    }
+    return cell.character
+  }
+
+  /**
    * Set cursor position
    */
   setCursorPosition(x: number, y: number): void {

@@ -7,6 +7,7 @@
 
 import type { CstNode } from 'chevrotain'
 
+import type { BasicDeviceAdapter } from '@/core/interfaces'
 import { getCstNodes, getFirstCstNode, getFirstToken } from '@/core/parser/cst-helpers'
 import type { ExecutionContext } from '@/core/state/ExecutionContext'
 import { getCharacterByCode } from '@/shared/utils/backgroundLookup'
@@ -33,14 +34,16 @@ function toNumber(value: number | string | boolean | undefined): number {
  * Function Evaluator
  *
  * Evaluates all BASIC functions: string functions, arithmetic functions, and controller input functions
- * String functions: LEN, LEFT$, RIGHT$, MID$, STR$, HEX$, CHR$, ASC
+ * String functions: LEN, LEFT$, RIGHT$, MID$, STR$, HEX$, CHR$, ASC, SCR$
  * Arithmetic functions: ABS, SGN, RND, VAL
  * Controller input functions: STICK, STRIG
+ * Cursor functions: POS
  */
 export class FunctionEvaluator {
   constructor(
     private context: ExecutionContext,
-    private evaluateExpression: (exprCst: CstNode) => number | string
+    private evaluateExpression: (exprCst: CstNode) => number | string,
+    private deviceAdapter?: BasicDeviceAdapter
   ) {}
 
   /**
@@ -59,6 +62,7 @@ export class FunctionEvaluator {
     const hexToken = getFirstToken(cst.children.Hex)
     const chrToken = getFirstToken(cst.children.Chr)
     const ascToken = getFirstToken(cst.children.Asc)
+    const scrToken = getFirstToken(cst.children.Scr)
     const absToken = getFirstToken(cst.children.Abs)
     const sgnToken = getFirstToken(cst.children.Sgn)
     const rndToken = getFirstToken(cst.children.Rnd)
@@ -68,6 +72,7 @@ export class FunctionEvaluator {
     const moveToken = getFirstToken(cst.children.Move)
     const xposToken = getFirstToken(cst.children.Xpos)
     const yposToken = getFirstToken(cst.children.Ypos)
+    const posToken = getFirstToken(cst.children.Pos)
 
     // Get arguments
     const expressionListCst = getFirstCstNode(cst.children.expressionList)
@@ -105,6 +110,9 @@ export class FunctionEvaluator {
     if (ascToken) {
       return this.evaluateAsc(args)
     }
+    if (scrToken) {
+      return this.evaluateScr(args)
+    }
 
     // Arithmetic functions
     if (absToken) {
@@ -126,6 +134,11 @@ export class FunctionEvaluator {
     }
     if (strigToken) {
       return this.evaluateStrig(args)
+    }
+
+    // Cursor position functions
+    if (posToken) {
+      return this.evaluatePos(args)
     }
 
     // Sprite query functions
@@ -534,7 +547,7 @@ export class FunctionEvaluator {
    * YPOS(n) - returns current Y position
    * n: action number (0-7)
    * Returns: Y coordinate (0-255) or 0 if no movement/position set
-   * 
+   *
    * Position is cached in WebWorkerDeviceAdapter, synced from Konva nodes in frontend.
    */
   private evaluateYpos(args: Array<number | string>): number {
@@ -547,5 +560,65 @@ export class FunctionEvaluator {
     }
     const position = this.context.getSpritePosition(actionNumber)
     return position?.y ?? 0
+  }
+
+  // ============================================================================
+  // Cursor Position Functions
+  // ============================================================================
+
+  /**
+   * POS(n) - returns current cursor column (X position)
+   * n: dummy argument (ignored)
+   * Returns: X coordinate (0-27)
+   * Reference: F-BASIC Manual page 85
+   */
+  private evaluatePos(args: Array<number | string>): number {
+    if (args.length !== 1) {
+      throw new Error('POS function requires exactly 1 argument')
+    }
+    // The argument is a dummy value (typically 0) and is ignored
+    if (!this.deviceAdapter) {
+      return 0
+    }
+    const position = this.deviceAdapter.getCursorPosition()
+    return position.x
+  }
+
+  // ============================================================================
+  // Screen Read Function
+  // ============================================================================
+
+  /**
+   * SCR$(X, Y, Sw) - reads character or color from screen at position
+   * X: horizontal column (0-27)
+   * Y: vertical row (0-23)
+   * Sw: color switch (0 = character, 1 = color pattern), optional, default 0
+   * Returns: character string (Sw=0) or color pattern number 0-3 (Sw=1)
+   * Reference: F-BASIC Manual page 87
+   */
+  private evaluateScr(args: Array<number | string>): string | number {
+    if (args.length < 2 || args.length > 3) {
+      throw new Error('SCR$ function requires 2 or 3 arguments')
+    }
+    const x = Math.floor(toNumber(args[0] ?? 0))
+    const y = Math.floor(toNumber(args[1] ?? 0))
+    const colorSwitch = args.length >= 3 ? Math.floor(toNumber(args[2] ?? 0)) : 0
+
+    // Validate ranges
+    if (x < 0 || x > 27) {
+      throw new Error(`SCR$ X coordinate out of range (0-27), got ${x}`)
+    }
+    if (y < 0 || y > 23) {
+      throw new Error(`SCR$ Y coordinate out of range (0-23), got ${y}`)
+    }
+    if (colorSwitch !== 0 && colorSwitch !== 1) {
+      throw new Error(`SCR$ color switch must be 0 or 1, got ${colorSwitch}`)
+    }
+
+    if (!this.deviceAdapter) {
+      return colorSwitch === 1 ? 0 : ' '
+    }
+
+    return this.deviceAdapter.getScreenCell(x, y, colorSwitch)
   }
 }
