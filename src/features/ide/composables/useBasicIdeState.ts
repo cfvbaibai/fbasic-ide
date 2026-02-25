@@ -3,7 +3,7 @@
  * Single source of refs used by screen integration, worker, execution, and editor.
  */
 
-import { type Ref, ref } from 'vue'
+import { type Ref, ref, shallowRef } from 'vue'
 
 import type { BasicVariable } from '@/core/interfaces'
 import type { RequestInputMessage } from '@/core/interfaces'
@@ -58,25 +58,25 @@ export function useBasicIdeState(): BasicIdeState {
     currentSampleType: ref<string | null>(null),
     highlightedCode: ref(''),
 
-    isRunning: ref(false),
+    isRunning: shallowRef(false),
     output: ref<string[]>([]),
     errors: ref<
       Array<{ line: number; message: string; type: string; stack?: string; sourceLine?: string }>
     >([]),
     variables: ref<Record<string, BasicVariable>>({}),
     debugOutput: ref<string>(''),
-    debugMode: ref(false),
+    debugMode: shallowRef(false),
 
     screenBuffer: ref(initializeScreenBuffer()),
-    cursorX: ref(0),
-    cursorY: ref(0),
-    bgPalette: ref(1),
-    backdropColor: ref(0),
-    spritePalette: ref(1),
-    cgenMode: ref(2),
+    cursorX: shallowRef(0),
+    cursorY: shallowRef(0),
+    bgPalette: shallowRef(1),
+    backdropColor: shallowRef(0),
+    spritePalette: shallowRef(1),
+    cgenMode: shallowRef(2),
 
     spriteStates: ref<SpriteState[]>([]),
-    spriteEnabled: ref(false),
+    spriteEnabled: shallowRef(false),
     // movementStates removed - read from shared buffer instead
     movementPositionsFromBuffer: ref<Map<number, { x: number; y: number }>>(new Map()),
     frontSpriteNodes: ref<Map<number, unknown>>(new Map()),

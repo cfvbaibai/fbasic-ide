@@ -1,40 +1,19 @@
-import { onMounted, onUnmounted, type Ref,ref } from 'vue'
+import { useElementSize } from '@vueuse/core'
+import type { MaybeRefOrGetter, Ref } from 'vue'
+import { computed, toValue } from 'vue'
 
 /**
  * Composable to observe container width and determine if it's in compact mode.
- * @param containerRef - Reference to the container element
+ * Uses VueUse's useElementSize for reactive element dimension tracking.
+ *
+ * @param containerRef - Reference to the container element (reactive or getter)
  * @param compactThreshold - Width threshold below which compact mode is enabled (default: 600)
- * @returns isCompact - Ref<boolean> indicating if the container is in compact mode
+ * @returns isCompact - Readonly Ref<boolean> indicating if the container is in compact mode
  */
 export function useContainerWidth(
-  containerRef: Ref<HTMLElement | null>,
-  compactThreshold = 600,
-): Ref<boolean> {
-  const isCompact = ref(false)
-
-  let observer: ResizeObserver | null = null
-
-  const updateCompact = (width: number) => {
-    isCompact.value = width < compactThreshold
-  }
-
-  onMounted(() => {
-    if (containerRef.value) {
-      updateCompact(containerRef.value.offsetWidth)
-
-      observer = new ResizeObserver((entries) => {
-        for (const entry of entries) {
-          updateCompact(entry.contentRect.width)
-        }
-      })
-
-      observer.observe(containerRef.value)
-    }
-  })
-
-  onUnmounted(() => {
-    observer?.disconnect()
-  })
-
-  return isCompact
+  containerRef: MaybeRefOrGetter<HTMLElement | null>,
+  compactThreshold: MaybeRefOrGetter<number> = 600,
+): Readonly<Ref<boolean>> {
+  const { width } = useElementSize(containerRef)
+  return computed(() => toValue(width) < toValue(compactThreshold))
 }

@@ -3,83 +3,43 @@
  *
  * Central state management for the Program Management System.
  * Uses singleton pattern with module-level state (same pattern as useBgEditorState).
+ * Auto-persists to localStorage using VueUse's useLocalStorage.
  */
 
-import { readonly, ref, watch } from 'vue'
+import { useLocalStorage } from '@vueuse/core'
+import { readonly, ref } from 'vue'
 
 import type { ProgramData, ProgramExportFile } from '@/core/interfaces'
 import { createEmptyGrid } from '@/features/bg-editor/composables/useBgGrid'
 import type { BgGridData } from '@/features/bg-editor/types'
 import { compressBg, decompressBg } from '@/features/bg-editor/utils/bgCompression'
-import { isValidProgramFile,loadJsonFile, saveJsonFile } from '@/shared/utils/fileIO'
+import { isValidProgramFile, loadJsonFile, saveJsonFile } from '@/shared/utils/fileIO'
 import { generateProgramId, generateSessionId } from '@/shared/utils/id'
 
 // ============================================================================
 // Module-level Singleton State
 // ============================================================================
 
-/** Current active program */
-const currentProgram = ref<ProgramData | null>(null)
+const STORAGE_KEY = 'program:current'
 
-/** Whether there are unsaved changes */
+/** Current active program - auto-persisted to localStorage */
+const currentProgram = useLocalStorage<ProgramData | null>(STORAGE_KEY, null, {
+  deep: true,
+  serializer: {
+    read: (v: string) => JSON.parse(v),
+    write: (v: ProgramData | null) => JSON.stringify(v),
+  },
+})
+
+/** Whether there are unsaved changes (not persisted) */
 const isDirty = ref(false)
 
 /** Whether the store has been initialized */
 const isInitialized = ref(false)
 
 // ============================================================================
-// Auto-persist to localStorage on program changes
-// ============================================================================
-
-watch(
-  currentProgram,
-  (program) => {
-    if (program) {
-      try {
-        localStorage.setItem(`program:${program.id}`, JSON.stringify(program))
-        localStorage.setItem('program:current', program.id)
-      } catch (error) {
-        console.error('[useProgramStore] Failed to persist program:', error)
-      }
-    }
-  },
-  { deep: true }
-)
-
-// ============================================================================
 // Internal Functions
 // ============================================================================
-
-/**
- * Restore the last active program from localStorage on startup
- */
-function restoreLastProgram(): void {
-  if (isInitialized.value) return
-  isInitialized.value = true
-
-  try {
-    const currentId = localStorage.getItem('program:current')
-    if (!currentId) {
-      // No previous program, create new one
-      newProgram()
-      return
-    }
-
-    const programJson = localStorage.getItem(`program:${currentId}`)
-    if (!programJson) {
-      // Program data missing, create new one
-      newProgram()
-      return
-    }
-
-    const program = JSON.parse(programJson) as ProgramData
-    currentProgram.value = program
-    isDirty.value = false
-  } catch (error) {
-    console.error('[useProgramStore] Failed to restore program:', error)
-    newProgram()
-  }
-}
 
 /**
  * Create a new empty program
@@ -96,6 +56,23 @@ function newProgram(): void {
     updatedAt: now,
   }
   isDirty.value = false
+}
+
+/**
+ * Ensure a program exists - restore from localStorage or create new
+ */
+function ensureProgram(): void {
+  if (isInitialized.value) return
+  isInitialized.value = true
+
+  // If we have a program from localStorage, use it
+  if (currentProgram.value) {
+    isDirty.value = false
+    return
+  }
+
+  // No program found, create new one
+  newProgram()
 }
 
 /**
@@ -215,11 +192,11 @@ function getBg(): BgGridData {
  * - Code and BG data management
  * - Save/Load functionality
  * - Dirty state tracking
- * - Auto-persistence to localStorage
+ * - Auto-persistence to localStorage (via VueUse)
  */
 export function useProgramStore() {
   // Initialize on first use
-  restoreLastProgram()
+  ensureProgram()
 
   return {
     // State (readonly to prevent direct mutation)

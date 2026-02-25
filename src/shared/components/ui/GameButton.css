@@ -1,0 +1,271 @@
+.game-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  min-width: 140px;
+  box-shadow:
+    0 2px 4px var(--base-alpha-gray-00-30),
+    inset 0 1px 0 var(--base-alpha-gray-100-10);
+}
+
+/* Focus styles for accessibility */
+.game-button:focus-visible {
+  outline: 2px solid var(--game-surface-border);
+  outline-offset: 2px;
+}
+
+.game-button:hover:not(.game-button-disabled) {
+  background: var(--game-surface-bg-hover-gradient);
+  border-color: var(--game-surface-border);
+  color: var(--game-text-primary);
+  transform: translateY(-2px);
+  box-shadow:
+    0 4px 8px var(--base-alpha-gray-00-40),
+    0 2px 4px var(--base-alpha-gray-00-40),
+    inset 0 1px 0 var(--base-alpha-gray-100-10);
+}
+
+.game-button:active:not(.game-button-disabled) {
+  transform: translateY(0);
+  box-shadow:
+    0 2px 4px var(--base-alpha-gray-00-30),
+    inset 0 1px 0 var(--base-alpha-gray-100-10);
+}
+
+/* Type variants - All buttons use the same base style, type affects hover/active states */
+.game-button-primary:hover:not(.game-button-disabled) {
+  border-color: var(--game-surface-border);
+  box-shadow:
+    0 4px 8px var(--base-alpha-gray-00-40),
+    0 2px 4px var(--base-alpha-gray-00-40),
+    inset 0 1px 0 var(--base-alpha-gray-100-10);
+}
+
+.game-button-primary:active:not(.game-button-disabled) {
+  background: linear-gradient(135deg, var(--base-solid-primary) 0%, var(--base-solid-primary) 100%);
+  border-color: var(--game-surface-border);
+  color: var(--game-text-contrast);
+  box-shadow:
+    0 0 20px var(--game-accent-glow),
+    0 4px 8px var(--base-alpha-gray-00-40),
+    inset 0 1px 0 var(--base-alpha-gray-100-30);
+}
+
+.game-button-success:hover:not(.game-button-disabled) {
+  border-color: var(--semantic-solid-success);
+  box-shadow:
+    0 4px 8px var(--semantic-alpha-success-40),
+    0 2px 4px var(--base-alpha-gray-00-40),
+    inset 0 1px 0 var(--base-alpha-gray-100-10);
+}
+
+.game-button-success:active:not(.game-button-disabled) {
+  background: linear-gradient(135deg, var(--semantic-solid-success) 0%, var(--semantic-solid-success) 100%);
+  border-color: var(--semantic-solid-success);
+  color: var(--base-solid-gray-100);
+  box-shadow:
+    0 0 12px var(--semantic-alpha-success-50),
+    0 2px 4px var(--base-alpha-gray-00-30),
+    inset 0 1px 0 var(--base-alpha-gray-100-20);
+}
+
+.game-button-warning:hover:not(.game-button-disabled) {
+  border-color: var(--semantic-solid-warning);
+  box-shadow:
+    0 4px 8px var(--semantic-alpha-warning-40),
+    0 2px 4px var(--base-alpha-gray-00-40),
+    inset 0 1px 0 var(--base-alpha-gray-100-10);
+}
+
+.game-button-warning:active:not(.game-button-disabled) {
+  background: linear-gradient(135deg, var(--semantic-solid-warning) 0%, var(--semantic-solid-warning) 100%);
+  border-color: var(--semantic-solid-warning);
+  color: var(--base-solid-gray-100);
+  box-shadow:
+    0 0 12px var(--semantic-alpha-warning-50),
+    0 2px 4px var(--base-alpha-gray-00-30),
+    inset 0 1px 0 var(--base-alpha-gray-100-20);
+}
+
+.game-button-danger:hover:not(.game-button-disabled) {
+  border-color: var(--semantic-solid-danger);
+  box-shadow:
+    0 4px 8px var(--semantic-alpha-danger-40),
+    0 2px 4px var(--base-alpha-gray-00-40),
+    inset 0 1px 0 var(--base-alpha-gray-100-10);
+}
+
+.game-button-danger:active:not(.game-button-disabled) {
+  background: linear-gradient(135deg, var(--semantic-solid-danger) 0%, var(--semantic-solid-danger) 100%);
+  border-color: var(--semantic-solid-danger);
+  color: var(--base-solid-gray-100);
+  box-shadow:
+    0 0 12px var(--semantic-alpha-danger-50),
+    0 2px 4px var(--base-alpha-gray-00-30),
+    inset 0 1px 0 var(--base-alpha-gray-100-20);
+}
+
+.game-button-info:hover:not(.game-button-disabled) {
+  border-color: var(--semantic-solid-info);
+  box-shadow:
+    0 4px 8px var(--semantic-alpha-info-40),
+    0 2px 4px var(--base-alpha-gray-00-40),
+    inset 0 1px 0 var(--base-alpha-gray-100-10);
+}
+
+.game-button-info:active:not(.game-button-disabled) {
+  background: linear-gradient(135deg, var(--semantic-solid-info) 0%, var(--semantic-solid-info) 100%);
+  border-color: var(--semantic-solid-info);
+  color: var(--base-solid-gray-100);
+  box-shadow:
+    0 0 12px var(--semantic-alpha-info-50),
+    0 2px 4px var(--base-alpha-gray-00-30),
+    inset 0 1px 0 var(--base-alpha-gray-100-20);
+}
+
+/* Toggle variant - more compact, designed for selection groups */
+.game-button-toggle {
+  min-width: auto;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+.game-button-toggle.game-button-small {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+}
+
+.game-button-toggle.game-button-large {
+  padding: 0.625rem 1.25rem;
+  font-size: 1rem;
+}
+
+/* Selected state - persistent highlight for toggle buttons */
+.game-button-toggle.game-button-selected {
+  background: linear-gradient(135deg, var(--base-solid-primary) 0%, var(--base-solid-primary) 100%);
+  border-color: var(--game-surface-border);
+  color: var(--game-text-contrast);
+  box-shadow:
+    0 0 20px var(--game-accent-glow),
+    0 4px 8px var(--base-alpha-gray-00-40),
+    inset 0 1px 0 var(--base-alpha-gray-100-30);
+}
+
+.game-button-toggle.game-button-selected:hover:not(.game-button-disabled) {
+  background: linear-gradient(135deg, var(--base-solid-primary) 0%, var(--base-solid-primary) 100%);
+  border-color: var(--game-surface-border);
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 24px var(--game-accent-glow),
+    0 6px 12px var(--base-alpha-gray-00-50),
+    inset 0 1px 0 var(--base-alpha-gray-100-30);
+}
+
+.game-button-toggle.game-button-selected:active:not(.game-button-disabled) {
+  transform: translateY(0);
+  box-shadow:
+    0 0 20px var(--game-accent-glow),
+    0 4px 8px var(--base-alpha-gray-00-40),
+    inset 0 1px 0 var(--base-alpha-gray-100-30);
+}
+
+/* Action buttons with selected state (for backward compatibility) */
+.game-button-action.game-button-selected {
+  background: linear-gradient(135deg, var(--base-solid-primary) 0%, var(--base-solid-primary) 100%);
+  border-color: var(--game-surface-border);
+  color: var(--game-text-contrast);
+  box-shadow:
+    0 0 20px var(--game-accent-glow),
+    0 4px 8px var(--base-alpha-gray-00-40),
+    inset 0 1px 0 var(--base-alpha-gray-100-30);
+}
+
+.game-button-action.game-button-selected:hover:not(.game-button-disabled) {
+  background: linear-gradient(135deg, var(--base-solid-primary) 0%, var(--base-solid-primary) 100%);
+  border-color: var(--game-surface-border);
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 24px var(--game-accent-glow),
+    0 6px 12px var(--base-alpha-gray-00-50),
+    inset 0 1px 0 var(--base-alpha-gray-100-30);
+}
+
+.game-button-action.game-button-selected:active:not(.game-button-disabled) {
+  transform: translateY(0);
+  box-shadow:
+    0 0 20px var(--game-accent-glow),
+    0 4px 8px var(--base-alpha-gray-00-40),
+    inset 0 1px 0 var(--base-alpha-gray-100-30);
+}
+
+/* Size variants */
+.game-button-small {
+  padding: 0.625rem 1rem;
+  font-size: 0.8rem;
+  gap: 0.5rem;
+  min-width: 120px;
+}
+
+.game-button-large {
+  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
+  gap: 0.875rem;
+  min-width: 160px;
+}
+
+/* Disabled state */
+.game-button-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.game-button-disabled:hover {
+  box-shadow:
+    0 2px 4px var(--base-alpha-gray-00-30),
+    inset 0 1px 0 var(--base-alpha-gray-100-10) !important;
+}
+
+/* Loading state */
+.game-button-loading {
+  cursor: wait;
+}
+
+.game-button-spinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-button-content {
+  display: inline-flex;
+  align-items: center;
+}
+
+.game-button-icon-left {
+  margin-right: 0;
+}
+
+.game-button-icon-right {
+  margin-left: 0;
+}
+
+/* Ensure icons in buttons are properly sized */
+.game-button .game-icon svg,
+.game-button svg.game-icon {
+  width: 1em !important;
+  height: 1em !important;
+  font-size: inherit;
+}
