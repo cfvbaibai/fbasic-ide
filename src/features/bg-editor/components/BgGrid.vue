@@ -7,7 +7,8 @@
  * - Top layer: Hover highlight (redrawn on mouse move)
  */
 
-import { computed, nextTick, onMounted, reactive, ref, useTemplateRef, watch } from 'vue'
+import { useMouseInElement } from '@vueuse/core'
+import { computed, nextTick, onMounted, shallowRef, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { GameBlock, GameIconButton, GameSelect } from '@/shared/components/ui'
@@ -46,16 +47,33 @@ const gridCanvasRef = useTemplateRef<HTMLCanvasElement>('gridCanvasRef')
 const hoverCanvasRef = useTemplateRef<HTMLCanvasElement>('hoverCanvasRef')
 
 /** Current scale */
-const currentScale = ref(DEFAULT_RENDER_SCALE)
+const currentScale = shallowRef(DEFAULT_RENDER_SCALE)
 
 /** Computed canvas dimensions based on scale */
 const canvasDimensions = computed(() => getCanvasDimensions(currentScale.value))
 
-/** Grid cursor position for highlighting */
-const hoverPosition = reactive({ x: -1, y: -1 })
+/** Mouse tracking with VueUse */
+const { elementX, elementY, elementWidth, elementHeight, isOutside } = useMouseInElement(hoverCanvasRef)
 
 /** Show grid lines toggle */
-const showGridLines = ref(false)
+const showGridLines = shallowRef(false)
+
+/** Computed grid cell position from mouse position */
+const hoverCellX = computed(() => {
+  if (isOutside.value || !hoverCanvasRef.value || elementWidth.value === 0) return -1
+  const scaledCellSize = getScaledCellSize(currentScale.value)
+  const scaleX = hoverCanvasRef.value.width / elementWidth.value
+  const x = Math.floor((elementX.value * scaleX) / scaledCellSize)
+  return (x >= 0 && x < BG_GRID.COLS) ? x : -1
+})
+
+const hoverCellY = computed(() => {
+  if (isOutside.value || !hoverCanvasRef.value || elementHeight.value === 0) return -1
+  const scaledCellSize = getScaledCellSize(currentScale.value)
+  const scaleY = hoverCanvasRef.value.height / elementHeight.value
+  const y = Math.floor((elementY.value * scaleY) / scaledCellSize)
+  return (y >= 0 && y < BG_GRID.ROWS) ? y : -1
+})
 
 /** Cached preview canvas for CHAR mode hover (recreated when selection/scale changes) */
 let cachedPreviewCanvas: HTMLCanvasElement | null = null
@@ -116,57 +134,12 @@ function handleClear(): void {
 }
 
 /**
- * Handle canvas click
+ * Handle canvas click - uses computed hover cell position
  */
-function onClick(event: MouseEvent): void {
-  const pos = getGridPosition(event)
-  if (pos) {
-    handleCellClick(pos.x, pos.y)
+function onClick(): void {
+  if (hoverCellX.value >= 0 && hoverCellY.value >= 0) {
+    handleCellClick(hoverCellX.value, hoverCellY.value)
   }
-}
-
-/**
- * Handle mouse move for hover effect
- */
-function onMouseMove(event: MouseEvent): void {
-  const pos = getGridPosition(event)
-  if (pos) {
-    if (hoverPosition.x !== pos.x || hoverPosition.y !== pos.y) {
-      hoverPosition.x = pos.x
-      hoverPosition.y = pos.y
-      renderHover()
-    }
-  }
-}
-
-/**
- * Handle mouse leave
- */
-function onMouseLeave(): void {
-  hoverPosition.x = -1
-  hoverPosition.y = -1
-  renderHover()
-}
-
-/**
- * Get canvas position from mouse event
- */
-function getGridPosition(event: MouseEvent): { x: number; y: number } | null {
-  const canvas = hoverCanvasRef.value
-  if (!canvas) return null
-
-  const scaledCellSize = getScaledCellSize(currentScale.value)
-  const rect = canvas.getBoundingClientRect()
-  const scaleX = canvas.width / rect.width
-  const scaleY = canvas.height / rect.height
-
-  const x = Math.floor(((event.clientX - rect.left) * scaleX) / scaledCellSize)
-  const y = Math.floor(((event.clientY - rect.top) * scaleY) / scaledCellSize)
-
-  if (x >= 0 && x < BG_GRID.COLS && y >= 0 && y < BG_GRID.ROWS) {
-    return { x, y }
-  }
-  return null
 }
 
 /**
@@ -196,9 +169,11 @@ function renderHover(): void {
   ctx.clearRect(0, 0, canvas.width, canvas.height)
 
   // Draw hover highlight if mouse is over a cell
-  if (hoverPosition.x >= 0 && hoverPosition.y >= 0) {
-    const hx = hoverPosition.x * scaledCellSize
-    const hy = hoverPosition.y * scaledCellSize
+  const cellX = hoverCellX.value
+  const cellY = hoverCellY.value
+  if (cellX >= 0 && cellY >= 0) {
+    const hx = cellX * scaledCellSize
+    const hy = cellY * scaledCellSize
 
     // In CHAR mode, show preview of selected item
     if (mode.value === BG_EDITOR_MODES.CHAR) {
@@ -236,6 +211,11 @@ watch(grid, () => {
 // Re-render grid when grid lines toggle changes
 watch(showGridLines, () => {
   renderGrid()
+})
+
+// Re-render hover when mouse moves to a new cell
+watch([hoverCellX, hoverCellY], () => {
+  renderHover()
 })
 
 // Re-render hover when selected item changes (for CHAR mode preview)
@@ -301,7 +281,7 @@ onMounted(() => {
         />
       </div>
     </template>
-    <div class="bg-grid-container">
+    <div class="bg-grid-container bg-chessboard">
       <!-- Double-layer canvas for performance -->
       <div class="canvas-wrapper">
         <canvas
@@ -316,8 +296,6 @@ onMounted(() => {
           :width="canvasDimensions.width"
           :height="canvasDimensions.height"
           @click="onClick"
-          @mousemove="onMouseMove"
-          @mouseleave="onMouseLeave"
         />
       </div>
 
@@ -372,11 +350,6 @@ onMounted(() => {
 
 .canvas-wrapper {
   position: relative;
-  border: 4px solid var(--game-surface-border);
-  border-radius: 4px;
-  box-shadow:
-    0 0 20px var(--base-alpha-gray-00-80),
-    inset 0 0 20px var(--base-alpha-primary-10);
 }
 
 .bg-grid-canvas {
@@ -394,7 +367,7 @@ onMounted(() => {
   position: absolute;
   top: 0;
   left: 0;
-  cursor: cell;
+  cursor: none;
 
   /* Pointer events only on hover layer */
 }

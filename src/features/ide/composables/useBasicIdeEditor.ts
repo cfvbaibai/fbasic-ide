@@ -6,6 +6,7 @@ import type { HighlighterInfo, ParserInfo } from '@/core/interfaces'
 import { FBasicParser } from '@/core/parser/FBasicParser'
 import { getSampleBgData, hasSampleBgData } from '@/core/samples/sampleBgData'
 import { getSampleCode, getSampleCodeKeys, type SampleCode } from '@/core/samples/sampleCodes'
+import { createEmptyGrid } from '@/features/bg-editor/composables/useBgGrid'
 import { logComposable } from '@/shared/logger'
 
 import type { BasicIdeState } from './useBasicIdeState'
@@ -15,7 +16,7 @@ export interface BasicIdeEditor {
   updateHighlighting: () => Promise<void>
   parseCode: () => Promise<unknown>
   validateCode: () => Promise<boolean>
-  loadSampleCode: (sampleType: string) => void
+  loadSampleCode: (sampleType: string) => boolean
   sampleSelectOptions: Array<{ value: string; label: string }>
   getParserCapabilities: () => ParserInfo
   getHighlighterCapabilities: () => HighlighterInfo
@@ -63,8 +64,8 @@ export function useBasicIdeEditor(state: BasicIdeState): BasicIdeEditor {
     return cst !== null
   }
 
-  const loadSampleCode = (sampleType: string) => {
-    if (!sampleType) return
+  const loadSampleCode = (sampleType: string): boolean => {
+    if (!sampleType) return false
     const sample = getSampleCode(sampleType)
     if (sample) {
       // Load code into IDE state (triggers sync to program store via watch)
@@ -73,13 +74,20 @@ export function useBasicIdeEditor(state: BasicIdeState): BasicIdeEditor {
 
       // Load BG data into program store if sample has associated BG
       const programStore = useProgramStore()
-      if (hasSampleBgData(sampleType)) {
-        const bgData = getSampleBgData(sampleType)
+      const bgKey = sample.bgKey
+      const hasBg = bgKey ? hasSampleBgData(bgKey) : false
+      if (hasBg && bgKey) {
+        const bgData = getSampleBgData(bgKey)
         programStore.setBg(bgData)
+      } else {
+        // Clear BG data when sample has no associated BG
+        programStore.setBg(createEmptyGrid())
       }
 
       void updateHighlighting()
+      return hasBg
     }
+    return false
   }
 
   const sampleSelectOptions = getSampleCodeKeys().map(key => {

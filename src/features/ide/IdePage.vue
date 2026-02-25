@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, useTemplateRef } from 'vue'
+import { computed, onMounted, ref, shallowRef, useTemplateRef } from 'vue'
 
 import type { HighlighterInfo, ParserInfo } from '@/core/interfaces'
 import { GameLayout } from '@/shared/components/ui'
@@ -61,9 +61,9 @@ const {
 } = useBasicIdeEnhanced()
 
 // UI state
-const sampleSelectorOpen = ref(false)
-const editorView = ref<'code' | 'bg'>('code')
-const logLevelPanelOpen = ref(false)
+const sampleSelectorOpen = shallowRef(false)
+const editorView = shallowRef<'code' | 'bg'>('code')
+const logLevelPanelOpen = shallowRef(false)
 
 // Responsive toolbar - observe editor panel which expands with screen
 const editorPanelRef = useTemplateRef<HTMLDivElement>('editorPanelRef')
@@ -103,6 +103,16 @@ function handleInputResponse(
   cancelled: boolean,
 ) {
   respondToInputRequest(requestId, values.map(String), cancelled)
+}
+
+// Handle sample selection with view switching
+function handleLoadSample(sampleType: string) {
+  const hasBg = loadSampleCode(sampleType)
+  sampleSelectorOpen.value = false
+  // Switch to code view if sample has no BG data and currently viewing bg-editor
+  if (!hasBg && editorView.value === 'bg') {
+    editorView.value = 'code'
+  }
 }
 
 // Computed properties for backward compatibility
@@ -186,7 +196,7 @@ onMounted(() => {
         <!-- Sample Selector -->
         <SampleSelector
           v-if="sampleSelectorOpen"
-          @select="loadSampleCode($event); sampleSelectorOpen = false"
+          @select="handleLoadSample"
           @close="sampleSelectorOpen = false"
         />
       </Teleport>
