@@ -54,6 +54,22 @@ import {
   Cut,
   Era,
   Position,
+  // REPL-only commands
+  List,
+  New,
+  Run,
+  Save,
+  Load,
+  Key,
+  Keylist,
+  Cont,
+  System,
+  // Limited utility commands
+  Poke,
+  Peek,
+  Fre,
+  Inkey,
+  Stop,
   // String functions
   Len,
   Left,
@@ -104,6 +120,7 @@ import {
   Colon,
   LParen,
   RParen,
+  Question,
   // Literals
   StringLiteral,
   HexLiteral,
@@ -176,6 +193,22 @@ class FBasicChevrotainParser extends CstParser {
   declare cutStatement: () => CstNode
   declare eraStatement: () => CstNode
   declare positionStatement: () => CstNode
+  // REPL-only command rules
+  declare listStatement: () => CstNode
+  declare newStatement: () => CstNode
+  declare runStatement: () => CstNode
+  declare saveStatement: () => CstNode
+  declare loadStatement: () => CstNode
+  declare keyStatement: () => CstNode
+  declare keylistStatement: () => CstNode
+  declare contStatement: () => CstNode
+  declare systemStatement: () => CstNode
+  // Limited utility command rules
+  declare pokeStatement: () => CstNode
+  declare peekStatement: () => CstNode
+  declare freStatement: () => CstNode
+  declare inkeyStatement: () => CstNode
+  declare stopStatement: () => CstNode
   declare arrayDeclaration: () => CstNode
   declare dimensionList: () => CstNode
   declare expressionList: () => CstNode
@@ -234,6 +267,9 @@ class FBasicChevrotainParser extends CstParser {
         { ALT: () => this.CONSUME(Ypos) },
         // Cursor position function
         { ALT: () => this.CONSUME(Pos) }, // POS(n) - cursor column
+        // Limited utility functions (not applicable in IDE)
+        { ALT: () => this.CONSUME(Peek) },
+        { ALT: () => this.CONSUME(Fre) },
       ])
       this.CONSUME(LParen)
       this.OPTION(() => {
@@ -272,6 +308,7 @@ class FBasicChevrotainParser extends CstParser {
           // Controller input functions: STICK, STRIG
           // Sprite query functions: MOVE(n), XPOS(n), YPOS(n)
           // Cursor position function: POS(n)
+          // Limited utility functions: PEEK(n), FRE(n)
           GATE: () =>
             this.LA(1).tokenType === Len ||
             this.LA(1).tokenType === Left ||
@@ -291,8 +328,15 @@ class FBasicChevrotainParser extends CstParser {
             (this.LA(1).tokenType === Move && this.LA(2).tokenType === LParen) ||
             this.LA(1).tokenType === Xpos ||
             this.LA(1).tokenType === Ypos ||
-            this.LA(1).tokenType === Pos,
+            this.LA(1).tokenType === Pos ||
+            this.LA(1).tokenType === Peek ||
+            this.LA(1).tokenType === Fre,
           ALT: () => this.SUBRULE(this.functionCall),
+        },
+        {
+          // INKEY$ - zero-argument function (not applicable in IDE)
+          GATE: () => this.LA(1).tokenType === Inkey,
+          ALT: () => this.CONSUME(Inkey),
         },
         {
           // Array access: Identifier LParen ExpressionList RParen
@@ -1013,6 +1057,115 @@ class FBasicChevrotainParser extends CstParser {
       this.SUBRULE3(this.expression, { LABEL: 'y' }) // Y
     })
 
+    // ============================================================================
+    // REPL-ONLY COMMANDS - Parse but report error
+    // These commands are recognized but not applicable for IDE version
+    // ============================================================================
+
+    // LIST - Lists program (REPL-only)
+    this.listStatement = this.RULE('listStatement', () => {
+      this.CONSUME(List)
+      // Optional line range: LIST or LIST 10-100
+      this.OPTION(() => {
+        this.CONSUME(NumberLiteral)
+        this.OPTION2(() => {
+          this.CONSUME(Minus)
+          this.CONSUME2(NumberLiteral)
+        })
+      })
+    })
+
+    // NEW - Erase program (REPL-only)
+    this.newStatement = this.RULE('newStatement', () => {
+      this.CONSUME(New)
+    })
+
+    // RUN - Execute program (REPL-only)
+    this.runStatement = this.RULE('runStatement', () => {
+      this.CONSUME(Run)
+    })
+
+    // SAVE - Save to tape (REPL-only)
+    this.saveStatement = this.RULE('saveStatement', () => {
+      this.CONSUME(Save)
+    })
+
+    // LOAD [?] - Load from tape or verify (REPL-only)
+    this.loadStatement = this.RULE('loadStatement', () => {
+      this.CONSUME(Load)
+      // Optional ? for verify mode
+      this.OPTION(() => {
+        this.CONSUME(Question)
+      })
+    })
+
+    // KEY - Define function keys (REPL-only)
+    this.keyStatement = this.RULE('keyStatement', () => {
+      this.CONSUME(Key)
+      // Optional parameters
+      this.OPTION(() => {
+        this.SUBRULE(this.expression)
+        this.OPTION2(() => {
+          this.CONSUME(Comma)
+          this.CONSUME(StringLiteral)
+        })
+      })
+    })
+
+    // KEYLIST - List function keys (REPL-only)
+    this.keylistStatement = this.RULE('keylistStatement', () => {
+      this.CONSUME(Keylist)
+    })
+
+    // CONT - Continue after STOP (REPL-only)
+    this.contStatement = this.RULE('contStatement', () => {
+      this.CONSUME(Cont)
+    })
+
+    // SYSTEM - Exit to system (REPL-only)
+    this.systemStatement = this.RULE('systemStatement', () => {
+      this.CONSUME(System)
+    })
+
+    // ============================================================================
+    // LIMITED UTILITY COMMANDS - Parse but report error
+    // These commands have limited applicability in IDE version
+    // ============================================================================
+
+    // POKE address, value - Write to memory (not applicable in emulator)
+    this.pokeStatement = this.RULE('pokeStatement', () => {
+      this.CONSUME(Poke)
+      this.SUBRULE(this.expression) // address
+      this.CONSUME(Comma)
+      this.SUBRULE2(this.expression) // value
+    })
+
+    // PEEK(address) - Read from memory (returns as function in primary)
+    this.peekStatement = this.RULE('peekStatement', () => {
+      this.CONSUME(Peek)
+      this.CONSUME(LParen)
+      this.SUBRULE(this.expression)
+      this.CONSUME(RParen)
+    })
+
+    // FRE(n) - Free memory (not meaningful in emulator)
+    this.freStatement = this.RULE('freStatement', () => {
+      this.CONSUME(Fre)
+      this.CONSUME(LParen)
+      this.SUBRULE(this.expression)
+      this.CONSUME(RParen)
+    })
+
+    // INKEY$ - Immediate keypress (not applicable for IDE)
+    this.inkeyStatement = this.RULE('inkeyStatement', () => {
+      this.CONSUME(Inkey)
+    })
+
+    // STOP - Pause execution (limited utility)
+    this.stopStatement = this.RULE('stopStatement', () => {
+      this.CONSUME(Stop)
+    })
+
     // IF LogicalExpression THEN (CommandList | NumberLiteral)
     // IF LogicalExpression GOTO NumberLiteral
     // Executes the commands after THEN or jumps to line number if condition is true
@@ -1199,6 +1352,64 @@ class FBasicChevrotainParser extends CstParser {
           GATE: () => this.LA(1).tokenType === Sprite,
           ALT: () => this.SUBRULE(this.spriteStatement),
         },
+        // REPL-only commands (parsed but produce error)
+        {
+          GATE: () => this.LA(1).tokenType === List,
+          ALT: () => this.SUBRULE(this.listStatement),
+        },
+        {
+          GATE: () => this.LA(1).tokenType === New,
+          ALT: () => this.SUBRULE(this.newStatement),
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Run,
+          ALT: () => this.SUBRULE(this.runStatement),
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Save,
+          ALT: () => this.SUBRULE(this.saveStatement),
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Load,
+          ALT: () => this.SUBRULE(this.loadStatement),
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Key,
+          ALT: () => this.SUBRULE(this.keyStatement),
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Keylist,
+          ALT: () => this.SUBRULE(this.keylistStatement),
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Cont,
+          ALT: () => this.SUBRULE(this.contStatement),
+        },
+        {
+          GATE: () => this.LA(1).tokenType === System,
+          ALT: () => this.SUBRULE(this.systemStatement),
+        },
+        // Limited utility commands (parsed but produce error)
+        {
+          GATE: () => this.LA(1).tokenType === Poke,
+          ALT: () => this.SUBRULE(this.pokeStatement),
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Peek,
+          ALT: () => this.SUBRULE(this.peekStatement),
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Fre,
+          ALT: () => this.SUBRULE(this.freStatement),
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Inkey,
+          ALT: () => this.SUBRULE(this.inkeyStatement),
+        },
+        {
+          GATE: () => this.LA(1).tokenType === Stop,
+          ALT: () => this.SUBRULE(this.stopStatement),
+        },
         { ALT: () => this.SUBRULE(this.letStatement) }, // Must be last since it can start with Identifier
       ])
     })
@@ -1236,6 +1447,121 @@ class FBasicChevrotainParser extends CstParser {
 
 // Create parser instance
 const parserInstance = new FBasicChevrotainParser()
+
+// ============================================================================
+// REPL-ONLY COMMAND VALIDATION
+// ============================================================================
+
+/**
+ * Map of REPL-only command names to their error messages
+ */
+const REPL_ONLY_COMMANDS: Record<string, string> = {
+  listStatement: 'LIST: Not applicable for IDE version',
+  newStatement: 'NEW: Not applicable for IDE version',
+  runStatement: 'RUN: Not applicable for IDE version - use the Run button instead',
+  saveStatement: 'SAVE: Not applicable for IDE version - use Export instead',
+  loadStatement: 'LOAD: Not applicable for IDE version - use Import instead',
+  keyStatement: 'KEY: Not applicable for IDE version',
+  keylistStatement: 'KEYLIST: Not applicable for IDE version',
+  contStatement: 'CONT: Not applicable for IDE version',
+  systemStatement: 'SYSTEM: Not applicable for IDE version',
+  pokeStatement: 'POKE: Not applicable for IDE version',
+  stopStatement: 'STOP: Not applicable for IDE version',
+}
+
+/**
+ * Map of REPL-only function token types to their error messages
+ * These are functions used in expressions (not statements)
+ */
+const REPL_ONLY_FUNCTIONS: Record<string, string> = {
+  Peek: 'PEEK: Not applicable for IDE version',
+  Fre: 'FRE: Not applicable for IDE version',
+  Inkey: 'INKEY$: Not applicable for IDE version',
+}
+
+/**
+ * Check CST for REPL-only commands and functions, return error messages
+ */
+function checkReplOnlyCommands(cst: CstNode): Array<{ message: string; line?: number; column?: number }> {
+  const errors: Array<{ message: string; line?: number; column?: number }> = []
+  const seenErrors = new Set<string>() // Avoid duplicate errors
+
+  function traverse(node: CstNode | unknown, lineNumber?: number) {
+    if (!node || typeof node !== 'object') return
+
+    // Check if this is a CST node
+    const cstNode = node as CstNode
+    if (!('name' in cstNode) || !cstNode.children) {
+      return
+    }
+
+    // Check if this node is a REPL-only statement
+    const errorMsg = REPL_ONLY_COMMANDS[cstNode.name]
+    if (errorMsg && !seenErrors.has(errorMsg)) {
+      seenErrors.add(errorMsg)
+      errors.push({
+        message: errorMsg,
+        line: lineNumber,
+        column: 1,
+      })
+    }
+
+    // Check for REPL-only functions in functionCall nodes
+    if (cstNode.name === 'functionCall' && cstNode.children) {
+      for (const key of Object.keys(cstNode.children)) {
+        const childArray = cstNode.children[key]
+        if (Array.isArray(childArray)) {
+          for (const child of childArray) {
+            if (child && typeof child === 'object' && 'tokenType' in child) {
+              const token = child as { tokenType: { name: string } }
+              const funcError = REPL_ONLY_FUNCTIONS[token.tokenType?.name]
+              if (funcError && !seenErrors.has(funcError)) {
+                seenErrors.add(funcError)
+                errors.push({
+                  message: funcError,
+                  line: lineNumber,
+                  column: 1,
+                })
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Check for INKEY$ token directly in primary (it's consumed directly, not via functionCall)
+    if (cstNode.name === 'primary' && cstNode.children.Inkey) {
+      const inkeyError = REPL_ONLY_FUNCTIONS['Inkey']
+      if (inkeyError && !seenErrors.has(inkeyError)) {
+        seenErrors.add(inkeyError)
+        errors.push({
+          message: inkeyError,
+          line: lineNumber,
+          column: 1,
+        })
+      }
+    }
+
+    // Traverse children recursively
+    for (const key of Object.keys(cstNode.children)) {
+      const childArray = cstNode.children[key]
+      if (Array.isArray(childArray)) {
+        for (const child of childArray) {
+          if (child && typeof child === 'object') {
+            if ('name' in child) {
+              // It's a CST node - recurse
+              traverse(child as CstNode, lineNumber)
+            }
+            // Token objects don't need recursion
+          }
+        }
+      }
+    }
+  }
+
+  traverse(cst)
+  return errors
+}
 
 // Export parse function
 export function parseWithChevrotain(source: string): {
@@ -1349,6 +1675,26 @@ export function parseWithChevrotain(source: string): {
     children: {
       statement: statements,
     },
+  }
+
+  // Check for REPL-only commands and add errors if found
+  const replErrors = checkReplOnlyCommands(programCst)
+  if (replErrors.length > 0) {
+    return {
+      success: false,
+      cst: programCst,
+      errors: replErrors.map(err => ({
+        message: err.message,
+        line: err.line,
+        column: err.column,
+        location: {
+          start: {
+            line: err.line,
+            column: err.column || 1,
+          },
+        },
+      })),
+    }
   }
 
   return {
