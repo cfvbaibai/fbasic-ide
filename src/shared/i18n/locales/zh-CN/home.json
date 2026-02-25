@@ -1,15 +1,15 @@
 {
   "hero": {
-    "title": "F-BASIC 模拟器",
-    "subtitle": "面向 Family Basic 编程语言的现代 Web IDE",
-    "description": "使用现代 Web 技术体验真正的 F-BASIC 开发环境。在浏览器中编写、执行和调试 Family Basic 程序。"
+    "title": "F-BASIC IDE",
+    "subtitle": "面向 F-BASIC 编程语言的现代 Web IDE",
+    "description": "使用现代 Web 技术体验真正的 F-BASIC 开发环境。在浏览器中编写、执行和调试 F-BASIC 程序。"
   },
   "features": {
     "title": "功能",
     "actionText": "探索 →",
     "items": {
       "ide": {
-        "title": "Family Basic IDE",
+        "title": "F-BASIC IDE",
         "description": "编写和执行 F-BASIC 程序，具有实时反馈、语法高亮和调试工具。"
       },
       "monaco": {
@@ -28,10 +28,10 @@
   },
   "about": {
     "title": "关于 F-BASIC",
-    "content": "Family Basic (F-BASIC) 是面向 Family Computer (Famicom) 的编程语言。此模拟器提供了一个完整的开发环境，用于编写和执行具有真实语法和行为的 F-BASIC 程序。"
+    "content": "F-BASIC (Family BASIC) 是面向 Family Computer (Famicom) 的编程语言。此 IDE 提供了一个完整的开发环境，用于编写和执行具有真实语法和行为的 F-BASIC 程序。"
   },
   "gettingStarted": {
     "title": "开始使用",
-    "content": "首先探索 Family Basic IDE 来编写您的第一个程序。使用上方的导航栏访问所有可用工具和功能。"
+    "content": "首先探索 F-BASIC IDE 来编写您的第一个程序。使用上方的导航栏访问所有可用工具和功能。"
   }
 }

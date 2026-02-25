@@ -1,5 +1,5 @@
 {
-  "title": "Family Basic IDE",
+  "title": "F-BASIC IDE",
   "toolbar": {
     "new": "新規",
     "import": "インポート",
@@ -7,7 +7,7 @@
   },
   "codeEditor": {
     "title": "コードエディター",
-    "placeholder": "Family Basicコードをここに入力..."
+    "placeholder": "F-BASICコードをここに入力..."
   },
   "controls": {
     "run": "実行",

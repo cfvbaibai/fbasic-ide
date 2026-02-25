@@ -1,5 +1,5 @@
 {
-  "appTitle": "F-BASIC EMU",
+  "appTitle": "F-BASIC IDE",
   "groups": {
     "main": "Main",
     "tools": "Development Tools",
@@ -12,7 +12,7 @@
     },
     "ide": {
       "name": "IDE",
-      "description": "Family Basic IDE"
+      "description": "F-BASIC IDE"
     },
     "spriteViewer": {
       "name": "Sprite Viewer",

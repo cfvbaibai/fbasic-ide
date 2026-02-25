@@ -1,5 +1,5 @@
 {
-  "appTitle": "F-BASIC 模拟器",
+  "appTitle": "F-BASIC IDE",
   "groups": {
     "main": "主要功能",
     "tools": "开发工具",
@@ -12,7 +12,7 @@
     },
     "ide": {
       "name": "IDE",
-      "description": "Family Basic IDE"
+      "description": "F-BASIC IDE"
     },
     "spriteViewer": {
       "name": "精灵查看器",

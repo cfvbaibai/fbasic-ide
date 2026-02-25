@@ -1,11 +1,11 @@
-# Family Basic IDE (F-BASIC Emulator)
+# F-BASIC IDE
 
-A modern web-based IDE for Family Basic (F-BASIC) programming language, built with Vue 3, TypeScript, and Vite. This project provides a complete development environment for writing, executing, and debugging Family Basic programs in the browser.
+A modern web-based IDE for F-BASIC (Family BASIC) programming language, built with Vue 3, TypeScript, and Vite. This project provides a complete development environment for writing, executing, and debugging F-BASIC programs in the browser.
 
 ## 🎯 Business Purpose
 
 ### Mission
-To preserve and modernize the Family Basic programming language by providing an accessible, web-based development environment that maintains the authentic F-BASIC experience while leveraging modern web technologies.
+To preserve and modernize the F-BASIC programming language by providing an accessible, web-based development environment that maintains the authentic F-BASIC experience while leveraging modern web technologies.
 
 ### Target Users
 - **Retro Computing Enthusiasts** - Users interested in classic programming languages
@@ -14,7 +14,7 @@ To preserve and modernize the Family Basic programming language by providing an 
 - **Preservationists** - Individuals working to preserve historical programming languages
 
 ### Key Features
-- **Authentic F-BASIC Syntax** - Faithful implementation of Family Basic language features
+- **Authentic F-BASIC Syntax** - Faithful implementation of F-BASIC language features
 - **Real-time Execution** - Immediate feedback with syntax highlighting and error reporting
 - **Modern Web Interface** - Clean, responsive UI built with Vue 3
 - **Cross-platform** - Runs in any modern web browser
@@ -229,7 +229,7 @@ When working with this codebase, follow these AI-specific instructions:
 - **Test coverage** - run `pnpm test:run` to ensure all tests pass
 
 ### Development Workflow
-- **Read Family BASIC Manual** - Read the manual under `docs/reference/family-basic-manual` folder
+- **Read F-BASIC Manual** - Read the manual under `docs/reference/family-basic-manual` folder
 - **Read existing code** to understand CST-based patterns and structure
 - **Check constants.ts** for existing constants before adding new ones
 - **Follow CST patterns** - use parser and CST nodes directly for execution
@@ -350,7 +350,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 🙏 Acknowledgments
 
-- Family Basic language specification
+- F-BASIC (Family BASIC) language specification
 - Vue.js and Vite teams for excellent tooling
 - Lodash team for utility functions
 - All contributors and testers
