@@ -24,6 +24,7 @@ export interface BasicIdeExecution {
   stopCode: () => void
   clearOutput: () => void
   clearAll: () => void
+  cleanup: () => void
 }
 
 export interface BasicIdeExecutionOptions {
@@ -197,10 +198,15 @@ export function useBasicIdeExecution(
     state.highlightedCode.value = ''
   }
 
+  const cleanup = () => {
+    audioPlayer.cleanup()
+  }
+
   return {
     runCode,
     stopCode,
     clearOutput,
     clearAll,
+    cleanup,
   }
 }

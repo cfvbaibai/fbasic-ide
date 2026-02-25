@@ -30,6 +30,8 @@ export function useWebAudioPlayer() {
   /** Queue for sequential PLAY: next melody starts after current finishes */
   const playQueue: Array<Array<Array<Note | Rest>>> = []
   let isPlaying = false
+  /** Track pending timeout IDs for cleanup */
+  const pendingTimeouts = new Set<ReturnType<typeof setTimeout>>()
 
   /**
    * Initialize AudioContext (requires user gesture)
@@ -149,10 +151,12 @@ export function useWebAudioPlayer() {
           // It's a Note - schedule playback
           const note = event
 
-          // Schedule note to start at timeOffset
-          setTimeout(() => {
+          // Schedule note to start at timeOffset (track for cleanup)
+          const timeoutId = setTimeout(() => {
+            pendingTimeouts.delete(timeoutId)
             playNote(note)
           }, timeOffset)
+          pendingTimeouts.add(timeoutId)
 
           timeOffset += note.duration
         } else {
@@ -174,7 +178,11 @@ export function useWebAudioPlayer() {
   ): void {
     playMusic(channels)
     const totalMs = getTotalDurationMs(channels)
-    setTimeout(onComplete, totalMs)
+    const timeoutId = setTimeout(() => {
+      pendingTimeouts.delete(timeoutId)
+      onComplete()
+    }, totalMs)
+    pendingTimeouts.add(timeoutId)
   }
 
   /**
@@ -200,6 +208,12 @@ export function useWebAudioPlayer() {
    * Stop all sounds and clear the play queue
    */
   function stopAll(): void {
+    // Clear all pending timeouts
+    for (const timeoutId of pendingTimeouts) {
+      clearTimeout(timeoutId)
+    }
+    pendingTimeouts.clear()
+
     playQueue.length = 0
     isPlaying = false
     if (audioContext.value) {
@@ -210,11 +224,20 @@ export function useWebAudioPlayer() {
     }
   }
 
+  /**
+   * Cleanup function for component unmount
+   * Clears all pending timeouts and closes audio context
+   */
+  function cleanup(): void {
+    stopAll()
+  }
+
   return {
     isInitialized,
     initialize,
     playMusic,
     playMusicSequential,
     stopAll,
+    cleanup,
   }
 }

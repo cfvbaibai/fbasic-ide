@@ -32,6 +32,8 @@ export interface BasicIdeScreenIntegration {
   scheduleRenderForScreenChanged: () => void
   /** Write current (cleared) state to shared buffer and bump sequence so Screen redraws. Call after clearOutput. */
   clearDisplayToSharedBuffer: () => void
+  /** Cleanup pending animation frames and timeouts. Call on component unmount. */
+  cleanup: () => void
 }
 
 /**
@@ -121,6 +123,19 @@ export function useBasicIdeScreenIntegration(state: BasicIdeState): BasicIdeScre
     }
   }
 
+  /**
+   * Cleanup pending animation frames and timeouts.
+   * Call on component unmount to prevent memory leaks.
+   */
+  const cleanup = () => {
+    if (screenChangedRafId !== null) {
+      // Cancel both - one will be a no-op since IDs don't overlap between raf and timeout
+      cancelAnimationFrame(screenChangedRafId)
+      clearTimeout(screenChangedRafId)
+      screenChangedRafId = null
+    }
+  }
+
   return {
     sharedDisplayViews,
     sharedDisplayBufferAccessor,
@@ -131,5 +146,6 @@ export function useBasicIdeScreenIntegration(state: BasicIdeState): BasicIdeScre
     scheduleRender,
     scheduleRenderForScreenChanged,
     clearDisplayToSharedBuffer,
+    cleanup,
   }
 }

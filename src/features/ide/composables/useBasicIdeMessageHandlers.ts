@@ -45,6 +45,23 @@ let queueAnimationFrame: number | null = null
 const audioPlayer = useWebAudioPlayer()
 
 /**
+ * Cleanup function for module-level resources
+ * Call on component unmount to prevent memory leaks
+ */
+export function cleanupMessageHandlers(): void {
+  // Cancel pending animation frame for message queue
+  if (queueAnimationFrame !== null) {
+    cancelAnimationFrame(queueAnimationFrame)
+    queueAnimationFrame = null
+  }
+  isProcessingQueue = false
+  messageQueue.length = 0
+
+  // Cleanup audio player
+  audioPlayer.cleanup()
+}
+
+/**
  * Process queued messages during animation frame
  * This ensures state updates happen in sync with rendering
  */

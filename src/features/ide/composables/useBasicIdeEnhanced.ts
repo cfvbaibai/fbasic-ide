@@ -23,6 +23,7 @@ import { onDeactivated, onUnmounted, watch } from 'vue'
 
 import { useBasicIdeEditor } from './useBasicIdeEditor'
 import { useBasicIdeExecution } from './useBasicIdeExecution'
+import { cleanupMessageHandlers } from './useBasicIdeMessageHandlers'
 import { useBasicIdeScreenIntegration } from './useBasicIdeScreenIntegration'
 import { useBasicIdeState } from './useBasicIdeState'
 import { useBasicIdeWorkerIntegration } from './useBasicIdeWorkerIntegration'
@@ -106,8 +107,15 @@ export function useBasicIde() {
     { immediate: true }
   )
 
-  onUnmounted(worker.cleanupWebWorker)
-  onDeactivated(worker.cleanupWebWorker)
+  // Cleanup on unmount AND deactivation (keep-alive support)
+  const cleanup = () => {
+    execution.cleanup()
+    screen.cleanup()
+    worker.cleanupWebWorker()
+    cleanupMessageHandlers()
+  }
+  onUnmounted(cleanup)
+  onDeactivated(cleanup)
 
   return {
     // State
