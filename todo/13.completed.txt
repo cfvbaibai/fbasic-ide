@@ -1,0 +1,188 @@
+type: refactor
+status: open
+subject: Vue Best Practices Refactoring - VueUse, shallowRef, CSS Extraction
+created: 2026-02-25
+priority: medium
+
+================================================================================
+PLAN: Vue Best Practices Refactoring
+================================================================================
+
+Three improvements identified from code review:
+1. Proactively adopt VueUse for common patterns
+2. Proactively use shallowRef for primitive values
+3. Extract large CSS blocks from complex components
+
+================================================================================
+PHASE 1: VueUse Adoption
+================================================================================
+
+VueUse provides battle-tested composables that replace manual implementations.
+
+### 1.1 Replace useContainerWidth with useElementSize
+
+**File**: `src/shared/composables/useContainerWidth.ts`
+**Current**: 41 lines of manual ResizeObserver code
+**Target**: Use VueUse's `useElementSize`
+
+Before:
+```typescript
+import { onMounted, onUnmounted, ref } from 'vue'
+// ... manual ResizeObserver setup
+```
+
+After:
+```typescript
+import { useElementSize } from '@vueuse/core'
+import { computed, toValue, type Ref, type MaybeRefOrGetter } from 'vue'
+
+export function useContainerWidth(
+  containerRef: MaybeRefOrGetter<HTMLElement | null>,
+  compactThreshold: MaybeRefOrGetter<number> = 600,
+): Readonly<Ref<boolean>> {
+  const { width } = useElementSize(containerRef)
+  return computed(() => toValue(width) < toValue(compactThreshold))
+}
+```
+
+### 1.2 Replace manual localStorage with useLocalStorage
+
+**File**: `src/features/ide/composables/useProgramStore.ts`
+**Current**: Manual watch + localStorage.setItem/getItem
+**Target**: Use VueUse's `useLocalStorage` for automatic persistence
+
+Consider replacing:
+- Lines 34-47: Manual persistence watch
+- Lines 56-82: Manual restore logic
+
+### 1.3 Evaluate other VueUse opportunities
+
+Review these files for VueUse adoption:
+- `src/shared/composables/useSkin.ts` - localStorage for theme
+- `src/shared/i18n/index.ts` - localStorage for locale
+- `src/features/ide/composables/useKeyboardJoystick.ts` - event handling
+
+================================================================================
+PHASE 2: shallowRef for Primitive Values
+================================================================================
+
+`shallowRef()` is more performant than `ref()` for primitives.
+
+### 2.1 Update useBasicIdeState
+
+**File**: `src/features/ide/composables/useBasicIdeState.ts`
+
+Change these from `ref()` to `shallowRef()`:
+```typescript
+// Line 61
+isRunning: shallowRef(false),
+
+// Line 68
+debugMode: shallowRef(false),
+
+// Line 79
+spriteEnabled: shallowRef(false),
+
+// Lines 71-76 (numeric primitives)
+cursorX: shallowRef(0),
+cursorY: shallowRef(0),
+bgPalette: shallowRef(1),
+backdropColor: shallowRef(0),
+spritePalette: shallowRef(1),
+cgenMode: shallowRef(2),
+```
+
+### 2.2 Audit other composables
+
+Scan and update these files:
+- `src/features/ide/composables/useBasicIdeScreenUtils.ts`
+- `src/features/ide/composables/useScreenZoom.ts`
+- `src/features/sprite-viewer/composables/*.ts`
+- `src/features/bg-editor/composables/*.ts`
+
+Pattern: Any `ref(false)`, `ref(0)`, `ref('')`, `ref(null)` for primitives
+should use `shallowRef()` instead.
+
+================================================================================
+PHASE 3: Extract Large CSS Blocks
+================================================================================
+
+Components exceeding 300 lines should have CSS extracted.
+
+### 3.1 GameButton.vue (364 lines, ~272 lines CSS)
+
+**Action**: Extract styles to separate file
+
+Structure:
+```
+src/shared/components/ui/GameButton/
+├── GameButton.vue          # Component logic + template
+├── GameButton.types.ts     # Existing types
+└── GameButton.css          # Extracted styles
+```
+
+Import in component:
+```vue
+<style scoped src="./GameButton.css"></style>
+```
+
+### 3.2 GameTabs.vue (308 lines)
+
+Consider extracting tab-related styles to:
+```
+src/shared/components/ui/GameTabs.css
+```
+
+### 3.3 GameSelect.vue (306 lines)
+
+Consider extracting select/dropdown styles.
+
+### 3.4 GameIconButton.vue (302 lines)
+
+May share styles with GameButton - consider common base.
+
+================================================================================
+IMPLEMENTATION ORDER
+================================================================================
+
+1. **Phase 1.1** - useContainerWidth → useElementSize (LOW RISK)
+   - Single file change
+   - Behavior identical
+   - Test: Responsive toolbar in IDE
+
+2. **Phase 2.1** - useBasicIdeState shallowRef (LOW RISK)
+   - Internal reactivity change
+   - No behavior change
+   - Test: Run/stop/basic operations
+
+3. **Phase 3.1** - GameButton CSS extraction (LOW RISK)
+   - File structure change only
+   - No logic changes
+   - Test: Button rendering
+
+4. **Phase 1.2** - useProgramStore VueUse (MEDIUM RISK)
+   - Changes persistence mechanism
+   - Needs careful testing
+   - Test: Save/load/restore
+
+5. **Phase 2.2** - Audit remaining composables (MEDIUM RISK)
+   - Multiple files
+   - Test: Full regression
+
+================================================================================
+VERIFICATION
+================================================================================
+
+After each phase:
+1. `pnpm type-check` - No TypeScript errors
+2. `pnpm lint` - No ESLint errors
+3. `pnpm test:run` - All tests pass
+4. Manual testing of affected features
+
+================================================================================
+NOTES
+================================================================================
+
+- VueUse is already a project dependency (check with `grep vueuse package.json`)
+- `shallowRef` import: `import { shallowRef } from 'vue'`
+- CSS extraction maintains scoped styles via `<style scoped src="...">`
