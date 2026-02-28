@@ -125,6 +125,17 @@ const routes: RouteRecordRaw[] = [
       group: 'testing',
     },
   },
+  {
+    path: '/sound-test',
+    name: 'SoundTest',
+    component: () => import('@/features/sound-test/SoundTestPage.vue'),
+    meta: {
+      title: 'Sound Test',
+      showInNav: true,
+      icon: 'mdi:music',
+      group: 'testing',
+    },
+  },
 ]
 
 const router = createRouter({

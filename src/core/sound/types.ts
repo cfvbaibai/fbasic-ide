@@ -5,6 +5,91 @@
  * Supports F-BASIC music DSL with tempo, duty cycle, envelope, volume, octave, and notes.
  */
 
+// ============================================================================
+// STAGE 1: MusicScore (Parsed notation - like sheet music)
+// ============================================================================
+
+/** Note names in F-BASIC */
+export type NoteName = 'C' | 'D' | 'E' | 'F' | 'G' | 'A' | 'B'
+
+/** A parsed note event (before frequency/duration calculation) */
+export interface ParsedNoteEvent {
+  type: 'note'
+  /** Note letter */
+  note: NoteName
+  /** Whether the note is sharp */
+  sharp: boolean
+  /** Optional length code 0-9; when omitted, uses previous length */
+  length?: number
+}
+
+/** A parsed rest event */
+export interface ParsedRestEvent {
+  type: 'rest'
+  /** Optional length code 0-9; when omitted, uses previous length */
+  length?: number
+}
+
+/** Tempo command: T1-T8 */
+export interface ParsedTempoEvent {
+  type: 'tempo'
+  /** Tempo value 1-8 */
+  value: number
+}
+
+/** Octave command: O0-O5 */
+export interface ParsedOctaveEvent {
+  type: 'octave'
+  /** Octave value 0-5 */
+  value: number
+}
+
+/** Duty cycle command: Y0-Y3 */
+export interface ParsedDutyEvent {
+  type: 'duty'
+  /** Duty value 0-3 */
+  value: number
+}
+
+/** Envelope command: M0-M1 */
+export interface ParsedEnvelopeEvent {
+  type: 'envelope'
+  /** Envelope value 0-1 */
+  value: number
+}
+
+/** Volume command: V0-V15 */
+export interface ParsedVolumeEvent {
+  type: 'volume'
+  /** Volume value 0-15 */
+  value: number
+}
+
+/** A single event in the parsed music score */
+export type MusicEvent =
+  | ParsedNoteEvent
+  | ParsedRestEvent
+  | ParsedTempoEvent
+  | ParsedOctaveEvent
+  | ParsedDutyEvent
+  | ParsedEnvelopeEvent
+  | ParsedVolumeEvent
+
+/**
+ * MusicScore - Parsed notation (like sheet music)
+ *
+ * This is the Stage 1 output: a structured representation of the music DSL
+ * with symbolic values (note letters, length codes) before any calculation.
+ */
+export interface MusicScore {
+  /** Events organized by channel (0-2) */
+  channels: MusicEvent[][]
+}
+
+// ============================================================================
+// STAGE 2: CompiledAudio (Ready for playback)
+// ============================================================================
+
 /**
  * Persistent sound state that carries over between PLAY calls
  * Follows F-BASIC v3 specification where T, Y, M, V, O persist
@@ -23,7 +108,7 @@ export interface SoundState {
 }
 
 /**
- * A single note to be played
+ * A single note to be played (with calculated frequency and duration)
  */
 export interface Note {
   /** Frequency in Hz (calculated from note and octave) */
@@ -51,7 +136,7 @@ export interface Rest {
 }
 
 /**
- * Either a note or a rest
+ * Either a note or a rest (audio-ready event)
  */
 export type SoundEvent = Note | Rest
 
@@ -70,9 +155,12 @@ export function isRest(event: SoundEvent): event is Rest {
 }
 
 /**
- * Parsed music command with events per channel
+ * CompiledAudio - Audio-ready data for playback
+ *
+ * This is the Stage 2 output: concrete sound events with calculated
+ * frequencies (Hz) and durations (ms), ready for the audio player.
  */
-export interface MusicCommand {
+export interface CompiledAudio {
   /** Sound events organized by channel (0-2) */
   channels: SoundEvent[][]
 }

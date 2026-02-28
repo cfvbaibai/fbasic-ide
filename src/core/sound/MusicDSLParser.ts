@@ -1,17 +1,31 @@
 /**
  * Music DSL Parser
  *
- * Parses F-BASIC PLAY music strings into Note[] arrays.
- * Handles tempo, duty cycle, envelope, volume, octave, intervals, sharps, and rests.
+ * Two-stage parsing for F-BASIC PLAY command:
+ *   Stage 1: parseMusicToAst() → MusicScore (symbolic notation)
+ *   Stage 2: compileToAudio() → CompiledAudio (audio-ready events)
  *
  * Frequency Calculation:
  * - Uses equal temperament tuning with A4 = 440Hz standard
  * - Formula: f = 440 * 2^((n-57)/12) where n is MIDI note number
- * - MIDI note numbers: C0=12, C4=60, A4=69
  */
 
 import type { SoundStateManager } from './SoundStateManager'
-import type { MusicCommand, Rest, SoundEvent } from './types'
+import type {
+  CompiledAudio,
+  MusicEvent,
+  MusicScore,
+  Note,
+  ParsedDutyEvent,
+  ParsedEnvelopeEvent,
+  ParsedNoteEvent,
+  ParsedOctaveEvent,
+  ParsedRestEvent,
+  ParsedTempoEvent,
+  ParsedVolumeEvent,
+  Rest,
+  SoundEvent,
+} from './types'
 
 /**
  * Note names to semitone offset mapping (C = 0)
@@ -29,22 +43,20 @@ const NOTE_SEMITONES: Record<string, number> = {
 /**
  * Tempo to milliseconds per whole note mapping
  * T1 (fast) to T8 (slow)
- * Based on typical BASIC tempo ranges
  */
 const TEMPO_MS_PER_WHOLE_NOTE: Record<number, number> = {
-  1: 800, // Very fast
+  1: 800,
   2: 1000,
   3: 1200,
-  4: 1600, // Default/medium
+  4: 1600, // Default
   5: 2000,
   6: 2400,
   7: 2800,
-  8: 3200, // Very slow
+  8: 3200,
 }
 
 /**
  * F-BASIC length codes 0-9 to fraction of whole note (manual page 81)
- * 0=32nd, 1=16th, 2=dotted16th, 3=8th, 4=dotted8th, 5=quarter, 6=dotted quarter, 7=half, 8=dotted half, 9=whole
  */
 const LENGTH_CODE_TO_FRACTION: Record<number, number> = {
   0: 1 / 32,
@@ -59,71 +71,384 @@ const LENGTH_CODE_TO_FRACTION: Record<number, number> = {
   9: 1, // whole
 }
 
-/** Default length code when none specified (5 = quarter note, manual page 81) */
+/** Default length code when none specified (5 = quarter note) */
 const DEFAULT_LENGTH_CODE = 5
+
+/**
+ * Valid characters in PLAY music string (excluding colon which is channel separator)
+ */
+const VALID_MUSIC_CHARS = new Set([
+  'A',
+  'B',
+  'C',
+  'D',
+  'E',
+  'F',
+  'G', // Notes
+  'O',
+  'T',
+  'Y',
+  'M',
+  'V',
+  'R', // Commands
+  '#', // Sharp
+  '0',
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9', // Digits
+  ' ', // Space (ignored)
+])
+
+// ============================================================================
+// VALIDATION
+// ============================================================================
+
+/**
+ * Validate a music string and throw error if invalid format
+ * F-BASIC raises SN (Syntax) error for invalid music strings
+ *
+ * Validates:
+ * - Invalid characters
+ * - Tempo: T1-T8
+ * - Octave: O0-O5
+ * - Duty: Y0-Y3
+ * - Envelope: M0-M1
+ * - Volume: V0-V15
+ * - Length codes: 0-9
+ * - Sharp notes: #C, #D, #F, #G, #A (not #E or #B)
+ */
+export function validateMusicString(musicString: string): void {
+  const input = musicString.toUpperCase()
+  let i = 0
+
+  while (i < input.length) {
+    const char = input[i]!
+
+    // Skip spaces
+    if (char === ' ') {
+      i++
+      continue
+    }
+
+    // Colon is channel separator
+    if (char === ':') {
+      i++
+      continue
+    }
+
+    // Check for invalid characters
+    if (!VALID_MUSIC_CHARS.has(char)) {
+      throw new Error(`Invalid character '${char}' in PLAY string at position ${i + 1}`)
+    }
+
+    // Validate Tempo: T1-T8
+    if (char === 'T') {
+      i++
+      const match = input.slice(i).match(/^(\d+)/)
+      if (!match?.[1]) {
+        throw new Error(`Tempo value required after T at position ${i + 1}`)
+      }
+      const value = parseInt(match[1], 10)
+      if (value < 1 || value > 8) {
+        throw new Error(`Invalid tempo T${value}: must be 1-8`)
+      }
+      i += match[1].length
+      continue
+    }
+
+    // Validate Octave: O0-O5
+    if (char === 'O') {
+      i++
+      const match = input.slice(i).match(/^(\d+)/)
+      if (!match?.[1]) {
+        throw new Error(`Octave value required after O at position ${i + 1}`)
+      }
+      const value = parseInt(match[1], 10)
+      if (value < 0 || value > 5) {
+        throw new Error(`Invalid octave O${value}: must be 0-5`)
+      }
+      i += match[1].length
+      continue
+    }
+
+    // Validate Duty: Y0-Y3
+    if (char === 'Y') {
+      i++
+      const match = input.slice(i).match(/^(\d+)/)
+      if (!match?.[1]) {
+        throw new Error(`Duty value required after Y at position ${i + 1}`)
+      }
+      const value = parseInt(match[1], 10)
+      if (value < 0 || value > 3) {
+        throw new Error(`Invalid duty Y${value}: must be 0-3`)
+      }
+      i += match[1].length
+      continue
+    }
+
+    // Validate Envelope: M0-M1
+    if (char === 'M') {
+      i++
+      const match = input.slice(i).match(/^(\d+)/)
+      if (!match?.[1]) {
+        throw new Error(`Envelope value required after M at position ${i + 1}`)
+      }
+      const value = parseInt(match[1], 10)
+      if (value < 0 || value > 1) {
+        throw new Error(`Invalid envelope M${value}: must be 0-1`)
+      }
+      i += match[1].length
+      continue
+    }
+
+    // Validate Volume: V0-V15
+    if (char === 'V') {
+      i++
+      const match = input.slice(i).match(/^(\d+)/)
+      if (!match?.[1]) {
+        throw new Error(`Volume value required after V at position ${i + 1}`)
+      }
+      const value = parseInt(match[1], 10)
+      if (value < 0 || value > 15) {
+        throw new Error(`Invalid volume V${value}: must be 0-15`)
+      }
+      i += match[1].length
+      continue
+    }
+
+    // Validate Sharp: # must be followed by C, D, F, G, or A
+    if (char === '#') {
+      i++
+      const nextChar = input[i]
+      if (!nextChar) {
+        throw new Error(`Sharp (#) at position ${i} must be followed by a note`)
+      }
+      if (!'CDFGA'.includes(nextChar)) {
+        throw new Error(
+          `Invalid sharp #${nextChar} at position ${i}: # must be followed by C, D, F, G, or A`
+        )
+      }
+      i++
+      // Optional length code
+      if (input[i] && /[0-9]/.test(input[i]!)) {
+        i++
+      }
+      continue
+    }
+
+    // Rest: R with optional length
+    if (char === 'R') {
+      i++
+      if (input[i] && /[0-9]/.test(input[i]!)) {
+        i++
+      }
+      continue
+    }
+
+    // Natural notes: C, D, E, F, G, A, B with optional length
+    if ('CDEFGAB'.includes(char)) {
+      i++
+      if (input[i] && /[0-9]/.test(input[i]!)) {
+        i++
+      }
+      continue
+    }
+
+    // Digits should only appear after commands/notes
+    if (/[0-9]/.test(char)) {
+      throw new Error(
+        `Unexpected digit '${char}' at position ${i}: digits must follow a command or note`
+      )
+    }
+
+    i++
+  }
+}
+
+// ============================================================================
+// STAGE 1: Parse string to MusicScore (symbolic notation)
+// ============================================================================
+
+/**
+ * Parse a single channel's music string into MusicEvent array
+ */
+function parseChannelToAst(channelString: string): MusicEvent[] {
+  const events: MusicEvent[] = []
+  const input = channelString.toUpperCase().replace(/\s+/g, '')
+  let i = 0
+
+  while (i < input.length) {
+    const char = input[i]
+
+    // Tempo: T1-T8
+    if (char === 'T') {
+      i++
+      const match = input.slice(i).match(/^(\d+)/)
+      if (match?.[1]) {
+        events.push({ type: 'tempo', value: parseInt(match[1], 10) } as ParsedTempoEvent)
+        i += match[1].length
+      }
+      continue
+    }
+
+    // Duty cycle: Y0-Y3
+    if (char === 'Y') {
+      i++
+      const match = input.slice(i).match(/^(\d+)/)
+      if (match?.[1]) {
+        events.push({ type: 'duty', value: parseInt(match[1], 10) } as ParsedDutyEvent)
+        i += match[1].length
+      }
+      continue
+    }
+
+    // Envelope: M0-M1
+    if (char === 'M') {
+      i++
+      const match = input.slice(i).match(/^(\d+)/)
+      if (match?.[1]) {
+        events.push({ type: 'envelope', value: parseInt(match[1], 10) } as ParsedEnvelopeEvent)
+        i += match[1].length
+      }
+      continue
+    }
+
+    // Volume: V0-V15
+    if (char === 'V') {
+      i++
+      const match = input.slice(i).match(/^(\d+)/)
+      if (match?.[1]) {
+        events.push({ type: 'volume', value: parseInt(match[1], 10) } as ParsedVolumeEvent)
+        i += match[1].length
+      }
+      continue
+    }
+
+    // Octave: O0-O5
+    if (char === 'O') {
+      i++
+      const match = input.slice(i).match(/^(\d+)/)
+      if (match?.[1]) {
+        events.push({ type: 'octave', value: parseInt(match[1], 10) } as ParsedOctaveEvent)
+        i += match[1].length
+      }
+      continue
+    }
+
+    // Sharp: #C, #D, #F, #G, #A
+    if (char === '#') {
+      i++
+      const nextChar = input[i]
+      if (nextChar && 'CDFGA'.includes(nextChar)) {
+        const noteName = nextChar as 'C' | 'D' | 'F' | 'G' | 'A'
+        i++
+
+        const digitMatch = input.slice(i).match(/^(\d)/)
+        const event: ParsedNoteEvent = {
+          type: 'note',
+          note: noteName,
+          sharp: true,
+        }
+        if (digitMatch) {
+          event.length = parseInt(digitMatch[1]!, 10)
+          i += 1
+        }
+        events.push(event)
+      }
+      continue
+    }
+
+    // Rest: R with optional length
+    if (char === 'R') {
+      i++
+      const event: ParsedRestEvent = { type: 'rest' }
+      const digitMatch = input.slice(i).match(/^(\d)/)
+      if (digitMatch) {
+        event.length = parseInt(digitMatch[1]!, 10)
+        i += 1
+      }
+      events.push(event)
+      continue
+    }
+
+    // Natural notes: C, D, E, F, G, A, B
+    if (char && 'CDEFGAB'.includes(char)) {
+      const noteName = char as 'C' | 'D' | 'E' | 'F' | 'G' | 'A' | 'B'
+      i++
+
+      const event: ParsedNoteEvent = {
+        type: 'note',
+        note: noteName,
+        sharp: false,
+      }
+      const digitMatch = input.slice(i).match(/^(\d)/)
+      if (digitMatch) {
+        event.length = parseInt(digitMatch[1]!, 10)
+        i += 1
+      }
+      events.push(event)
+      continue
+    }
+
+    // Unknown character - skip (should not happen if validated)
+    i++
+  }
+
+  return events
+}
+
+/**
+ * Parse music string into MusicScore (Stage 1)
+ *
+ * @param musicString - Music DSL string
+ * @returns Parsed music score with symbolic events
+ */
+export function parseMusicToAst(musicString: string): MusicScore {
+  // Validate first
+  validateMusicString(musicString)
+
+  // Split by channel separator ":"
+  const channelStrings = musicString.split(':')
+
+  // Limit to 3 channels
+  const channels = channelStrings.slice(0, 3).map((channelString) => {
+    return parseChannelToAst(channelString)
+  })
+
+  return { channels }
+}
+
+// ============================================================================
+// STAGE 2: Compile MusicScore to CompiledAudio (audio-ready)
+// ============================================================================
 
 /**
  * Calculate frequency in Hz for a given note and octave
  * Uses equal temperament tuning with A4 = 440Hz
- *
- * F-BASIC Octave Mapping:
- * F-BASIC uses octave numbers O0-O5, which map to standard MIDI octaves with a +2 offset:
- * - F-BASIC O0 = Standard O2 (low bass, ~65 Hz for C)
- * - F-BASIC O2 = Standard O4 (middle C range, ~262 Hz for C)
- * - F-BASIC O3 = Standard O5 (treble range, ~523 Hz for C)
- * - F-BASIC O5 = Standard O7 (high range, ~2093 Hz for C)
- *
- * This mapping aligns F-BASIC's O2 with the treble clef range where melodies are typically written.
- *
- * @param noteName - Note letter (C, D, E, F, G, A, B)
- * @param octave - F-BASIC octave number (0-5)
- * @param sharp - Whether the note is sharp (#)
- * @returns Frequency in Hz
  */
-export function calculateNoteFrequency(noteName: string, octave: number, sharp: boolean = false): number {
+function calculateNoteFrequency(noteName: string, octave: number, sharp: boolean): number {
   const baseSemitone = NOTE_SEMITONES[noteName]
   if (baseSemitone === undefined) {
     throw new Error(`Invalid note name: ${noteName}`)
   }
 
-  // Calculate MIDI note number with F-BASIC octave offset (+2)
-  // F-BASIC O2 maps to Standard O4 (Middle C range)
-  // Formula: (fbasicOctave + 2) * 12 + semitone + 12
   const semitone = baseSemitone + (sharp ? 1 : 0)
   const midiNote = (octave + 2) * 12 + semitone + 12
-
-  // Calculate frequency using equal temperament formula
-  // f = 440 * 2^((n-69)/12) where n is MIDI note number and A4=69
   const frequency = 440 * Math.pow(2, (midiNote - 69) / 12)
 
   return frequency
 }
 
 /**
- * Calculate note duration in milliseconds (denominator semantics: 1=whole, 2=half, 4=quarter, 8=eighth).
- * Prefer lengthCodeToDuration for F-BASIC length codes 0-9.
+ * Duration in ms for F-BASIC length code 0-9
  */
-export function calculateNoteDuration(length: number, tempo: number): number {
-  const wholeNoteDuration = TEMPO_MS_PER_WHOLE_NOTE[tempo]
-  if (wholeNoteDuration === undefined) {
-    const defaultDuration = TEMPO_MS_PER_WHOLE_NOTE[4]
-    if (defaultDuration === undefined) {
-      throw new Error('Invalid default tempo configuration')
-    }
-    return defaultDuration / length
-  }
-  return wholeNoteDuration / length
-}
-
-/**
- * Duration in ms for F-BASIC length code 0-9 (manual page 81).
- * 0=32nd, 1=16th, 2=dotted16th, 3=8th, 4=dotted8th, 5=quarter, 6=dotted quarter, 7=half, 8=dotted half, 9=whole.
- *
- * @param code - Length code 0-9 (clamped if out of range)
- * @param tempo - Tempo setting (1-8)
- * @returns Duration in milliseconds
- */
-export function lengthCodeToDuration(code: number, tempo: number): number {
+function lengthCodeToDuration(code: number, tempo: number): number {
   const clamped = Math.max(0, Math.min(9, code))
   const fraction =
     LENGTH_CODE_TO_FRACTION[clamped] ?? LENGTH_CODE_TO_FRACTION[DEFAULT_LENGTH_CODE] ?? 1 / 4
@@ -132,188 +457,104 @@ export function lengthCodeToDuration(code: number, tempo: number): number {
 }
 
 /**
- * Parse a single channel's music string into sound events
- *
- * @param channelString - Music string for one channel
- * @param stateManager - Sound state manager for persistent state
- * @param channelNumber - Channel number (0-2)
- * @returns Array of sound events (notes and rests)
+ * Compile a single channel's MusicEvent array to SoundEvent array
  */
-export function parseChannelMusic(
-  channelString: string,
+function compileChannelToAudio(
+  events: MusicEvent[],
   stateManager: SoundStateManager,
   channelNumber: number
 ): SoundEvent[] {
-  const events: SoundEvent[] = []
-  const input = channelString.toUpperCase().replace(/\s+/g, '') // Remove spaces, convert to uppercase
-  let i = 0
-  // F-BASIC manual page 81: "When no integer is specified, it takes the same length of note as the one written before."
+  const soundEvents: SoundEvent[] = []
   let lastLengthCode = DEFAULT_LENGTH_CODE
 
-  while (i < input.length) {
-    const char = input[i]
+  for (const event of events) {
+    switch (event.type) {
+      case 'tempo':
+        stateManager.setTempo(event.value)
+        break
 
-    // Tempo: T1-T8
-    if (char === 'T') {
-      i++
-      const tempoMatch = input.slice(i).match(/^(\d+)/)
-      if (tempoMatch?.[1]) {
-        const tempo = parseInt(tempoMatch[1], 10)
-        stateManager.setTempo(tempo)
-        i += tempoMatch[1].length
-      }
-      continue
-    }
+      case 'duty':
+        stateManager.setDuty(event.value)
+        break
 
-    // Duty cycle: Y0-Y3
-    if (char === 'Y') {
-      i++
-      const dutyMatch = input.slice(i).match(/^(\d+)/)
-      if (dutyMatch?.[1]) {
-        const duty = parseInt(dutyMatch[1], 10)
-        stateManager.setDuty(duty)
-        i += dutyMatch[1].length
-      }
-      continue
-    }
+      case 'envelope':
+        stateManager.setEnvelope(event.value)
+        break
 
-    // Envelope: M0-M1
-    if (char === 'M') {
-      i++
-      const envelopeMatch = input.slice(i).match(/^(\d+)/)
-      if (envelopeMatch?.[1]) {
-        const envelope = parseInt(envelopeMatch[1], 10)
-        stateManager.setEnvelope(envelope)
-        i += envelopeMatch[1].length
-      }
-      continue
-    }
+      case 'volume':
+        stateManager.setVolumeOrLength(event.value)
+        break
 
-    // Volume/Length: V0-V15
-    if (char === 'V') {
-      i++
-      const volumeMatch = input.slice(i).match(/^(\d+)/)
-      if (volumeMatch?.[1]) {
-        const volume = parseInt(volumeMatch[1], 10)
-        stateManager.setVolumeOrLength(volume)
-        i += volumeMatch[1].length
-      }
-      continue
-    }
+      case 'octave':
+        stateManager.setOctave(event.value)
+        break
 
-    // Octave: O0-O5
-    if (char === 'O') {
-      i++
-      const octaveMatch = input.slice(i).match(/^(\d+)/)
-      if (octaveMatch?.[1]) {
-        const octave = parseInt(octaveMatch[1], 10)
-        stateManager.setOctave(octave)
-        i += octaveMatch[1].length
-      }
-      continue
-    }
-
-    // Sharp: #C, #D, #F, #G, #A (skip #E and #B as they don't exist)
-    if (char === '#') {
-      i++
-      const nextChar = input[i]
-      if (nextChar && 'CDFGA'.includes(nextChar)) {
-        const noteName = nextChar
-        i++
-
-        // Optional length code 0-9; when omitted, same as previous (manual page 81)
-        const digitMatch = input.slice(i).match(/^(\d)/)
-        const lengthCode = digitMatch ? parseInt(digitMatch[1]!, 10) : lastLengthCode
-        if (digitMatch) i += 1
+      case 'note': {
+        const lengthCode = event.length ?? lastLengthCode
         lastLengthCode = lengthCode
 
-        // Create note
         const state = stateManager.getState()
-        const frequency = calculateNoteFrequency(noteName, state.octave, true)
+        const frequency = calculateNoteFrequency(event.note, state.octave, event.sharp)
         const duration = lengthCodeToDuration(lengthCode, state.tempo)
 
-        events.push({
+        soundEvents.push({
           frequency,
           duration,
           channel: channelNumber,
           duty: state.duty,
           envelope: state.envelope,
           volumeOrLength: state.volumeOrLength,
-        })
+        } as Note)
+        break
       }
-      continue
+
+      case 'rest': {
+        const lengthCode = event.length ?? lastLengthCode
+        lastLengthCode = lengthCode
+
+        const state = stateManager.getState()
+        const duration = lengthCodeToDuration(lengthCode, state.tempo)
+
+        soundEvents.push({
+          duration,
+          channel: channelNumber,
+        } as Rest)
+        break
+      }
     }
-
-    // Rest: Rn (R0-R9; when omitted, same length as previous — manual page 81)
-    if (char === 'R') {
-      i++
-      const digitMatch = input.slice(i).match(/^(\d)/)
-      const lengthCode = digitMatch ? parseInt(digitMatch[1]!, 10) : lastLengthCode
-      if (digitMatch) i += 1
-      lastLengthCode = lengthCode
-
-      const state = stateManager.getState()
-      const duration = lengthCodeToDuration(lengthCode, state.tempo)
-
-      events.push({
-        duration,
-        channel: channelNumber,
-      } as Rest)
-      continue
-    }
-
-    // Natural notes: C, D, E, F, G, A, B (optional length 0-9; when omitted, same as previous — manual page 81)
-    if (char && 'CDEFGAB'.includes(char)) {
-      const noteName = char
-      i++
-
-      const digitMatch = input.slice(i).match(/^(\d)/)
-      const lengthCode = digitMatch ? parseInt(digitMatch[1]!, 10) : lastLengthCode
-      if (digitMatch) i += 1
-      lastLengthCode = lengthCode
-
-      // Create note
-      const state = stateManager.getState()
-      const frequency = calculateNoteFrequency(noteName, state.octave, false)
-      const duration = lengthCodeToDuration(lengthCode, state.tempo)
-
-      events.push({
-        frequency,
-        duration,
-        channel: channelNumber,
-        duty: state.duty,
-        envelope: state.envelope,
-        volumeOrLength: state.volumeOrLength,
-      })
-      continue
-    }
-
-    // Unknown character - skip
-    i++
   }
 
-  return events
+  return soundEvents
 }
 
 /**
- * Parse PLAY music string into MusicCommand
- * Supports up to 3 channels separated by colons
+ * Compile MusicScore to CompiledAudio (Stage 2)
  *
- * @param musicString - PLAY command music string (may contain channel separators ":")
- * @param stateManager - Sound state manager for persistent state
- * @returns Parsed music command with events per channel
+ * @param score - Parsed music score
+ * @param stateManager - Sound state manager for state persistence
+ * @returns Compiled audio ready for playback
  */
-export function parseMusic(musicString: string, stateManager: SoundStateManager): MusicCommand {
-  // Split by channel separator ":"
-  const channelStrings = musicString.split(':')
-
-  // Limit to 3 channels
-  const limitedChannels = channelStrings.slice(0, 3)
-
-  // Parse each channel
-  const channels = limitedChannels.map((channelString, index) => {
-    return parseChannelMusic(channelString, stateManager, index)
+export function compileToAudio(score: MusicScore, stateManager: SoundStateManager): CompiledAudio {
+  const channels = score.channels.map((channelEvents, index) => {
+    return compileChannelToAudio(channelEvents, stateManager, index)
   })
 
   return { channels }
+}
+
+// ============================================================================
+// CONVENIENCE: Combined parse + compile
+// ============================================================================
+
+/**
+ * Parse music string and compile to audio in one step
+ * Convenience function for backward compatibility
+ *
+ * @param musicString - Music DSL string
+ * @param stateManager - Sound state manager
+ * @returns Compiled audio ready for playback
+ */
+export function parseMusic(musicString: string, stateManager: SoundStateManager): CompiledAudio {
+  const score = parseMusicToAst(musicString)
+  return compileToAudio(score, stateManager)
 }

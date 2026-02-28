@@ -11,6 +11,7 @@ import type { CstNode } from 'chevrotain'
 import { ERROR_TYPES } from '@/core/constants'
 import type { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
 import { getCstNodes } from '@/core/parser/cst-helpers'
+import { parseMusicToAst } from '@/core/sound/MusicDSLParser'
 import type { ExecutionContext } from '@/core/state/ExecutionContext'
 
 export class PlayExecutor {
@@ -73,12 +74,26 @@ export class PlayExecutor {
       return
     }
 
-    // 3. Call device adapter to play sound
-    if (this.context.deviceAdapter?.playSound) {
-      this.context.deviceAdapter.playSound(musicString)
+    // 3. Parse music string to MusicScore (Stage 1)
+    // This validates the string and throws on invalid characters
+    let musicScore
+    try {
+      musicScore = parseMusicToAst(musicString)
+    } catch (error) {
+      this.context.addError({
+        line: lineNumber ?? 0,
+        message: `PLAY: ${error instanceof Error ? error.message : String(error)}`,
+        type: ERROR_TYPES.RUNTIME,
+      })
+      return
     }
 
-    // 4. Debug output
+    // 4. Call device adapter to play sound (Stage 2 compilation happens in adapter)
+    if (this.context.deviceAdapter?.playSound) {
+      this.context.deviceAdapter.playSound(musicScore)
+    }
+
+    // 5. Debug output
     if (this.context.config.enableDebugMode) {
       this.context.addDebugOutput(`PLAY: "${musicString}"`)
     }

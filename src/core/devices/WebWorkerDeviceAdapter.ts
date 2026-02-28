@@ -16,8 +16,9 @@ import type {
   InterpreterConfig,
   OutputMessage,
 } from '@/core/interfaces'
-import { parseMusic } from '@/core/sound/MusicDSLParser'
+import { compileToAudio } from '@/core/sound/MusicDSLParser'
 import { SoundStateManager } from '@/core/sound/SoundStateManager'
+import type { MusicScore } from '@/core/sound/types'
 import type { BgGridData } from '@/features/bg-editor/types'
 import { logWorker } from '@/shared/logger'
 
@@ -575,21 +576,21 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   }
 
   /**
-   * Play sound using F-BASIC PLAY music DSL
-   * Parses the music string into Note[] and posts PLAY_SOUND message to main thread
+   * Play parsed music score
+   * Compiles MusicScore to CompiledAudio and posts PLAY_SOUND message to main thread
    */
-  playSound(musicString: string): void {
-    logWorker.debug('Playing sound:', musicString)
+  playSound(musicScore: MusicScore): void {
+    logWorker.debug('Playing sound, channels:', musicScore.channels.length)
 
     try {
-      // Parse music string using DSL parser
-      const musicCommand = parseMusic(musicString, this.soundStateManager)
+      // Stage 2: Compile MusicScore to CompiledAudio
+      const compiledAudio = compileToAudio(musicScore, this.soundStateManager)
 
       // Flatten all channels into a single event array for transmission
-      const events = musicCommand.channels.flatMap(channelEvents => channelEvents)
+      const events = compiledAudio.channels.flatMap((channelEvents) => channelEvents)
 
       // Convert events to serializable format
-      const serializedEvents = events.map(event => ({
+      const serializedEvents = events.map((event) => ({
         frequency: 'frequency' in event ? event.frequency : undefined,
         duration: event.duration,
         channel: event.channel,
@@ -605,12 +606,11 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
         timestamp: Date.now(),
         data: {
           executionId: this.screenStateManager.getCurrentExecutionId() ?? 'unknown',
-          musicString,
           events: serializedEvents,
         },
       })
     } catch (error) {
-      logWorker.error('Error parsing music string:', error)
+      logWorker.error('Error compiling music:', error)
       this.errorOutput(`PLAY error: ${error instanceof Error ? error.message : String(error)}`)
     }
   }
