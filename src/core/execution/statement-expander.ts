@@ -16,6 +16,19 @@ export interface ExpandedStatement {
 }
 
 /**
+ * Create a no-op placeholder CST node for REM/comment lines
+ * These lines have no executable commands but need to be registered for GOTO/GOSUB targets
+ */
+function createNoOpCommand(): CstNode {
+  return {
+    name: 'command',
+    children: {
+      // Empty command - will be treated as no-op by the statement router
+    },
+  }
+}
+
+/**
  * Expand statements from CST into a flat list
  * Each statement contains a single command (colon-separated commands become separate statements)
  *
@@ -44,7 +57,7 @@ export function expandStatements(statementsCst: CstNode[]): {
     // Get commandList from statement
     const commandListCst = getFirstCstNode(statementCst.children.commandList)
     if (!commandListCst) {
-      continue // Skip statements without commands
+      continue // Skip statements without commandList
     }
 
     // Get all commands from the command list (colon-separated commands)
@@ -53,15 +66,27 @@ export function expandStatements(statementsCst: CstNode[]): {
     // Get statement indices for this line number
     const statementIndices: number[] = []
 
-    // Expand each command into a separate statement
-    for (const commandCst of commands) {
+    // Handle empty command list (e.g., REM lines that have no executable code)
+    // Still register the line number for GOTO/GOSUB targets
+    if (commands.length === 0) {
       const statementIndex = expandedStatements.length
       expandedStatements.push({
-        command: commandCst,
+        command: createNoOpCommand(),
         lineNumber,
         statementIndex,
       })
       statementIndices.push(statementIndex)
+    } else {
+      // Expand each command into a separate statement
+      for (const commandCst of commands) {
+        const statementIndex = expandedStatements.length
+        expandedStatements.push({
+          command: commandCst,
+          lineNumber,
+          statementIndex,
+        })
+        statementIndices.push(statementIndex)
+      }
     }
 
     // Map line number to statement indices

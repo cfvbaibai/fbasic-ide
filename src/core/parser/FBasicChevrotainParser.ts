@@ -12,7 +12,7 @@
  */
 
 import { CstParser } from 'chevrotain'
-import type { CstNode, ILexingError, IRecognitionException } from 'chevrotain'
+import type { CstNode, ILexingError, IRecognitionException, IToken } from 'chevrotain'
 import {
   // Keywords
   Let,
@@ -241,6 +241,7 @@ class FBasicChevrotainParser extends CstParser {
     // Family BASIC arithmetic functions: ABS, SGN, RND, VAL
     // String functions: LEN, LEFT$, RIGHT$, MID$, STR$, HEX$, CHR$, ASC, SCR$
     // Cursor functions: POS(n)
+    // Keyboard input function: INKEY$ (optional argument)
     this.functionCall = this.RULE('functionCall', () => {
       this.OR([
         // String functions
@@ -267,6 +268,8 @@ class FBasicChevrotainParser extends CstParser {
         { ALT: () => this.CONSUME(Ypos) },
         // Cursor position function
         { ALT: () => this.CONSUME(Pos) }, // POS(n) - cursor column
+        // Keyboard input function (fully implemented)
+        { ALT: () => this.CONSUME(Inkey) }, // INKEY$ - keyboard input
         // Limited utility functions (not applicable in IDE)
         { ALT: () => this.CONSUME(Peek) },
         { ALT: () => this.CONSUME(Fre) },
@@ -302,12 +305,19 @@ class FBasicChevrotainParser extends CstParser {
           ALT: () => this.CONSUME(Csrlin),
         },
         {
+          // INKEY$ without parentheses - consume directly (most common usage)
+          // INKEY$(n) with parentheses - handled by functionCall below
+          GATE: () => this.LA(1).tokenType === Inkey && this.LA(2).tokenType !== LParen,
+          ALT: () => this.CONSUME(Inkey),
+        },
+        {
           // Function call: String functions, arithmetic functions, controller input functions, and sprite query functions
           // Family BASIC arithmetic functions: ABS, SGN, RND, VAL
           // String functions: LEN, LEFT$, RIGHT$, MID$, STR$, HEX$, CHR$, ASC, SCR$
           // Controller input functions: STICK, STRIG
           // Sprite query functions: MOVE(n), XPOS(n), YPOS(n)
           // Cursor position function: POS(n)
+          // Keyboard input function: INKEY$(n) - only with parentheses here
           // Limited utility functions: PEEK(n), FRE(n)
           GATE: () =>
             this.LA(1).tokenType === Len ||
@@ -329,14 +339,10 @@ class FBasicChevrotainParser extends CstParser {
             this.LA(1).tokenType === Xpos ||
             this.LA(1).tokenType === Ypos ||
             this.LA(1).tokenType === Pos ||
+            (this.LA(1).tokenType === Inkey && this.LA(2).tokenType === LParen) ||
             this.LA(1).tokenType === Peek ||
             this.LA(1).tokenType === Fre,
           ALT: () => this.SUBRULE(this.functionCall),
-        },
-        {
-          // INKEY$ - zero-argument function (not applicable in IDE)
-          GATE: () => this.LA(1).tokenType === Inkey,
-          ALT: () => this.CONSUME(Inkey),
         },
         {
           // Array access: Identifier LParen ExpressionList RParen
@@ -1476,7 +1482,7 @@ const REPL_ONLY_COMMANDS: Record<string, string> = {
 const REPL_ONLY_FUNCTIONS: Record<string, string> = {
   Peek: 'PEEK: Not applicable for IDE version',
   Fre: 'FRE: Not applicable for IDE version',
-  Inkey: 'INKEY$: Not applicable for IDE version',
+  // INKEY$ is now fully implemented - removed from REPL-only list
 }
 
 /**
@@ -1526,19 +1532,6 @@ function checkReplOnlyCommands(cst: CstNode): Array<{ message: string; line?: nu
             }
           }
         }
-      }
-    }
-
-    // Check for INKEY$ token directly in primary (it's consumed directly, not via functionCall)
-    if (cstNode.name === 'primary' && cstNode.children.Inkey) {
-      const inkeyError = REPL_ONLY_FUNCTIONS['Inkey']
-      if (inkeyError && !seenErrors.has(inkeyError)) {
-        seenErrors.add(inkeyError)
-        errors.push({
-          message: inkeyError,
-          line: lineNumber,
-          column: 1,
-        })
       }
     }
 
@@ -1596,10 +1589,40 @@ export function parseWithChevrotain(source: string): {
     // Check if line is a comment line: REM or apostrophe (') per F-BASIC manual p.67
     // Format: <lineNumber> REM <comment text>  OR  <lineNumber> ' <comment text>
     // Abbreviation for REM is ' (apostrophe); "You can use (apostrophe) instead of REM."
+    // IMPORTANT: REM lines must still register their line numbers for GOTO/GOSUB targets
     const remMatch = line.match(/^\s*(\d+)\s+REM\b/i)
     const apostropheCommentMatch = line.match(/^\s*(\d+)\s+'/)
     if (remMatch || apostropheCommentMatch) {
-      // Comment line - skip entirely (don't tokenize or parse)
+      // Comment line - create a placeholder CST node to register the line number
+      const lineNumber = remMatch?.[1] ?? apostropheCommentMatch?.[1]
+      if (!lineNumber) continue // Should never happen, but satisfies TypeScript
+
+      const placeholderCst: CstNode = {
+        name: 'statement',
+        children: {
+          NumberLiteral: [
+            {
+              image: lineNumber,
+              startOffset: 0,
+              startLine: lineIndex + 1,
+              startColumn: 1,
+              endOffset: lineNumber.length - 1,
+              endLine: lineIndex + 1,
+              endColumn: lineNumber.length,
+              tokenTypeIdx: 0,
+            } as IToken,
+          ],
+          commandList: [
+            {
+              name: 'commandList',
+              children: {
+                command: [], // Empty command list - REM is a no-op
+              },
+            } as CstNode,
+          ],
+        },
+      }
+      statements.push(placeholderCst)
       continue
     }
 

@@ -91,6 +91,58 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
     return state
   }
 
+  // === KEYBOARD INPUT (INKEY$) ===
+
+  /** Current keyboard state for INKEY$ testing */
+  private inkeyState: string = ''
+
+  getInkeyState(): string {
+    return this.inkeyState
+  }
+
+  /**
+   * Set keyboard state for testing INKEY$
+   */
+  setInkeyStateForTest(keyChar: string): void {
+    this.inkeyState = keyChar
+  }
+
+  /**
+   * Clear keyboard state (called on key up in real adapter)
+   */
+  clearInkeyStateForTest(): void {
+    this.inkeyState = ''
+  }
+
+  /** Queue of key responses for waitForInkey; each call pops the next. */
+  public waitForInkeyQueue: string[] = []
+
+  /**
+   * Wait for a key press (blocking mode for INKEY$(0)).
+   * For testing: returns immediately with queued key or current state.
+   */
+  waitForInkey?(): Promise<string> {
+    // First check if there's a queued response
+    if (this.waitForInkeyQueue.length > 0) {
+      return Promise.resolve(this.waitForInkeyQueue.shift()!)
+    }
+    // Otherwise return current state (may be empty string if no key pressed)
+    return Promise.resolve(this.inkeyState)
+  }
+
+  /**
+   * Wait for a key press synchronously (blocking mode for INKEY$(0)).
+   * For testing: returns immediately with queued key or current state.
+   */
+  waitForInkeyBlocking?(): string {
+    // First check if there's a queued response
+    if (this.waitForInkeyQueue.length > 0) {
+      return this.waitForInkeyQueue.shift()!
+    }
+    // Otherwise return current state
+    return this.inkeyState
+  }
+
   // === SPRITE POSITION QUERY ===
 
   getSpritePosition(actionNumber: number): { x: number; y: number } | null {

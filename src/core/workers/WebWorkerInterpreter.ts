@@ -19,6 +19,7 @@ import type {
   SetBgDataMessage,
   SetSharedAnimationBufferMessage,
   SetSharedJoystickBufferMessage,
+  SetSharedKeyboardBufferMessage,
   StopMessage,
   StrigEventMessage,
 } from '@/core/interfaces'
@@ -88,6 +89,9 @@ class WebWorkerInterpreter {
           break
         case 'SET_SHARED_JOYSTICK_BUFFER':
           this.handleSetSharedJoystickBuffer(message)
+          break
+        case 'SET_SHARED_KEYBOARD_BUFFER':
+          this.handleSetSharedKeyboardBuffer(message)
           break
         case 'SET_BG_DATA':
           this.handleSetBgData(message)
@@ -281,6 +285,22 @@ class WebWorkerInterpreter {
       logWorker.debug('[WebWorkerInterpreter] Shared joystick buffer set in WebWorkerDeviceAdapter')
     } else {
       logWorker.warn('[WebWorkerInterpreter] No WebWorkerDeviceAdapter available for SET_SHARED_JOYSTICK_BUFFER')
+    }
+  }
+
+  handleSetSharedKeyboardBuffer(message: SetSharedKeyboardBufferMessage) {
+    const data = message.data
+    if (!data?.buffer) {
+      logWorker.warn('SET_SHARED_KEYBOARD_BUFFER: message.data or buffer missing')
+      return
+    }
+    const { buffer } = data
+    console.log('[WebWorkerInterpreter] SET_SHARED_KEYBOARD_BUFFER received, buffer byteLength =', buffer.byteLength)
+    if (this.webWorkerDeviceAdapter) {
+      this.webWorkerDeviceAdapter.setSharedKeyboardBuffer(buffer)
+      logWorker.debug('[WebWorkerInterpreter] Shared keyboard buffer set in WebWorkerDeviceAdapter')
+    } else {
+      logWorker.warn('[WebWorkerInterpreter] No WebWorkerDeviceAdapter available for SET_SHARED_KEYBOARD_BUFFER')
     }
   }
 

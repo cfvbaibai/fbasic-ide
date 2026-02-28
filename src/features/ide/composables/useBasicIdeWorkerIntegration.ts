@@ -84,7 +84,7 @@ export function useBasicIdeWorkerIntegration(
   const initializeWebWorkerWrapper = async (): Promise<void> => {
     await initializeWebWorker(webWorkerManager, message => {
       handleWorkerMessage(message, messageHandlerContext)
-    }, screen.sharedAnimationBuffer, screen.sharedJoystickBuffer)
+    }, screen.sharedAnimationBuffer, screen.sharedJoystickBuffer, screen.sharedKeyboardBuffer)
   }
 
   const restartWebWorkerWrapper = async (): Promise<void> => {

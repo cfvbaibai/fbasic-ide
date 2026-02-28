@@ -21,6 +21,7 @@ describe('Colon-Separated Statement Execution', () => {
       pushStrigState: vi.fn(),
       consumeStrigState: vi.fn(() => 0),
       getSpritePosition: vi.fn(() => null),
+      getInkeyState: vi.fn(() => ''),
       printOutput: printOutputMock,
       debugOutput: vi.fn(),
       errorOutput: vi.fn(),

@@ -15,7 +15,12 @@ import {
   SharedDisplayBufferAccessor,
 } from '@/core/animation/sharedDisplayBufferAccessor'
 import { TIMING } from '@/core/constants'
-import { createSharedJoystickBuffer } from '@/core/devices'
+import {
+  createSharedJoystickBuffer,
+  createSharedKeyboardBuffer,
+  createViewsFromKeyboardBuffer,
+  type KeyboardBufferView,
+} from '@/core/devices'
 
 import type { BasicIdeState } from './useBasicIdeState'
 
@@ -24,6 +29,8 @@ export interface BasicIdeScreenIntegration {
   sharedDisplayBufferAccessor: SharedDisplayBufferAccessor
   sharedAnimationBuffer: SharedArrayBuffer
   sharedJoystickBuffer: SharedArrayBuffer
+  sharedKeyboardBuffer: SharedArrayBuffer
+  sharedKeyboardBufferView: KeyboardBufferView
   registerScheduleRender: (fn: () => void) => void
   setDecodedScreenState: (decoded: DecodedScreenState) => void
   /** Called by message handlers when SCREEN_CHANGED is received. */
@@ -46,6 +53,10 @@ export function useBasicIdeScreenIntegration(state: BasicIdeState): BasicIdeScre
 
   // Shared joystick buffer (main thread writes, workers read)
   const sharedJoystickBuffer = createSharedJoystickBuffer()
+
+  // Shared keyboard buffer for INKEY$ function (main thread writes, workers read)
+  const sharedKeyboardBuffer = createSharedKeyboardBuffer()
+  const sharedKeyboardBufferView = createViewsFromKeyboardBuffer(sharedKeyboardBuffer)
 
   const scheduleScreenRenderRef = ref<(() => void) | null>(null)
   const registerScheduleRender = (fn: () => void) => {
@@ -141,6 +152,8 @@ export function useBasicIdeScreenIntegration(state: BasicIdeState): BasicIdeScre
     sharedDisplayBufferAccessor,
     sharedAnimationBuffer,
     sharedJoystickBuffer,
+    sharedKeyboardBuffer,
+    sharedKeyboardBufferView,
     registerScheduleRender,
     setDecodedScreenState,
     scheduleRender,

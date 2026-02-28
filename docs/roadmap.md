@@ -8,79 +8,76 @@
 
 Family Basic IDE is feature-complete for core F-BASIC functionality. Major systems implemented:
 
-- **Parser**: Full F-BASIC grammar with Chevrotain
+- **Parser**: Full F-BASIC grammar with Chevrotain, includes REPL-only command parsing
 - **Runtime**: Executors for all core statements
 - **Platform**: Screen, sprites, animation, sound, joystick
-- **UI**: Vue 3 IDE with i18n support
+- **UI**: Vue 3 IDE with i18n support, VueUse integration
 - **BG Editor**: Integrated BG GRAPHIC editor with VIEW command support (complete)
 
 ---
 
 ## Active Work
 
-### Command Coverage Enhancement
+**No active work.** All planned commands are implemented.
 
-Tracking implementation status of remaining F-BASIC commands.
-
-#### Implemented Functions (51 commands/functions)
-All core F-BASIC commands are implemented. See [Command Analysis](#command-analysis) below.
-
-#### Remaining Work
-
-| Priority | Commands | Status | Notes |
-|----------|----------|--------|-------|
-| High | CSRLIN, POS, SCR$, BEEP | Pending | Implementable in web context |
-| Medium | LIST, NEW, RUN, SAVE, LOAD, etc. | Pending | Parse but report "Not applicable for IDE version" |
+Track future work via [GitHub Issues](https://github.com/cfvbaibai/fbasic-ide/issues).
 
 ---
 
 ## Command Analysis
 
-### Fully Implemented (~51 commands/functions)
+### Fully Implemented (~55 commands/functions)
 
-**Statements**: CGEN, CGSET, CLEAR, CLS, COLOR, CUT, DATA, DEF MOVE, DEF SPRITE, DIM, END, ERA, FOR/NEXT, GOTO, GOSUB, IF/THEN, INPUT, LET, LINPUT, LOCATE, MOVE, ON, PALET/PALETB/PALETS, PAUSE, PLAY, POSITION, PRINT, READ, REM, RESTORE, RETURN, SPRITE/SPRITE ON/OFF, SWAP, VIEW
+**Statements**: BEEP, CGEN, CGSET, CLEAR, CLS, COLOR, CUT, DATA, DEF MOVE, DEF SPRITE, DIM, END, ERA, FOR/NEXT, GOTO, GOSUB, IF/THEN, INPUT, LET, LINPUT, LOCATE, MOVE, ON, PALET/PALETB/PALETS, PAUSE, PLAY, POSITION, PRINT, READ, REM, RESTORE, RETURN, SPRITE/SPRITE ON/OFF, SWAP, VIEW
 
-**Functions**: ABS, ASC, CHR$, HEX$, LEFT$, LEN, MID$, MOVE(n), RIGHT$, RND, SGN, STICK, STR$, STRIG, VAL, XPOS, YPOS
+**Functions**: ABS, ASC, CHR$, CSRLIN, HEX$, LEFT$, LEN, MID$, MOVE(n), POS, RIGHT$, RND, SCR$, SGN, STICK, STR$, STRIG, VAL, XPOS, YPOS
 
-### REPL-Only (Not Applicable to Web IDE)
+### REPL-Only (Parsed with IDE Error Message)
 
-These are program editing/system commands for the original Famicom tape system:
+These commands are recognized by the parser but produce "Not applicable for IDE version" error:
 
-| Command | Description | Reason |
-|---------|-------------|--------|
-| LIST | List program | IDE has code viewer |
-| NEW | Erase program | IDE manages code |
-| RUN | Execute program | IDE has Run button |
-| SAVE | Save to tape | No tape drive |
-| LOAD | Load from tape | No tape drive |
-| LOAD? | Verify tape | No tape drive |
-| KEY | Define function keys | No F-keys |
-| KEYLIST | List function keys | No F-keys |
-| CONT | Continue after STOP | REPL-only |
-| SYSTEM | Exit to menu | No system menu |
-
-### Limited Utility in Web Context
-
-| Command | Description | Consideration |
+| Command | Description | Error Message |
 |---------|-------------|---------------|
-| POKE | Write memory | No real memory access |
-| PEEK | Read memory | No real memory access |
-| FRE | Free memory | Not meaningful |
-| INKEY$ | Immediate keypress | Different input model |
-| STOP | Pause execution | Needs CONT to resume |
-
-### Could Implement
-
-| Command | Description | Notes |
-|---------|-------------|-------|
-| CSRLIN | Cursor line | Screen state query |
-| POS | Cursor column | Screen state query |
-| SCR$ | Read screen char | Screen buffer read |
-| BEEP | Beep sound | Web Audio API |
+| LIST | List program | "LIST: Not applicable for IDE version" |
+| NEW | Erase program | "NEW: Not applicable for IDE version" |
+| RUN | Execute program | "RUN: Not applicable for IDE version" |
+| SAVE | Save to tape | "SAVE: Not applicable for IDE version" |
+| LOAD | Load from tape | "LOAD: Not applicable for IDE version" |
+| LOAD? | Verify tape | "LOAD?: Not applicable for IDE version" |
+| KEY | Define function keys | "KEY: Not applicable for IDE version" |
+| KEYLIST | List function keys | "KEYLIST: Not applicable for IDE version" |
+| CONT | Continue after STOP | "CONT: Not applicable for IDE version" |
+| SYSTEM | Exit to menu | "SYSTEM: Not applicable for IDE version" |
+| POKE | Write memory | "POKE: Not applicable for IDE version" |
+| PEEK | Read memory | "PEEK: Not applicable for IDE version" |
+| FRE | Free memory | "FRE: Not applicable for IDE version" |
+| INKEY$ | Immediate keypress | "INKEY$: Not applicable for IDE version" |
+| STOP | Pause execution | "STOP: Not applicable for IDE version" |
 
 ---
 
 ## Completed
+
+### Command Coverage Complete (2026-02-25)
+
+**What was implemented**:
+- CSRLIN, POS, SCR$ functions for screen state queries
+- BEEP statement for audio feedback (Web Audio API)
+- REPL-only command parsing with helpful IDE error messages
+- All F-BASIC commands now either implemented or gracefully handled
+
+### Memory Leak Prevention (2026-02-25)
+
+**What was implemented**:
+- Proper cleanup in composables with `onScopeDispose` and `watch` cleanup
+- VueUse integration for reactive primitives (`useStorage`, `toRef`, `toValue`)
+- Refactored `useBasicIdeState` and `useProgramStore` for memory safety
+
+### Syntax Highlighting Fix (2026-02-24)
+
+**What was implemented**:
+- Complete F-BASIC syntax highlighting for all tokens
+- Disabled hover tooltip (not useful for this language)
 
 ### BG Editor UX Enhancements (2026-02-19)
 
@@ -118,17 +115,13 @@ Labels:
 - `enhancement` - New features
 - `refactor` - Code improvements
 
+**Recently Closed**:
+- [#1](https://github.com/cfvbaibai/fbasic-ide/issues/1): CSRLIN, POS, SCR$, BEEP functions
+- [#2](https://github.com/cfvbaibai/fbasic-ide/issues/2): REPL-only command parsing
+
 ---
 
 ## Backlog
-
-### F-BASIC Commands (Optional)
-
-| Command | Description | Notes |
-|---------|-------------|-------|
-| STOP | Stop execution with resume | Requires CONT |
-| CONT | Continue after STOP | Requires STOP |
-| POKE | Memory write | No-op or limited in web |
 
 ### Future Enhancements
 
@@ -136,6 +129,7 @@ Labels:
 |---------|-------------|----------|
 | Documentation | README, user guide, architecture | Low |
 | Performance | Incremental dirty updates (if needed) | Low |
+| STOP/CONT | Pause/resume execution | Low (requires state persistence) |
 
 ---
 

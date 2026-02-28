@@ -15,8 +15,8 @@ export const EXECUTION_LIMITS = {
   MAX_ITERATIONS_TEST: 10000,
   MAX_OUTPUT_LINES_TEST: 1000,
 
-  // Production environment limits (more permissive for real user interaction)
-  MAX_ITERATIONS_PRODUCTION: 1000000, // Much higher limit for production
+  // Production environment limits (no iteration limit - user controls via STOP button)
+  MAX_ITERATIONS_PRODUCTION: Infinity,
   MAX_OUTPUT_LINES_PRODUCTION: 10000,
 
   // Legacy limits (for backward compatibility)

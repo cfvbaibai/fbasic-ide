@@ -464,6 +464,12 @@ export class ExpressionEvaluator {
       return this.evaluateCsrlin()
     }
 
+    // Check for INKEY$ (keyboard input - no parentheses, consumed directly in primary)
+    const inkeyToken = getFirstToken(cst.children.Inkey)
+    if (inkeyToken) {
+    return this.evaluateInkey()
+    }
+
     // Check for parenthesized expression
     if (cst.children.LParen && !functionCallCst && !arrayAccessCst) {
       const exprCst = getFirstCstNode(cst.children.expression)
@@ -590,6 +596,23 @@ export class ExpressionEvaluator {
     }
     const position = this.context.deviceAdapter.getCursorPosition()
     return position.y
+  }
+
+  // ============================================================================
+  // Keyboard Input Functions
+  // ============================================================================
+
+  /**
+   * Evaluate INKEY$ - returns currently pressed key character
+   * Returns: Single character string or empty string if no key pressed
+   * This is a polling (non-blocking) read - the key remains "pressed" until released
+   * Reference: F-BASIC Manual page 87
+   */
+  private evaluateInkey(): string {
+    if (!this.context.deviceAdapter) {
+      return ''
+    }
+    return this.context.deviceAdapter.getInkeyState()
   }
 
   /**

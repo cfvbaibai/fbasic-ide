@@ -2,6 +2,7 @@
 import { useI18n } from 'vue-i18n'
 
 import BgEditorPanel from '@/features/bg-editor/components/BgEditorPanel.vue'
+import type { InputMode } from '@/features/ide/composables/useBasicIdeState'
 import { GameBlock, GameButton, GameIconButton } from '@/shared/components/ui'
 
 import EditorViewToggle from './EditorViewToggle.vue'
@@ -23,6 +24,7 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   (e: 'update:code', value: string): void
   (e: 'update:editorView', value: 'code' | 'bg'): void
+  (e: 'update:inputMode', value: InputMode): void
   (e: 'run'): void
   (e: 'stop'): void
   (e: 'clear'): void
@@ -46,6 +48,8 @@ interface Props {
   canStop: boolean
   /** Whether debug mode is active */
   debugMode: boolean
+  /** Current input mode: 'joystick' or 'keyboard' */
+  inputMode: InputMode
 }
 
 const { t } = useI18n()
@@ -85,11 +89,13 @@ const { t } = useI18n()
           :can-run="props.canRun"
           :can-stop="props.canStop"
           :debug-mode="props.debugMode"
+          :input-mode="props.inputMode"
           @run="emit('run')"
           @stop="emit('stop')"
           @clear="emit('clear')"
           @toggle-debug="emit('toggleDebug')"
           @debug-buffer="emit('debugBuffer')"
+          @update:input-mode="emit('update:inputMode', $event)"
         />
       </div>
     </template>

@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 
+import type { InputMode } from '@/features/ide/composables/useBasicIdeState'
 import { GameIconButton } from '@/shared/components/ui'
+
+import InputModeToggle from './InputModeToggle.vue'
 
 /**
  * IdeControls component - Control buttons for the IDE (run, stop, clear, debug toggle).
@@ -28,6 +31,7 @@ withDefaults(defineProps<Props>(), {
   canRun: true,
   canStop: false,
   debugMode: false,
+  inputMode: 'joystick',
 })
 
 const emit = defineEmits<Emits>()
@@ -43,6 +47,8 @@ interface Props {
   canStop?: boolean
   /** Whether debug mode is currently enabled */
   debugMode?: boolean
+  /** Current input mode: 'joystick' or 'keyboard' */
+  inputMode?: InputMode
 }
 
 interface Emits {
@@ -56,6 +62,8 @@ interface Emits {
   (e: 'toggleDebug'): void
   /** Emitted when the buffer debug button is clicked */
   (e: 'debugBuffer'): void
+  /** Emitted when the input mode changes */
+  (e: 'update:inputMode', value: InputMode): void
 }
 
 const handleRun = () => {
@@ -77,10 +85,23 @@ const handleDebugToggle = () => {
 const handleDebugBuffer = () => {
   emit('debugBuffer')
 }
+
+const handleInputModeChange = (value: InputMode) => {
+  emit('update:inputMode', value)
+}
 </script>
 
 <template>
   <div class="ide-controls">
+    <!-- Input mode toggle -->
+    <InputModeToggle
+      :model-value="inputMode"
+      is-compact
+      @update:model-value="handleInputModeChange"
+    />
+
+    <div class="control-divider" />
+
     <GameIconButton
       type="primary"
       :disabled="!canRun"
@@ -133,5 +154,12 @@ const handleDebugBuffer = () => {
   align-items: center;
   gap: 0.5rem;
   padding: 0;
+}
+
+.control-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--game-surface-border);
+  margin: 0 0.25rem;
 }
 </style>

@@ -140,11 +140,8 @@ export class StatementRouter {
     const singleCommandCst = getFirstCstNode(commandCst.children.singleCommand)
 
     if (!singleCommandCst) {
-      this.context.addError({
-        line: expandedStatement.lineNumber,
-        message: 'Invalid command: missing single command',
-        type: ERROR_TYPES.RUNTIME,
-      })
+      // No singleCommand means this is a no-op (e.g., REM line with no executable code)
+      // This is valid for GOTO/GOSUB targets that are comment lines
       return
     }
 

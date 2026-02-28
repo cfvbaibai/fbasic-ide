@@ -148,11 +148,15 @@ export class ExecutionContext {
   }
 
   /**
-   * Increment iteration count and check limits
+   * Increment iteration count and check limits.
+   * Only applies count-based limit when maxIterations is finite (test mode).
+   * Production mode (maxIterations = Infinity) has no iteration limit.
    */
   incrementIteration(): void {
     this.iterationCount++
-    if (this.iterationCount >= this.config.maxIterations) {
+
+    // Only check limit if maxIterations is finite (test mode)
+    if (this.config.maxIterations !== Infinity && this.iterationCount >= this.config.maxIterations) {
       this.addError({
         line: 0,
         message: 'Maximum iterations exceeded',

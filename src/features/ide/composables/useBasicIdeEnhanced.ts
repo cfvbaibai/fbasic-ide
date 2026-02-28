@@ -27,6 +27,7 @@ import { cleanupMessageHandlers } from './useBasicIdeMessageHandlers'
 import { useBasicIdeScreenIntegration } from './useBasicIdeScreenIntegration'
 import { useBasicIdeState } from './useBasicIdeState'
 import { useBasicIdeWorkerIntegration } from './useBasicIdeWorkerIntegration'
+import { useKeyboardInput } from './useKeyboardInput'
 import { useProgramStore } from './useProgramStore'
 
 /**
@@ -40,6 +41,14 @@ export function useBasicIde() {
   const execution = useBasicIdeExecution(state, worker, editor.parseCode, {
     clearSharedDisplay: () => screen.clearDisplayToSharedBuffer(),
     clearWorkerDisplay: () => worker.sendClearDisplay(),
+  })
+
+  // Keyboard input for INKEY$ function
+  // Only active when input mode is 'keyboard' and program is running
+  useKeyboardInput({
+    sharedKeyboardView: () => screen.sharedKeyboardBufferView,
+    enabled: () => state.isRunning.value,
+    inputMode: state.inputMode,
   })
 
   // Program store integration
@@ -142,6 +151,9 @@ export function useBasicIde() {
     backSpriteNodes: state.backSpriteNodes,
     pendingInputRequest: state.pendingInputRequest,
     respondToInputRequest: worker.respondToInputRequest,
+
+    // Input mode
+    inputMode: state.inputMode,
 
     // Methods
     runCode: execution.runCode,

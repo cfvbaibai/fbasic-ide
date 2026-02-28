@@ -5,6 +5,8 @@
  * Delegates to specialized modules for web worker management, screen state, and message handling.
  */
 
+/* eslint-disable max-lines */
+
 import type { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import type {
   AnyServiceWorkerMessage,
@@ -26,6 +28,13 @@ import {
   getStickState,
   type JoystickBufferView,
 } from './sharedJoystickBuffer'
+import {
+  consumeKeyAvailable,
+  createViewsFromKeyboardBuffer,
+  getInkeyState as getInkeyFromBuffer,
+  type KeyboardBufferView,
+  waitForInkeyBlocking as waitForInkeyBlockingFromBuffer,
+} from './sharedKeyboardBuffer'
 import { type WebWorkerExecutionOptions, WebWorkerManager } from './WebWorkerManager'
 
 export type { WebWorkerExecutionOptions }
@@ -37,33 +46,30 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   private sharedDisplayAccessor: SharedDisplayBufferAccessor | null = null
   /** Shared joystick buffer view. Set when receiving SET_SHARED_JOYSTICK_BUFFER. */
   private sharedJoystickView: JoystickBufferView | null = null
+  /** Shared keyboard buffer view for INKEY$. Set when receiving SET_SHARED_KEYBOARD_BUFFER. */
+  private sharedKeyboardView: KeyboardBufferView | null = null
   /** Last POSITION per sprite; getSpritePosition returns it so MOVE uses it (not buffer 0,0). */
   private lastPositionBySprite: Map<number, { x: number; y: number }> = new Map()
   private isEnabled = true
   /** BG GRAPHIC data for VIEW command. Set via SET_BG_DATA message from main thread. */
   private bgGridData: BgGridData | null = null
-
   // === MANAGERS ===
   private webWorkerManager: WebWorkerManager
   private screenStateManager: ScreenStateManager
   private messageHandler: MessageHandler
   private soundStateManager: SoundStateManager
-
   // === INPUT REQUEST (worker only: INPUT/LINPUT) ===
   private pendingInputRequests: Map<
     string,
     { resolve: (values: string[]) => void; reject: (err: Error) => void }
   > = new Map()
-
-  // === SCREEN UPDATE BATCHING ===
-  // FPS-based batching: batches screen updates to align with target frame rate
+  // === SCREEN UPDATE BATCHING (FPS-based: aligns updates with target frame rate) ===
   private pendingScreenUpdate: boolean = false
   private screenUpdateTimeout: number | null = null
   private lastScreenUpdateTime: number = 0
-  private readonly TARGET_FPS = 60 // Target frames per second
-  private readonly FRAME_INTERVAL_MS = 1000 / 60 // ~16.67ms for 60 FPS
-  private readonly MAX_BATCH_DELAY_MS = 33 // Maximum delay (2 frames) to prevent excessive lag
-
+  private readonly TARGET_FPS = 60
+  private readonly FRAME_INTERVAL_MS = 1000 / 60
+  private readonly MAX_BATCH_DELAY_MS = 33
   constructor() {
     logWorker.debug('WebWorkerDeviceAdapter created')
     this.webWorkerManager = new WebWorkerManager()
@@ -75,31 +81,20 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
 
   // === WEB WORKER MANAGEMENT METHODS ===
 
-  /**
-   * Check if web workers are supported
-   */
+  /** Check if web workers are supported */
   static isSupported(): boolean {
     return WebWorkerManager.isSupported()
   }
-
-  /**
-   * Check if we're currently running in a web worker context
-   */
+  /** Check if we're currently running in a web worker context */
   static isInWebWorker(): boolean {
     return WebWorkerManager.isInWebWorker()
   }
-
-  /**
-   * Initialize the web worker
-   */
+  /** Initialize the web worker */
   async initialize(workerScript?: string): Promise<void> {
     await this.webWorkerManager.initialize(workerScript)
     this.setupMessageListener()
   }
-
-  /**
-   * Execute BASIC code in the web worker
-   */
+  /** Execute BASIC code in the web worker */
   async executeInWorker(
     code: string,
     config: InterpreterConfig,
@@ -110,16 +105,11 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     })
   }
 
-  /**
-   * Stop execution in the web worker
-   */
+  /** Stop execution in the web worker */
   stopExecution(): void {
     this.webWorkerManager.stopExecution()
   }
-
-  /**
-   * Send a STRIG event to the web worker
-   */
+  /** Send a STRIG event to the web worker */
   sendStrigEvent(joystickId: number, state: number): void {
     const worker = this.webWorkerManager.getWorker()
     if (!worker) {
@@ -147,41 +137,28 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     worker.postMessage(message)
   }
 
-  /**
-   * Send a message to the web worker
-   */
+  /** Send a message to the web worker */
   sendMessage(message: AnyServiceWorkerMessage): void {
     this.webWorkerManager.sendMessage(message)
   }
-
-  /**
-   * Terminate the web worker
-   */
+  /** Terminate the web worker */
   terminate(): void {
     this.webWorkerManager.terminate()
     this.messageHandler.rejectAllPending('Web worker terminated')
   }
 
   // === DEVICE ADAPTER METHODS ===
-
-  /**
-   * Enable or disable the device adapter
-   */
+  /** Enable or disable the device adapter */
   setEnabled(enabled: boolean): void {
     this.isEnabled = enabled
     logWorker.debug('Device adapter enabled:', enabled)
   }
 
   // === JOYSTICK INPUT METHODS ===
-
   getJoystickCount(): number {
     return 2
   }
-
-  /**
-   * Get stick state from shared joystick buffer (zero-copy read)
-   * @throws Error if shared joystick buffer is not set
-   */
+  /** Get stick state from shared joystick buffer (zero-copy read). Throws if buffer not set. */
   getStickState(joystickId: number): number {
     if (!this.sharedJoystickView) {
       throw new Error(
@@ -190,11 +167,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     }
     return getStickState(this.sharedJoystickView, joystickId)
   }
-
-  /**
-   * Set stick state (deprecated - main thread now writes directly to shared buffer)
-   * @throws Error - this method is deprecated and should not be used
-   */
+  /** Set stick state (deprecated - main thread now writes directly to shared buffer) */
   setStickState(_joystickId: number, _state: number): void {
     throw new Error(
       'setStickState() is deprecated. Main thread writes directly to shared joystick buffer. This method is no longer supported.'
@@ -207,6 +180,63 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   setSharedJoystickBuffer(buffer: SharedArrayBuffer): void {
     this.sharedJoystickView = createViewsFromJoystickBuffer(buffer)
     logWorker.debug('[WebWorkerDeviceAdapter] Shared joystick buffer set')
+  }
+
+  // === KEYBOARD INPUT (INKEY$) ===
+
+  /** Get current keyboard state for INKEY$ - returns pressed character or empty string */
+  getInkeyState(): string {
+    if (!this.sharedKeyboardView) return ''
+    const { keyChar } = getInkeyFromBuffer(this.sharedKeyboardView)
+    return keyChar
+  }
+
+  /** Set shared keyboard buffer (called from worker when receiving SET_SHARED_KEYBOARD_BUFFER) */
+  setSharedKeyboardBuffer(buffer: SharedArrayBuffer): void {
+    this.sharedKeyboardView = createViewsFromKeyboardBuffer(buffer)
+    logWorker.debug('[WebWorkerDeviceAdapter] Shared keyboard buffer set')
+  }
+
+  /** Wait for a key press (blocking mode for INKEY$(0)) - polls until key is pressed */
+  async waitForInkey(): Promise<string> {
+    const POLL_INTERVAL_MS = 16 // ~60fps polling rate
+
+    while (this.isEnabled) {
+      const keyChar = this.getInkeyState()
+      if (keyChar) {
+        return keyChar
+      }
+      // Wait before next poll
+      await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS))
+    }
+    // If disabled (e.g., STOP), return empty string
+    return ''
+  }
+
+  /** Wait for a key press synchronously using Atomics.wait (blocking mode for INKEY$(0)) */
+  waitForInkeyBlocking(): string {
+    if (!this.sharedKeyboardView) return ''
+
+    // First check if key already pressed
+    const keyChar = this.getInkeyState()
+    if (keyChar) {
+      consumeKeyAvailable(this.sharedKeyboardView)
+      return keyChar
+    }
+
+    // Block until key available or disabled
+    const TIMEOUT_MS = 100 // Check isEnabled periodically
+    while (this.isEnabled) {
+      const available = waitForInkeyBlockingFromBuffer(this.sharedKeyboardView, TIMEOUT_MS)
+      if (available) {
+        const char = this.getInkeyState()
+        consumeKeyAvailable(this.sharedKeyboardView)
+        return char
+      }
+    }
+
+    // Disabled (STOP pressed)
+    return ''
   }
 
   pushStrigState(joystickId: number, state: number): void {
@@ -231,17 +261,14 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   }
 
   getSpritePosition(actionNumber: number): { x: number; y: number } | null {
-    // First, sync from shared buffer if available (main thread writes live animation positions each frame)
+    // Sync from shared buffer if available (main thread writes live animation positions)
     if (this.sharedDisplayAccessor) {
       const livePos = this.sharedDisplayAccessor.readSpritePosition(actionNumber)
-      // Buffer (0,0) means uninitialized or off-screen - don't cache it
       if (livePos !== null && (livePos.x !== 0 || livePos.y !== 0)) {
-        // Update cache with live position so XPOS/YPOS see animated movement
         this.lastPositionBySprite.set(actionNumber, livePos)
         return livePos
       }
     }
-    // Fall back to cached explicit POSITION command (or null if never positioned)
     return this.lastPositionBySprite.get(actionNumber) ?? null
   }
 
@@ -253,30 +280,19 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     this.lastPositionBySprite.delete(actionNumber)
   }
 
-  /** Clear all stored POSITION values (e.g. when IDE Clear is clicked so next Run uses default center). */
   clearAllSpritePositions(): void {
     this.lastPositionBySprite.clear()
   }
 
   // === BG GRAPHIC METHODS (VIEW command) ===
 
-  /**
-   * Set BG grid data for VIEW command.
-   * Called from WebWorkerInterpreter when receiving SET_BG_DATA message.
-   */
+  /** Set BG grid data for VIEW command (called from WebWorkerInterpreter when receiving SET_BG_DATA) */
   setBgGridData(data: BgGridData): void {
     this.bgGridData = data
     logWorker.debug('[WebWorkerDeviceAdapter] BG grid data set, rows:', data.length)
   }
 
-  /**
-   * Copy BG GRAPHIC to Background Screen.
-   * Per F-BASIC Manual page 36: "Upon executing the VIEW command,
-   * the BG GRAPHIC Screen will be copied to the Background Screen."
-   *
-   * This method writes the stored BG grid data directly to the screen buffer.
-   * The BG grid covers rows 3-23 (21 rows, leaving top 3 rows for system use).
-   */
+  /** Copy BG GRAPHIC to Background Screen (per F-BASIC Manual page 36). Grid rows 0-20 map to screen rows 3-23. */
   copyBgGraphicToBackground(): void {
     if (!this.bgGridData) {
       logWorker.warn('[WebWorkerDeviceAdapter] VIEW: No BG grid data available')
@@ -394,8 +410,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       this.screenStateManager.writeCharacter(char)
     }
 
-    // Batch screen updates to avoid sending too many messages
-    // This significantly reduces Vue reactivity overhead on the receiving side
+    // Batch screen updates to reduce Vue reactivity overhead
     this.scheduleScreenUpdate()
   }
 
@@ -548,6 +563,8 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   setCurrentExecutionId(executionId: string | null): void {
     this.screenStateManager.setCurrentExecutionId(executionId)
     if (executionId) {
+      // Reset sound state to defaults when starting a new program
+      this.soundStateManager.reset()
       this.screenStateManager.initializeScreen()
       this.syncScreenStateToShared()
       this.postScreenChanged()
@@ -654,26 +671,20 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     }
   }
 
-  /**
-   * Handle messages from the web worker
-   */
+  /** Handle messages from the web worker */
   private handleWorkerMessage(message: AnyServiceWorkerMessage): void {
     this.messageHandler.handleWorkerMessage(message, outputMessage => {
       this.handleOutputMessage(outputMessage)
     })
   }
 
-  /**
-   * Handle OUTPUT messages from the web worker
-   */
+  /** Handle OUTPUT messages from the web worker */
   private handleOutputMessage(message: OutputMessage): void {
     logWorker.debug('Handling OUTPUT message:', {
       outputType: message.data.outputType,
       outputLength: message.data.output.length,
     })
-
     // Output is now handled by the device adapter in the web worker
-    // No need to forward to main thread callbacks
   }
 
   /**
@@ -701,30 +712,21 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     const timeSinceLastUpdate = now - this.lastScreenUpdateTime
 
     // If enough time has passed since last update, send immediately
-    // This ensures we don't delay unnecessarily when updates are sparse
     if (timeSinceLastUpdate >= this.FRAME_INTERVAL_MS) {
-      // Send immediately - we're already past the frame boundary
       this.flushScreenUpdate()
       return
     }
 
-    // Calculate delay to next frame boundary
-    // This aligns updates with FPS intervals for smoother rendering
+    // Calculate delay to next frame boundary (capped to prevent excessive lag)
     const delayUntilNextFrame = this.FRAME_INTERVAL_MS - timeSinceLastUpdate
-    
-    // Cap the delay to prevent excessive lag (max 2 frames)
     const delay = Math.min(delayUntilNextFrame, this.MAX_BATCH_DELAY_MS)
-
     // Schedule the update to be sent at the next frame boundary
-    // This batches multiple rapid updates together while maintaining FPS alignment
     this.screenUpdateTimeout = self.setTimeout(() => {
       this.flushScreenUpdate()
     }, delay)
   }
 
-  /**
-   * Cancel any pending screen update (used by flush paths and by tests to avoid timeouts firing after teardown).
-   */
+  /** Cancel any pending screen update (used by flush paths and tests to avoid timeouts after teardown) */
   cancelPendingScreenUpdate(): void {
     if (this.screenUpdateTimeout !== null) {
       self.clearTimeout(this.screenUpdateTimeout)
@@ -732,17 +734,10 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     }
     this.pendingScreenUpdate = false
   }
-
-  /**
-   * Flush the pending screen update immediately.
-   * With shared buffer: writes to shared buffer, increments sequence, sends SCREEN_CHANGED.
-   * Without (e.g. tests): sends SCREEN_UPDATE full.
-   */
+  /** Flush pending screen update: write to shared buffer and send SCREEN_CHANGED */
   private flushScreenUpdate(): void {
     this.screenUpdateTimeout = null
-    if (!this.pendingScreenUpdate) {
-      return
-    }
+    if (!this.pendingScreenUpdate) return
     this.pendingScreenUpdate = false
     this.lastScreenUpdateTime = performance.now()
     this.syncScreenStateToShared()

@@ -26,7 +26,8 @@ export async function initializeWebWorker(
   webWorkerManager: WebWorkerManager,
   onMessage: (message: AnyServiceWorkerMessage) => void,
   sharedAnimationBuffer: SharedArrayBuffer,
-  sharedJoystickBuffer?: SharedArrayBuffer
+  sharedJoystickBuffer?: SharedArrayBuffer,
+  sharedKeyboardBuffer?: SharedArrayBuffer
 ): Promise<void> {
   if (webWorkerManager.worker) {
     logComposable.debug('Web worker already initialized')
@@ -74,6 +75,16 @@ export async function initializeWebWorker(
         data: { buffer: sharedJoystickBuffer },
       })
       logComposable.debug('Shared joystick buffer sent to worker')
+    }
+
+    if (sharedKeyboardBuffer) {
+      webWorkerManager.worker.postMessage({
+        type: 'SET_SHARED_KEYBOARD_BUFFER',
+        id: `init-keyboard-${Date.now()}`,
+        timestamp: Date.now(),
+        data: { buffer: sharedKeyboardBuffer },
+      })
+      logComposable.debug('Shared keyboard buffer sent to worker')
     }
 
     logComposable.debug('Web worker initialized successfully')

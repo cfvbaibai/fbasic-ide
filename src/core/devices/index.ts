@@ -10,6 +10,7 @@ export * from './WebWorkerDeviceAdapter'
 
 // Shared buffers
 export * from './sharedJoystickBuffer'
+export * from './sharedKeyboardBuffer'
 
 // Re-export commonly used types for convenience
 export type { BasicDeviceAdapter } from '../interfaces'

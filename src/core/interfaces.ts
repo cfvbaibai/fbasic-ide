@@ -63,6 +63,41 @@ export interface BasicDeviceAdapter {
   pushStrigState(joystickId: number, state: number): void
   consumeStrigState(joystickId: number): number
 
+  // === KEYBOARD INPUT (INKEY$) ===
+  /**
+   * Get current keyboard state for INKEY$ function.
+   * Returns the currently pressed key character, or empty string if no key pressed.
+   * This is a polling (non-consuming) read - the key remains "pressed" until released.
+   */
+  getInkeyState(): string
+  /**
+   * Set keyboard state (main thread only).
+   * Used to update the current key state when keyboard events occur.
+   */
+  setInkeyState?(keyChar: string): void
+  /**
+   * Clear keyboard state (main thread only).
+   * Called when key is released.
+   */
+  clearInkeyState?(): void
+  /**
+   * Set shared keyboard buffer (worker only).
+   * Called when receiving SET_SHARED_KEYBOARD_BUFFER message.
+   */
+  setSharedKeyboardBuffer?(buffer: SharedArrayBuffer): void
+  /**
+   * Wait for a key press (blocking mode for INKEY$(0)).
+   * Blocks execution until a key is pressed, then returns the character.
+   * @returns Promise resolving to the pressed character string
+   */
+  waitForInkey?(): Promise<string>
+  /**
+   * Wait for a key press synchronously (blocking mode for INKEY$(0)).
+   * Uses Atomics.wait() to block the worker until a key is pressed.
+   * @returns The pressed character string, or empty string if timeout/stop
+   */
+  waitForInkeyBlocking?(): string
+
   // === SPRITE POSITION QUERY ===
   getSpritePosition(actionNumber: number): { x: number; y: number } | null
   /** Store position for sprite (called when POSITION runs); used so MOVE uses it when no prior START_MOVEMENT. */
@@ -251,6 +286,7 @@ export type ServiceWorkerMessageType =
   | 'STICK_EVENT'
   | 'SET_SHARED_ANIMATION_BUFFER'
   | 'SET_SHARED_JOYSTICK_BUFFER'
+  | 'SET_SHARED_KEYBOARD_BUFFER'
   | 'SET_BG_DATA'
   | 'REQUEST_INPUT'
   | 'INPUT_VALUE'
@@ -436,6 +472,14 @@ export interface SetSharedJoystickBufferMessage extends ServiceWorkerMessage {
   }
 }
 
+// Set shared keyboard buffer - sent from main thread to worker for INKEY$ function
+export interface SetSharedKeyboardBufferMessage extends ServiceWorkerMessage {
+  type: 'SET_SHARED_KEYBOARD_BUFFER'
+  data: {
+    buffer: SharedArrayBuffer
+  }
+}
+
 // Set BG data - sent from main thread to worker before execution (for VIEW command)
 export interface SetBgDataMessage extends ServiceWorkerMessage {
   type: 'SET_BG_DATA'
@@ -502,6 +546,7 @@ export type AnyServiceWorkerMessage =
   | ReadyMessage
   | SetSharedAnimationBufferMessage
   | SetSharedJoystickBufferMessage
+  | SetSharedKeyboardBufferMessage
   | SetBgDataMessage
   | RequestInputMessage
   | InputValueMessage

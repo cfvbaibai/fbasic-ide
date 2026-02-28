@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, shallowRef, useTemplateRef } from 'vue'
+import { computed, onMounted, onUnmounted, ref, shallowRef, useTemplateRef } from 'vue'
 
 import type { HighlighterInfo, ParserInfo } from '@/core/interfaces'
 import { GameLayout } from '@/shared/components/ui'
@@ -41,6 +41,7 @@ const {
   movementPositionsFromBuffer,
   frontSpriteNodes,
   backSpriteNodes,
+  inputMode,
   runCode,
   stopCode,
   clearOutput,
@@ -127,7 +128,30 @@ const highlighterInfo = ref<HighlighterInfo | null>(null)
 onMounted(() => {
   parserInfo.value = getParserCapabilities()
   highlighterInfo.value = getHighlighterCapabilities()
+  window.addEventListener('keydown', handleGlobalKeydown)
 })
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleGlobalKeydown)
+})
+
+// Global hotkey handler
+function handleGlobalKeydown(e: KeyboardEvent) {
+  // Only handle if not in an input field
+  const target = e.target as HTMLElement
+  if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return
+
+  // F9: Toggle input mode (joystick/keyboard)
+  if (e.key === 'F9') {
+    e.preventDefault()
+    toggleInputMode()
+  }
+}
+
+// Toggle input mode between joystick and keyboard
+function toggleInputMode() {
+  inputMode.value = inputMode.value === 'joystick' ? 'keyboard' : 'joystick'
+}
 </script>
 
 <template>
@@ -145,8 +169,10 @@ onMounted(() => {
             :can-run="canRun"
             :can-stop="canStop"
             :debug-mode="debugMode"
+            :input-mode="inputMode"
             @update:code="code = $event"
             @update:editor-view="editorView = $event"
+            @update:input-mode="inputMode = $event"
             @run="runCode"
             @stop="stopCode"
             @clear="clearOutput"

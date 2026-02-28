@@ -32,6 +32,7 @@ describe.skipIf(!shouldRunPauseDemoTests)('Pause Demo Program', () => {
       pushStrigState: () => {},
       consumeStrigState: () => 0,
       getSpritePosition: () => null,
+      getInkeyState: () => '',
       printOutput: printOutputMock,
       debugOutput: () => {},
       errorOutput: () => {},

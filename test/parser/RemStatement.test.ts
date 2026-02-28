@@ -345,5 +345,53 @@ describe('REM Statement', () => {
       expect(result.errors).toHaveLength(0)
       expect(result.variables.get('X')?.value).toBe(7)
     })
+
+    it('should allow GOSUB to REM line (REM line must register line number)', async () => {
+      // This is a critical test: REM lines must register their line numbers
+      // so they can be targets for GOTO/GOSUB
+      const code = `10 LET X = 1
+20 GOSUB 500
+30 PRINT X
+40 END
+500 REM * Subroutine *
+510 X = X + 10
+520 RETURN`
+      const result = await interpreter.execute(code)
+
+      expect(result.success).toBe(true)
+      expect(result.errors).toHaveLength(0)
+      expect(result.variables.get('X')?.value).toBe(11)
+    })
+
+    it('should allow GOTO to REM line', async () => {
+      const code = `10 LET X = 0
+20 GOTO 300
+100 X = 100
+110 PRINT X
+120 END
+300 REM Jump target
+310 GOTO 100`
+      const result = await interpreter.execute(code)
+
+      expect(result.success).toBe(true)
+      expect(result.errors).toHaveLength(0)
+      expect(result.variables.get('X')?.value).toBe(100)
+    })
+
+    it('should allow GOSUB to apostrophe comment line', async () => {
+      // Apostrophe is abbreviation for REM (F-BASIC manual p.67)
+      const code = `10 LET X = 5
+20 GOSUB 400
+30 PRINT X
+40 END
+400 ' Subroutine
+410 X = X * 2
+420 RETURN`
+      const result = await interpreter.execute(code)
+
+      expect(result.success).toBe(true)
+      expect(result.errors).toHaveLength(0)
+      expect(result.variables.get('X')?.value).toBe(10)
+    })
   })
 })

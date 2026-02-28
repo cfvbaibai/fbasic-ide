@@ -13,6 +13,9 @@ import type { SpriteState } from '@/core/sprite/types'
 import type { PendingSpriteAction } from './useBasicIdeMessageHandlers'
 import { initializeScreenBuffer } from './useBasicIdeScreenUtils'
 
+/** Input mode for controlling keyboard vs joystick input */
+export type InputMode = 'joystick' | 'keyboard'
+
 const DEFAULT_CODE = `10 PRINT "Hello World!"
 20 PRINT "Family Basic IDE Demo"
 30 PRINT "Program completed!"
@@ -47,6 +50,8 @@ export interface BasicIdeState {
   backSpriteNodes: Ref<Map<number, unknown>>
   spriteActionQueues: Ref<Map<number, PendingSpriteAction[]>>
   pendingInputRequest: Ref<RequestInputMessage['data'] | null>
+  /** Input mode: 'joystick' uses keyboard for joystick controls, 'keyboard' uses keyboard for INKEY$ */
+  inputMode: Ref<InputMode>
 }
 
 /**
@@ -84,5 +89,8 @@ export function useBasicIdeState(): BasicIdeState {
     spriteActionQueues: ref<Map<number, PendingSpriteAction[]>>(new Map()),
 
     pendingInputRequest: ref<RequestInputMessage['data'] | null>(null),
+
+    // Input mode: 'joystick' (default) or 'keyboard' (for INKEY$)
+    inputMode: ref<InputMode>('joystick'),
   }
 }

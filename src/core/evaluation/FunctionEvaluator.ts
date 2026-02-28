@@ -69,6 +69,7 @@ export class FunctionEvaluator {
     const valToken = getFirstToken(cst.children.Val)
     const stickToken = getFirstToken(cst.children.Stick)
     const strigToken = getFirstToken(cst.children.Strig)
+    const inkeyToken = getFirstToken(cst.children.Inkey)
     const moveToken = getFirstToken(cst.children.Move)
     const xposToken = getFirstToken(cst.children.Xpos)
     const yposToken = getFirstToken(cst.children.Ypos)
@@ -134,6 +135,11 @@ export class FunctionEvaluator {
     }
     if (strigToken) {
       return this.evaluateStrig(args)
+    }
+
+    // Keyboard input function (INKEY$)
+    if (inkeyToken) {
+      return this.evaluateInkey(args)
     }
 
     // Cursor position functions
@@ -499,6 +505,43 @@ export class FunctionEvaluator {
       throw new Error('STRIG joystickId must be 0 or 1')
     }
     return this.context.consumeStrigState(joystickId)
+  }
+
+  // ============================================================================
+  // Keyboard Input Function (INKEY$)
+  // ============================================================================
+
+  /**
+   * Evaluate INKEY$(n) - returns character of currently pressed key
+   * Per F-BASIC Manual page 87:
+   * - When omitting argument: Returns pressed character, or "" if none (non-blocking)
+   * - When n=0: Cursor blinks and waits for input (blocking mode)
+   *
+   * @param args - Optional argument n (0 for blocking mode)
+   * @returns Single character string or empty string
+   */
+  private evaluateInkey(args: Array<number | string>): string {
+    // Check if blocking mode is requested (n=0)
+    if (args.length === 1) {
+      const mode = Math.floor(toNumber(args[0] ?? 1))
+      if (mode === 0) {
+        // Blocking mode - use waitForInkeyBlocking() if available
+        if (this.deviceAdapter?.waitForInkeyBlocking) {
+          return this.deviceAdapter.waitForInkeyBlocking()
+        }
+        // Fallback: return current key state (non-blocking behavior)
+        if (!this.deviceAdapter) {
+          return ''
+        }
+        return this.deviceAdapter.getInkeyState()
+      }
+    }
+
+    // Non-blocking mode: return currently pressed key
+    if (!this.deviceAdapter) {
+      return ''
+    }
+    return this.deviceAdapter.getInkeyState()
   }
 
   // ============================================================================
