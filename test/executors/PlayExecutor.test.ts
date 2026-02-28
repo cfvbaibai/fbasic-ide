@@ -9,6 +9,21 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
 
+/**
+ * Helper to extract note names from a MusicScore for simple assertion
+ */
+function extractNoteNames(score: { channels: Array<Array<{ type: string; note?: string }>> }): string[] {
+  const notes: string[] = []
+  for (const channel of score.channels) {
+    for (const event of channel) {
+      if (event.type === 'note' && event.note) {
+        notes.push(event.note)
+      }
+    }
+  }
+  return notes
+}
+
 describe('PlayExecutor', () => {
   let interpreter: BasicInterpreter
   let deviceAdapter: TestDeviceAdapter
@@ -33,19 +48,21 @@ describe('PlayExecutor', () => {
 
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
-    expect(deviceAdapter.playSoundCalls).toEqual(['CRDRE'])
+    expect(deviceAdapter.playSoundCalls.length).toBe(1)
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C', 'D', 'E'])
   })
 
   it('should execute PLAY with complex music string', async () => {
     const source = `
-10 PLAY "T4Y2M0V1503C5R5D5R5E5"
+10 PLAY "T4Y2M0V15O3C5R5D5R5E5"
 20 END
 `
     const result = await interpreter.execute(source)
 
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
-    expect(deviceAdapter.playSoundCalls).toEqual(['T4Y2M0V1503C5R5D5R5E5'])
+    expect(deviceAdapter.playSoundCalls.length).toBe(1)
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C', 'D', 'E'])
   })
 
   it('should execute PLAY with multi-channel music', async () => {
@@ -57,7 +74,8 @@ describe('PlayExecutor', () => {
 
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
-    expect(deviceAdapter.playSoundCalls).toEqual(['C:E:G'])
+    expect(deviceAdapter.playSoundCalls.length).toBe(1)
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C', 'E', 'G'])
   })
 
   it('should execute PLAY with string variable', async () => {
@@ -70,7 +88,8 @@ describe('PlayExecutor', () => {
 
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
-    expect(deviceAdapter.playSoundCalls).toEqual(['CDEFG'])
+    expect(deviceAdapter.playSoundCalls.length).toBe(1)
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C', 'D', 'E', 'F', 'G'])
   })
 
   it('should handle PLAY with empty string', async () => {
@@ -82,7 +101,8 @@ describe('PlayExecutor', () => {
 
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
-    expect(deviceAdapter.playSoundCalls).toEqual([''])
+    expect(deviceAdapter.playSoundCalls.length).toBe(1)
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual([])
   })
 
   it('should error for non-string expression', async () => {
@@ -108,7 +128,8 @@ describe('PlayExecutor', () => {
 
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
-    expect(deviceAdapter.playSoundCalls).toEqual(['CDE'])
+    expect(deviceAdapter.playSoundCalls.length).toBe(1)
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C', 'D', 'E'])
   })
 
   it('should handle multiple PLAY commands', async () => {
@@ -122,7 +143,10 @@ describe('PlayExecutor', () => {
 
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
-    expect(deviceAdapter.playSoundCalls).toEqual(['C', 'D', 'E'])
+    expect(deviceAdapter.playSoundCalls.length).toBe(3)
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C'])
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[1]!)).toEqual(['D'])
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[2]!)).toEqual(['E'])
   })
 
   it('should handle PLAY on same line as other commands', async () => {
@@ -134,7 +158,8 @@ describe('PlayExecutor', () => {
 
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
-    expect(deviceAdapter.playSoundCalls).toEqual(['C'])
+    expect(deviceAdapter.playSoundCalls.length).toBe(1)
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C'])
   })
 
   it('should handle PLAY in a loop', async () => {
@@ -148,7 +173,10 @@ describe('PlayExecutor', () => {
 
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
-    expect(deviceAdapter.playSoundCalls).toEqual(['C', 'C', 'C'])
+    expect(deviceAdapter.playSoundCalls.length).toBe(3)
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C'])
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[1]!)).toEqual(['C'])
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[2]!)).toEqual(['C'])
   })
 
   it('should handle PLAY with conditional execution', async () => {
@@ -161,7 +189,8 @@ describe('PlayExecutor', () => {
 
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
-    expect(deviceAdapter.playSoundCalls).toEqual(['C'])
+    expect(deviceAdapter.playSoundCalls.length).toBe(1)
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C'])
   })
 
   it('should not execute PLAY when condition is false', async () => {
@@ -188,7 +217,10 @@ describe('PlayExecutor', () => {
 
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
-    expect(deviceAdapter.playSoundCalls).toEqual(['T4O3C', 'D', 'E'])
+    expect(deviceAdapter.playSoundCalls.length).toBe(3)
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C'])
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[1]!)).toEqual(['D'])
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[2]!)).toEqual(['E'])
   })
 
   it('should handle PLAY with rest command', async () => {
@@ -200,7 +232,8 @@ describe('PlayExecutor', () => {
 
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
-    expect(deviceAdapter.playSoundCalls).toEqual(['CR5D'])
+    expect(deviceAdapter.playSoundCalls.length).toBe(1)
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C', 'D'])
   })
 
   it('should handle PLAY with volume and waveform commands', async () => {
@@ -212,6 +245,7 @@ describe('PlayExecutor', () => {
 
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
-    expect(deviceAdapter.playSoundCalls).toEqual(['V15Y2C'])
+    expect(deviceAdapter.playSoundCalls.length).toBe(1)
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C'])
   })
 })

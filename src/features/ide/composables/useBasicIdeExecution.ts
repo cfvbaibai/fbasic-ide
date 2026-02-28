@@ -9,12 +9,12 @@ import { ExecutionError } from '@/features/ide/errors/ExecutionError'
 import { logComposable } from '@/shared/logger'
 
 import { formatArrayForDisplay } from './useBasicIdeFormatting'
+import { stopAudioPlayback } from './useBasicIdeMessageHandlers'
 import { clearScreenBuffer, initializeScreenBuffer } from './useBasicIdeScreenUtils'
 import type { BasicIdeState } from './useBasicIdeState'
 import type { BasicIdeWorkerIntegration } from './useBasicIdeWorkerIntegration'
 import { clearAllCaches } from './useKonvaScreenRenderer'
 import { useProgramStore } from './useProgramStore'
-import { useWebAudioPlayer } from './useWebAudioPlayer'
 
 /** Parser returns CST or null; used by runCode. */
 export type ParseCodeFn = () => Promise<unknown>
@@ -43,9 +43,6 @@ export function useBasicIdeExecution(
   parseCode: ParseCodeFn,
   options?: BasicIdeExecutionOptions
 ): BasicIdeExecution {
-  // Initialize Web Audio player for PLAY command
-  const audioPlayer = useWebAudioPlayer()
-
   const runCode = async () => {
     if (state.isRunning.value) return
 
@@ -54,10 +51,6 @@ export function useBasicIdeExecution(
     state.errors.value = []
     state.variables.value = {}
     state.debugOutput.value = ''
-
-    // Initialize audio context before running (autoplay policy requirement)
-    // User gesture (Run button click) allows AudioContext creation
-    audioPlayer.initialize()
 
     try {
       await worker.initializeWebWorker()
@@ -171,6 +164,9 @@ export function useBasicIdeExecution(
   }
 
   const clearOutput = () => {
+    // Stop any playing audio (uses shared audio player from message handlers)
+    stopAudioPlayback()
+
     state.output.value = []
     state.errors.value = []
     state.variables.value = {}
@@ -199,7 +195,7 @@ export function useBasicIdeExecution(
   }
 
   const cleanup = () => {
-    audioPlayer.cleanup()
+    // Audio player cleanup is handled by cleanupMessageHandlers() from useBasicIdeMessageHandlers
   }
 
   return {

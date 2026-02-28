@@ -45,6 +45,14 @@ let queueAnimationFrame: number | null = null
 const audioPlayer = useWebAudioPlayer()
 
 /**
+ * Stop all audio playback immediately
+ * Call when CLEAR button is pressed to stop any playing music
+ */
+export function stopAudioPlayback(): void {
+  audioPlayer.stopAll()
+}
+
+/**
  * Cleanup function for module-level resources
  * Call on component unmount to prevent memory leaks
  */

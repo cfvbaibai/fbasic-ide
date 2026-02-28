@@ -559,6 +559,15 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   }
 
   /**
+   * Reset sound state to defaults (tempo, duty, envelope, volume, octave).
+   * Called when CLEAR button is pressed.
+   */
+  resetSoundState(): void {
+    this.soundStateManager.reset()
+    logWorker.debug('[WebWorkerDeviceAdapter] Sound state reset to defaults')
+  }
+
+  /**
    * Set the current execution ID (called by WebWorkerInterpreter)
    */
   setCurrentExecutionId(executionId: string | null): void {

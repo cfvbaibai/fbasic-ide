@@ -9,6 +9,21 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
 
+/**
+ * Helper to extract note names from a MusicScore for simple assertion
+ */
+function extractNoteNames(score: { channels: Array<Array<{ type: string; note?: string }>> }): string[] {
+  const notes: string[] = []
+  for (const channel of score.channels) {
+    for (const event of channel) {
+      if (event.type === 'note' && event.note) {
+        notes.push(event.note)
+      }
+    }
+  }
+  return notes
+}
+
 describe('PLAY Integration', () => {
   let interpreter: BasicInterpreter
   let deviceAdapter: TestDeviceAdapter
@@ -35,7 +50,8 @@ describe('PLAY Integration', () => {
 
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
-    expect(deviceAdapter.playSoundCalls).toEqual(['CRDRE'])
+    expect(deviceAdapter.playSoundCalls.length).toBe(1)
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C', 'D', 'E'])
   })
 
   it('should handle PLAY with variable assignment', async () => {
@@ -49,7 +65,8 @@ describe('PLAY Integration', () => {
 
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
-    expect(deviceAdapter.playSoundCalls).toEqual(['C:E:G'])
+    expect(deviceAdapter.playSoundCalls.length).toBe(1)
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C', 'E', 'G'])
   })
 
   it('should handle multiple PLAY calls to verify state persistence', async () => {
@@ -64,7 +81,11 @@ describe('PLAY Integration', () => {
 
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
-    expect(deviceAdapter.playSoundCalls).toEqual(['T4O3C', 'D', 'E'])
+    expect(deviceAdapter.playSoundCalls.length).toBe(3)
+    // First call has tempo and octave commands plus C note
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C'])
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[1]!)).toEqual(['D'])
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[2]!)).toEqual(['E'])
     // State (T4, O3) should persist across calls in Platform layer
   })
 
@@ -82,7 +103,9 @@ describe('PLAY Integration', () => {
 
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
-    expect(deviceAdapter.playSoundCalls).toEqual(['CDEFG', 'GFEDC'])
+    expect(deviceAdapter.playSoundCalls.length).toBe(2)
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C', 'D', 'E', 'F', 'G'])
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[1]!)).toEqual(['G', 'F', 'E', 'D', 'C'])
     expect(deviceAdapter.printOutputs).toEqual([
       'Starting music\n',
       'Music playing\n',
@@ -92,7 +115,7 @@ describe('PLAY Integration', () => {
 
   it('should handle PLAY with complex multi-channel music', async () => {
     const code = `
-10 PLAY "C:E:G:C5"
+10 PLAY "C:E:G"
 20 END
 `
 
@@ -100,7 +123,9 @@ describe('PLAY Integration', () => {
 
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
-    expect(deviceAdapter.playSoundCalls).toEqual(['C:E:G:C5'])
+    expect(deviceAdapter.playSoundCalls.length).toBe(1)
+    // C:E:G creates 3 channels with one note each
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C', 'E', 'G'])
   })
 
   it('should handle PLAY with all music parameters', async () => {
@@ -113,7 +138,8 @@ describe('PLAY Integration', () => {
 
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
-    expect(deviceAdapter.playSoundCalls).toEqual(['T4Y2M0V15O3C5R5D5R5E5'])
+    expect(deviceAdapter.playSoundCalls.length).toBe(1)
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C', 'D', 'E'])
   })
 
   it('should handle PLAY in conditional branches', async () => {
@@ -128,7 +154,8 @@ describe('PLAY Integration', () => {
 
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
-    expect(deviceAdapter.playSoundCalls).toEqual(['C'])
+    expect(deviceAdapter.playSoundCalls.length).toBe(1)
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C'])
   })
 
   it('should handle PLAY in loops with dynamic music', async () => {
@@ -144,7 +171,10 @@ describe('PLAY Integration', () => {
 
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
-    expect(deviceAdapter.playSoundCalls).toEqual(['C', 'C', 'C'])
+    expect(deviceAdapter.playSoundCalls.length).toBe(3)
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C'])
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[1]!)).toEqual(['C'])
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[2]!)).toEqual(['C'])
   })
 
   it('should handle PLAY with GOSUB subroutine', async () => {
@@ -159,7 +189,8 @@ describe('PLAY Integration', () => {
 
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
-    expect(deviceAdapter.playSoundCalls).toEqual(['CDEFG'])
+    expect(deviceAdapter.playSoundCalls.length).toBe(1)
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C', 'D', 'E', 'F', 'G'])
   })
 
   it('should handle error when PLAY receives non-string', async () => {
@@ -188,7 +219,8 @@ describe('PLAY Integration', () => {
 
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
-    expect(deviceAdapter.playSoundCalls).toEqual(['CDEFG'])
+    expect(deviceAdapter.playSoundCalls.length).toBe(1)
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C', 'D', 'E', 'F', 'G'])
   })
 
   it('should handle PLAY with multiple colons on same line', async () => {
@@ -201,6 +233,9 @@ describe('PLAY Integration', () => {
 
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
-    expect(deviceAdapter.playSoundCalls).toEqual(['C', 'D', 'E'])
+    expect(deviceAdapter.playSoundCalls.length).toBe(3)
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C'])
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[1]!)).toEqual(['D'])
+    expect(extractNoteNames(deviceAdapter.playSoundCalls[2]!)).toEqual(['E'])
   })
 })

@@ -237,6 +237,8 @@ class WebWorkerInterpreter {
   handleClearDisplay(_message: ClearDisplayMessage) {
     this.interpreter?.clearDisplay?.()
     this.webWorkerDeviceAdapter?.clearAllSpritePositions?.()
+    // Reset sound state when CLEAR is pressed
+    this.webWorkerDeviceAdapter?.resetSoundState?.()
   }
 
   handleStrigEvent(message: StrigEventMessage) {
