@@ -42,17 +42,17 @@ const NOTE_SEMITONES: Record<string, number> = {
 
 /**
  * Tempo to milliseconds per whole note mapping
- * T1 (fast) to T8 (slow)
+ * T1 (fastest) to T8 (slowest) - per F-BASIC manual
  */
 const TEMPO_MS_PER_WHOLE_NOTE: Record<number, number> = {
-  1: 800,
-  2: 1000,
-  3: 1200,
-  4: 1600, // Default
-  5: 2000,
-  6: 2400,
-  7: 2800,
-  8: 3200,
+  1: 1100,
+  2: 1375,
+  3: 1650,
+  4: 2200, // Default
+  5: 2750,
+  6: 3300,
+  7: 3850,
+  8: 4400,
 }
 
 /**

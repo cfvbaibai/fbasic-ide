@@ -289,22 +289,22 @@ describe('compileToAudio (Stage 2)', () => {
   test('calculates correct durations for length codes', () => {
     const manager = new SoundStateManager()
 
-    // At T4 (default): code 5 = quarter = 400ms, code 7 = half = 800ms, code 9 = whole = 1600ms
+    // At T4 (default): code 5 = quarter = 550ms, code 7 = half = 1100ms, code 9 = whole = 2200ms
     const score = parseMusicToAst('C5C7C9')
     const audio = compileToAudio(score, manager)
 
     const notes = audio.channels[0]!
-    if (isNote(notes[0]!)) expect(notes[0].duration).toEqual(400)
-    if (isNote(notes[1]!)) expect(notes[1].duration).toEqual(800)
-    if (isNote(notes[2]!)) expect(notes[2].duration).toEqual(1600)
+    if (isNote(notes[0]!)) expect(notes[0].duration).toEqual(550)
+    if (isNote(notes[1]!)) expect(notes[1].duration).toEqual(1100)
+    if (isNote(notes[2]!)) expect(notes[2].duration).toEqual(2200)
   })
 
-  test('length code 0 is 32nd note (50ms at T4)', () => {
+  test('length code 0 is 32nd note (68.75ms at T4)', () => {
     const manager = new SoundStateManager()
     const audio = compileToAudio(parseMusicToAst('C0'), manager)
 
     if (isNote(audio.channels[0]![0]!)) {
-      expect(audio.channels[0]![0].duration).toEqual(50)
+      expect(audio.channels[0]![0].duration).toEqual(68.75)
     }
   })
 
@@ -324,11 +324,11 @@ describe('compileToAudio (Stage 2)', () => {
     const manager = new SoundStateManager()
     const audio = compileToAudio(parseMusicToAst('C5DE'), manager)
 
-    // All notes should be quarter notes (400ms at T4)
+    // All notes should be quarter notes (550ms at T4)
     const notes = audio.channels[0]!
-    if (isNote(notes[0]!)) expect(notes[0].duration).toEqual(400)
-    if (isNote(notes[1]!)) expect(notes[1].duration).toEqual(400)
-    if (isNote(notes[2]!)) expect(notes[2].duration).toEqual(400)
+    if (isNote(notes[0]!)) expect(notes[0].duration).toEqual(550)
+    if (isNote(notes[1]!)) expect(notes[1].duration).toEqual(550)
+    if (isNote(notes[2]!)) expect(notes[2].duration).toEqual(550)
   })
 
   test('rest length carries from previous', () => {
@@ -336,10 +336,10 @@ describe('compileToAudio (Stage 2)', () => {
     const audio = compileToAudio(parseMusicToAst('C5R7DE'), manager)
 
     const events = audio.channels[0]!
-    if (isNote(events[0]!)) expect(events[0].duration).toEqual(400) // C5 quarter
-    if (isRest(events[1]!)) expect(events[1].duration).toEqual(800) // R7 half
-    if (isNote(events[2]!)) expect(events[2].duration).toEqual(800) // D uses R7's length
-    if (isNote(events[3]!)) expect(events[3].duration).toEqual(800) // E uses R7's length
+    if (isNote(events[0]!)) expect(events[0].duration).toEqual(550) // C5 quarter
+    if (isRest(events[1]!)) expect(events[1].duration).toEqual(1100) // R7 half
+    if (isNote(events[2]!)) expect(events[2].duration).toEqual(1100) // D uses R7's length
+    if (isNote(events[3]!)) expect(events[3].duration).toEqual(1100) // E uses R7's length
   })
 
   test('carries duty/envelope/volume to notes', () => {

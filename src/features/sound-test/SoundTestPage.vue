@@ -10,6 +10,7 @@ import { computed, onBeforeUnmount, ref } from 'vue'
 
 import { parseMusic } from '@/core/sound/MusicDSLParser'
 import { SoundStateManager } from '@/core/sound/SoundStateManager'
+import type { Note, Rest } from '@/core/sound/types'
 import { useWebAudioPlayer } from '@/features/ide/composables/useWebAudioPlayer'
 import { GameBlock, GameButton, GameLayout } from '@/shared/components/ui'
 
@@ -37,6 +38,76 @@ const {
 
 // Playback state
 const currentlyPlaying = ref<string | null>(null)
+
+// ============================================
+// TEMPO CALIBRATION
+// ============================================
+const calibrationPlayString = ref('M1V7Y2T3O2A6G3F5GA5AA7')
+const speedFactor = ref(1.0)
+const isCalibrationPlaying = ref(false)
+let calibrationLoopTimeout: ReturnType<typeof setTimeout> | null = null
+
+// Current tempo mapping for reference (T1=fastest, T8=slowest per F-BASIC manual)
+const TEMPO_MS_PER_WHOLE_NOTE: Record<number, number> = {
+  1: 1100,
+  2: 1375,
+  3: 1650,
+  4: 2200, // Default
+  5: 2750,
+  6: 3300,
+  7: 3850,
+  8: 4400,
+}
+
+// Scale durations by a factor
+function scaleDurations(
+  channels: Array<Array<Note | Rest>>,
+  factor: number
+): Array<Array<Note | Rest>> {
+  return channels.map((channel) =>
+    channel.map((event) => ({
+      ...event,
+      duration: event.duration * factor,
+    }))
+  )
+}
+
+// Play calibration test with speed factor (loops infinitely)
+function playCalibrationTest() {
+  stopCalibrationLoop()
+
+  initialize()
+  stopAll()
+
+  const stateManager = new SoundStateManager()
+  const musicCommand = parseMusic(calibrationPlayString.value, stateManager)
+
+  // Scale durations by speed factor
+  const scaledChannels = scaleDurations(musicCommand.channels, speedFactor.value)
+
+  playMusic(scaledChannels)
+  isCalibrationPlaying.value = true
+  currentlyPlaying.value = 'calibration'
+
+  const totalDuration = Math.max(
+    ...scaledChannels.map((ch) => ch.reduce((sum, e) => sum + e.duration, 0))
+  )
+
+  // Schedule next loop iteration
+  calibrationLoopTimeout = setTimeout(() => {
+    if (isCalibrationPlaying.value) {
+      playCalibrationTest()
+    }
+  }, totalDuration + 200) // Small gap between loops
+}
+
+// Stop the calibration loop
+function stopCalibrationLoop() {
+  if (calibrationLoopTimeout) {
+    clearTimeout(calibrationLoopTimeout)
+    calibrationLoopTimeout = null
+  }
+}
 
 // Group test cases by category
 const testCasesByCategory = computed(() => getTestCasesByCategory())
@@ -66,12 +137,15 @@ function playTestCase(musicString: string, testId: string) {
 
 // Stop playback
 function stopPlayback() {
+  stopCalibrationLoop()
   stopAll()
   currentlyPlaying.value = null
+  isCalibrationPlaying.value = false
 }
 
 // Cleanup
 onBeforeUnmount(() => {
+  stopCalibrationLoop()
   cleanup()
 })
 </script>
@@ -108,6 +182,72 @@ onBeforeUnmount(() => {
             <GameButton v-if="currentlyPlaying" type="danger" @click="stopPlayback">
               Stop Sound
             </GameButton>
+          </div>
+        </div>
+      </GameBlock>
+
+      <!-- Tempo Calibration Section -->
+      <GameBlock title="Tempo Calibration" title-icon="mdi:speedometer" class="calibration-panel">
+        <div class="calibration-content">
+          <p class="calibration-description">
+            Compare IDE playback speed against real F-BASIC hardware.
+            Adjust the speed factor until the tempo matches your reference.
+          </p>
+
+          <div class="calibration-controls">
+            <div class="control-group">
+              <label class="control-label">PLAY String:</label>
+              <input
+                v-model="calibrationPlayString"
+                type="text"
+                class="play-string-input"
+                placeholder="Enter PLAY string..."
+              />
+            </div>
+
+            <div class="control-group">
+              <label class="control-label">Speed Factor: {{ speedFactor.toFixed(2) }}x</label>
+              <div class="slider-container">
+                <span class="slider-label">0.25x</span>
+                <input
+                  v-model.number="speedFactor"
+                  type="range"
+                  min="0.25"
+                  max="4"
+                  step="0.05"
+                  class="speed-slider"
+                />
+                <span class="slider-label">4x</span>
+              </div>
+              <p class="slider-hint">
+                &lt; 1.0 = slower | 1.0 = current | &gt; 1.0 = faster
+              </p>
+            </div>
+
+            <div class="calibration-actions">
+              <GameButton
+                :type="isCalibrationPlaying ? 'danger' : 'primary'"
+                @click="isCalibrationPlaying ? stopPlayback() : playCalibrationTest()"
+              >
+                {{ isCalibrationPlaying ? 'Stop' : 'Play' }}
+              </GameButton>
+            </div>
+          </div>
+
+          <div class="tempo-reference">
+            <h4 class="reference-title">Current Tempo Mapping (ms per whole note):</h4>
+            <div class="tempo-grid">
+              <div v-for="(ms, tempo) in TEMPO_MS_PER_WHOLE_NOTE" :key="tempo" class="tempo-item">
+                <span class="tempo-key">T{{ tempo }}</span>
+                <span class="tempo-value">{{ ms }}ms</span>
+                <span class="tempo-scaled">{{ (ms * speedFactor).toFixed(0) }}ms*</span>
+              </div>
+            </div>
+            <p class="reference-note">
+              * Scaled values with current speed factor.
+              T1 = fastest, T8 = slowest (per F-BASIC manual).
+              If IDE plays too fast, use factor &gt; 1.0 to slow down.
+            </p>
           </div>
         </div>
       </GameBlock>
@@ -420,5 +560,162 @@ onBeforeUnmount(() => {
 
 .notes-input::placeholder {
   color: var(--game-text-tertiary);
+}
+
+/* Tempo Calibration Styles */
+.calibration-panel {
+  flex-shrink: 0;
+}
+
+.calibration-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.calibration-description {
+  margin: 0;
+  color: var(--game-text-secondary);
+  font-size: var(--game-font-size-base);
+}
+
+.calibration-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.control-label {
+  font-weight: var(--game-font-weight-semibold);
+  color: var(--game-text-primary);
+  font-size: var(--game-font-size-sm);
+}
+
+.play-string-input {
+  padding: 0.5rem 0.75rem;
+  font-family: var(--game-font-family-mono);
+  font-size: var(--game-font-size-base);
+  background: var(--base-solid-gray-20);
+  border: 1px solid var(--game-surface-border);
+  border-radius: var(--game-radius-sm);
+  color: var(--game-text-primary);
+  transition: border-color 0.2s;
+}
+
+.play-string-input:focus {
+  outline: none;
+  border-color: var(--base-solid-primary);
+}
+
+.slider-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.speed-slider {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--base-solid-gray-30);
+  appearance: none;
+  cursor: pointer;
+}
+
+.speed-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--base-solid-primary);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.speed-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+}
+
+.slider-label {
+  font-size: var(--game-font-size-sm);
+  color: var(--game-text-tertiary);
+  min-width: 2.5rem;
+}
+
+.slider-hint {
+  margin: 0;
+  font-size: var(--game-font-size-sm);
+  color: var(--game-text-tertiary);
+}
+
+.calibration-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.tempo-reference {
+  padding: 1rem;
+  background: var(--base-solid-gray-20);
+  border-radius: var(--game-radius-md);
+}
+
+.reference-title {
+  margin: 0 0 0.75rem 0;
+  font-size: var(--game-font-size-sm);
+  font-weight: var(--game-font-weight-semibold);
+  color: var(--game-text-primary);
+}
+
+.tempo-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+.tempo-item {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem;
+  background: var(--base-solid-gray-30);
+  border-radius: var(--game-radius-sm);
+  text-align: center;
+}
+
+.tempo-key {
+  font-weight: var(--game-font-weight-bold);
+  color: var(--base-solid-primary);
+  font-size: var(--game-font-size-sm);
+}
+
+.tempo-value {
+  font-family: var(--game-font-family-mono);
+  font-size: var(--game-font-size-sm);
+  color: var(--game-text-secondary);
+}
+
+.tempo-scaled {
+  font-family: var(--game-font-family-mono);
+  font-size: var(--game-font-size-sm);
+  color: var(--semantic-solid-warning);
+}
+
+.reference-note {
+  margin: 0.75rem 0 0 0;
+  font-size: var(--game-font-size-sm);
+  color: var(--game-text-tertiary);
+}
+
+.reference-note.warning {
+  color: var(--semantic-solid-warning);
+  padding: 0.5rem;
+  background: var(--semantic-alpha-warning-20);
+  border-radius: var(--game-radius-sm);
+  border-left: 3px solid var(--semantic-solid-warning);
 }
 </style>
