@@ -7,7 +7,34 @@
 
 import { ref } from 'vue'
 
+import { ENVELOPE_DECAY_BASE } from '@/core/sound/constants'
 import type { Note, Rest } from '@/core/sound/types'
+
+/** Current decay factor (1.0 = use base values) */
+let envelopeDecayFactor = 1.0
+
+/**
+ * Set the envelope decay factor
+ * @param factor - Multiplier for envelope decay times (< 1.0 = shorter, > 1.0 = longer)
+ */
+export function setEnvelopeDecayFactor(factor: number): void {
+  envelopeDecayFactor = Math.max(0.1, Math.min(5, factor))
+}
+
+/**
+ * Get the current envelope decay factor
+ */
+export function getEnvelopeDecayFactor(): number {
+  return envelopeDecayFactor
+}
+
+/**
+ * Get calibrated decay time for an envelope value
+ */
+function getEnvelopeDecayMs(envelopeValue: number): number {
+  const baseMs = ENVELOPE_DECAY_BASE[envelopeValue] ?? ENVELOPE_DECAY_BASE[0]!
+  return baseMs * envelopeDecayFactor
+}
 
 /**
  * Web Audio API player for F-BASIC PLAY command
@@ -117,12 +144,15 @@ export function useWebAudioPlayer() {
     const duration = note.duration / 1000 // ms → seconds
 
     if (note.envelope === 1) {
-      // Exponential decay (longer volumeOrLength = slower decay)
-      const decayFactor = note.volumeOrLength / 15 // 0-15 → 0-1
-      const decayTime = duration * (0.5 + decayFactor * 0.5) // 50%-100% of duration
+      // M1: Envelope decay mode (NES APU hardware behavior)
+      // The period becomes V + 1 quarter frames (240Hz clock)
+      // Total decay time = 15 × (V + 1) / 240 seconds
+      // Volume values are linear, decaying from 15 to 0
+      const envelopeDecayMs = getEnvelopeDecayMs(note.volumeOrLength)
+      const decayTime = Math.min(envelopeDecayMs / 1000, duration)
 
       gainNode.gain.setValueAtTime(volume, now)
-      gainNode.gain.exponentialRampToValueAtTime(0.01, now + decayTime)
+      gainNode.gain.linearRampToValueAtTime(0, now + decayTime)
     } else {
       // M0: Constant volume
       gainNode.gain.setValueAtTime(volume, now)

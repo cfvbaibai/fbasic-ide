@@ -143,12 +143,12 @@ describe('validateMusicString', () => {
   })
 
   // Sharp validation
-  test('rejects #E (E sharp does not exist)', () => {
-    expect(() => validateMusicString('#E')).toThrow('Invalid sharp #E')
+  test('accepts #E (E sharp = F)', () => {
+    expect(() => validateMusicString('#E')).not.toThrow()
   })
 
-  test('rejects #B (B sharp does not exist)', () => {
-    expect(() => validateMusicString('#B')).toThrow('Invalid sharp #B')
+  test('accepts #B (B sharp = C, used in F-BASIC manual songs)', () => {
+    expect(() => validateMusicString('#B')).not.toThrow()
   })
 
   test('rejects # at end of string', () => {
@@ -191,6 +191,15 @@ describe('parseMusicToAst (Stage 1)', () => {
     expect(score.channels[0]![0]).toEqual({ type: 'note', note: 'C', sharp: true })
     expect(score.channels[0]![1]).toEqual({ type: 'note', note: 'D', sharp: true })
     expect(score.channels[0]![2]).toEqual({ type: 'note', note: 'F', sharp: true })
+  })
+
+  test('parses #B and #E (enharmonic sharps)', () => {
+    const score = parseMusicToAst('#B#E')
+    expect(score.channels).toHaveLength(1)
+    expect(score.channels[0]).toHaveLength(2)
+
+    expect(score.channels[0]![0]).toEqual({ type: 'note', note: 'B', sharp: true })
+    expect(score.channels[0]![1]).toEqual({ type: 'note', note: 'E', sharp: true })
   })
 
   test('parses rests', () => {
@@ -271,6 +280,36 @@ describe('compileToAudio (Stage 2)', () => {
 
     if (isNote(audio.channels[0]![0]!)) {
       expect(audio.channels[0]![0].frequency).toBeCloseTo(440.0, 1)
+    }
+  })
+
+  test('#B is enharmonically equivalent to C (next octave)', () => {
+    // O2#B should equal O3C (B# in octave 2 = C in octave 3)
+    const scoreBsharp = parseMusicToAst('O2#B')
+    const scoreC = parseMusicToAst('O3C')
+    const audioBsharp = compileToAudio(scoreBsharp, createTestStateManagers())
+    const audioC = compileToAudio(scoreC, createTestStateManagers())
+
+    if (isNote(audioBsharp.channels[0]![0]!) && isNote(audioC.channels[0]![0]!)) {
+      expect(audioBsharp.channels[0]![0].frequency).toBeCloseTo(
+        audioC.channels[0]![0].frequency,
+        1
+      )
+    }
+  })
+
+  test('#E is enharmonically equivalent to F (same octave)', () => {
+    // O3#E should equal O3F (E# in octave 3 = F in octave 3)
+    const scoreEsharp = parseMusicToAst('O3#E')
+    const scoreF = parseMusicToAst('O3F')
+    const audioEsharp = compileToAudio(scoreEsharp, createTestStateManagers())
+    const audioF = compileToAudio(scoreF, createTestStateManagers())
+
+    if (isNote(audioEsharp.channels[0]![0]!) && isNote(audioF.channels[0]![0]!)) {
+      expect(audioEsharp.channels[0]![0].frequency).toBeCloseTo(
+        audioF.channels[0]![0].frequency,
+        1
+      )
     }
   })
 
@@ -458,6 +497,76 @@ describe('parseMusic (convenience)', () => {
     // Channel 2: quarter note = 550ms
     if (isNote(audio.channels[2]![0]!)) {
       expect(audio.channels[2]![0].duration).toEqual(550)
+    }
+  })
+})
+
+// ============================================================================
+// Channel C Constraint Tests (F-BASIC Manual Page 81)
+// ============================================================================
+
+describe('Channel C constraint (ignores M/Y commands)', () => {
+  test('Channel C ignores envelope (M) commands', () => {
+    const managers = createTestStateManagers()
+    // Set envelope to M1 on all channels
+    const audio = parseMusic('M1V5C:M1V5C:M1V5C', managers)
+
+    // Channel 0 and 1 should have envelope=1 (M1)
+    if (isNote(audio.channels[0]![0]!)) {
+      expect(audio.channels[0]![0].envelope).toEqual(1)
+    }
+    if (isNote(audio.channels[1]![0]!)) {
+      expect(audio.channels[1]![0].envelope).toEqual(1)
+    }
+    // Channel C (index 2) should have envelope=0 (M0, fixed)
+    if (isNote(audio.channels[2]![0]!)) {
+      expect(audio.channels[2]![0].envelope).toEqual(0)
+    }
+  })
+
+  test('Channel C ignores duty (Y) commands', () => {
+    const managers = createTestStateManagers()
+    // Set duty to Y3 on all channels
+    const audio = parseMusic('Y3C:Y3C:Y3C', managers)
+
+    // Channel 0 and 1 should have duty=3 (Y3)
+    if (isNote(audio.channels[0]![0]!)) {
+      expect(audio.channels[0]![0].duty).toEqual(3)
+    }
+    if (isNote(audio.channels[1]![0]!)) {
+      expect(audio.channels[1]![0].duty).toEqual(3)
+    }
+    // Channel C (index 2) should have duty=2 (Y2, fixed 50%)
+    if (isNote(audio.channels[2]![0]!)) {
+      expect(audio.channels[2]![0].duty).toEqual(2)
+    }
+  })
+
+  test('Channel C uses fixed M0 Y2 even after state changes', () => {
+    const managers = createTestStateManagers()
+    // Try to change envelope and duty on channel C
+    parseMusic('::M1Y0C', managers)
+
+    // Channel C state manager should NOT have been updated
+    // (M1 and Y0 should be ignored for channel C)
+    expect(managers[2]!.getEnvelope()).toEqual(0) // Default M0
+    expect(managers[2]!.getDuty()).toEqual(2) // Default Y2
+  })
+
+  test('Channel C still respects other commands (T, O, V, length)', () => {
+    const managers = createTestStateManagers()
+    const audio = parseMusic('::T1O5V7C9', managers)
+
+    // Channel C should respect tempo, octave, volume, length
+    expect(managers[2]!.getTempo()).toEqual(1)
+    expect(managers[2]!.getOctave()).toEqual(5)
+    expect(managers[2]!.getVolumeOrLength()).toEqual(7)
+    expect(managers[2]!.getLastLength()).toEqual(9)
+
+    // Note should have the correct duration (based on T1, length 9)
+    if (isNote(audio.channels[2]![0]!)) {
+      // T1 whole note = 1100ms
+      expect(audio.channels[2]![0].duration).toEqual(1100)
     }
   })
 })

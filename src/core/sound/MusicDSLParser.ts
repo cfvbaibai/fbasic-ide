@@ -10,6 +10,11 @@
  * - Formula: f = 440 * 2^((n-57)/12) where n is MIDI note number
  */
 
+import {
+  CHANNEL_C_DEFAULT_DUTY,
+  CHANNEL_C_DEFAULT_ENVELOPE,
+  CHANNEL_C_INDEX,
+} from './constants'
 import type { SoundStateManager } from './SoundStateManager'
 import type {
   CompiledAudio,
@@ -121,7 +126,7 @@ const VALID_MUSIC_CHARS = new Set([
  * - Envelope: M0-M1
  * - Volume: V0-V15
  * - Length codes: 0-9
- * - Sharp notes: #C, #D, #F, #G, #A (not #E or #B)
+ * - Sharp notes: #C, #D, #F, #G, #A, #B, #E (all sharps supported)
  */
 export function validateMusicString(musicString: string): void {
   const input = musicString.toUpperCase()
@@ -222,16 +227,16 @@ export function validateMusicString(musicString: string): void {
       continue
     }
 
-    // Validate Sharp: # must be followed by C, D, F, G, or A
+    // Validate Sharp: # must be followed by a valid note (C, D, E, F, G, A, B)
     if (char === '#') {
       i++
       const nextChar = input[i]
       if (!nextChar) {
         throw new Error(`Sharp (#) at position ${i} must be followed by a note`)
       }
-      if (!'CDFGA'.includes(nextChar)) {
+      if (!'CDEFGAB'.includes(nextChar)) {
         throw new Error(
-          `Invalid sharp #${nextChar} at position ${i}: # must be followed by C, D, F, G, or A`
+          `Invalid sharp #${nextChar} at position ${i}: # must be followed by a note (C, D, E, F, G, A, B)`
         )
       }
       i++
@@ -341,12 +346,12 @@ function parseChannelToAst(channelString: string): MusicEvent[] {
       continue
     }
 
-    // Sharp: #C, #D, #F, #G, #A
+    // Sharp: #C, #D, #E, #F, #G, #A, #B
     if (char === '#') {
       i++
       const nextChar = input[i]
-      if (nextChar && 'CDFGA'.includes(nextChar)) {
-        const noteName = nextChar as 'C' | 'D' | 'F' | 'G' | 'A'
+      if (nextChar && 'CDEFGAB'.includes(nextChar)) {
+        const noteName = nextChar as 'C' | 'D' | 'E' | 'F' | 'G' | 'A' | 'B'
         i++
 
         const digitMatch = input.slice(i).match(/^(\d)/)
@@ -458,6 +463,9 @@ function lengthCodeToDuration(code: number, tempo: number): number {
 
 /**
  * Compile a single channel's MusicEvent array to SoundEvent array
+ *
+ * Note: Per F-BASIC manual page 81, Channel C (index 2) ignores envelope (M)
+ * and duty (Y) commands - it uses fixed M0 (volume mode) and Y2 (50% duty).
  */
 function compileChannelToAudio(
   events: MusicEvent[],
@@ -468,6 +476,9 @@ function compileChannelToAudio(
   // Get lastLength from state manager (persists across PLAY calls)
   let lastLengthCode = stateManager.getLastLength()
 
+  // Channel C (index 2) ignores M/Y commands per F-BASIC spec
+  const isChannelC = channelNumber === CHANNEL_C_INDEX
+
   for (const event of events) {
     switch (event.type) {
       case 'tempo':
@@ -475,11 +486,17 @@ function compileChannelToAudio(
         break
 
       case 'duty':
-        stateManager.setDuty(event.value)
+        // Channel C ignores duty changes - uses fixed 50% duty
+        if (!isChannelC) {
+          stateManager.setDuty(event.value)
+        }
         break
 
       case 'envelope':
-        stateManager.setEnvelope(event.value)
+        // Channel C ignores envelope changes - uses fixed M0 (volume mode)
+        if (!isChannelC) {
+          stateManager.setEnvelope(event.value)
+        }
         break
 
       case 'volume':
@@ -500,12 +517,16 @@ function compileChannelToAudio(
         const frequency = calculateNoteFrequency(event.note, state.octave, event.sharp)
         const duration = lengthCodeToDuration(lengthCode, state.tempo)
 
+        // Channel C uses fixed envelope and duty values
+        const noteDuty = isChannelC ? CHANNEL_C_DEFAULT_DUTY : state.duty
+        const noteEnvelope = isChannelC ? CHANNEL_C_DEFAULT_ENVELOPE : state.envelope
+
         soundEvents.push({
           frequency,
           duration,
           channel: channelNumber,
-          duty: state.duty,
-          envelope: state.envelope,
+          duty: noteDuty,
+          envelope: noteEnvelope,
           volumeOrLength: state.volumeOrLength,
         } as Note)
         break

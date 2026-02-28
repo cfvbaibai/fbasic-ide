@@ -5,6 +5,12 @@
  */
 
 export {
+  CHANNEL_C_DEFAULT_DUTY,
+  CHANNEL_C_DEFAULT_ENVELOPE,
+  CHANNEL_C_INDEX,
+  ENVELOPE_DECAY_BASE,
+} from './constants'
+export {
   compileToAudio,
   parseMusic,
   parseMusicToAst,

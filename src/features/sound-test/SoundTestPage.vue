@@ -13,6 +13,7 @@ import { SoundStateManager } from '@/core/sound/SoundStateManager'
 import { useWebAudioPlayer } from '@/features/ide/composables/useWebAudioPlayer'
 import { GameBlock, GameButton, GameLayout } from '@/shared/components/ui'
 
+import EnvelopeCalibrationBlock from './EnvelopeCalibrationBlock.vue'
 import { getTestCasesByCategory } from './soundTestCases'
 import TempoCalibrationBlock from './TempoCalibrationBlock.vue'
 import TestCaseCard from './TestCaseCard.vue'
@@ -23,7 +24,12 @@ defineOptions({
 })
 
 // Audio player
-const { initialize, playMusic, stopAll, cleanup } = useWebAudioPlayer()
+const {
+  initialize,
+  playMusic,
+  stopAll,
+  cleanup,
+} = useWebAudioPlayer()
 
 // Test results management
 const {
@@ -42,6 +48,9 @@ const currentlyPlaying = ref<string | null>(null)
 
 // Calibration block ref
 const calibrationBlockRef = useTemplateRef('calibrationBlock')
+
+// Envelope calibration block ref
+const envelopeCalibrationBlockRef = useTemplateRef('envelopeCalibrationBlockRef')
 
 // Create state managers array for parseMusic (3 channels)
 function createStateManagers(): SoundStateManager[] {
@@ -89,9 +98,19 @@ function handleCalibrationPlayingChange(isPlaying: boolean) {
   }
 }
 
+// Handle envelope calibration playing state change
+function handleEnvelopeCalibrationPlayingChange(isPlaying: boolean) {
+  if (isPlaying) {
+    currentlyPlaying.value = 'envelope-calibration'
+  } else if (currentlyPlaying.value === 'envelope-calibration') {
+    currentlyPlaying.value = null
+  }
+}
+
 // Cleanup
 onBeforeUnmount(() => {
   calibrationBlockRef.value?.stopCalibrationLoop()
+  envelopeCalibrationBlockRef.value?.stopCalibrationLoop()
   cleanup()
 })
 </script>
@@ -138,6 +157,12 @@ onBeforeUnmount(() => {
         @playing-change="handleCalibrationPlayingChange"
       />
 
+      <!-- Envelope Calibration Section -->
+      <EnvelopeCalibrationBlock
+        ref="envelopeCalibrationBlockRef"
+        @playing-change="handleEnvelopeCalibrationPlayingChange"
+      />
+
       <!-- Test Cases -->
       <div class="test-cases-container">
         <div v-for="[category, cases] in testCasesByCategory" :key="category" class="category-section">
@@ -169,9 +194,6 @@ onBeforeUnmount(() => {
   padding: 1rem;
   max-width: 1400px;
   margin: 0 auto;
-  flex: 1 1 0;
-  min-height: 0;
-  overflow: hidden;
 }
 
 .header-panel {
@@ -237,8 +259,6 @@ onBeforeUnmount(() => {
 }
 
 .test-cases-container {
-  flex: 1 1 0;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
