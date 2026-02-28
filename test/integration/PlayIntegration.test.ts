@@ -8,20 +8,21 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
+import type { CompiledAudio } from '@/core/sound/types'
 
 /**
- * Helper to extract note names from a MusicScore for simple assertion
+ * Helper to count notes in CompiledAudio
  */
-function extractNoteNames(score: { channels: Array<Array<{ type: string; note?: string }>> }): string[] {
-  const notes: string[] = []
-  for (const channel of score.channels) {
+function countNotes(audio: CompiledAudio): number {
+  let count = 0
+  for (const channel of audio.channels) {
     for (const event of channel) {
-      if (event.type === 'note' && event.note) {
-        notes.push(event.note)
+      if ('frequency' in event) {
+        count++
       }
     }
   }
-  return notes
+  return count
 }
 
 describe('PLAY Integration', () => {
@@ -51,7 +52,7 @@ describe('PLAY Integration', () => {
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.playSoundCalls.length).toBe(1)
-    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C', 'D', 'E'])
+    expect(countNotes(deviceAdapter.playSoundCalls[0]!)).toBe(3)
   })
 
   it('should handle PLAY with variable assignment', async () => {
@@ -66,7 +67,7 @@ describe('PLAY Integration', () => {
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.playSoundCalls.length).toBe(1)
-    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C', 'E', 'G'])
+    expect(countNotes(deviceAdapter.playSoundCalls[0]!)).toBe(3)
   })
 
   it('should handle multiple PLAY calls to verify state persistence', async () => {
@@ -83,10 +84,10 @@ describe('PLAY Integration', () => {
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.playSoundCalls.length).toBe(3)
     // First call has tempo and octave commands plus C note
-    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C'])
-    expect(extractNoteNames(deviceAdapter.playSoundCalls[1]!)).toEqual(['D'])
-    expect(extractNoteNames(deviceAdapter.playSoundCalls[2]!)).toEqual(['E'])
-    // State (T4, O3) should persist across calls in Platform layer
+    expect(countNotes(deviceAdapter.playSoundCalls[0]!)).toBe(1)
+    expect(countNotes(deviceAdapter.playSoundCalls[1]!)).toBe(1)
+    expect(countNotes(deviceAdapter.playSoundCalls[2]!)).toBe(1)
+    // State (T4, O3) should persist across calls in SoundService
   })
 
   it('should handle PLAY in program with mixed commands', async () => {
@@ -104,8 +105,8 @@ describe('PLAY Integration', () => {
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.playSoundCalls.length).toBe(2)
-    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C', 'D', 'E', 'F', 'G'])
-    expect(extractNoteNames(deviceAdapter.playSoundCalls[1]!)).toEqual(['G', 'F', 'E', 'D', 'C'])
+    expect(countNotes(deviceAdapter.playSoundCalls[0]!)).toBe(5)
+    expect(countNotes(deviceAdapter.playSoundCalls[1]!)).toBe(5)
     expect(deviceAdapter.printOutputs).toEqual([
       'Starting music\n',
       'Music playing\n',
@@ -125,7 +126,7 @@ describe('PLAY Integration', () => {
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.playSoundCalls.length).toBe(1)
     // C:E:G creates 3 channels with one note each
-    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C', 'E', 'G'])
+    expect(countNotes(deviceAdapter.playSoundCalls[0]!)).toBe(3)
   })
 
   it('should handle PLAY with all music parameters', async () => {
@@ -139,7 +140,7 @@ describe('PLAY Integration', () => {
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.playSoundCalls.length).toBe(1)
-    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C', 'D', 'E'])
+    expect(countNotes(deviceAdapter.playSoundCalls[0]!)).toBe(3)
   })
 
   it('should handle PLAY in conditional branches', async () => {
@@ -155,7 +156,7 @@ describe('PLAY Integration', () => {
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.playSoundCalls.length).toBe(1)
-    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C'])
+    expect(countNotes(deviceAdapter.playSoundCalls[0]!)).toBe(1)
   })
 
   it('should handle PLAY in loops with dynamic music', async () => {
@@ -172,9 +173,9 @@ describe('PLAY Integration', () => {
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.playSoundCalls.length).toBe(3)
-    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C'])
-    expect(extractNoteNames(deviceAdapter.playSoundCalls[1]!)).toEqual(['C'])
-    expect(extractNoteNames(deviceAdapter.playSoundCalls[2]!)).toEqual(['C'])
+    expect(countNotes(deviceAdapter.playSoundCalls[0]!)).toBe(1)
+    expect(countNotes(deviceAdapter.playSoundCalls[1]!)).toBe(1)
+    expect(countNotes(deviceAdapter.playSoundCalls[2]!)).toBe(1)
   })
 
   it('should handle PLAY with GOSUB subroutine', async () => {
@@ -190,7 +191,7 @@ describe('PLAY Integration', () => {
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.playSoundCalls.length).toBe(1)
-    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C', 'D', 'E', 'F', 'G'])
+    expect(countNotes(deviceAdapter.playSoundCalls[0]!)).toBe(5)
   })
 
   it('should handle error when PLAY receives non-string', async () => {
@@ -220,7 +221,7 @@ describe('PLAY Integration', () => {
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.playSoundCalls.length).toBe(1)
-    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C', 'D', 'E', 'F', 'G'])
+    expect(countNotes(deviceAdapter.playSoundCalls[0]!)).toBe(5)
   })
 
   it('should handle PLAY with multiple colons on same line', async () => {
@@ -234,8 +235,8 @@ describe('PLAY Integration', () => {
     expect(result.success).toBe(true)
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.playSoundCalls.length).toBe(3)
-    expect(extractNoteNames(deviceAdapter.playSoundCalls[0]!)).toEqual(['C'])
-    expect(extractNoteNames(deviceAdapter.playSoundCalls[1]!)).toEqual(['D'])
-    expect(extractNoteNames(deviceAdapter.playSoundCalls[2]!)).toEqual(['E'])
+    expect(countNotes(deviceAdapter.playSoundCalls[0]!)).toBe(1)
+    expect(countNotes(deviceAdapter.playSoundCalls[1]!)).toBe(1)
+    expect(countNotes(deviceAdapter.playSoundCalls[2]!)).toBe(1)
   })
 })

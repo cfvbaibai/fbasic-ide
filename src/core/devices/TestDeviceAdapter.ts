@@ -6,7 +6,7 @@
  */
 
 import type { BasicDeviceAdapter } from '@/core/interfaces'
-import type { MusicScore } from '@/core/sound/types'
+import type { CompiledAudio } from '@/core/sound/types'
 import { logDevice } from '@/shared/logger'
 
 export class TestDeviceAdapter implements BasicDeviceAdapter {
@@ -179,11 +179,11 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
   // === SOUND OUTPUT ===
 
   /** Captured playSound calls for testing */
-  public playSoundCalls: MusicScore[] = []
+  public playSoundCalls: CompiledAudio[] = []
 
-  playSound?(musicScore: MusicScore): void {
-    this.playSoundCalls.push(musicScore)
-    logDevice.debug('Play sound, channels:', musicScore.channels.length)
+  playSound?(audio: CompiledAudio): void {
+    this.playSoundCalls.push(audio)
+    logDevice.debug('Play sound, channels:', audio.channels.length)
   }
 
   /** Captured beep calls for testing */

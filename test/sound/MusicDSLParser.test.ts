@@ -12,6 +12,13 @@ import { compileToAudio, parseMusic, parseMusicToAst, validateMusicString } from
 import { SoundStateManager } from '@/core/sound/SoundStateManager'
 import { isNote, isRest } from '@/core/sound/types'
 
+/**
+ * Helper to create an array of 3 SoundStateManagers for testing
+ */
+function createTestStateManagers(): SoundStateManager[] {
+  return [new SoundStateManager(), new SoundStateManager(), new SoundStateManager()]
+}
+
 // ============================================================================
 // Validation Tests
 // ============================================================================
@@ -247,11 +254,9 @@ describe('parseMusicToAst (Stage 1)', () => {
 
 describe('compileToAudio (Stage 2)', () => {
   test('calculates correct note frequencies for octaves', () => {
-    const manager = new SoundStateManager()
-
     // O2 C should be ~261.63 Hz (middle C)
     const score = parseMusicToAst('O2C')
-    const audio = compileToAudio(score, manager)
+    const audio = compileToAudio(score, createTestStateManagers())
 
     expect(audio.channels[0]).toHaveLength(1)
     if (isNote(audio.channels[0]![0]!)) {
@@ -260,11 +265,9 @@ describe('compileToAudio (Stage 2)', () => {
   })
 
   test('calculates correct note frequencies for A440', () => {
-    const manager = new SoundStateManager()
-
     // O2 A should be 440 Hz
     const score = parseMusicToAst('O2A')
-    const audio = compileToAudio(score, manager)
+    const audio = compileToAudio(score, createTestStateManagers())
 
     if (isNote(audio.channels[0]![0]!)) {
       expect(audio.channels[0]![0].frequency).toBeCloseTo(440.0, 1)
@@ -272,11 +275,8 @@ describe('compileToAudio (Stage 2)', () => {
   })
 
   test('each octave doubles frequency', () => {
-    const manager0 = new SoundStateManager()
-    const manager1 = new SoundStateManager()
-
-    const audio0 = compileToAudio(parseMusicToAst('O0C'), manager0)
-    const audio1 = compileToAudio(parseMusicToAst('O1C'), manager1)
+    const audio0 = compileToAudio(parseMusicToAst('O0C'), createTestStateManagers())
+    const audio1 = compileToAudio(parseMusicToAst('O1C'), createTestStateManagers())
 
     const freq0 = audio0.channels[0]![0]!
     const freq1 = audio1.channels[0]![0]!
@@ -287,11 +287,9 @@ describe('compileToAudio (Stage 2)', () => {
   })
 
   test('calculates correct durations for length codes', () => {
-    const manager = new SoundStateManager()
-
     // At T4 (default): code 5 = quarter = 550ms, code 7 = half = 1100ms, code 9 = whole = 2200ms
     const score = parseMusicToAst('C5C7C9')
-    const audio = compileToAudio(score, manager)
+    const audio = compileToAudio(score, createTestStateManagers())
 
     const notes = audio.channels[0]!
     if (isNote(notes[0]!)) expect(notes[0].duration).toEqual(550)
@@ -300,8 +298,7 @@ describe('compileToAudio (Stage 2)', () => {
   })
 
   test('length code 0 is 32nd note (68.75ms at T4)', () => {
-    const manager = new SoundStateManager()
-    const audio = compileToAudio(parseMusicToAst('C0'), manager)
+    const audio = compileToAudio(parseMusicToAst('C0'), createTestStateManagers())
 
     if (isNote(audio.channels[0]![0]!)) {
       expect(audio.channels[0]![0].duration).toEqual(68.75)
@@ -309,11 +306,8 @@ describe('compileToAudio (Stage 2)', () => {
   })
 
   test('tempo affects note durations', () => {
-    const managerFast = new SoundStateManager()
-    const managerSlow = new SoundStateManager()
-
-    const audioFast = compileToAudio(parseMusicToAst('T1C5'), managerFast)
-    const audioSlow = compileToAudio(parseMusicToAst('T8C5'), managerSlow)
+    const audioFast = compileToAudio(parseMusicToAst('T1C5'), createTestStateManagers())
+    const audioSlow = compileToAudio(parseMusicToAst('T8C5'), createTestStateManagers())
 
     if (isNote(audioFast.channels[0]![0]!) && isNote(audioSlow.channels[0]![0]!)) {
       expect(audioSlow.channels[0]![0].duration).toBeGreaterThan(audioFast.channels[0]![0].duration)
@@ -321,8 +315,7 @@ describe('compileToAudio (Stage 2)', () => {
   })
 
   test('length carries from previous note', () => {
-    const manager = new SoundStateManager()
-    const audio = compileToAudio(parseMusicToAst('C5DE'), manager)
+    const audio = compileToAudio(parseMusicToAst('C5DE'), createTestStateManagers())
 
     // All notes should be quarter notes (550ms at T4)
     const notes = audio.channels[0]!
@@ -332,8 +325,7 @@ describe('compileToAudio (Stage 2)', () => {
   })
 
   test('rest length carries from previous', () => {
-    const manager = new SoundStateManager()
-    const audio = compileToAudio(parseMusicToAst('C5R7DE'), manager)
+    const audio = compileToAudio(parseMusicToAst('C5R7DE'), createTestStateManagers())
 
     const events = audio.channels[0]!
     if (isNote(events[0]!)) expect(events[0].duration).toEqual(550) // C5 quarter
@@ -343,8 +335,7 @@ describe('compileToAudio (Stage 2)', () => {
   })
 
   test('carries duty/envelope/volume to notes', () => {
-    const manager = new SoundStateManager()
-    const audio = compileToAudio(parseMusicToAst('T1Y3M1V8C'), manager)
+    const audio = compileToAudio(parseMusicToAst('T1Y3M1V8C'), createTestStateManagers())
 
     const note = audio.channels[0]![0]!
     if (isNote(note)) {
@@ -355,8 +346,7 @@ describe('compileToAudio (Stage 2)', () => {
   })
 
   test('assigns correct channel numbers', () => {
-    const manager = new SoundStateManager()
-    const audio = compileToAudio(parseMusicToAst('C:D:E'), manager)
+    const audio = compileToAudio(parseMusicToAst('C:D:E'), createTestStateManagers())
 
     expect(audio.channels[0]![0]!.channel).toEqual(0)
     expect(audio.channels[1]![0]!.channel).toEqual(1)
@@ -364,14 +354,14 @@ describe('compileToAudio (Stage 2)', () => {
   })
 
   test('updates SoundStateManager state', () => {
-    const manager = new SoundStateManager()
-    compileToAudio(parseMusicToAst('T1O5Y3M1V8'), manager)
+    const managers = createTestStateManagers()
+    compileToAudio(parseMusicToAst('T1O5Y3M1V8'), managers)
 
-    expect(manager.getTempo()).toEqual(1)
-    expect(manager.getOctave()).toEqual(5)
-    expect(manager.getDuty()).toEqual(3)
-    expect(manager.getEnvelope()).toEqual(1)
-    expect(manager.getVolumeOrLength()).toEqual(8)
+    expect(managers[0]!.getTempo()).toEqual(1)
+    expect(managers[0]!.getOctave()).toEqual(5)
+    expect(managers[0]!.getDuty()).toEqual(3)
+    expect(managers[0]!.getEnvelope()).toEqual(1)
+    expect(managers[0]!.getVolumeOrLength()).toEqual(8)
   })
 })
 
@@ -381,16 +371,14 @@ describe('compileToAudio (Stage 2)', () => {
 
 describe('parseMusic (convenience)', () => {
   test('parses single channel', () => {
-    const manager = new SoundStateManager()
-    const audio = parseMusic('CDE', manager)
+    const audio = parseMusic('CDE', createTestStateManagers())
 
     expect(audio.channels).toHaveLength(1)
     expect(audio.channels[0]).toHaveLength(3)
   })
 
   test('parses multiple channels with separator', () => {
-    const manager = new SoundStateManager()
-    const audio = parseMusic('C:E:G', manager)
+    const audio = parseMusic('C:E:G', createTestStateManagers())
 
     expect(audio.channels).toHaveLength(3)
     expect(audio.channels[0]).toHaveLength(1)
@@ -399,19 +387,19 @@ describe('parseMusic (convenience)', () => {
   })
 
   test('state persists across calls (F-BASIC spec)', () => {
-    const manager = new SoundStateManager()
+    const managers = createTestStateManagers()
 
     // First PLAY call sets state
-    parseMusic('T1Y0M1V9O5', manager)
+    parseMusic('T1Y0M1V9O5', managers)
 
     // Second PLAY call should use persisted state
-    const audio = parseMusic('C', manager)
+    const audio = parseMusic('C', managers)
 
-    expect(manager.getTempo()).toEqual(1)
-    expect(manager.getDuty()).toEqual(0)
-    expect(manager.getEnvelope()).toEqual(1)
-    expect(manager.getVolumeOrLength()).toEqual(9)
-    expect(manager.getOctave()).toEqual(5)
+    expect(managers[0]!.getTempo()).toEqual(1)
+    expect(managers[0]!.getDuty()).toEqual(0)
+    expect(managers[0]!.getEnvelope()).toEqual(1)
+    expect(managers[0]!.getVolumeOrLength()).toEqual(9)
+    expect(managers[0]!.getOctave()).toEqual(5)
 
     const note = audio.channels[0]![0]!
     if (isNote(note)) {
@@ -422,12 +410,54 @@ describe('parseMusic (convenience)', () => {
   })
 
   test('handles empty channels', () => {
-    const manager = new SoundStateManager()
-    const audio = parseMusic('C::E', manager)
+    const audio = parseMusic('C::E', createTestStateManagers())
 
     expect(audio.channels).toHaveLength(3)
     expect(audio.channels[0]).toHaveLength(1)
     expect(audio.channels[1]).toHaveLength(0) // Empty channel
     expect(audio.channels[2]).toHaveLength(1)
+  })
+
+  test('note length persists across PLAY calls (F-BASIC spec)', () => {
+    const managers = createTestStateManagers()
+
+    // First PLAY call sets length to 7 (half note)
+    parseMusic('C7', managers)
+    expect(managers[0]!.getLastLength()).toEqual(7)
+
+    // Second PLAY call should use persisted length for notes without explicit length
+    const audio = parseMusic('DE', managers)
+
+    // All notes should be half notes (1100ms at T4)
+    const notes = audio.channels[0]!
+    if (isNote(notes[0]!)) expect(notes[0].duration).toEqual(1100) // D uses inherited length 7
+    if (isNote(notes[1]!)) expect(notes[1].duration).toEqual(1100) // E uses inherited length 7
+  })
+
+  test('note length persists independently per channel', () => {
+    const managers = createTestStateManagers()
+
+    // Set different lengths for each channel
+    parseMusic('C9:D7:E5', managers)
+
+    expect(managers[0]!.getLastLength()).toEqual(9) // Channel 0: whole note
+    expect(managers[1]!.getLastLength()).toEqual(7) // Channel 1: half note
+    expect(managers[2]!.getLastLength()).toEqual(5) // Channel 2: quarter note
+
+    // Each channel should use its own persisted length
+    const audio = parseMusic('C:D:E', managers)
+
+    // Channel 0: whole note = 2200ms
+    if (isNote(audio.channels[0]![0]!)) {
+      expect(audio.channels[0]![0].duration).toEqual(2200)
+    }
+    // Channel 1: half note = 1100ms
+    if (isNote(audio.channels[1]![0]!)) {
+      expect(audio.channels[1]![0].duration).toEqual(1100)
+    }
+    // Channel 2: quarter note = 550ms
+    if (isNote(audio.channels[2]![0]!)) {
+      expect(audio.channels[2]![0].duration).toEqual(550)
+    }
   })
 })

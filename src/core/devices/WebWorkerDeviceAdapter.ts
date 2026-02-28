@@ -16,9 +16,7 @@ import type {
   InterpreterConfig,
   OutputMessage,
 } from '@/core/interfaces'
-import { compileToAudio } from '@/core/sound/MusicDSLParser'
-import { SoundStateManager } from '@/core/sound/SoundStateManager'
-import type { MusicScore } from '@/core/sound/types'
+import type { CompiledAudio } from '@/core/sound/types'
 import type { BgGridData } from '@/features/bg-editor/types'
 import { logWorker } from '@/shared/logger'
 
@@ -58,7 +56,6 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   private webWorkerManager: WebWorkerManager
   private screenStateManager: ScreenStateManager
   private messageHandler: MessageHandler
-  private soundStateManager: SoundStateManager
   // === INPUT REQUEST (worker only: INPUT/LINPUT) ===
   private pendingInputRequests: Map<
     string,
@@ -75,7 +72,6 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     logWorker.debug('WebWorkerDeviceAdapter created')
     this.webWorkerManager = new WebWorkerManager()
     this.screenStateManager = new ScreenStateManager()
-    this.soundStateManager = new SoundStateManager()
     this.messageHandler = new MessageHandler(this.webWorkerManager.getPendingMessages())
     this.setupMessageListener()
   }
@@ -559,12 +555,12 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   }
 
   /**
-   * Reset sound state to defaults (tempo, duty, envelope, volume, octave).
+   * Reset sound state to defaults.
    * Called when CLEAR button is pressed.
+   * Note: Sound state is now managed by SoundService in the execution layer.
    */
   resetSoundState(): void {
-    this.soundStateManager.reset()
-    logWorker.debug('[WebWorkerDeviceAdapter] Sound state reset to defaults')
+    logWorker.debug('[WebWorkerDeviceAdapter] resetSoundState called (delegated to SoundService)')
   }
 
   /**
@@ -573,8 +569,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   setCurrentExecutionId(executionId: string | null): void {
     this.screenStateManager.setCurrentExecutionId(executionId)
     if (executionId) {
-      // Reset sound state to defaults when starting a new program
-      this.soundStateManager.reset()
+      // Sound state reset is now handled by SoundService in ExecutionContext.reset()
       this.screenStateManager.initializeScreen()
       this.syncScreenStateToShared()
       this.postScreenChanged()
@@ -585,43 +580,35 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   }
 
   /**
-   * Play parsed music score
-   * Compiles MusicScore to CompiledAudio and posts PLAY_SOUND message to main thread
+   * Play compiled audio
+   * Just transmits the audio to main thread - no state management here
    */
-  playSound(musicScore: MusicScore): void {
-    logWorker.debug('Playing sound, channels:', musicScore.channels.length)
+  playSound(audio: CompiledAudio): void {
+    logWorker.debug('Playing sound, channels:', audio.channels.length)
 
-    try {
-      // Stage 2: Compile MusicScore to CompiledAudio
-      const compiledAudio = compileToAudio(musicScore, this.soundStateManager)
+    // Flatten all channels into a single event array for transmission
+    const events = audio.channels.flatMap((channelEvents) => channelEvents)
 
-      // Flatten all channels into a single event array for transmission
-      const events = compiledAudio.channels.flatMap((channelEvents) => channelEvents)
+    // Convert events to serializable format
+    const serializedEvents = events.map((event) => ({
+      frequency: 'frequency' in event ? event.frequency : undefined,
+      duration: event.duration,
+      channel: event.channel,
+      duty: 'duty' in event ? event.duty : 0,
+      envelope: 'envelope' in event ? event.envelope : 0,
+      volumeOrLength: 'volumeOrLength' in event ? event.volumeOrLength : 0,
+    }))
 
-      // Convert events to serializable format
-      const serializedEvents = events.map((event) => ({
-        frequency: 'frequency' in event ? event.frequency : undefined,
-        duration: event.duration,
-        channel: event.channel,
-        duty: 'duty' in event ? event.duty : 0,
-        envelope: 'envelope' in event ? event.envelope : 0,
-        volumeOrLength: 'volumeOrLength' in event ? event.volumeOrLength : 0,
-      }))
-
-      // Post PLAY_SOUND message to main thread
-      self.postMessage({
-        type: 'PLAY_SOUND',
-        id: `play-sound-${Date.now()}`,
-        timestamp: Date.now(),
-        data: {
-          executionId: this.screenStateManager.getCurrentExecutionId() ?? 'unknown',
-          events: serializedEvents,
-        },
-      })
-    } catch (error) {
-      logWorker.error('Error compiling music:', error)
-      this.errorOutput(`PLAY error: ${error instanceof Error ? error.message : String(error)}`)
-    }
+    // Post PLAY_SOUND message to main thread
+    self.postMessage({
+      type: 'PLAY_SOUND',
+      id: `play-sound-${Date.now()}`,
+      timestamp: Date.now(),
+      data: {
+        executionId: this.screenStateManager.getCurrentExecutionId() ?? 'unknown',
+        events: serializedEvents,
+      },
+    })
   }
 
   /**

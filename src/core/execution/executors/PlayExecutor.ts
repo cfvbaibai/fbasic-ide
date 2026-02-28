@@ -4,6 +4,11 @@
  * Handles execution of PLAY statements for music/sound playback.
  * Format: PLAY string-expression
  * Example: PLAY "CRDRE", PLAY "C:E:G"
+ *
+ * Architecture:
+ * - Uses SoundService to compile music with per-channel state management
+ * - Passes CompiledAudio (not MusicScore) to device adapter
+ * - Device adapter is a dumb I/O layer - it just transmits audio to main thread
  */
 
 import type { CstNode } from 'chevrotain'
@@ -11,7 +16,6 @@ import type { CstNode } from 'chevrotain'
 import { ERROR_TYPES } from '@/core/constants'
 import type { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
 import { getCstNodes } from '@/core/parser/cst-helpers'
-import { parseMusicToAst } from '@/core/sound/MusicDSLParser'
 import type { ExecutionContext } from '@/core/state/ExecutionContext'
 
 export class PlayExecutor {
@@ -74,11 +78,20 @@ export class PlayExecutor {
       return
     }
 
-    // 3. Parse music string to MusicScore (Stage 1)
-    // This validates the string and throws on invalid characters
-    let musicScore
+    // 3. Compile music string to audio using SoundService
+    // SoundService handles parsing + per-channel state management + compilation
+    if (!this.context.soundService) {
+      this.context.addError({
+        line: lineNumber ?? 0,
+        message: 'PLAY: Sound service not available',
+        type: ERROR_TYPES.RUNTIME,
+      })
+      return
+    }
+
+    let compiledAudio
     try {
-      musicScore = parseMusicToAst(musicString)
+      compiledAudio = this.context.soundService.compileMusic(musicString)
     } catch (error) {
       this.context.addError({
         line: lineNumber ?? 0,
@@ -88,9 +101,10 @@ export class PlayExecutor {
       return
     }
 
-    // 4. Call device adapter to play sound (Stage 2 compilation happens in adapter)
+    // 4. Call device adapter to play compiled audio
+    // Device adapter just transmits the audio to main thread - no state management
     if (this.context.deviceAdapter?.playSound) {
-      this.context.deviceAdapter.playSound(musicScore)
+      this.context.deviceAdapter.playSound(compiledAudio)
     }
 
     // 5. Debug output

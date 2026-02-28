@@ -1,161 +1,62 @@
-# Tech Lead Team
+# Tech Lead Context
 
 ## Role
-Orchestrate feature development across teams. Analyze architecture, decompose tasks, spawn sub-agents, integrate results.
 
-## Architecture Overview
+Pure orchestrator. Coordinate specialists, never implement.
 
-### System Layers
-```
-┌─────────────────────────────────────────┐
-│  UI Layer (Vue 3)                       │
-│  src/features/                          │
-└─────────────────────────────────────────┘
-         │
-┌─────────────────────────────────────────┐
-│  Core Interpreter (DOM-free)            │
-│  ├─ Parser (Chevrotain CST)             │
-│  ├─ Execution Engine                    │
-│  ├─ Expression Evaluator                │
-│  └─ Device Adapters                     │
-└─────────────────────────────────────────┘
-         │
-┌─────────────────────────────────────────┐
-│  Platform Layer                         │
-│  ├─ Animation Manager                   │
-│  ├─ Sprite State Manager                │
-│  └─ Shared Buffers                      │
-└─────────────────────────────────────────┘
-```
+## Specialists (7 Total)
 
-### Key Pattern: Direct CST Execution
-**No AST conversion.** Parser outputs CST, executors consume CST nodes directly.
+| Specialist | Domain | Skill | Files |
+|------------|--------|-------|-------|
+| **Parser Dev** | Grammar, CST | `/parser` | `src/core/parser/` |
+| **Runtime Dev** | Executors, evaluation, state | `/runtime` | `src/core/execution/`, `src/core/evaluation/`, `src/core/state/` |
+| **Sound Dev** | Music DSL, sound state | `/sound` | `src/core/sound/` |
+| **Device Dev** | Device adapters, interfaces | `/device` | `src/core/devices/` |
+| **Graphics Dev** | Animation, sprites, buffers | `/graphics` | `src/core/animation/`, `src/core/sprite/` |
+| **IDE Dev** | IDE interface, editor, console | `/ide` | `src/features/ide/`, `src/features/monaco-editor/`, `src/shared/` |
+| **Tools Dev** | Sprite viewer, BG editor, etc. | `/tools` | `src/features/sprite-viewer/`, `src/features/bg-editor/`, etc. |
 
-### Key Pattern: Worker Architecture
-Interpreter runs in web worker for non-blocking execution:
-1. Main → Worker: `EXECUTE` message with code
-2. Worker → Main: `OUTPUT` messages for PRINT
-3. Worker → Main: `SCREEN_CHANGED` notification (shared buffer updated)
-4. Worker ↔ Main: SharedArrayBuffer for sprite positions (Animation Worker single writer)
+## Decision Rules
 
-**See**: `docs/reference/worker-messages.md` for complete message types
+| Request Type | Action |
+|--------------|--------|
+| Code change (any) | Delegate to specialist |
+| Bug fix (any) | Delegate to specialist |
+| Investigation | Delegate to specialist |
+| Documentation only | May handle directly |
 
-## File Structure
+## Pipeline Flow
 
 ```
-src/
-├── core/                      # Parser + Runtime teams
-│   ├── BasicInterpreter.ts   # Main orchestrator
-│   ├── parser/               # Parser team ownership
-│   ├── execution/            # Runtime team ownership
-│   ├── evaluation/           # Runtime team ownership
-│   ├── state/                # Runtime team ownership
-│   ├── animation/            # Platform team ownership
-│   ├── sprite/               # Platform team ownership
-│   └── devices/              # Platform team ownership
-├── features/                  # UI team ownership
-│   ├── ide/
-│   └── sprite-viewer/
-└── shared/                    # UI team ownership
-    ├── components/
-    └── styles/
+Parser Dev → Runtime Dev → Device Dev → Graphics Dev → IDE Dev
+                 ↓              ↓
+              Sound Dev ←──────┘
+                                 ↓
+                             Tools Dev
 ```
-
-## Team Ownership
-
-| Team | Directories | Responsibilities |
-|------|-------------|------------------|
-| **Parser** | `src/core/parser/` | Grammar, CST generation, syntax errors |
-| **Runtime** | `src/core/execution/`, `src/core/evaluation/`, `src/core/state/` | Command execution, expression evaluation, state management |
-| **UI** | `src/features/`, `src/shared/` | Vue components, IDE, theming |
-| **Platform** | `src/core/animation/`, `src/core/sprite/`, `src/core/devices/` | Device models, sprites, animation, buffers |
 
 ## Integration Points
 
-### Parser → Runtime
-- **Output**: CST (Concrete Syntax Tree)
-- **Interface**: CST node types from Chevrotain
-- **Example**: `IfStatementCstNode` → `IfThenExecutor`
+- **Parser → Runtime**: CST structure
+- **Runtime → Device**: Device adapter interface
+- **Runtime ↔ Sound**: PLAY command integration
+- **Sound → Device**: Audio data for playback
+- **Device → Graphics**: SharedBuffer coordination
+- **Graphics → IDE**: SharedBuffer layout for rendering
+- **Graphics → Tools**: Sprite data for viewer
+- **Device → IDE**: Message types for handling
 
-### Runtime → Platform
-- **Output**: Device commands
-- **Interface**: `BasicDeviceAdapter`
-- **Example**: `MoveExecutor` → `AnimationManager.scheduleMove()`
+## Reference
 
-### Platform → UI
-- **Output**: SharedArrayBuffer updates
-- **Interface**: `sharedDisplayBuffer` layout
-- **Example**: Sprite positions written by worker, read by Konva renderer
+- F-BASIC Language: `docs/reference/family-basic-manual/`
+- Worker Messages: `docs/reference/worker-messages.md`
+- Shared Buffer: `docs/reference/shared-display-buffer.md`
 
-### UI → Runtime
-- **Output**: User actions (run, stop, input)
-- **Interface**: Web Worker messages
-- **Example**: User clicks "Run" → `EXECUTE` message to worker
+## When to Create New Specialist
 
-## Workflow: Task Decomposition
+If a domain grows beyond 50 files or becomes cognitively complex:
+1. Analyze if it can be split along natural boundaries
+2. Propose the split to Tech Lead
+3. Create new skill and team context files
 
-When user requests a feature:
-
-1. **Check GitHub Issues FIRST** - Review existing issues for any related open work
-2. **Analyze** against architecture (above)
-3. **Identify** which teams are involved
-4. **Break down** into team-specific tasks
-5. **Spawn** sub-agents via Task tool
-6. **Integrate** results and verify cross-team boundaries
-7. **Close issues** - Comment and close when work is complete
-
-### Issue Management
-
-Track work via [GitHub Issues](https://github.com/cfvbaibai/fbasic-ide/issues).
-
-**When work is complete**:
-1. Add a comment summarizing the implementation
-2. Close the issue
-3. Reference the issue in commit messages (e.g., "fixes #123")
-
-### Example: Add CIRCLE Command
-
-```markdown
-Feature: "Add CIRCLE command to draw circles"
-
-Analysis:
-- Parser: Add grammar rule
-- Runtime: Implement executor
-- Platform: Add drawing primitive to device
-- UI: No changes needed
-
-Task Breakdown:
-1. Parser Team: Add CIRCLE token and grammar rule
-2. Runtime Team: Implement CircleExecutor
-3. Platform Team: Add circle drawing to BasicDeviceAdapter
-4. Integration: Verify CST → Executor → Device flow
-```
-
-## Common Scenarios
-
-### New BASIC Command
-Teams: Parser → Runtime → (maybe Platform)
-
-### New IDE Feature
-Teams: UI only (usually)
-
-### Animation/Sprite Feature
-Teams: Platform → Runtime
-
-### Bug Fix
-Teams: Usually single team (identify which layer has the bug)
-
-## Reference Documentation
-
-- **F-BASIC Language**: `docs/reference/family-basic-manual/`
-- **Worker Message Types**: `docs/reference/worker-messages.md`
-- **Shared Buffer Layout**: `docs/reference/shared-display-buffer.md`
-- **Roadmap**: `docs/roadmap.md`
-- **Changelog**: `docs/CHANGELOG.md`
-
-## Code Constraints (Enforce Across All Teams)
-
-- Files: **MAX 500 lines**
-- TypeScript: strict mode, no `any`, `import type` for types
-- Tests: `.toEqual()` for exact matching
-- Constants: `src/core/constants.ts`
+**Example**: Sound was split from Runtime when music DSL grew complex.

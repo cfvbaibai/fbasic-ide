@@ -6,6 +6,7 @@
 
 import type { AnimationManager } from '@/core/animation/AnimationManager'
 import { ERROR_TYPES } from '@/core/constants'
+import type { SoundService } from '@/core/execution/sound/SoundService'
 import type { ExpandedStatement } from '@/core/execution/statement-expander'
 import type { BasicDeviceAdapter, BasicError, BasicVariable, InterpreterConfig } from '@/core/interfaces'
 import type { SpriteStateManager } from '@/core/sprite/SpriteStateManager'
@@ -49,6 +50,7 @@ export class ExecutionContext {
   public deviceAdapter?: BasicDeviceAdapter
   public spriteStateManager?: SpriteStateManager
   public animationManager?: AnimationManager
+  public soundService?: SoundService
 
   private errors: BasicError[] = []
 
@@ -81,6 +83,9 @@ export class ExecutionContext {
     }
     if (this.animationManager) {
       this.animationManager.reset()
+    }
+    if (this.soundService) {
+      this.soundService.reset()
     }
   }
 

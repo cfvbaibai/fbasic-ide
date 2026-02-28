@@ -17,6 +17,7 @@ const DEFAULT_STATE: SoundState = {
   envelope: 0, // No envelope (volume mode)
   volumeOrLength: 15, // Maximum volume
   octave: 3, // Middle octave
+  lastLength: 5, // Quarter note (default length code)
 }
 
 /**
@@ -134,5 +135,23 @@ export class SoundStateManager {
       throw new Error(`Invalid octave: ${octave}. Must be 0-5`)
     }
     this.state.octave = octave
+  }
+
+  /**
+   * Get last note length code (0-9)
+   */
+  getLastLength(): number {
+    return this.state.lastLength
+  }
+
+  /**
+   * Set last note length code (0-9)
+   * Used for note length inheritance across PLAY calls
+   */
+  setLastLength(length: number): void {
+    if (length < 0 || length > 9) {
+      throw new Error(`Invalid length: ${length}. Must be 0-9`)
+    }
+    this.state.lastLength = length
   }
 }

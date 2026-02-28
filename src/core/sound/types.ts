@@ -93,6 +93,7 @@ export interface MusicScore {
 /**
  * Persistent sound state that carries over between PLAY calls
  * Follows F-BASIC v3 specification where T, Y, M, V, O persist
+ * Note: Last note length (0-9) also persists across PLAY calls
  */
 export interface SoundState {
   /** Tempo: 1-8 (1=fast, 8=slow) */
@@ -105,6 +106,8 @@ export interface SoundState {
   volumeOrLength: number
   /** Octave: 0-5 (0=low, 5=high) */
   octave: number
+  /** Last note length code: 0-9 (5=quarter note is default) */
+  lastLength: number
 }
 
 /**

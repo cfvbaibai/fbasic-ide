@@ -17,6 +17,7 @@ import { AnimationManager } from './animation/AnimationManager'
 import { ERROR_TYPES, EXECUTION_LIMITS } from './constants'
 // Import refactored components
 import { ExecutionContext, ExecutionEngine } from './execution'
+import { SoundService } from './execution/sound/SoundService'
 import { expandStatements } from './execution/statement-expander'
 import type { BasicVariable, ExecutionResult, InterpreterConfig } from './interfaces'
 import { getSourceTextFromCst } from './parser/cst-helpers'
@@ -101,6 +102,8 @@ export class BasicInterpreter {
         this.context.spriteStateManager = new SpriteStateManager()
         // Initialize animation manager (worker passes shared buffer for isActive / MOVE(n))
         this.context.animationManager = new AnimationManager(this.config.sharedAnimationBuffer)
+        // Initialize sound service for per-channel state management
+        this.context.soundService = new SoundService()
         // Set device adapter in animation manager for command sending
         if (this.config.deviceAdapter) {
           this.context.animationManager.setDeviceAdapter(this.config.deviceAdapter)

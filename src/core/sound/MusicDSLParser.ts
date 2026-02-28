@@ -465,7 +465,8 @@ function compileChannelToAudio(
   channelNumber: number
 ): SoundEvent[] {
   const soundEvents: SoundEvent[] = []
-  let lastLengthCode = DEFAULT_LENGTH_CODE
+  // Get lastLength from state manager (persists across PLAY calls)
+  let lastLengthCode = stateManager.getLastLength()
 
   for (const event of events) {
     switch (event.type) {
@@ -491,7 +492,9 @@ function compileChannelToAudio(
 
       case 'note': {
         const lengthCode = event.length ?? lastLengthCode
+        // Update lastLength in state manager for cross-PLAY persistence
         lastLengthCode = lengthCode
+        stateManager.setLastLength(lengthCode)
 
         const state = stateManager.getState()
         const frequency = calculateNoteFrequency(event.note, state.octave, event.sharp)
@@ -510,7 +513,9 @@ function compileChannelToAudio(
 
       case 'rest': {
         const lengthCode = event.length ?? lastLengthCode
+        // Update lastLength in state manager for cross-PLAY persistence
         lastLengthCode = lengthCode
+        stateManager.setLastLength(lengthCode)
 
         const state = stateManager.getState()
         const duration = lengthCodeToDuration(lengthCode, state.tempo)
@@ -531,11 +536,15 @@ function compileChannelToAudio(
  * Compile MusicScore to CompiledAudio (Stage 2)
  *
  * @param score - Parsed music score
- * @param stateManager - Sound state manager for state persistence
+ * @param stateManagers - Array of sound state managers (one per channel) for state persistence
  * @returns Compiled audio ready for playback
  */
-export function compileToAudio(score: MusicScore, stateManager: SoundStateManager): CompiledAudio {
+export function compileToAudio(
+  score: MusicScore,
+  stateManagers: SoundStateManager[]
+): CompiledAudio {
   const channels = score.channels.map((channelEvents, index) => {
+    const stateManager = stateManagers[index]!
     return compileChannelToAudio(channelEvents, stateManager, index)
   })
 
@@ -551,10 +560,13 @@ export function compileToAudio(score: MusicScore, stateManager: SoundStateManage
  * Convenience function for backward compatibility
  *
  * @param musicString - Music DSL string
- * @param stateManager - Sound state manager
+ * @param stateManagers - Array of sound state managers (one per channel)
  * @returns Compiled audio ready for playback
  */
-export function parseMusic(musicString: string, stateManager: SoundStateManager): CompiledAudio {
+export function parseMusic(
+  musicString: string,
+  stateManagers: SoundStateManager[]
+): CompiledAudio {
   const score = parseMusicToAst(musicString)
-  return compileToAudio(score, stateManager)
+  return compileToAudio(score, stateManagers)
 }

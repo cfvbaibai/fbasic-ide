@@ -3,7 +3,7 @@
  */
 
 import type { ERROR_TYPES, VARIABLE_TYPES } from './constants'
-import type { MusicScore } from './sound/types'
+import type { CompiledAudio } from './sound/types'
 import type { SpriteState } from './sprite/types'
 import type { ExecutionContext } from './state/ExecutionContext'
 import type { BasicArrayValue } from './types/BasicTypes'
@@ -134,10 +134,10 @@ export interface BasicDeviceAdapter {
 
   // === SOUND OUTPUT ===
   /**
-   * Play parsed music score
-   * @param musicScore - Parsed music score with symbolic events
+   * Play compiled audio
+   * @param audio - Compiled audio with calculated frequencies and durations
    */
-  playSound?(musicScore: MusicScore): void
+  playSound?(audio: CompiledAudio): void
 
   /**
    * Play a beep sound (BEEP statement)
