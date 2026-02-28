@@ -8,7 +8,7 @@ export interface SampleCode {
   name: string
   description: string
   code: string
-  category: 'basics' | 'control' | 'data' | 'screen' | 'sprites' | 'interactive' | 'comprehensive' | 'debug'
+  category: 'basics' | 'control' | 'data' | 'screen' | 'sprites' | 'interactive' | 'comprehensive' | 'debug' | 'music'
   /** Optional BG data key for samples that use VIEW command */
   bgKey?: string
 }
@@ -292,6 +292,43 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 150 PAUSE 2
 160 GOTO 70
 170 END`,
+  },
+
+  inkeyTest: {
+    name: 'INKEY$ Test',
+    description: 'Test keyboard input with INKEY$ - press keys to see characters (GitHub Issue #4)',
+    category: 'interactive',
+    code: `10 CLS
+20 PRINT "=== INKEY$ TEST ==="
+30 PRINT "Press any key to see it"
+40 PRINT "Press Q to quit"
+50 PRINT ""
+60 K$ = INKEY$
+70 IF K$ = "" THEN 60
+80 IF K$ = "Q" THEN 120
+90 PRINT "You pressed: "; K$; " (code "; ASC(K$); ")"
+100 PAUSE 10
+110 GOTO 60
+120 PRINT "Goodbye!"
+130 END`,
+  },
+
+  inkeyBlockingTest: {
+    name: 'INKEY$(0) Blocking Test',
+    description: 'Test INKEY$ with blocking mode - waits for key press (GitHub Issue #4)',
+    category: 'interactive',
+    code: `10 CLS
+20 PRINT "=== INKEY$(0) BLOCKING TEST ==="
+30 PRINT "This mode waits for input"
+40 PRINT ""
+50 PRINT "Enter character: ";
+60 K$ = INKEY$(0)
+70 PRINT K$; " (code "; ASC(K$); ")"
+80 PRINT "Press Q to quit, any other to continue"
+90 IF K$ = "Q" THEN 110
+100 GOTO 50
+110 PRINT "Done!"
+120 END`,
   },
 
   shooting: {
@@ -583,6 +620,833 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 70 GOTO 40
 100 PRINT "Goodbye!"
 110 END`,
+  },
+
+  // ============================================================================
+  // Music Samples
+  // ============================================================================
+
+  musicBasic: {
+    name: 'Basic Music Demo',
+    description: 'Simple PLAY demonstration with single notes',
+    category: 'music',
+    code: `10 PRINT "Basic Music Demo"
+20 PLAY "CDEFGAB"
+30 PRINT "Done!"
+40 END`,
+  },
+
+  musicTwinkle: {
+    name: 'Twinkle Twinkle Little Star (Full)',
+    description: 'Complete classic nursery rhyme with GOTO loop - demonstrates BASIC repetition',
+    category: 'music',
+    code: `10 CLS
+20 PRINT "Twinkle Twinkle Little Star"
+30 PRINT "================================"
+40 PLAY "T3"
+50 V=1
+60 REM === VERSE LOOP ===
+70 REM Twinkle twinkle little star
+80 PLAY "CCGGAAG7"
+90 REM How I wonder what you are
+100 PLAY "FFEEDDC7"
+110 REM Up above the world so high
+120 PLAY "GGFFEED7"
+130 REM Like a diamond in the sky
+140 PLAY "GGFFEED7"
+150 REM Twinkle twinkle little star
+160 PLAY "CCGGAAG7"
+170 REM How I wonder what you are
+180 PLAY "FFEEDDC9"
+190 V=V+1
+200 IF V<=2 THEN PRINT "":PRINT "Verse ";V:GOTO 60
+210 PRINT ""
+220 PRINT "Song complete!"
+230 END`,
+  },
+
+  musicOdeToJoy: {
+    name: 'Ode to Joy (Full - Beethoven)',
+    description: 'Complete melody with GOSUB for repeated phrases - demonstrates BASIC subroutines',
+    category: 'music',
+    code: `10 CLS
+20 PRINT "Ode to Joy - Beethoven"
+30 PRINT "Symphony No.9 - Full Theme"
+40 PRINT "=========================="
+50 PLAY "T3"
+60 REM === PLAY FULL THEME TWICE ===
+70 R=1
+80 REM === MAIN THEME START ===
+90 REM Phrase 1: Joyful, joyful...
+100 PLAY "E5E5F5G5G5F5E5D5C5C5D5E5E6D3D7"
+110 REM Phrase 2: We sing thy song...
+120 PLAY "E5E5F5G5G5F5E5D5C5C5D5E5D6C3C7"
+130 REM Phrase 3 - Bridge
+140 PLAY "D5D5E5C5D5E5F5E5C5D5E5F5E5D5C5D7"
+150 REM Phrase 4
+160 PLAY "E5E5F5G5G5F5E5D5C5C5D5E5D6C3C9"
+170 R=R+1
+180 IF R<=2 THEN PRINT "Repeat ";R-1:GOTO 90
+190 PRINT ""
+200 PRINT "Fin!"
+210 END`,
+  },
+
+  musicMaryHadALittleLamb: {
+    name: 'Mary Had a Little Lamb',
+    description: 'Traditional children\'s song from F-BASIC Manual (page 34) - 3-channel harmony',
+    category: 'music',
+    code: `10 CLS
+20 LOCATE 6,12:PRINT "Mary Had a Little Lamb"
+30 PLAY "M1Y2V7T3:M1Y1V5T3:M1T3"
+40 PLAY "O2A6G3F5G:O2R3FCEDCEC:O1F7C"
+50 PLAY "A5AA7:RFCFRCO1A02C:FC"
+60 PLAY "G5GG7:RECERCO1GO2C:O2CO1G"
+70 PLAY "A5O3CC7:RF5AO3C3AG:FC"
+80 PLAY "O2A6G3F5G:O2RFRERDRC:FC"
+90 PLAY "AAAZ:RFFFRCCC:FC"
+100 PLAY "G5#AA6G3:RERGRERC:O2CO1G"
+110 PLAY "F9:FCFAO3F7:F5CF7"
+120 PRINT ""
+130 PRINT "Song complete!"
+140 END`,
+  },
+
+  musicHappyBirthday: {
+    name: 'Happy Birthday (Full)',
+    description: 'Complete traditional birthday song with all phrases - demonstrates dotted rhythms',
+    category: 'music',
+    code: `10 CLS
+20 PRINT "Happy Birthday to You!"
+30 PRINT "======================="
+40 PLAY "T3"
+50 REM Happy birthday to you
+60 PLAY "C4C4D6C5F4E9"
+70 REM Happy birthday to you
+80 PLAY "C4C4D6C5G4F9"
+90 REM Happy birthday dear [name]
+100 PLAY "C4C4C6O4C5O3A5F5E5D5"
+110 REM Happy birthday to you
+120 PLAY "O2#A4#A4O3A5F5G5F9"
+130 PRINT ""
+140 PRINT "Make a wish!"
+150 END`,
+  },
+
+  musicJingleBells: {
+    name: 'Jingle Bells (Full)',
+    description: 'Complete Christmas carol with GOSUB for chorus - demonstrates BASIC subroutines',
+    category: 'music',
+    code: `10 CLS
+20 PRINT "Jingle Bells"
+30 PRINT "============"
+40 PLAY "T2"
+50 REM === VERSE: Dashing through the snow ===
+60 PLAY "E5E5E7E5E5E7"
+70 REM In a one-horse open sleigh
+80 PLAY "E5G5C5D6E8"
+90 REM O'er the fields we go
+100 PLAY "F5F5F5F5F5E5E5"
+110 REM Laughing all the way
+120 PLAY "E5E5D5D5E5D6G7"
+130 REM Bells on bobtail ring
+140 PLAY "F5F5F5F5F5E5E5"
+150 REM Making spirits bright
+160 PLAY "G5G5F5D5C6O4C8"
+170 REM What fun it is to ride and sing
+180 PLAY "O3E5E5E5E5E5E5E5G5C5D5E8"
+190 REM A sleighing song tonight
+200 PLAY "F5F5F5F5F5E5E5E5G5G5F5D5C8"
+210 REM === CHORUS (first time) ===
+220 GOSUB 400
+230 REM === CHORUS (second time) ===
+240 GOSUB 400
+250 PRINT ""
+260 PRINT "Merry Christmas!"
+270 END
+280 REM ========== CHORUS SUBROUTINE ==========
+400 REM Jingle bells, jingle bells
+410 PLAY "E5E5E7E5E5E7"
+420 REM Jingle all the way
+430 PLAY "E5G5C5D6E8"
+440 REM Oh what fun it is to ride
+450 PLAY "F5F5F5F5F5E5E5E5D5D5E5D6G7"
+460 REM In a one-horse open sleigh
+470 PLAY "F5F5F5F5F5E5E5G5G5F5D5C8"
+480 RETURN`,
+  },
+
+  musicScale: {
+    name: 'C Major Scale',
+    description: 'Ascending and descending C major scale - demonstrates octaves',
+    category: 'music',
+    code: `10 CLS
+20 PRINT "C Major Scale"
+30 PRINT "============="
+40 PRINT "Ascending..."
+50 PLAY "O2C5D5E5F5G5A5B5"
+60 PLAY "O3C5"
+70 PRINT "Descending..."
+80 PLAY "O3C5"
+90 PLAY "O2B5A5G5F5E5D5C5"
+100 PRINT ""
+110 PRINT "Complete!"
+120 END`,
+  },
+
+  musicArpeggio: {
+    name: 'C Major Arpeggio',
+    description: 'C major arpeggio pattern - demonstrates chord arpeggios',
+    category: 'music',
+    code: `10 CLS
+20 PRINT "C Major Arpeggio"
+30 PRINT "================"
+40 PLAY "T3"
+50 PRINT "Ascending..."
+60 PLAY "O2C5E5G5O3C5E5G5O4C5"
+70 PRINT "Descending..."
+80 PLAY "O4C5G5E5O3C5G5E5O2C5"
+90 PRINT ""
+100 PRINT "Complete!"
+110 END`,
+  },
+
+  musicThreeChannel: {
+    name: 'Three-Channel Harmony Demo',
+    description: 'Demonstrates 3-channel simultaneous playback with PLAY',
+    category: 'music',
+    code: `10 CLS
+20 PRINT "Three-Channel Harmony Demo"
+30 PRINT "=========================="
+40 PRINT "Playing C major chord..."
+50 PLAY "T4"
+60 PLAY "O3C9:O3E9:O3G9"
+70 PRINT "Playing F major chord..."
+80 PLAY "O3F9:O3A9:O4C9"
+90 PRINT "Playing G major chord..."
+100 PLAY "O3G9:O3B9:O4D9"
+110 PRINT "Playing C major chord..."
+120 PLAY "O3C9:O3E9:O3G9"
+130 PRINT ""
+140 PRINT "Complete!"
+150 END`,
+  },
+
+  musicPlayer: {
+    name: 'Music Player with Menu',
+    description: 'Interactive music player demonstrating GOTO for menu loop and song selection',
+    category: 'music',
+    code: `10 CLS
+20 PRINT "===================="
+30 PRINT "   F-BASIC JUKEBOX"
+40 PRINT "===================="
+50 PRINT ""
+60 PRINT "1. Twinkle Twinkle"
+70 PRINT "2. Scale Demo"
+80 PRINT "3. Chord Demo"
+90 PRINT "4. Exit"
+100 PRINT ""
+110 INPUT "Select song (1-4)";S
+120 IF S=1 THEN GOTO 200
+130 IF S=2 THEN GOTO 300
+140 IF S=3 THEN GOTO 400
+150 IF S=4 THEN PRINT "Goodbye!":END
+160 PRINT "Invalid choice!"
+170 PAUSE 30
+180 GOTO 10
+190 REM ===== SONG 1: TWINKLE =====
+200 CLS:PRINT "Playing: Twinkle Twinkle"
+210 PLAY "T3"
+220 PLAY "CCGGAAG7"
+230 PLAY "FFEEDDC7"
+240 PLAY "GGFFEED7"
+250 PLAY "GGFFEED7"
+260 PLAY "CCGGAAG7"
+270 PLAY "FFEEDDC9"
+280 PRINT "Done!"
+290 PAUSE 60:GOTO 10
+300 REM ===== SONG 2: SCALE =====
+310 CLS:PRINT "Playing: C Major Scale"
+320 PLAY "T3"
+330 PLAY "O2C5D5E5F5G5A5B5O3C5"
+340 PLAY "O3C5O2B5A5G5F5E5D5C5"
+350 PRINT "Done!"
+360 PAUSE 60:GOTO 10
+400 REM ===== SONG 3: CHORDS =====
+410 CLS:PRINT "Playing: Chord Progression"
+420 PLAY "T4"
+430 PLAY "O3C9:O3E9:O3G9"
+440 PLAY "O3F9:O3A9:O4C9"
+450 PLAY "O3G9:O3B9:O4D9"
+460 PLAY "O3C9:O3E9:O3G9"
+470 PRINT "Done!"
+480 PAUSE 60:GOTO 10`,
+  },
+
+  musicLoopDemo: {
+    name: 'Music Loop Demo',
+    description: 'Demonstrates FOR-NEXT and GOTO for musical repetition patterns',
+    category: 'music',
+    code: `10 CLS
+20 PRINT "Music Loop Demo"
+30 PRINT "==============="
+40 PLAY "T3"
+50 REM === ASCENDING SCALE WITH FOR-NEXT ===
+60 PRINT "Ascending scale 3x:"
+70 FOR R=1 TO 3
+80 PLAY "O2C5D5E5F5G5A5B5O3C5"
+90 NEXT
+100 REM === DESCENDING WITH GOTO ===
+110 PRINT "Descending scale 3x:"
+120 C=1
+130 PLAY "O3C5O2B5A5G5F5E5D5C5"
+140 C=C+1
+150 IF C<=3 THEN GOTO 130
+160 REM === REPEATING PATTERN ===
+170 PRINT "Pattern repeat 4x:"
+180 P=1
+190 PLAY "C5E5G5E5"
+200 P=P+1
+210 IF P<=4 THEN GOTO 190
+220 PRINT ""
+230 PRINT "Complete!"`,
+  },
+
+  musicFurElise: {
+    name: 'Fur Elise (Full - Beethoven)',
+    description: 'Complete piano piece with GOSUB for A-B-A structure - demonstrates BASIC subroutines',
+    category: 'music',
+    code: `10 CLS
+20 PRINT "Fur Elise - Beethoven"
+30 PRINT "====================="
+40 PLAY "T3"
+50 REM ========== A SECTION (First) ==========
+60 GOSUB 300
+70 REM ========== B SECTION ==========
+80 REM F major section
+90 PLAY "O2E6D6#D5E6D6#D5E6D6#D5"
+100 PLAY "O1C5E5O2A5B7"
+110 PLAY "E5#G5B5C7"
+120 PLAY "A5#G5A5E6D6#D5E6D6#D5"
+130 PLAY "O1C5E5O2A5B7"
+140 PLAY "D5C5B4A7"
+150 REM Arpeggio section
+160 PLAY "O1A5O2E5A5B7"
+170 PLAY "C5E5A5B7"
+180 PLAY "E5G5#B5C7"
+190 PLAY "E5O3C5E7"
+200 REM Descending phrase
+210 PLAY "O3D5C5O2B5A7"
+220 PLAY "O1G5O2E5G5A7"
+230 PLAY "O1F5O2E5F5G7"
+240 PLAY "O1E5O2D5E5F7"
+250 PLAY "O1D5O2C5D5E7"
+260 REM ========== A SECTION (Return) ==========
+270 GOSUB 300
+280 PRINT ""
+290 PRINT "Fin!"
+295 END
+300 REM ========== A SECTION SUBROUTINE ==========
+310 PLAY "E5#D5E5#D5E5B4D5C5A7"
+320 PLAY "O1C5E5A5B7"
+330 PLAY "E5G5#B5C7"
+340 PLAY "E5#D5E5#D5E5B4D5C5A7"
+350 PLAY "O1C5E5A5B7"
+360 PLAY "D5C5B4A7"
+370 RETURN`,
+  },
+
+  // ============================================================================
+  // F-BASIC Reference Manual Sample Games (pages 94-101)
+  // ============================================================================
+
+  knight: {
+    name: 'KNIGHT',
+    description: 'Chess knight movement game - 2 players take turns placing pieces using knight moves (from F-BASIC Manual p.94)',
+    category: 'comprehensive',
+    bgKey: 'knight',
+    code: `10 REM * KNIGHT *
+20 VIEW
+30 CGEN 2
+40 CGSET 1,1
+50 DEF SPRITE 0,(0,1,0,0,0)=CHR$(0)+CHR$(1)+CHR$(2)+CHR$(3)
+60 DEF SPRITE 1,(1,1,0,0,0)=CHR$(0)+CHR$(1)+CHR$(2)+CHR$(3)
+70 DEF SPRITE 2,(2,1,0,0,0)=CHR$(0)+CHR$(1)+CHR$(2)+CHR$(3)
+80 DEF SPRITE 3,(3,1,0,0,0)=CHR$(0)+CHR$(1)+CHR$(2)+CHR$(3)
+90 PALETS 0,1,48,25,18
+100 PALETS 1,1,48,25,18
+110 PALETS 2,1,48,25,18
+120 PALETS 3,1,48,25,18
+130 SPRITE ON
+140 DIM B(7,7)
+150 FOR Y=0 TO 7
+160 FOR X=0 TO 7
+170 B(X,Y)=0
+180 NEXT
+190 NEXT
+200 X=0:Y=0:F=0
+210 GOSUB 500
+220 S=STICK(0)
+230 IF S=0 THEN 220
+240 IF S=4 THEN Y=Y+1
+250 IF S=8 THEN Y=Y-1
+260 IF S=1 THEN X=X+1
+270 IF S=2 THEN X=X-1
+280 IF X<0 THEN X=0
+290 IF X>7 THEN X=7
+300 IF Y<0 THEN Y=0
+310 IF Y>7 THEN Y=7
+320 IF STRIG(0)<>0 THEN 340
+330 GOTO 210
+340 IF B(X,Y)<>0 THEN 220
+350 B(X,Y)=F+1
+360 GOSUB 500
+370 F=1-F
+380 GOTO 220
+500 REM * DISPLAY *
+510 CLS
+520 FOR Y=0 TO 7
+530 FOR X=0 TO 7
+540 IF B(X,Y)=0 THEN 560
+550 LOCATE X*3+2,Y*2+2:PRINT CHR$(B(X,Y)+47)
+560 NEXT
+570 NEXT
+580 IF F=0 THEN LOCATE 8,20:PRINT "BLUE WIN!!"
+590 IF F=1 THEN LOCATE 8,20:PRINT "RED WIN!!"
+600 RETURN`,
+  },
+
+  superMemory: {
+    name: 'SUPER MEMORY',
+    description: 'Memory matching game - remember and repeat color panel sequences (from F-BASIC Manual p.95) - REQUIRES INKEY$ (Issue #4)',
+    category: 'comprehensive',
+    bgKey: 'superMemory',
+    code: `10 REM * SUPER MEMORY *
+20 VIEW:CGEN 2
+30 MAX=5
+40 I=Z-Y:C=0
+50 PP$="CFGE"
+60 Z=CHR$(254):Z$=Z$+Z$+Z$+Z$+Z$
+70 N$=""
+80 DIM PL(MAX), PX(3), PY(3), C(3)
+90 PX(0)=16:PY(0)=8:C(0)=2
+100 PX(1)=16:PY(1)=12:C(1)=1
+110 PX(2)=12:PY(2)=10:C(2)=3
+120 PX(3)=20:PY(3)=10:C(3)=0
+130 PL(Z)=RND(4)
+140 FOR I=0 TO Z
+150 X=PX(PL(I)):Y=PY(PL(I))
+160 C=C(PL(I))
+170 PALETB 8, 13, 13, 13, 13
+180 GOSUB 440
+190 PLAY "T204"+MID$(PP$, PL(I)+1, 1)+"3"
+200 GOSUB 500
+210 PALETB 8, 13, &H16, &H27, 2
+220 PAUSE 10
+230 NEXT
+240 LOCATE 9, 10:PRINT "YOU"
+250 A$=INKEY$:IF A$="" THEN 250
+260 IF A$=CHR$(PL(I)+65) THEN 280
+270 PLAY "T101CICIC1":GOTO 240
+280 PLAY "T205C2R2F2R2E2"
+290 PALETB 8, 13, &H16, &H27, 2
+300 X=PX(PL(I)):Y=PY(PL(I))
+310 C=C(PL(I))
+320 GOSUB 440
+330 PAUSE 10
+340 PALETB 8, 13, 13, 13, 13
+350 GOSUB 500
+360 I=I+1:IF I<=Z THEN 250
+370 Z=Z+1:IF Z>MAX THEN 410
+380 LOCATE 9, 10:PRINT ""
+390 PAUSE 50
+400 GOTO 140
+410 END
+420 CLS:CGSET 1, 1:PRINT "GOOD!!"
+430 REM * SUBROUTINES *
+440 FOR J=0 TO 5
+450 LOCATE X, Y+J
+460 PRINT Z$
+470 NEXT
+480 RETURN
+500 FOR J=0 TO 5
+510 LOCATE X, Y+J
+520 PRINT N$
+530 NEXT
+540 RETURN
+550 END`,
+  },
+
+  ufo: {
+    name: 'UFO',
+    description: 'UFO shooting game - defend against fighter flies (from F-BASIC Manual p.96)',
+    category: 'comprehensive',
+    bgKey: 'ufo',
+    code: `10 REM * UFO *
+20 VIEW:CGEN 2
+30 CGSET 1,1
+40 U0$=CHR$(64)+CHR$(65)+CHR$(66)+CHR$(67)
+50 U1$=CHR$(68)+CHR$(69)+CHR$(70)+CHR$(71)
+60 B$=CHR$(72)+CHR$(73)+CHR$(74)+CHR$(75)
+70 G0$=CHR$(76)+CHR$(77)+CHR$(78)+CHR$(79)
+80 G1$=CHR$(80)+CHR$(81)+CHR$(82)+CHR$(83)
+90 D0$=CHR$(84)+CHR$(85)+CHR$(86)+CHR$(87)
+100 D1$=CHR$(88)+CHR$(89)+CHR$(90)+CHR$(91)
+110 DEF SPRITE 0,(0,1,0,0,0)=U0$
+120 DEF SPRITE 1,(0,1,0,0,0)=U1$
+130 DEF SPRITE 2,(0,1,0,0,0)=B$
+140 DEF SPRITE 3,(0,1,0,0,0)=G0$
+150 DEF SPRITE 4,(0,1,0,0,0)=G1$
+160 DEF SPRITE 5,(0,1,0,0,0)=D0$
+170 DEF SPRITE 6,(0,1,0,0,0)=D1$
+180 PALETS 0,1,48,25,18
+190 PALETS 1,1,48,25,18
+200 PALETS 2,1,48,25,18
+210 SPRITE ON
+220 LG=2:RG=25:TG=2:BG=18
+230 GX=13:GY=18:BV=0:DV=0:R=0
+240 PR=0
+250 GOSUB 300
+260 S=STICK(0)
+270 IF S=1 THEN GX=GX+1
+280 IF S=2 THEN GX=GX-1
+290 IF GX<LG THEN GX=LG
+300 IF GX>RG THEN GX=RG
+310 SPRITE 2,GX*8+16,GY*8+24
+320 IF STRIG(0)<>0 THEN 340
+330 GOTO 260
+340 BV=GY-2:DV=GX
+350 SPRITE 3,DV*8+16,BV*8+24
+360 IF BV<TG THEN 380
+370 BV=BV-1:GOTO 350
+380 SPRITE 3,0,0
+390 R=RND(10)
+400 IF R<3 THEN 420
+410 GOTO 260
+420 GOSUB 440
+430 GOTO 260
+440 REM * ENEMY *
+450 EX=RND(24)+2
+460 EY=TG
+470 SPRITE 0,EX*8+16,EY*8+24
+480 IF EY>=GY THEN 500
+490 EY=EY+1:GOTO 470
+500 IF EX=DV AND EY>=BV THEN 520
+510 GOTO 480
+520 SPRITE 0,0,0:SPRITE 3,0,0
+530 PR=PR+10
+540 LOCATE 0,0:PRINT "SCORE: ";PR
+550 RETURN
+560 END`,
+  },
+
+  route66: {
+    name: 'ROUTE 66',
+    description: 'Racing game - avoid other cars on the endless road (from F-BASIC Manual p.97)',
+    category: 'comprehensive',
+    bgKey: 'route66',
+    code: `10 REM * ROUTE 66 *
+20 VIEW
+30 CGEN 2
+40 CGSET 1,1
+50 PALETB 0,1,48,25,18
+60 PALETB 1,1,48,25,18
+70 PALETB 2,1,48,25,18
+80 SPRITE ON
+90 X1=120:Y1=180
+100 SC=0:CA=3:V=0
+110 FOR I=0 TO 3
+120 DEF SPRITE I,(I,1,0,0,0)=CHR$(I*4)+CHR$(I*4+1)+CHR$(I*4+2)+CHR$(I*4+3)
+130 NEXT
+140 DIM X(3),Y(3)
+150 FOR I=0 TO 3
+160 X(I)=RND(1)*200+28
+170 Y(I)=RND(1)*100
+180 NEXT
+190 GOSUB 500
+200 S=STICK(0)
+210 IF S=1 THEN X1=X1-4
+220 IF S=2 THEN X1=X1+4
+230 IF STRIG(0)=0 THEN V=V+1
+240 IF STRIG(1)=0 THEN V=V-1
+250 IF V<0 THEN V=0
+260 IF V>10 THEN V=10
+270 FOR I=0 TO 3
+280 Y(I)=Y(I)+V
+290 IF Y(I)>240 THEN Y(I)=Y(I)-240:X(I)=RND(1)*200+28
+300 IF ABS(X(I)-X1)<16 AND ABS(Y(I)-Y1)<16 THEN 360
+310 NEXT
+320 SC=SC+V
+330 IF SC>9999 THEN SC=9999
+340 GOSUB 500
+350 GOTO 200
+360 CA=CA-1
+370 IF CA<0 THEN 390
+380 GOTO 190
+390 PRINT "GAME OVER!"
+400 END
+500 REM * DISPLAY *
+510 CLS
+520 LOCATE 0,0:PRINT "HIGH SCORE";SC
+530 LOCATE 0,1:PRINT "LEVEL";V
+540 LOCATE 0,2:PRINT "SCORE";SC
+550 LOCATE 0,3:PRINT "CARS";CA
+560 LOCATE 0,4:PRINT "LEFT";9999-SC;"M"
+570 LOCATE 0,5:PRINT "SEC";100
+580 SPRITE 0,X1,Y1
+590 FOR I=0 TO 3
+600 SPRITE I+1,X(I),Y(I)
+610 NEXT
+620 RETURN`,
+  },
+
+  typeMaster: {
+    name: 'TYPE MASTER',
+    description: 'Typing practice game - find and type the matching character (from F-BASIC Manual p.98) - REQUIRES INKEY$ (Issue #4)',
+    category: 'comprehensive',
+    bgKey: 'typeMaster',
+    code: `10 CGEN 3:CGSET 1,1
+20 VIEW
+30 PLAY "T120"
+40 PO=0:PP=0
+50 DIM A$(10),B$(10)
+60 FOR I=0 TO 9
+70 A$(I)=CHR$(48+I)
+80 NEXT
+90 FOR I=0 TO 9
+100 READ B$(I)
+110 NEXT
+120 DEF SPRITE 0,(0,1,0,0,0)=CHR$(0)+CHR$(1)+CHR$(2)+CHR$(3)
+130 SPRITE ON
+140 LOCATE 0,0:PRINT "TYPE"
+150 FOR I=0 TO 9
+160 LOCATE I*2+2,1:PRINT A$(I)
+170 NEXT
+180 LOCATE 10,3:PRINT "THIS..."
+190 LOCATE 15,3:PRINT CHR$(0)
+200 LOCATE 0,4:PRINT "     "
+210 PAUSE 60
+220 FOR I=0 TO 9
+230 SWAP A$(I),A$(RND(1)*10)
+240 NEXT
+250 FOR I=0 TO 9
+260 LOCATE I*2+2,1:PRINT A$(I)
+270 NEXT
+280 GOSUB 400
+290 K$=INKEY$
+300 IF K$="" THEN 290
+310 IF ASC(K$)<48 OR ASC(K$)>57 THEN 290
+320 FOR I=0 TO 9
+330 IF A$(I)=K$ THEN 360
+340 NEXT
+350 GOTO 290
+360 IF I=PP THEN 380
+370 GOTO 290
+380 PO=PO+1
+390 IF PO>9 THEN 200
+400 REM * SOUND *
+410 FOR J=0 TO 5
+420 GOSUB 400
+430 NEXT
+440 RETURN
+450 DATA "0","1","2","3","4","5","6","7","8","9"
+460 FOR J=0 TO 5:GOSUB 400: NEXT: RETURN`,
+  },
+
+  turtle: {
+    name: 'TURTLE',
+    description: 'Turtle racing game - simplified version (from F-BASIC Manual p.99)',
+    category: 'comprehensive',
+    bgKey: 'turtle',
+    code: `10 CLS
+20 CGEN 3
+30 CGSET 1,1
+40 PALETB 0,1,48,25,18
+50 PALETB 1,1,48,25,18
+60 PALETB 2,1,48,25,18
+70 PLAY "04T1"
+80 DIM AX(5),AY(5),Q(5),C(5)
+90 INPUT "HOW MANY PLAYERS";PL
+100 IF PL<1 THEN 90
+110 IF PL>5 THEN 90
+120 FOR I=1 TO 5
+130 Q(I)=RND(5)+1
+140 C(I)=Q(I)
+150 NEXT
+160 VIEW
+170 LOCATE 0,0:PRINT "TURTLE 1 2 3 4 5"
+180 FOR I=1 TO 5
+190 LOCATE 0,I:PRINT I
+200 NEXT
+210 FOR I=1 TO 5
+220 AX(I)=0
+230 AY(I)=I*32+16
+240 NEXT
+250 DEF SPRITE 0,(0,1,0,0,0)=CHR$(184)+CHR$(185)+CHR$(186)+CHR$(187)
+260 SPRITE ON
+270 FOR K=1 TO 100
+280 FOR I=1 TO 5
+290 A=RND(8)
+300 IF A<Q(I) THEN AX(I)=AX(I)+1
+310 IF AX(I)>200 THEN 400
+320 NEXT
+330 FOR I=1 TO 5
+340 SPRITE 0,AX(I),AY(I)
+350 NEXT
+360 IF K=50 THEN PLAY "T6CEDFEGC2T1"
+370 IF K=50 THEN LOCATE 10,10:PRINT "CHANGE"
+380 IF K=50 THEN GOSUB 500
+390 NEXT
+400 FOR I=1 TO 5
+410 IF AX(I)>200 THEN W=I
+420 NEXT
+430 LOCATE 10,12:PRINT "WINNER:";W
+440 SPRITE OFF
+450 INPUT "PLAY AGAIN (Y/N)";A$
+460 IF A$="Y" THEN PRINT "PRESS RUN TO RESTART"
+470 IF A$="y" THEN PRINT "PRESS RUN TO RESTART"
+480 END
+500 REM * CHANGE SPEED *
+510 FOR I=1 TO 5
+520 Q(I)=RND(5)+1
+530 NEXT
+540 RETURN`,
+  },
+
+  card: {
+    name: 'CARD',
+    description: 'Card matching game - simplified version (from F-BASIC Manual p.100)',
+    category: 'comprehensive',
+    bgKey: 'card',
+    code: `10 VIEW
+20 CGEN 3
+30 CGSET 1,1
+40 SPRITE ON
+50 CX=0
+60 CY=0
+70 P=0
+80 ED=0
+90 N$=CHR$(254)
+100 N$=N$+N$+N$+N$
+110 M0$=CHR$(243)+CHR$(247)
+120 M1$=CHR$(245)+CHR$(248)
+130 DIM D(5,5),PT(17),PR(1)
+140 FOR I=0 TO 5
+150 FOR J=0 TO 5
+160 LOCATE I*4+1,J*3+1
+170 PRINT M0$
+180 LOCATE I*4+1,J*3+2
+190 PRINT M1$
+200 A=RND(18)
+210 IF PT(A)=2 THEN 200
+220 D(I,J)=A
+230 PT(A)=PT(A)+1
+240 NEXT
+250 NEXT
+260 PALETS 0,13,&H12,&H22,2
+270 PALETS 1,13,&H14,&H24,4
+280 PALETS 2,13,&H16,&H26,6
+290 PALETS 3,13,2,25,&H36
+300 DEF SPRITE 0,(3,1,0,0,0)=N$
+310 DEF SPRITE 5,(3,1,0,0,0)=N$
+320 LOCATE 25,9:PRINT "LEFT"
+330 LOCATE 25,12:PRINT "RIGHT"
+340 T0=-1
+350 T1=-1
+360 SPRITE 0,CX*32+24,CY*24+31
+370 S=STICK(P)
+380 T=STRIG(P)
+390 IF S=1 THEN CX=CX+1
+400 IF CX>5 THEN CX=0
+410 IF S=2 THEN CX=CX-1
+420 IF CX<0 THEN CX=5
+430 IF S=4 THEN CY=CY+1
+440 IF CY>5 THEN CY=0
+450 IF S=8 THEN CY=CY-1
+460 IF CY<0 THEN CY=5
+470 IF S<>0 THEN SPRITE 0,CX*32+24,CY*24+31
+480 IF T<8 THEN 370
+490 SWAP D(CX,CY),T0
+500 IF T0=-1 THEN 520
+510 GOTO 540
+520 SWAP D(CX,CY),T0
+530 GOTO 370
+540 SPRITE 0,0,0
+550 PLAY "05T1C1C1"
+560 PAUSE 10
+570 LOCATE CX*4+1,CY*3+1:PRINT " "
+580 LOCATE CX*4+1,CY*3+2:PRINT " "
+590 TC=T0/6
+600 IF TC=0 THEN DEF SPRITE 6,(0,1,1,0,0)=CHR$(48+T0)
+610 IF TC=1 THEN DEF SPRITE 6,(1,1,1,0,0)=CHR$(48+T0-6)
+620 IF TC=2 THEN DEF SPRITE 6,(2,1,1,0,0)=CHR$(48+T0-12)
+630 IF TC=3 THEN DEF SPRITE 6,(3,1,1,0,0)=CHR$(48+T0-18)
+640 SPRITE 6,CX*32+24,CY*24+31
+650 IF T1=-1 THEN 680
+660 IF T0<>T1 THEN 720
+670 GOTO 700
+680 T1=T0
+690 X=CX:Y=CY:P=1-P:GOTO 370
+700 PLAY "T204C1E1G1"
+710 ED=ED+1
+720 IF ED=18 THEN 800
+730 PR(P)=PR(P)+10
+740 LOCATE 23,10+P*3:PRINT PR(P)
+750 T0=-1:T1=-1
+760 SPRITE 6,0,0
+770 SPRITE 7,0,0
+780 GOTO 360
+800 PRINT "GAME OVER!"
+810 FOR J=0 TO 1
+820 LOCATE 10,10+J:PRINT "PLAYER";J;"=";PR(J)
+830 NEXT
+840 PRINT "PRESS RUN TO PLAY AGAIN"
+850 END`,
+  },
+
+  scrSample: {
+    name: 'SCR$ Sample',
+    description: 'Penguin chase demo - collect flags while avoiding the smiley (from F-BASIC Manual p.101)',
+    category: 'comprehensive',
+    bgKey: 'scrSample',
+    code: `10 VIEW
+20 PLAY "04C1D1A1G1E1B"
+30 SPRITE ON
+40 CGSET 1,0
+50 PX=50:PY=56:MX=190:MY=150:DEF MOVE(0)=SPRITE(4,0,1,1,0,0):POSITION 0,PX,PY
+60 DX=PX-MX:DY=PY-MY
+70 IF ABS(DX)<8 AND ABS(DY)<8 THEN 360
+80 S1=-1*(DX>0)-2*(DX<0):S2=-4*(DY>0)-8*(DY<0)
+90 IF ABS(DX)<ABS(DY) THEN SWAP S1,S2
+100 S=S1:GOSUB 270:GOSUB 290
+110 IF D<>0 THEN 140
+120 SWAP S1,S2:S=S1:GOSUB 270:GOSUB 290
+130 IF D=0 THEN 160
+140 DEF MOVE(1)=SPRITE(11,0,1,3,0,0):POSITION 1,MX,MY
+150 MOVE 1:PLAY "01C1C1C1"
+160 S0=STICK(0)
+170 S=S0:GOSUB 280:GOSUB 290
+180 IF D=0 THEN 250
+190 DEF MOVE(0)=SPRITE(4,D,1,3,0,0)
+200 POSITION 0,PX,PY
+210 MOVE 0:PLAY "03B1D1"
+220 XX=(PX+7)/8-2:YY=(PY+7)/8-3
+230 IF SCR$(XX,YY)=CHR$(199) THEN LOCATE XX,YY:PRINT " ":CN=CN+1:LOCATE 10,23:PRINT "SCORE:";CN:PLAY "04C1A1G1"
+240 IF MOVE(0)=-1 OR MOVE(1)=-1 THEN 240
+250 PX=XPOS(0):PY=YPOS(0):MX=XPOS(1):MY=YPOS(1)
+260 GOTO 60
+270 X=MX-(S=1)*4+(S=2)*4:Y=MY-(S=4)*4+(S=8)*4:RETURN
+280 X=PX-(S=1)*4+(S=2)*4:Y=PY-(S=4)*4+(S=8)*4:RETURN
+290 C1=(X-1)/8-2:L1=(Y-1)/8-3
+300 C2=X+16:C2=(C2-1)/8-2:L2=Y+16:L2=(L2-1)/8-3
+310 D=-3*(S=1)*(SCR$(C2,L1)=" ")*(SCR$(C2,L2)=" ")
+320 D=D-7*(S=2)*(SCR$(C1,L1)=" ")*(SCR$(C1,L2)=" ")
+330 D=D-1*(S=8)*(SCR$(C1,L1)=" ")*(SCR$(C2,L1)=" ")
+340 D=D-5*(S=4)*(SCR$(C1,L2)=" ")*(SCR$(C2,L2)=" ")
+350 RETURN
+360 PLAY "04G1C1G1":FOR Q=0 TO 3:CGSET 0,0:CGSET 1,1:CGSET 0,0:NEXT
+370 PLAY "01C1G1A1C1D1":CLS:SPRITE OFF
+380 LOCATE 5,10:PRINT "-END-"`,
   },
 }
 

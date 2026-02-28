@@ -66,8 +66,17 @@ const DEFAULT_LENGTH_CODE = 5
  * Calculate frequency in Hz for a given note and octave
  * Uses equal temperament tuning with A4 = 440Hz
  *
+ * F-BASIC Octave Mapping:
+ * F-BASIC uses octave numbers O0-O5, which map to standard MIDI octaves with a +2 offset:
+ * - F-BASIC O0 = Standard O2 (low bass, ~65 Hz for C)
+ * - F-BASIC O2 = Standard O4 (middle C range, ~262 Hz for C)
+ * - F-BASIC O3 = Standard O5 (treble range, ~523 Hz for C)
+ * - F-BASIC O5 = Standard O7 (high range, ~2093 Hz for C)
+ *
+ * This mapping aligns F-BASIC's O2 with the treble clef range where melodies are typically written.
+ *
  * @param noteName - Note letter (C, D, E, F, G, A, B)
- * @param octave - Octave number (0-5)
+ * @param octave - F-BASIC octave number (0-5)
  * @param sharp - Whether the note is sharp (#)
  * @returns Frequency in Hz
  */
@@ -77,10 +86,11 @@ export function calculateNoteFrequency(noteName: string, octave: number, sharp: 
     throw new Error(`Invalid note name: ${noteName}`)
   }
 
-  // Calculate MIDI note number
-  // C0 = 12, so formula is: octave * 12 + semitone + 12
+  // Calculate MIDI note number with F-BASIC octave offset (+2)
+  // F-BASIC O2 maps to Standard O4 (Middle C range)
+  // Formula: (fbasicOctave + 2) * 12 + semitone + 12
   const semitone = baseSemitone + (sharp ? 1 : 0)
-  const midiNote = octave * 12 + semitone + 12
+  const midiNote = (octave + 2) * 12 + semitone + 12
 
   // Calculate frequency using equal temperament formula
   // f = 440 * 2^((n-69)/12) where n is MIDI note number and A4=69

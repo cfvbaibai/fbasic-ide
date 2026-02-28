@@ -15,26 +15,27 @@ import { SoundStateManager } from '@/core/sound/SoundStateManager'
 import { isNote, isRest } from '@/core/sound/types'
 
 describe('calculateNoteFrequency', () => {
-  test('calculates C4 (middle C) frequency', () => {
-    const freq = calculateNoteFrequency('C', 4, false)
+  // F-BASIC octave mapping: F-BASIC O2 = Standard O4 (Middle C range)
+  test('calculates F-BASIC O2 C (middle C) frequency', () => {
+    const freq = calculateNoteFrequency('C', 2, false)
     expect(freq).toBeCloseTo(261.63, 1)
   })
 
-  test('calculates A4 (440Hz standard)', () => {
-    const freq = calculateNoteFrequency('A', 4, false)
+  test('calculates F-BASIC O2 A (440Hz standard)', () => {
+    const freq = calculateNoteFrequency('A', 2, false)
     expect(freq).toBeCloseTo(440.0, 1)
   })
 
-  test('calculates C#4 frequency', () => {
-    const freq = calculateNoteFrequency('C', 4, true)
+  test('calculates F-BASIC O2 C# frequency', () => {
+    const freq = calculateNoteFrequency('C', 2, true)
     expect(freq).toBeCloseTo(277.18, 1)
   })
 
   test('calculates different octaves', () => {
-    const c0 = calculateNoteFrequency('C', 0, false)
-    const c1 = calculateNoteFrequency('C', 1, false)
-    const c2 = calculateNoteFrequency('C', 2, false)
-    const c3 = calculateNoteFrequency('C', 3, false)
+    const c0 = calculateNoteFrequency('C', 0, false) // Standard O2 C
+    const c1 = calculateNoteFrequency('C', 1, false) // Standard O3 C
+    const c2 = calculateNoteFrequency('C', 2, false) // Standard O4 C (Middle C)
+    const c3 = calculateNoteFrequency('C', 3, false) // Standard O5 C
 
     // Each octave doubles the frequency
     expect(c1 / c0).toBeCloseTo(2, 1)
@@ -43,7 +44,7 @@ describe('calculateNoteFrequency', () => {
   })
 
   test('throws on invalid note name', () => {
-    expect(() => calculateNoteFrequency('H', 4, false)).toThrow('Invalid note name: H')
+    expect(() => calculateNoteFrequency('H', 2, false)).toThrow('Invalid note name: H')
   })
 })
 
@@ -208,7 +209,7 @@ describe('parseChannelMusic', () => {
     const manager = new SoundStateManager()
     const events = parseChannelMusic('O5CDE', manager, 0)
 
-    // All notes should use octave 5
+    // All notes should use octave 5 (F-BASIC O5 = Standard O7, ~2093+ Hz)
     expect(isNote(events[0]!) && events[0].frequency).toBeGreaterThan(500) // High octave
     expect(isNote(events[1]!) && events[1].frequency).toBeGreaterThan(500)
     expect(isNote(events[2]!) && events[2].frequency).toBeGreaterThan(500)
@@ -326,11 +327,12 @@ describe('parseMusic', () => {
 
     expect(command.channels).toHaveLength(3)
 
-    // Each channel has its own octave setting
+    // Each channel has its own octave setting (F-BASIC octaves map to standard + 2)
     const c0 = command.channels[0]![0]!
     const c1 = command.channels[1]![0]!
     const c2 = command.channels[2]![0]!
 
+    // F-BASIC O5 C = Standard O7 C, F-BASIC O4 E = Standard O6 E, F-BASIC O1 G = Standard O3 G
     expect(isNote(c0) && c0.frequency).toBeCloseTo(calculateNoteFrequency('C', 5, false), 1)
     expect(isNote(c1) && c1.frequency).toBeCloseTo(calculateNoteFrequency('E', 4, false), 1)
     expect(isNote(c2) && c2.frequency).toBeCloseTo(calculateNoteFrequency('G', 1, false), 1)
@@ -356,6 +358,7 @@ describe('parseMusic', () => {
       expect(note.duty).toEqual(0)
       expect(note.envelope).toEqual(1)
       expect(note.volumeOrLength).toEqual(9)
+      // F-BASIC O5 C maps to Standard O7 C
       expect(note.frequency).toBeCloseTo(calculateNoteFrequency('C', 5, false), 1)
     }
   })
