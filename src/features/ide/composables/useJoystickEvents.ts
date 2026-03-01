@@ -1,5 +1,5 @@
 import { useIntervalFn, useTimeoutFn } from '@vueuse/core'
-import { onDeactivated, onUnmounted, ref } from 'vue'
+import { onDeactivated, onUnmounted, ref, shallowRef } from 'vue'
 
 import { type JoystickBufferView, setStickState } from '@/core/devices'
 import { logComposable } from '@/shared/logger'
@@ -40,20 +40,19 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
   // Track which buttons are currently "held" (toggle state)
   const heldButtons = ref<Record<string, boolean>>({})
 
+  // Track which action buttons are currently pressed (for simultaneous button detection)
+  const pressedActionButtons = ref<Set<string>>(new Set())
+
   // Track which D-pad buttons are being held for periodic triggering
   // Store the pause function from useIntervalFn (Pausable interface)
   const heldDpadButtons = ref<Record<string, (() => void) | null>>({})
   const dpadRepeatInterval = 100 // Repeat every 100ms when held
 
   // Track if we're actively using manual controls to prevent polling interference
-  const usingManualControls = ref(false)
-  const actionButtonActive = ref(false)
+  const usingManualControls = shallowRef(false)
 
   // Track flashing state for table cells
   const flashingCells = ref<Record<string, boolean>>({})
-
-  // Track STRIG reset timers - store the stop function from useTimeoutFn
-  const strigResetTimers = ref<Record<number, (() => void) | null>>({})
 
   // Helper function to flash a table cell
   const flashCell = (cellKey: string) => {
@@ -65,29 +64,8 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
     onCellFlash?.(cellKey)
   }
 
-  // Helper function to reset STRIG value after delay
-  const resetStrigValue = (joystickId: number) => {
-    // Stop existing timer if any
-    if (strigResetTimers.value[joystickId]) {
-      strigResetTimers.value[joystickId]()
-      strigResetTimers.value[joystickId] = null
-    }
-
-    // Set new timer to reset STRIG value after 300ms
-    const { start, stop } = useTimeoutFn(() => {
-      if (sendStrigEvent) {
-        sendStrigEvent(joystickId, 0)
-        logComposable.debug('Sending STRIG reset (message passing):', { joystickId })
-      }
-      onStrigStateChange?.(joystickId, 0)
-      strigResetTimers.value[joystickId] = null
-    }, 300)
-    strigResetTimers.value[joystickId] = stop
-    start()
-  }
-
   // D-pad hold and repeat functions
-  const startDpadHold = async (joystickId: number, direction: 'up' | 'down' | 'left' | 'right') => {
+  const startDpadHold = (joystickId: number, direction: 'up' | 'down' | 'left' | 'right') => {
     const buttonKey = `${joystickId}-${direction}`
 
     // Set manual controls flag to prevent polling interference
@@ -141,7 +119,7 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
     heldDpadButtons.value[buttonKey] = pause
   }
 
-  const stopDpadHold = async (joystickId: number, direction: 'up' | 'down' | 'left' | 'right') => {
+  const stopDpadHold = (joystickId: number, direction: 'up' | 'down' | 'left' | 'right') => {
     const buttonKey = `${joystickId}-${direction}`
 
     // Only process if button was actually being held
@@ -187,19 +165,19 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
     }
   }
 
-  // Toggle action button (pulse effect - only send pressed event)
-  const toggleActionButton = async (joystickId: number, button: 'select' | 'start' | 'a' | 'b') => {
+  // Toggle action button (pulse effect - supports simultaneous button presses)
+  const toggleActionButton = (joystickId: number, button: 'select' | 'start' | 'a' | 'b') => {
     const buttonKey = `${joystickId}-${button}`
 
-    // Prevent multiple triggers if button is already active
-    if (actionButtonActive.value) {
+    // If button is already pressed, ignore (prevent double-press)
+    if (pressedActionButtons.value.has(buttonKey)) {
       return
     }
 
-    // Set action button flag to prevent polling interference
-    actionButtonActive.value = true
+    // Add button to pressed set
+    pressedActionButtons.value.add(buttonKey)
 
-    // Set button to active state
+    // Set button to active state for UI display
     heldButtons.value[buttonKey] = true
 
     // Map button names to STRIG values
@@ -210,30 +188,48 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
       a: 8,
     }
 
-    const strigValue = buttonMap[button] ?? 0
+    // Calculate combined STRIG value from ALL currently pressed buttons
+    let combinedStrigValue = 0
+    for (const pressedKey of pressedActionButtons.value) {
+      if (pressedKey.startsWith(`${joystickId}-`)) {
+        const btn = pressedKey.split('-')[1] as 'select' | 'start' | 'a' | 'b'
+        combinedStrigValue |= buttonMap[btn] ?? 0
+      }
+    }
 
-    // Send STRIG event via message passing (consume pattern)
+    // Send combined STRIG event via message passing (consume pattern)
     // STRIG always uses message passing, NOT shared buffer (unlike STICK)
-    if (sendStrigEvent && strigValue > 0) {
-      sendStrigEvent(joystickId, strigValue)
+    if (sendStrigEvent && combinedStrigValue > 0) {
+      sendStrigEvent(joystickId, combinedStrigValue)
     }
 
     // Update local state for display
-    onStrigStateChange?.(joystickId, strigValue)
+    onStrigStateChange?.(joystickId, combinedStrigValue)
 
     // Flash the STRIG cell
     flashCell(`strig-${joystickId}`)
 
-    // Set up timer to reset STRIG value after 300ms
-    resetStrigValue(joystickId)
-
-    // Reset button state immediately after sending pressed event
+    // Set up timer to reset this button and recalculate combined value
     const { start } = useTimeoutFn(() => {
+      // Remove this button from pressed set
+      pressedActionButtons.value.delete(buttonKey)
       heldButtons.value[buttonKey] = false
 
-      // Allow polling to resume after action button is processed
-      actionButtonActive.value = false
-    }, 50) // Short delay to ensure pressed event is processed
+      // Recalculate and send new combined value (0 if no buttons pressed)
+      let newCombinedValue = 0
+      for (const pressedKey of pressedActionButtons.value) {
+        if (pressedKey.startsWith(`${joystickId}-`)) {
+          const btn = pressedKey.split('-')[1] as 'select' | 'start' | 'a' | 'b'
+          newCombinedValue |= buttonMap[btn] ?? 0
+        }
+      }
+
+      // Send updated STRIG value
+      if (sendStrigEvent) {
+        sendStrigEvent(joystickId, newCombinedValue)
+      }
+      onStrigStateChange?.(joystickId, newCombinedValue)
+    }, 300) // Hold for 300ms to allow simultaneous detection
     start()
   }
 
@@ -247,13 +243,8 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
     }
     heldDpadButtons.value = {}
 
-    // Clean up all STRIG timers (stop them)
-    for (const [_joystickId, stopFn] of Object.entries(strigResetTimers.value)) {
-      if (stopFn) {
-        stopFn()
-      }
-    }
-    strigResetTimers.value = {}
+    // Clear pressed action buttons
+    pressedActionButtons.value.clear()
   }
 
   // Clean up on unmount AND deactivation (keep-alive)
